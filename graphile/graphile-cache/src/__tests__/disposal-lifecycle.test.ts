@@ -5,11 +5,22 @@ jest.mock('@pgpmjs/logger', () => ({
   })),
 }));
 
+jest.mock('pg-cache', () => ({
+  pgCache: {
+    registerCleanupCallback: jest.fn(() => jest.fn()),
+    close: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import type { GraphileCacheEntry } from '../graphile-cache';
 import {
+  assertGraphileCacheOpen,
   clearGraphileCache,
+  clearMatchingEntries,
+  closeAllCaches,
   disposeUncachedEntry,
   graphileCache,
+  trackGraphileBuild,
   waitForEntryDisposal,
 } from '../graphile-cache';
 
@@ -32,7 +43,8 @@ const flushPromises = (): Promise<void> =>
 const makeEntry = (
   cacheKey: string,
   release = jest.fn().mockResolvedValue(undefined),
-  releasePresetServices = jest.fn().mockResolvedValue(undefined)
+  releasePresetServices = jest.fn().mockResolvedValue(undefined),
+  releaseRuntimePool = jest.fn().mockResolvedValue(undefined)
 ): GraphileCacheEntry =>
   ({
     pgl: { release },
@@ -42,6 +54,7 @@ const makeEntry = (
     cacheKey,
     createdAt: Date.now(),
     releasePresetServices,
+    releaseRuntimePool,
   }) as unknown as GraphileCacheEntry;
 
 describe('Graphile cache disposal lifecycle', () => {
@@ -171,5 +184,58 @@ describe('Graphile cache disposal lifecycle', () => {
 
     expect(firstRelease).toHaveBeenCalledTimes(1);
     expect(secondRelease).toHaveBeenCalledTimes(1);
+  });
+
+  it('releases the runtime pool after services even when service cleanup fails', async () => {
+    const serviceFailure = new Error('service release failed');
+    const events: string[] = [];
+    const release = jest.fn(async () => {
+      events.push('pgl');
+    });
+    const releasePresetServices = jest.fn(async () => {
+      events.push('services');
+      throw serviceFailure;
+    });
+    const releaseRuntimePool = jest.fn(async () => {
+      events.push('runtime-pool');
+    });
+    const entry = makeEntry(
+      'release-order',
+      release,
+      releasePresetServices,
+      releaseRuntimePool
+    );
+
+    await expect(disposeUncachedEntry(entry)).rejects.toBe(serviceFailure);
+    expect(events).toEqual(['pgl', 'services', 'runtime-pool']);
+    expect(releaseRuntimePool).toHaveBeenCalledTimes(1);
+  });
+
+  it('matches targeted clears against logical service keys', async () => {
+    const entry = makeEntry('opaque-pool-key:one');
+    entry.logicalServiceKey = 'service:one';
+    graphileCache.set(entry.cacheKey, entry);
+
+    expect(clearMatchingEntries(/^service:/)).toBe(1);
+    await waitForEntryDisposal(entry);
+  });
+
+  it('blocks new builds during close and disposes a build that finishes then', async () => {
+    const build = deferred<GraphileCacheEntry>();
+    const release = jest.fn().mockResolvedValue(undefined);
+    const entry = makeEntry('closing-build', release);
+    const tracked = trackGraphileBuild(() => build.promise);
+    const closing = closeAllCaches();
+
+    expect(() => assertGraphileCacheOpen()).toThrow('Graphile cache is closing');
+    expect(() => trackGraphileBuild(() => Promise.resolve(entry))).toThrow(
+      'Graphile cache is closing'
+    );
+
+    build.resolve(entry);
+    await expect(tracked).rejects.toThrow('Graphile cache is closing');
+    await closing;
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(() => assertGraphileCacheOpen()).not.toThrow();
   });
 });

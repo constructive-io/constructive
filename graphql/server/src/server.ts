@@ -9,7 +9,7 @@ import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
-import { closeAllCaches,graphileCache } from 'graphile-cache';
+import { clearGraphileCache, closeAllCaches } from 'graphile-cache';
 import graphqlUpload from 'graphql-upload';
 import type { Server as HttpServer } from 'http';
 import { Pool, PoolClient } from 'pg';
@@ -171,6 +171,9 @@ class Server {
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
+      runtimePg: effectiveOpts.runtimePg,
+      runtimePgStaticIdentity: effectiveOpts.runtimePgStaticIdentity,
+      runtimePgResolver: effectiveOpts.runtimePgResolver,
       dependencySchemas: effectiveOpts.graphile?.introspectionDependencySchemas,
       loaders: createDefaultRegistry(),
       routingSchema: getRoutingSchema(effectiveOpts)
@@ -392,7 +395,7 @@ class Server {
     if (closePools) {
       await closeAllCaches();
     } else {
-      graphileCache.clear();
+      await clearGraphileCache();
     }
   }
 

@@ -6,11 +6,16 @@ import { graphileCache } from 'graphile-cache';
 import { createFlushMiddleware } from '../flush';
 
 const TOKEN = 'flush-secret-token';
+const SERVICE_KEY = 'tenant.example.com';
+const ROTATED_CACHE_KEYS = [
+  `${SERVICE_KEY}:runtime:old`,
+  `${SERVICE_KEY}:runtime:new`,
+];
 
 const makeReq = (url: string, authorization?: string): Request => {
   const req: any = {
     url,
-    svc_key: 'tenant.example.com',
+    svc_key: SERVICE_KEY,
     get: (name: string) =>
       name.toLowerCase() === 'authorization' ? authorization : undefined
   };
@@ -44,8 +49,9 @@ describe('createFlushMiddleware', () => {
   });
 
   afterEach(() => {
-    graphileCache.delete('tenant.example.com');
-    svcCache.delete('tenant.example.com');
+    graphileCache.delete(SERVICE_KEY);
+    for (const key of ROTATED_CACHE_KEYS) graphileCache.delete(key);
+    svcCache.delete(SERVICE_KEY);
   });
 
   it('passes non-flush requests through', async () => {
@@ -63,8 +69,31 @@ describe('createFlushMiddleware', () => {
       next
     );
     expect(res.statusCode).toBe(200);
-    expect(graphileCache.get('tenant.example.com')).toBeUndefined();
-    expect(svcCache.get('tenant.example.com')).toBeUndefined();
+    expect(graphileCache.get(SERVICE_KEY)).toBeUndefined();
+    expect(svcCache.get(SERVICE_KEY)).toBeUndefined();
+  });
+
+  it('flushes every physical generation for one logical service key', async () => {
+    graphileCache.set(ROTATED_CACHE_KEYS[0], {
+      cached: 'old-credentials',
+      logicalServiceKey: SERVICE_KEY,
+    } as any);
+    graphileCache.set(ROTATED_CACHE_KEYS[1], {
+      cached: 'new-credentials',
+      logicalServiceKey: SERVICE_KEY,
+    } as any);
+
+    const res = makeRes();
+    await createFlushMiddleware(opts(TOKEN))(
+      makeReq('/flush', `Bearer ${TOKEN}`),
+      res,
+      next
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(graphileCache.get(ROTATED_CACHE_KEYS[0])).toBeUndefined();
+    expect(graphileCache.get(ROTATED_CACHE_KEYS[1])).toBeUndefined();
+    expect(svcCache.get(SERVICE_KEY)).toBeUndefined();
   });
 
   it.each([
@@ -82,8 +111,8 @@ describe('createFlushMiddleware', () => {
     );
     expect(res.statusCode).toBe(401);
     expect(next).not.toHaveBeenCalled();
-    expect(graphileCache.get('tenant.example.com')).toBeDefined();
-    expect(svcCache.get('tenant.example.com')).toBeDefined();
+    expect(graphileCache.get(SERVICE_KEY)).toBeDefined();
+    expect(svcCache.get(SERVICE_KEY)).toBeDefined();
   });
 
   it('keeps the route closed when no token is configured', async () => {
@@ -94,7 +123,7 @@ describe('createFlushMiddleware', () => {
       next
     );
     expect(res.statusCode).toBe(404);
-    expect(graphileCache.get('tenant.example.com')).toBeDefined();
-    expect(svcCache.get('tenant.example.com')).toBeDefined();
+    expect(graphileCache.get(SERVICE_KEY)).toBeDefined();
+    expect(svcCache.get(SERVICE_KEY)).toBeDefined();
   });
 });

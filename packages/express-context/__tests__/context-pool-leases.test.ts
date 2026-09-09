@@ -2,13 +2,19 @@ import { EventEmitter } from 'node:events';
 
 import type { Request, Response } from 'express';
 import type { Pool } from 'pg';
-import { acquirePgPool, getPgPool, getPgPoolIdentity } from 'pg-cache';
+import {
+  acquirePgPool,
+  getPgDatabaseTargetIdentity,
+  getPgPool,
+  getPgPoolIdentity,
+} from 'pg-cache';
 
 import { buildContext, createContextMiddleware } from '../src/context';
 import type { ApiStructure } from '../src/types';
 
 jest.mock('pg-cache', () => ({
   acquirePgPool: jest.fn(),
+  getPgDatabaseTargetIdentity: jest.fn(() => 'pg-target:test'),
   getPgPool: jest.fn(),
   getPgPoolIdentity: jest.fn(() => 'pg:v1:test'),
 }));
@@ -17,6 +23,9 @@ const mockedAcquire = acquirePgPool as jest.MockedFunction<
   typeof acquirePgPool
 >;
 const mockedGet = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const mockedTarget = getPgDatabaseTargetIdentity as jest.MockedFunction<
+  typeof getPgDatabaseTargetIdentity
+>;
 const mockedIdentity = getPgPoolIdentity as jest.MockedFunction<
   typeof getPgPoolIdentity
 >;
@@ -62,15 +71,16 @@ const makeResponse = (): Response => {
 };
 
 let leaseSequence = 0;
-const leaseFor = (pool: Pool) => ({
+const leaseFor = (pool: Pool, identity = 'pg:v1:test') => ({
   pool,
-  identity: `pg:v1:lease-${++leaseSequence}`,
+  identity: identity || `pg:v1:lease-${++leaseSequence}`,
   release: jest.fn(),
 });
 
 describe('context PostgreSQL identities and lifetimes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedTarget.mockReturnValue('pg-target:test');
     mockedIdentity.mockReturnValue('pg:v1:test');
   });
 
@@ -159,6 +169,113 @@ describe('context PostgreSQL identities and lifetimes', () => {
       })
     );
     expect(mockedAcquire).not.toHaveBeenCalled();
+  });
+
+  it('rejects a runtime config whose physical target differs from control', () => {
+    mockedTarget
+      .mockReturnValueOnce('pg-target:control')
+      .mockReturnValueOnce('pg-target:runtime');
+    const next = jest.fn();
+
+    createContextMiddleware({
+      pg: { host: 'control.internal' },
+      runtimePg: {
+        host: 'runtime.internal',
+        database: 'tenant_a',
+        user: 'runtime',
+        password: 'runtime-secret',
+      },
+      runtimePgStaticIdentity: runtimeRoute,
+    })(makeRequest(), makeResponse(), next);
+
+    expect(next.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        message: expect.stringContaining('target does not match'),
+      })
+    );
+    expect(next.mock.calls[0][0].message).not.toContain('runtime-secret');
+    expect(mockedAcquire).not.toHaveBeenCalled();
+  });
+
+  it('retains runtime only while identity and request lifetime remain valid', () => {
+    const initial = leaseFor(makePool());
+    const retained = leaseFor(makePool());
+    mockedAcquire
+      .mockReturnValueOnce(initial)
+      .mockReturnValueOnce(retained);
+    const request = makeRequest();
+    const response = makeResponse();
+    const next = jest.fn();
+
+    createContextMiddleware({
+      runtimePg: {
+        database: 'tenant_a',
+        user: 'runtime',
+        password: 'runtime-secret',
+      },
+      runtimePgStaticIdentity: runtimeRoute,
+    })(request, response, next);
+
+    expect(request.constructive?.retainRuntimePool?.()).toBe(retained);
+    expect(mockedAcquire).toHaveBeenCalledWith(
+      {
+        database: 'tenant_a',
+        user: 'runtime',
+        password: 'runtime-secret',
+      },
+      { purpose: 'runtime' }
+    );
+    retained.release();
+    response.emit('finish');
+  });
+
+  it('releases a retained lease when its identity changes after acquisition', () => {
+    const initial = leaseFor(makePool());
+    const mismatch = leaseFor(makePool(), 'pg:v1:changed');
+    mockedAcquire
+      .mockReturnValueOnce(initial)
+      .mockReturnValueOnce(mismatch);
+    const request = makeRequest();
+    const response = makeResponse();
+    const next = jest.fn();
+
+    createContextMiddleware({
+      runtimePg: {
+        database: 'tenant_a',
+        user: 'runtime',
+        password: 'runtime-secret',
+      },
+      runtimePgStaticIdentity: runtimeRoute,
+    })(request, response, next);
+
+    expect(() => request.constructive?.retainRuntimePool?.()).toThrow(
+      'changed after retention'
+    );
+    expect(mismatch.release).toHaveBeenCalledTimes(1);
+    response.emit('finish');
+  });
+
+  it('rejects runtime retention after the request has ended', () => {
+    const initial = leaseFor(makePool());
+    mockedAcquire.mockReturnValue(initial);
+    const request = makeRequest();
+    const response = makeResponse();
+    const next = jest.fn();
+
+    createContextMiddleware({
+      runtimePg: {
+        database: 'tenant_a',
+        user: 'runtime',
+        password: 'runtime-secret',
+      },
+      runtimePgStaticIdentity: runtimeRoute,
+    })(request, response, next);
+    (response as any).writableEnded = true;
+
+    expect(() => request.constructive?.retainRuntimePool?.()).toThrow(
+      'after request ended'
+    );
+    response.emit('finish');
   });
 
   it('passes frozen credential-free facts to the runtime resolver', () => {

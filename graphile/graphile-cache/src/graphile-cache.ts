@@ -8,6 +8,8 @@ import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { PostGraphileInstance } from 'postgraphile';
 
+import { retireGraphileEntry } from './runtime-entry-usage';
+
 const log = new Logger('graphile-cache');
 
 // --- Time Constants ---
@@ -88,15 +90,82 @@ export interface GraphileCacheEntry {
   createdAt: number;
   /** Idempotent release for pgServices owned by this exact preset generation. */
   releasePresetServices?: () => Promise<void>;
+  /** Opaque runtime pool identity retained by this exact Graphile generation. */
+  runtimePoolIdentity?: string;
+  /** Logical service key used for matching entries during targeted flushes. */
+  logicalServiceKey?: string;
+  /** Release the cache owner's runtime pool lease after preset services release. */
+  releaseRuntimePool?: () => void | Promise<void>;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
 }
 
 const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
 const activeDisposals = new Set<Promise<void>>();
+const activeBuilds = new Set<Promise<GraphileCacheEntry>>();
+let graphileCacheClosing = false;
+let graphileCacheEpoch = 0;
 
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
+
+const GRAPHILE_CACHE_CLOSING = 'Graphile cache is closing';
+
+/** Throw synchronously when a new Graphile build cannot be admitted. */
+export const assertGraphileCacheOpen = (): void => {
+  if (graphileCacheClosing) {
+    throw new Error(GRAPHILE_CACHE_CLOSING);
+  }
+};
+
+/**
+ * Admit one complete Graphile build and retain it through settlement. A build
+ * that completes after shutdown begins is disposed rather than being
+ * published into the cache.
+ */
+export function trackGraphileBuild(
+  factory: () => Promise<GraphileCacheEntry>
+): Promise<GraphileCacheEntry> {
+  assertGraphileCacheOpen();
+  const buildEpoch = graphileCacheEpoch;
+
+  let resolveTracked!: (entry: GraphileCacheEntry) => void;
+  let rejectTracked!: (error: unknown) => void;
+  const tracked = new Promise<GraphileCacheEntry>((resolve, reject) => {
+    resolveTracked = resolve;
+    rejectTracked = reject;
+  });
+  activeBuilds.add(tracked);
+  void tracked.then(
+    () => activeBuilds.delete(tracked),
+    () => activeBuilds.delete(tracked)
+  );
+
+  let factoryPromise: Promise<GraphileCacheEntry>;
+  try {
+    factoryPromise = Promise.resolve(factory());
+  } catch (error) {
+    rejectTracked(error);
+    return tracked;
+  }
+
+  void factoryPromise
+    .then(async (entry) => {
+      if (graphileCacheClosing || buildEpoch !== graphileCacheEpoch) {
+        await disposeUncachedEntry(entry);
+        throw new Error(GRAPHILE_CACHE_CLOSING);
+      }
+      return entry;
+    })
+    .then(resolveTracked, rejectTracked);
+  return tracked;
+}
+
+const waitForActiveBuilds = async (): Promise<void> => {
+  while (activeBuilds.size > 0) {
+    await Promise.allSettled([...activeBuilds]);
+  }
+};
 
 /**
  * Dispose a PostGraphile v5 cache entry
@@ -113,6 +182,7 @@ const releaseEntry = async (
   log.debug(`Disposing PostGraphile[${key}]`);
   let firstError: unknown;
   let failed = false;
+  await retireGraphileEntry(entry);
   try {
     if (entry.httpServer?.listening) {
       await new Promise<void>((resolve) => {
@@ -139,6 +209,12 @@ const releaseEntry = async (
   }
   try {
     await entry.releasePresetServices?.();
+  } catch (error) {
+    if (!failed) firstError = error;
+    failed = true;
+  }
+  try {
+    await entry.releaseRuntimePool?.();
   } catch (error) {
     if (!failed) firstError = error;
     failed = true;
@@ -258,7 +334,10 @@ export function clearMatchingEntries(pattern: RegExp): number {
   let cleared = 0;
 
   for (const key of graphileCache.keys()) {
-    if (pattern.test(key)) {
+    const entry = graphileCache.peek(key);
+    const matchKey = entry?.logicalServiceKey ?? key;
+    pattern.lastIndex = 0;
+    if (pattern.test(matchKey)) {
       // Mark as manual eviction before deleting
       manualEvictionKeys.add(key);
       graphileCache.delete(key);
@@ -276,7 +355,11 @@ const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
 
   // Remove graphile entries that reference this pool key
   graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
+    if (
+      entry.runtimePoolIdentity === undefined || entry.runtimePoolIdentity === null
+        ? entry.cacheKey.includes(pgPoolKey)
+        : entry.runtimePoolIdentity === pgPoolKey
+    ) {
       log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
       manualEvictionKeys.add(k);
       graphileCache.delete(k);
@@ -311,10 +394,13 @@ export const clearGraphileCache = async (): Promise<void> => {
 export const closeAllCaches = async (verbose = false): Promise<void> => {
   if (closePromise.promise) return closePromise.promise;
 
+  graphileCacheClosing = true;
+  graphileCacheEpoch += 1;
   closePromise.promise = (async () => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
+      await waitForActiveBuilds();
       await clearGraphileCache();
 
       // Close pg pools
@@ -322,6 +408,7 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
 
       if (verbose) log.success('All caches disposed.');
     } finally {
+      graphileCacheClosing = false;
       closePromise.promise = null;
     }
   })();

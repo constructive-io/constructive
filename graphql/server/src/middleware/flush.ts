@@ -12,6 +12,14 @@ import { getRoutingSchema, isValidSchemaName } from './routing';
 
 const log = new Logger('flush');
 
+// Credential rotations create multiple physical generations for one logical
+// service. A service flush retires every such generation.
+const flushGraphileService = (serviceKey: string): void => {
+  graphileCache.forEach((entry, key) => {
+    if ((entry.logicalServiceKey ?? key) === serviceKey) graphileCache.delete(key);
+  });
+};
+
 const bearerToken = (req: Request): string | null => {
   const header = req.get('authorization');
   if (!header) return null;
@@ -61,7 +69,7 @@ export const createFlushMiddleware = (
       return;
     }
 
-    graphileCache.delete((req as any).svc_key);
+    flushGraphileService((req as any).svc_key);
     svcCache.delete((req as any).svc_key);
     res.status(200).send('OK');
   };
@@ -79,9 +87,10 @@ export const flushService = async (
   const meta = new RegExp(`^metaschema:api:${databaseId}`);
 
   if (!opts.api.isPublic) {
-    graphileCache.forEach((_, k: string) => {
+    graphileCache.forEach((entry, cacheKey: string) => {
+      const k = entry.logicalServiceKey ?? cacheKey;
       if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
+        graphileCache.delete(cacheKey);
         svcCache.delete(k);
       }
     });
@@ -104,7 +113,7 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
+      flushGraphileService(key);
       svcCache.delete(key);
     }
   }

@@ -24,6 +24,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Pool } from 'pg';
 import {
   acquirePgPool,
+  getPgDatabaseTargetIdentity,
   getPgPool,
   getPgPoolIdentity,
   type GetPgPoolOptions,
@@ -47,10 +48,14 @@ import type {
 
 type PoolConfig = Parameters<typeof acquirePgPool>[0];
 
-/** Secret-bearing config paired with its process-local opaque identity. */
+/** Public metadata for a resolved runtime pool; credentials remain private. */
 export interface RuntimePgPoolResolution {
-  pgConfig: PoolConfig;
   poolIdentity: string;
+}
+
+interface RuntimePgPoolResolutionInternal extends RuntimePgPoolResolution {
+  /** Kept only in the middleware closure; never placed on req.constructive. */
+  pgConfig: PoolConfig;
 }
 
 export interface ContextMiddlewareOptions {
@@ -124,6 +129,15 @@ const sameRuntimeRoute = (
   left.roles[0] === right.roles[0] &&
   left.roles[1] === right.roles[1];
 
+const hasOwnString = (
+  candidate: object,
+  field: 'database' | 'user' | 'password'
+): boolean => {
+  if (!Object.prototype.hasOwnProperty.call(candidate, field)) return false;
+  const value = (candidate as Record<string, unknown>)[field];
+  return typeof value === 'string' && value.length > 0;
+};
+
 const requireExplicitRuntimeConfig = (
   candidate: RuntimePgConfig,
   route: Readonly<RuntimePgResolverInput>,
@@ -135,12 +149,9 @@ const requireExplicitRuntimeConfig = (
     );
   }
   for (const field of ['database', 'user', 'password'] as const) {
-    if (
-      typeof candidate[field] !== 'string' ||
-      candidate[field]!.length === 0
-    ) {
+    if (!hasOwnString(candidate, field)) {
       throw new Error(
-        `Runtime PostgreSQL configuration requires explicit ${field}`
+        'Runtime PostgreSQL configuration requires explicit ' + field
       );
     }
   }
@@ -156,23 +167,35 @@ const makeRuntimeResolution = (
   candidate: RuntimePgConfig,
   route: Readonly<RuntimePgResolverInput>,
   controlPg: PgpmOptions['pg'] | undefined
-): Readonly<RuntimePgPoolResolution> => {
+): Readonly<RuntimePgPoolResolutionInternal> => {
   const pgConfig = requireExplicitRuntimeConfig(candidate, route, controlPg);
+  const controlTarget = getPgDatabaseTargetIdentity({
+    ...controlPg,
+    database: route.databaseName,
+  });
+  const runtimeTarget = getPgDatabaseTargetIdentity(pgConfig);
+  if (controlTarget !== runtimeTarget) {
+    throw new Error(
+      'Runtime PostgreSQL database target does not match the control target'
+    );
+  }
   return Object.freeze({
     pgConfig,
     poolIdentity: getPgPoolIdentity(pgConfig, { purpose: 'runtime' }),
   });
 };
 
-const isPromiseLike = <T>(value: T | Promise<T>): value is Promise<T> =>
-  typeof (value as Promise<T>)?.then === 'function';
+const isPromiseLike = <T>(
+  value: T | PromiseLike<T>
+): value is PromiseLike<T> =>
+    typeof (value as { then?: unknown } | null)?.then === 'function';
 
 const resolveConfiguredRuntime = (
   api: ApiStructure,
   opts: ContextMiddlewareOptions
 ):
-  | Readonly<RuntimePgPoolResolution>
-  | Promise<Readonly<RuntimePgPoolResolution>>
+  | Readonly<RuntimePgPoolResolutionInternal>
+  | Promise<Readonly<RuntimePgPoolResolutionInternal>>
   | undefined => {
   if (opts.runtimePgResolver && opts.runtimePg) {
     throw new Error(
@@ -235,7 +258,10 @@ export function buildContext(
   /** Internal request lifetime; omitted for backwards-compatible direct use. */
   poolLeases?: PgPoolLease[],
   /** Internal async resolver result; raw credentials never enter the request. */
-  suppliedRuntimeResolution?: Readonly<RuntimePgPoolResolution>
+  suppliedRuntimeResolution?: Readonly<RuntimePgPoolResolutionInternal>,
+  /** Request lifetime predicate supplied by the Express middleware. */
+  requestEnded: () => boolean = () =>
+    Boolean(req.aborted || req.socket?.destroyed)
 ): ConstructiveContext | null {
   const api = req.api;
   if (!api) return null;
@@ -262,24 +288,28 @@ export function buildContext(
       );
     }
     const configured = resolveConfiguredRuntime(api, opts);
-    runtimeResolution = configured as
-      Readonly<RuntimePgPoolResolution> | undefined;
+    if (isPromiseLike(configured)) {
+      throw new Error(
+        'runtimePgResolver must be used through createContextMiddleware'
+      );
+    }
+    runtimeResolution = configured;
   }
   const runtimeConfig = runtimeResolution?.pgConfig ?? {
     ...opts.pg,
     database: api.dbname,
   };
+  const expectedRuntimeIdentity =
+    runtimeResolution?.poolIdentity ??
+    getPgPoolIdentity(runtimeConfig, { purpose: 'runtime' });
   const runtimePool = resolvePool(
     runtimeConfig,
     { purpose: 'runtime' },
     poolLeases
   );
-  if (
-    runtimeResolution &&
-    runtimePool.identity !== runtimeResolution.poolIdentity
-  ) {
+  if (runtimePool.identity !== expectedRuntimeIdentity) {
     throw new Error(
-      'Resolved runtime PostgreSQL pool identity changed before acquisition'
+      'Resolved runtime PostgreSQL pool identity changed before context use'
     );
   }
   const tenantPool = runtimePool.pool;
@@ -325,6 +355,30 @@ export function buildContext(
     requestId,
     pool: tenantPool,
     runtimePoolIdentity: runtimePool.identity,
+    retainRuntimePool: () => {
+      if (requestEnded()) {
+        throw new Error(
+          'Cannot retain runtime PostgreSQL pool after request ended'
+        );
+      }
+      const beforeIdentity = getPgPoolIdentity(
+        runtimeConfig,
+        { purpose: 'runtime' }
+      );
+      if (beforeIdentity !== runtimePool.identity) {
+        throw new Error(
+          'Runtime PostgreSQL pool identity changed before retention'
+        );
+      }
+      const lease = acquirePgPool(runtimeConfig, { purpose: 'runtime' });
+      if (lease.identity !== runtimePool.identity) {
+        lease.release();
+        throw new Error(
+          'Runtime PostgreSQL pool identity changed after retention'
+        );
+      }
+      return lease;
+    },
     withPgClient,
     useModule,
     async useBilling() {
@@ -401,7 +455,7 @@ export function createContextMiddleware(
     if (requestEnded()) return;
 
     const finish = (
-      runtimeResolution?: Readonly<RuntimePgPoolResolution>
+      runtimeResolution?: Readonly<RuntimePgPoolResolutionInternal>
     ): void => {
       if (requestEnded()) return;
       const leases: PgPoolLease[] = [];
@@ -416,7 +470,13 @@ export function createContextMiddleware(
       };
 
       try {
-        const ctx = buildContext(req, opts, leases, runtimeResolution);
+        const ctx = buildContext(
+          req,
+          opts,
+          leases,
+          runtimeResolution,
+          requestEnded
+        );
         if (!ctx) {
           releaseLeases();
           next();
@@ -445,7 +505,7 @@ export function createContextMiddleware(
       }
       const resolution = resolveConfiguredRuntime(api, opts);
       if (isPromiseLike(resolution)) {
-        void resolution.then(
+        void Promise.resolve(resolution).then(
           (resolved) => finish(resolved),
           (error) => {
             if (!requestEnded()) next(error);
