@@ -1,5 +1,5 @@
 interface ReleasablePresetService {
-  release?: () => void | Promise<void>;
+  release?: () => void | PromiseLike<void>;
 }
 
 /** Own and release the unique pgServices for one resolved preset generation. */

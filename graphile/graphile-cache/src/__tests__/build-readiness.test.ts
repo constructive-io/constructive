@@ -61,6 +61,44 @@ describe('awaitGraphileBuildReadiness', () => {
     expect(ready).toHaveBeenCalledTimes(1);
   });
 
+  it('waits for schema construction before releasing after adapter attachment fails', async () => {
+    const schemaResult = deferred<unknown>();
+    const attachmentFailure = new Error('adapter attachment failed');
+    const release = jest.fn().mockResolvedValue(undefined);
+    const buildPromise = awaitGraphileBuildReadiness({
+      schemaResult: schemaResult.promise,
+      addTo: jest.fn().mockRejectedValue(attachmentFailure),
+      ready: jest.fn().mockResolvedValue(undefined),
+      release,
+    });
+
+    await flushPromises();
+    expect(release).not.toHaveBeenCalled();
+
+    schemaResult.resolve({});
+    await expect(buildPromise).rejects.toBe(attachmentFailure);
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for schema construction before releasing after readiness fails', async () => {
+    const schemaResult = deferred<unknown>();
+    const readinessFailure = new Error('grafserv readiness failed');
+    const release = jest.fn().mockResolvedValue(undefined);
+    const buildPromise = awaitGraphileBuildReadiness({
+      schemaResult: schemaResult.promise,
+      addTo: jest.fn().mockResolvedValue(undefined),
+      ready: jest.fn().mockRejectedValue(readinessFailure),
+      release,
+    });
+
+    await flushPromises();
+    expect(release).not.toHaveBeenCalled();
+
+    schemaResult.resolve({});
+    await expect(buildPromise).rejects.toBe(readinessFailure);
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
   it('observes schema failure while adapter attachment is pending', async () => {
     const schemaResult = deferred<unknown>();
     const addTo = deferred<unknown>();

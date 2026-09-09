@@ -22,6 +22,9 @@ export const awaitGraphileBuildReadiness = async (
     const [schema] = await Promise.all([schemaOutcome, build.ready()]);
     if ('error' in schema) throw schema.error;
   } catch (error) {
+    // A failed adapter/readiness operation can race schema construction. Wait
+    // for schema work to settle before releasing the services it may still use.
+    await schemaOutcome;
     try {
       await build.release();
     } catch (releaseError) {

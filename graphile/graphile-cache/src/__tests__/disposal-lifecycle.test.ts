@@ -134,4 +134,42 @@ describe('Graphile cache disposal lifecycle', () => {
     await clearing;
     expect(cleared).toBe(true);
   });
+
+  it('does not complete entry disposal before preset services are released', async () => {
+    const releasePresetServices = deferred<void>();
+    const entry = makeEntry(
+      'delayed-preset-service',
+      jest.fn().mockResolvedValue(undefined),
+      jest.fn(() => releasePresetServices.promise)
+    );
+    graphileCache.set(entry.cacheKey, entry);
+
+    graphileCache.delete(entry.cacheKey);
+    const disposal = waitForEntryDisposal(entry);
+    let disposed = false;
+    void disposal.then(() => {
+      disposed = true;
+    });
+
+    await flushPromises();
+    expect(disposed).toBe(false);
+
+    releasePresetServices.resolve(undefined);
+    await disposal;
+    expect(disposed).toBe(true);
+  });
+
+  it('disposes a new generation after an older same-key generation fails', async () => {
+    const firstFailure = new Error('first generation release failed');
+    const firstRelease = jest.fn().mockRejectedValue(firstFailure);
+    const secondRelease = jest.fn().mockResolvedValue(undefined);
+    const first = makeEntry('retry-by-generation', firstRelease);
+    const second = makeEntry('retry-by-generation', secondRelease);
+
+    await expect(disposeUncachedEntry(first)).rejects.toBe(firstFailure);
+    await expect(disposeUncachedEntry(second)).resolves.toBeUndefined();
+
+    expect(firstRelease).toHaveBeenCalledTimes(1);
+    expect(secondRelease).toHaveBeenCalledTimes(1);
+  });
 });
