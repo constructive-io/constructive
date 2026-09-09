@@ -148,3 +148,7 @@ This package is designed to be extended. For example, `graphile-cache` uses the 
 ### Checkout sanitation performance
 
 The default sanitizer adds a database round trip and invalidates prepared statements on every checkout. See the [reproducible benchmark and measured tradeoff](../pg-query-context/benchmarks/README.md) before setting a production throughput budget. The benchmark does not weaken the default sanitation contract.
+
+### Dedicated notification listener validation
+
+The broker accepts only an audited, dedicated login and exact channel allowlists. Its two real PostgreSQL integration suites require `PG_CACHE_RUN_NOTIFICATION_ROLE_INTEGRATION=1`. CI provisions `src/__tests__/fixtures/notification-role.sql` and runs both suites after the `pg-postgres` batch. Run this fixture only in a disposable cluster: it revokes PUBLIC cross-database CONNECT to test the listener isolation contract. The normal unit run keeps these environment-specific suites gated.

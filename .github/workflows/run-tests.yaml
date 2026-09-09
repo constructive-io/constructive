@@ -332,6 +332,14 @@ jobs:
             echo "::endgroup::"
           done
 
+      # Run last: the strict listener fixture revokes PUBLIC cross-database
+      # CONNECT in this disposable service container.
+      - name: Test dedicated notification role and broker
+        if: matrix.batch == 'pg-postgres'
+        run: |
+          docker exec -i -e PGUSER=postgres ${{ job.services.pg_db.id }} psql -d postgres -v ON_ERROR_STOP=1 < postgres/pg-cache/src/__tests__/fixtures/notification-role.sql
+          PGUSER=cnc_notify_fixture PGPASSWORD=pg-cache-notify-test PGDATABASE=cnc_notify_fixture PG_CACHE_RUN_NOTIFICATION_ROLE_INTEGRATION=1 pnpm --filter pg-cache test --runInBand --runTestsByPath src/__tests__/notification-role.integration.test.ts src/__tests__/notification-broker.integration.test.ts
+
   # =========================================================================
   # TIER 3 – Integration tests (PostgreSQL + MinIO)
   # =========================================================================
