@@ -1,4 +1,10 @@
-import type { ApiOptions,GraphileOptions } from '@constructive-io/graphql-types';
+import type {
+  ApiOptions,
+  GraphileOptions,
+  RuntimePgConfig,
+  RuntimePgResolver,
+  RuntimePgResolverInput
+} from '@constructive-io/graphql-types';
 import type { DocumentNode, GraphQLError } from 'graphql';
 import type { Server } from 'http';
 import type { PgTestClient } from 'pgsql-test/test-client';
@@ -71,6 +77,12 @@ export interface GetConnectionsInput {
   authRole?: string;
   /** Graphile/PostGraphile configuration options */
   graphile?: GraphileOptions;
+  /** Static least-privilege tenant execution login. */
+  runtimePg?: RuntimePgConfig;
+  /** Exact route authorized to use `runtimePg`. */
+  runtimePgStaticIdentity?: RuntimePgResolverInput;
+  /** Resolve one least-privilege login from credential-free route facts. */
+  runtimePgResolver?: RuntimePgResolver;
   /** Server configuration options (port, host, and API configuration) */
   server?: ServerOptions;
 }

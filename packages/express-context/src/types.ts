@@ -7,6 +7,7 @@
  * (PostGraphile, LLM sidecar, etc.) can share the same context.
  */
 
+import type { PgPoolLease } from 'pg-cache';
 import type { Pool, PoolClient } from 'pg';
 
 import type { BillingClient } from './billing-client';
@@ -320,6 +321,10 @@ export interface ConstructiveContext {
   requestId: string;
   /** Tenant database connection pool */
   pool: Pool;
+  /** Opaque identity of the exact runtime connection contract. */
+  runtimePoolIdentity: string;
+  /** Retain a separate runtime lease for a cache-owned handler, when needed. */
+  retainRuntimePool?: () => PgPoolLease;
   /** Execute a function within a tenant-scoped RLS transaction */
   withPgClient: WithPgClient;
 

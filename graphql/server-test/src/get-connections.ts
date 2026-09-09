@@ -55,7 +55,14 @@ export const getConnections = async (
       exposedSchemas: input.schemas,
       ...(input.authRole && { anonRole: input.authRole, roleName: input.authRole })
     },
-    graphile: input.graphile
+    graphile: input.graphile,
+    ...(input.runtimePg !== undefined && { runtimePg: input.runtimePg }),
+    ...(input.runtimePgStaticIdentity !== undefined && {
+      runtimePgStaticIdentity: input.runtimePgStaticIdentity
+    }),
+    ...(input.runtimePgResolver !== undefined && {
+      runtimePgResolver: input.runtimePgResolver
+    })
   });
 
   // Start the HTTP server. Suites default to the production scoped-routing

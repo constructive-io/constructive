@@ -149,3 +149,15 @@ Use `supertest` or your HTTP client of choice against `/graphql`. For RLS-aware 
 - `@constructive-io/graphql-types` - shared types and defaults
 - `graphile-settings` - PostGraphile configuration
 - `graphile-meta-schema` - meta schema support
+
+### Runtime PostgreSQL connection ownership
+
+The production server forwards `runtimePg`, `runtimePgStaticIdentity`, and `runtimePgResolver` to the request context. Configure either a static login bound to one exact route, or a resolver receiving frozen database/API/schema/role facts. A configured login must explicitly provide database, user, and password; its effective host, port, database, and driver target must match the control connection's routed database. Invalid configuration fails before acquisition. With neither option configured, the existing single-login deployment remains supported.
+
+Routing and module loaders retain control-plane pools. Graphile uses the already resolved context pool and canonical request settings. Introspection keeps the configured `api.introspectionRole`; the runtime login needs permission to assume that role and the served roles, plus any enabled module/realtime grants. This is credential separation, not the F18 runtime privilege audit.
+
+Each Graphile cache key combines the logical service key with an opaque process-local pool identity. Credential rotation creates a separate generation. The request context supplies an optional `retainRuntimePool()` capability; the server requires it and acquires a cache lease before asynchronous module discovery or schema work. It never reruns the resolver. Flush operations match logical service keys across all credential generations.
+
+Eviction retires an exact entry and waits for both the direct Grafserv handler promise and response termination before releasing its services and cache lease. Request abort alone does not imply a pending query has finished. Process cache shutdown closes build admission, drains in-flight builds, and disposes unpublished results. Long-lived responses must finish or be cancelled by the HTTP lifecycle before graceful cleanup can complete.
+
+The notification broker remains a separately tested capability; this change does not enable the F24 generation subscription consumer.

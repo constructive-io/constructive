@@ -6,12 +6,10 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
+import { assertGraphileCacheOpen, createGraphileInstance, disposeUncachedEntry, graphileCache, trackGraphileBuild, type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
-import { getPgPool } from 'pg-cache';
-import { getPgEnvOptions } from 'pg-env';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
@@ -152,8 +150,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(res, errors.INTERNAL_FAILURE({ details: 'Missing API info' }));
         return;
       }
-      const key = req.svc_key;
-      if (!key) {
+      const serviceKey = req.svc_key;
+      if (!serviceKey) {
         log.error(`${label} Missing service cache key`);
         respondWithGraphQLError(
           res,
@@ -161,6 +159,22 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         );
         return;
       }
+      const context = req.constructive;
+      if (!context?.runtimePoolIdentity || !context.retainRuntimePool) {
+        throw new Error('Graphile requires a resolved runtime pool and lease capability');
+      }
+      assertGraphileCacheOpen();
+      const key = JSON.stringify([serviceKey, context.runtimePoolIdentity]);
+      const assertEntryOwnership = (entry: GraphileCacheEntry): void => {
+        if (entry.runtimePoolIdentity !== context.runtimePoolIdentity ||
+            entry.logicalServiceKey !== serviceKey) {
+          throw new Error('Graphile cache entry is missing its exact runtime ownership');
+        }
+      };
+      const serve = (entry: GraphileCacheEntry): unknown => {
+        assertEntryOwnership(entry);
+        return entry.handler(req, res, next);
+      };
       const { dbname, anonRole, roleName, schema } = api;
       const schemaLabel = schema?.join(',') || 'unknown';
 
@@ -170,7 +184,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const cached = graphileCache.get(key);
       if (cached) {
         log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
-        return cached.handler(req, res, next);
+        return serve(cached);
       }
 
       log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
@@ -183,7 +197,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
-          return instance.handler(req, res, next);
+          return serve(instance);
         } catch (error) {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
           // Fall through to Phase C to retry creation
@@ -198,7 +212,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const recheckedCache = graphileCache.get(key);
       if (recheckedCache) {
         log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
-        return recheckedCache.handler(req, res, next);
+        return serve(recheckedCache);
       }
 
       // Re-check in-flight map (another retry may have started creation)
@@ -206,52 +220,74 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       if (retryInFlight) {
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
-        return retryInstance.handler(req, res, next);
+        return serve(retryInstance);
       }
 
       log.info(
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname
-      });
-
-      // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
-
-      // Create promise and store in in-flight map BEFORE try block
-      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-      const preset = buildPreset(
-        pool,
-        schema || [],
-        opts.api?.introspectionRole,
-        api.databaseSettings,
-        api.apiId,
-        compute
-      );
-      const creationPromise = observeGraphileBuild(
-        {
-          cacheKey: key,
-          serviceKey: key,
-          databaseId: api.databaseId ?? null
-        },
-        () => createGraphileInstance({
-          preset,
-          cacheKey: key,
-          enableRealtime: api.databaseSettings?.enableRealtime
-        }),
-        { enabled: observabilityEnabled }
-      );
+      // Retain synchronously while this request still owns its pool lease.
+      const cacheLease = context.retainRuntimePool();
+      if (cacheLease.identity !== context.runtimePoolIdentity || cacheLease.pool !== context.pool) {
+        cacheLease.release();
+        throw new Error('Graphile runtime pool identity changed before cache acquisition');
+      }
+      let creationPromise: Promise<GraphileCacheEntry>;
+      try {
+        creationPromise = trackGraphileBuild(async () => {
+          let preset: GraphileConfig.Preset | undefined;
+          let instance: GraphileCacheEntry | undefined;
+          try {
+            // The first await is inside the registered factory, so callers
+            // coalesce even while module discovery is pending.
+            const compute = api.apiId ? await context.useModule('compute') : undefined;
+            preset = buildPreset(
+              cacheLease.pool, schema || [],
+              opts.api?.introspectionRole, api.databaseSettings, api.apiId, compute
+            );
+            instance = await observeGraphileBuild(
+              { cacheKey: key, serviceKey, databaseId: api.databaseId ?? null },
+              () => createGraphileInstance({
+                preset,
+                cacheKey: key,
+                runtimePoolIdentity: cacheLease.identity,
+                logicalServiceKey: serviceKey,
+                releaseRuntimePool: () => cacheLease.release(),
+                enableRealtime: api.databaseSettings?.enableRealtime
+              }),
+              { enabled: observabilityEnabled }
+            );
+            assertGraphileCacheOpen();
+            assertEntryOwnership(instance);
+            graphileCache.set(key, instance);
+            return instance;
+          } catch (error) {
+            if (instance) {
+              try { await disposeUncachedEntry(instance); }
+              catch (cleanupError) { log.error('Failed to dispose unpublished Graphile instance', cleanupError); }
+            } else {
+              // Factory failures already release their preset. Public service
+              // release is idempotent and also covers failures before factory entry.
+              for (const service of [...(preset?.pgServices ?? [])].reverse()) {
+                try { await service.release?.(); }
+                catch (cleanupError) { log.error('Failed to release Graphile build service', cleanupError); }
+              }
+              cacheLease.release();
+            }
+            throw error;
+          }
+        });
+      } catch (error) {
+        cacheLease.release();
+        throw error;
+      }
       creating.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
-        graphileCache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
-        return instance.handler(req, res, next);
+        return serve(instance);
       } catch (error) {
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
         throw new HandlerCreationError(
@@ -263,7 +299,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         );
       } finally {
         // Always clean up in-flight tracker
-        creating.delete(key);
+        if (creating.get(key) === creationPromise) creating.delete(key);
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);

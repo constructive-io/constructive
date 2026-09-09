@@ -147,7 +147,7 @@ export { BoundedCounter, CounterFlusher } from './usage-counter';
 export { requestIdMiddleware } from './request-id';
 
 // Context middleware
-export type { ContextMiddlewareOptions } from './context';
+export type { ContextMiddlewareOptions, RuntimePgPoolResolution } from './context';
 export { buildContext, createContextMiddleware } from './context';
 
 // Module loaders

@@ -8,6 +8,8 @@ import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { PostGraphileInstance } from 'postgraphile';
 
+import { retireGraphileEntry } from './runtime-entry-usage';
+
 const log = new Logger('graphile-cache');
 
 // --- Time Constants ---
@@ -86,57 +88,177 @@ export interface GraphileCacheEntry {
   httpServer: HttpServer;
   cacheKey: string;
   createdAt: number;
+  /** Idempotent release for pgServices owned by this exact preset generation. */
+  releasePresetServices?: () => Promise<void>;
+  /** Opaque runtime pool identity retained by this exact Graphile generation. */
+  runtimePoolIdentity?: string;
+  /** Logical service key used for matching entries during targeted flushes. */
+  logicalServiceKey?: string;
+  /** Release the cache owner's runtime pool lease after preset services release. */
+  releaseRuntimePool?: () => void | Promise<void>;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
 }
 
-// Track disposed entries to prevent double-disposal
-const disposedKeys = new Set<string>();
+const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
+const activeDisposals = new Set<Promise<void>>();
+const activeBuilds = new Set<Promise<GraphileCacheEntry>>();
+let graphileCacheClosing = false;
+let graphileCacheEpoch = 0;
 
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
+
+const GRAPHILE_CACHE_CLOSING = 'Graphile cache is closing';
+
+/** Throw synchronously when a new Graphile build cannot be admitted. */
+export const assertGraphileCacheOpen = (): void => {
+  if (graphileCacheClosing) {
+    throw new Error(GRAPHILE_CACHE_CLOSING);
+  }
+};
+
+/**
+ * Admit one complete Graphile build and retain it through settlement. A build
+ * that completes after shutdown begins is disposed rather than being
+ * published into the cache.
+ */
+export function trackGraphileBuild(
+  factory: () => Promise<GraphileCacheEntry>
+): Promise<GraphileCacheEntry> {
+  assertGraphileCacheOpen();
+  const buildEpoch = graphileCacheEpoch;
+
+  let resolveTracked!: (entry: GraphileCacheEntry) => void;
+  let rejectTracked!: (error: unknown) => void;
+  const tracked = new Promise<GraphileCacheEntry>((resolve, reject) => {
+    resolveTracked = resolve;
+    rejectTracked = reject;
+  });
+  activeBuilds.add(tracked);
+  void tracked.then(
+    () => activeBuilds.delete(tracked),
+    () => activeBuilds.delete(tracked)
+  );
+
+  let factoryPromise: Promise<GraphileCacheEntry>;
+  try {
+    factoryPromise = Promise.resolve(factory());
+  } catch (error) {
+    rejectTracked(error);
+    return tracked;
+  }
+
+  void factoryPromise
+    .then(async (entry) => {
+      if (graphileCacheClosing || buildEpoch !== graphileCacheEpoch) {
+        await disposeUncachedEntry(entry);
+        throw new Error(GRAPHILE_CACHE_CLOSING);
+      }
+      return entry;
+    })
+    .then(resolveTracked, rejectTracked);
+  return tracked;
+}
+
+const waitForActiveBuilds = async (): Promise<void> => {
+  while (activeBuilds.size > 0) {
+    await Promise.allSettled([...activeBuilds]);
+  }
+};
 
 /**
  * Dispose a PostGraphile v5 cache entry
  *
  * Properly releases resources by:
  * 1. Closing the HTTP server if listening
- * 2. Releasing the PostGraphile instance (which internally releases grafserv)
- *
- * Uses disposedKeys set to prevent double-disposal when closeAllCaches()
- * explicitly disposes entries and then clear() triggers the dispose callback.
+ * 2. Stopping the realtime manager
+ * 3. Releasing PostGraphile/Grafserv and preset services
  */
-const disposeEntry = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
-  // Prevent double-disposal
-  if (disposedKeys.has(key)) {
-    return;
-  }
-  disposedKeys.add(key);
-
+const releaseEntry = async (
+  entry: GraphileCacheEntry,
+  key: string
+): Promise<void> => {
   log.debug(`Disposing PostGraphile[${key}]`);
+  let firstError: unknown;
+  let failed = false;
+  await retireGraphileEntry(entry);
   try {
-    // Close HTTP server if it's listening
     if (entry.httpServer?.listening) {
       await new Promise<void>((resolve) => {
         entry.httpServer.close(() => resolve());
       });
     }
-    // Stop RealtimeManager if present (before releasing PostGraphile)
+  } catch (error) {
+    firstError = error;
+    failed = true;
+  }
+  try {
     if (entry.realtimeManager) {
-      try {
-        await entry.realtimeManager.stop();
-      } catch (err) {
-        log.error(`Error stopping RealtimeManager for PostGraphile[${key}]:`, err);
-      }
+      await entry.realtimeManager.stop();
     }
-    // Release PostGraphile instance (this also releases grafserv internally)
-    if (entry.pgl) {
-      await entry.pgl.release();
-    }
-  } catch (err) {
-    log.error(`Error disposing PostGraphile[${key}]:`, err);
-  } finally {
-    disposedKeys.delete(key);
+  } catch (error) {
+    if (!failed) firstError = error;
+    failed = true;
+  }
+  try {
+    await entry.pgl.release();
+  } catch (error) {
+    if (!failed) firstError = error;
+    failed = true;
+  }
+  try {
+    await entry.releasePresetServices?.();
+  } catch (error) {
+    if (!failed) firstError = error;
+    failed = true;
+  }
+  try {
+    await entry.releaseRuntimePool?.();
+  } catch (error) {
+    if (!failed) firstError = error;
+    failed = true;
+  }
+  if (failed) throw firstError;
+};
+
+/**
+ * Coalesce teardown by exact entry identity, not by its reusable cache key.
+ */
+const scheduleDisposal = (
+  entry: GraphileCacheEntry,
+  key: string
+): Promise<void> => {
+  const existing = disposalPromises.get(entry);
+  if (existing) return existing;
+
+  const pending = releaseEntry(entry, key);
+
+  disposalPromises.set(entry, pending);
+  activeDisposals.add(pending);
+  void pending
+    .catch((error) => {
+      log.error(`Failed to dispose PostGraphile[${key}]:`, error);
+    })
+    .finally(() => activeDisposals.delete(pending));
+  return pending;
+};
+
+/** Dispose a generation that was built but never published in the cache. */
+export const disposeUncachedEntry = (
+  entry: GraphileCacheEntry,
+  key = entry.cacheKey
+): Promise<void> => scheduleDisposal(entry, key);
+
+/** Await the terminal result for an entry whose disposal has been scheduled. */
+export const waitForEntryDisposal = (
+  entry: GraphileCacheEntry
+): Promise<void> => disposalPromises.get(entry) ?? Promise.resolve();
+
+/** Await every disposal that is active at or begins during this drain. */
+export const waitForActiveDisposals = async (): Promise<void> => {
+  while (activeDisposals.size > 0) {
+    await Promise.allSettled([...activeDisposals]);
   }
 };
 
@@ -176,11 +298,7 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
 
     log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
 
-    // LRU dispose is synchronous, but v5 disposal is async
-    // Fire and forget the async cleanup
-    disposeEntry(entry, key).catch((err) => {
-      log.error(`Failed to dispose PostGraphile[${key}]:`, err);
-    });
+    scheduleDisposal(entry, key);
   }
 });
 
@@ -216,7 +334,10 @@ export function clearMatchingEntries(pattern: RegExp): number {
   let cleared = 0;
 
   for (const key of graphileCache.keys()) {
-    if (pattern.test(key)) {
+    const entry = graphileCache.peek(key);
+    const matchKey = entry?.logicalServiceKey ?? key;
+    pattern.lastIndex = 0;
+    if (pattern.test(matchKey)) {
       // Mark as manual eviction before deleting
       manualEvictionKeys.add(key);
       graphileCache.delete(key);
@@ -234,7 +355,11 @@ const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
 
   // Remove graphile entries that reference this pool key
   graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
+    if (
+      entry.runtimePoolIdentity === undefined || entry.runtimePoolIdentity === null
+        ? entry.cacheKey.includes(pgPoolKey)
+        : entry.runtimePoolIdentity === pgPoolKey
+    ) {
       log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
       manualEvictionKeys.add(k);
       graphileCache.delete(k);
@@ -244,6 +369,16 @@ const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
 
 // Enhanced close function that handles all caches
 const closePromise: { promise: Promise<void> | null } = { promise: null };
+
+/** Clear all resident entries and await every exact-generation disposal. */
+export const clearGraphileCache = async (): Promise<void> => {
+  for (const key of graphileCache.keys()) {
+    manualEvictionKeys.add(key);
+  }
+  graphileCache.clear();
+  await waitForActiveDisposals();
+  manualEvictionKeys.clear();
+};
 
 /**
  * Close all caches and release resources
@@ -259,37 +394,21 @@ const closePromise: { promise: Promise<void> | null } = { promise: null };
 export const closeAllCaches = async (verbose = false): Promise<void> => {
   if (closePromise.promise) return closePromise.promise;
 
+  graphileCacheClosing = true;
+  graphileCacheEpoch += 1;
   closePromise.promise = (async () => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
-      // Collect all entries and dispose them properly
-      const entries = [...graphileCache.entries()];
-
-      // Mark all as manual evictions
-      for (const [key] of entries) {
-        manualEvictionKeys.add(key);
-      }
-
-      const disposePromises = entries.map(([key, entry]) =>
-        disposeEntry(entry, key)
-      );
-
-      // Wait for all disposals to complete
-      await Promise.allSettled(disposePromises);
-
-      // Clear the cache after disposal (dispose callback will no-op due to disposedKeys)
-      graphileCache.clear();
-
-      // Clear disposed keys tracking after full cleanup
-      disposedKeys.clear();
-      manualEvictionKeys.clear();
+      await waitForActiveBuilds();
+      await clearGraphileCache();
 
       // Close pg pools
       await pgCache.close();
 
       if (verbose) log.success('All caches disposed.');
     } finally {
+      graphileCacheClosing = false;
       closePromise.promise = null;
     }
   })();

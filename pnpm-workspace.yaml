@@ -105,3 +105,6 @@ packageExtensions:
 allowBuilds:
   "@launchql/protobufjs": true
   core-js-pure: true
+
+patchedDependencies:
+  '@dataplan/pg@1.1.1': patches/@dataplan__pg@1.1.1.patch

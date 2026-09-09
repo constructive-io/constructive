@@ -7,7 +7,7 @@ import {
   PgTestConnectionOptions,
   ServerOptions} from '@pgpmjs/types';
 import deepmerge from 'deepmerge';
-import { PgConfig } from 'pg-env';
+import type { PgConfig, PgPoolConfig } from 'pg-env';
 
 import {
   apiDefaults,
@@ -18,6 +18,24 @@ import {
   GraphileOptions} from './graphile';
 import { LlmOptions } from './llm';
 import { SmsOptions } from './sms';
+
+/** Credential-free route facts used to resolve one runtime login. */
+export interface RuntimePgResolverInput {
+  databaseId: string;
+  databaseName: string;
+  apiId: string;
+  /** Physical schemas in Graphile exposure order. */
+  schemas: readonly string[];
+  /** Request roles in `[anonymous, authenticated]` order. */
+  roles: readonly [anonymous: string, authenticated: string];
+}
+
+export type RuntimePgConfig = Partial<PgConfig> & { pool?: PgPoolConfig };
+
+/** Resolve a least-privilege login from credential-free exact route facts. */
+export type RuntimePgResolver = (
+  input: Readonly<RuntimePgResolverInput>
+) => RuntimePgConfig | Promise<RuntimePgConfig>;
 
 /**
  * GraphQL-specific options for Constructive
@@ -40,6 +58,12 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   db?: Partial<PgTestConnectionOptions>;
   /** PostgreSQL connection configuration */
   pg?: Partial<PgConfig>;
+  /** Static least-privilege tenant execution login. */
+  runtimePg?: RuntimePgConfig;
+  /** Exact route authorized to use the static runtime login. */
+  runtimePgStaticIdentity?: RuntimePgResolverInput;
+  /** Per-route least-privilege tenant execution login resolver. */
+  runtimePgResolver?: RuntimePgResolver;
   /** PostGraphile/Graphile configuration */
   graphile?: GraphileOptions;
   /** HTTP server configuration */

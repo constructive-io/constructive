@@ -8,9 +8,11 @@ export {
   CacheEvictionEvent,
   // Cache stats
   CacheStats,
+  clearGraphileCache,
   // Clear matching entries
   clearMatchingEntries,
   closeAllCaches,
+  disposeUncachedEntry,
   // Eviction tracking
   EvictionReason,
   FIVE_MINUTES_MS,
@@ -19,11 +21,21 @@ export {
   // Cache instance and entry type
   graphileCache,
   GraphileCacheEntry,
+  assertGraphileCacheOpen,
+  trackGraphileBuild,
   // Time constants
-  ONE_HOUR_MS} from './graphile-cache';
+  ONE_HOUR_MS,
+  waitForActiveDisposals,
+  waitForEntryDisposal} from './graphile-cache';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';
+
+export type { GraphilePublicRequestHandler } from './runtime-entry-usage';
+export {
+  retireGraphileEntry,
+  withGraphileEntryUsage,
+} from './runtime-entry-usage';
 
 // Generic module config cache for plugin lookups
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';
