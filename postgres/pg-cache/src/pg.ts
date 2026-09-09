@@ -5,6 +5,7 @@ import { getPgEnvOptions, PgConfig, PgPoolConfig } from 'pg-env';
 
 import { getActivePgPoolFactory, PgPoolFactory } from './driver';
 import { pgCache } from './lru';
+import { installCheckoutSanitizer } from './sanitizer';
 
 const log = new Logger('pg-cache');
 
@@ -97,7 +98,7 @@ export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
     }
   });
 
-  return pgPool;
+  return installCheckoutSanitizer(pgPool);
 };
 
 export const getPgPool = (pgConfig: Partial<PgConfig> & { pool?: PgPoolConfig }): pg.Pool => {
