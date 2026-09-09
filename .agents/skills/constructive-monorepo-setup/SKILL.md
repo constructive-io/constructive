@@ -4,7 +4,7 @@ Set up the Constructive monorepo for local development and testing.
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - pnpm 9+
 - Docker (for PostgreSQL)
 - pgpm CLI (`npm install -g pgpm`)
