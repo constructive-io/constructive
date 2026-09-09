@@ -144,3 +144,7 @@ Gracefully close all cached pools and wait for disposal.
 ## Integration with Other Packages
 
 This package is designed to be extended. For example, `graphile-cache` uses the cleanup callback system to automatically clean up PostGraphile instances when their associated pools are disposed.
+
+### Checkout sanitation performance
+
+The default sanitizer adds a database round trip and invalidates prepared statements on every checkout. See the [reproducible benchmark and measured tradeoff](../pg-query-context/benchmarks/README.md) before setting a production throughput budget. The benchmark does not weaken the default sanitation contract.

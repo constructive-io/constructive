@@ -1,0 +1,213 @@
+{
+  "timestamp": "2026-09-09T04:25:47.607Z",
+  "node": "v24.20.0",
+  "postgres": "18.6",
+  "clients": 1,
+  "concurrency": 1,
+  "warmupPerArm": 50,
+  "order": "alternating by round",
+  "preparedState": {
+    "baseline": 1,
+    "sanitized": 0
+  },
+  "results": [
+    {
+      "round": 1,
+      "workload": "checkout",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 36.203164000000015,
+      "operationsPerSecond": 27621.895147065035,
+      "p50Ms": 0.018110999999862543,
+      "p95Ms": 0.049364999999852444,
+      "p99Ms": 0.19730600000002596
+    },
+    {
+      "round": 1,
+      "workload": "checkout",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 658.2653730000002,
+      "operationsPerSecond": 1519.1441643703165,
+      "p50Ms": 0.4535110000001623,
+      "p95Ms": 1.9466569999999592,
+      "p99Ms": 2.827784999999949
+    },
+    {
+      "round": 1,
+      "workload": "prepared_select",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 774.8421929999995,
+      "operationsPerSecond": 1290.5853721365438,
+      "p50Ms": 0.5050600000004124,
+      "p95Ms": 2.1595499999998538,
+      "p99Ms": 3.433371000000079
+    },
+    {
+      "round": 1,
+      "workload": "prepared_select",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 1582.3473240000003,
+      "operationsPerSecond": 631.972503654956,
+      "p50Ms": 1.1145530000003419,
+      "p95Ms": 3.3778690000008282,
+      "p99Ms": 5.153209000000061
+    },
+    {
+      "round": 1,
+      "workload": "transaction",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 4116.908935,
+      "operationsPerSecond": 242.90068490426785,
+      "p50Ms": 2.8951149999993504,
+      "p95Ms": 11.492820999999822,
+      "p99Ms": 18.891061999999692
+    },
+    {
+      "round": 1,
+      "workload": "transaction",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 2654.5545359999996,
+      "operationsPerSecond": 376.7110400025325,
+      "p50Ms": 2.143340000000535,
+      "p95Ms": 4.725237000000561,
+      "p99Ms": 6.516456999999718
+    },
+    {
+      "round": 2,
+      "workload": "checkout",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 746.4313989999991,
+      "operationsPerSecond": 1339.7078436674944,
+      "p50Ms": 0.3215150000014546,
+      "p95Ms": 2.7295560000002297,
+      "p99Ms": 4.3268000000007305
+    },
+    {
+      "round": 2,
+      "workload": "checkout",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 29.56981700000142,
+      "operationsPerSecond": 33818.268134698024,
+      "p50Ms": 0.012894999999844003,
+      "p95Ms": 0.01690500000040629,
+      "p99Ms": 0.04099800000039977
+    },
+    {
+      "round": 2,
+      "workload": "prepared_select",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 1708.5425560000003,
+      "operationsPerSecond": 585.2941716249529,
+      "p50Ms": 0.8252430000011373,
+      "p95Ms": 4.723308000000543,
+      "p99Ms": 11.009928999999829
+    },
+    {
+      "round": 2,
+      "workload": "prepared_select",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 540.5481880000025,
+      "operationsPerSecond": 1849.9738269402826,
+      "p50Ms": 0.3831950000003417,
+      "p95Ms": 1.835321999998996,
+      "p99Ms": 2.5052509999986796
+    },
+    {
+      "round": 2,
+      "workload": "transaction",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 2696.2393999999986,
+      "operationsPerSecond": 370.8869472050592,
+      "p50Ms": 2.070953999998892,
+      "p95Ms": 5.2929259999982605,
+      "p99Ms": 9.943190999998478
+    },
+    {
+      "round": 2,
+      "workload": "transaction",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 2496.743677000002,
+      "operationsPerSecond": 400.52169119801846,
+      "p50Ms": 1.7455379999992147,
+      "p95Ms": 5.845160999997461,
+      "p99Ms": 10.184078000002046
+    },
+    {
+      "round": 3,
+      "workload": "checkout",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 9.899107000001095,
+      "operationsPerSecond": 101019.21314719493,
+      "p50Ms": 0.006733000001986511,
+      "p95Ms": 0.007228000002214685,
+      "p99Ms": 0.021767000002000714
+    },
+    {
+      "round": 3,
+      "workload": "checkout",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 500.14959199999794,
+      "operationsPerSecond": 1999.4018109685953,
+      "p50Ms": 0.3214140000018233,
+      "p95Ms": 1.845209999999497,
+      "p99Ms": 2.537365000000136
+    },
+    {
+      "round": 3,
+      "workload": "prepared_select",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 571.5955599999979,
+      "operationsPerSecond": 1749.4887469034986,
+      "p50Ms": 0.3712660000019241,
+      "p95Ms": 1.9807080000027781,
+      "p99Ms": 2.727685999998357
+    },
+    {
+      "round": 3,
+      "workload": "prepared_select",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 1014.8897780000007,
+      "operationsPerSecond": 985.3286747755571,
+      "p50Ms": 0.7470359999970242,
+      "p95Ms": 2.548804999998538,
+      "p99Ms": 3.442180999998527
+    },
+    {
+      "round": 3,
+      "workload": "transaction",
+      "arm": "baseline",
+      "samples": 1000,
+      "elapsedMs": 2317.362653,
+      "operationsPerSecond": 431.52503502437344,
+      "p50Ms": 1.8842420000000857,
+      "p95Ms": 4.489830000002257,
+      "p99Ms": 5.647777999998652
+    },
+    {
+      "round": 3,
+      "workload": "transaction",
+      "arm": "sanitized",
+      "samples": 1000,
+      "elapsedMs": 3205.106445999998,
+      "operationsPerSecond": 312.0021181349559,
+      "p50Ms": 2.643698999996559,
+      "p95Ms": 6.96096100000068,
+      "p99Ms": 10.79024600000048
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { Pool, type PoolClient } from 'pg';
+import { type Pool, type PoolClient } from 'pg';
 import { defaultPgPoolFactory } from 'pg-cache';
 import { getConnections } from 'pgsql-test';
 
@@ -53,8 +53,10 @@ describe('pg-query-context transaction-local integration', () => {
   let sanitizedPool: Pool;
 
   beforeAll(async () => {
-    ({ db, teardown } = await getConnections({}, []));
-    singleClientPool = new Pool({ ...db.config, max: 1 });
+    const fixture = await getConnections({}, []);
+    ({ db, teardown } = fixture);
+    const poolConfig = { ...db.config, max: 1 };
+    singleClientPool = fixture.manager.getPool(poolConfig);
     sanitizedPool = defaultPgPoolFactory({
       ...db.config,
       pool: { max: 1 },
@@ -62,9 +64,8 @@ describe('pg-query-context transaction-local integration', () => {
   });
 
   afterAll(async () => {
-    if (sanitizedPool) await sanitizedPool.end();
-    if (singleClientPool) await singleClientPool.end();
-    if (teardown) await teardown();
+    try { if (sanitizedPool) await sanitizedPool.end(); }
+    finally { if (teardown) await teardown(); }
   });
 
   beforeEach(async () => {
