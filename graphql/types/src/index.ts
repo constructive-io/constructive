@@ -5,7 +5,8 @@ export {
   graphileDefaults,
   graphileFeatureDefaults,
   GraphileFeatureOptions,
-  GraphileOptions} from './graphile';
+  GraphileOptions,
+  ScopedCatalogTypes} from './graphile';
 
 // Export Constructive combined types
 export {
