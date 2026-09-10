@@ -5,6 +5,7 @@ import {
 } from 'graphile-build-pg';
 import { resolvePreset } from 'graphile-config';
 
+import { peerDependencies } from '../package.json';
 import {
   ConstructivePgIntrospectionPlugin,
   ScopedIntrospectionPreset,
@@ -12,6 +13,12 @@ import {
 } from '../src';
 
 describe('CNC introspection replacement contract', () => {
+  it('declares the exact upstream version enforced by the runtime guard', () => {
+    expect(peerDependencies['graphile-build-pg']).toBe(
+      scopedIntrospectionUpstreamContract.version
+    );
+  });
+
   it('atomically replaces the upstream namespace owner exactly once', () => {
     const stock = resolvePreset({
       extends: [graphileBuildPreset, graphileBuildPgPreset],
