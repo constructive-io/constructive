@@ -1,5 +1,48 @@
 import type { GraphileConfig } from 'graphile-config';
 
+export type ScopedCatalogTypes = 'all' | 'dependency-closure';
+
+/** Options for schema-scoped PostgreSQL catalog introspection. */
+export interface SchemaScopedIntrospectionOptions {
+  /** Retain all catalog types, or only the transitive dependency closure. */
+  catalogTypes?: ScopedCatalogTypes;
+  /** Extensions whose optional capability metadata should be retained. */
+  capabilityExtensions?: readonly string[];
+}
+
+/** Per-service schema-scoped introspection configuration. */
+export type PgScopedIntrospectionServiceConfig =
+  | boolean
+  | SchemaScopedIntrospectionOptions;
+
+/** Schema-scoped introspection configuration keyed by PostgreSQL service name. */
+export type PgScopedIntrospectionConfig = Readonly<
+  Record<string, PgScopedIntrospectionServiceConfig>
+>;
+
+declare global {
+  namespace GraphileBuild {
+    interface GatherOptions {
+      /**
+       * Schema-scoped introspection options keyed by PostgreSQL service name.
+       * `true` enables defaults, `false` keeps stock introspection, and an
+       * object customizes the scoped query. Services without an entry keep
+       * stock introspection.
+       */
+      pgScopedIntrospection?: PgScopedIntrospectionConfig;
+    }
+  }
+
+  // Keep the public preset type usable by graphql-types consumers that do not
+  // import graphile-build themselves. graphile-build declares the same field,
+  // so this merges with its richer preset declaration when it is present.
+  namespace GraphileConfig {
+    interface Preset {
+      gather?: GraphileBuild.GatherOptions;
+    }
+  }
+}
+
 /**
  * PostGraphile/Graphile v5 configuration
  */

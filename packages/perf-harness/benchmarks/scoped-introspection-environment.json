@@ -1,0 +1,76 @@
+{
+  "capturedAt": "2026-09-10T03:08:22.678Z",
+  "node": "v24.20.0",
+  "platform": "linux",
+  "architecture": "x64",
+  "cpu": "Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz",
+  "logicalCpus": 3,
+  "totalMemory": 4105740288,
+  "loadAverageBefore": [
+    6.24,
+    5.67,
+    5.14
+  ],
+  "adaptorSessionSettings": [
+    {
+      "name": "jit",
+      "setting": "on",
+      "unit": null
+    },
+    {
+      "name": "jit_above_cost",
+      "setting": "100000",
+      "unit": null
+    },
+    {
+      "name": "jit_inline_above_cost",
+      "setting": "500000",
+      "unit": null
+    },
+    {
+      "name": "jit_optimize_above_cost",
+      "setting": "-1",
+      "unit": null
+    },
+    {
+      "name": "max_parallel_workers_per_gather",
+      "setting": "2",
+      "unit": null
+    },
+    {
+      "name": "statement_timeout",
+      "setting": "0",
+      "unit": "ms"
+    },
+    {
+      "name": "work_mem",
+      "setting": "4096",
+      "unit": "kB"
+    }
+  ],
+  "postgresVersion": "18.6",
+  "mainBase": "e008e936",
+  "crystalSource": "441cef73b0a12ed24343b7f38241af28b6454280",
+  "loadAverageAfter": {
+    "0": [
+      5.57,
+      5.6,
+      5.16
+    ],
+    "10": [
+      4.82,
+      5.37,
+      5.12
+    ],
+    "50": [
+      5.25,
+      5.3,
+      5.12
+    ]
+  },
+  "compiledCodeSha256": {
+    "graphile/graphile-scoped-introspection/dist/plugin.js": "68bb93b9e373b916b5453d026f92fc9f239ac4a29c5fe4cbde05e4b57324fa0f",
+    "graphile/graphile-scoped-introspection/dist/scoped-introspection-query.js": "82f61359eec84444bd2d425274740385364a7de258ba7896d62114dbf48d81fe",
+    "packages/perf-harness/dist/scoped-introspection-worker.js": "929a29ab9d3b061867a976d45a35b59da9e5183923457c64ee74fb5551a9b999"
+  }
+}

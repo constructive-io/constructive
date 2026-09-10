@@ -138,6 +138,53 @@ describe('getEnvOptions', () => {
     expect(result.api?.metaSchemas).toEqual(['env_meta', 'override_meta']);
   });
 
+  it('defaults to the upstream Graphile preset configuration', () => {
+    const result = getEnvOptions({}, process.cwd(), {});
+
+    expect(result.graphile).toEqual({
+      schema: [],
+      extends: [],
+      preset: {}
+    });
+  });
+
+  it('forwards Graphile preset gather configuration with runtime precedence', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-introspection-')
+    );
+    writeConfig(tempDir, {
+      graphile: {
+        preset: {
+          gather: {
+            pgScopedIntrospection: { main: true }
+          }
+        }
+      }
+    });
+
+    const configured = getEnvOptions({}, tempDir, {});
+    expect(configured.graphile?.preset?.gather).toEqual({
+      pgScopedIntrospection: { main: true }
+    });
+
+    const overridden = getEnvOptions(
+      {
+        graphile: {
+          preset: {
+            gather: {
+              pgScopedIntrospection: { main: false }
+            }
+          }
+        }
+      },
+      tempDir,
+      {}
+    );
+    expect(overridden.graphile?.preset?.gather).toEqual({
+      pgScopedIntrospection: { main: false }
+    });
+  });
+
   it('parses SMS environment variables into typed options', () => {
     const result = getGraphQLEnvVars({
       SMS_PROVIDER: 'devsms',
