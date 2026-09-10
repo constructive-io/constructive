@@ -254,13 +254,16 @@ describe('createRecordRefusalsSink', () => {
     await sink(rows);
 
     const texts = queries.map((q) => q.text);
-    expect(texts[0]).toBe('BEGIN');
-    expect(texts.slice(1, 3)).toEqual(['SELECT set_config($1, $2, true)', 'SELECT set_config($1, $2, true)']);
-    expect(queries[1].values).toEqual(['jwt.claims.user_id', 'u-platform']);
-    expect(queries[2].values).toEqual(['jwt.claims.database_id', 'db-platform']);
-    expect(texts[3]).toBe('SELECT "constructive_usage_private"."record_refusals"($1::jsonb) AS recorded');
-    expect(JSON.parse(queries[3].values![0] as string)).toEqual(rows);
-    expect(texts[4]).toBe('COMMIT');
+    const setConfigSql =
+      'SELECT pg_catalog.set_config(setting->>0, setting->>1, true) ' +
+      'FROM pg_catalog.json_array_elements($1::json) AS setting';
+    const recordRefusalsSql = 'SELECT "constructive_usage_private"."record_refusals"($1::jsonb) AS recorded';
+    expect(texts).toEqual(['BEGIN', setConfigSql, recordRefusalsSql, 'COMMIT']);
+    expect(JSON.parse(queries[1].values![0] as string)).toEqual([
+      ['jwt.claims.user_id', 'u-platform'],
+      ['jwt.claims.database_id', 'db-platform']
+    ]);
+    expect(JSON.parse(queries[2].values![0] as string)).toEqual(rows);
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 

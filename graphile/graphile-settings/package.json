@@ -31,6 +31,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1052.0",
     "@constructive-io/bucket-provisioner": "workspace:^",
+    "@constructive-io/express-context": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@constructive-io/s3-streamer": "workspace:^",
@@ -69,7 +70,6 @@
     "lru-cache": "^11.2.7",
     "mime-bytes": "workspace:^",
     "pg": "^8.21.0",
-    "pg-query-context": "workspace:^",
     "pg-sql2": "5.0.1",
     "postgraphile": "5.1.4",
     "request-ip": "^3.3.0",
