@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (784 distinct codes
+ * Source of truth: the constructive-db error audit (786 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 784 total, 576 public, 208 internal.
+ * Counts: 786 total, 578 public, 208 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -455,6 +455,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'INVITE_EMAIL_NOT_FOUND': defineError({ code: 'INVITE_EMAIL_NOT_FOUND', class: 'public', http: 404, message: 'Invite email not found.' }),
   'INVITE_LIMIT': defineError({ code: 'INVITE_LIMIT', class: 'public', http: 429, message: 'Invite limit.' }),
   'INVITE_NOT_FOUND': defineError({ code: 'INVITE_NOT_FOUND', class: 'public', http: 404, message: 'Invite not found.' }),
+  'INVITE_PHONE_NOT_FOUND': defineError({ code: 'INVITE_PHONE_NOT_FOUND', class: 'public', http: 404, message: 'Invite phone not found.' }),
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_AUTHORIZED', class: 'public', http: 400, message: 'Invocation anonymous not authorized.' }),
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_CALLABLE', class: 'public', http: 400, message: 'Invocation anonymous not callable.' }),
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': defineError({ code: 'INVOCATION_ANONYMOUS_ROUTE_REQUIRED', class: 'public', http: 400, message: 'Invocation anonymous route required.' }),
@@ -698,6 +699,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'SESSION_TTL_EXCEEDS_PARENT': defineError({ code: 'SESSION_TTL_EXCEEDS_PARENT', class: 'public', http: 400, message: 'Session ttl exceeds parent.' }),
   'SETTINGS_SURFACE_NOT_PROVISIONED': defineError({ code: 'SETTINGS_SURFACE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Settings surface not provisioned.' }),
   'SIGN_UP_DISABLED': defineError({ code: 'SIGN_UP_DISABLED', class: 'public', http: 403, message: 'Sign up disabled.' }),
+  'SIGN_UP_REQUIRES_INVITE': defineError({ code: 'SIGN_UP_REQUIRES_INVITE', class: 'public', http: 403, message: 'Sign up requires invite.' }),
   'SITE_INSTALLATION_MEMBER_NOT_SERVABLE': defineError({ code: 'SITE_INSTALLATION_MEMBER_NOT_SERVABLE', class: 'internal', http: 500, message: 'Site installation member not servable.' }),
   'SITE_NOT_FOUND': defineError({ code: 'SITE_NOT_FOUND', class: 'public', http: 404, message: 'Site not found.' }),
   'SITE_NOT_PROVISIONED': defineError({ code: 'SITE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Site not provisioned.' }),
@@ -1243,6 +1245,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'INVITE_EMAIL_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'INVITE_PHONE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1486,6 +1489,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'SESSION_TTL_EXCEEDS_PARENT': { class: 'public', dynamic: false, generatedOnly: true },
   'SETTINGS_SURFACE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'SIGN_UP_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
+  'SIGN_UP_REQUIRES_INVITE': { class: 'public', dynamic: false, generatedOnly: false },
   'SITE_INSTALLATION_MEMBER_NOT_SERVABLE': { class: 'internal', dynamic: false, generatedOnly: true },
   'SITE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'SITE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1599,4 +1603,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 784;
+export const GENERATED_CODE_COUNT = 786;
