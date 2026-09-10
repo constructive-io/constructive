@@ -91,6 +91,12 @@ export const registry = {
     http: 403,
     message: 'Sign-up is currently disabled.'
   }),
+  SIGN_UP_REQUIRES_INVITE: defineError({
+    code: 'SIGN_UP_REQUIRES_INVITE',
+    class: 'public',
+    http: 403,
+    message: 'Sign-up is by invitation only. Please provide a valid invite code.'
+  }),
 
   // ===========================================================================
   // Auth / account (public) — migrated from the server graphile SAFE_ERROR_CODES
@@ -230,6 +236,13 @@ export const registry = {
     http: 404,
     message:
       'This email is not associated with the invitation. Please use the email address the invitation was sent to.'
+  }),
+  INVITE_PHONE_NOT_FOUND: defineError({
+    code: 'INVITE_PHONE_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message:
+      'This phone number is not associated with the invitation. Please use the phone number the invitation was sent to.'
   }),
 
   // ===========================================================================
