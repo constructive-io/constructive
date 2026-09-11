@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (786 distinct codes
+ * Source of truth: the constructive-db error audit (792 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 786 total, 578 public, 208 internal.
+ * Counts: 792 total, 583 public, 209 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -260,6 +260,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED': defineError({ code: 'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED', class: 'public', http: 400, message: 'Data permissions mapping table required.' }),
   'DATA_PERMISSIONS_MODULE_AMBIGUOUS': defineError({ code: 'DATA_PERMISSIONS_MODULE_AMBIGUOUS', class: 'public', http: 400, message: 'Data permissions module ambiguous.' }),
   'DATA_PERMISSIONS_MODULE_NOT_FOUND': defineError({ code: 'DATA_PERMISSIONS_MODULE_NOT_FOUND', class: 'public', http: 404, message: 'Data permissions module not found.' }),
+  'DATA_PERMISSIONS_MODULE_REF_INVALID': defineError({ code: 'DATA_PERMISSIONS_MODULE_REF_INVALID', class: 'public', http: 400, message: 'Data permissions module ref invalid.' }),
   'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE': defineError({ code: 'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE', class: 'public', http: 400, message: 'Data permissions no permissions module.' }),
   'DATA_PERMISSIONS_REGISTRATION_CONFLICT': defineError({ code: 'DATA_PERMISSIONS_REGISTRATION_CONFLICT', class: 'public', http: 400, message: 'Data permissions registration conflict.' }),
   'DATA_PERMISSIONS_TABLE_NOT_FOUND': defineError({ code: 'DATA_PERMISSIONS_TABLE_NOT_FOUND', class: 'public', http: 404, message: 'Data permissions table not found.' }),
@@ -415,6 +416,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'HIERARCHY_MEMBER_IN_USE': defineError({ code: 'HIERARCHY_MEMBER_IN_USE', class: 'internal', http: 500, message: 'HIERARCHY_MEMBER_IN_USE: Cannot deactivate user {{arg0}} - user must be removed from the organization hierarchy first', positional: ['arg0'] }),
   'HISTORY': defineError({ code: 'HISTORY', class: 'internal', http: 500, message: 'HISTORY: history {{arg0}}.{{arg1}} registration has no copy_fields', positional: ['arg0', 'arg1'] }),
   'HOSTNAME_BINDING_SYNC': defineError({ code: 'HOSTNAME_BINDING_SYNC', class: 'internal', http: 500, message: 'HOSTNAME_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
+  'HOSTNAME_CLAIMED_IN_OTHER_PLANE': defineError({ code: 'HOSTNAME_CLAIMED_IN_OTHER_PLANE', class: 'public', http: 400, message: 'Hostname claimed in other plane.' }),
   'IDENTITY_ACCOUNT_NOT_FOUND': defineError({ code: 'IDENTITY_ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Identity account not found.' }),
   'IDENTITY_ALREADY_LINKED': defineError({ code: 'IDENTITY_ALREADY_LINKED', class: 'public', http: 409, message: 'Identity already linked.' }),
   'IDENTITY_LINK_AVAILABLE': defineError({ code: 'IDENTITY_LINK_AVAILABLE', class: 'public', http: 400, message: 'Identity link available.' }),
@@ -452,10 +454,12 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'INVALID_TOKEN': defineError({ code: 'INVALID_TOKEN', class: 'public', http: 401, message: 'Invalid token.' }),
   'INVALID_USER': defineError({ code: 'INVALID_USER', class: 'public', http: 400, message: 'Invalid user.' }),
   'INVALID_WORKER_ID': defineError({ code: 'INVALID_WORKER_ID', class: 'internal', http: 500, message: 'Invalid worker id.' }),
+  'INVITE_ADDRESS_REQUIRED': defineError({ code: 'INVITE_ADDRESS_REQUIRED', class: 'public', http: 400, message: 'Invite address required.' }),
   'INVITE_EMAIL_NOT_FOUND': defineError({ code: 'INVITE_EMAIL_NOT_FOUND', class: 'public', http: 404, message: 'Invite email not found.' }),
   'INVITE_LIMIT': defineError({ code: 'INVITE_LIMIT', class: 'public', http: 429, message: 'Invite limit.' }),
   'INVITE_NOT_FOUND': defineError({ code: 'INVITE_NOT_FOUND', class: 'public', http: 404, message: 'Invite not found.' }),
   'INVITE_PHONE_NOT_FOUND': defineError({ code: 'INVITE_PHONE_NOT_FOUND', class: 'public', http: 404, message: 'Invite phone not found.' }),
+  'INVITE_USERS_INVALID': defineError({ code: 'INVITE_USERS_INVALID', class: 'public', http: 400, message: 'Invite users invalid.' }),
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_AUTHORIZED', class: 'public', http: 400, message: 'Invocation anonymous not authorized.' }),
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_CALLABLE', class: 'public', http: 400, message: 'Invocation anonymous not callable.' }),
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': defineError({ code: 'INVOCATION_ANONYMOUS_ROUTE_REQUIRED', class: 'public', http: 400, message: 'Invocation anonymous route required.' }),
@@ -573,6 +577,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS': defineError({ code: 'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS', class: 'public', http: 423, message: 'Password reset locked exceed attempts.' }),
   'PASSWORD_SIGN_IN_DISABLED': defineError({ code: 'PASSWORD_SIGN_IN_DISABLED', class: 'public', http: 403, message: 'Password sign in disabled.' }),
   'PASSWORD_SIGN_UP_DISABLED': defineError({ code: 'PASSWORD_SIGN_UP_DISABLED', class: 'public', http: 403, message: 'Password sign up disabled.' }),
+  'PERMISSION_DENIED': defineError({ code: 'PERMISSION_DENIED', class: 'public', http: 403, message: 'Permission denied.' }),
   'PLAN_REQUIRED': defineError({ code: 'PLAN_REQUIRED', class: 'internal', http: 500, message: 'Plan required.' }),
   'PLATFORM_FLAG_IMMUTABLE': defineError({ code: 'PLATFORM_FLAG_IMMUTABLE', class: 'internal', http: 500, message: 'Platform flag immutable.' }),
   'POLICY_COLUMN_REF_UNRESOLVED': defineError({ code: 'POLICY_COLUMN_REF_UNRESOLVED', class: 'internal', http: 500, message: 'Policy column ref unresolved.' }),
@@ -643,6 +648,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED': defineError({ code: 'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED', class: 'internal', http: 500, message: 'Resource storage total cap exceeded.' }),
   'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED': defineError({ code: 'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED', class: 'internal', http: 500, message: 'Retire unserved apis scope required.' }),
   'ROUTE_BINDING_SYNC': defineError({ code: 'ROUTE_BINDING_SYNC', class: 'internal', http: 500, message: 'ROUTE_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
+  'ROUTE_DOMAIN_REQUIRED': defineError({ code: 'ROUTE_DOMAIN_REQUIRED', class: 'internal', http: 500, message: 'Route domain required.' }),
   'ROUTE_PRIVILEGED_TARGET_FORBIDDEN': defineError({ code: 'ROUTE_PRIVILEGED_TARGET_FORBIDDEN', class: 'internal', http: 500, message: 'ROUTE_PRIVILEGED_TARGET_FORBIDDEN: only a platform administrator may route to an API served as a role other than anonymous or authenticated' }),
   'ROUTE_TARGET_NOT_OWNED': defineError({ code: 'ROUTE_TARGET_NOT_OWNED', class: 'internal', http: 500, message: 'Route target not owned.' }),
   'ROUTE_TARGET_REQUIRED': defineError({ code: 'ROUTE_TARGET_REQUIRED', class: 'internal', http: 500, message: 'Route target required.' }),
@@ -1050,6 +1056,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_MODULE_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_MODULE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'DATA_PERMISSIONS_MODULE_REF_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_REGISTRATION_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_TABLE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1078,7 +1085,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CERT_BAD_ISSUER': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CERT_FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: true },
-  'DOMAIN_ISSUE_CERT_NOT_VERIFIED': { class: 'public', dynamic: true, generatedOnly: false },
+  'DOMAIN_ISSUE_CERT_NOT_VERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
   'DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CHALLENGE_BAD_METHOD': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
@@ -1205,6 +1212,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'HIERARCHY_MEMBER_IN_USE': { class: 'internal', dynamic: true, generatedOnly: false },
   'HISTORY': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
+  'HOSTNAME_CLAIMED_IN_OTHER_PLANE': { class: 'public', dynamic: false, generatedOnly: true },
   'IDENTITY_ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ALREADY_LINKED': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_LINK_AVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1242,10 +1250,12 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'INVALID_TOKEN': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_USER': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_WORKER_ID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'INVITE_ADDRESS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_EMAIL_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_PHONE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'INVITE_USERS_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1363,6 +1373,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS': { class: 'public', dynamic: false, generatedOnly: true },
   'PASSWORD_SIGN_IN_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
   'PASSWORD_SIGN_UP_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
+  'PERMISSION_DENIED': { class: 'public', dynamic: false, generatedOnly: false },
   'PLAN_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'PLATFORM_FLAG_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
   'POLICY_COLUMN_REF_UNRESOLVED': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1433,6 +1444,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED': { class: 'internal', dynamic: false, generatedOnly: false },
   'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'ROUTE_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
+  'ROUTE_DOMAIN_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_PRIVILEGED_TARGET_FORBIDDEN': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_TARGET_NOT_OWNED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_TARGET_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
@@ -1603,4 +1615,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 786;
+export const GENERATED_CODE_COUNT = 792;
