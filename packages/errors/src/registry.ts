@@ -244,6 +244,18 @@ export const registry = {
     message:
       'This phone number is not associated with the invitation. Please use the phone number the invitation was sent to.'
   }),
+  INVITE_ADDRESS_REQUIRED: defineError({
+    code: 'INVITE_ADDRESS_REQUIRED',
+    class: 'public',
+    http: 400,
+    message: 'An email address or phone number is required.'
+  }),
+  INVITE_USERS_INVALID: defineError({
+    code: 'INVITE_USERS_INVALID',
+    class: 'public',
+    http: 400,
+    message: 'The users payload must be a JSON array.'
+  }),
 
   // ===========================================================================
   // Authorization / step-up (public)
