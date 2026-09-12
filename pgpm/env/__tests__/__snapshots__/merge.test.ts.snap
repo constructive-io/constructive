@@ -3,9 +3,9 @@
 exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
 {
   "cdn": {
-    "awsAccessKey": "minioadmin",
+    "awsAccessKey": "constructive",
     "awsRegion": "us-east-1",
-    "awsSecretKey": "minioadmin",
+    "awsSecretKey": "constructive-dev-secret",
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",

@@ -1,4 +1,4 @@
-// Minimal script to create a bucket in MinIO/S3 using @constructive-io/s3-utils
+// Minimal script to create a bucket in RustFS/S3 using @constructive-io/s3-utils
 
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { StorageProvider } from '@constructive-io/s3-utils';
@@ -12,12 +12,12 @@ const log = new Logger('create-bucket');
     const opts = getEnvOptions();
     const { cdn } = opts;
 
-    const provider = (cdn?.provider || 'minio') as StorageProvider;
-    const bucket = cdn?.bucketName || 'test-bucket';
-    const region = cdn?.awsRegion || 'us-east-1';
-    const accessKey = cdn?.awsAccessKey || 'minioadmin';
-    const secretKey = cdn?.awsSecretKey || 'minioadmin';
-    const endpoint = cdn?.endpoint || 'http://localhost:9000';
+    const provider = cdn.provider as StorageProvider;
+    const bucket = cdn.bucketName;
+    const region = cdn.awsRegion;
+    const accessKey = cdn.awsAccessKey;
+    const secretKey = cdn.awsSecretKey;
+    const endpoint = cdn.endpoint;
 
     const client = createS3Client({
       provider,

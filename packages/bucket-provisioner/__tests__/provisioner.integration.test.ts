@@ -1,5 +1,5 @@
 /**
- * Integration tests for BucketProvisioner against a real MinIO instance.
+ * Integration tests for BucketProvisioner against a real RustFS instance.
  *
  * These tests exercise the full provisioning pipeline end-to-end:
  *   1. provision() — create bucket, set policies, CORS, versioning, lifecycle
@@ -7,37 +7,29 @@
  *   3. updateCors() — change CORS rules on an existing bucket
  *   4. bucketExists() — verify bucket existence checks
  *
- * Requires MinIO running on localhost:9000 (docker-compose or CI service).
- * Skips gracefully when MinIO is not reachable.
+ * Requires RustFS running on localhost:9000 (docker-compose or CI service).
+ * Skips gracefully when RustFS is not reachable.
  *
- * NOTE: MinIO free / edge-cicd does NOT support several S3 APIs:
- *   - PutBucketCors / GetBucketCors (paid AIStor feature)
- *   - PutPublicAccessBlock / GetPublicAccessBlock
- *   - PutBucketPolicy (may partially work)
- *   - PutBucketVersioning (edge-cicd)
- *   - PutBucketLifecycleConfiguration (edge-cicd)
- * The provisioner gracefully degrades via error-code matching (XmlParseException,
- * NotImplemented, etc.), so provision() and updateCors() succeed but these
- * features are not actually applied on MinIO free.
- * Tests verify the graceful degradation path and focus on APIs MinIO supports:
- * bucket creation and bucket existence checks.
+ * RustFS supports the S3 APIs used by the provisioner. The tests focus on
+ * bucket creation and bucket existence checks in addition to the provisioning
+ * result and graceful error handling.
  */
 
 import { BucketProvisioner } from '../src/provisioner';
 import type { StorageConnectionConfig } from '../src/types';
 import { ProvisionerError } from '../src/types';
 
-// --- MinIO config (matches CI env) ---
+// --- RustFS config (matches CI env) ---
 
-const MINIO_ENDPOINT = process.env.CDN_ENDPOINT || 'http://localhost:9000';
+const OBJECT_STORE_ENDPOINT = process.env.CDN_ENDPOINT || 'http://localhost:9000';
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY || 'minioadmin';
-const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || 'minioadmin';
+const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY || 'constructive';
+const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || 'constructive-dev-secret';
 
 const connection: StorageConnectionConfig = {
   provider: 'minio',
   region: AWS_REGION,
-  endpoint: MINIO_ENDPOINT,
+  endpoint: OBJECT_STORE_ENDPOINT,
   accessKeyId: AWS_ACCESS_KEY,
   secretAccessKey: AWS_SECRET_KEY,
 };
@@ -54,11 +46,11 @@ function testBucketName(suffix: string): string {
 }
 
 /**
- * Check if MinIO is reachable. Skips the entire suite if not.
+ * Check if RustFS is reachable. Skips the entire suite if not.
  */
-async function isMinioReachable(): Promise<boolean> {
+async function isObjectStoreReachable(): Promise<boolean> {
   try {
-    const response = await fetch(`${MINIO_ENDPOINT}/minio/health/live`, {
+    const response = await fetch(`${OBJECT_STORE_ENDPOINT}/minio/health/live`, {
       signal: AbortSignal.timeout(3000),
     });
     return response.ok;
@@ -68,28 +60,28 @@ async function isMinioReachable(): Promise<boolean> {
 }
 
 // --- Conditional test runner ---
-// If MinIO is not available, all tests in this file pass instantly (early return).
+// If RustFS is not available, all tests in this file pass instantly (early return).
 
-let minioAvailable = false;
+let objectStoreAvailable = false;
 
 beforeAll(async () => {
-  minioAvailable = await isMinioReachable();
-  if (!minioAvailable) {
+  objectStoreAvailable = await isObjectStoreReachable();
+  if (!objectStoreAvailable) {
     // eslint-disable-next-line no-console
     console.warn(
-      'MinIO not reachable at %s — skipping bucket-provisioner integration tests',
-      MINIO_ENDPOINT,
+      'RustFS not reachable at %s — skipping bucket-provisioner integration tests',
+      OBJECT_STORE_ENDPOINT,
     );
   }
 });
 
 // --- Tests ---
 
-describe('BucketProvisioner integration (MinIO)', () => {
+describe('BucketProvisioner integration (RustFS)', () => {
   let provisioner: BucketProvisioner;
 
   beforeAll(() => {
-    if (!minioAvailable) return;
+    if (!objectStoreAvailable) return;
     provisioner = new BucketProvisioner({
       connection,
       allowedOrigins: TEST_ORIGINS,
@@ -100,7 +92,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const bucketName = testBucketName('private');
 
     it('should provision a private bucket successfully', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -112,13 +104,12 @@ describe('BucketProvisioner integration (MinIO)', () => {
       expect(result.accessType).toBe('private');
       expect(result.provider).toBe('minio');
       expect(result.region).toBe(AWS_REGION);
-      expect(result.endpoint).toBe(MINIO_ENDPOINT);
+      expect(result.endpoint).toBe(OBJECT_STORE_ENDPOINT);
       expect(result.blockPublicAccess).toBe(true);
       expect(result.versioning).toBe(false);
       expect(result.publicUrlPrefix).toBeNull();
       expect(result.lifecycleRules).toHaveLength(0);
-      // CORS rules are built and returned (intent), even though MinIO
-      // may not actually apply them (PutBucketCors unsupported on free)
+      // CORS rules are built and returned as part of the intended configuration.
       expect(result.corsRules).toHaveLength(1);
       expect(result.corsRules[0].allowedOrigins).toEqual(TEST_ORIGINS);
       expect(result.corsRules[0].allowedMethods).toContain('PUT');
@@ -127,21 +118,19 @@ describe('BucketProvisioner integration (MinIO)', () => {
     });
 
     it('should be inspectable after provisioning', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const inspected = await provisioner.inspect(bucketName, 'private');
 
       expect(inspected.bucketName).toBe(bucketName);
       expect(inspected.accessType).toBe('private');
       expect(inspected.versioning).toBe(false);
-      // MinIO free doesn't support GetPublicAccessBlock — returns false
-      expect(inspected.blockPublicAccess).toBe(false);
-      // MinIO free doesn't support GetBucketCors — returns empty
-      expect(inspected.corsRules).toHaveLength(0);
+      expect(inspected.blockPublicAccess).toBe(true);
+      expect(inspected.corsRules).toHaveLength(1);
     });
 
     it('should survive re-provisioning (idempotent)', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -157,7 +146,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const bucketName = testBucketName('public');
 
     it('should provision a public bucket without error', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -176,22 +165,21 @@ describe('BucketProvisioner integration (MinIO)', () => {
     });
 
     it('should be inspectable after provisioning', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const inspected = await provisioner.inspect(bucketName, 'public');
 
       expect(inspected.bucketName).toBe(bucketName);
       expect(inspected.accessType).toBe('public');
-      // MinIO free doesn't support CORS/policy reads
-      expect(inspected.corsRules).toHaveLength(0);
+      expect(inspected.corsRules).toHaveLength(1);
     });
   });
 
   describe('provision — temp bucket', () => {
     const bucketName = testBucketName('temp');
 
-    it('should provision a temp bucket (lifecycle rules gracefully skipped on MinIO)', async () => {
-      if (!minioAvailable) return;
+    it('should provision a temp bucket with lifecycle rules', async () => {
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -202,30 +190,27 @@ describe('BucketProvisioner integration (MinIO)', () => {
       expect(result.accessType).toBe('temp');
       expect(result.blockPublicAccess).toBe(true);
       expect(result.publicUrlPrefix).toBeNull();
-      // provision() returns intended lifecycle rules even though MinIO can't apply them
       expect(result.lifecycleRules).toHaveLength(1);
       expect(result.lifecycleRules[0].id).toBe('temp-cleanup');
       expect(result.lifecycleRules[0].expirationDays).toBe(1);
       expect(result.lifecycleRules[0].enabled).toBe(true);
     });
 
-    it('should be inspectable (lifecycle not visible on MinIO free)', async () => {
-      if (!minioAvailable) return;
+    it('should be inspectable with lifecycle rules', async () => {
+      if (!objectStoreAvailable) return;
 
       const inspected = await provisioner.inspect(bucketName, 'temp');
 
       expect(inspected.bucketName).toBe(bucketName);
-      // MinIO free doesn't support PutBucketLifecycleConfiguration —
-      // the rules were gracefully skipped, so inspect() returns empty
-      expect(inspected.lifecycleRules).toHaveLength(0);
+      expect(inspected.lifecycleRules).toHaveLength(1);
     });
   });
 
   describe('provision — versioning', () => {
     const bucketName = testBucketName('versioned');
 
-    it('should provision with versioning flag (gracefully skipped on MinIO)', async () => {
-      if (!minioAvailable) return;
+    it('should provision with versioning flag', async () => {
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -233,16 +218,14 @@ describe('BucketProvisioner integration (MinIO)', () => {
         versioning: true,
       });
 
-      // provision() returns intended config even though MinIO can't apply versioning
       expect(result.versioning).toBe(true);
     });
 
-    it('should report versioning state on inspect (not applied on MinIO)', async () => {
-      if (!minioAvailable) return;
+    it('should report versioning state on inspect', async () => {
+      if (!objectStoreAvailable) return;
 
       const inspected = await provisioner.inspect(bucketName, 'private');
-      // MinIO free doesn't support PutBucketVersioning — gracefully skipped
-      expect(inspected.versioning).toBe(false);
+      expect(inspected.versioning).toBe(true);
     });
   });
 
@@ -251,7 +234,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const customOrigins = ['https://custom.example.com', 'https://other.example.com'];
 
     it('should accept per-bucket allowedOrigins (returned in provision result)', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
         bucketName,
@@ -264,12 +247,11 @@ describe('BucketProvisioner integration (MinIO)', () => {
       expect(result.corsRules[0].allowedOrigins).toEqual(customOrigins);
     });
 
-    it('should be inspectable (CORS not visible on MinIO free)', async () => {
-      if (!minioAvailable) return;
+    it('should be inspectable with CORS rules', async () => {
+      if (!objectStoreAvailable) return;
 
       const inspected = await provisioner.inspect(bucketName, 'private');
-      // MinIO free doesn't support GetBucketCors
-      expect(inspected.corsRules).toHaveLength(0);
+      expect(inspected.corsRules).toHaveLength(1);
     });
   });
 
@@ -277,15 +259,15 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const bucketName = testBucketName('cors-update');
 
     beforeAll(async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
       await provisioner.provision({
         bucketName,
         accessType: 'private',
       });
     });
 
-    it('should return updated CORS rules (graceful degradation on MinIO)', async () => {
-      if (!minioAvailable) return;
+    it('should return updated CORS rules', async () => {
+      if (!objectStoreAvailable) return;
 
       const newOrigins = ['https://new-app.example.com'];
       const rules = await provisioner.updateCors({
@@ -294,7 +276,6 @@ describe('BucketProvisioner integration (MinIO)', () => {
         allowedOrigins: newOrigins,
       });
 
-      // updateCors() returns the intended rules even on MinIO
       expect(rules).toHaveLength(1);
       expect(rules[0].allowedOrigins).toEqual(newOrigins);
       expect(rules[0].allowedMethods).toContain('PUT');
@@ -302,7 +283,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     });
 
     it('should switch from private to public CORS methods on access type change', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const rules = await provisioner.updateCors({
         bucketName,
@@ -320,7 +301,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const bucketName = testBucketName('exists-check');
 
     beforeAll(async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
       await provisioner.provision({
         bucketName,
         accessType: 'private',
@@ -328,14 +309,14 @@ describe('BucketProvisioner integration (MinIO)', () => {
     });
 
     it('should return true for an existing bucket', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const exists = await provisioner.bucketExists(bucketName);
       expect(exists).toBe(true);
     });
 
     it('should return false for a non-existent bucket', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       const exists = await provisioner.bucketExists('does-not-exist-' + RUN_ID);
       expect(exists).toBe(false);
@@ -344,7 +325,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
 
   describe('inspect — error handling', () => {
     it('should throw BUCKET_NOT_FOUND for non-existent bucket', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       await expect(
         provisioner.inspect('no-such-bucket-' + RUN_ID, 'private'),
@@ -360,7 +341,7 @@ describe('BucketProvisioner integration (MinIO)', () => {
     const bucketName = testBucketName('roundtrip');
 
     it('should complete the full workflow without error', async () => {
-      if (!minioAvailable) return;
+      if (!objectStoreAvailable) return;
 
       // 1. Provision a private bucket with versioning
       const provisionResult = await provisioner.provision({
@@ -374,14 +355,13 @@ describe('BucketProvisioner integration (MinIO)', () => {
       expect(provisionResult.versioning).toBe(true);
       expect(provisionResult.corsRules[0].allowedOrigins).toEqual(TEST_ORIGINS);
 
-      // 2. Inspect — versioning gracefully skipped on MinIO, CORS not readable
+      // 2. Inspect the applied versioning and CORS configuration.
       const inspected1 = await provisioner.inspect(bucketName, 'private');
       expect(inspected1.bucketName).toBe(bucketName);
-      // MinIO can't apply versioning or CORS
-      expect(inspected1.versioning).toBe(false);
-      expect(inspected1.corsRules).toHaveLength(0);
+      expect(inspected1.versioning).toBe(true);
+      expect(inspected1.corsRules).toHaveLength(1);
 
-      // 3. Update CORS to new origins (graceful degradation on MinIO)
+      // 3. Update CORS to new origins.
       const newOrigins = ['https://staging.example.com'];
       const updatedRules = await provisioner.updateCors({
         bucketName,

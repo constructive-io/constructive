@@ -4,7 +4,7 @@
  * Exercises the file-centric upload pipeline:
  *   uploadAppFile mutation -> presigned PUT URL -> PUT to S3
  *
- * Uses real MinIO (available in CI as minio_cdn service) and reconciled
+ * Uses real RustFS (available in CI as rustfs_cdn service) and reconciled
  * physical bucket fixtures.
  *
  * Three actors (single beforeAll, single server -- stays fast):
@@ -284,8 +284,8 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     provider: 'minio',
     region: 'us-east-1',
     endpoint: 'http://localhost:9000',
-    accessKeyId: 'minioadmin',
-    secretAccessKey: 'minioadmin'
+    accessKeyId: 'constructive',
+    secretAccessKey: 'constructive-dev-secret'
   });
 
   const ensureS3Buckets = async (bucketNames: string[]): Promise<void> => {
@@ -506,7 +506,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       return res.rows[0]?.physical_name ?? null;
     };
 
-    // MinIO uses path-style URLs: http://host:9000/<bucket>/<key>?...
+    // RustFS uses path-style URLs: http://host:9000/<bucket>/<key>?...
     const bucketFromPresignedUrl = (url: string): string =>
       new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
 

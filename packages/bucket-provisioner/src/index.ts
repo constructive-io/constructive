@@ -13,9 +13,9 @@
  *   connection: {
  *     provider: 'minio',
  *     region: 'us-east-1',
- *     endpoint: 'http://minio:9000',
- *     accessKeyId: 'minioadmin',
- *     secretAccessKey: 'minioadmin',
+ *     endpoint: 'http://rustfs:9000',
+ *     accessKeyId: 'constructive',
+ *     secretAccessKey: 'constructive-dev-secret',
  *   },
  *   allowedOrigins: ['https://app.example.com'],
  * });

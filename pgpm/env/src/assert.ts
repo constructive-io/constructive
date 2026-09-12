@@ -6,7 +6,7 @@ import { getStrictEnvMode, isProduction } from '12factor-env';
  *
  * `pgpmDefaults` bakes in development-only values so local dev and tests work
  * out of the box (e.g. `pg.password = 'password'`, `cdn.awsAccessKey =
- * 'minioadmin'`, `pg.host = 'localhost'`). Those are a liability in production:
+ * 'constructive'`, `pg.host = 'localhost'`). Those are a liability in production:
  * a deploy that forgets to set the real value boots on the dev default instead
  * of failing. `deepmerge` cannot express "dev default, required in prod", so
  * this is enforced here as an opt-in assertion callers run at startup.

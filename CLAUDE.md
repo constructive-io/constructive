@@ -69,7 +69,7 @@ React Query Hooks or Prisma-like ORM Client
 | `graphile/` | PostGraphile plugins - filters, i18n, meta-schema, PostGIS, search, uploads, settings |
 | `postgres/` | PostgreSQL utilities - introspection, testing (pgsql-test), seeding, AST, query context |
 | `packages/` | Shared utilities - CLI (`cnc`), ORM base, query builder, server utils, client |
-| `uploads/` | File streaming - S3/MinIO, ETags, content-type detection, UUID hashing |
+| `uploads/` | File streaming - RustFS (or any S3-compatible store), ETags, content-type detection, UUID hashing |
 
 ### Key Packages & CLIs
 
@@ -115,7 +115,7 @@ Tests require PostgreSQL. Standard PG env vars:
 - `PGHOST` (default: localhost), `PGPORT` (default: 5432)
 - `PGUSER` (default: postgres), `PGPASSWORD` (default: password)
 
-For S3/MinIO tests: `MINIO_ENDPOINT`, `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`, `AWS_REGION`
+For S3/RustFS tests: `OBJECT_STORE_ENDPOINT`, `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`, `AWS_REGION`
 
 ## Build System
 

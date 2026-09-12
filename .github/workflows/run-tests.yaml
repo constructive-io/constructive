@@ -37,7 +37,7 @@ concurrency:
 # Service tiers (avoids spinning up unneeded containers):
 #   unit-tests        → no services (pure JS/TS)
 #   pg-tests          → PostgreSQL only
-#   integration-tests → PostgreSQL + MinIO
+#   integration-tests → PostgreSQL + RustFS
 #   ai-tests          → PostgreSQL + Ollama
 # ---------------------------------------------------------------------------
 
@@ -333,7 +333,7 @@ jobs:
           done
 
   # =========================================================================
-  # TIER 3 – Integration tests (PostgreSQL + MinIO)
+  # TIER 3 – Integration tests (PostgreSQL + RustFS)
   # =========================================================================
   integration-tests:
     needs: build
@@ -356,8 +356,8 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: password
       CDN_ENDPOINT: http://localhost:9000
-      AWS_ACCESS_KEY: minioadmin
-      AWS_SECRET_KEY: minioadmin
+      AWS_ACCESS_KEY: constructive
+      AWS_SECRET_KEY: constructive-dev-secret
       AWS_REGION: us-east-1
       # uploads/s3-streamer reads BUCKET_NAME; harmless for the others.
       BUCKET_NAME: test-bucket
@@ -379,16 +379,16 @@ jobs:
         ports:
           - 5432:5432
 
-      minio_cdn:
-        image: minio/minio:edge-cicd
+      rustfs_cdn:
+        image: rustfs/rustfs:1.0.0-rc.5
         env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
+          RUSTFS_ACCESS_KEY: constructive
+          RUSTFS_SECRET_KEY: constructive-dev-secret
+          RUSTFS_ADDRESS: ":9000"
         ports:
           - 9000:9000
-          - 9001:9001
         options: >-
-          --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
+          --health-cmd "curl -f http://localhost:9000/health || exit 1"
           --health-interval 3s
           --health-timeout 5s
           --health-retries 10

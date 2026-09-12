@@ -7,10 +7,10 @@
  * (`buckets`/`files`), because the plane *is* that database's storage. Both must
  * produce an upload surface, so this pins the two together: one schema build over
  * both planes has to expose `uploadAppFile` AND `uploadFile`, and the unprefixed
- * one has to work end to end — presigned PUT to MinIO, and a physical bucket
+ * one has to work end to end — presigned PUT to RustFS, and a physical bucket
  * recorded on the tenant's own bucket row.
  *
- * Uses real MinIO (the `minio_cdn` service in CI, localhost:9000 locally).
+ * Uses real RustFS (the `rustfs_cdn` service in CI, localhost:9000 locally).
  *
  *   pnpm test -- --testPathPattern=db-scope-upload
  */
@@ -103,8 +103,8 @@ describe('database-scope upload surface', () => {
     provider: 'minio',
     region: 'us-east-1',
     endpoint: 'http://localhost:9000',
-    accessKeyId: 'minioadmin',
-    secretAccessKey: 'minioadmin'
+    accessKeyId: 'constructive',
+    secretAccessKey: 'constructive-dev-secret'
   });
 
   const post = (
@@ -170,7 +170,7 @@ describe('database-scope upload surface', () => {
     let contentHash: string;
     let uploadUrl: string;
 
-    // MinIO uses path-style URLs: http://host:9000/<bucket>/<key>?...
+    // RustFS uses path-style URLs: http://host:9000/<bucket>/<key>?...
     const bucketFromPresignedUrl = (url: string): string =>
       new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
 
