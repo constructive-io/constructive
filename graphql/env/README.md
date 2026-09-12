@@ -44,6 +44,12 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 ### GraphQL Schema
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
 
+Schema-scoped introspection is configured through the Graphile preset in
+`pgpm.json` or runtime options. The map is keyed by the final PostgreSQL
+service name: omit a service or set it to `false` for stock introspection, set
+it to `true` for scoped defaults, or provide `catalogTypes` and
+`capabilityExtensions` explicitly.
+
 ### Feature Flags
 - `FEATURES_SIMPLE_INFLECTION` - Enable simple inflection plugin
 - `FEATURES_OPPOSITE_BASE_NAMES` - Enable opposite base names
@@ -65,7 +71,11 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
 
 ```typescript
 {
-  graphile: { schema: [] },
+  graphile: {
+    schema: [],
+    extends: [],
+    preset: {}
+  },
   features: {
     simpleInflection: true,
     oppositeBaseNames: true,
@@ -78,6 +88,41 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
     isPublic: true,
     metaSchemas: ['routing_public', 'metaschema_public', 'metaschema_modules_public'],
     routingSchema: 'routing_public'
+  }
+}
+```
+
+For example, this enables scoped introspection with the defaults for the
+server's default `main` service:
+
+```json
+{
+  "graphile": {
+    "preset": {
+      "gather": {
+        "pgScopedIntrospection": { "main": true }
+      }
+    }
+  }
+}
+```
+
+Advanced options can be supplied when a service needs a specific catalog
+policy or extension capability:
+
+```json
+{
+  "graphile": {
+    "preset": {
+      "gather": {
+        "pgScopedIntrospection": {
+          "main": {
+            "catalogTypes": "dependency-closure",
+            "capabilityExtensions": ["pg_trgm"]
+          }
+        }
+      }
+    }
   }
 }
 ```

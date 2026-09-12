@@ -80,3 +80,29 @@ may be visible to other local processes.
 
 The PostgreSQL fixture command only creates a previously absent schema whose
 name starts with `cperf_`; it never drops or replaces schemas.
+
+## Scoped introspection comparison
+
+`makeScopedIntrospectionSuite({ schemas })` compares stock introspection with
+`gather.pgScopedIntrospection.main: true` using `scoped-introspection-worker.js`.
+Both cases use the same upstream service factory and its default session settings.
+The scoped case uses the copied CNC plugin and its default `catalogTypes: 'all'`;
+there is no legacy mode, dependency-schema allowlist, or performance-only tuning.
+The stock case does not load the scoped plugin.
+
+Pass an optional `runtimeCheck: { query, expectedData }` to the suite to verify
+actual table, relation, or function results after each build. A result mismatch
+fails the sample. Without this option, the worker performs the minimal
+`{ __typename }` smoke check. Schema hash equivalence is checked separately by
+the runner. Service release completes before the worker reports success.
+
+For performance comparisons, keep target schemas fixed while increasing unrelated
+catalog objects, discard a warm-up pair, and use repeated fresh-process samples
+with the runner's seeded case ordering. Fresh Node processes do not imply cold
+PostgreSQL caches. Report medians and sample ranges together with PostgreSQL/Node
+versions and catalog sizes; runtime validation and process startup are outside
+`buildMs`. `processPeakRss` is the worker peak measured after runtime validation,
+before service release.
+
+The [default scoped comparison](benchmarks/scoped-introspection.md) includes a
+reproduction command, measured results, and the individual timing/memory samples.
