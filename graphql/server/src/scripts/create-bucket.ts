@@ -12,10 +12,6 @@ const log = new Logger('create-bucket');
     const opts = getEnvOptions();
     const { cdn } = opts;
 
-    if (!cdn) {
-      throw new Error('[create-bucket] CDN config not found. Ensure pgpmDefaults provides CDN fields.');
-    }
-
     const provider = cdn.provider as StorageProvider;
     const bucket = cdn.bucketName;
     const region = cdn.awsRegion;
