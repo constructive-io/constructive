@@ -12,34 +12,12 @@ services:
     networks:
       - constructive-net
 
-  minio:
-    container_name: minio
-    image: minio/minio
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    expose:
-      - "9000"
-      - "9001"
-    command: server /data --console-address ":9001"
-    networks:
-      - constructive-net
-
-  # RustFS is an alternative to the `minio` service above: same S3 API on 9000
-  # and console on 9001, so the two cannot run together. Behind a profile:
-  # `docker compose up postgres` keeps MinIO, `docker compose --profile rustfs
-  # up postgres rustfs` swaps it in. Pair it with BUCKET_PROVIDER=rustfs.
   rustfs:
     container_name: rustfs
-    image: rustfs/rustfs:latest
-    profiles:
-      - rustfs
+    image: rustfs/rustfs:1.0.0-rc.5
     environment:
-      - RUSTFS_ACCESS_KEY=minioadmin
-      - RUSTFS_SECRET_KEY=minioadmin
+      - RUSTFS_ACCESS_KEY=constructive
+      - RUSTFS_SECRET_KEY=constructive-dev-secret
       - RUSTFS_ADDRESS=:9000
       - RUSTFS_CONSOLE_ADDRESS=:9001
       - RUSTFS_CONSOLE_ENABLE=true
@@ -49,7 +27,6 @@ services:
     expose:
       - "9000"
       - "9001"
-    command: /data
     networks:
       - constructive-net
 

@@ -115,7 +115,7 @@ export type BucketProvider = 's3' | 'minio' | 'rustfs' | 'gcs';
  * CDN and file storage configuration
  */
 export interface CDNOptions {
-    /** Storage provider type (s3, minio, rustfs, gcs). Defaults to 'minio' for local dev */
+    /** Storage provider type (s3, minio, rustfs, gcs). 'minio' means path-style S3-compatible (RustFS, MinIO) */
     provider?: BucketProvider;
     /** S3 bucket name for file storage */
     bucketName?: string;
@@ -125,7 +125,7 @@ export interface CDNOptions {
     awsAccessKey?: string;
     /** AWS secret key for S3 */
     awsSecretKey?: string;
-    /** S3-compatible API endpoint URL (MinIO, R2, DO Spaces, GCS, etc.) */
+    /** S3-compatible API endpoint URL (RustFS, MinIO, R2, DO Spaces, GCS, etc.) */
     endpoint?: string;
     /** Public URL prefix for generating download URLs (e.g., CDN domain, S3 public URL) */
     publicUrlPrefix?: string;
@@ -373,8 +373,8 @@ export const pgpmDefaults: PgpmOptions = {
     provider: 'minio',
     bucketName: 'test-bucket',
     awsRegion: 'us-east-1',
-    awsAccessKey: 'minioadmin',
-    awsSecretKey: 'minioadmin',
+    awsAccessKey: 'constructive',
+    awsSecretKey: 'constructive-dev-secret',
     endpoint: 'http://localhost:9000',
     publicUrlPrefix: 'http://localhost:9000'
   },

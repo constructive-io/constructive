@@ -20,9 +20,9 @@
  * ENV VARS (S3 connection only):
  *   BUCKET_PROVIDER  - 'minio' | 's3' (default: 'minio')
  *   AWS_REGION       - AWS region (default: 'us-east-1')
- *   AWS_ACCESS_KEY   - access key (default: 'minioadmin')
- *   AWS_SECRET_KEY   - secret key (default: 'minioadmin')
- *   CDN_ENDPOINT     - S3-compatible endpoint (default: 'http://localhost:9000')
+ *   AWS_ACCESS_KEY   - access key (default from pgpmDefaults)
+ *   AWS_SECRET_KEY   - secret key (default from pgpmDefaults)
+ *   CDN_ENDPOINT     - S3-compatible endpoint (default from pgpmDefaults)
  */
 
 import { getEnvOptions } from '@constructive-io/graphql-env';
@@ -61,21 +61,25 @@ let streamer: Streamer | null = null;
 function getStreamer(): Streamer {
   if (streamer) return streamer;
 
-  const { cdn = {} } = getEnvOptions();
+  const { cdn } = getEnvOptions();
 
-  if (process.env.NODE_ENV === 'production' && (!cdn.awsAccessKey || !cdn.awsSecretKey)) {
-    log.warn('[upload-resolver] WARNING: Using default credentials in production.');
+  if (process.env.NODE_ENV === 'production' && (!cdn || !cdn.awsAccessKey || !cdn.awsSecretKey)) {
+    log.warn('[upload-resolver] WARNING: Incomplete CDN configuration in production.');
   }
 
-  const provider = cdn.provider || 'minio';
+  if (!cdn) {
+    throw new Error('[upload-resolver] CDN config not found. Ensure pgpmDefaults provides CDN fields.');
+  }
+
+  const provider = cdn.provider;
   log.info(`[upload-resolver] Initializing: provider=${provider}`);
 
   streamer = new Streamer({
     provider,
-    awsRegion: cdn.awsRegion || 'us-east-1',
-    awsAccessKey: cdn.awsAccessKey || 'minioadmin',
-    awsSecretKey: cdn.awsSecretKey || 'minioadmin',
-    endpoint: cdn.endpoint || 'http://localhost:9000',
+    awsRegion: cdn.awsRegion,
+    awsAccessKey: cdn.awsAccessKey,
+    awsSecretKey: cdn.awsSecretKey,
+    endpoint: cdn.endpoint,
   });
 
   return streamer;

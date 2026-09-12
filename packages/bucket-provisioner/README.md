@@ -20,7 +20,7 @@ S3-compatible bucket provisioning library for the Constructive storage module. C
 - **CORS configuration** — Browser-compatible rules for presigned URL uploads
 - **Lifecycle rules** — Auto-cleanup for temp buckets (abandoned uploads)
 - **Versioning** — Optional S3 versioning for durability
-- **Multi-provider** — Works with AWS S3, MinIO, Cloudflare R2, Google Cloud Storage, and DigitalOcean Spaces
+- **Multi-provider** — Works with AWS S3, RustFS (or any S3-compatible store), Cloudflare R2, Google Cloud Storage, and DigitalOcean Spaces
 - **Inspect/audit** — Read back a bucket's current configuration for verification
 - **Typed errors** — Structured `ProvisionerError` with error codes for programmatic handling
 
@@ -39,9 +39,9 @@ const provisioner = new BucketProvisioner({
   connection: {
     provider: 'minio',
     region: 'us-east-1',
-    endpoint: 'http://minio:9000',
-    accessKeyId: 'minioadmin',
-    secretAccessKey: 'minioadmin',
+    endpoint: 'http://rustfs:9000',
+    accessKeyId: 'constructive',
+    secretAccessKey: 'constructive-dev-secret',
   },
   allowedOrigins: ['https://app.example.com'],
 });
@@ -282,7 +282,7 @@ Error codes:
 | Provider | Endpoint Required | Path Style | Notes |
 |----------|------------------|------------|-------|
 | `s3` | No | Virtual-hosted | AWS default |
-| `minio` | Yes | Path-style | Local development, self-hosted |
+| `minio` | Yes | Path-style S3-compatible (RustFS, MinIO) | Local development, self-hosted |
 | `r2` | Yes | Path-style | Cloudflare R2 |
 | `gcs` | Yes | Path-style | GCS S3-compatible API |
 | `spaces` | Yes | Virtual-hosted | DigitalOcean Spaces |

@@ -13,7 +13,7 @@ export interface BucketConfig {
   max_file_size: number | null;
   allow_custom_keys: boolean;
   /**
-   * The physical S3/MinIO bucket name recorded by reconciliation. NULL until
+   * The physical S3-compatible (RustFS, MinIO) bucket name recorded by reconciliation. NULL until
    * reconciliation completes. Once set, it is the source of truth for the
    * physical bucket — reads never reconstruct the name.
    */
@@ -179,11 +179,11 @@ export interface S3Config {
   client: S3Client;
   /** S3 bucket name (the actual S3 bucket, not the logical bucket key) */
   bucket: string;
-  /** S3 endpoint URL (for MinIO/custom S3) */
+  /** S3 endpoint URL (for RustFS, MinIO, or custom S3) */
   endpoint?: string;
   /** S3 region */
   region?: string;
-  /** Whether to use path-style URLs (required for MinIO) */
+  /** Whether to use path-style URLs (required for path-style S3-compatible storage) */
   forcePathStyle?: boolean;
   /** Public URL prefix for generating download URLs */
   publicUrlPrefix?: string;

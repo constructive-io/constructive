@@ -14,8 +14,7 @@ Database Profiles:
   --supabase         Use Supabase local development profile
 
 Additional Services:
-  --minio            Include MinIO/S3 environment variables
-  --rustfs           Include RustFS/S3 environment variables (same vars as --minio)
+  --rustfs           Include RustFS/S3 environment variables
 
 Modes:
   No command         Print export statements for shell evaluation
@@ -24,20 +23,15 @@ Modes:
 Options:
   --help, -h         Show this help message
   --supabase         Use Supabase profile instead of default Postgres
-  --minio            Include CDN_ENDPOINT, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
-  --rustfs           Alias for --minio (RustFS serves the same S3 API on :9000)
+  --rustfs           Include CDN_ENDPOINT, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
 
 Examples:
   pgpm env                                    Print default Postgres env exports
   pgpm env --supabase                         Print Supabase env exports
-  pgpm env --minio                            Print Postgres + MinIO env exports
   pgpm env --rustfs                           Print Postgres + RustFS env exports
-  pgpm env --supabase --minio                 Print Supabase + MinIO env exports
   eval "$(pgpm env)"                          Load default Postgres env into shell
-  eval "$(pgpm env --minio)"                  Load Postgres + MinIO env into shell
-  eval "$(pgpm env --supabase --minio)"       Load Supabase + MinIO env into shell
-  pgpm env pgpm deploy --database db1         Run command with default Postgres env
-  pgpm env --minio pgpm deploy --database db1 Run command with Postgres + MinIO env
+  eval "$(pgpm env --rustfs)"                 Load Postgres + RustFS env into shell
+  pgpm env --rustfs pgpm deploy --database db1 Run command with Postgres + RustFS env
 `;
 
 const SUPABASE_PROFILE: PgConfig = {
@@ -61,8 +55,8 @@ interface ObjectStoreConfig {
 
 const OBJECT_STORE_PROFILE: ObjectStoreConfig = {
   endpoint: 'http://localhost:9000',
-  accessKey: 'minioadmin',
-  secretKey: 'minioadmin',
+  accessKey: 'constructive',
+  secretKey: 'constructive-dev-secret',
   region: 'us-east-1',
 };
 

@@ -28,8 +28,8 @@ const defaultOptions: BucketProvisionerOptions = {
     provider: 'minio',
     region: 'us-east-1',
     endpoint: 'http://minio:9000',
-    accessKeyId: 'minioadmin',
-    secretAccessKey: 'minioadmin',
+    accessKeyId: 'constructive',
+    secretAccessKey: 'constructive-dev-secret',
   },
   allowedOrigins: ['https://app.example.com'],
 };

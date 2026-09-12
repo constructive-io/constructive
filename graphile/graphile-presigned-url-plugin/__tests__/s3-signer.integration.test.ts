@@ -1,12 +1,12 @@
 /**
- * Integration tests for s3-signer against a real MinIO instance.
+ * Integration tests for s3-signer against a real RustFS instance.
  *
  * These tests exercise the presigned URL pipeline end-to-end:
  *   1. generatePresignedPutUrl → PUT a file via the presigned URL
  *   2. headObject → verify the file exists with correct metadata
  *   3. generatePresignedGetUrl → GET the file via the presigned URL
  *
- * Requires MinIO running on localhost:9000 (docker-compose or CI service).
+ * Requires RustFS running on localhost:9000 (docker-compose or CI service).
  */
 
 import { S3Client } from '@aws-sdk/client-s3';
@@ -21,12 +21,12 @@ import {
 } from '../src/s3-signer';
 import type { S3Config } from '../src/types';
 
-// --- MinIO config (matches docker-compose.yml + CI env) ---
+// --- RustFS config (matches docker-compose.yml + CI env) ---
 
-const MINIO_ENDPOINT = process.env.CDN_ENDPOINT || 'http://localhost:9000';
+const OBJECT_STORE_ENDPOINT = process.env.CDN_ENDPOINT || 'http://localhost:9000';
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY || 'minioadmin';
-const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || 'minioadmin';
+const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY || 'constructive';
+const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY || 'constructive-dev-secret';
 const TEST_BUCKET = 'presigned-url-test-bucket';
 
 // --- S3 client + config ---
@@ -37,14 +37,14 @@ const s3Client = new S3Client({
     secretAccessKey: AWS_SECRET_KEY,
   },
   region: AWS_REGION,
-  endpoint: MINIO_ENDPOINT,
+  endpoint: OBJECT_STORE_ENDPOINT,
   forcePathStyle: true,
 });
 
 const s3Config: S3Config = {
   client: s3Client,
   bucket: TEST_BUCKET,
-  endpoint: MINIO_ENDPOINT,
+  endpoint: OBJECT_STORE_ENDPOINT,
   region: AWS_REGION,
   forcePathStyle: true,
 };
@@ -101,7 +101,7 @@ async function downloadFromPresignedUrl(url: string): Promise<{
 
 // --- Tests ---
 
-describe('s3-signer integration (MinIO)', () => {
+describe('s3-signer integration (RustFS)', () => {
   describe('generatePresignedPutUrl', () => {
     it('should generate a presigned PUT URL that accepts a valid upload', async () => {
       const key = 'test-put-basic.txt';
