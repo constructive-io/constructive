@@ -1,0 +1,327 @@
+diff --git a/dist/adaptors/pg.d.ts b/dist/adaptors/pg.d.ts
+index 2c69e9046a83c61e59b42d9a733ea3051a658f59..22797b5aa5fbf277a71bb1691b200e853f94be95 100644
+--- a/dist/adaptors/pg.d.ts
++++ b/dist/adaptors/pg.d.ts
+@@ -96,8 +96,10 @@ export declare class PgSubscriber<TTopics extends {
+     private resetClient;
+     private listeningClient;
+     private listeningClientPromise;
++    private listeningClientErrorListener;
+     private getClient;
+-    release(): void;
++    private releasePromise;
++    release(): Promise<void>;
+     private _chain;
+     private chain;
+ }
+diff --git a/dist/adaptors/pg.js b/dist/adaptors/pg.js
+index afa172c99d66784cbefb9aad271978d87e0d4277..3e9f00c711b545945a6c31e9353043c98028159a 100644
+--- a/dist/adaptors/pg.js
++++ b/dist/adaptors/pg.js
+@@ -349,6 +349,22 @@ const adaptor = {
+     makePgService,
+ };
+ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
++const pgSubscriberReleaseAbort = Symbol("PgSubscriber release abort");
++const makePgSubscriberReleaseAbortError = () => {
++    const error = new Error("PgSubscriber released; aborting getClient");
++    error[pgSubscriberReleaseAbort] = true;
++    return error;
++};
++const isPgSubscriberReleaseAbortError = (error) => error != null &&
++    typeof error === "object" &&
++    error[pgSubscriberReleaseAbort] === true;
++const releaseErrorFrom = (errors, message) => {
++    if (errors.length === 0)
++        return null;
++    if (errors.length === 1)
++        return errors[0];
++    return new AggregateError(errors, message);
++};
+ /**
+  * This class provides helpers for Postgres' LISTEN/NOTIFY pub/sub
+  * implementation. We aggregate all LISTEN/NOTIFY events so that we can supply
+@@ -369,6 +385,8 @@ class PgSubscriber {
+         this.subscribedTopics = new Set();
+         this.listeningClient = null;
+         this.listeningClientPromise = null;
++        this.listeningClientErrorListener = null;
++        this.releasePromise = null;
+         // Avoid race conditions by chaining everything
+         this._chain = Promise.resolve();
+         this.pool = pool;
+@@ -480,7 +498,7 @@ class PgSubscriber {
+     }
+     async syncWithClient(client) {
+         if (!this.alive) {
+-            throw new Error("PgSubscriber released; aborting syncWithClient");
++            throw makePgSubscriberReleaseAbortError();
+         }
+         const expectedTopics = Object.keys(this.topics);
+         const topicsToAdd = expectedTopics.filter((t) => !this.subscribedTopics.has(t));
+@@ -501,6 +519,10 @@ class PgSubscriber {
+             }
+             const client = this.listeningClient;
+             if (client !== null) {
++                if (this.listeningClientErrorListener) {
++                    client.off("error", this.listeningClientErrorListener);
++                    this.listeningClientErrorListener = null;
++                }
+                 client.off("notification", this.recordNotification);
+                 client.release();
+                 this.listeningClient = null;
+@@ -525,7 +547,7 @@ class PgSubscriber {
+     }
+     getClient() {
+         if (!this.alive) {
+-            return Promise.reject(new Error("Released; aborting getClient"));
++            return Promise.reject(makePgSubscriberReleaseAbortError());
+         }
+         if (this.listeningClient) {
+             return Promise.resolve(this.listeningClient);
+@@ -536,34 +558,65 @@ class PgSubscriber {
+                     for (let attempts = 0;; attempts++) {
+                         try {
+                             if (!this.alive) {
+-                                return Promise.reject(new Error("PgSubscriber released; aborting getClient"));
++                                throw makePgSubscriberReleaseAbortError();
+                             }
+                             const logError = (e) => {
+                                 console.error(`Error on listening client: ${e}`);
+                             };
+                             const client = await this.pool.connect();
++                            if (!this.alive) {
++                                await client.release(true);
++                                throw makePgSubscriberReleaseAbortError();
++                            }
+                             try {
+                                 client.on("error", logError);
+                                 client.on("notification", this.recordNotification);
+                                 await this.syncWithClient(client);
++                                if (!this.alive) {
++                                    throw makePgSubscriberReleaseAbortError();
++                                }
+                                 // All good; we can return this client finally!
+                                 this.listeningClientPromise = null;
+                                 this.listeningClient = client;
+                                 client.off("error", logError);
+-                                client.on("error", (e) => {
++                                const listeningClientErrorListener = (e) => {
+                                     logError(e);
+                                     this.resetClient();
+-                                });
++                                };
++                                this.listeningClientErrorListener = listeningClientErrorListener;
++                                client.on("error", listeningClientErrorListener);
+                                 return client;
+                             }
+                             catch (e) {
+-                                client.off("error", logError);
+-                                client.off("notification", this.recordNotification);
+-                                client.release();
++                                const cleanupErrors = [];
++                                try {
++                                    client.off("error", logError);
++                                }
++                                catch (error) {
++                                    cleanupErrors.push(error);
++                                }
++                                try {
++                                    client.off("notification", this.recordNotification);
++                                }
++                                catch (error) {
++                                    cleanupErrors.push(error);
++                                }
++                                try {
++                                    await client.release(!this.alive);
++                                }
++                                catch (error) {
++                                    cleanupErrors.push(error);
++                                }
++                                if (cleanupErrors.length > 0) {
++                                    throw releaseErrorFrom([e, ...cleanupErrors], "Failed to release a PgSubscriber client after getClient failed");
++                                }
+                                 throw e;
+                             }
+                         }
+                         catch (e) {
++                            if (!this.alive) {
++                                throw e;
++                            }
+                             console.error(`Error with listening client during getClient (attempt ${attempts + 1}): ${e}`);
+                             // Exponential back-off (maximum 30 seconds)
+                             await sleep(Math.min(100 * Math.exp(attempts), 30000));
+@@ -582,15 +635,30 @@ class PgSubscriber {
+         }
+     }
+     release() {
+-        if (this.alive) {
++        if (this.releasePromise) {
++            return this.releasePromise;
++        }
++        this.releasePromise = (async () => {
++            const errors = [];
+             this.alive = false;
++            const iteratorPromises = [];
+             for (const topic of Object.keys(this.topics)) {
+-                for (const asyncIterableIterator of this.topics[topic]) {
++                for (const asyncIterableIterator of [...this.topics[topic]]) {
+                     if (asyncIterableIterator.return) {
+-                        asyncIterableIterator.return().then(null, grafast_1.noop);
++                        try {
++                            iteratorPromises.push(Promise.resolve(asyncIterableIterator.return()));
++                        }
++                        catch (error) {
++                            errors.push(error);
++                        }
+                     }
+                     else if (asyncIterableIterator.throw) {
+-                        asyncIterableIterator.throw(new Error("Released")).then(null, grafast_1.noop);
++                        try {
++                            iteratorPromises.push(Promise.resolve(asyncIterableIterator.throw(new Error("Released"))));
++                        }
++                        catch (error) {
++                            errors.push(error);
++                        }
+                     }
+                     else {
+                         // What do we do now?!
+@@ -600,27 +668,89 @@ class PgSubscriber {
+                 }
+                 delete this.topics[topic];
+             }
++            const chain = this._chain;
++            const listeningClientPromise = this.listeningClientPromise;
++            const iteratorResults = await Promise.allSettled(iteratorPromises);
++            for (const result of iteratorResults) {
++                if (result.status === "rejected") {
++                    errors.push(result.reason);
++                }
++            }
++            try {
++                await chain;
++            }
++            catch (error) {
++                errors.push(error);
++            }
++            if (listeningClientPromise) {
++                try {
++                    await listeningClientPromise;
++                }
++                catch (error) {
++                    if (!isPgSubscriberReleaseAbortError(error)) {
++                        errors.push(error);
++                    }
++                }
++            }
+             const unlistenAndRelease = async (client) => {
++                const errors = [];
++                try {
++                    if (this.listeningClientErrorListener) {
++                        client.off("error", this.listeningClientErrorListener);
++                        this.listeningClientErrorListener = null;
++                    }
++                }
++                catch (error) {
++                    errors.push(error);
++                }
++                try {
++                    client.off("notification", this.recordNotification);
++                }
++                catch (error) {
++                    errors.push(error);
++                }
+                 try {
+                     for (const topic of this.subscribedTopics) {
+                         await client.query(`UNLISTEN ${client.escapeIdentifier(topic)}`);
+                         this.subscribedTopics.delete(topic);
+                     }
+                 }
+-                catch (_e) {
+-                    // ignore
++                catch (error) {
++                    errors.push(error);
++                }
++                finally {
++                    this.subscribedTopics.clear();
++                    try {
++                        await client.release(errors.length > 0);
++                    }
++                    catch (error) {
++                        errors.push(error);
++                    }
++                }
++                const releaseError = releaseErrorFrom(errors, "Failed to release a PgSubscriber client");
++                if (releaseError) {
++                    throw releaseError;
+                 }
+-                client.release();
+             };
+             if (this.listeningClient) {
+-                unlistenAndRelease(this.listeningClient).then(null, grafast_1.noop);
++                const client = this.listeningClient;
++                try {
++                    await unlistenAndRelease(client);
++                }
++                catch (error) {
++                    errors.push(error);
++                }
++                finally {
++                    this.listeningClient = null;
++                }
+             }
+-            else if (this.listeningClientPromise) {
+-                this.listeningClientPromise.then(unlistenAndRelease, () => {
+-                    /* ignore */
+-                });
++            this.listeningClientPromise = null;
++            const releaseError = releaseErrorFrom(errors, "Failed to release a PgSubscriber");
++            if (releaseError) {
++                throw releaseError;
+             }
+-        }
++        })();
++        return this.releasePromise;
+     }
+     chain(callback) {
+         this._chain = this._chain.then(callback, callback).then(null, grafast_1.noop);
+@@ -661,6 +791,7 @@ function makePgService(options) {
+         pgSubscriber = new PgSubscriber(pool);
+         releasers.push(() => pgSubscriber.release?.());
+     }
++    let releasePromise = null;
+     const service = {
+         name,
+         schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+@@ -675,11 +806,27 @@ function makePgService(options) {
+             pool,
+             superuserPool,
+         },
+-        async release() {
+-            // Release in reverse order
+-            for (const releaser of [...releasers].reverse()) {
+-                await releaser();
++        release() {
++            if (releasePromise) {
++                return releasePromise;
+             }
++            releasePromise = (async () => {
++                const errors = [];
++                // Release in reverse order, but always attempt every releaser.
++                for (const releaser of [...releasers].reverse()) {
++                    try {
++                        await releaser();
++                    }
++                    catch (error) {
++                        errors.push(error);
++                    }
++                }
++                const releaseError = releaseErrorFrom(errors, "Failed to release a PgService");
++                if (releaseError) {
++                    throw releaseError;
++                }
++            })();
++            return releasePromise;
+         },
+     };
+     return service;
