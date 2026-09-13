@@ -1,8 +1,10 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient, sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
+
+import { queryPgClient } from '../utils/pg-client';
 
 const version = '0.1.0';
 
@@ -106,7 +108,7 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         if (requireWhere && (!input.where || Object.keys(input.where).length === 0)) {
                           throw new Error(
                             'Bulk update requires a non-empty where condition. Set bulkRequireWhere: false to allow unrestricted updates.'
@@ -212,13 +214,15 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
 
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         const text = `UPDATE ${compiledFrom}\nSET ${setClauses.join(', ')}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await queryPgClient<
+                          Record<string, unknown>
+                        >(pgClient, text, values);
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // Follow-up SELECT using PKs to respect column-level grants
                         let returning: unknown[] = [];
                         if (mutationResult.rows && mutationResult.rows.length > 0) {
-                          const pkRows: Record<string, unknown>[] = mutationResult.rows;
+                          const pkRows = mutationResult.rows;
                           const pkConditions = pkRows.map((pkRow, rowIdx) => {
                             return pkColumns.map((col, colIdx) => {
                               const paramIdx = rowIdx * pkColumns.length + colIdx + 1;
@@ -229,11 +233,12 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                           const selectParams = pkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
+                          const selectResult = await queryPgClient<unknown>(
+                            pgClient,
                             `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
                             selectParams
                           );
-                          returning = selectResult.rows || [];
+                          returning = [...selectResult.rows];
                         }
 
                         return {

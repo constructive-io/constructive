@@ -17,6 +17,7 @@
  * billing piece.
  */
 
+import type { PgClient as DataplanPgClient } from '@dataplan/pg';
 import { ModuleConfigCache } from 'graphile-cache';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -25,9 +26,7 @@ import { ModuleConfigCache } from 'graphile-cache';
  * Generic pg client interface matching what Graphile's withPgClient provides.
  * Avoids a hard dependency on the `pg` package.
  */
-export interface PgClient {
-  query(sql: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
-}
+export type PgClient = DataplanPgClient;
 
 /**
  * Billing function metadata resolved from the billing_module metaschema table.
@@ -105,61 +104,64 @@ const billingCache = new ModuleConfigCache<LlmBillingCacheEntry>({
 
 // ─── Resolution Functions ───────────────────────────────────────────────────
 
-/**
- * SQL to check if a schema exists. Used as a guard before querying
- * metaschema tables that may not be provisioned.
- */
-const SCHEMA_EXISTS_SQL = `
-  SELECT 1 FROM information_schema.schemata WHERE schema_name = $1 LIMIT 1
+/** Check the exact optional module relation before querying it. */
+const RELATION_EXISTS_SQL = `
+  SELECT pg_catalog.to_regclass($1) AS relation
 `;
 
 async function resolveInferenceLogConfig(
   pgClient: PgClient,
   databaseId: string
 ): Promise<InferenceLogConfig | null> {
-  try {
-    const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
-    if (schemaCheck.rows.length === 0) return null;
+  const relationCheck = await pgClient.query<{ relation: string | null }>({
+    text: RELATION_EXISTS_SQL,
+    values: ['metaschema_modules_public.inference_log_module'],
+  });
+  if (!relationCheck.rows[0]?.relation) return null;
 
-    const result = await pgClient.query(INFERENCE_LOG_MODULE_SQL, [databaseId]);
-    const row = result.rows[0];
-    if (!row?.schema || !row?.table_name) return null;
-
-    return {
-      schema: row.schema as string,
-      tableName: row.table_name as string
-    };
-  } catch {
-    return null;
+  const result = await pgClient.query<Record<string, unknown>>({
+    text: INFERENCE_LOG_MODULE_SQL,
+    values: [databaseId],
+  });
+  const row = result.rows[0];
+  if (!row) return null;
+  if (!row.schema || !row.table_name) {
+    throw new Error('LLM_INFERENCE_LOG_CONFIG_INCOMPLETE');
   }
+
+  return {
+    schema: row.schema as string,
+    tableName: row.table_name as string,
+  };
 }
 
 async function resolveBillingConfig(
   pgClient: PgClient,
   databaseId: string
 ): Promise<BillingConfig | null> {
-  try {
-    // Guard: check if the metaschema_modules_public schema exists.
-    // If the database doesn't have the billing module provisioned,
-    // this schema (or the billing_module table) won't exist.
-    const schemaCheck = await pgClient.query(SCHEMA_EXISTS_SQL, ['metaschema_modules_public']);
-    if (schemaCheck.rows.length === 0) return null;
+  const relationCheck = await pgClient.query<{ relation: string | null }>({
+    text: RELATION_EXISTS_SQL,
+    values: ['metaschema_modules_public.billing_module'],
+  });
+  if (!relationCheck.rows[0]?.relation) return null;
 
-    const result = await pgClient.query(BILLING_MODULE_SQL, [databaseId]);
-    const row = result.rows[0];
-    if (!row?.record_usage_function) return null;
-
-    return {
-      publicSchema: row.public_schema as string,
-      privateSchema: row.private_schema as string,
-      recordUsageFunction: row.record_usage_function as string,
-      // The check_billing_quota function name follows the inflection pattern
-      checkBillingQuotaFunction: 'check_billing_quota'
-    };
-  } catch {
-    // Schema/table doesn't exist or query failed — billing not available
-    return null;
+  const result = await pgClient.query<Record<string, unknown>>({
+    text: BILLING_MODULE_SQL,
+    values: [databaseId],
+  });
+  const row = result.rows[0];
+  if (!row) return null;
+  if (!row.public_schema || !row.private_schema || !row.record_usage_function) {
+    throw new Error('LLM_BILLING_CONFIG_INCOMPLETE');
   }
+
+  return {
+    publicSchema: row.public_schema as string,
+    privateSchema: row.private_schema as string,
+    recordUsageFunction: row.record_usage_function as string,
+    // The check_billing_quota function name follows the inflection pattern
+    checkBillingQuotaFunction: 'check_billing_quota',
+  };
 }
 
 // ─── Public API ─────────────────────────────────────────────────────────────

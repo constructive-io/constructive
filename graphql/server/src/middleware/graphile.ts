@@ -2,7 +2,6 @@ import './types'; // for Request type
 
 import { errors } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
-import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
@@ -22,6 +21,7 @@ import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
 import { maskError } from './mask-error';
+import { getGraphileRequestPgSettings } from './graphile-request-context';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const isDev = (): boolean => getNodeEnv() === 'development';
@@ -74,8 +74,6 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
 const buildPreset = (
   pool: import('pg').Pool,
   schemas: string[],
-  anonRole: string,
-  roleName: string,
   introspectionRole: string | undefined,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
@@ -131,143 +129,11 @@ const buildPreset = (
     grafast: {
       explain: process.env.NODE_ENV === 'development',
       context: (requestContext: Partial<Grafast.RequestContext>) => {
-      // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
-        const context: Record<string, string> = {};
-
-        // Timeouts travel with the transaction as GUCs, so they bound the work
-        // this request can do inside PostgreSQL whatever the plan turns out to
-        // be. Resolved per request (not baked into the cached preset) so a
-        // tenant lowering a timeout takes effect on the next request.
-        const timeouts = protectionPgSettings(req?.requestProtection ?? DEFAULT_REQUEST_PROTECTION);
-
-        if (req) {
-          if (req.databaseId) {
-            context['jwt.claims.database_id'] = req.databaseId;
-          }
-          // API provenance — which API surface this request arrived through.
-          // Derived server-side by resolving the hostname through the scoped
-          // routing plane (resolve_route -> api_id); never taken from
-          // client-supplied headers, body, or token payload.
-          if (req.api?.apiId) {
-            context['jwt.claims.api_id'] = req.api.apiId;
-          }
-          if (req.clientIp) {
-            context['jwt.claims.ip_address'] = req.clientIp;
-          }
-          if (req.get('origin')) {
-            context['jwt.claims.origin'] = req.get('origin') as string;
-          }
-          if (req.get('User-Agent')) {
-            context['jwt.claims.user_agent'] = req.get('User-Agent') as string;
-          }
-          if (req.deviceToken) {
-            context['jwt.claims.device_token'] = req.deviceToken;
-          }
-
-          if (req.token?.user_id) {
-            const pgSettings: Record<string, string> = {
-              ...timeouts,
-              role: roleName,
-              'jwt.claims.token_id': req.token.id,
-              'jwt.claims.user_id': req.token.user_id,
-              ...context
-            };
-
-            if (req.token.session_id) {
-              pgSettings['jwt.claims.session_id'] = req.token.session_id;
-            }
-            if (req.token.root_session_id) {
-              pgSettings['jwt.claims.root_session_id'] = req.token.root_session_id;
-            }
-            if (req.token.parent_session_id) {
-              pgSettings['jwt.claims.parent_session_id'] = req.token.parent_session_id;
-            }
-            if (req.token.intent) {
-              pgSettings['jwt.claims.intent'] = req.token.intent;
-            }
-
-            // Propagate credential metadata as JWT claims so PG functions
-            // can read them via current_setting('jwt.claims.access_level') etc.
-            if (req.token.access_level) {
-              pgSettings['jwt.claims.access_level'] = req.token.access_level;
-            }
-            if (req.token.kind) {
-              pgSettings['jwt.claims.kind'] = req.token.kind;
-            }
-
-            // Principal identity — always set; equals user_id for human sessions
-            pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
-
-            // Enforce read-only transactions for read_only credentials
-            if (req.token.access_level === 'read_only') {
-              pgSettings['default_transaction_read_only'] = 'on';
-            }
-
-            if (req.requestId) {
-              pgSettings['request.id'] = req.requestId;
-            }
-
-            return { pgSettings };
-          }
-
-          // Private (in-cluster) surface: there is no token — identity
-          // arrives on the trusted internal X-* headers stamped by the
-          // dispatching worker/sync gateway (the same vocabulary as
-          // X-Database-Id above). Map it into per-request claims so writes
-          // made through this surface carry actor attribution. Never applied
-          // on the public surface, where client-supplied identity headers
-          // must not assert identity.
-          const headerActorId = req.get('X-Actor-Id');
-          if (req.api?.isPublic === false && headerActorId) {
-            const pgSettings: Record<string, string> = {
-              ...timeouts,
-              role: roleName,
-              'jwt.claims.user_id': headerActorId,
-              'jwt.claims.principal_id': headerActorId,
-              ...context
-            };
-            // The entity pair travels together: the tenant's writers reject an
-            // entity id whose type they cannot interpret (`ENTITY_TYPE_REQUIRED`).
-            const headerEntityId = req.get('X-Entity-Id');
-            const headerEntityType = req.get('X-Entity-Type');
-            if (headerEntityId) {
-              pgSettings['jwt.claims.entity_id'] = headerEntityId;
-            }
-            if (headerEntityType) {
-              pgSettings['jwt.claims.entity_type'] = headerEntityType;
-            }
-            const headerOrganizationId = req.get('X-Organization-Id');
-            if (headerOrganizationId) {
-              pgSettings['jwt.claims.organization_id'] = headerOrganizationId;
-            }
-            if (req.requestId) {
-              pgSettings['request.id'] = req.requestId;
-            }
-            return { pgSettings };
-          }
-        }
-
-        // No actor to name, so the tenant database the request addresses carries
-        // the attribution — the same rule the sync gateway applies to a request
-        // that arrives without a credential. Without it the tenant's own writers
-        // refuse the work an anonymous request legitimately does
-        // (`ATTRIBUTION_REQUIRED`), so a public mutation cannot enqueue a job.
-        const anonSettings: Record<string, string> = {
-          ...timeouts,
-          role: anonRole,
-          ...context
-        };
-        if (req?.databaseId) {
-          anonSettings['jwt.claims.entity_id'] = req.databaseId;
-          anonSettings['jwt.claims.entity_type'] = 'database';
-        }
-        if (req?.requestId) {
-          anonSettings['request.id'] = req.requestId;
-        }
-
+        // In grafserv/express/v4, the request is available at requestContext.expressv4.req
+        const req = (requestContext as { expressv4?: { req?: Request } })
+          ?.expressv4?.req;
         return {
-          pgSettings: anonSettings
+          pgSettings: getGraphileRequestPgSettings(req),
         };
       }
     }
@@ -361,8 +227,6 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const preset = buildPreset(
         pool,
         schema || [],
-        anonRole,
-        roleName,
         opts.api?.introspectionRole,
         api.databaseSettings,
         api.apiId,

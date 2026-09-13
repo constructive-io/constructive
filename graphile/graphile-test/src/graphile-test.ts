@@ -75,7 +75,9 @@ export const GraphQLTest = (
       input,
       schema,
       resolvedPreset,
-      authRole: authRole ?? 'anonymous',
+      // Root-mode fixtures retain the selected connection's identity unless
+      // the test explicitly supplies a bounded execution role.
+      authRole: authRole ?? (input.useRoot ? conn.pg.config.user : 'anonymous'),
       pgPool,
       pgService,
       conn,

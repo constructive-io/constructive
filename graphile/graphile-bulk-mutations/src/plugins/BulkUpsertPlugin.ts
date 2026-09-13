@@ -1,9 +1,10 @@
 import '../augmentations';
 
-import { sideEffectWithPgClient } from '@dataplan/pg';
+import { type PgClient, sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
 
+import { queryPgClient } from '../utils/pg-client';
 import type { ColumnSpec } from '../utils/sql-builder';
 import { buildBulkInsertSQL } from '../utils/sql-builder';
 
@@ -118,7 +119,7 @@ export const BulkUpsertPlugin: GraphileConfig.Plugin = {
                     const $result = sideEffectWithPgClient(
                       executor,
                       $input,
-                      async (pgClient: any, input: any) => {
+                      async (pgClient: PgClient, input: any) => {
                         const values = input.values;
                         if (!values || !Array.isArray(values) || values.length === 0) {
                           return { affectedCount: 0, returning: [] };
@@ -177,10 +178,9 @@ export const BulkUpsertPlugin: GraphileConfig.Plugin = {
                         const allPkRows: Record<string, unknown>[] = [];
 
                         for (const batch of batches) {
-                          const result = await pgClient.query(
-                            batch.text,
-                            batch.values
-                          );
+                          const result = await queryPgClient<
+                            Record<string, unknown>
+                          >(pgClient, batch.text, batch.values);
                           totalAffected += result.rowCount ?? 0;
                           if (result.rows) {
                             allPkRows.push(...result.rows);
@@ -200,11 +200,12 @@ export const BulkUpsertPlugin: GraphileConfig.Plugin = {
                           const selectParams = allPkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
+                          const selectResult = await queryPgClient<unknown>(
+                            pgClient,
                             `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
                             selectParams
                           );
-                          returning = selectResult.rows || [];
+                          returning = [...selectResult.rows];
                         }
 
                         return {

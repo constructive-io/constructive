@@ -32,6 +32,7 @@ export interface GraphQLTestContext {
 export interface GetConnectionsInput {
   useRoot?: boolean;
   schemas: string[];
+  /** Defaults to the root connection user with useRoot, otherwise anonymous. */
   authRole?: string;
   /**
    * V5 preset configuration.

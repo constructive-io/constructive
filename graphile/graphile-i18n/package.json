@@ -30,7 +30,8 @@
   },
   "dependencies": {
     "accept-language-parser": "^1.5.0",
-    "graphile-plugin-utils": "workspace:^"
+    "graphile-plugin-utils": "workspace:^",
+    "@constructive-io/express-context": "workspace:^"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",

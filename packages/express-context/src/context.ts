@@ -34,6 +34,8 @@ export interface ContextMiddlewareOptions {
   loaders?: LoaderRegistry;
   /** Routing-plane schema loaders query (defaults to routing_public) */
   routingSchema?: string;
+  /** Ordered, audited extension/shared schemas required by request SQL. */
+  dependencySchemas?: readonly string[];
 }
 
 /**
@@ -77,7 +79,11 @@ export function buildContext(
     api,
     token,
     requestId,
-    clientIp: req.clientIp
+    clientIp: req.clientIp,
+    origin: req.get('origin'),
+    userAgent: req.get('User-Agent'),
+    deviceToken: req.deviceToken,
+    dependencySchemas: opts.dependencySchemas,
   });
 
   const tenantPool: Pool = getPgPool({
