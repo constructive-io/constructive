@@ -20,6 +20,8 @@ export default [
       '**/*.generated.ts',
       'postgres/pg-ast/src/asts.ts',
       'postgres/pg-ast/src/wrapped.ts',
+      // upstream-derived source; preserve Crystal formatting for reviewability
+      'graphile/graphile-scoped-introspection/src/upstream/**',
       // read verbatim at codegen time and written into generated clients
       'graphql/codegen/src/core/codegen/templates/**',
       // codegen output snapshots and standalone sqitch/pgpm fixture projects

@@ -55,8 +55,10 @@ export * from './presets/index';
 // Utilities
 // ============================================================================
 
-// Re-export makePgService for convenience
+// Keep the default service factory as the untouched upstream implementation.
 export { makePgService };
+
+export { resolveIntrospectionSettings } from './introspection-settings';
 
 // Presigned URL utilities
 export { getPresignedUrlS3Config } from './presigned-url-resolver';
