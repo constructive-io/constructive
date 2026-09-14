@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { getGraphQLEnvVars } from '../src/env';
 import { getEnvOptions } from '../src/merge';
+import { OAUTH_PROVIDER_REQUEST_TIMEOUT_MAX_MS } from '../src/oauth';
 
 const writeConfig = (dir: string, config: Record<string, unknown>): void => {
   fs.writeFileSync(path.join(dir, 'pgpm.json'), JSON.stringify(config, null, 2));
@@ -228,6 +229,108 @@ describe('getEnvOptions', () => {
     const result = getEnvOptions({}, process.cwd(), {});
 
     expect(result.sms).toBeUndefined();
+  });
+
+  it('defaults OAuth off with a ten-second Provider timeout', () => {
+    expect(getEnvOptions({}, process.cwd(), {}).oauth).toEqual({
+      enabled: false,
+      providerRequestTimeoutMs: 10_000
+    });
+  });
+
+  it('keeps absent OAuth environment variables out of partial overrides', () => {
+    expect(getGraphQLEnvVars({})).not.toHaveProperty('oauth');
+  });
+
+  it('parses explicit OAuth environment overrides', () => {
+    expect(
+      getGraphQLEnvVars({
+        OAUTH_ENABLED: 'true',
+        OAUTH_PROVIDER_REQUEST_TIMEOUT_MS: '2500'
+      }).oauth
+    ).toEqual({
+      enabled: true,
+      providerRequestTimeoutMs: 2500
+    });
+  });
+
+  it('preserves config OAuth enablement when environment overrides are absent', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-oauth-'));
+    writeConfig(tempDir, {
+      oauth: {
+        enabled: true,
+        providerRequestTimeoutMs: 8000
+      }
+    });
+
+    expect(getEnvOptions({}, tempDir, {}).oauth).toEqual({
+      enabled: true,
+      providerRequestTimeoutMs: 8000
+    });
+  });
+
+  it('honors config, env, and runtime priority for OAuth', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-priority-')
+    );
+    writeConfig(tempDir, {
+      oauth: {
+        enabled: false,
+        providerRequestTimeoutMs: 5000
+      }
+    });
+
+    const result = getEnvOptions(
+      { oauth: { providerRequestTimeoutMs: 9000 } },
+      tempDir,
+      { OAUTH_ENABLED: 'true', OAUTH_PROVIDER_REQUEST_TIMEOUT_MS: '7000' }
+    );
+
+    expect(result.oauth).toEqual({
+      enabled: true,
+      providerRequestTimeoutMs: 9000
+    });
+  });
+
+  it.each(['not-a-boolean', '', 'enabled'])(
+    'rejects an explicitly malformed OAuth enabled value %p',
+    value => {
+      expect(() => getGraphQLEnvVars({ OAUTH_ENABLED: value })).toThrow(
+        /OAUTH_ENABLED/
+      );
+    }
+  );
+
+  it.each([
+    'not-a-number',
+    '0',
+    '-1',
+    '1.5',
+    String(OAUTH_PROVIDER_REQUEST_TIMEOUT_MAX_MS + 1)
+  ])('rejects an invalid OAuth Provider timeout %p', value => {
+    expect(() =>
+      getEnvOptions({}, process.cwd(), {
+        OAUTH_PROVIDER_REQUEST_TIMEOUT_MS: value
+      })
+    ).toThrow(/providerRequestTimeoutMs|OAUTH_PROVIDER_REQUEST_TIMEOUT_MS/);
+  });
+
+  it('rejects invalid OAuth config and runtime override types after merging', () => {
+    tempDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'graphql-env-oauth-invalid-')
+    );
+    writeConfig(tempDir, { oauth: { enabled: 'yes' } });
+
+    expect(() => getEnvOptions({}, tempDir, {})).toThrow(
+      /oauth.enabled must be a boolean/
+    );
+    expect(() =>
+      getEnvOptions(
+        { oauth: { providerRequestTimeoutMs: 60_001 } },
+        process.cwd(),
+        {}
+      )
+    ).toThrow(/providerRequestTimeoutMs/);
   });
 
   it('omits an invalid SMS timeout from partial env overrides', () => {

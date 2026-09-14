@@ -126,10 +126,12 @@ describe('toError', () => {
   });
 
   it('falls back to UNKNOWN_ERROR and the raw message for unresolved errors', () => {
-    const err = toError(new Error('totally opaque failure'));
+    const original = new Error('totally opaque failure');
+    const err = toError(original);
     expect(err.code).toBe('UNKNOWN_ERROR');
     expect(err.errorClass).toBe('internal');
     expect(err.message).toBe('totally opaque failure');
+    expect(err.cause).toBe(original);
   });
 
   it('returns a ConstructiveError unchanged', () => {

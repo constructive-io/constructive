@@ -1,6 +1,6 @@
 import type { ErrorClass, ErrorContext } from './types';
 
-export interface ConstructiveErrorArgs {
+export interface ConstructiveErrorArgs extends ErrorOptions {
   code: string;
   message: string;
   errorClass: ErrorClass;
@@ -22,7 +22,10 @@ export class ConstructiveError extends Error {
   readonly context?: ErrorContext;
 
   constructor(args: ConstructiveErrorArgs) {
-    super(args.message);
+    super(
+      args.message,
+      args.cause === undefined ? undefined : { cause: args.cause }
+    );
     this.name = 'ConstructiveError';
     this.code = args.code;
     this.errorClass = args.errorClass;

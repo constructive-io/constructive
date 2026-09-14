@@ -207,6 +207,7 @@ export function toError(error: unknown, locale?: string): ConstructiveError {
     message,
     errorClass: parsed.class,
     http: def ? def.http : httpStatusFor(code).status,
-    context: parsed.context
+    context: parsed.context,
+    cause: parsed.originalError
   });
 }

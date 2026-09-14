@@ -47,6 +47,10 @@ const config: ConstructiveOptions = {
     simpleInflection: true,
     postgis: true,
   },
+  oauth: {
+    enabled: false,
+    providerRequestTimeoutMs: 10_000,
+  },
 };
 ```
 
@@ -67,6 +71,12 @@ Configuration for the Constructive API including meta API settings, exposed sche
 ### GraphileFeatureOptions
 
 Feature flags for GraphQL/Graphile including inflection settings and PostGIS support.
+
+### OAuthServerOptions
+
+GraphQL-server-owned OAuth enablement and bounded Provider request timeout.
+Provider credentials and endpoint configuration remain Tenant data and are not
+part of this type.
 
 ## Re-exports
 
