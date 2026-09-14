@@ -21,6 +21,10 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
+import {
+  composeGraphilePreset,
+  type GraphilePresetProtectionPolicy
+} from './graphile-preset-composition';
 import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 
@@ -63,6 +67,22 @@ export function clearInFlightMap(): void {
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
+// Protect only fields and plugins currently owned by this server. Future
+// features extend this policy alongside their own activation.
+const GRAPHILE_PRESET_PROTECTION = {
+  protectedPaths: [
+    'pgServices',
+    'grafast.context',
+    'grafast.explain',
+    'grafserv.graphqlPath',
+    'grafserv.graphiqlPath',
+    'grafserv.graphiql',
+    'grafserv.graphiqlOnGraphQLGET',
+    'grafserv.maskError'
+  ],
+  protectedPluginNames: ['AuthCookiePlugin', 'FunctionBindingsPlugin']
+} as const satisfies GraphilePresetProtectionPolicy;
+
 /**
  * Build a PostGraphile v5 preset for a tenant.
  *
@@ -81,8 +101,7 @@ const buildPreset = (
   apiId?: string,
   compute?: ComputeConfig
 ): GraphileConfig.Preset => {
-  return {
-    extends: [createConstructivePreset(databaseSettings)],
+  const protectedPreset: GraphileConfig.Preset = {
     plugins: [
       AuthCookiePlugin,
       RequestProtectionPlugin,
@@ -272,6 +291,15 @@ const buildPreset = (
       }
     }
   };
+
+  return composeGraphilePreset({
+    basePresets: [createConstructivePreset(databaseSettings)],
+    // Caller configuration remains intentionally dormant until build/cache
+    // identity includes preset composition (F17).
+    callerPresetsTrusted: false,
+    protection: GRAPHILE_PRESET_PROTECTION,
+    protectedPreset
+  });
 };
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
