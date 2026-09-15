@@ -21,9 +21,15 @@ Every Constructive CI workflow follows this pattern:
 1. **Spin up PostgreSQL service container** with health checks
 2. **Install pnpm and Node.js** with caching
 3. **Cache and install pgpm CLI** globally
-4. **Build the workspace** with `pnpm -r build`
+4. **Build the workspace** with `pnpm -r --if-present run build` — only if some
+   package has a `build` script. pgpm modules are plain SQL and have none; from
+   pnpm 10.28.1 a bare `pnpm -r build` exits 1 with
+   `ERR_PNPM_RECURSIVE_RUN_NO_SCRIPT` when no selected package defines the script.
 5. **Bootstrap database users** with `pgpm admin-users`
 6. **Run tests** per package
+
+Never put `continue-on-error: true` on the test job: GitHub then reports the run
+green even when every matrix job failed, and a broken step goes unnoticed.
 
 ## PostgreSQL Service Container
 
@@ -204,7 +210,7 @@ jobs:
         run: npm install -g pgpm@${{ env.PGPM_VERSION }}
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm -r --if-present run build
 
       - name: Seed pg and app_user
         run: |
@@ -253,7 +259,7 @@ jobs:
       # ... checkout, pnpm, node, pgpm setup ...
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm -r --if-present run build
 
       - name: Seed pg and app_user
         run: |
