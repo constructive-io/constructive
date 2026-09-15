@@ -24,15 +24,18 @@ export interface AgentMessage {
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
+  kind: string | null;
   model: string | null;
   parts: unknown | null;
   threadId: string | null;
   updatedAt: string | null;
+  visibility: string | null;
 }
 export interface AgentPersona {
   config: unknown | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   id: string | null;
@@ -43,6 +46,7 @@ export interface AgentPersona {
   systemPrompt: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface AgentPlan {
   createdAt: string | null;
@@ -54,11 +58,13 @@ export interface AgentPlan {
   threadId: string | null;
   title: string | null;
   updatedAt: string | null;
+  visibility: string | null;
 }
 export interface AgentPrompt {
   content: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   id: string | null;
@@ -67,12 +73,14 @@ export interface AgentPrompt {
   name: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface AgentResourceChunk {
   agentResourceId: string | null;
   body: string | null;
   chunkIndex: number | null;
   createdAt: string | null;
+  databaseId: string | null;
   embedding: number[] | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -86,6 +94,7 @@ export interface AgentResource {
   bodyTrgmSimilarity: number | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   descriptionTrgmSimilarity: number | null;
@@ -107,6 +116,7 @@ export interface AgentResource {
   titleTrgmSimilarity: number | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface AgentTask {
   actorId: string | null;
@@ -125,6 +135,7 @@ export interface AgentTask {
   source: string | null;
   status: string | null;
   updatedAt: string | null;
+  visibility: string | null;
 }
 export interface AgentThread {
   agentId: string | null;
@@ -143,6 +154,214 @@ export interface AgentThread {
   tags: string[] | null;
   title: string | null;
   updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgent {
+  config: unknown | null;
+  createdAt: string | null;
+  id: string | null;
+  isEphemeral: boolean | null;
+  name: string | null;
+  ownerId: string | null;
+  parentId: string | null;
+  personaId: string | null;
+  status: string | null;
+  systemPrompt: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformAgentEvent {
+  actorId: string | null;
+  createdAt: string | null;
+  entry: unknown | null;
+  id: string | null;
+  recordedAt: string | null;
+  runId: string | null;
+  seq: number | null;
+  transcriptFormat: string | null;
+  transcriptVersion: number | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentMessage {
+  actorId: string | null;
+  agentId: string | null;
+  authorRole: string | null;
+  createdAt: string | null;
+  deliveredRunId: string | null;
+  id: string | null;
+  kind: string | null;
+  model: string | null;
+  parts: unknown | null;
+  threadId: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentPersona {
+  config: unknown | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  description: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  name: string | null;
+  resources: string[] | null;
+  slug: string | null;
+  systemPrompt: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformAgentPlan {
+  createdAt: string | null;
+  description: string | null;
+  id: string | null;
+  ownerId: string | null;
+  status: string | null;
+  threadId: string | null;
+  title: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentPrompt {
+  content: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  description: string | null;
+  id: string | null;
+  isDefault: boolean | null;
+  metadata: unknown | null;
+  name: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformAgentResourceChunk {
+  body: string | null;
+  chunkIndex: number | null;
+  createdAt: string | null;
+  embedding: number[] | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  metadata: unknown | null;
+  platformAgentResourceId: string | null;
+  searchScore: number | null;
+  updatedAt: string | null;
+}
+export interface PlatformAgentResource {
+  archivedAt: string | null;
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  description: string | null;
+  descriptionTrgmSimilarity: number | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  isActive: boolean | null;
+  isArchived: boolean | null;
+  keywords: string[] | null;
+  kind: string | null;
+  kindTrgmSimilarity: number | null;
+  metadata: unknown | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  slug: string | null;
+  title: string | null;
+  titleTrgmSimilarity: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformAgentRun {
+  actorId: string | null;
+  artifacts: unknown | null;
+  attempt: number | null;
+  baseCommit: string | null;
+  branch: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  deadlineAt: string | null;
+  entityId: string | null;
+  error: string | null;
+  executionId: string | null;
+  finishedAt: string | null;
+  headCommit: string | null;
+  id: string | null;
+  lastEventSeq: number | null;
+  parentRunId: string | null;
+  placement: string | null;
+  principalId: string | null;
+  repoUrl: string | null;
+  startedAt: string | null;
+  status: string | null;
+  threadId: string | null;
+  tokenUsage: unknown | null;
+  totalCost: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentRunWorkspace {
+  actorId: string | null;
+  artifacts: unknown | null;
+  baseBranch: string | null;
+  baseCommit: string | null;
+  branch: string | null;
+  clonedAt: string | null;
+  createdAt: string | null;
+  headCommit: string | null;
+  id: string | null;
+  lastUsedAt: string | null;
+  ordinal: number | null;
+  provider: string | null;
+  publication: string | null;
+  repo: string | null;
+  repositoryId: string | null;
+  runId: string | null;
+  state: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentTask {
+  actorId: string | null;
+  approvalFeedback: string | null;
+  approvalStatus: string | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  createdAt: string | null;
+  description: string | null;
+  error: string | null;
+  id: string | null;
+  orderIndex: number | null;
+  planId: string | null;
+  requiresApproval: boolean | null;
+  source: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
+}
+export interface PlatformAgentThread {
+  agentId: string | null;
+  archivedAt: string | null;
+  createdAt: string | null;
+  id: string | null;
+  isArchived: boolean | null;
+  mode: string | null;
+  model: string | null;
+  ownerId: string | null;
+  parentThreadId: string | null;
+  promptTemplateId: string | null;
+  status: string | null;
+  systemPrompt: string | null;
+  tags: string[] | null;
+  title: string | null;
+  updatedAt: string | null;
+  visibility: string | null;
 }
 export interface StringFilter {
   isNull?: boolean;

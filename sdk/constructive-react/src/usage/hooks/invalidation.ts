@@ -15,13 +15,6 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  appAchievementRewardKeys,
-  appEventAggregateKeys,
-  appEventKeys,
-  appEventTypeKeys,
-  appLevelKeys,
-  appLevelGrantKeys,
-  appLevelRequirementKeys,
   appLimitCapKeys,
   appLimitCapsDefaultKeys,
   appLimitKeys,
@@ -32,12 +25,6 @@ import {
   appLimitDefaultKeys,
   appLimitEventKeys,
   appLimitWarningKeys,
-  billingUsageSummaryKeys,
-  ledgerKeys,
-  meterKeys,
-  meterCreditKeys,
-  meterDefaultKeys,
-  meterSourceKeys,
   orgLimitAggregateKeys,
   orgLimitCapKeys,
   orgLimitCapsDefaultKeys,
@@ -46,13 +33,6 @@ import {
   orgLimitDefaultKeys,
   orgLimitEventKeys,
   orgLimitWarningKeys,
-  planCapKeys,
-  planKeys,
-  planLimitKeys,
-  planMeterLimitKeys,
-  planOverrideKeys,
-  planPricingKeys,
-  planSubscriptionKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -74,119 +54,6 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate appAchievementReward queries */ appAchievementReward: {
-    /** Invalidate all appAchievementReward queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appAchievementRewardKeys.all,
-      }),
-    /** Invalidate appAchievementReward list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appAchievementRewardKeys.lists(),
-      }),
-    /** Invalidate a specific appAchievementReward */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appAchievementRewardKeys.detail(id),
-      }),
-  },
-  /** Invalidate appEventAggregate queries */ appEventAggregate: {
-    /** Invalidate all appEventAggregate queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventAggregateKeys.all,
-      }),
-    /** Invalidate appEventAggregate list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventAggregateKeys.lists(),
-      }),
-    /** Invalidate a specific appEventAggregate */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventAggregateKeys.detail(id),
-      }),
-  },
-  /** Invalidate appEvent queries */ appEvent: {
-    /** Invalidate all appEvent queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventKeys.all,
-      }),
-    /** Invalidate appEvent list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventKeys.lists(),
-      }),
-    /** Invalidate a specific appEvent */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventKeys.detail(id),
-      }),
-  },
-  /** Invalidate appEventType queries */ appEventType: {
-    /** Invalidate all appEventType queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventTypeKeys.all,
-      }),
-    /** Invalidate appEventType list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventTypeKeys.lists(),
-      }),
-    /** Invalidate a specific appEventType */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appEventTypeKeys.detail(id),
-      }),
-  },
-  /** Invalidate appLevel queries */ appLevel: {
-    /** Invalidate all appLevel queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelKeys.all,
-      }),
-    /** Invalidate appLevel list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelKeys.lists(),
-      }),
-    /** Invalidate a specific appLevel */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelKeys.detail(id),
-      }),
-  },
-  /** Invalidate appLevelGrant queries */ appLevelGrant: {
-    /** Invalidate all appLevelGrant queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelGrantKeys.all,
-      }),
-    /** Invalidate appLevelGrant list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelGrantKeys.lists(),
-      }),
-    /** Invalidate a specific appLevelGrant */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelGrantKeys.detail(id),
-      }),
-  },
-  /** Invalidate appLevelRequirement queries */ appLevelRequirement: {
-    /** Invalidate all appLevelRequirement queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelRequirementKeys.all,
-      }),
-    /** Invalidate appLevelRequirement list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelRequirementKeys.lists(),
-      }),
-    /** Invalidate a specific appLevelRequirement */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: appLevelRequirementKeys.detail(id),
-      }),
-  },
   /** Invalidate appLimitCap queries */ appLimitCap: {
     /** Invalidate all appLimitCap queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -354,102 +221,6 @@ export const invalidate = {
         queryKey: appLimitWarningKeys.detail(id),
       }),
   },
-  /** Invalidate billingUsageSummary queries */ billingUsageSummary: {
-    /** Invalidate all billingUsageSummary queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingUsageSummaryKeys.all,
-      }),
-    /** Invalidate billingUsageSummary list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: billingUsageSummaryKeys.lists(),
-      }),
-    /** Invalidate a specific billingUsageSummary */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: billingUsageSummaryKeys.detail(id),
-      }),
-  },
-  /** Invalidate ledger queries */ ledger: {
-    /** Invalidate all ledger queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: ledgerKeys.all,
-      }),
-    /** Invalidate ledger list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: ledgerKeys.lists(),
-      }),
-    /** Invalidate a specific ledger */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: ledgerKeys.detail(id),
-      }),
-  },
-  /** Invalidate meter queries */ meter: {
-    /** Invalidate all meter queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterKeys.all,
-      }),
-    /** Invalidate meter list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterKeys.lists(),
-      }),
-    /** Invalidate a specific meter */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: meterKeys.detail(id),
-      }),
-  },
-  /** Invalidate meterCredit queries */ meterCredit: {
-    /** Invalidate all meterCredit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterCreditKeys.all,
-      }),
-    /** Invalidate meterCredit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterCreditKeys.lists(),
-      }),
-    /** Invalidate a specific meterCredit */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: meterCreditKeys.detail(id),
-      }),
-  },
-  /** Invalidate meterDefault queries */ meterDefault: {
-    /** Invalidate all meterDefault queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterDefaultKeys.all,
-      }),
-    /** Invalidate meterDefault list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterDefaultKeys.lists(),
-      }),
-    /** Invalidate a specific meterDefault */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: meterDefaultKeys.detail(id),
-      }),
-  },
-  /** Invalidate meterSource queries */ meterSource: {
-    /** Invalidate all meterSource queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterSourceKeys.all,
-      }),
-    /** Invalidate meterSource list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: meterSourceKeys.lists(),
-      }),
-    /** Invalidate a specific meterSource */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: meterSourceKeys.detail(id),
-      }),
-  },
   /** Invalidate orgLimitAggregate queries */ orgLimitAggregate: {
     /** Invalidate all orgLimitAggregate queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -583,119 +354,6 @@ export const invalidate = {
         queryKey: orgLimitWarningKeys.detail(id),
       }),
   },
-  /** Invalidate planCap queries */ planCap: {
-    /** Invalidate all planCap queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planCapKeys.all,
-      }),
-    /** Invalidate planCap list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planCapKeys.lists(),
-      }),
-    /** Invalidate a specific planCap */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: planCapKeys.detail(id),
-      }),
-  },
-  /** Invalidate plan queries */ plan: {
-    /** Invalidate all plan queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planKeys.all,
-      }),
-    /** Invalidate plan list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planKeys.lists(),
-      }),
-    /** Invalidate a specific plan */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: planKeys.detail(id),
-      }),
-  },
-  /** Invalidate planLimit queries */ planLimit: {
-    /** Invalidate all planLimit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planLimitKeys.all,
-      }),
-    /** Invalidate planLimit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planLimitKeys.lists(),
-      }),
-    /** Invalidate a specific planLimit */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: planLimitKeys.detail(id),
-      }),
-  },
-  /** Invalidate planMeterLimit queries */ planMeterLimit: {
-    /** Invalidate all planMeterLimit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planMeterLimitKeys.all,
-      }),
-    /** Invalidate planMeterLimit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planMeterLimitKeys.lists(),
-      }),
-    /** Invalidate a specific planMeterLimit */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: planMeterLimitKeys.detail(id),
-      }),
-  },
-  /** Invalidate planOverride queries */ planOverride: {
-    /** Invalidate all planOverride queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planOverrideKeys.all,
-      }),
-    /** Invalidate planOverride list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planOverrideKeys.lists(),
-      }),
-    /** Invalidate a specific planOverride */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: planOverrideKeys.detail(id),
-      }),
-  },
-  /** Invalidate planPricing queries */ planPricing: {
-    /** Invalidate all planPricing queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planPricingKeys.all,
-      }),
-    /** Invalidate planPricing list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planPricingKeys.lists(),
-      }),
-    /** Invalidate a specific planPricing */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: planPricingKeys.detail(id),
-      }),
-  },
-  /** Invalidate planSubscription queries */ planSubscription: {
-    /** Invalidate all planSubscription queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planSubscriptionKeys.all,
-      }),
-    /** Invalidate planSubscription list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: planSubscriptionKeys.lists(),
-      }),
-    /** Invalidate a specific planSubscription */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: planSubscriptionKeys.detail(id),
-      }),
-  },
 } as const;
 /**
 
@@ -709,56 +367,6 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove appAchievementReward from cache */ appAchievementReward: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appAchievementRewardKeys.detail(id),
-    });
-  },
-  /** Remove appEventAggregate from cache */ appEventAggregate: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appEventAggregateKeys.detail(id),
-    });
-  },
-  /** Remove appEvent from cache */ appEvent: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: appEventKeys.detail(id),
-    });
-  },
-  /** Remove appEventType from cache */ appEventType: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appEventTypeKeys.detail(id),
-    });
-  },
-  /** Remove appLevel from cache */ appLevel: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: appLevelKeys.detail(id),
-    });
-  },
-  /** Remove appLevelGrant from cache */ appLevelGrant: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appLevelGrantKeys.detail(id),
-    });
-  },
-  /** Remove appLevelRequirement from cache */ appLevelRequirement: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: appLevelRequirementKeys.detail(id),
-    });
-  },
   /** Remove appLimitCap from cache */ appLimitCap: (
     queryClient: QueryClient,
     id: string | number
@@ -836,48 +444,6 @@ export const remove = {
       queryKey: appLimitWarningKeys.detail(id),
     });
   },
-  /** Remove billingUsageSummary from cache */ billingUsageSummary: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: billingUsageSummaryKeys.detail(id),
-    });
-  },
-  /** Remove ledger from cache */ ledger: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: ledgerKeys.detail(id),
-    });
-  },
-  /** Remove meter from cache */ meter: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: meterKeys.detail(id),
-    });
-  },
-  /** Remove meterCredit from cache */ meterCredit: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: meterCreditKeys.detail(id),
-    });
-  },
-  /** Remove meterDefault from cache */ meterDefault: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: meterDefaultKeys.detail(id),
-    });
-  },
-  /** Remove meterSource from cache */ meterSource: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: meterSourceKeys.detail(id),
-    });
-  },
   /** Remove orgLimitAggregate from cache */ orgLimitAggregate: (
     queryClient: QueryClient,
     id: string | number
@@ -937,53 +503,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgLimitWarningKeys.detail(id),
-    });
-  },
-  /** Remove planCap from cache */ planCap: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: planCapKeys.detail(id),
-    });
-  },
-  /** Remove plan from cache */ plan: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: planKeys.detail(id),
-    });
-  },
-  /** Remove planLimit from cache */ planLimit: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: planLimitKeys.detail(id),
-    });
-  },
-  /** Remove planMeterLimit from cache */ planMeterLimit: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: planMeterLimitKeys.detail(id),
-    });
-  },
-  /** Remove planOverride from cache */ planOverride: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: planOverrideKeys.detail(id),
-    });
-  },
-  /** Remove planPricing from cache */ planPricing: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: planPricingKeys.detail(id),
-    });
-  },
-  /** Remove planSubscription from cache */ planSubscription: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: planSubscriptionKeys.detail(id),
     });
   },
 } as const;

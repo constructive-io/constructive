@@ -7,7 +7,7 @@ React Query mutation hook for signUpSms
 ## Usage
 
 ```typescript
-const { mutate } = useSignUpSmsMutation(); mutate({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } });
+const { mutate } = useSignUpSmsMutation(); mutate({ input: '<SignUpSmsInput>' });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignUpSmsMutation(); mutate({ input: { code: '<String>', c
 
 ```typescript
 const { mutate, isLoading } = useSignUpSmsMutation();
-mutate({ input: { code: '<String>', credentialKind: '<String>', deviceToken: '<String>', phone: '<String>', rememberMe: '<Boolean>' } });
+mutate({ input: '<SignUpSmsInput>' });
 ```

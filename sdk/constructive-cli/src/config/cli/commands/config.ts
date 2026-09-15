@@ -18,6 +18,7 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
   createdAt: 'string',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   description: 'string',
   expiresAt: 'string',
@@ -28,6 +29,7 @@ const fieldSchema: FieldSchema = {
   provider: 'string',
   realm: 'string',
   updatedAt: 'string',
+  updatedByPrincipal: 'uuid',
   value: 'string',
 };
 const usage =
@@ -83,6 +85,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       annotations: true,
       createdAt: true,
+      createdByPrincipal: true,
       databaseId: true,
       description: true,
       expiresAt: true,
@@ -93,6 +96,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       provider: true,
       realm: true,
       updatedAt: true,
+      updatedByPrincipal: true,
       value: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -116,6 +120,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       annotations: true,
       createdAt: true,
+      createdByPrincipal: true,
       databaseId: true,
       description: true,
       expiresAt: true,
@@ -126,6 +131,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       provider: true,
       realm: true,
       updatedAt: true,
+      updatedByPrincipal: true,
       value: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -161,6 +167,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           annotations: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           expiresAt: true,
@@ -171,6 +178,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           provider: true,
           realm: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           value: true,
         },
       })
@@ -191,6 +199,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'json',
         name: 'annotations',
         message: 'annotations',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -249,6 +264,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'value',
         message: 'value',
         required: false,
@@ -262,6 +284,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           annotations: cleanedData.annotations,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           expiresAt: cleanedData.expiresAt,
@@ -270,11 +293,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           namespaceId: cleanedData.namespaceId,
           provider: cleanedData.provider,
           realm: cleanedData.realm,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
           value: cleanedData.value,
         },
         select: {
           annotations: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           expiresAt: true,
@@ -285,6 +310,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           provider: true,
           realm: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           value: true,
         },
       })
@@ -316,6 +342,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -369,6 +402,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'value',
         message: 'value',
         required: false,
@@ -385,6 +425,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           annotations: cleanedData.annotations,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           expiresAt: cleanedData.expiresAt,
@@ -393,11 +434,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           namespaceId: cleanedData.namespaceId,
           provider: cleanedData.provider,
           realm: cleanedData.realm,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
           value: cleanedData.value,
         },
         select: {
           annotations: true,
           createdAt: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           expiresAt: true,
@@ -408,6 +451,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           provider: true,
           realm: true,
           updatedAt: true,
+          updatedByPrincipal: true,
           value: true,
         },
       })

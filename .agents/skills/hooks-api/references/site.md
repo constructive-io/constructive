@@ -7,8 +7,8 @@ Site surfaces exposed by this scope; publication makes a surface bindable from o
 ## Usage
 
 ```typescript
-useSitesQuery({ selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } } })
-useSiteQuery({ id: '<UUID>', selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } } })
+useSitesQuery({ selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } } })
+useSiteQuery({ id: '<UUID>', selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } } })
 useCreateSiteMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMutation({})
 
 ```typescript
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSitesQuery({
 const { mutate } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ activeCommitId: '<UUID>', bucketId: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+mutate({ activeCommitId: '<UUID>', bucketId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>', updatedByPrincipal: '<UUID>' });
 ```

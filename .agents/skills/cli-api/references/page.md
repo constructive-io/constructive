@@ -12,8 +12,8 @@ csdk page list --where.<field>.<op> <value> --orderBy <values>
 csdk page list --limit 10 --after <cursor>
 csdk page find-first --where.<field>.<op> <value>
 csdk page get --id <UUID>
-csdk page create --content <JSON> --databaseId <UUID> --siteId <UUID> --slug <String> [--commitId <UUID>] [--storeId <UUID>]
-csdk page update --id <UUID> [--commitId <UUID>] [--content <JSON>] [--databaseId <UUID>] [--siteId <UUID>] [--slug <String>] [--storeId <UUID>]
+csdk page create --content <JSON> --databaseId <UUID> --siteId <UUID> --slug <String> [--commitId <UUID>] [--seededFrom <JSON>] [--storeId <UUID>]
+csdk page update --id <UUID> [--commitId <UUID>] [--content <JSON>] [--databaseId <UUID>] [--seededFrom <JSON>] [--siteId <UUID>] [--slug <String>] [--storeId <UUID>]
 csdk page delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk page list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a page
 
 ```bash
-csdk page create --content <JSON> --databaseId <UUID> --siteId <UUID> --slug <String> [--commitId <UUID>] [--storeId <UUID>]
+csdk page create --content <JSON> --databaseId <UUID> --siteId <UUID> --slug <String> [--commitId <UUID>] [--seededFrom <JSON>] [--storeId <UUID>]
 ```
 
 ### Get a page by id

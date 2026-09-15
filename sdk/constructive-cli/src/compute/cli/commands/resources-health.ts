@@ -21,9 +21,11 @@ const fieldSchema: FieldSchema = {
   cpuRequestMillicores: 'int',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   errorCount: 'int',
   id: 'uuid',
+  imageRef: 'string',
   installationId: 'uuid',
   integrations: 'string',
   kind: 'string',
@@ -46,8 +48,10 @@ const fieldSchema: FieldSchema = {
   statusObserved: 'json',
   storageClass: 'string',
   storageSizeBytes: 'int',
+  storageTotalBytes: 'int',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nresources-health <command>\n\nCommands:\n  list                  List resourcesHealth records\n  find-first            Find first matching resourcesHealth record\n  create                Create a new resourcesHealth\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -99,9 +103,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       cpuRequestMillicores: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
+      imageRef: true,
       installationId: true,
       integrations: true,
       kind: true,
@@ -124,8 +130,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       statusObserved: true,
       storageClass: true,
       storageSizeBytes: true,
+      storageTotalBytes: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy> & {
@@ -151,9 +159,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       cpuRequestMillicores: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
+      imageRef: true,
       installationId: true,
       integrations: true,
       kind: true,
@@ -176,8 +186,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       statusObserved: true,
       storageClass: true,
       storageSizeBytes: true,
+      storageTotalBytes: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy> & {
@@ -224,6 +236,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: true,
@@ -232,6 +250,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'errorCount',
         message: 'errorCount',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'imageRef',
+        message: 'imageRef',
         required: true,
       },
       {
@@ -368,8 +392,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'storageTotalBytes',
+        message: 'storageTotalBytes',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'updatedBy',
         message: 'updatedBy',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
         required: true,
       },
     ]);
@@ -386,8 +422,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           cpuLimitMillicores: cleanedData.cpuLimitMillicores,
           cpuRequestMillicores: cleanedData.cpuRequestMillicores,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           errorCount: cleanedData.errorCount,
+          imageRef: cleanedData.imageRef,
           installationId: cleanedData.installationId,
           integrations: cleanedData.integrations,
           kind: cleanedData.kind,
@@ -410,7 +448,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           statusObserved: cleanedData.statusObserved,
           storageClass: cleanedData.storageClass,
           storageSizeBytes: cleanedData.storageSizeBytes,
+          storageTotalBytes: cleanedData.storageTotalBytes,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
@@ -418,9 +458,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           cpuRequestMillicores: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           errorCount: true,
           id: true,
+          imageRef: true,
           installationId: true,
           integrations: true,
           kind: true,
@@ -443,8 +485,10 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           statusObserved: true,
           storageClass: true,
           storageSizeBytes: true,
+          storageTotalBytes: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

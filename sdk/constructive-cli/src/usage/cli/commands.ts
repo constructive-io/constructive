@@ -24,6 +24,8 @@ import orgLimitCreditCmd from './commands/org-limit-credit';
 import orgLimitDefaultCmd from './commands/org-limit-default';
 import orgLimitEventCmd from './commands/org-limit-event';
 import orgLimitWarningCmd from './commands/org-limit-warning';
+import captureAppLimitDefaultsCmd from './commands/capture-app-limit-defaults';
+import captureOrgLimitDefaultsCmd from './commands/capture-org-limit-defaults';
 import provisionBucketCmd from './commands/provision-bucket';
 import seedAppLimitCapsDefaultsCmd from './commands/seed-app-limit-caps-defaults';
 import seedAppLimitDefaultsCmd from './commands/seed-app-limit-defaults';
@@ -57,6 +59,8 @@ const createCommandMap: () => Record<
   'org-limit-default': orgLimitDefaultCmd,
   'org-limit-event': orgLimitEventCmd,
   'org-limit-warning': orgLimitWarningCmd,
+  'capture-app-limit-defaults': captureAppLimitDefaultsCmd,
+  'capture-org-limit-defaults': captureOrgLimitDefaultsCmd,
   'provision-bucket': provisionBucketCmd,
   'seed-app-limit-caps-defaults': seedAppLimitCapsDefaultsCmd,
   'seed-app-limit-defaults': seedAppLimitDefaultsCmd,
@@ -64,7 +68,7 @@ const createCommandMap: () => Record<
   'seed-org-limit-defaults': seedOrgLimitDefaultsCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-limit-cap        appLimitCap CRUD operations\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  app-limit            appLimit CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  seed-app-limit-caps-defaults seedAppLimitCapsDefaults\n  seed-app-limit-defaults seedAppLimitDefaults\n  seed-org-limit-caps-defaults seedOrgLimitCapsDefaults\n  seed-org-limit-defaults seedOrgLimitDefaults\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-limit-cap        appLimitCap CRUD operations\n  app-limit-caps-default appLimitCapsDefault CRUD operations\n  app-limit            appLimit CRUD operations\n  app-limit-credit-code appLimitCreditCode CRUD operations\n  app-limit-credit-code-item appLimitCreditCodeItem CRUD operations\n  app-limit-credit     appLimitCredit CRUD operations\n  app-limit-credit-redemption appLimitCreditRedemption CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  app-limit-event      appLimitEvent CRUD operations\n  app-limit-warning    appLimitWarning CRUD operations\n  org-limit-aggregate  orgLimitAggregate CRUD operations\n  org-limit-cap        orgLimitCap CRUD operations\n  org-limit-caps-default orgLimitCapsDefault CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-limit-credit     orgLimitCredit CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-limit-event      orgLimitEvent CRUD operations\n  org-limit-warning    orgLimitWarning CRUD operations\n  capture-app-limit-defaults captureAppLimitDefaults\n  capture-org-limit-defaults captureOrgLimitDefaults\n  provision-bucket     Reconcile an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then enqueues the same\nstorage:provision_bucket job used by the INSERT trigger. This is\nidempotent for an already-reconciled bucket; enqueue failures become\nGraphQL errors.\n  seed-app-limit-caps-defaults seedAppLimitCapsDefaults\n  seed-app-limit-defaults seedAppLimitDefaults\n  seed-org-limit-caps-defaults seedOrgLimitCapsDefaults\n  seed-org-limit-defaults seedOrgLimitDefaults\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
