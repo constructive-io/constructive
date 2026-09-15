@@ -111,6 +111,9 @@ importers:
         version: link:../openai/dist
     publishDirectory: dist
 
+  agentic/agent-conversation:
+    publishDirectory: dist
+
   agentic/agentic-kit:
     dependencies:
       '@agentic-kit/agent':
@@ -291,6 +294,28 @@ importers:
         version: 0.79.6(ws@8.20.1)(zod@4.4.3)
     publishDirectory: dist
 
+  agentic/pi-host:
+    dependencies:
+      '@agentic-kit/agent':
+        specifier: workspace:^
+        version: link:../agent/dist
+      '@agentic-kit/agent-conversation':
+        specifier: workspace:^
+        version: link:../agent-conversation/dist
+      '@agentic-kit/chat':
+        specifier: workspace:^
+        version: link:../chat/dist
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@agentic-kit/pi':
+        specifier: workspace:^
+        version: link:../pi/dist
+      '@constructive-io/coerce':
+        specifier: ^0.4.1
+        version: 0.4.1
+    publishDirectory: dist
+
   agentic/protocol:
     publishDirectory: dist
 
@@ -327,6 +352,13 @@ importers:
     publishDirectory: dist
 
   agentic/run-log:
+    publishDirectory: dist
+
+  agentic/run-log-client:
+    dependencies:
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
     publishDirectory: dist
 
   examples/codegen-integration:
@@ -4733,6 +4765,12 @@ packages:
     resolution:
       {
         integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==,
+      }
+
+  '@constructive-io/coerce@0.4.1':
+    resolution:
+      {
+        integrity: sha512-6u4912/BgzZubEEPnh1Btpz8WZTjiY0iIjY2QBFhbcgDAJe2bPhD6lraXcTpMo22uPwCkni4LXrQv0f9yYHMfQ==,
       }
 
   '@constructive-io/eslint-config@0.2.0':
@@ -16251,6 +16289,8 @@ snapshots:
       '@babel/helper-validator-identifier': 7.28.5
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@constructive-io/coerce@0.4.1': {}
 
   '@constructive-io/eslint-config@0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
     dependencies:
