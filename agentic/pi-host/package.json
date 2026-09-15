@@ -37,7 +37,6 @@
   ],
   "dependencies": {
     "@constructive-io/coerce": "^0.4.1",
-    "@agentic-kit/agent-conversation": "workspace:^",
     "@agentic-kit/agent-conversation": "workspace:^"
   },
   "peerDependencies": {
@@ -45,17 +44,5 @@
     "@agentic-kit/chat": "workspace:^",
     "@agentic-kit/harness": "workspace:^",
     "@agentic-kit/pi": "workspace:^"
-  },
-  "devDependencies": {
-    "@agentic-kit/agent": "workspace:^",
-    "@agentic-kit/chat": "workspace:^",
-    "@agentic-kit/harness": "workspace:^",
-    "@agentic-kit/pi": "workspace:^",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.4",
-    "jest": "^29.7.0",
-    "makage": "^0.8.0",
-    "ts-jest": "^29.2.0",
-    "typescript": "^5.1.6"
   }
 }
