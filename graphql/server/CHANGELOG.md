@@ -3,18 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [5.25.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.1...@constructive-io/graphql-server@5.25.3) (2026-09-15)
-
-### Bug Fixes
-
-- **graphql-server:** bound introspection depth with its own fixed ceiling ([8d20e5c](https://github.com/constructive-io/constructive/commit/8d20e5c4f69bea16c5d02e35662a31dfce1a3ece))
-
-## [5.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.1...@constructive-io/graphql-server@5.25.2) (2026-09-15)
-
-### Bug Fixes
-
-- **graphql-server:** bound introspection depth with its own fixed ceiling ([8d20e5c](https://github.com/constructive-io/constructive/commit/8d20e5c4f69bea16c5d02e35662a31dfce1a3ece))
-
 ## [5.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.0...@constructive-io/graphql-server@5.25.1) (2026-09-08)
 
 ### Bug Fixes

@@ -3,14 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.15.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@1.15.12...@constructive-io/graphql-realtime-test@1.15.14) (2026-09-15)
-
-**Note:** Version bump only for package @constructive-io/graphql-realtime-test
-
-## [1.15.13](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@1.15.12...@constructive-io/graphql-realtime-test@1.15.13) (2026-09-15)
-
-**Note:** Version bump only for package @constructive-io/graphql-realtime-test
-
 ## [1.15.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-realtime-test@1.15.11...@constructive-io/graphql-realtime-test@1.15.12) (2026-09-08)
 
 **Note:** Version bump only for package @constructive-io/graphql-realtime-test
