@@ -5,7 +5,19 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { BuildModel } from './models/build';
+import { BuildStepModel } from './models/buildStep';
+import { BuilderBindingModel } from './models/builderBinding';
 import { ContentPresetModel } from './models/contentPreset';
+import { DatabaseFunctionGraphModel } from './models/databaseFunctionGraph';
+import { DatabaseFunctionGraphExecutionModel } from './models/databaseFunctionGraphExecution';
+import { DatabaseFunctionGraphExecutionNodeStateModel } from './models/databaseFunctionGraphExecutionNodeState';
+import { DatabaseFunctionGraphExecutionOutputModel } from './models/databaseFunctionGraphExecutionOutput';
+import { DatabaseGraphCommitModel } from './models/databaseGraphCommit';
+import { DatabaseGraphGetAllTreeNodesRecordModel } from './models/databaseGraphGetAllTreeNodesRecord';
+import { DatabaseGraphObjectModel } from './models/databaseGraphObject';
+import { DatabaseGraphRefModel } from './models/databaseGraphRef';
+import { DatabaseGraphStoreModel } from './models/databaseGraphStore';
 import { DbPresetModel } from './models/dbPreset';
 import { FunctionApiBindingModel } from './models/functionApiBinding';
 import { FunctionCapabilityBindingModel } from './models/functionCapabilityBinding';
@@ -24,6 +36,8 @@ import { FunctionGraphStoreModel } from './models/functionGraphStore';
 import { FunctionInvocationAttemptModel } from './models/functionInvocationAttempt';
 import { FunctionInvocationModel } from './models/functionInvocation';
 import { GetAllTreeNodesRecordModel } from './models/getAllTreeNodesRecord';
+import { ImageModel } from './models/image';
+import { ImageGrantModel } from './models/imageGrant';
 import { InfraCommitModel } from './models/infraCommit';
 import { InfraGetAllTreeNodesRecordModel } from './models/infraGetAllTreeNodesRecord';
 import { InfraObjectModel } from './models/infraObject';
@@ -32,6 +46,9 @@ import { InfraStoreModel } from './models/infraStore';
 import { IntegrationProviderModel } from './models/integrationProvider';
 import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
+import { PlatformBuildModel } from './models/platformBuild';
+import { PlatformBuildStepModel } from './models/platformBuildStep';
+import { PlatformBuilderBindingModel } from './models/platformBuilderBinding';
 import { PlatformFunctionApiBindingModel } from './models/platformFunctionApiBinding';
 import { PlatformFunctionCapabilityBindingModel } from './models/platformFunctionCapabilityBinding';
 import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
@@ -40,18 +57,36 @@ import { PlatformFunctionDeploymentEventModel } from './models/platformFunctionD
 import { PlatformFunctionExecutionLogModel } from './models/platformFunctionExecutionLog';
 import { PlatformFunctionInvocationAttemptModel } from './models/platformFunctionInvocationAttempt';
 import { PlatformFunctionInvocationModel } from './models/platformFunctionInvocation';
+import { PlatformImageModel } from './models/platformImage';
+import { PlatformImageGrantModel } from './models/platformImageGrant';
 import { PlatformInfraCommitModel } from './models/platformInfraCommit';
 import { PlatformInfraGetAllTreeNodesRecordModel } from './models/platformInfraGetAllTreeNodesRecord';
 import { PlatformInfraObjectModel } from './models/platformInfraObject';
 import { PlatformInfraRefModel } from './models/platformInfraRef';
 import { PlatformInfraStoreModel } from './models/platformInfraStore';
+import { PlatformK8sResourceKindModel } from './models/platformK8sResourceKind';
+import { PlatformK8sSpecRuleModel } from './models/platformK8sSpecRule';
 import { PlatformNamespaceModel } from './models/platformNamespace';
 import { PlatformNamespaceEventModel } from './models/platformNamespaceEvent';
+import { PlatformProposalCommentModel } from './models/platformProposalComment';
+import { PlatformProposalModel } from './models/platformProposal';
+import { PlatformProposalFileViewModel } from './models/platformProposalFileView';
+import { PlatformProposalReactionModel } from './models/platformProposalReaction';
+import { PlatformProposalReviewModel } from './models/platformProposalReview';
+import { PlatformProposalsChunkModel } from './models/platformProposalsChunk';
+import { PlatformRegistryBindingModel } from './models/platformRegistryBinding';
+import { PlatformRegistryModel } from './models/platformRegistry';
+import { PlatformRegistryGrantModel } from './models/platformRegistryGrant';
+import { PlatformRepositoryModel } from './models/platformRepository';
+import { PlatformRepositoryEventModel } from './models/platformRepositoryEvent';
+import { PlatformRepositoryRequiredCheckModel } from './models/platformRepositoryRequiredCheck';
+import { PlatformRepositoryWorkflowModel } from './models/platformRepositoryWorkflow';
 import { PlatformResourceModel } from './models/platformResource';
 import { PlatformResourceDeclaredCapacityModel } from './models/platformResourceDeclaredCapacity';
 import { PlatformResourceDefinitionModel } from './models/platformResourceDefinition';
 import { PlatformResourceEventModel } from './models/platformResourceEvent';
 import { PlatformResourceInstallationModel } from './models/platformResourceInstallation';
+import { PlatformResourceObservedStorageModel } from './models/platformResourceObservedStorage';
 import { PlatformResourceStatusCheckModel } from './models/platformResourceStatusCheck';
 import { PlatformResourceUsageLogModel } from './models/platformResourceUsageLog';
 import { PlatformResourceUsageSummaryModel } from './models/platformResourceUsageSummary';
@@ -61,11 +96,25 @@ import { PlatformResourcesRequirementsStateModel } from './models/platformResour
 import { PlatformResourcesResolvedRequirementModel } from './models/platformResourcesResolvedRequirement';
 import { PlatformWebhookEndpointModel } from './models/platformWebhookEndpoint';
 import { PlatformWebhookEventModel } from './models/platformWebhookEvent';
+import { ProposalCommentModel } from './models/proposalComment';
+import { ProposalModel } from './models/proposal';
+import { ProposalFileViewModel } from './models/proposalFileView';
+import { ProposalReactionModel } from './models/proposalReaction';
+import { ProposalReviewModel } from './models/proposalReview';
+import { ProposalsChunkModel } from './models/proposalsChunk';
+import { RegistryBindingModel } from './models/registryBinding';
+import { RegistryModel } from './models/registry';
+import { RegistryGrantModel } from './models/registryGrant';
+import { RepositoryModel } from './models/repository';
+import { RepositoryEventModel } from './models/repositoryEvent';
+import { RepositoryRequiredCheckModel } from './models/repositoryRequiredCheck';
+import { RepositoryWorkflowModel } from './models/repositoryWorkflow';
 import { ResourceModel } from './models/resource';
 import { ResourceDeclaredCapacityModel } from './models/resourceDeclaredCapacity';
 import { ResourceDefinitionModel } from './models/resourceDefinition';
 import { ResourceEventModel } from './models/resourceEvent';
 import { ResourceInstallationModel } from './models/resourceInstallation';
+import { ResourceObservedStorageModel } from './models/resourceObservedStorage';
 import { ResourceStatusCheckModel } from './models/resourceStatusCheck';
 import { ResourceUsageLogModel } from './models/resourceUsageLog';
 import { ResourceUsageSummaryModel } from './models/resourceUsageSummary';
@@ -110,7 +159,21 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    build: new BuildModel(client),
+    buildStep: new BuildStepModel(client),
+    builderBinding: new BuilderBindingModel(client),
     contentPreset: new ContentPresetModel(client),
+    databaseFunctionGraph: new DatabaseFunctionGraphModel(client),
+    databaseFunctionGraphExecution: new DatabaseFunctionGraphExecutionModel(client),
+    databaseFunctionGraphExecutionNodeState: new DatabaseFunctionGraphExecutionNodeStateModel(
+      client
+    ),
+    databaseFunctionGraphExecutionOutput: new DatabaseFunctionGraphExecutionOutputModel(client),
+    databaseGraphCommit: new DatabaseGraphCommitModel(client),
+    databaseGraphGetAllTreeNodesRecord: new DatabaseGraphGetAllTreeNodesRecordModel(client),
+    databaseGraphObject: new DatabaseGraphObjectModel(client),
+    databaseGraphRef: new DatabaseGraphRefModel(client),
+    databaseGraphStore: new DatabaseGraphStoreModel(client),
     dbPreset: new DbPresetModel(client),
     functionApiBinding: new FunctionApiBindingModel(client),
     functionCapabilityBinding: new FunctionCapabilityBindingModel(client),
@@ -129,6 +192,8 @@ export function createClient(config: OrmClientConfig) {
     functionInvocationAttempt: new FunctionInvocationAttemptModel(client),
     functionInvocation: new FunctionInvocationModel(client),
     getAllTreeNodesRecord: new GetAllTreeNodesRecordModel(client),
+    image: new ImageModel(client),
+    imageGrant: new ImageGrantModel(client),
     infraCommit: new InfraCommitModel(client),
     infraGetAllTreeNodesRecord: new InfraGetAllTreeNodesRecordModel(client),
     infraObject: new InfraObjectModel(client),
@@ -137,6 +202,9 @@ export function createClient(config: OrmClientConfig) {
     integrationProvider: new IntegrationProviderModel(client),
     namespace: new NamespaceModel(client),
     namespaceEvent: new NamespaceEventModel(client),
+    platformBuild: new PlatformBuildModel(client),
+    platformBuildStep: new PlatformBuildStepModel(client),
+    platformBuilderBinding: new PlatformBuilderBindingModel(client),
     platformFunctionApiBinding: new PlatformFunctionApiBindingModel(client),
     platformFunctionCapabilityBinding: new PlatformFunctionCapabilityBindingModel(client),
     platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
@@ -145,18 +213,36 @@ export function createClient(config: OrmClientConfig) {
     platformFunctionExecutionLog: new PlatformFunctionExecutionLogModel(client),
     platformFunctionInvocationAttempt: new PlatformFunctionInvocationAttemptModel(client),
     platformFunctionInvocation: new PlatformFunctionInvocationModel(client),
+    platformImage: new PlatformImageModel(client),
+    platformImageGrant: new PlatformImageGrantModel(client),
     platformInfraCommit: new PlatformInfraCommitModel(client),
     platformInfraGetAllTreeNodesRecord: new PlatformInfraGetAllTreeNodesRecordModel(client),
     platformInfraObject: new PlatformInfraObjectModel(client),
     platformInfraRef: new PlatformInfraRefModel(client),
     platformInfraStore: new PlatformInfraStoreModel(client),
+    platformK8sResourceKind: new PlatformK8sResourceKindModel(client),
+    platformK8sSpecRule: new PlatformK8sSpecRuleModel(client),
     platformNamespace: new PlatformNamespaceModel(client),
     platformNamespaceEvent: new PlatformNamespaceEventModel(client),
+    platformProposalComment: new PlatformProposalCommentModel(client),
+    platformProposal: new PlatformProposalModel(client),
+    platformProposalFileView: new PlatformProposalFileViewModel(client),
+    platformProposalReaction: new PlatformProposalReactionModel(client),
+    platformProposalReview: new PlatformProposalReviewModel(client),
+    platformProposalsChunk: new PlatformProposalsChunkModel(client),
+    platformRegistryBinding: new PlatformRegistryBindingModel(client),
+    platformRegistry: new PlatformRegistryModel(client),
+    platformRegistryGrant: new PlatformRegistryGrantModel(client),
+    platformRepository: new PlatformRepositoryModel(client),
+    platformRepositoryEvent: new PlatformRepositoryEventModel(client),
+    platformRepositoryRequiredCheck: new PlatformRepositoryRequiredCheckModel(client),
+    platformRepositoryWorkflow: new PlatformRepositoryWorkflowModel(client),
     platformResource: new PlatformResourceModel(client),
     platformResourceDeclaredCapacity: new PlatformResourceDeclaredCapacityModel(client),
     platformResourceDefinition: new PlatformResourceDefinitionModel(client),
     platformResourceEvent: new PlatformResourceEventModel(client),
     platformResourceInstallation: new PlatformResourceInstallationModel(client),
+    platformResourceObservedStorage: new PlatformResourceObservedStorageModel(client),
     platformResourceStatusCheck: new PlatformResourceStatusCheckModel(client),
     platformResourceUsageLog: new PlatformResourceUsageLogModel(client),
     platformResourceUsageSummary: new PlatformResourceUsageSummaryModel(client),
@@ -166,11 +252,25 @@ export function createClient(config: OrmClientConfig) {
     platformResourcesResolvedRequirement: new PlatformResourcesResolvedRequirementModel(client),
     platformWebhookEndpoint: new PlatformWebhookEndpointModel(client),
     platformWebhookEvent: new PlatformWebhookEventModel(client),
+    proposalComment: new ProposalCommentModel(client),
+    proposal: new ProposalModel(client),
+    proposalFileView: new ProposalFileViewModel(client),
+    proposalReaction: new ProposalReactionModel(client),
+    proposalReview: new ProposalReviewModel(client),
+    proposalsChunk: new ProposalsChunkModel(client),
+    registryBinding: new RegistryBindingModel(client),
+    registry: new RegistryModel(client),
+    registryGrant: new RegistryGrantModel(client),
+    repository: new RepositoryModel(client),
+    repositoryEvent: new RepositoryEventModel(client),
+    repositoryRequiredCheck: new RepositoryRequiredCheckModel(client),
+    repositoryWorkflow: new RepositoryWorkflowModel(client),
     resource: new ResourceModel(client),
     resourceDeclaredCapacity: new ResourceDeclaredCapacityModel(client),
     resourceDefinition: new ResourceDefinitionModel(client),
     resourceEvent: new ResourceEventModel(client),
     resourceInstallation: new ResourceInstallationModel(client),
+    resourceObservedStorage: new ResourceObservedStorageModel(client),
     resourceStatusCheck: new ResourceStatusCheckModel(client),
     resourceUsageLog: new ResourceUsageLogModel(client),
     resourceUsageSummary: new ResourceUsageSummaryModel(client),

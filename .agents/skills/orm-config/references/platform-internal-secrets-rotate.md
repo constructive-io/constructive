@@ -7,7 +7,7 @@ Execute the platformInternalSecretsRotate mutation
 ## Usage
 
 ```typescript
-db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', namespaceId: '<UUID>', realm: '<String>', secretName: '<String>', secretValue: '<String>' } }).execute()
+db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', realm: '<String>', secretName: '<String>', secretValue: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', namespace
 ### Run platformInternalSecretsRotate
 
 ```typescript
-const result = await db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', namespaceId: '<UUID>', realm: '<String>', secretName: '<String>', secretValue: '<String>' } }).execute();
+const result = await db.mutation.platformInternalSecretsRotate({ input: { algo: '<String>', realm: '<String>', secretName: '<String>', secretValue: '<String>' } }).execute();
 ```

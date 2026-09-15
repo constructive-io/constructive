@@ -16,15 +16,11 @@ import type {
 } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
-  appIdentifier: 'string',
+  appStoreIdentityId: 'uuid',
   createdAt: 'string',
   id: 'uuid',
   pathComponents: 'string',
-  platform: 'string',
-  sha256CertFingerprints: 'string',
   siteId: 'uuid',
-  storeUrl: 'string',
-  teamId: 'string',
   updatedAt: 'string',
   webcredentials: 'boolean',
 };
@@ -79,15 +75,11 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      appIdentifier: true,
+      appStoreIdentityId: true,
       createdAt: true,
       id: true,
       pathComponents: true,
-      platform: true,
-      sha256CertFingerprints: true,
       siteId: true,
-      storeUrl: true,
-      teamId: true,
       updatedAt: true,
       webcredentials: true,
     };
@@ -114,15 +106,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
-      appIdentifier: true,
+      appStoreIdentityId: true,
       createdAt: true,
       id: true,
       pathComponents: true,
-      platform: true,
-      sha256CertFingerprints: true,
       siteId: true,
-      storeUrl: true,
-      teamId: true,
       updatedAt: true,
       webcredentials: true,
     };
@@ -161,15 +149,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          appIdentifier: true,
+          appStoreIdentityId: true,
           createdAt: true,
           id: true,
           pathComponents: true,
-          platform: true,
-          sha256CertFingerprints: true,
           siteId: true,
-          storeUrl: true,
-          teamId: true,
           updatedAt: true,
           webcredentials: true,
         },
@@ -189,8 +173,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const rawAnswers = await prompter.prompt(argv, [
       {
         type: 'text',
-        name: 'appIdentifier',
-        message: 'appIdentifier',
+        name: 'appStoreIdentityId',
+        message: 'appStoreIdentityId',
         required: true,
       },
       {
@@ -202,36 +186,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'platform',
-        message: 'platform',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'sha256CertFingerprints',
-        message: 'sha256CertFingerprints',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'storeUrl',
-        message: 'storeUrl',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'teamId',
-        message: 'teamId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -250,25 +207,17 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.platformSiteAppLink
       .create({
         data: {
-          appIdentifier: cleanedData.appIdentifier,
+          appStoreIdentityId: cleanedData.appStoreIdentityId,
           pathComponents: cleanedData.pathComponents,
-          platform: cleanedData.platform,
-          sha256CertFingerprints: cleanedData.sha256CertFingerprints,
           siteId: cleanedData.siteId,
-          storeUrl: cleanedData.storeUrl,
-          teamId: cleanedData.teamId,
           webcredentials: cleanedData.webcredentials,
         },
         select: {
-          appIdentifier: true,
+          appStoreIdentityId: true,
           createdAt: true,
           id: true,
           pathComponents: true,
-          platform: true,
-          sha256CertFingerprints: true,
           siteId: true,
-          storeUrl: true,
-          teamId: true,
           updatedAt: true,
           webcredentials: true,
         },
@@ -294,8 +243,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'appIdentifier',
-        message: 'appIdentifier',
+        name: 'appStoreIdentityId',
+        message: 'appStoreIdentityId',
         required: false,
       },
       {
@@ -307,36 +256,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'platform',
-        message: 'platform',
-        required: false,
-      },
-      {
-        type: 'text',
-        name: 'sha256CertFingerprints',
-        message: 'sha256CertFingerprints',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'siteId',
         message: 'siteId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'storeUrl',
-        message: 'storeUrl',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'teamId',
-        message: 'teamId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -355,25 +277,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          appIdentifier: cleanedData.appIdentifier,
+          appStoreIdentityId: cleanedData.appStoreIdentityId,
           pathComponents: cleanedData.pathComponents,
-          platform: cleanedData.platform,
-          sha256CertFingerprints: cleanedData.sha256CertFingerprints,
           siteId: cleanedData.siteId,
-          storeUrl: cleanedData.storeUrl,
-          teamId: cleanedData.teamId,
           webcredentials: cleanedData.webcredentials,
         },
         select: {
-          appIdentifier: true,
+          appStoreIdentityId: true,
           createdAt: true,
           id: true,
           pathComponents: true,
-          platform: true,
-          sha256CertFingerprints: true,
           siteId: true,
-          storeUrl: true,
-          teamId: true,
           updatedAt: true,
           webcredentials: true,
         },

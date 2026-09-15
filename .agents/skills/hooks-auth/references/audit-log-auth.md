@@ -7,8 +7,8 @@ Partitioned append-only audit log of authentication events (sign-in, sign-up, pa
 ## Usage
 
 ```typescript
-useAuditLogAuthsQuery({ selection: { fields: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } } })
-useAuditLogAuthQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } } })
+useAuditLogAuthsQuery({ selection: { fields: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } } })
+useAuditLogAuthQuery({ id: '<UUID>', selection: { fields: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } } })
 useCreateAuditLogAuthMutation({ selection: { fields: { id: true } } })
 useUpdateAuditLogAuthMutation({ selection: { fields: { id: true } } })
 useDeleteAuditLogAuthMutation({})
@@ -20,7 +20,7 @@ useDeleteAuditLogAuthMutation({})
 
 ```typescript
 const { data, isLoading } = useAuditLogAuthsQuery({
-  selection: { fields: { actorId: true, createdAt: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
+  selection: { fields: { actorId: true, createdAt: true, details: true, event: true, id: true, ipAddress: true, origin: true, success: true, userAgent: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAuditLogAuthsQuery({
 const { mutate } = useCreateAuditLogAuthMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' });
+mutate({ actorId: '<UUID>', details: '<JSON>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' });
 ```

@@ -7,11 +7,43 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import { connectionFieldsMap } from '../input-types';
+export interface DatabaseReadFunctionGraphVariables {
+  graphId?: string;
+}
 export interface ReadFunctionGraphVariables {
   graphId?: string;
 }
 export function createQueryOperations(client: OrmClient) {
   return {
+    databaseReadFunctionGraph: (
+      args: DatabaseReadFunctionGraphVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        databaseReadFunctionGraph: unknown | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'DatabaseReadFunctionGraph',
+        fieldName: 'databaseReadFunctionGraph',
+        ...buildCustomDocument(
+          'query',
+          'DatabaseReadFunctionGraph',
+          'databaseReadFunctionGraph',
+          options?.select,
+          args,
+          [
+            {
+              name: 'graphId',
+              type: 'UUID',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
     readFunctionGraph: (
       args: ReadFunctionGraphVariables,
       options?: {

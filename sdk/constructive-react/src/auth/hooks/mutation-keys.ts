@@ -125,6 +125,24 @@ export const userMutationKeys = {
   /** Delete user mutation key */ delete: (id: string | number) =>
     ['mutation', 'user', 'delete', id] as const,
 } as const;
+export const userSettingMutationKeys = {
+  /** All userSetting mutation keys */ all: ['mutation', 'usersetting'] as const,
+  /** Create userSetting mutation key */ create: () =>
+    ['mutation', 'usersetting', 'create'] as const,
+  /** Update userSetting mutation key */ update: (id: string | number) =>
+    ['mutation', 'usersetting', 'update', id] as const,
+  /** Delete userSetting mutation key */ delete: (id: string | number) =>
+    ['mutation', 'usersetting', 'delete', id] as const,
+} as const;
+export const userSettingsSecurityMutationKeys = {
+  /** All userSettingsSecurity mutation keys */ all: ['mutation', 'usersettingssecurity'] as const,
+  /** Create userSettingsSecurity mutation key */ create: () =>
+    ['mutation', 'usersettingssecurity', 'create'] as const,
+  /** Update userSettingsSecurity mutation key */ update: (id: string | number) =>
+    ['mutation', 'usersettingssecurity', 'update', id] as const,
+  /** Delete userSettingsSecurity mutation key */ delete: (id: string | number) =>
+    ['mutation', 'usersettingssecurity', 'delete', id] as const,
+} as const;
 export const webauthnCredentialMutationKeys = {
   /** All webauthnCredential mutation keys */ all: ['mutation', 'webauthncredential'] as const,
   /** Create webauthnCredential mutation key */ create: () =>
@@ -140,18 +158,34 @@ export const webauthnCredentialMutationKeys = {
 // ============================================================================
 
 export const customMutationKeys = {
+  /** Mutation key for approveDevice */ approveDevice: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'approveDevice', identifier] as const)
+      : (['mutation', 'approveDevice'] as const),
   /** Mutation key for checkPassword */ checkPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'checkPassword', identifier] as const)
       : (['mutation', 'checkPassword'] as const),
+  /** Mutation key for completeMfaChallenge */ completeMfaChallenge: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'completeMfaChallenge', identifier] as const)
+      : (['mutation', 'completeMfaChallenge'] as const),
   /** Mutation key for confirmDeleteAccount */ confirmDeleteAccount: (identifier?: string) =>
     identifier
       ? (['mutation', 'confirmDeleteAccount', identifier] as const)
       : (['mutation', 'confirmDeleteAccount'] as const),
+  /** Mutation key for confirmTotpSetup */ confirmTotpSetup: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'confirmTotpSetup', identifier] as const)
+      : (['mutation', 'confirmTotpSetup'] as const),
   /** Mutation key for createApiKey */ createApiKey: (identifier?: string) =>
     identifier
       ? (['mutation', 'createApiKey', identifier] as const)
       : (['mutation', 'createApiKey'] as const),
+  /** Mutation key for createChildPrincipal */ createChildPrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createChildPrincipal', identifier] as const)
+      : (['mutation', 'createChildPrincipal'] as const),
   /** Mutation key for createOrgApiKey */ createOrgApiKey: (identifier?: string) =>
     identifier
       ? (['mutation', 'createOrgApiKey', identifier] as const)
@@ -160,6 +194,12 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'createOrgPrincipal', identifier] as const)
       : (['mutation', 'createOrgPrincipal'] as const),
+  /** Mutation key for createPrincipalFromPreset */ createPrincipalFromPreset: (
+    identifier?: string
+  ) =>
+    identifier
+      ? (['mutation', 'createPrincipalFromPreset', identifier] as const)
+      : (['mutation', 'createPrincipalFromPreset'] as const),
   /** Mutation key for deleteOrgPrincipal */ deleteOrgPrincipal: (identifier?: string) =>
     identifier
       ? (['mutation', 'deleteOrgPrincipal', identifier] as const)
@@ -168,10 +208,34 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'deletePrincipal', identifier] as const)
       : (['mutation', 'deletePrincipal'] as const),
+  /** Mutation key for disableEmailMfa */ disableEmailMfa: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'disableEmailMfa', identifier] as const)
+      : (['mutation', 'disableEmailMfa'] as const),
+  /** Mutation key for disableSmsMfa */ disableSmsMfa: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'disableSmsMfa', identifier] as const)
+      : (['mutation', 'disableSmsMfa'] as const),
+  /** Mutation key for disableTotp */ disableTotp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'disableTotp', identifier] as const)
+      : (['mutation', 'disableTotp'] as const),
   /** Mutation key for disconnectAccount */ disconnectAccount: (identifier?: string) =>
     identifier
       ? (['mutation', 'disconnectAccount', identifier] as const)
       : (['mutation', 'disconnectAccount'] as const),
+  /** Mutation key for enableEmailMfa */ enableEmailMfa: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'enableEmailMfa', identifier] as const)
+      : (['mutation', 'enableEmailMfa'] as const),
+  /** Mutation key for enableSmsMfa */ enableSmsMfa: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'enableSmsMfa', identifier] as const)
+      : (['mutation', 'enableSmsMfa'] as const),
+  /** Mutation key for enableTotp */ enableTotp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'enableTotp', identifier] as const)
+      : (['mutation', 'enableTotp'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)
@@ -180,10 +244,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'forgotPassword', identifier] as const)
       : (['mutation', 'forgotPassword'] as const),
+  /** Mutation key for generateBackupCodes */ generateBackupCodes: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'generateBackupCodes', identifier] as const)
+      : (['mutation', 'generateBackupCodes'] as const),
   /** Mutation key for linkIdentity */ linkIdentity: (identifier?: string) =>
     identifier
       ? (['mutation', 'linkIdentity', identifier] as const)
       : (['mutation', 'linkIdentity'] as const),
+  /** Mutation key for mintAccessToken */ mintAccessToken: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'mintAccessToken', identifier] as const)
+      : (['mutation', 'mintAccessToken'] as const),
   /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionBucket', identifier] as const)
@@ -192,6 +264,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'provisionNewUser', identifier] as const)
       : (['mutation', 'provisionNewUser'] as const),
+  /** Mutation key for refreshAccessToken */ refreshAccessToken: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'refreshAccessToken', identifier] as const)
+      : (['mutation', 'refreshAccessToken'] as const),
   /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestCrossOriginToken', identifier] as const)
@@ -226,6 +302,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'setPassword', identifier] as const)
       : (['mutation', 'setPassword'] as const),
+  /** Mutation key for setPrincipalEntities */ setPrincipalEntities: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setPrincipalEntities', identifier] as const)
+      : (['mutation', 'setPrincipalEntities'] as const),
+  /** Mutation key for setPrincipalScope */ setPrincipalScope: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'setPrincipalScope', identifier] as const)
+      : (['mutation', 'setPrincipalScope'] as const),
   /** Mutation key for signIn */ signIn: (identifier?: string) =>
     identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
   /** Mutation key for signInCrossOrigin */ signInCrossOrigin: (identifier?: string) =>
@@ -254,6 +338,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'signUpSms', identifier] as const)
       : (['mutation', 'signUpSms'] as const),
+  /** Mutation key for updatePrincipal */ updatePrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'updatePrincipal', identifier] as const)
+      : (['mutation', 'updatePrincipal'] as const),
   /** Mutation key for verifyEmail */ verifyEmail: (identifier?: string) =>
     identifier
       ? (['mutation', 'verifyEmail', identifier] as const)
@@ -302,6 +390,8 @@ export const mutationKeys = {
   roleType: roleTypeMutationKeys,
   userConnectedAccount: userConnectedAccountMutationKeys,
   user: userMutationKeys,
+  userSetting: userSettingMutationKeys,
+  userSettingsSecurity: userSettingsSecurityMutationKeys,
   webauthnCredential: webauthnCredentialMutationKeys,
   custom: customMutationKeys,
 } as const;
