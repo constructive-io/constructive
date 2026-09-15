@@ -361,6 +361,16 @@ importers:
         version: link:../run-log/dist
     publishDirectory: dist
 
+  agentic/run-log-gate:
+    dependencies:
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
+    publishDirectory: dist
+
   examples/codegen-integration:
     dependencies:
       '@0no-co/graphql.web':
