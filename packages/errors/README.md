@@ -49,35 +49,6 @@ throw errors.ACCOUNT_EXISTS();
     pgpm CLI codes). These override the generated entries.
 - Unregistered codes still `parse()` and are classified `internal` (masked).
 
-## Causes and wrapping
-
-`ConstructiveError` accepts an optional `cause: unknown`. It uses native
-`Error.cause`, preserving the original value and any existing cause chain.
-`toError(caught)` sets the new error's cause to `caught`; an existing
-`ConstructiveError` is returned unchanged, without adding a self-reference.
-The cause is non-enumerable and is excluded from `toExtensions()` and ordinary
-JSON serialization. Adding a cause does not change the message or context.
-
-Factories accept an optional third argument, `ErrorFactoryOptions`. The existing
-context and override-message arguments keep their positions and behavior:
-
-```ts
-import { errors, toError } from '@constructive-io/errors';
-
-const original = new Error('upstream lookup failed');
-const wrapped = errors.MODULE_NOT_FOUND({ name: 'auth' }, undefined, {
-  cause: original
-});
-wrapped.cause === original; // true
-
-const normalized = toError(original);
-normalized.cause === original; // true
-```
-
-The same options work with `makeErrorFromDefinition()` and the factory returned
-by `makeError()`. Omitting `cause` leaves the native property absent; explicitly
-supplying `cause: undefined` creates a non-enumerable property with that value.
-
 ## Producer classification
 
 `parse()` keeps its existing classification policy: a valid producer class wins,
@@ -100,8 +71,8 @@ parsed.explicitClass; // undefined
 const adapterClass = parsed.explicitClass ?? 'internal';
 ```
 
-This describes the **immediate input**, not the origin of its cause. A canonical
-error is authoritative for its class, including errors created by registry
+This describes the **immediate input**. A canonical error is authoritative for
+its class, including errors created by registry
 factories or `toError()`. To distinguish the raw producer's class from a registry
 fallback, inspect `parse(caught)` before normalizing it with `toError()`.
 

@@ -61,7 +61,7 @@ export interface ParsedError {
   /**
    * Valid producer classification actually used by parse (canonical error,
    * DETAIL or GraphQL extensions). Absent when class comes from the registry
-   * or the unknown-code fallback. Describes the immediate input, not its cause.
+   * or the unknown-code fallback. Describes the immediate input before any further normalization.
    */
   explicitClass?: ErrorClass;
   /** `true` when `code` is present in the registry. */

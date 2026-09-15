@@ -195,8 +195,6 @@ export function parse(error: unknown): ParsedError {
  * Codes that could not be resolved become `UNKNOWN_ERROR` (internal); a code
  * with no registered status is reported by {@link httpStatusFor} rather than
  * quietly becoming a 500.
- * Newly wrapped errors retain the original input as their native cause;
- * existing ConstructiveError instances are returned unchanged.
  */
 export function toError(error: unknown, locale?: string): ConstructiveError {
   if (error instanceof ConstructiveError) return error;
@@ -213,7 +211,6 @@ export function toError(error: unknown, locale?: string): ConstructiveError {
     message,
     errorClass: parsed.class,
     http: def ? def.http : httpStatusFor(code).status,
-    context: parsed.context,
-    cause: parsed.originalError
+    context: parsed.context
   });
 }

@@ -4,19 +4,14 @@ import { generatedRegistry } from './generated/registry.generated';
 import { registry } from './registry';
 import type { ErrorClass, ErrorContext, ErrorDefinition } from './types';
 
-/** Optional native cause for a factory-created error; never part of context. */
-export interface ErrorFactoryOptions {
-  cause?: unknown;
-}
-
 /**
  * The callable produced for a registry entry. Codes with no context params can
  * be called with no arguments; codes with params require a matching context.
  * The `[keyof C]` tuple wrapper prevents `never` from distributing.
  */
 export type ErrorFactory<C extends ErrorContext> = [keyof C] extends [never]
-  ? (context?: Record<string, never>, overrideMessage?: string, options?: ErrorFactoryOptions) => ConstructiveError
-  : (context: C, overrideMessage?: string, options?: ErrorFactoryOptions) => ConstructiveError;
+  ? (context?: Record<string, never>, overrideMessage?: string) => ConstructiveError
+  : (context: C, overrideMessage?: string) => ConstructiveError;
 
 export type ErrorsApi<R> = {
   [K in keyof R]: R[K] extends { __context: (context: infer C) => void }
@@ -30,14 +25,13 @@ export type ErrorsApi<R> = {
 export function makeErrorFromDefinition<C extends ErrorContext>(
   def: ErrorDefinition<C>
 ): ErrorFactory<C> {
-  const factory = (context?: ErrorContext, overrideMessage?: string, options?: ErrorFactoryOptions): ConstructiveError =>
+  const factory = (context?: ErrorContext, overrideMessage?: string): ConstructiveError =>
     new ConstructiveError({
       code: def.code,
       message: overrideMessage ?? format(def.code, context ?? {}),
       errorClass: def.class,
       http: def.http,
-      context,
-      ...(options && 'cause' in options ? { cause: options.cause } : {})
+      context
     });
   return factory as ErrorFactory<C>;
 }
@@ -65,15 +59,14 @@ export function makeError<C extends ErrorContext>(
   messageFn: (context: C) => string,
   httpCode = 500,
   errorClass: ErrorClass = 'internal'
-): (context: C, overrideMessage?: string, options?: ErrorFactoryOptions) => ConstructiveError {
-  return (context: C, overrideMessage?: string, options?: ErrorFactoryOptions) =>
+): (context: C, overrideMessage?: string) => ConstructiveError {
+  return (context: C, overrideMessage?: string) =>
     new ConstructiveError({
       code,
       message: overrideMessage ?? messageFn(context),
       errorClass,
       http: httpCode,
-      context,
-      ...(options && 'cause' in options ? { cause: options.cause } : {})
+      context
     });
 }
 
