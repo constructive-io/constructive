@@ -1,6 +1,6 @@
 {
   "name": "graphile-test",
-  "version": "5.14.8",
+  "version": "5.14.6",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostGraphile Testing",
   "main": "index.js",
