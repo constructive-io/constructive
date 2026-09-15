@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@agentic-kit/agent-conversation": "workspace:^",
-    "@constructive-io/coerce": "^0.4.1"
+    "@constructive-io/coerce": "workspace:^"
   },
   "peerDependencies": {
     "@agentic-kit/agent": "workspace:^",

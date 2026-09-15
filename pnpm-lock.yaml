@@ -312,8 +312,8 @@ importers:
         specifier: workspace:^
         version: link:../pi/dist
       '@constructive-io/coerce':
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: workspace:^
+        version: link:../../packages/coerce/dist
     publishDirectory: dist
 
   agentic/protocol:
@@ -4775,12 +4775,6 @@ packages:
     resolution:
       {
         integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==,
-      }
-
-  '@constructive-io/coerce@0.4.1':
-    resolution:
-      {
-        integrity: sha512-6u4912/BgzZubEEPnh1Btpz8WZTjiY0iIjY2QBFhbcgDAJe2bPhD6lraXcTpMo22uPwCkni4LXrQv0f9yYHMfQ==,
       }
 
   '@constructive-io/eslint-config@0.2.0':
@@ -16299,8 +16293,6 @@ snapshots:
       '@babel/helper-validator-identifier': 7.28.5
 
   '@bcoe/v8-coverage@0.2.3': {}
-
-  '@constructive-io/coerce@0.4.1': {}
 
   '@constructive-io/eslint-config@0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
     dependencies:
