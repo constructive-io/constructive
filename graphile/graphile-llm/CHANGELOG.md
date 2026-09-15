@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.15.8...graphile-llm@1.15.9) (2026-09-15)
+
+### Bug Fixes
+
+- **graphile-llm:** bump graphile-search peer to ^2; document Node 22 floor ([8bd86ea](https://github.com/constructive-io/constructive/commit/8bd86eab885076cd06fd2f678859d6f9a53d4bcc))
+
 ## [1.15.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.15.7...graphile-llm@1.15.8) (2026-09-08)
 
 **Note:** Version bump only for package graphile-llm

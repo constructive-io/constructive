@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.14.0...@constructive-io/errors@0.15.0) (2026-09-15)
+
+### Features
+
+- **errors:** register INVITE_ADDRESS_REQUIRED and INVITE_USERS_INVALID ([a7af570](https://github.com/constructive-io/constructive/commit/a7af570f135be4b062db1aa9d3b55f2a9701ff67))
+- **errors:** register SIGN_UP_REQUIRES_INVITE and INVITE_PHONE_NOT_FOUND ([ea074ed](https://github.com/constructive-io/constructive/commit/ea074ed85e6a014925c3688c46bbc082ce9d5246)), closes [constructive-db#3730](https://github.com/constructive-db/issues/3730)
+- **errors:** register storage file processing lifecycle errors ([ecf19ca](https://github.com/constructive-io/constructive/commit/ecf19ca29074321d4752e6315bb900cf56308751))
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.13.0...@constructive-io/errors@0.14.0) (2026-09-08)
 
 ### Features
