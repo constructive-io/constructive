@@ -3,7 +3,6 @@ import { createGraphQLConversationClient, Inbox, requestApproval, respondToAppro
 import { FakeAgentApi } from '../../agent-conversation/__tests__/fake-client';
 import { createThreadGateHost } from '../src/gate';
 
-const DATABASE_ID = '00000000-0000-0000-0000-0000000000db';
 const THREAD_ID = '00000000-0000-0000-0000-0000000000ad';
 
 interface Harness {
@@ -29,7 +28,6 @@ function harness(): Harness {
 
   const conversation = createGraphQLConversationClient({
     client: api,
-    databaseId: DATABASE_ID,
     threadId: THREAD_ID
   });
 
@@ -128,7 +126,6 @@ describe('thread gate host', () => {
     const inbox = new Inbox({
       client: createGraphQLConversationClient({
         client: h.api,
-        databaseId: DATABASE_ID,
         threadId: THREAD_ID
       }),
       since: new Date(0).toISOString(),

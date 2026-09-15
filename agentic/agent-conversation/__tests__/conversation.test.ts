@@ -14,7 +14,6 @@ const DATABASE_ID = '00000000-0000-0000-0000-0000000000db';
 const conversation = (api: FakeAgentApi, threadId: string) =>
   createGraphQLConversationClient({
     client: api,
-    databaseId: DATABASE_ID,
     threadId,
     actorId: 'actor-1',
   });

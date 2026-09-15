@@ -7,21 +7,26 @@ owns all of it.
 
 ```ts
 import {
+  createGraphQLConversationClient,
+  createHttpGraphQLClient,
   Inbox,
   isApprovalEvent,
   loadOrCreateThread,
   TaskWriter,
-  Transcript,
-  createHttpGraphQLClient
+  Transcript
 } from '@agentic-kit/agent-conversation';
 
 const client = createHttpGraphQLClient({ url, token });
 const thread = await loadOrCreateThread({ client, databaseId, threadId, title });
 
-const transcript = new Transcript(client, { databaseId, threadId: thread.id, model });
+// Messages and tasks inherit their scope from the thread; only the thread
+// creation above names the database.
+const conversation = createGraphQLConversationClient({ client, threadId: thread.id, actorId });
+
+const transcript = new Transcript(conversation, { model });
 await transcript.appendText('Reading the tests first.');
 
-const inbox = new Inbox({ client, threadId: thread.id, since: thread.createdAt! });
+const inbox = new Inbox({ client: conversation, since: thread.createdAt! });
 const { event, cancelled } = await inbox.waitFor(isApprovalEvent, { timeoutMs: 900_000 });
 ```
 

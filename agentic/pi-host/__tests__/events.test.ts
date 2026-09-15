@@ -4,14 +4,12 @@ import { createGraphQLConversationClient, TaskWriter, Transcript } from '@agenti
 import { FakeAgentApi } from '../../agent-conversation/__tests__/fake-client';
 import { parseTodos, TranscriptWriter } from '../src/events';
 
-const DATABASE_ID = '00000000-0000-0000-0000-0000000000db';
 const THREAD_ID = '00000000-0000-0000-0000-0000000000ad';
 
 function setup(withTasks = true) {
   const api = new FakeAgentApi();
   const conversation = createGraphQLConversationClient({
     client: api,
-    databaseId: DATABASE_ID,
     threadId: THREAD_ID
   });
   const transcript = new Transcript(conversation);

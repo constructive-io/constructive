@@ -49,8 +49,11 @@ const UPDATE_TASK = `mutation CodeTaskUpdateTask($input: UpdateAgentTaskInput!) 
 
 export interface GraphQLConversationClientOptions {
   client: GraphQLClient;
-  databaseId: string;
-  /** The thread every write lands on. */
+  /**
+   * The thread every write lands on. Scope (`database_id` / `entity_id`,
+   * `visibility`) is inherited from it by the agent module's insert triggers,
+   * so the client never names it.
+   */
   threadId: string;
   /** The agent row the run speaks as, when the tenant has one. */
   agentId?: string | null;
@@ -68,7 +71,7 @@ export interface GraphQLConversationClientOptions {
 export function createGraphQLConversationClient(
   options: GraphQLConversationClientOptions
 ): ConversationClient {
-  const { client, databaseId, threadId } = options;
+  const { client, threadId } = options;
   const parent: TaskParent = options.taskParent ?? { column: 'threadId', id: threadId };
   const attribution = {
     ...(options.agentId ? { agentId: options.agentId } : {}),
@@ -82,7 +85,6 @@ export function createGraphQLConversationClient(
       }>(CREATE_MESSAGE, {
         input: {
           agentMessage: {
-            databaseId,
             threadId,
             authorRole: input.authorRole,
             ...attribution,
@@ -123,7 +125,6 @@ export function createGraphQLConversationClient(
         {
           input: {
             agentTask: {
-              databaseId,
               [parent.column]: parent.id,
               description: input.description,
               status: input.status,
