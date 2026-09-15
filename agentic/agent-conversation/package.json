@@ -1,8 +1,8 @@
 {
   "name": "@agentic-kit/agent-conversation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "The agent module's conversation as a library: thread load/create, an inbox over new messages, transcript append, ToolPart state machine and agent_task rows \u2014 over an injected GraphQL client.",
+  "description": "The agent module's conversation as a library: thread load/create, an inbox over new messages, transcript append, ToolPart state machine and agent_task rows — over an injected GraphQL client.",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",

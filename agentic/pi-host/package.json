@@ -1,8 +1,8 @@
 {
   "name": "@agentic-kit/pi-host",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "The host side of a headless agent run: a GateHost that asks for approval through the conversation thread, persona \u2192 model/prompt/tools selection, and an AgentEvent \u2192 transcript/task writer.",
+  "description": "The host side of a headless agent run: a GateHost that asks for approval through the conversation thread, persona → model/prompt/tools selection, and an AgentEvent → transcript/task writer.",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -36,8 +36,8 @@
     "constructive"
   ],
   "dependencies": {
-    "@constructive-io/coerce": "^0.4.1",
-    "@agentic-kit/agent-conversation": "workspace:^"
+    "@agentic-kit/agent-conversation": "workspace:^",
+    "@constructive-io/coerce": "^0.4.1"
   },
   "peerDependencies": {
     "@agentic-kit/agent": "workspace:^",
