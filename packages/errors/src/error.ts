@@ -6,6 +6,8 @@ export interface ConstructiveErrorArgs {
   errorClass: ErrorClass;
   http: number;
   context?: ErrorContext;
+  /** Original failure, retained as a native non-enumerable Error.cause. */
+  cause?: unknown;
 }
 
 /**
@@ -22,7 +24,7 @@ export class ConstructiveError extends Error {
   readonly context?: ErrorContext;
 
   constructor(args: ConstructiveErrorArgs) {
-    super(args.message);
+    super(args.message, 'cause' in args ? { cause: args.cause } : undefined);
     this.name = 'ConstructiveError';
     this.code = args.code;
     this.errorClass = args.errorClass;

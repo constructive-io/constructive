@@ -8,7 +8,7 @@ service or client without pulling in pgpm.
 - **`parse(anyError)`** — normalize an error from any source (a
   `ConstructiveError`, a node-postgres `DatabaseError`, a GraphQL error or
   `{ errors: [...] }` wrapper, a plain `Error`, or a string) into a canonical
-  `{ code, context, class, known }`.
+  `{ code, context, class, known, explicitClass? }`.
 - **`format(code, context, locale)`** — render a localized, interpolated
   message. `{{var}}` placeholders + registerable per-locale catalogs (i18n).
 - **`errors.*` factory** — type-safe throwable builders derived from the
@@ -48,6 +48,62 @@ throw errors.ACCOUNT_EXISTS();
     that matter most (public auth/limit copy, native PostgreSQL constraint codes,
     pgpm CLI codes). These override the generated entries.
 - Unregistered codes still `parse()` and are classified `internal` (masked).
+
+## Causes and wrapping
+
+`ConstructiveError` accepts an optional `cause: unknown`. It uses native
+`Error.cause`, preserving the original value and any existing cause chain.
+`toError(caught)` sets the new error's cause to `caught`; an existing
+`ConstructiveError` is returned unchanged, without adding a self-reference.
+The cause is non-enumerable and is excluded from `toExtensions()` and ordinary
+JSON serialization. Adding a cause does not change the message or context.
+
+Factories accept an optional third argument, `ErrorFactoryOptions`. The existing
+context and override-message arguments keep their positions and behavior:
+
+```ts
+import { errors, toError } from '@constructive-io/errors';
+
+const original = new Error('upstream lookup failed');
+const wrapped = errors.MODULE_NOT_FOUND({ name: 'auth' }, undefined, {
+  cause: original
+});
+wrapped.cause === original; // true
+
+const normalized = toError(original);
+normalized.cause === original; // true
+```
+
+The same options work with `makeErrorFromDefinition()` and the factory returned
+by `makeError()`. Omitting `cause` leaves the native property absent; explicitly
+supplying `cause: undefined` creates a non-enumerable property with that value.
+
+## Producer classification
+
+`parse()` keeps its existing classification policy: a valid producer class wins,
+then the registry is consulted, and unknown codes default to internal.
+`explicitClass` is additional metadata, present only when the parser actually
+used a valid producer classification from `ConstructiveError.errorClass`,
+PostgreSQL `DETAIL.class`, or GraphQL `extensions.class` (including request
+wrappers). Missing or invalid producer classes do not populate it. The existing
+code-selection precedence also governs which transport's class can be used.
+
+```ts
+import { parse } from '@constructive-io/errors';
+
+const parsed = parse({ message: 'STORAGE_PROCESSING_CONFLICT' });
+parsed.class; // 'public', from the registry
+parsed.explicitClass; // undefined
+
+// An adapter can retain its own internal default for undeclared classifications
+// without duplicating the DETAIL or GraphQL parser.
+const adapterClass = parsed.explicitClass ?? 'internal';
+```
+
+This describes the **immediate input**, not the origin of its cause. A canonical
+error is authoritative for its class, including errors created by registry
+factories or `toError()`. To distinguish the raw producer's class from a registry
+fallback, inspect `parse(caught)` before normalizing it with `toError()`.
 
 ## HTTP status
 

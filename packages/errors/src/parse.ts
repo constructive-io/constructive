@@ -119,6 +119,8 @@ function parseMessageCode(message: string): { code: string; args: string[] } | n
  * present, since that source is authoritative for the raise site (and correctly
  * classifies codes not yet in the registry). It falls back to `classify(code)`
  * (registry lookup, unknown ⇒ `internal`) only when no explicit class is given.
+ * `explicitClass` records the producer class actually used, and is absent when
+ * classification falls back to the registry or the unknown-code default.
  */
 export function parse(error: unknown): ParsedError {
   if (error instanceof ConstructiveError) {
@@ -126,6 +128,7 @@ export function parse(error: unknown): ParsedError {
       code: error.code,
       context: error.context ?? {},
       class: error.errorClass,
+      ...(toErrorClass(error.errorClass) ? { explicitClass: error.errorClass } : {}),
       known: Boolean(getDefinition(error.code)),
       rawMessage: error.message,
       originalError: error
@@ -175,6 +178,7 @@ export function parse(error: unknown): ParsedError {
     code,
     context,
     class: explicitClass ?? classify(code),
+    ...(explicitClass ? { explicitClass } : {}),
     known: Boolean(code && getDefinition(code)),
     rawMessage,
     sqlState,
@@ -191,6 +195,8 @@ export function parse(error: unknown): ParsedError {
  * Codes that could not be resolved become `UNKNOWN_ERROR` (internal); a code
  * with no registered status is reported by {@link httpStatusFor} rather than
  * quietly becoming a 500.
+ * Newly wrapped errors retain the original input as their native cause;
+ * existing ConstructiveError instances are returned unchanged.
  */
 export function toError(error: unknown, locale?: string): ConstructiveError {
   if (error instanceof ConstructiveError) return error;
@@ -207,6 +213,7 @@ export function toError(error: unknown, locale?: string): ConstructiveError {
     message,
     errorClass: parsed.class,
     http: def ? def.http : httpStatusFor(code).status,
-    context: parsed.context
+    context: parsed.context,
+    cause: parsed.originalError
   });
 }
