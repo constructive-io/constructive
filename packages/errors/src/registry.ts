@@ -4,6 +4,14 @@ import type { ErrorContext, ErrorDefinition } from './types';
 
 export { type DefinedError,defineError } from './define';
 
+// SQL completion errors carry these keys verbatim; NULL claims/arguments are
+// possible. Runtime validation can fail before a database target is resolved.
+type StorageFileContext = {
+  database_id?: string | null;
+  file_id?: string | null;
+  bucket_id?: string | null;
+};
+
 /**
  * The curated Constructive error registry.
  *
@@ -19,6 +27,82 @@ export const registry = {
     class: 'public',
     http: 409,
     message: 'The storage bucket has not yet been reconciled.'
+  }),
+  // File processing lifecycle — curated HTTP hints override the generated
+  // name-based heuristic, particularly for access and processing conflicts.
+  STORAGE_ACCESS_CLAIM_MISMATCH: defineError<StorageFileContext>({
+    code: 'STORAGE_ACCESS_CLAIM_MISMATCH',
+    class: 'public',
+    http: 403,
+    message: 'You do not have permission to process this file.'
+  }),
+  STORAGE_FILE_NOT_FOUND: defineError<StorageFileContext & {
+    bucket?: string;
+    fileId?: string;
+    reason?: string;
+  }>({
+    code: 'STORAGE_FILE_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message: 'The file could not be found.'
+  }),
+  STORAGE_SOURCE_HASH_REQUIRED: defineError<StorageFileContext & { field?: string }>({
+    code: 'STORAGE_SOURCE_HASH_REQUIRED',
+    class: 'public',
+    http: 400,
+    message: 'A valid source file hash is required.'
+  }),
+  STORAGE_SOURCE_HASH_MISMATCH: defineError<StorageFileContext>({
+    code: 'STORAGE_SOURCE_HASH_MISMATCH',
+    class: 'public',
+    http: 409,
+    message: 'The source file has changed. Please process it again.'
+  }),
+  STORAGE_INVALID_COMPLETION_RESULT: defineError<StorageFileContext & {
+    field?: string;
+    reason?: string;
+    cause?: string;
+    maxBytes?: number;
+  }>({
+    code: 'STORAGE_INVALID_COMPLETION_RESULT',
+    class: 'public',
+    http: 400,
+    message: 'The file processing result is invalid.'
+  }),
+  STORAGE_PROCESSING_CONFLICT: defineError<StorageFileContext>({
+    code: 'STORAGE_PROCESSING_CONFLICT',
+    class: 'public',
+    http: 409,
+    message: 'The file is not in a state that allows this processing result.'
+  }),
+  STORAGE_INVALID_UPLOAD_DOCUMENT: defineError<StorageFileContext>({
+    code: 'STORAGE_INVALID_UPLOAD_DOCUMENT',
+    class: 'internal',
+    http: 500,
+    message: 'The stored upload document is invalid.'
+  }),
+  // Runtime-only dispatch errors; these have no database audit records.
+  STORAGE_BUCKET_DATABASE_MISMATCH: defineError<{
+    bucket: string;
+    capabilitiesDatabaseId?: string;
+    bucketDatabaseId?: string;
+    invocationDatabaseId?: string | null;
+    reason?: string;
+  }>({
+    code: 'STORAGE_BUCKET_DATABASE_MISMATCH',
+    class: 'internal',
+    http: 500,
+    message: 'The storage bucket does not belong to the invocation database.'
+  }),
+  STORAGE_FILE_TARGET_UNAVAILABLE: defineError<{
+    bucket: string;
+    bucketId?: string;
+    reason?: string;
+  }>({
+    code: 'STORAGE_FILE_TARGET_UNAVAILABLE',
+    class: 'internal',
+    http: 500,
+    message: 'The storage file target is unavailable.'
   }),
 
   // ===========================================================================
