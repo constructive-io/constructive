@@ -50,7 +50,7 @@ function testBucketName(suffix: string): string {
  */
 async function isObjectStoreReachable(): Promise<boolean> {
   try {
-    const response = await fetch(`${OBJECT_STORE_ENDPOINT}/minio/health/live`, {
+    const response = await fetch(`${OBJECT_STORE_ENDPOINT}/health`, {
       signal: AbortSignal.timeout(3000),
     });
     return response.ok;
