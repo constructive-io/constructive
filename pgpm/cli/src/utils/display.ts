@@ -46,9 +46,9 @@ export const usageText = `
       deps             Show change dependencies
   
   Development Tools:
-    docker             Manage Docker containers (start/stop/ls, --minio)
+    docker             Manage Docker containers (start/stop/ls, --rustfs)
     doctor             Check local dependencies (node, docker, psql) with install guidance
-    env                Manage environment variables (--supabase, --minio)
+    env                Manage environment variables (--supabase, --rustfs)
     test-packages      Run integration tests on workspace packages
   
   Global Options:

@@ -17,9 +17,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "routingSchema": "routing_public",
   },
   "cdn": {
-    "awsAccessKey": "minioadmin",
+    "awsAccessKey": "constructive",
     "awsRegion": "us-east-1",
-    "awsSecretKey": "minioadmin",
+    "awsSecretKey": "constructive-dev-secret",
     "bucketName": "test-bucket",
     "endpoint": "http://localhost:9000",
     "provider": "minio",
