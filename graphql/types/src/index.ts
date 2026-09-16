@@ -5,7 +5,12 @@ export {
   graphileDefaults,
   graphileFeatureDefaults,
   GraphileFeatureOptions,
-  GraphileOptions} from './graphile';
+  GraphileOptions,
+  PgScopedIntrospectionConfig,
+  PgScopedIntrospectionServiceConfig,
+  SchemaScopedIntrospectionOptions,
+  ScopedCatalogTypes,
+} from './graphile';
 
 // Export Constructive combined types
 export {

@@ -183,6 +183,56 @@ const { schema } = await makeSchema(preset);
 const sdl = printSchema(schema);
 ```
 
+## Opt-in Scoped Introspection
+
+`ConstructivePreset` and `makePgService` retain PostGraphile's upstream
+introspection behavior. Applications that explicitly opt into schema-scoped
+introspection add the independently owned replacement preset and configure the
+service by name in the Graphile gather options:
+
+```typescript
+import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
+
+const preset = {
+  extends: [ConstructivePreset, ScopedIntrospectionPreset],
+  gather: {
+    pgScopedIntrospection: {
+      main: true,
+    },
+  },
+  pgServices: [
+    makePgService({
+      connectionString: 'postgres://user:pass@localhost/mydb',
+      schemas: ['app_public'],
+    }),
+  ],
+};
+```
+
+Use an options object when a service needs a specific catalog policy or
+extension capability:
+
+```typescript
+const preset = {
+  extends: [ConstructivePreset, ScopedIntrospectionPreset],
+  gather: {
+    pgScopedIntrospection: {
+      main: {
+        catalogTypes: 'dependency-closure',
+        capabilityExtensions: ['pg_trgm'],
+      },
+    },
+  },
+};
+```
+
+The map is keyed by the final PostgreSQL service name. `true` enables scoped
+defaults, `false` keeps stock introspection, and an omitted service keeps stock
+introspection. The Constructive GraphQL server accepts the same gather options
+under `graphile.preset.gather` and loads the scoped package only when the map is
+configured, unless the replacement preset is already included in `graphile.extends`.
+
 ## Smart Tags Reference
 
 Control schema generation with PostgreSQL comments:
