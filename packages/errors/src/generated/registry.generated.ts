@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (799 distinct codes
+ * Source of truth: the constructive-db error audit (801 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 799 total, 589 public, 210 internal.
+ * Counts: 801 total, 591 public, 210 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -378,6 +378,8 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'GUARD_STEP_UP_CONDITION_FIELD_WATCH_FIELDS_CONFLICT': defineError({ code: 'GUARD_STEP_UP_CONDITION_FIELD_WATCH_FIELDS_CONFLICT', class: 'public', http: 403, message: 'Guard step up condition field watch fields conflict.' }),
   'GUARD_STEP_UP_INVALID_MIN_AGE': defineError({ code: 'GUARD_STEP_UP_INVALID_MIN_AGE', class: 'public', http: 403, message: 'Guard step up invalid min age.' }),
   'GUARD_STEP_UP_INVALID_STEP_UP_TYPE': defineError({ code: 'GUARD_STEP_UP_INVALID_STEP_UP_TYPE', class: 'public', http: 403, message: 'Guard step up invalid step up type.' }),
+  'GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND': defineError({ code: 'GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Guard step up min age anchor condition field not found.' }),
+  'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT': defineError({ code: 'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT', class: 'public', http: 403, message: 'Guard step up min age anchor fk field conditions conflict.' }),
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_NOT_FOUND': defineError({ code: 'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Guard step up min age anchor fk field not found.' }),
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_INVALID': defineError({ code: 'GUARD_STEP_UP_MIN_AGE_ANCHOR_INVALID', class: 'public', http: 403, message: 'Guard step up min age anchor invalid.' }),
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_LOOKUP_CONFLICT': defineError({ code: 'GUARD_STEP_UP_MIN_AGE_ANCHOR_LOOKUP_CONFLICT', class: 'public', http: 403, message: 'Guard step up min age anchor lookup conflict.' }),
@@ -1181,6 +1183,8 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'GUARD_STEP_UP_CONDITION_FIELD_WATCH_FIELDS_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'GUARD_STEP_UP_INVALID_MIN_AGE': { class: 'public', dynamic: false, generatedOnly: false },
   'GUARD_STEP_UP_INVALID_STEP_UP_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
+  'GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'GUARD_STEP_UP_MIN_AGE_ANCHOR_LOOKUP_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1629,4 +1633,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 799;
+export const GENERATED_CODE_COUNT = 801;
