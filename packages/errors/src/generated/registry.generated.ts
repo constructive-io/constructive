@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (784 distinct codes
+ * Source of truth: the constructive-db error audit (799 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 784 total, 576 public, 208 internal.
+ * Counts: 799 total, 589 public, 210 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -260,6 +260,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED': defineError({ code: 'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED', class: 'public', http: 400, message: 'Data permissions mapping table required.' }),
   'DATA_PERMISSIONS_MODULE_AMBIGUOUS': defineError({ code: 'DATA_PERMISSIONS_MODULE_AMBIGUOUS', class: 'public', http: 400, message: 'Data permissions module ambiguous.' }),
   'DATA_PERMISSIONS_MODULE_NOT_FOUND': defineError({ code: 'DATA_PERMISSIONS_MODULE_NOT_FOUND', class: 'public', http: 404, message: 'Data permissions module not found.' }),
+  'DATA_PERMISSIONS_MODULE_REF_INVALID': defineError({ code: 'DATA_PERMISSIONS_MODULE_REF_INVALID', class: 'public', http: 400, message: 'Data permissions module ref invalid.' }),
   'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE': defineError({ code: 'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE', class: 'public', http: 400, message: 'Data permissions no permissions module.' }),
   'DATA_PERMISSIONS_REGISTRATION_CONFLICT': defineError({ code: 'DATA_PERMISSIONS_REGISTRATION_CONFLICT', class: 'public', http: 400, message: 'Data permissions registration conflict.' }),
   'DATA_PERMISSIONS_TABLE_NOT_FOUND': defineError({ code: 'DATA_PERMISSIONS_TABLE_NOT_FOUND', class: 'public', http: 404, message: 'Data permissions table not found.' }),
@@ -415,6 +416,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'HIERARCHY_MEMBER_IN_USE': defineError({ code: 'HIERARCHY_MEMBER_IN_USE', class: 'internal', http: 500, message: 'HIERARCHY_MEMBER_IN_USE: Cannot deactivate user {{arg0}} - user must be removed from the organization hierarchy first', positional: ['arg0'] }),
   'HISTORY': defineError({ code: 'HISTORY', class: 'internal', http: 500, message: 'HISTORY: history {{arg0}}.{{arg1}} registration has no copy_fields', positional: ['arg0', 'arg1'] }),
   'HOSTNAME_BINDING_SYNC': defineError({ code: 'HOSTNAME_BINDING_SYNC', class: 'internal', http: 500, message: 'HOSTNAME_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
+  'HOSTNAME_CLAIMED_IN_OTHER_PLANE': defineError({ code: 'HOSTNAME_CLAIMED_IN_OTHER_PLANE', class: 'public', http: 400, message: 'Hostname claimed in other plane.' }),
   'IDENTITY_ACCOUNT_NOT_FOUND': defineError({ code: 'IDENTITY_ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Identity account not found.' }),
   'IDENTITY_ALREADY_LINKED': defineError({ code: 'IDENTITY_ALREADY_LINKED', class: 'public', http: 409, message: 'Identity already linked.' }),
   'IDENTITY_LINK_AVAILABLE': defineError({ code: 'IDENTITY_LINK_AVAILABLE', class: 'public', http: 400, message: 'Identity link available.' }),
@@ -452,9 +454,12 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'INVALID_TOKEN': defineError({ code: 'INVALID_TOKEN', class: 'public', http: 401, message: 'Invalid token.' }),
   'INVALID_USER': defineError({ code: 'INVALID_USER', class: 'public', http: 400, message: 'Invalid user.' }),
   'INVALID_WORKER_ID': defineError({ code: 'INVALID_WORKER_ID', class: 'internal', http: 500, message: 'Invalid worker id.' }),
+  'INVITE_ADDRESS_REQUIRED': defineError({ code: 'INVITE_ADDRESS_REQUIRED', class: 'public', http: 400, message: 'Invite address required.' }),
   'INVITE_EMAIL_NOT_FOUND': defineError({ code: 'INVITE_EMAIL_NOT_FOUND', class: 'public', http: 404, message: 'Invite email not found.' }),
   'INVITE_LIMIT': defineError({ code: 'INVITE_LIMIT', class: 'public', http: 429, message: 'Invite limit.' }),
   'INVITE_NOT_FOUND': defineError({ code: 'INVITE_NOT_FOUND', class: 'public', http: 404, message: 'Invite not found.' }),
+  'INVITE_PHONE_NOT_FOUND': defineError({ code: 'INVITE_PHONE_NOT_FOUND', class: 'public', http: 404, message: 'Invite phone not found.' }),
+  'INVITE_USERS_INVALID': defineError({ code: 'INVITE_USERS_INVALID', class: 'public', http: 400, message: 'Invite users invalid.' }),
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_AUTHORIZED', class: 'public', http: 400, message: 'Invocation anonymous not authorized.' }),
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': defineError({ code: 'INVOCATION_ANONYMOUS_NOT_CALLABLE', class: 'public', http: 400, message: 'Invocation anonymous not callable.' }),
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': defineError({ code: 'INVOCATION_ANONYMOUS_ROUTE_REQUIRED', class: 'public', http: 400, message: 'Invocation anonymous route required.' }),
@@ -572,6 +577,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS': defineError({ code: 'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS', class: 'public', http: 423, message: 'Password reset locked exceed attempts.' }),
   'PASSWORD_SIGN_IN_DISABLED': defineError({ code: 'PASSWORD_SIGN_IN_DISABLED', class: 'public', http: 403, message: 'Password sign in disabled.' }),
   'PASSWORD_SIGN_UP_DISABLED': defineError({ code: 'PASSWORD_SIGN_UP_DISABLED', class: 'public', http: 403, message: 'Password sign up disabled.' }),
+  'PERMISSION_DENIED': defineError({ code: 'PERMISSION_DENIED', class: 'public', http: 403, message: 'Permission denied.' }),
   'PLAN_REQUIRED': defineError({ code: 'PLAN_REQUIRED', class: 'internal', http: 500, message: 'Plan required.' }),
   'PLATFORM_FLAG_IMMUTABLE': defineError({ code: 'PLATFORM_FLAG_IMMUTABLE', class: 'internal', http: 500, message: 'Platform flag immutable.' }),
   'POLICY_COLUMN_REF_UNRESOLVED': defineError({ code: 'POLICY_COLUMN_REF_UNRESOLVED', class: 'internal', http: 500, message: 'Policy column ref unresolved.' }),
@@ -642,6 +648,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED': defineError({ code: 'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED', class: 'internal', http: 500, message: 'Resource storage total cap exceeded.' }),
   'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED': defineError({ code: 'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED', class: 'internal', http: 500, message: 'Retire unserved apis scope required.' }),
   'ROUTE_BINDING_SYNC': defineError({ code: 'ROUTE_BINDING_SYNC', class: 'internal', http: 500, message: 'ROUTE_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
+  'ROUTE_DOMAIN_REQUIRED': defineError({ code: 'ROUTE_DOMAIN_REQUIRED', class: 'internal', http: 500, message: 'Route domain required.' }),
   'ROUTE_PRIVILEGED_TARGET_FORBIDDEN': defineError({ code: 'ROUTE_PRIVILEGED_TARGET_FORBIDDEN', class: 'internal', http: 500, message: 'ROUTE_PRIVILEGED_TARGET_FORBIDDEN: only a platform administrator may route to an API served as a role other than anonymous or authenticated' }),
   'ROUTE_TARGET_NOT_OWNED': defineError({ code: 'ROUTE_TARGET_NOT_OWNED', class: 'internal', http: 500, message: 'Route target not owned.' }),
   'ROUTE_TARGET_REQUIRED': defineError({ code: 'ROUTE_TARGET_REQUIRED', class: 'internal', http: 500, message: 'Route target required.' }),
@@ -698,6 +705,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'SESSION_TTL_EXCEEDS_PARENT': defineError({ code: 'SESSION_TTL_EXCEEDS_PARENT', class: 'public', http: 400, message: 'Session ttl exceeds parent.' }),
   'SETTINGS_SURFACE_NOT_PROVISIONED': defineError({ code: 'SETTINGS_SURFACE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Settings surface not provisioned.' }),
   'SIGN_UP_DISABLED': defineError({ code: 'SIGN_UP_DISABLED', class: 'public', http: 403, message: 'Sign up disabled.' }),
+  'SIGN_UP_REQUIRES_INVITE': defineError({ code: 'SIGN_UP_REQUIRES_INVITE', class: 'public', http: 403, message: 'Sign up requires invite.' }),
   'SITE_INSTALLATION_MEMBER_NOT_SERVABLE': defineError({ code: 'SITE_INSTALLATION_MEMBER_NOT_SERVABLE', class: 'internal', http: 500, message: 'Site installation member not servable.' }),
   'SITE_NOT_FOUND': defineError({ code: 'SITE_NOT_FOUND', class: 'public', http: 404, message: 'Site not found.' }),
   'SITE_NOT_PROVISIONED': defineError({ code: 'SITE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Site not provisioned.' }),
@@ -731,10 +739,12 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': defineError({ code: 'STEP_UP_REQUIRED_FRESH_AUTH', class: 'public', http: 403, message: 'Please verify your identity to continue.' }),
   'STEP_UP_REQUIRED_MFA': defineError({ code: 'STEP_UP_REQUIRED_MFA', class: 'public', http: 403, message: 'Please enter a code from your authenticator app to continue.' }),
   'STEP_UP_REQUIRED_PASSWORD': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD', class: 'public', http: 403, message: 'Please re-enter your password to continue.' }),
+  'STORAGE_ACCESS_CLAIM_MISMATCH': defineError({ code: 'STORAGE_ACCESS_CLAIM_MISMATCH', class: 'public', http: 400, message: 'Storage access claim mismatch.' }),
   'STORAGE_API_NOT_PROVISIONED': defineError({ code: 'STORAGE_API_NOT_PROVISIONED', class: 'public', http: 400, message: 'Storage api not provisioned.' }),
   'STORAGE_DESTINATION_REQUIRES_TEMP': defineError({ code: 'STORAGE_DESTINATION_REQUIRES_TEMP', class: 'internal', http: 500, message: 'Storage destination requires temp.' }),
   'STORAGE_FILE_BUCKET_IMMUTABLE': defineError({ code: 'STORAGE_FILE_BUCKET_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file bucket immutable.' }),
   'STORAGE_FILE_KEY_IMMUTABLE': defineError({ code: 'STORAGE_FILE_KEY_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file key immutable.' }),
+  'STORAGE_FILE_NOT_FOUND': defineError({ code: 'STORAGE_FILE_NOT_FOUND', class: 'public', http: 404, message: 'Storage file not found.' }),
   'STORAGE_GC_CONTENT_HASH_UNSUPPORTED': defineError({ code: 'STORAGE_GC_CONTENT_HASH_UNSUPPORTED', class: 'internal', http: 500, message: 'Storage gc content hash unsupported.' }),
   'STORAGE_GC_FILES_TABLE_MISSING': defineError({ code: 'STORAGE_GC_FILES_TABLE_MISSING', class: 'internal', http: 500, message: 'Storage gc files table missing.' }),
   'STORAGE_GC_MODULE_AMBIGUOUS': defineError({ code: 'STORAGE_GC_MODULE_AMBIGUOUS', class: 'internal', http: 500, message: 'Storage gc module ambiguous.' }),
@@ -744,10 +754,15 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STORAGE_GC_REF_CROSS_DATABASE': defineError({ code: 'STORAGE_GC_REF_CROSS_DATABASE', class: 'internal', http: 500, message: 'Storage gc ref cross database.' }),
   'STORAGE_GC_REF_FIELD_MISSING': defineError({ code: 'STORAGE_GC_REF_FIELD_MISSING', class: 'internal', http: 500, message: 'Storage gc ref field missing.' }),
   'STORAGE_GC_REF_TABLE_MISSING': defineError({ code: 'STORAGE_GC_REF_TABLE_MISSING', class: 'internal', http: 500, message: 'Storage gc ref table missing.' }),
+  'STORAGE_INVALID_COMPLETION_RESULT': defineError({ code: 'STORAGE_INVALID_COMPLETION_RESULT', class: 'public', http: 400, message: 'Storage invalid completion result.' }),
+  'STORAGE_INVALID_UPLOAD_DOCUMENT': defineError({ code: 'STORAGE_INVALID_UPLOAD_DOCUMENT', class: 'internal', http: 500, message: 'Storage invalid upload document.' }),
   'STORAGE_MODULE_ENTITY_FIELD_INVALID': defineError({ code: 'STORAGE_MODULE_ENTITY_FIELD_INVALID', class: 'internal', http: 500, message: 'Storage module entity field invalid.' }),
   'STORAGE_MODULE_NOT_FOUND': defineError({ code: 'STORAGE_MODULE_NOT_FOUND', class: 'internal', http: 500, message: 'Storage module not found.' }),
+  'STORAGE_PROCESSING_CONFLICT': defineError({ code: 'STORAGE_PROCESSING_CONFLICT', class: 'public', http: 400, message: 'Storage processing conflict.' }),
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_DESTINATION_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion destination mismatch.' }),
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_VISIBILITY_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion visibility mismatch.' }),
+  'STORAGE_SOURCE_HASH_MISMATCH': defineError({ code: 'STORAGE_SOURCE_HASH_MISMATCH', class: 'public', http: 400, message: 'Storage source hash mismatch.' }),
+  'STORAGE_SOURCE_HASH_REQUIRED': defineError({ code: 'STORAGE_SOURCE_HASH_REQUIRED', class: 'public', http: 400, message: 'Storage source hash required.' }),
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': defineError({ code: 'STORAGE_STAGING_BUCKET_NO_DESTINATION', class: 'internal', http: 500, message: 'Storage staging bucket no destination.' }),
   'STORAGE_STAGING_BUCKET_NO_TTL': defineError({ code: 'STORAGE_STAGING_BUCKET_NO_TTL', class: 'internal', http: 500, message: 'Storage staging bucket no ttl.' }),
   'STORAGE_STAGING_DESTINATION_INVALID': defineError({ code: 'STORAGE_STAGING_DESTINATION_INVALID', class: 'internal', http: 500, message: 'Storage staging destination invalid.' }),
@@ -1048,6 +1063,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DATA_PERMISSIONS_MAPPING_TABLE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_MODULE_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_MODULE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'DATA_PERMISSIONS_MODULE_REF_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_NO_PERMISSIONS_MODULE': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_REGISTRATION_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_PERMISSIONS_TABLE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1076,7 +1092,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DOMAIN_CHECK_CERT_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CERT_BAD_ISSUER': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CERT_FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: true },
-  'DOMAIN_ISSUE_CERT_NOT_VERIFIED': { class: 'public', dynamic: true, generatedOnly: false },
+  'DOMAIN_ISSUE_CERT_NOT_VERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
   'DOMAIN_ISSUE_CERT_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CHALLENGE_BAD_METHOD': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_ISSUE_CHALLENGE_UNKNOWN_DOMAIN': { class: 'internal', dynamic: true, generatedOnly: true },
@@ -1203,6 +1219,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'HIERARCHY_MEMBER_IN_USE': { class: 'internal', dynamic: true, generatedOnly: false },
   'HISTORY': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
+  'HOSTNAME_CLAIMED_IN_OTHER_PLANE': { class: 'public', dynamic: false, generatedOnly: true },
   'IDENTITY_ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ALREADY_LINKED': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_LINK_AVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1240,9 +1257,12 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'INVALID_TOKEN': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_USER': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_WORKER_ID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'INVITE_ADDRESS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_EMAIL_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'INVITE_PHONE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'INVITE_USERS_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_AUTHORIZED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_NOT_CALLABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'INVOCATION_ANONYMOUS_ROUTE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1360,6 +1380,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'PASSWORD_RESET_LOCKED_EXCEED_ATTEMPTS': { class: 'public', dynamic: false, generatedOnly: true },
   'PASSWORD_SIGN_IN_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
   'PASSWORD_SIGN_UP_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
+  'PERMISSION_DENIED': { class: 'public', dynamic: false, generatedOnly: false },
   'PLAN_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'PLATFORM_FLAG_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
   'POLICY_COLUMN_REF_UNRESOLVED': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1430,6 +1451,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED': { class: 'internal', dynamic: false, generatedOnly: false },
   'RETIRE_UNSERVED_APIS_SCOPE_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'ROUTE_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
+  'ROUTE_DOMAIN_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_PRIVILEGED_TARGET_FORBIDDEN': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_TARGET_NOT_OWNED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ROUTE_TARGET_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
@@ -1486,6 +1508,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'SESSION_TTL_EXCEEDS_PARENT': { class: 'public', dynamic: false, generatedOnly: true },
   'SETTINGS_SURFACE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'SIGN_UP_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
+  'SIGN_UP_REQUIRES_INVITE': { class: 'public', dynamic: false, generatedOnly: false },
   'SITE_INSTALLATION_MEMBER_NOT_SERVABLE': { class: 'internal', dynamic: false, generatedOnly: true },
   'SITE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'SITE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1519,10 +1542,12 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_PASSWORD': { class: 'public', dynamic: false, generatedOnly: false },
+  'STORAGE_ACCESS_CLAIM_MISMATCH': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_API_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_DESTINATION_REQUIRES_TEMP': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_BUCKET_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_KEY_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
+  'STORAGE_FILE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_GC_CONTENT_HASH_UNSUPPORTED': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_FILES_TABLE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_MODULE_AMBIGUOUS': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1532,10 +1557,15 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STORAGE_GC_REF_CROSS_DATABASE': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_FIELD_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_TABLE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
+  'STORAGE_INVALID_COMPLETION_RESULT': { class: 'public', dynamic: false, generatedOnly: false },
+  'STORAGE_INVALID_UPLOAD_DOCUMENT': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_MODULE_ENTITY_FIELD_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_MODULE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
+  'STORAGE_PROCESSING_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
+  'STORAGE_SOURCE_HASH_MISMATCH': { class: 'public', dynamic: false, generatedOnly: false },
+  'STORAGE_SOURCE_HASH_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_BUCKET_NO_TTL': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_DESTINATION_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1599,4 +1629,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 784;
+export const GENERATED_CODE_COUNT = 799;

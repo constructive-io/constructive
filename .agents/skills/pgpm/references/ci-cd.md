@@ -21,9 +21,15 @@ Every Constructive CI workflow follows this pattern:
 1. **Spin up PostgreSQL service container** with health checks
 2. **Install pnpm and Node.js** with caching
 3. **Cache and install pgpm CLI** globally
-4. **Build the workspace** with `pnpm -r build`
+4. **Build the workspace** with `pnpm -r --if-present run build` — only if some
+   package has a `build` script. pgpm modules are plain SQL and have none; from
+   pnpm 10.28.1 a bare `pnpm -r build` exits 1 with
+   `ERR_PNPM_RECURSIVE_RUN_NO_SCRIPT` when no selected package defines the script.
 5. **Bootstrap database users** with `pgpm admin-users`
 6. **Run tests** per package
+
+Never put `continue-on-error: true` on the test job: GitHub then reports the run
+green even when every matrix job failed, and a broken step goes unnoticed.
 
 ## PostgreSQL Service Container
 
@@ -75,13 +81,13 @@ env:
   PGPASSWORD: password
 ```
 
-For MinIO/S3 testing (uploads, storage):
+For RustFS/S3 testing (uploads, storage):
 
 ```yaml
 env:
-  MINIO_ENDPOINT: http://localhost:9000
-  AWS_ACCESS_KEY: minioadmin
-  AWS_SECRET_KEY: minioadmin
+  OBJECT_STORE_ENDPOINT: http://localhost:9000
+  AWS_ACCESS_KEY: constructive
+  AWS_SECRET_KEY: constructive-dev-secret
   AWS_REGION: us-east-1
   BUCKET_NAME: test-bucket
 ```
@@ -204,7 +210,7 @@ jobs:
         run: npm install -g pgpm@${{ env.PGPM_VERSION }}
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm -r --if-present run build
 
       - name: Seed pg and app_user
         run: |
@@ -253,7 +259,7 @@ jobs:
       # ... checkout, pnpm, node, pgpm setup ...
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm -r --if-present run build
 
       - name: Seed pg and app_user
         run: |
@@ -320,22 +326,22 @@ steps:
       fi
 ```
 
-## MinIO Service Container
+## RustFS Service Container
 
 For testing uploads and S3-compatible storage:
 
 ```yaml
 services:
-  minio_cdn:
-    image: minio/minio:edge-cicd
+  rustfs_cdn:
+    image: rustfs/rustfs:1.0.0-rc.5
     env:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      RUSTFS_ACCESS_KEY: constructive
+      RUSTFS_SECRET_KEY: constructive-dev-secret
+      RUSTFS_ADDRESS: ":9000"
     ports:
       - 9000:9000
-      - 9001:9001
     options: >-
-      --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
+      --health-cmd "curl -f http://localhost:9000/health || exit 1"
       --health-interval 10s
       --health-timeout 5s
       --health-retries 5

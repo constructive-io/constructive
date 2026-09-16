@@ -1,0 +1,43 @@
+{
+  "name": "@agentic-kit/run-log-gate",
+  "version": "0.2.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Tool approvals over the run log — the request, the human's answer and every settled gate decision are run-log entries, so desktop, cloud pi and agentic hosts ask and are answered on one surface",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "agentic-kit",
+    "pi",
+    "coding-agent",
+    "run-log",
+    "approvals",
+    "constructive"
+  ],
+  "peerDependencies": {
+    "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/run-log": "workspace:^"
+  }
+}

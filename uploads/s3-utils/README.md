@@ -16,7 +16,7 @@ Unified S3 utilities for the Constructive ecosystem — client factory, file ope
 
 ## Features
 
-- **Multi-provider support** — AWS S3, MinIO, RustFS, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces
+- **Multi-provider support** — AWS S3, RustFS (or any S3-compatible store), MinIO, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces
 - **Presigned URLs** — generate secure PUT and GET URLs with configurable expiry
 - **File operations** — streaming upload, download, existence checks, and metadata retrieval
 - **Bucket management** — create buckets with provider-appropriate policies and CORS
@@ -43,9 +43,9 @@ import {
 const client = createS3Client({
   provider: 'minio',
   region: 'us-east-1',
-  endpoint: 'http://minio:9000',
-  accessKeyId: 'minioadmin',
-  secretAccessKey: 'minioadmin',
+  endpoint: 'http://rustfs:9000',
+  accessKeyId: 'constructive',
+  secretAccessKey: 'constructive-dev-secret',
 });
 
 // 2. Upload a file via stream
@@ -198,7 +198,7 @@ someReadable.pipe(pass);
 
 Creates a bucket with provider-appropriate policies and CORS configuration.
 
-- **MinIO**: read-only public access policy (list + get)
+- **Path-style S3-compatible (`minio`, covering RustFS and MinIO)**: read-only public access policy (list + get)
 - **RustFS/S3/GCS**: full-access policy with CORS rules for browser uploads
 
 ```typescript

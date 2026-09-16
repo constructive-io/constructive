@@ -47,7 +47,7 @@ describe('findUnsafeProductionDefaults', () => {
     // actual secret/host strings baked into pgpmDefaults).
     expect(joined).not.toContain('app_password');
     expect(joined).not.toContain('admin_password');
-    expect(joined).not.toContain('minioadmin');
+    expect(joined).not.toContain('constructive-dev-secret');
     expect(joined).not.toContain('localhost');
     expect(joined).not.toContain('test-bucket');
   });
