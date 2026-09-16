@@ -50,6 +50,55 @@ service name: omit a service or set it to `false` for stock introspection, set
 it to `true` for scoped defaults, or provide `catalogTypes` and
 `capabilityExtensions` explicitly.
 
+### Scoped introspection environment overrides
+
+The server maps these variables to
+`graphile.preset.gather.pgScopedIntrospection.main`. `main` is the internal
+PostgreSQL service name, not the routing service name (such as `local`).
+
+| Variable | Accepted values |
+| --- | --- |
+| `GRAPHILE_SCOPED_INTROSPECTION` | `true` or `false` |
+| `GRAPHILE_SCOPED_INTROSPECTION_CATALOG_TYPES` | `all` or `dependency-closure` |
+| `GRAPHILE_SCOPED_INTROSPECTION_CAPABILITY_EXTENSIONS` | Comma-separated extension names, e.g. `pg_trgm,vector` |
+
+- Unset variables do not override `pgpm.json`. With neither configuration nor
+  environment settings, introspection remains stock.
+- `true` enables scoped introspection while preserving advanced options in
+  `pgpm.json`; without advanced options it uses Crystal's defaults
+  (`catalogTypes: "all"`).
+- Either advanced variable alone enables scoped introspection, including when
+  the config file sets `main: false`.
+- Explicit `false` overrides both advanced variables and the config file.
+  Advanced variables are ignored, even if malformed, so one switch is enough
+  to roll back to stock.
+- Advanced options override only their own field. Extension lists replace the
+  configured array, trim names and remove duplicates. An explicitly empty or
+  whitespace-only extension variable clears the list to `[]`; unset preserves it.
+- An empty or whitespace-only enable variable means unset. Other enable values
+  must be lowercase `true` or `false` (surrounding whitespace is allowed).
+  Catalog values must match one of the two lowercase choices exactly; an empty
+  catalog value is invalid. Empty CSV items such as `pg_trgm,,vector` are invalid.
+  Invalid active settings fail option resolution with the variable name.
+- Precedence remains defaults < config file < environment < explicit runtime
+  options. These variables affect only `main`.
+
+```bash
+# Enable default scoped introspection
+export GRAPHILE_SCOPED_INTROSPECTION=true
+
+# Optionally customize it
+export GRAPHILE_SCOPED_INTROSPECTION_CATALOG_TYPES=dependency-closure
+export GRAPHILE_SCOPED_INTROSPECTION_CAPABILITY_EXTENSIONS=pg_trgm,vector
+
+# Roll back without removing the advanced variables
+export GRAPHILE_SCOPED_INTROSPECTION=false
+```
+
+Restart the server after changing its environment. `capabilityExtensions`
+retains introspection metadata for extension capabilities; it does not install
+PostgreSQL extensions or change the API's exposed schemas.
+
 ### Feature Flags
 - `FEATURES_SIMPLE_INFLECTION` - Enable simple inflection plugin
 - `FEATURES_OPPOSITE_BASE_NAMES` - Enable opposite base names

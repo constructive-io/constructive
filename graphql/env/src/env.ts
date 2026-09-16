@@ -1,10 +1,13 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
+import { getScopedIntrospectionEnv } from './scoped-introspection';
+
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
  */
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
+  const scopedIntrospection = getScopedIntrospectionEnv(env);
   const {
     GRAPHILE_SCHEMA,
 
@@ -50,6 +53,13 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
 
   return {
     graphile: {
+      ...(scopedIntrospection !== undefined && {
+        preset: {
+          gather: {
+            pgScopedIntrospection: { main: scopedIntrospection }
+          }
+        }
+      }),
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
