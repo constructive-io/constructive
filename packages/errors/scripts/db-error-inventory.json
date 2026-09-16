@@ -2792,6 +2792,22 @@
     "n_generated": 1,
     "class": "public"
   },
+  "GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_NOT_FOUND": {
     "count": 2,
     "dynamic": false,
