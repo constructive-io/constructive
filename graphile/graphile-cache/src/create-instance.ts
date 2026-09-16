@@ -2,8 +2,8 @@ import { createServer } from 'node:http';
 
 import { Logger } from '@pgpmjs/logger';
 import express from 'express';
-import { RealtimeManager } from 'graphile-realtime-subscriptions';
 import { grafserv } from 'grafserv/express/v4';
+import { RealtimeManager } from 'graphile-realtime-subscriptions';
 import { postgraphile } from 'postgraphile';
 
 import type { GraphileCacheEntry } from './graphile-cache';
