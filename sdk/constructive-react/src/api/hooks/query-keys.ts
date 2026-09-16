@@ -46,23 +46,14 @@ export const apiSettingKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...apiSettingKeys.details(), id] as const,
 } as const;
-export const appComponentKeys = {
-  /** All appComponent queries */ all: ['appcomponent'] as const,
-  /** List query keys */ lists: () => [...appComponentKeys.all, 'list'] as const,
+export const astMigrationKeys = {
+  /** All astMigration queries */ all: ['astmigration'] as const,
+  /** List query keys */ lists: () => [...astMigrationKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...appComponentKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appComponentKeys.all, 'detail'] as const,
+    [...astMigrationKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...astMigrationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appComponentKeys.details(), id] as const,
-} as const;
-export const appKeys = {
-  /** All app queries */ all: ['app'] as const,
-  /** List query keys */ lists: () => [...appKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appKeys.details(), id] as const,
+    [...astMigrationKeys.details(), id] as const,
 } as const;
 export const checkConstraintKeys = {
   /** All checkConstraint queries */ all: ['checkconstraint'] as const,
@@ -289,15 +280,6 @@ export const hostnameBindingKeys = {
   /** Detail query keys */ details: () => [...hostnameBindingKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...hostnameBindingKeys.details(), id] as const,
-} as const;
-export const httpRouteKeys = {
-  /** All httpRoute queries */ all: ['httproute'] as const,
-  /** List query keys */ lists: () => [...httpRouteKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...httpRouteKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...httpRouteKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...httpRouteKeys.details(), id] as const,
 } as const;
 export const indexKeys = {
   /** All index queries */ all: ['index'] as const,
@@ -553,6 +535,15 @@ export const pubkeySettingKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...pubkeySettingKeys.details(), id] as const,
 } as const;
+export const redirectKeys = {
+  /** All redirect queries */ all: ['redirect'] as const,
+  /** List query keys */ lists: () => [...redirectKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...redirectKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...redirectKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...redirectKeys.details(), id] as const,
+} as const;
 export const rlsSettingKeys = {
   /** All rlsSetting queries */ all: ['rlssetting'] as const,
   /** List query keys */ lists: () => [...rlsSettingKeys.all, 'list'] as const,
@@ -678,6 +669,15 @@ export const spatialRelationKeys = {
   /** Detail query keys */ details: () => [...spatialRelationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...spatialRelationKeys.details(), id] as const,
+} as const;
+export const sqlActionKeys = {
+  /** All sqlAction queries */ all: ['sqlaction'] as const,
+  /** List query keys */ lists: () => [...sqlActionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...sqlActionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...sqlActionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...sqlActionKeys.details(), id] as const,
 } as const;
 export const tableBehaviorKeys = {
   /** All tableBehavior queries */ all: ['tablebehavior'] as const,
@@ -808,8 +808,6 @@ export const customQueryKeys = {
     ['applyRegistryDefaults', variables] as const,
   /** Query key for resolveDeepLink */ resolveDeepLink: (variables?: object) =>
     ['resolveDeepLink', variables] as const,
-  /** Query key for resolveHttpRoute */ resolveHttpRoute: (variables?: object) =>
-    ['resolveHttpRoute', variables] as const,
   /** Query key for resolveRoute */ resolveRoute: (variables?: object) =>
     ['resolveRoute', variables] as const,
   /** Query key for resolveSiteAppLinks */ resolveSiteAppLinks: (variables?: object) =>
@@ -841,8 +839,7 @@ export const queryKeys = {
   api: apiKeys,
   apiSchema: apiSchemaKeys,
   apiSetting: apiSettingKeys,
-  appComponent: appComponentKeys,
-  app: appKeys,
+  astMigration: astMigrationKeys,
   checkConstraint: checkConstraintKeys,
   compositeType: compositeTypeKeys,
   corsSetting: corsSettingKeys,
@@ -868,7 +865,6 @@ export const queryKeys = {
   fullTextSearch: fullTextSearchKeys,
   function: functionKeys,
   hostnameBinding: hostnameBindingKeys,
-  httpRoute: httpRouteKeys,
   index: indexKeys,
   managedDomain: managedDomainKeys,
   nodeTypeRegistry: nodeTypeRegistryKeys,
@@ -897,6 +893,7 @@ export const queryKeys = {
   policy: policyKeys,
   primaryKeyConstraint: primaryKeyConstraintKeys,
   pubkeySetting: pubkeySettingKeys,
+  redirect: redirectKeys,
   rlsSetting: rlsSettingKeys,
   routeBinding: routeBindingKeys,
   route: routeKeys,
@@ -911,6 +908,7 @@ export const queryKeys = {
   siteTheme: siteThemeKeys,
   siteWebConfig: siteWebConfigKeys,
   spatialRelation: spatialRelationKeys,
+  sqlAction: sqlActionKeys,
   tableBehavior: tableBehaviorKeys,
   table: tableKeys,
   tableGrant: tableGrantKeys,

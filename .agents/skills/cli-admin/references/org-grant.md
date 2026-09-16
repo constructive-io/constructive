@@ -12,8 +12,8 @@ csdk org-grant list --where.<field>.<op> <value> --orderBy <values>
 csdk org-grant list --limit 10 --after <cursor>
 csdk org-grant find-first --where.<field>.<op> <value>
 csdk org-grant get --id <UUID>
-csdk org-grant create --entityId <UUID> [--actorId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--permissions <BitString>]
-csdk org-grant update --id <UUID> [--actorId <UUID>] [--entityId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--permissions <BitString>]
+csdk org-grant create --entityId <UUID> [--actorId <UUID>] [--capabilities <BitString>] [--grantorId <UUID>] [--isGrant <Boolean>]
+csdk org-grant update --id <UUID> [--actorId <UUID>] [--capabilities <BitString>] [--entityId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>]
 csdk org-grant delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-grant list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgGrant
 
 ```bash
-csdk org-grant create --entityId <UUID> [--actorId <UUID>] [--grantorId <UUID>] [--isGrant <Boolean>] [--permissions <BitString>]
+csdk org-grant create --entityId <UUID> [--actorId <UUID>] [--capabilities <BitString>] [--grantorId <UUID>] [--isGrant <Boolean>]
 ```
 
 ### Get a orgGrant by id

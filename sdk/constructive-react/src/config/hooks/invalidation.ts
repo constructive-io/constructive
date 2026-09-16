@@ -16,7 +16,10 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   configKeys,
+  internalConfigKeys,
+  internalSecretKeys,
   platformConfigKeys,
+  platformInternalConfigKeys,
   platformInternalSecretKeys,
   platformSecretKeys,
   secretKeys,
@@ -55,6 +58,40 @@ export const invalidate = {
         queryKey: configKeys.detail(id),
       }),
   },
+  /** Invalidate internalConfig queries */ internalConfig: {
+    /** Invalidate all internalConfig queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalConfigKeys.all,
+      }),
+    /** Invalidate internalConfig list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalConfigKeys.lists(),
+      }),
+    /** Invalidate a specific internalConfig */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: internalConfigKeys.detail(id),
+      }),
+  },
+  /** Invalidate internalSecret queries */ internalSecret: {
+    /** Invalidate all internalSecret queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretKeys.all,
+      }),
+    /** Invalidate internalSecret list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretKeys.lists(),
+      }),
+    /** Invalidate a specific internalSecret */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: internalSecretKeys.detail(id),
+      }),
+  },
   /** Invalidate platformConfig queries */ platformConfig: {
     /** Invalidate all platformConfig queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -70,6 +107,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformConfigKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformInternalConfig queries */ platformInternalConfig: {
+    /** Invalidate all platformInternalConfig queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInternalConfigKeys.all,
+      }),
+    /** Invalidate platformInternalConfig list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInternalConfigKeys.lists(),
+      }),
+    /** Invalidate a specific platformInternalConfig */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformInternalConfigKeys.detail(id),
       }),
   },
   /** Invalidate platformInternalSecret queries */ platformInternalSecret: {
@@ -138,12 +192,36 @@ export const remove = {
       queryKey: configKeys.detail(id),
     });
   },
+  /** Remove internalConfig from cache */ internalConfig: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: internalConfigKeys.detail(id),
+    });
+  },
+  /** Remove internalSecret from cache */ internalSecret: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: internalSecretKeys.detail(id),
+    });
+  },
   /** Remove platformConfig from cache */ platformConfig: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: platformConfigKeys.detail(id),
+    });
+  },
+  /** Remove platformInternalConfig from cache */ platformInternalConfig: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformInternalConfigKeys.detail(id),
     });
   },
   /** Remove platformInternalSecret from cache */ platformInternalSecret: (

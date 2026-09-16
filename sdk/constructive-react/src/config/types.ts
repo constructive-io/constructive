@@ -6,6 +6,7 @@
 export interface Config {
   annotations: unknown | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   expiresAt: string | null;
@@ -16,9 +17,53 @@ export interface Config {
   provider: string | null;
   realm: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   value: string | null;
 }
+export interface InternalConfig {
+  annotations: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  labels: unknown | null;
+  name: string | null;
+  provider: string | null;
+  realm: string | null;
+  updatedAt: string | null;
+  value: string | null;
+}
+export interface InternalSecret {
+  annotations: unknown | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
+  id: string | null;
+  labels: unknown | null;
+  name: string | null;
+  realm: string | null;
+  retiredAt: string | null;
+  rotatedAt: string | null;
+  updatedAt: string | null;
+}
 export interface PlatformConfig {
+  annotations: unknown | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  description: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  labels: unknown | null;
+  name: string | null;
+  namespaceId: string | null;
+  provider: string | null;
+  realm: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  value: string | null;
+}
+export interface PlatformInternalConfig {
   annotations: unknown | null;
   createdAt: string | null;
   description: string | null;
@@ -26,7 +71,6 @@ export interface PlatformConfig {
   id: string | null;
   labels: unknown | null;
   name: string | null;
-  namespaceId: string | null;
   provider: string | null;
   realm: string | null;
   updatedAt: string | null;
@@ -39,7 +83,6 @@ export interface PlatformInternalSecret {
   id: string | null;
   labels: unknown | null;
   name: string | null;
-  namespaceId: string | null;
   realm: string | null;
   retiredAt: string | null;
   rotatedAt: string | null;

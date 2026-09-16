@@ -10,38 +10,17 @@ import type {
   ConstructBlueprintInput,
   CopyTemplateToBlueprintInput,
   ProvisionBucketInput,
-  ProvisionCheckConstraintInput,
-  ProvisionFullTextSearchInput,
-  ProvisionIndexInput,
-  ProvisionRelationInput,
-  ProvisionSpatialRelationInput,
-  ProvisionTableInput,
-  ProvisionUniqueConstraintInput,
   ConstructBlueprintPayload,
   CopyTemplateToBlueprintPayload,
   ProvisionBucketPayload,
-  ProvisionCheckConstraintPayload,
-  ProvisionFullTextSearchPayload,
-  ProvisionIndexPayload,
-  ProvisionRelationPayload,
-  ProvisionSpatialRelationPayload,
-  ProvisionTablePayload,
-  ProvisionUniqueConstraintPayload,
   ConstructBlueprintPayloadSelect,
   CopyTemplateToBlueprintPayloadSelect,
   ProvisionBucketPayloadSelect,
-  ProvisionCheckConstraintPayloadSelect,
-  ProvisionFullTextSearchPayloadSelect,
-  ProvisionIndexPayloadSelect,
-  ProvisionRelationPayloadSelect,
-  ProvisionSpatialRelationPayloadSelect,
-  ProvisionTablePayloadSelect,
-  ProvisionUniqueConstraintPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 /**
  * Variables for constructBlueprint
- * Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
+ * Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). A table entry either names its table (table_name plus optional schema_name) or references one an installed module generated ("module": {"type": "agent", "scope": "org", "table": "message"}), which resolves through the module row's recorded table ids and raises when it matches nothing instead of creating an empty table. After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
  */
 export interface ConstructBlueprintVariables {
   input: ConstructBlueprintInput;
@@ -62,55 +41,6 @@ and lifecycle settings.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
-}
-/**
- * Variables for provisionCheckConstraint
- * Creates a check constraint on a table from a $type + data blueprint definition. Supports: CheckOneOf (enum validation via = ANY(ARRAY[...])), CheckGreaterThan (single-column > value or cross-column), CheckLessThan (single-column < value or cross-column), CheckNotEqual (cross-column inequality). Builds AST expressions via ast_helpers and inserts into metaschema_public.check_constraint. Graceful: skips if a constraint with the same name already exists.
- */
-export interface ProvisionCheckConstraintVariables {
-  input: ProvisionCheckConstraintInput;
-}
-/**
- * Variables for provisionFullTextSearch
- * Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
- */
-export interface ProvisionFullTextSearchVariables {
-  input: ProvisionFullTextSearchInput;
-}
-/**
- * Variables for provisionIndex
- * Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
- */
-export interface ProvisionIndexVariables {
-  input: ProvisionIndexInput;
-}
-/**
- * Variables for provisionRelation
- * Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
- */
-export interface ProvisionRelationVariables {
-  input: ProvisionRelationInput;
-}
-/**
- * Variables for provisionSpatialRelation
- * Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
- */
-export interface ProvisionSpatialRelationVariables {
-  input: ProvisionSpatialRelationInput;
-}
-/**
- * Variables for provisionTable
- * Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
- */
-export interface ProvisionTableVariables {
-  input: ProvisionTableInput;
-}
-/**
- * Variables for provisionUniqueConstraint
- * Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
- */
-export interface ProvisionUniqueConstraintVariables {
-  input: ProvisionUniqueConstraintInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -199,209 +129,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
-        ),
-      }),
-    provisionCheckConstraint: <S extends ProvisionCheckConstraintPayloadSelect>(
-      args: ProvisionCheckConstraintVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionCheckConstraintPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionCheckConstraint: InferSelectResult<ProvisionCheckConstraintPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionCheckConstraint',
-        fieldName: 'provisionCheckConstraint',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionCheckConstraint',
-          'provisionCheckConstraint',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionCheckConstraintInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionCheckConstraintPayload'
-        ),
-      }),
-    provisionFullTextSearch: <S extends ProvisionFullTextSearchPayloadSelect>(
-      args: ProvisionFullTextSearchVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionFullTextSearchPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionFullTextSearch: InferSelectResult<ProvisionFullTextSearchPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionFullTextSearch',
-        fieldName: 'provisionFullTextSearch',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionFullTextSearch',
-          'provisionFullTextSearch',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionFullTextSearchInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionFullTextSearchPayload'
-        ),
-      }),
-    provisionIndex: <S extends ProvisionIndexPayloadSelect>(
-      args: ProvisionIndexVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionIndexPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionIndex: InferSelectResult<ProvisionIndexPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionIndex',
-        fieldName: 'provisionIndex',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionIndex',
-          'provisionIndex',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionIndexInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionIndexPayload'
-        ),
-      }),
-    provisionRelation: <S extends ProvisionRelationPayloadSelect>(
-      args: ProvisionRelationVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionRelationPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionRelation: InferSelectResult<ProvisionRelationPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionRelation',
-        fieldName: 'provisionRelation',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionRelation',
-          'provisionRelation',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionRelationInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionRelationPayload'
-        ),
-      }),
-    provisionSpatialRelation: <S extends ProvisionSpatialRelationPayloadSelect>(
-      args: ProvisionSpatialRelationVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionSpatialRelationPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionSpatialRelation: InferSelectResult<ProvisionSpatialRelationPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionSpatialRelation',
-        fieldName: 'provisionSpatialRelation',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionSpatialRelation',
-          'provisionSpatialRelation',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionSpatialRelationInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionSpatialRelationPayload'
-        ),
-      }),
-    provisionTable: <S extends ProvisionTablePayloadSelect>(
-      args: ProvisionTableVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionTablePayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionTable: InferSelectResult<ProvisionTablePayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionTable',
-        fieldName: 'provisionTable',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionTable',
-          'provisionTable',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionTableInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionTablePayload'
-        ),
-      }),
-    provisionUniqueConstraint: <S extends ProvisionUniqueConstraintPayloadSelect>(
-      args: ProvisionUniqueConstraintVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionUniqueConstraintPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionUniqueConstraint: InferSelectResult<ProvisionUniqueConstraintPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionUniqueConstraint',
-        fieldName: 'provisionUniqueConstraint',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionUniqueConstraint',
-          'provisionUniqueConstraint',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionUniqueConstraintInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionUniqueConstraintPayload'
         ),
       }),
   };

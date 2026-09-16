@@ -306,7 +306,7 @@ export interface OrgApiKeyList {
 }
 /** User phone numbers with country code, verification, and primary-number management */
 export interface PhoneNumber {
-  /** Country calling code (e.g. +1, +44) */
+  /** Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`. */
   cc?: string | null;
   createdAt?: string | null;
   id: string;
@@ -316,7 +316,7 @@ export interface PhoneNumber {
   isVerified?: boolean | null;
   /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
   name?: string | null;
-  /** The phone number without country code */
+  /** The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape. */
   number?: string | null;
   ownerId?: string | null;
   updatedAt?: string | null;
@@ -351,9 +351,9 @@ export interface PrincipalEntity {
   principalId?: string | null;
   updatedAt?: string | null;
 }
-/** Per-scope permission overrides for principals. No row = full access; row exists = apply restrictions. */
+/** Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. */
 export interface PrincipalScopeOverride {
-  /** Optional permission mask; AND-masked with parent permissions during cascade. NULL means no extra mask. */
+  /** Optional capability mask; AND-masked with parent capabilities during cascade. NULL means no extra mask. */
   allowedMask?: string | null;
   createdAt?: string | null;
   id: string;
@@ -1866,6 +1866,13 @@ export interface SignInCrossOriginInput {
   credentialKind?: string;
   token?: string;
 }
+export interface SignInMagicLinkInput {
+  clientMutationId?: string;
+  credentialKind?: string;
+  deviceToken?: string;
+  rememberMe?: boolean;
+  token?: string;
+}
 export interface SignInSmsOtpInput {
   clientMutationId?: string;
   code?: string;
@@ -1885,6 +1892,13 @@ export interface SignUpInput {
   email?: string;
   password?: string;
   rememberMe?: boolean;
+}
+export interface SignUpMagicLinkInput {
+  clientMutationId?: string;
+  credentialKind?: string;
+  deviceToken?: string;
+  rememberMe?: boolean;
+  token?: string;
 }
 export interface SignUpSmsInput {
   clientMutationId?: string;
@@ -2332,7 +2346,7 @@ export interface EmailInput {
 }
 /** An input for mutations affecting `PhoneNumber` */
 export interface PhoneNumberInput {
-  /** Country calling code (e.g. +1, +44) */
+  /** Country calling code the number was entered under (e.g. +1, +44). Display only: `number` already carries it, and sign-in matches `number`. */
   cc: string;
   createdAt?: string;
   id?: string;
@@ -2342,7 +2356,7 @@ export interface PhoneNumberInput {
   isVerified?: boolean;
   /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
   name?: string;
-  /** The phone number without country code */
+  /** The full number in E.164 form, country calling code included (e.g. +15551234567). This is the value SMS sign-in and MFA match, so it is unique across the table and constrained to that shape. */
   number: string;
   ownerId?: string;
   updatedAt?: string;
@@ -3271,6 +3285,16 @@ export type SignInCrossOriginPayloadSelect = {
     select: SignInCrossOriginRecordSelect;
   };
 };
+export interface SignInMagicLinkPayload {
+  clientMutationId?: string | null;
+  result?: SignInMagicLinkRecord | null;
+}
+export type SignInMagicLinkPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignInMagicLinkRecordSelect;
+  };
+};
 export interface SignInSmsOtpPayload {
   clientMutationId?: string | null;
   result?: SignInSmsOtpRecord | null;
@@ -3295,6 +3319,16 @@ export type SignUpPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
     select: SignUpRecordSelect;
+  };
+};
+export interface SignUpMagicLinkPayload {
+  clientMutationId?: string | null;
+  result?: SignUpMagicLinkRecord | null;
+}
+export type SignUpMagicLinkPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignUpMagicLinkRecordSelect;
   };
 };
 export interface SignUpSmsPayload {
@@ -3765,6 +3799,16 @@ export type SignInCrossOriginRecordSelect = {
   totpEnabled?: boolean;
   userId?: boolean;
 };
+export interface SignInMagicLinkRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  userId?: string | null;
+}
+export type SignInMagicLinkRecordSelect = {
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+  userId?: boolean;
+};
 export interface SignInSmsOtpRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
@@ -3789,6 +3833,16 @@ export type SignUpRecordSelect = {
   id?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+  userId?: boolean;
+};
+export interface SignUpMagicLinkRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  userId?: string | null;
+}
+export type SignUpMagicLinkRecordSelect = {
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
   userId?: boolean;
 };
 export interface SignUpSmsRecord {

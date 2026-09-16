@@ -7,18 +7,18 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
 import appAdminGrantCmd from './commands/app-admin-grant';
+import appCapabilityDefaultCapabilityCmd from './commands/app-capability-default-capability';
+import appCapabilityDefaultGrantCmd from './commands/app-capability-default-grant';
 import appClaimedInviteCmd from './commands/app-claimed-invite';
 import appGrantCmd from './commands/app-grant';
 import appInviteCmd from './commands/app-invite';
 import appMembershipCmd from './commands/app-membership';
 import appMembershipDefaultCmd from './commands/app-membership-default';
 import appOwnerGrantCmd from './commands/app-owner-grant';
-import appPermissionCmd from './commands/app-permission';
-import appPermissionDefaultCmd from './commands/app-permission-default';
-import appPermissionDefaultGrantCmd from './commands/app-permission-default-grant';
-import appPermissionDefaultPermissionCmd from './commands/app-permission-default-permission';
 import membershipTypeCmd from './commands/membership-type';
 import orgAdminGrantCmd from './commands/org-admin-grant';
+import orgCapabilityDefaultCapabilityCmd from './commands/org-capability-default-capability';
+import orgCapabilityDefaultGrantCmd from './commands/org-capability-default-grant';
 import orgChartEdgeCmd from './commands/org-chart-edge';
 import orgChartEdgeGrantCmd from './commands/org-chart-edge-grant';
 import orgClaimedInviteCmd from './commands/org-claimed-invite';
@@ -32,19 +32,7 @@ import orgMembershipCmd from './commands/org-membership';
 import orgMembershipDefaultCmd from './commands/org-membership-default';
 import orgMembershipSettingCmd from './commands/org-membership-setting';
 import orgOwnerGrantCmd from './commands/org-owner-grant';
-import orgPermissionCmd from './commands/org-permission';
-import orgPermissionDefaultCmd from './commands/org-permission-default';
-import orgPermissionDefaultGrantCmd from './commands/org-permission-default-grant';
-import orgPermissionDefaultPermissionCmd from './commands/org-permission-default-permission';
-import appPermissionsGetByMaskCmd from './commands/app-permissions-get-by-mask';
-import appPermissionsGetMaskCmd from './commands/app-permissions-get-mask';
-import appPermissionsGetMaskByNamesCmd from './commands/app-permissions-get-mask-by-names';
-import appPermissionsGetPaddedMaskCmd from './commands/app-permissions-get-padded-mask';
 import orgIsManagerOfCmd from './commands/org-is-manager-of';
-import orgPermissionsGetByMaskCmd from './commands/org-permissions-get-by-mask';
-import orgPermissionsGetMaskCmd from './commands/org-permissions-get-mask';
-import orgPermissionsGetMaskByNamesCmd from './commands/org-permissions-get-mask-by-names';
-import orgPermissionsGetPaddedMaskCmd from './commands/org-permissions-get-padded-mask';
 import provisionBucketCmd from './commands/provision-bucket';
 import submitAppInviteCodeCmd from './commands/submit-app-invite-code';
 import submitOrgInviteCodeCmd from './commands/submit-org-invite-code';
@@ -59,18 +47,18 @@ const createCommandMap: () => Record<
   context: contextCmd,
   auth: authCmd,
   'app-admin-grant': appAdminGrantCmd,
+  'app-capability-default-capability': appCapabilityDefaultCapabilityCmd,
+  'app-capability-default-grant': appCapabilityDefaultGrantCmd,
   'app-claimed-invite': appClaimedInviteCmd,
   'app-grant': appGrantCmd,
   'app-invite': appInviteCmd,
   'app-membership': appMembershipCmd,
   'app-membership-default': appMembershipDefaultCmd,
   'app-owner-grant': appOwnerGrantCmd,
-  'app-permission': appPermissionCmd,
-  'app-permission-default': appPermissionDefaultCmd,
-  'app-permission-default-grant': appPermissionDefaultGrantCmd,
-  'app-permission-default-permission': appPermissionDefaultPermissionCmd,
   'membership-type': membershipTypeCmd,
   'org-admin-grant': orgAdminGrantCmd,
+  'org-capability-default-capability': orgCapabilityDefaultCapabilityCmd,
+  'org-capability-default-grant': orgCapabilityDefaultGrantCmd,
   'org-chart-edge': orgChartEdgeCmd,
   'org-chart-edge-grant': orgChartEdgeGrantCmd,
   'org-claimed-invite': orgClaimedInviteCmd,
@@ -84,25 +72,13 @@ const createCommandMap: () => Record<
   'org-membership-default': orgMembershipDefaultCmd,
   'org-membership-setting': orgMembershipSettingCmd,
   'org-owner-grant': orgOwnerGrantCmd,
-  'org-permission': orgPermissionCmd,
-  'org-permission-default': orgPermissionDefaultCmd,
-  'org-permission-default-grant': orgPermissionDefaultGrantCmd,
-  'org-permission-default-permission': orgPermissionDefaultPermissionCmd,
-  'app-permissions-get-by-mask': appPermissionsGetByMaskCmd,
-  'app-permissions-get-mask': appPermissionsGetMaskCmd,
-  'app-permissions-get-mask-by-names': appPermissionsGetMaskByNamesCmd,
-  'app-permissions-get-padded-mask': appPermissionsGetPaddedMaskCmd,
   'org-is-manager-of': orgIsManagerOfCmd,
-  'org-permissions-get-by-mask': orgPermissionsGetByMaskCmd,
-  'org-permissions-get-mask': orgPermissionsGetMaskCmd,
-  'org-permissions-get-mask-by-names': orgPermissionsGetMaskByNamesCmd,
-  'org-permissions-get-padded-mask': orgPermissionsGetPaddedMaskCmd,
   'provision-bucket': provisionBucketCmd,
   'submit-app-invite-code': submitAppInviteCodeCmd,
   'submit-org-invite-code': submitOrgInviteCodeCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-admin-grant      appAdminGrant CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  app-grant            appGrant CRUD operations\n  app-invite           appInvite CRUD operations\n  app-membership       appMembership CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-permission       appPermission CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  app-permission-default-grant appPermissionDefaultGrant CRUD operations\n  app-permission-default-permission appPermissionDefaultPermission CRUD operations\n  membership-type      membershipType CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-member           orgMember CRUD operations\n  org-member-profile   orgMemberProfile CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  org-membership-setting orgMembershipSetting CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-permission       orgPermission CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  org-permission-default-grant orgPermissionDefaultGrant CRUD operations\n  org-permission-default-permission orgPermissionDefaultPermission CRUD operations\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  app-permissions-get-mask appPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  org-permissions-get-mask orgPermissionsGetMask\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  app-admin-grant      appAdminGrant CRUD operations\n  app-capability-default-capability appCapabilityDefaultCapability CRUD operations\n  app-capability-default-grant appCapabilityDefaultGrant CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  app-grant            appGrant CRUD operations\n  app-invite           appInvite CRUD operations\n  app-membership       appMembership CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  membership-type      membershipType CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-capability-default-capability orgCapabilityDefaultCapability CRUD operations\n  org-capability-default-grant orgCapabilityDefaultGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-member           orgMember CRUD operations\n  org-member-profile   orgMemberProfile CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  org-membership-setting orgMembershipSetting CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-is-manager-of    orgIsManagerOf\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

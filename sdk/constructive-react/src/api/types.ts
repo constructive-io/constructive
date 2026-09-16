@@ -46,30 +46,20 @@ export interface ApiSetting {
   statementTimeoutMs: string | null;
   updatedAt: string | null;
 }
-export interface AppComponent {
-  appId: string | null;
-  componentApiId: string | null;
-  componentDomainId: string | null;
-  componentInstallationId: string | null;
-  componentSiteId: string | null;
-  componentType: string | null;
-  config: unknown | null;
+export interface AstMigration {
+  actionId: string | null;
+  actionName: string | null;
+  actorId: string | null;
   createdAt: string | null;
   databaseId: string | null;
-  id: string | null;
-  updatedAt: string | null;
-}
-export interface App {
-  config: unknown | null;
-  createdAt: string | null;
-  databaseId: string | null;
-  description: string | null;
-  id: string | null;
-  isPublished: boolean | null;
+  deploy: unknown | null;
+  deploys: string | null;
+  id: number | null;
   name: string | null;
-  status: string | null;
-  title: string | null;
-  updatedAt: string | null;
+  payload: unknown | null;
+  requires: string[] | null;
+  revert: unknown | null;
+  verify: unknown | null;
 }
 export interface CheckConstraint {
   category: ObjectCategory | null;
@@ -168,6 +158,7 @@ export interface Derive {
   createdAt: string | null;
   databaseId: string | null;
   id: string | null;
+  includeGrants: boolean | null;
   includeMutations: boolean | null;
   kind: string | null;
   policyPrefix: string | null;
@@ -178,6 +169,7 @@ export interface Derive {
 export interface Domain {
   config: unknown | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   hostname: string | null;
   id: string | null;
@@ -189,6 +181,7 @@ export interface Domain {
   tlsSecretName: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -430,21 +423,6 @@ export interface HostnameBinding {
   updatedAt: string | null;
   verificationStatus: string | null;
 }
-export interface HttpRoute {
-  createdAt: string | null;
-  createdBy: string | null;
-  databaseId: string | null;
-  domainId: string | null;
-  id: string | null;
-  isActive: boolean | null;
-  method: string | null;
-  path: string | null;
-  priority: number | null;
-  targetId: string | null;
-  targetKind: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
-}
 export interface Index {
   accessMethod: string | null;
   category: ObjectCategory | null;
@@ -469,6 +447,7 @@ export interface ManagedDomain {
   annotations: unknown | null;
   certStatus: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   domain: string | null;
   id: string | null;
@@ -476,6 +455,7 @@ export interface ManagedDomain {
   tlsReadyAt: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -562,6 +542,7 @@ export interface PlatformCorsSetting {
 export interface PlatformDomain {
   config: unknown | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   hostname: string | null;
   id: string | null;
   isPublished: boolean | null;
@@ -572,6 +553,7 @@ export interface PlatformDomain {
   tlsSecretName: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -647,12 +629,14 @@ export interface PlatformManagedDomain {
   annotations: unknown | null;
   certStatus: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   domain: string | null;
   id: string | null;
   isWildcard: boolean | null;
   tlsReadyAt: string | null;
   tlsStatus: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   verificationStatus: string | null;
   verifiedAt: string | null;
 }
@@ -683,6 +667,7 @@ export interface PlatformSite {
   activeCommitId: string | null;
   bucketId: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   description: string | null;
   id: string | null;
   installationId: string | null;
@@ -692,6 +677,7 @@ export interface PlatformSite {
   resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformSiteDeepLink {
   appPath: string | null;
@@ -761,6 +747,7 @@ export interface PlatformSiteWebConfig {
 }
 export interface Policy {
   category: ObjectCategory | null;
+  columnRefs: string[] | null;
   createdAt: string | null;
   data: unknown | null;
   databaseId: string | null;
@@ -808,6 +795,18 @@ export interface PubkeySetting {
   updatedAt: string | null;
   userField: string | null;
 }
+export interface Redirect {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  preservePath: boolean | null;
+  preserveQuery: boolean | null;
+  statusCode: number | null;
+  toHost: string | null;
+  toPath: string | null;
+  updatedAt: string | null;
+}
 export interface RlsSetting {
   authenticateFunctionId: string | null;
   authenticateSchemaId: string | null;
@@ -832,6 +831,7 @@ export interface RouteBinding {
   targetApiId: string | null;
   targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetRedirectId: string | null;
   targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
@@ -849,6 +849,7 @@ export interface Route {
   targetApiId: string | null;
   targetBucketId: string | null;
   targetFunctionId: string | null;
+  targetRedirectId: string | null;
   targetServiceId: string | null;
   targetSiteId: string | null;
   updatedAt: string | null;
@@ -894,6 +895,7 @@ export interface Site {
   activeCommitId: string | null;
   bucketId: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   id: string | null;
@@ -904,6 +906,7 @@ export interface Site {
   resourceId: string | null;
   title: string | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface SiteDeepLink {
   appPath: string | null;
@@ -991,6 +994,21 @@ export interface SpatialRelation {
   tableId: string | null;
   tags: string[] | null;
   updatedAt: string | null;
+}
+export interface SqlAction {
+  actionId: string | null;
+  actionName: string | null;
+  actorId: string | null;
+  content: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  deploy: string | null;
+  deps: string[] | null;
+  id: number | null;
+  name: string | null;
+  payload: unknown | null;
+  revert: string | null;
+  verify: string | null;
 }
 export interface TableBehavior {
   createdAt: string | null;

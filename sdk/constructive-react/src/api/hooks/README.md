@@ -47,16 +47,11 @@ function App() {
 | `useCreateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useUpdateApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
-| `useAppComponentsQuery` | Query | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useAppComponentQuery` | Query | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useCreateAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useUpdateAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useDeleteAppComponentMutation` | Mutation | App component rows binding an app to typed catalog rows (exactly one typed component reference per row) |
-| `useAppsQuery` | Query | App aggregates: thin identity rows whose components are global catalog references |
-| `useAppQuery` | Query | App aggregates: thin identity rows whose components are global catalog references |
-| `useCreateAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
-| `useUpdateAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
-| `useDeleteAppMutation` | Mutation | App aggregates: thin identity rows whose components are global catalog references |
+| `useAstMigrationsQuery` | Query | List all astMigrations |
+| `useAstMigrationQuery` | Query | Get one astMigration |
+| `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
+| `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
+| `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
 | `useCheckConstraintsQuery` | Query | List all checkConstraints |
 | `useCheckConstraintQuery` | Query | Get one checkConstraint |
 | `useCreateCheckConstraintMutation` | Mutation | Create a checkConstraint |
@@ -182,11 +177,6 @@ function App() {
 | `useCreateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useUpdateHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
 | `useDeleteHostnameBindingMutation` | Mutation | Compiled hostname index maintained by domain sync triggers; read only through the resolver |
-| `useHttpRoutesQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useHttpRouteQuery` | Query | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useCreateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useUpdateHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
-| `useDeleteHttpRouteMutation` | Mutation | Request-time HTTP routing authority: registered domain plus path prefix and optional method to a typed target |
 | `useIndicesQuery` | Query | List all indices |
 | `useIndexQuery` | Query | Get one index |
 | `useCreateIndexMutation` | Mutation | Create a index |
@@ -327,6 +317,11 @@ function App() {
 | `useCreatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
 | `useUpdatePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
 | `useDeletePubkeySettingMutation` | Mutation | Public-key crypto auth runtime configuration; typed references to the crypto sign-up/sign-in function plumbing |
+| `useRedirectsQuery` | Query | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useRedirectQuery` | Query | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useCreateRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useUpdateRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
+| `useDeleteRedirectMutation` | Mutation | Redirect targets a route can point at; the edge answers with a redirect status instead of a backend |
 | `useRlsSettingsQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
 | `useRlsSettingQuery` | Query | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
 | `useCreateRlsSettingMutation` | Mutation | RLS module runtime configuration; typed references to the authenticate/current_role function plumbing |
@@ -397,6 +392,11 @@ function App() {
 | `useCreateSpatialRelationMutation` | Mutation | Create a spatialRelation |
 | `useUpdateSpatialRelationMutation` | Mutation | Update a spatialRelation |
 | `useDeleteSpatialRelationMutation` | Mutation | Delete a spatialRelation |
+| `useSqlActionsQuery` | Query | List all sqlActions |
+| `useSqlActionQuery` | Query | Get one sqlAction |
+| `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
+| `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
+| `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
 | `useTableBehaviorsQuery` | Query | List all tableBehaviors |
 | `useTableBehaviorQuery` | Query | Get one tableBehavior |
 | `useCreateTableBehaviorMutation` | Mutation | Create a tableBehavior |
@@ -465,13 +465,11 @@ function App() {
 | `useApiSchemaNamesQuery` | Query | apiSchemaNames |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
 | `useResolveDeepLinkQuery` | Query | resolveDeepLink |
-| `useResolveHttpRouteQuery` | Query | resolveHttpRoute |
 | `useResolveRouteQuery` | Query | resolveRoute |
 | `useResolveSiteAppLinksQuery` | Query | resolveSiteAppLinks |
+| `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useApplyRlsMutation` | Mutation | applyRls |
-| `useAppsInstallAppMutation` | Mutation | appsInstallApp |
-| `useAppsUninstallAppMutation` | Mutation | appsUninstallApp |
-| `useAppsUpgradeAppMutation` | Mutation | appsUpgradeApp |
+| `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
 | `useDomainsAssignSubdomainMutation` | Mutation | domainsAssignSubdomain |
 | `usePlatformDomainsAssignSubdomainMutation` | Mutation | platformDomainsAssignSubdomain |
 | `usePlatformSitesProvisionStaticSiteMutation` | Mutation | platformSitesProvisionStaticSite |
@@ -479,6 +477,7 @@ function App() {
 Reads the bucket config via RLS, then creates and configures
 the S3 bucket with the appropriate privacy policies, CORS rules,
 and lifecycle settings. |
+| `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
 | `useRequestDatabaseMutation` | Mutation | Requests a database and returns a ticket (database_provision_module row) to poll.
 
 Pass exactly one of preset_slug or modules. The pool, presets, and owner bootstrap are private implementation details: a warm pool hit fulfills the ticket immediately (fulfilled_at set, deferred owner bootstrap), otherwise the database is cold-provisioned asynchronously with exactly the requested modules. Poll the ticket until status = 'completed'; it then carries database_id and fulfilled_at.
@@ -554,46 +553,25 @@ const { mutate: create } = useCreateApiSettingMutation({
 create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', options: '<JSON>', statementTimeoutMs: '<BigInt>' });
 ```
 
-### AppComponent
+### AstMigration
 
 ```typescript
-// List all appComponents
-const { data, isLoading } = useAppComponentsQuery({
-  selection: { fields: { appId: true, componentApiId: true, componentDomainId: true, componentInstallationId: true, componentSiteId: true, componentType: true, config: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
+// List all astMigrations
+const { data, isLoading } = useAstMigrationsQuery({
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
-// Get one appComponent
-const { data: item } = useAppComponentQuery({
-  id: '<UUID>',
-  selection: { fields: { appId: true, componentApiId: true, componentDomainId: true, componentInstallationId: true, componentSiteId: true, componentType: true, config: true, createdAt: true, databaseId: true, id: true, updatedAt: true } },
+// Get one astMigration
+const { data: item } = useAstMigrationQuery({
+  id: '<Int>',
+  selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
-// Create a appComponent
-const { mutate: create } = useCreateAppComponentMutation({
+// Create a astMigration
+const { mutate: create } = useCreateAstMigrationMutation({
   selection: { fields: { id: true } },
 });
-create({ appId: '<UUID>', componentApiId: '<UUID>', componentDomainId: '<UUID>', componentInstallationId: '<UUID>', componentSiteId: '<UUID>', componentType: '<String>', config: '<JSON>', databaseId: '<UUID>' });
-```
-
-### App
-
-```typescript
-// List all apps
-const { data, isLoading } = useAppsQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } },
-});
-
-// Get one app
-const { data: item } = useAppQuery({
-  id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, description: true, id: true, isPublished: true, name: true, status: true, title: true, updatedAt: true } },
-});
-
-// Create a app
-const { mutate: create } = useCreateAppMutation({
-  selection: { fields: { id: true } },
-});
-create({ config: '<JSON>', databaseId: '<UUID>', description: '<String>', isPublished: '<Boolean>', name: '<String>', status: '<String>', title: '<String>' });
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```
 
 ### CheckConstraint
@@ -748,20 +726,20 @@ create({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', ob
 ```typescript
 // List all derives
 const { data, isLoading } = useDerivesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Get one derive
 const { data: item } = useDeriveQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Create a derive
 const { mutate: create } = useCreateDeriveMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
+create({ databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
 ```
 
 ### Domain
@@ -769,20 +747,20 @@ create({ databaseId: '<UUID>', includeMutations: '<Boolean>', kind: '<String>', 
 ```typescript
 // List all domains
 const { data, isLoading } = useDomainsQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one domain
 const { data: item } = useDomainQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, databaseId: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a domain
 const { mutate: create } = useCreateDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ config: '<JSON>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### DomainEvent
@@ -1121,27 +1099,6 @@ const { mutate: create } = useCreateHostnameBindingMutation({
 create({ domainId: '<UUID>', hostname: '<String>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>' });
 ```
 
-### HttpRoute
-
-```typescript
-// List all httpRoutes
-const { data, isLoading } = useHttpRoutesQuery({
-  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
-});
-
-// Get one httpRoute
-const { data: item } = useHttpRouteQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetId: true, targetKind: true, updatedAt: true, updatedBy: true } },
-});
-
-// Create a httpRoute
-const { mutate: create } = useCreateHttpRouteMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetId: '<UUID>', targetKind: '<String>', updatedBy: '<UUID>' });
-```
-
 ### Index
 
 ```typescript
@@ -1168,20 +1125,20 @@ create({ accessMethod: '<String>', category: '<ObjectCategory>', databaseId: '<U
 ```typescript
 // List all managedDomains
 const { data, isLoading } = useManagedDomainsQuery({
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one managedDomain
 const { data: item } = useManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, databaseId: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a managedDomain
 const { mutate: create } = useCreateManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### NodeTypeRegistry
@@ -1336,20 +1293,20 @@ create({ allowedOrigins: '<String>', apiId: '<UUID>' });
 ```typescript
 // List all platformDomains
 const { data, isLoading } = usePlatformDomainsQuery({
-  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one platformDomain
 const { data: item } = usePlatformDomainQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { config: true, createdAt: true, createdByPrincipal: true, hostname: true, id: true, isPublished: true, isWildcard: true, managed: true, parentHostname: true, tlsReadyAt: true, tlsSecretName: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a platformDomain
 const { mutate: create } = useCreatePlatformDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ config: '<JSON>', createdByPrincipal: '<UUID>', hostname: '<String>', isPublished: '<Boolean>', isWildcard: '<Boolean>', managed: '<Boolean>', parentHostname: '<String>', tlsReadyAt: '<Datetime>', tlsSecretName: '<String>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### PlatformDomainEvent
@@ -1462,20 +1419,20 @@ create({ emailIdentityId: '<UUID>', siteId: '<UUID>' });
 ```typescript
 // List all platformManagedDomains
 const { data, isLoading } = usePlatformManagedDomainsQuery({
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Get one platformManagedDomain
 const { data: item } = usePlatformManagedDomainQuery({
   id: '<UUID>',
-  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, verificationStatus: true, verifiedAt: true } },
+  selection: { fields: { allowPublicUsage: true, annotations: true, certStatus: true, createdAt: true, createdByPrincipal: true, domain: true, id: true, isWildcard: true, tlsReadyAt: true, tlsStatus: true, updatedAt: true, updatedByPrincipal: true, verificationStatus: true, verifiedAt: true } },
 });
 
 // Create a platformManagedDomain
 const { mutate: create } = useCreatePlatformManagedDomainMutation({
   selection: { fields: { id: true } },
 });
-create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
+create({ allowPublicUsage: '<Boolean>', annotations: '<JSON>', certStatus: '<String>', createdByPrincipal: '<UUID>', domain: '<String>', isWildcard: '<Boolean>', tlsReadyAt: '<Datetime>', tlsStatus: '<String>', updatedByPrincipal: '<UUID>', verificationStatus: '<String>', verifiedAt: '<Datetime>' });
 ```
 
 ### PlatformPage
@@ -1525,20 +1482,20 @@ create({ appIdentifier: '<String>', pathComponents: '<String>', platform: '<Stri
 ```typescript
 // List all platformSites
 const { data, isLoading } = usePlatformSitesQuery({
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one platformSite
 const { data: item } = usePlatformSiteQuery({
   id: '<UUID>',
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a platformSite
 const { mutate: create } = useCreatePlatformSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ activeCommitId: '<UUID>', bucketId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', createdByPrincipal: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformSiteDeepLink
@@ -1672,20 +1629,20 @@ create({ cleanUrls: '<Boolean>', indexDocument: '<String>', metadata: '<JSON>', 
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<UUID>',
-  selection: { fields: { category: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
+  selection: { fields: { category: true, columnRefs: true, createdAt: true, data: true, databaseId: true, derivedFromPolicyId: true, derivedFromTableId: true, disabled: true, granteeName: true, id: true, name: true, permissive: true, policyType: true, privilege: true, smartTags: true, tableId: true, tags: true, updatedAt: true, withCheck: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ category: '<ObjectCategory>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
+create({ category: '<ObjectCategory>', columnRefs: '<String>', data: '<JSON>', databaseId: '<UUID>', derivedFromPolicyId: '<UUID>', derivedFromTableId: '<UUID>', disabled: '<Boolean>', granteeName: '<String>', name: '<String>', permissive: '<Boolean>', policyType: '<String>', privilege: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', withCheck: '<JSON>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -1730,6 +1687,27 @@ const { mutate: create } = useCreatePubkeySettingMutation({
 create({ cryptoNetwork: '<String>', databaseId: '<UUID>', schemaId: '<UUID>', signInRecordFailureFunctionId: '<UUID>', signInRequestChallengeFunctionId: '<UUID>', signInWithChallengeFunctionId: '<UUID>', signUpWithKeyFunctionId: '<UUID>', userField: '<String>' });
 ```
 
+### Redirect
+
+```typescript
+// List all redirects
+const { data, isLoading } = useRedirectsQuery({
+  selection: { fields: { createdAt: true, databaseId: true, id: true, name: true, preservePath: true, preserveQuery: true, statusCode: true, toHost: true, toPath: true, updatedAt: true } },
+});
+
+// Get one redirect
+const { data: item } = useRedirectQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, databaseId: true, id: true, name: true, preservePath: true, preserveQuery: true, statusCode: true, toHost: true, toPath: true, updatedAt: true } },
+});
+
+// Create a redirect
+const { mutate: create } = useCreateRedirectMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', name: '<String>', preservePath: '<Boolean>', preserveQuery: '<Boolean>', statusCode: '<Int>', toHost: '<String>', toPath: '<String>' });
+```
+
 ### RlsSetting
 
 ```typescript
@@ -1756,20 +1734,20 @@ create({ authenticateFunctionId: '<UUID>', authenticateSchemaId: '<UUID>', authe
 ```typescript
 // List all routeBindings
 const { data, isLoading } = useRouteBindingsQuery({
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one routeBinding
 const { data: item } = useRouteBindingQuery({
   id: '<UUID>',
-  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a routeBinding
 const { mutate: create } = useCreateRouteBindingMutation({
   selection: { fields: { id: true } },
 });
-create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
+create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Route
@@ -1777,20 +1755,20 @@ create({ domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<
 ```typescript
 // List all routes
 const { data, isLoading } = useRoutesQuery({
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Get one route
 const { data: item } = useRouteQuery({
   id: '<UUID>',
-  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
+  selection: { fields: { config: true, createdAt: true, databaseId: true, domainId: true, id: true, isActive: true, method: true, path: true, priority: true, targetApiId: true, targetBucketId: true, targetFunctionId: true, targetRedirectId: true, targetServiceId: true, targetSiteId: true, updatedAt: true } },
 });
 
 // Create a route
 const { mutate: create } = useCreateRouteMutation({
   selection: { fields: { id: true } },
 });
-create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
+create({ config: '<JSON>', databaseId: '<UUID>', domainId: '<UUID>', isActive: '<Boolean>', method: '<String>', path: '<String>', priority: '<Int>', targetApiId: '<UUID>', targetBucketId: '<UUID>', targetFunctionId: '<UUID>', targetRedirectId: '<UUID>', targetServiceId: '<UUID>', targetSiteId: '<UUID>' });
 ```
 
 ### Schema
@@ -1861,20 +1839,20 @@ create({ appIdentifier: '<String>', databaseId: '<UUID>', pathComponents: '<Stri
 ```typescript
 // List all sites
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Get one site
 const { data: item } = useSiteQuery({
   id: '<UUID>',
-  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true } },
+  selection: { fields: { activeCommitId: true, bucketId: true, createdAt: true, createdByPrincipal: true, databaseId: true, description: true, id: true, installationId: true, installationMemberSlug: true, isPublished: true, name: true, resourceId: true, title: true, updatedAt: true, updatedByPrincipal: true } },
 });
 
 // Create a site
 const { mutate: create } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ activeCommitId: '<UUID>', bucketId: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>' });
+create({ activeCommitId: '<UUID>', bucketId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', installationId: '<UUID>', installationMemberSlug: '<String>', isPublished: '<Boolean>', name: '<String>', resourceId: '<UUID>', title: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### SiteDeepLink
@@ -2022,6 +2000,27 @@ const { mutate: create } = useCreateSpatialRelationMutation({
   selection: { fields: { id: true } },
 });
 create({ category: '<ObjectCategory>', databaseId: '<UUID>', fieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', refFieldId: '<UUID>', refTableId: '<UUID>', tableId: '<UUID>', tags: '<String>' });
+```
+
+### SqlAction
+
+```typescript
+// List all sqlActions
+const { data, isLoading } = useSqlActionsQuery({
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+});
+
+// Get one sqlAction
+const { data: item } = useSqlActionQuery({
+  id: '<Int>',
+  selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
+});
+
+// Create a sqlAction
+const { mutate: create } = useCreateSqlActionMutation({
+  selection: { fields: { id: true } },
+});
+create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
 ```
 
 ### TableBehavior
@@ -2334,19 +2333,6 @@ resolveDeepLink
   | `linkSlug` | String |
   | `targetSiteId` | UUID |
 
-### `useResolveHttpRouteQuery`
-
-resolveHttpRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
-
 ### `useResolveRouteQuery`
 
 resolveRoute
@@ -2371,6 +2357,17 @@ resolveSiteAppLinks
   |----------|------|
   | `targetSiteId` | UUID |
 
+### `useAcceptDatabaseTransferMutation`
+
+acceptDatabaseTransfer
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | AcceptDatabaseTransferInput (required) |
+
 ### `useApplyRlsMutation`
 
 applyRls
@@ -2382,38 +2379,16 @@ applyRls
   |----------|------|
   | `input` | ApplyRlsInput (required) |
 
-### `useAppsInstallAppMutation`
+### `useCancelDatabaseTransferMutation`
 
-appsInstallApp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | AppsInstallAppInput (required) |
-
-### `useAppsUninstallAppMutation`
-
-appsUninstallApp
+cancelDatabaseTransfer
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | AppsUninstallAppInput (required) |
-
-### `useAppsUpgradeAppMutation`
-
-appsUpgradeApp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | AppsUpgradeAppInput (required) |
+  | `input` | CancelDatabaseTransferInput (required) |
 
 ### `useDomainsAssignSubdomainMutation`
 
@@ -2461,6 +2436,17 @@ and lifecycle settings.
   | Argument | Type |
   |----------|------|
   | `input` | ProvisionBucketInput (required) |
+
+### `useRejectDatabaseTransferMutation`
+
+rejectDatabaseTransfer
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RejectDatabaseTransferInput (required) |
 
 ### `useRequestDatabaseMutation`
 

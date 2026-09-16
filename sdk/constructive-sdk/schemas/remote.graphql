@@ -1,0 +1,2385 @@
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""
+A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
+"""
+input BigIntFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigInt
+
+  """Equal to the specified value."""
+  equalTo: BigInt
+
+  """Greater than the specified value."""
+  greaterThan: BigInt
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BigInt
+
+  """Included in the specified list."""
+  in: [BigInt!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: BigInt
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BigInt
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigInt
+
+  """Not equal to the specified value."""
+  notEqualTo: BigInt
+
+  """Not included in the specified list."""
+  notIn: [BigInt!]
+}
+
+"""
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+}
+
+"""All input for the create `Machine` mutation."""
+input CreateMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Machine` to be created by this mutation."""
+  machine: MachineInput!
+}
+
+"""All input for the create `MachineMessage` mutation."""
+input CreateMachineMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MachineMessage` to be created by this mutation."""
+  machineMessage: MachineMessageInput!
+}
+
+"""The output of our create `MachineMessage` mutation."""
+type CreateMachineMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineMessage` that was created by this mutation."""
+  machineMessage: MachineMessage
+
+  """An edge for our `MachineMessage`. May be used by Relay 1."""
+  machineMessageEdge(
+    """The method to use when ordering `MachineMessage`."""
+    orderBy: [MachineMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our create `Machine` mutation."""
+type CreateMachinePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Machine` that was created by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachineOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `MachineSession` mutation."""
+input CreateMachineSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MachineSession` to be created by this mutation."""
+  machineSession: MachineSessionInput!
+}
+
+"""The output of our create `MachineSession` mutation."""
+type CreateMachineSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineSession` that was created by this mutation."""
+  machineSession: MachineSession
+
+  """An edge for our `MachineSession`. May be used by Relay 1."""
+  machineSessionEdge(
+    """The method to use when ordering `MachineSession`."""
+    orderBy: [MachineSessionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineSessionEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+}
+
+"""All input for the `deleteMachine` mutation."""
+input DeleteMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""All input for the `deleteMachineMessage` mutation."""
+input DeleteMachineMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier (uuidv7 provides temporal ordering)"""
+  id: UUID!
+
+  """When the message was recorded (partition key)"""
+  recordedAt: Datetime!
+}
+
+"""The output of our delete `MachineMessage` mutation."""
+type DeleteMachineMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineMessage` that was deleted by this mutation."""
+  machineMessage: MachineMessage
+
+  """An edge for our `MachineMessage`. May be used by Relay 1."""
+  machineMessageEdge(
+    """The method to use when ordering `MachineMessage`."""
+    orderBy: [MachineMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our delete `Machine` mutation."""
+type DeleteMachinePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Machine` that was deleted by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachineOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteMachineSession` mutation."""
+input DeleteMachineSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `MachineSession` mutation."""
+type DeleteMachineSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineSession` that was deleted by this mutation."""
+  machineSession: MachineSession
+
+  """An edge for our `MachineSession`. May be used by Relay 1."""
+  machineSessionEdge(
+    """The method to use when ordering `MachineSession`."""
+    orderBy: [MachineSessionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineSessionEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """Contained by the specified JSON."""
+  containedBy: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+}
+
+"""Computers enrolled for remote control, one row per database enrollment"""
+type Machine {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """
+  Entity that owns this machine (a personal entity for my own laptop, an org for a shared box)
+  """
+  entityId: UUID!
+
+  """
+  What the runner advertises: os, arch, hostname, shells, pty, installed agents, max_sessions
+  """
+  facts: JSON!
+  id: UUID!
+
+  """
+  Whether this machine is a shared runner anyone with the session capability may use (false: owner only)
+  """
+  isShared: Boolean!
+
+  """Human-readable machine name (dan-macbook)"""
+  label: String!
+
+  """Last heartbeat from the runner; online is derived from this"""
+  lastSeenAt: Datetime
+
+  """Reads and enables pagination through a set of `MachineSession`."""
+  machineSessions(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `MachineSession`."""
+    orderBy: [MachineSessionOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MachineSessionFilter
+  ): MachineSessionConnection!
+
+  """User who enrolled this machine"""
+  ownerId: UUID!
+
+  """
+  Server-side copy of the local policy: mode, approved commands, allowed cwds and env keys
+  """
+  policy: JSON!
+
+  """Principal this machine acts as (NULL until enrollment completes)"""
+  principalId: UUID
+
+  """When enrollment was revoked; the relay refuses a revoked machine"""
+  revokedAt: Datetime
+
+  """Hash of the enrollment credential the runner presents"""
+  tokenHash: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `Machine` values."""
+type MachineConnection {
+  """
+  A list of edges which contains the `Machine` and cursor to aid in pagination.
+  """
+  edges: [MachineEdge]!
+
+  """A list of `Machine` objects."""
+  nodes: [Machine]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Machine` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Machine` edge in the connection."""
+type MachineEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Machine` at the end of the edge."""
+  node: Machine
+}
+
+"""
+A filter to be used against `Machine` object types. All fields are combined with a logical ‘and.’
+"""
+input MachineFilter {
+  """Checks for all expressions in this list."""
+  and: [MachineFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `facts` field."""
+  facts: JSONFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isShared` field."""
+  isShared: BooleanFilter
+
+  """Filter by the object’s `label` field."""
+  label: StringFilter
+
+  """Filter by the object’s `lastSeenAt` field."""
+  lastSeenAt: DatetimeFilter
+
+  """Filter by the object’s `machineSessions` relation."""
+  machineSessions: MachineToManyMachineSessionFilter
+
+  """`machineSessions` exist."""
+  machineSessionsExist: Boolean
+
+  """Negates the expression."""
+  not: MachineFilter
+
+  """Checks for any expressions in this list."""
+  or: [MachineFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `policy` field."""
+  policy: JSONFilter
+
+  """Filter by the object’s `principalId` field."""
+  principalId: UUIDFilter
+
+  """Filter by the object’s `revokedAt` field."""
+  revokedAt: DatetimeFilter
+
+  """Filter by the object’s `tokenHash` field."""
+  tokenHash: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `Machine`"""
+input MachineInput {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """
+  Entity that owns this machine (a personal entity for my own laptop, an org for a shared box)
+  """
+  entityId: UUID!
+
+  """
+  What the runner advertises: os, arch, hostname, shells, pty, installed agents, max_sessions
+  """
+  facts: JSON
+  id: UUID
+
+  """
+  Whether this machine is a shared runner anyone with the session capability may use (false: owner only)
+  """
+  isShared: Boolean
+
+  """Human-readable machine name (dan-macbook)"""
+  label: String!
+
+  """Last heartbeat from the runner; online is derived from this"""
+  lastSeenAt: Datetime
+
+  """User who enrolled this machine"""
+  ownerId: UUID!
+
+  """
+  Server-side copy of the local policy: mode, approved commands, allowed cwds and env keys
+  """
+  policy: JSON
+
+  """Principal this machine acts as (NULL until enrollment completes)"""
+  principalId: UUID
+
+  """When enrollment was revoked; the relay refuses a revoked machine"""
+  revokedAt: Datetime
+
+  """Hash of the enrollment credential the runner presents"""
+  tokenHash: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Partitioned append-only ledger of session input, output and lifecycle"""
+type MachineMessage {
+  """
+  Who produced this message: the user, or the machine acting as its principal
+  """
+  actorId: UUID!
+
+  """Body of the message; its shape follows the kind"""
+  content: JSON!
+
+  """Acting principal (agent, API key, or user) who created this record"""
+  createdByPrincipal: UUID
+
+  """Entity that owns the machine this message was exchanged with"""
+  entityId: UUID!
+
+  """Unique identifier (uuidv7 provides temporal ordering)"""
+  id: UUID!
+
+  """
+  What this message is: command, stdin, signal, resize, stdout, stderr, cwd, exit, state, policy
+  """
+  kind: String!
+
+  """User who owns the session this message belongs to (inherited)"""
+  ownerId: UUID!
+
+  """When the message was recorded (partition key)"""
+  recordedAt: Datetime!
+
+  """Position in the session's ledger, monotonically increasing"""
+  seq: BigInt!
+
+  """
+  Reads a single `MachineSession` that is related to this `MachineMessage`.
+  """
+  session: MachineSession
+
+  """Session this message belongs to"""
+  sessionId: UUID!
+}
+
+"""A connection to a list of `MachineMessage` values."""
+type MachineMessageConnection {
+  """
+  A list of edges which contains the `MachineMessage` and cursor to aid in pagination.
+  """
+  edges: [MachineMessageEdge]!
+
+  """A list of `MachineMessage` objects."""
+  nodes: [MachineMessage]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MachineMessage` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `MachineMessage` edge in the connection."""
+type MachineMessageEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MachineMessage` at the end of the edge."""
+  node: MachineMessage
+}
+
+"""
+A filter to be used against `MachineMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input MachineMessageFilter {
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [MachineMessageFilter!]
+
+  """Filter by the object’s `content` field."""
+  content: JSONFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Negates the expression."""
+  not: MachineMessageFilter
+
+  """Checks for any expressions in this list."""
+  or: [MachineMessageFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `recordedAt` field."""
+  recordedAt: DatetimeFilter
+
+  """Filter by the object’s `seq` field."""
+  seq: BigIntFilter
+
+  """Filter by the object’s `session` relation."""
+  session: MachineSessionFilter
+
+  """Filter by the object’s `sessionId` field."""
+  sessionId: UUIDFilter
+}
+
+"""An input for mutations affecting `MachineMessage`"""
+input MachineMessageInput {
+  """
+  Who produced this message: the user, or the machine acting as its principal
+  """
+  actorId: UUID!
+
+  """Body of the message; its shape follows the kind"""
+  content: JSON
+
+  """Acting principal (agent, API key, or user) who created this record"""
+  createdByPrincipal: UUID
+
+  """Entity that owns the machine this message was exchanged with"""
+  entityId: UUID!
+
+  """Unique identifier (uuidv7 provides temporal ordering)"""
+  id: UUID
+
+  """
+  What this message is: command, stdin, signal, resize, stdout, stderr, cwd, exit, state, policy
+  """
+  kind: String!
+
+  """User who owns the session this message belongs to (inherited)"""
+  ownerId: UUID!
+
+  """When the message was recorded (partition key)"""
+  recordedAt: Datetime
+
+  """Position in the session's ledger, monotonically increasing"""
+  seq: BigInt!
+
+  """Session this message belongs to"""
+  sessionId: UUID!
+}
+
+"""Methods to use when ordering `MachineMessage`."""
+enum MachineMessageOrderBy {
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  CONTENT_ASC
+  CONTENT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ID_ASC
+  ID_DESC
+  KIND_ASC
+  KIND_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RECORDED_AT_ASC
+  RECORDED_AT_DESC
+  SEQ_ASC
+  SEQ_DESC
+  SESSION_ID_ASC
+  SESSION_ID_DESC
+}
+
+"""
+Represents an update to a `MachineMessage`. Fields that are set will be updated.
+"""
+input MachineMessagePatch {
+  """
+  Who produced this message: the user, or the machine acting as its principal
+  """
+  actorId: UUID
+
+  """Body of the message; its shape follows the kind"""
+  content: JSON
+
+  """Acting principal (agent, API key, or user) who created this record"""
+  createdByPrincipal: UUID
+
+  """Entity that owns the machine this message was exchanged with"""
+  entityId: UUID
+
+  """Unique identifier (uuidv7 provides temporal ordering)"""
+  id: UUID
+
+  """
+  What this message is: command, stdin, signal, resize, stdout, stderr, cwd, exit, state, policy
+  """
+  kind: String
+
+  """User who owns the session this message belongs to (inherited)"""
+  ownerId: UUID
+
+  """When the message was recorded (partition key)"""
+  recordedAt: Datetime
+
+  """Position in the session's ledger, monotonically increasing"""
+  seq: BigInt
+
+  """Session this message belongs to"""
+  sessionId: UUID
+}
+
+"""Methods to use when ordering `Machine`."""
+enum MachineOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  FACTS_ASC
+  FACTS_DESC
+  ID_ASC
+  ID_DESC
+  IS_SHARED_ASC
+  IS_SHARED_DESC
+  LABEL_ASC
+  LABEL_DESC
+  LAST_SEEN_AT_ASC
+  LAST_SEEN_AT_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  POLICY_ASC
+  POLICY_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PRINCIPAL_ID_ASC
+  PRINCIPAL_ID_DESC
+  REVOKED_AT_ASC
+  REVOKED_AT_DESC
+  TOKEN_HASH_ASC
+  TOKEN_HASH_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `Machine`. Fields that are set will be updated.
+"""
+input MachinePatch {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """
+  Entity that owns this machine (a personal entity for my own laptop, an org for a shared box)
+  """
+  entityId: UUID
+
+  """
+  What the runner advertises: os, arch, hostname, shells, pty, installed agents, max_sessions
+  """
+  facts: JSON
+  id: UUID
+
+  """
+  Whether this machine is a shared runner anyone with the session capability may use (false: owner only)
+  """
+  isShared: Boolean
+
+  """Human-readable machine name (dan-macbook)"""
+  label: String
+
+  """Last heartbeat from the runner; online is derived from this"""
+  lastSeenAt: Datetime
+
+  """User who enrolled this machine"""
+  ownerId: UUID
+
+  """
+  Server-side copy of the local policy: mode, approved commands, allowed cwds and env keys
+  """
+  policy: JSON
+
+  """Principal this machine acts as (NULL until enrollment completes)"""
+  principalId: UUID
+
+  """When enrollment was revoked; the relay refuses a revoked machine"""
+  revokedAt: Datetime
+
+  """Hash of the enrollment credential the runner presents"""
+  tokenHash: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Command or terminal sessions running on an enrolled machine"""
+type MachineSession {
+  """
+  How a bound session runs the agent: cli (the user's installed CLI) or embedded (our loop)
+  """
+  agentMode: String
+
+  """The CLI's own resumable session identifier (agent_mode = cli)"""
+  agentSessionRef: String
+
+  """Arguments the command is spawned with"""
+  args: [String]!
+
+  """Terminal width, preserved across reattach"""
+  cols: Int
+
+  """Program the runner spawns for this session"""
+  command: String!
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Working directory the runner last reported"""
+  cwd: String
+
+  """When the session reached a terminal state"""
+  endedAt: Datetime
+
+  """Entity that owns the machine this session runs on"""
+  entityId: UUID!
+
+  """
+  Non-secret environment variables for the process; policy gates which keys are allowed
+  """
+  env: JSON!
+
+  """Process exit status, once it ended"""
+  exitCode: Int
+  id: UUID!
+
+  """
+  Whether raw PTY bytes ride the socket (interactive) or every command is a ledger row
+  """
+  interactive: Boolean!
+
+  """Last time bytes moved in either direction"""
+  lastActivityAt: Datetime
+
+  """Highest ledger sequence recorded for this session"""
+  lastSeq: BigInt!
+
+  """Reads a single `Machine` that is related to this `MachineSession`."""
+  machine: Machine
+
+  """Machine this session runs on"""
+  machineId: UUID!
+
+  """Reads and enables pagination through a set of `MachineMessage`."""
+  machineMessagesBySessionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `MachineMessage`."""
+    orderBy: [MachineMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MachineMessageFilter
+  ): MachineMessageConnection!
+
+  """Session detail (client, shell integration, scrollback pointer)"""
+  metadata: JSON
+
+  """User who opened this session"""
+  ownerId: UUID!
+
+  """Process id on the machine, while it is running"""
+  pid: Int
+
+  """Agent run this session executes locally (NULL for a plain terminal)"""
+  runId: UUID
+
+  """When the process was spawned"""
+  startedAt: Datetime
+
+  """Lifecycle: pending, running, detached, exited, killed, failed"""
+  state: String!
+
+  """Terminal height, preserved across reattach"""
+  termRows: Int
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `MachineSession` values."""
+type MachineSessionConnection {
+  """
+  A list of edges which contains the `MachineSession` and cursor to aid in pagination.
+  """
+  edges: [MachineSessionEdge]!
+
+  """A list of `MachineSession` objects."""
+  nodes: [MachineSession]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MachineSession` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `MachineSession` edge in the connection."""
+type MachineSessionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MachineSession` at the end of the edge."""
+  node: MachineSession
+}
+
+"""
+A filter to be used against `MachineSession` object types. All fields are combined with a logical ‘and.’
+"""
+input MachineSessionFilter {
+  """Filter by the object’s `agentMode` field."""
+  agentMode: StringFilter
+
+  """Filter by the object’s `agentSessionRef` field."""
+  agentSessionRef: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [MachineSessionFilter!]
+
+  """Filter by the object’s `args` field."""
+  args: StringListFilter
+
+  """Filter by the object’s `cols` field."""
+  cols: IntFilter
+
+  """Filter by the object’s `command` field."""
+  command: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `cwd` field."""
+  cwd: StringFilter
+
+  """Filter by the object’s `endedAt` field."""
+  endedAt: DatetimeFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `env` field."""
+  env: JSONFilter
+
+  """Filter by the object’s `exitCode` field."""
+  exitCode: IntFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `interactive` field."""
+  interactive: BooleanFilter
+
+  """Filter by the object’s `lastActivityAt` field."""
+  lastActivityAt: DatetimeFilter
+
+  """Filter by the object’s `lastSeq` field."""
+  lastSeq: BigIntFilter
+
+  """Filter by the object’s `machine` relation."""
+  machine: MachineFilter
+
+  """Filter by the object’s `machineId` field."""
+  machineId: UUIDFilter
+
+  """Filter by the object’s `machineMessagesBySessionId` relation."""
+  machineMessagesBySessionId: MachineSessionToManyMachineMessageFilter
+
+  """`machineMessagesBySessionId` exist."""
+  machineMessagesBySessionIdExist: Boolean
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Negates the expression."""
+  not: MachineSessionFilter
+
+  """Checks for any expressions in this list."""
+  or: [MachineSessionFilter!]
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `pid` field."""
+  pid: IntFilter
+
+  """Filter by the object’s `runId` field."""
+  runId: UUIDFilter
+
+  """Filter by the object’s `startedAt` field."""
+  startedAt: DatetimeFilter
+
+  """Filter by the object’s `state` field."""
+  state: StringFilter
+
+  """Filter by the object’s `termRows` field."""
+  termRows: IntFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `MachineSession`"""
+input MachineSessionInput {
+  """
+  How a bound session runs the agent: cli (the user's installed CLI) or embedded (our loop)
+  """
+  agentMode: String
+
+  """The CLI's own resumable session identifier (agent_mode = cli)"""
+  agentSessionRef: String
+
+  """Arguments the command is spawned with"""
+  args: [String]
+
+  """Terminal width, preserved across reattach"""
+  cols: Int
+
+  """Program the runner spawns for this session"""
+  command: String
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Working directory the runner last reported"""
+  cwd: String
+
+  """When the session reached a terminal state"""
+  endedAt: Datetime
+
+  """Entity that owns the machine this session runs on"""
+  entityId: UUID!
+
+  """
+  Non-secret environment variables for the process; policy gates which keys are allowed
+  """
+  env: JSON
+
+  """Process exit status, once it ended"""
+  exitCode: Int
+  id: UUID
+
+  """
+  Whether raw PTY bytes ride the socket (interactive) or every command is a ledger row
+  """
+  interactive: Boolean
+
+  """Last time bytes moved in either direction"""
+  lastActivityAt: Datetime
+
+  """Highest ledger sequence recorded for this session"""
+  lastSeq: BigInt
+
+  """Machine this session runs on"""
+  machineId: UUID!
+
+  """Session detail (client, shell integration, scrollback pointer)"""
+  metadata: JSON
+
+  """User who opened this session"""
+  ownerId: UUID!
+
+  """Process id on the machine, while it is running"""
+  pid: Int
+
+  """Agent run this session executes locally (NULL for a plain terminal)"""
+  runId: UUID
+
+  """When the process was spawned"""
+  startedAt: Datetime
+
+  """Lifecycle: pending, running, detached, exited, killed, failed"""
+  state: String
+
+  """Terminal height, preserved across reattach"""
+  termRows: Int
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `MachineSession`."""
+enum MachineSessionOrderBy {
+  AGENT_MODE_ASC
+  AGENT_MODE_DESC
+  AGENT_SESSION_REF_ASC
+  AGENT_SESSION_REF_DESC
+  ARGS_ASC
+  ARGS_DESC
+  COLS_ASC
+  COLS_DESC
+  COMMAND_ASC
+  COMMAND_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  CWD_ASC
+  CWD_DESC
+  ENDED_AT_ASC
+  ENDED_AT_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ENV_ASC
+  ENV_DESC
+  EXIT_CODE_ASC
+  EXIT_CODE_DESC
+  ID_ASC
+  ID_DESC
+  INTERACTIVE_ASC
+  INTERACTIVE_DESC
+  LAST_ACTIVITY_AT_ASC
+  LAST_ACTIVITY_AT_DESC
+  LAST_SEQ_ASC
+  LAST_SEQ_DESC
+  MACHINE_ID_ASC
+  MACHINE_ID_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NATURAL
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  PID_ASC
+  PID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RUN_ID_ASC
+  RUN_ID_DESC
+  STARTED_AT_ASC
+  STARTED_AT_DESC
+  STATE_ASC
+  STATE_DESC
+  TERM_ROWS_ASC
+  TERM_ROWS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `MachineSession`. Fields that are set will be updated.
+"""
+input MachineSessionPatch {
+  """
+  How a bound session runs the agent: cli (the user's installed CLI) or embedded (our loop)
+  """
+  agentMode: String
+
+  """The CLI's own resumable session identifier (agent_mode = cli)"""
+  agentSessionRef: String
+
+  """Arguments the command is spawned with"""
+  args: [String]
+
+  """Terminal width, preserved across reattach"""
+  cols: Int
+
+  """Program the runner spawns for this session"""
+  command: String
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Working directory the runner last reported"""
+  cwd: String
+
+  """When the session reached a terminal state"""
+  endedAt: Datetime
+
+  """Entity that owns the machine this session runs on"""
+  entityId: UUID
+
+  """
+  Non-secret environment variables for the process; policy gates which keys are allowed
+  """
+  env: JSON
+
+  """Process exit status, once it ended"""
+  exitCode: Int
+  id: UUID
+
+  """
+  Whether raw PTY bytes ride the socket (interactive) or every command is a ledger row
+  """
+  interactive: Boolean
+
+  """Last time bytes moved in either direction"""
+  lastActivityAt: Datetime
+
+  """Highest ledger sequence recorded for this session"""
+  lastSeq: BigInt
+
+  """Machine this session runs on"""
+  machineId: UUID
+
+  """Session detail (client, shell integration, scrollback pointer)"""
+  metadata: JSON
+
+  """User who opened this session"""
+  ownerId: UUID
+
+  """Process id on the machine, while it is running"""
+  pid: Int
+
+  """Agent run this session executes locally (NULL for a plain terminal)"""
+  runId: UUID
+
+  """When the process was spawned"""
+  startedAt: Datetime
+
+  """Lifecycle: pending, running, detached, exited, killed, failed"""
+  state: String
+
+  """Terminal height, preserved across reattach"""
+  termRows: Int
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""
+A filter to be used against many `MachineMessage` object types. All fields are combined with a logical ‘and.’
+"""
+input MachineSessionToManyMachineMessageFilter {
+  """Filters to entities where every related entity matches."""
+  every: MachineMessageFilter
+
+  """Filters to entities where no related entity matches."""
+  none: MachineMessageFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: MachineMessageFilter
+}
+
+"""
+A filter to be used against many `MachineSession` object types. All fields are combined with a logical ‘and.’
+"""
+input MachineToManyMachineSessionFilter {
+  """Filters to entities where every related entity matches."""
+  every: MachineSessionFilter
+
+  """Filters to entities where no related entity matches."""
+  none: MachineSessionFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: MachineSessionFilter
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  references: MetaRefTable!
+  type: String
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  foreignKey: [MetaForeignKeyConstraint!]!
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL enum type"""
+type MetaEnum {
+  """The PostgreSQL enum type name"""
+  name: String!
+
+  """Allowed values for this enum"""
+  values: [String!]!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  """PostgreSQL column name"""
+  columnName: String!
+  description: String
+
+  """Enum metadata if this field has an enum type"""
+  enumValues: MetaEnum
+  hasDefault: Boolean!
+  isForeignKey: Boolean!
+  isNotNull: Boolean!
+  isPrimaryKey: Boolean!
+
+  """Final GraphQL field name"""
+  name: String!
+  type: MetaType!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+  referencedFields: [String!]!
+  referencedTable: String!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+  type: String
+}
+
+"""i18n metadata for a table with @i18n tag"""
+type MetaI18n {
+  """Fields that are translatable"""
+  translatableFields: [MetaI18nField!]!
+
+  """Name of the translation table"""
+  translationTable: String!
+}
+
+"""A translatable field"""
+type MetaI18nField {
+  """GraphQL field name"""
+  name: String!
+
+  """PostgreSQL column type (text, citext)"""
+  type: String!
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  columns: [String!]!
+  fields: [MetaField!]
+  isPrimary: Boolean!
+  isUnique: Boolean!
+  name: String!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  allRows: String!
+  conditionType: String!
+  connection: String!
+  createInputType: String!
+  createPayloadType: String!
+  deletePayloadType: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  patchType: String
+  tableType: String!
+  updatePayloadType: String
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  junctionTable: MetaRefTable!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+  type: String
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String
+  create: String
+  delete: String
+  one: String
+  update: String
+}
+
+"""Realtime metadata for a table with @realtime tag"""
+type MetaRealtime {
+  """The generated subscription field name (e.g. onPostChanged)"""
+  subscriptionFieldName: String!
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""
+How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+"""
+type MetaScalarEncoding {
+  """For 'vector': declared length, else null."""
+  dimensions: Int
+
+  """For 'ltree': values are dot-separated path strings."""
+  dotPath: Boolean
+
+  """For 'vector': element scalar (e.g. 'float')."""
+  elementType: String
+
+  """For 'geojson': Point/LineString/Polygon/…, else null."""
+  geometrySubtype: String
+
+  """
+  Machine kind: bigint, datetime, date, time, interval, uuid, geojson, point, inet, ltree, vector, bytea, or composite.
+  """
+  kind: String!
+
+  """For 'geojson': spatial reference id, else null."""
+  srid: Int
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Provisioning scope metadata for a table"""
+type MetaScope {
+  """SQL name of the entity table for entity scopes, else null"""
+  entityTable: String
+
+  """
+  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  """
+  keyColumn: String
+
+  """
+  Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')
+  """
+  scope: String!
+
+  """Provenance of the scope metadata (always 'smartTag')"""
+  source: String!
+
+  """Coarse bucket: 'global', 'database', or 'entity'"""
+  tier: String!
+}
+
+"""Search metadata for a table"""
+type MetaSearch {
+  """Active search algorithms on this table"""
+  algorithms: [String!]!
+
+  """Searchable columns with their algorithm"""
+  columns: [MetaSearchColumn!]!
+
+  """Per-table search configuration"""
+  config: MetaSearchConfig
+
+  """Whether unifiedSearch composite filter is available"""
+  hasUnifiedSearch: Boolean!
+}
+
+"""A searchable column with its algorithm"""
+type MetaSearchColumn {
+  """Search algorithm: tsvector, bm25, trgm, or vector"""
+  algorithm: String!
+
+  """Column name (camelCase)"""
+  name: String!
+}
+
+"""Per-table search configuration from @searchConfig smart tag"""
+type MetaSearchConfig {
+  """Exponential decay factor per day"""
+  boostRecencyDecay: Float
+
+  """Field used for recency decay"""
+  boostRecencyField: String
+
+  """Whether recency boosting is enabled"""
+  boostRecent: Boolean!
+
+  """JSON-encoded per-adapter score weights"""
+  weights: String
+}
+
+"""Storage metadata for a table"""
+type MetaStorage {
+  """Whether this table is a storage buckets table"""
+  isBucketsTable: Boolean!
+
+  """Whether this table is a storage files table"""
+  isFilesTable: Boolean!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  constraints: MetaConstraints!
+  fields: [MetaField!]!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+
+  """i18n metadata (null if no @i18n tag)"""
+  i18n: MetaI18n
+  indexes: [MetaIndex!]!
+  inflection: MetaInflection!
+
+  """Final GraphQL output type name"""
+  name: String!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  query: MetaQuery!
+
+  """Realtime metadata (null if no @realtime tag)"""
+  realtime: MetaRealtime
+  relations: MetaRelations!
+  schemaName: String!
+
+  """Provisioning scope metadata (null if no @scope tag)"""
+  scope: MetaScope
+
+  """Search metadata (null if no search configured)"""
+  search: MetaSearch
+
+  """Storage metadata (null if not a storage table)"""
+  storage: MetaStorage
+
+  """PostgreSQL table name"""
+  tableName: String!
+  uniqueConstraints: [MetaUniqueConstraint!]!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  """Scalar serialization contract (null for plain scalars)"""
+  encoding: MetaScalarEncoding
+  gqlType: String!
+  hasDefault: Boolean
+  isArray: Boolean!
+  isNotNull: Boolean
+  pgType: String!
+  subtype: String
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  fields: [MetaField!]!
+  name: String!
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Machine`."""
+  createMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMachineInput!
+  ): CreateMachinePayload
+
+  """Creates a single `MachineMessage`."""
+  createMachineMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMachineMessageInput!
+  ): CreateMachineMessagePayload
+
+  """Creates a single `MachineSession`."""
+  createMachineSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMachineSessionInput!
+  ): CreateMachineSessionPayload
+
+  """Deletes a single `Machine` using a unique key."""
+  deleteMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMachineInput!
+  ): DeleteMachinePayload
+
+  """Deletes a single `MachineMessage` using a unique key."""
+  deleteMachineMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMachineMessageInput!
+  ): DeleteMachineMessagePayload
+
+  """Deletes a single `MachineSession` using a unique key."""
+  deleteMachineSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMachineSessionInput!
+  ): DeleteMachineSessionPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+
+  """Updates a single `Machine` using a unique key and a patch."""
+  updateMachine(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMachineInput!
+  ): UpdateMachinePayload
+
+  """Updates a single `MachineMessage` using a unique key and a patch."""
+  updateMachineMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMachineMessageInput!
+  ): UpdateMachineMessagePayload
+
+  """Updates a single `MachineSession` using a unique key and a patch."""
+  updateMachineSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMachineSessionInput!
+  ): UpdateMachineSessionPayload
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
+}
+
+type ProvisionBucketPayload {
+  """The access type applied"""
+  accessType: String!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
+
+  """The storage provider used"""
+  provider: String!
+
+  """Whether provisioning succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+
+  """Reads and enables pagination through a set of `MachineMessage`."""
+  machineMessages(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `MachineMessage`."""
+    orderBy: [MachineMessageOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MachineMessageFilter
+  ): MachineMessageConnection
+
+  """Reads and enables pagination through a set of `MachineSession`."""
+  machineSessions(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `MachineSession`."""
+    orderBy: [MachineSessionOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MachineSessionFilter
+  ): MachineSessionConnection
+
+  """Reads and enables pagination through a set of `Machine`."""
+  machines(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachineOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MachineFilter
+  ): MachineConnection
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+}
+
+"""All input for the `updateMachine` mutation."""
+input UpdateMachineInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Machine` being updated.
+  """
+  machinePatch: MachinePatch!
+}
+
+"""All input for the `updateMachineMessage` mutation."""
+input UpdateMachineMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier (uuidv7 provides temporal ordering)"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `MachineMessage` being updated.
+  """
+  machineMessagePatch: MachineMessagePatch!
+
+  """When the message was recorded (partition key)"""
+  recordedAt: Datetime!
+}
+
+"""The output of our update `MachineMessage` mutation."""
+type UpdateMachineMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineMessage` that was updated by this mutation."""
+  machineMessage: MachineMessage
+
+  """An edge for our `MachineMessage`. May be used by Relay 1."""
+  machineMessageEdge(
+    """The method to use when ordering `MachineMessage`."""
+    orderBy: [MachineMessageOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineMessageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The output of our update `Machine` mutation."""
+type UpdateMachinePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Machine` that was updated by this mutation."""
+  machine: Machine
+
+  """An edge for our `Machine`. May be used by Relay 1."""
+  machineEdge(
+    """The method to use when ordering `Machine`."""
+    orderBy: [MachineOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateMachineSession` mutation."""
+input UpdateMachineSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `MachineSession` being updated.
+  """
+  machineSessionPatch: MachineSessionPatch!
+}
+
+"""The output of our update `MachineSession` mutation."""
+type UpdateMachineSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MachineSession` that was updated by this mutation."""
+  machineSession: MachineSession
+
+  """An edge for our `MachineSession`. May be used by Relay 1."""
+  machineSessionEdge(
+    """The method to use when ordering `MachineSession`."""
+    orderBy: [MachineSessionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MachineSessionEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}

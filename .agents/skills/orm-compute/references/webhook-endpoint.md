@@ -9,7 +9,7 @@ Webhook route authority: (host, path) -> function task_identifier invoked throug
 ```typescript
 db.webhookEndpoint.findMany({ select: { id: true } }).execute()
 db.webhookEndpoint.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.webhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' }, select: { id: true } }).execute()
+db.webhookEndpoint.create({ data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute()
 db.webhookEndpoint.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute()
 db.webhookEndpoint.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.webhookEndpoint.findMany({
 
 ```typescript
 const item = await db.webhookEndpoint.create({
-  data: { active: '<Boolean>', createdBy: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>' },
+  data: { active: '<Boolean>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', functionDefinitionId: '<UUID>', host: '<String>', namespaceId: '<UUID>', path: '<String>', provider: '<String>', replayWindowSeconds: '<Int>', signingSecretName: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

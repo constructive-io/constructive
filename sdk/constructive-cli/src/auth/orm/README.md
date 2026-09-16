@@ -921,6 +921,21 @@ signInCrossOrigin
 const result = await db.mutation.signInCrossOrigin({ input: { credentialKind: '<String>', token: '<String>' } }).execute();
 ```
 
+### `db.mutation.signInMagicLink`
+
+signInMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInMagicLinkInput (required) |
+
+```typescript
+const result = await db.mutation.signInMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
+```
+
 ### `db.mutation.signInSmsOtp`
 
 signInSmsOtp
@@ -964,6 +979,21 @@ signUp
 
 ```typescript
 const result = await db.mutation.signUp({ input: '<SignUpInput>' }).execute();
+```
+
+### `db.mutation.signUpMagicLink`
+
+signUpMagicLink
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignUpMagicLinkInput (required) |
+
+```typescript
+const result = await db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.signUpSms`

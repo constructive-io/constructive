@@ -4,7 +4,10 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { ConfigModel } from './config';
+export { InternalConfigModel } from './internalConfig';
+export { InternalSecretModel } from './internalSecret';
 export { PlatformConfigModel } from './platformConfig';
+export { PlatformInternalConfigModel } from './platformInternalConfig';
 export { PlatformInternalSecretModel } from './platformInternalSecret';
 export { PlatformSecretModel } from './platformSecret';
 export { SecretModel } from './secret';

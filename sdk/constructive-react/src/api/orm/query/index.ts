@@ -6,12 +6,7 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type {
-  ResolveHttpRouteRecord,
-  ResolveRouteRecord,
-  ResolveHttpRouteRecordSelect,
-  ResolveRouteRecordSelect,
-} from '../input-types';
+import type { ResolveRouteRecord, ResolveRouteRecordSelect } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface ApiSchemaNamesVariables {
   targetApiId?: string;
@@ -23,11 +18,6 @@ export interface ApplyRegistryDefaultsVariables {
 export interface ResolveDeepLinkVariables {
   linkSlug?: string;
   targetSiteId?: string;
-}
-export interface ResolveHttpRouteVariables {
-  requestHost?: string;
-  requestMethod?: string;
-  requestPath?: string;
 }
 export interface ResolveRouteVariables {
   requestHost?: string;
@@ -132,43 +122,6 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
-        ),
-      }),
-    resolveHttpRoute: <S extends ResolveHttpRouteRecordSelect>(
-      args: ResolveHttpRouteVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ResolveHttpRouteRecordSelect>
-    ) =>
-      new QueryBuilder<{
-        resolveHttpRoute: InferSelectResult<ResolveHttpRouteRecord, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveHttpRoute',
-        fieldName: 'resolveHttpRoute',
-        ...buildCustomDocument(
-          'query',
-          'ResolveHttpRoute',
-          'resolveHttpRoute',
-          options.select,
-          args,
-          [
-            {
-              name: 'requestHost',
-              type: 'String',
-            },
-            {
-              name: 'requestMethod',
-              type: 'String',
-            },
-            {
-              name: 'requestPath',
-              type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          'ResolveHttpRouteRecord'
         ),
       }),
     resolveRoute: <S extends ResolveRouteRecordSelect>(

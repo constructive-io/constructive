@@ -12,8 +12,8 @@ csdk resource-installation list --where.<field>.<op> <value> --orderBy <values>
 csdk resource-installation list --limit 10 --after <cursor>
 csdk resource-installation find-first --where.<field>.<op> <value>
 csdk resource-installation get --id <UUID>
-csdk resource-installation create --databaseId <UUID> --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
-csdk resource-installation update --id <UUID> [--commitId <UUID>] [--createdBy <UUID>] [--databaseId <UUID>] [--name <String>] [--namespaceId <UUID>] [--params <JSON>] [--revision <Int>] [--slug <String>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
+csdk resource-installation create --databaseId <UUID> --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk resource-installation update --id <UUID> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--name <String>] [--namespaceId <UUID>] [--params <JSON>] [--revision <Int>] [--slug <String>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk resource-installation delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk resource-installation list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a resourceInstallation
 
 ```bash
-csdk resource-installation create --databaseId <UUID> --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>]
+csdk resource-installation create --databaseId <UUID> --name <String> --namespaceId <UUID> --slug <String> [--commitId <UUID>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--params <JSON>] [--revision <Int>] [--status <String>] [--storeId <UUID>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a resourceInstallation by id

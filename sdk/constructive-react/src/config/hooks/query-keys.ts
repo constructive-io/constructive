@@ -28,6 +28,24 @@ export const configKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...configKeys.details(), id] as const,
 } as const;
+export const internalConfigKeys = {
+  /** All internalConfig queries */ all: ['internalconfig'] as const,
+  /** List query keys */ lists: () => [...internalConfigKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...internalConfigKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...internalConfigKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...internalConfigKeys.details(), id] as const,
+} as const;
+export const internalSecretKeys = {
+  /** All internalSecret queries */ all: ['internalsecret'] as const,
+  /** List query keys */ lists: () => [...internalSecretKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...internalSecretKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...internalSecretKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...internalSecretKeys.details(), id] as const,
+} as const;
 export const platformConfigKeys = {
   /** All platformConfig queries */ all: ['platformconfig'] as const,
   /** List query keys */ lists: () => [...platformConfigKeys.all, 'list'] as const,
@@ -36,6 +54,15 @@ export const platformConfigKeys = {
   /** Detail query keys */ details: () => [...platformConfigKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformConfigKeys.details(), id] as const,
+} as const;
+export const platformInternalConfigKeys = {
+  /** All platformInternalConfig queries */ all: ['platforminternalconfig'] as const,
+  /** List query keys */ lists: () => [...platformInternalConfigKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformInternalConfigKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformInternalConfigKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformInternalConfigKeys.details(), id] as const,
 } as const;
 export const platformInternalSecretKeys = {
   /** All platformInternalSecret queries */ all: ['platforminternalsecret'] as const,
@@ -88,7 +115,10 @@ export const secretKeys = {
  */
 export const queryKeys = {
   config: configKeys,
+  internalConfig: internalConfigKeys,
+  internalSecret: internalSecretKeys,
   platformConfig: platformConfigKeys,
+  platformInternalConfig: platformInternalConfigKeys,
   platformInternalSecret: platformInternalSecretKeys,
   platformSecret: platformSecretKeys,
   secret: secretKeys,

@@ -27,10 +27,17 @@ csdk auth set-token <your-token>
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
 | `config` | config CRUD operations |
+| `internal-config` | internalConfig CRUD operations |
+| `internal-secret` | internalSecret CRUD operations |
 | `platform-config` | platformConfig CRUD operations |
+| `platform-internal-config` | platformInternalConfig CRUD operations |
 | `platform-internal-secret` | platformInternalSecret CRUD operations |
 | `platform-secret` | platformSecret CRUD operations |
 | `secret` | secret CRUD operations |
+| `internal-secrets-del` | _internalSecretsDel |
+| `internal-secrets-remove-array` | _internalSecretsRemoveArray |
+| `internal-secrets-rotate` | _internalSecretsRotate |
+| `internal-secrets-set` | _internalSecretsSet |
 | `secrets-del` | _secretsDel |
 | `secrets-remove-array` | _secretsRemoveArray |
 | `secrets-rotate` | _secretsRotate |
@@ -108,6 +115,7 @@ CRUD operations for Config records.
 |-------|------|
 | `annotations` | JSON |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `description` | String |
 | `expiresAt` | Datetime |
@@ -118,10 +126,75 @@ CRUD operations for Config records.
 | `provider` | String |
 | `realm` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `value` | String |
 
 **Required create fields:** `databaseId`, `name`, `namespaceId`
+**Optional create fields (backend defaults):** `annotations`, `createdByPrincipal`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `updatedByPrincipal`, `value`
+
+### `internal-config`
+
+CRUD operations for InternalConfig records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all internalConfig records |
+| `find-first` | Find first matching internalConfig record |
+| `get` | Get a internalConfig by id |
+| `create` | Create a new internalConfig |
+| `update` | Update an existing internalConfig |
+| `delete` | Delete a internalConfig |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `provider` | String |
+| `realm` | String |
+| `updatedAt` | Datetime |
+| `value` | String |
+
+**Required create fields:** `databaseId`, `name`
 **Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `value`
+
+### `internal-secret`
+
+CRUD operations for InternalSecret records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all internalSecret records |
+| `find-first` | Find first matching internalSecret record |
+| `get` | Get a internalSecret by id |
+| `create` | Create a new internalSecret |
+| `update` | Update an existing internalSecret |
+| `delete` | Delete a internalSecret |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `realm` | String |
+| `retiredAt` | Datetime |
+| `rotatedAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `annotations`, `databaseId`, `description`, `labels`, `name`, `realm`, `retiredAt`, `rotatedAt`
 
 ### `platform-config`
 
@@ -142,6 +215,7 @@ CRUD operations for PlatformConfig records.
 |-------|------|
 | `annotations` | JSON |
 | `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
 | `description` | String |
 | `expiresAt` | Datetime |
 | `id` | UUID |
@@ -151,9 +225,42 @@ CRUD operations for PlatformConfig records.
 | `provider` | String |
 | `realm` | String |
 | `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
 | `value` | String |
 
 **Required create fields:** `name`, `namespaceId`
+**Optional create fields (backend defaults):** `annotations`, `createdByPrincipal`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `updatedByPrincipal`, `value`
+
+### `platform-internal-config`
+
+CRUD operations for PlatformInternalConfig records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformInternalConfig records |
+| `find-first` | Find first matching platformInternalConfig record |
+| `get` | Get a platformInternalConfig by id |
+| `create` | Create a new platformInternalConfig |
+| `update` | Update an existing platformInternalConfig |
+| `delete` | Delete a platformInternalConfig |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `annotations` | JSON |
+| `createdAt` | Datetime |
+| `description` | String |
+| `expiresAt` | Datetime |
+| `id` | UUID |
+| `labels` | JSON |
+| `name` | String |
+| `provider` | String |
+| `realm` | String |
+| `updatedAt` | Datetime |
+| `value` | String |
+
+**Required create fields:** `name`
 **Optional create fields (backend defaults):** `annotations`, `description`, `expiresAt`, `labels`, `provider`, `realm`, `value`
 
 ### `platform-internal-secret`
@@ -179,13 +286,12 @@ CRUD operations for PlatformInternalSecret records.
 | `id` | UUID |
 | `labels` | JSON |
 | `name` | String |
-| `namespaceId` | UUID |
 | `realm` | String |
 | `retiredAt` | Datetime |
 | `rotatedAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `annotations`, `description`, `labels`, `name`, `namespaceId`, `realm`, `retiredAt`, `rotatedAt`
+**Required create fields:** `annotations`, `description`, `labels`, `name`, `realm`, `retiredAt`, `rotatedAt`
 
 ### `platform-secret`
 
@@ -253,6 +359,66 @@ CRUD operations for Secret records.
 **Required create fields:** `annotations`, `databaseId`, `description`, `labels`, `name`, `namespaceId`, `provider`, `realm`, `retiredAt`, `rotatedAt`
 
 ## Custom Operations
+
+### `internal-secrets-del`
+
+_internalSecretsDel
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.realm` | String |
+  | `--input.secretName` | String |
+
+### `internal-secrets-remove-array`
+
+_internalSecretsRemoveArray
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.realm` | String |
+  | `--input.secretNames` | String |
+
+### `internal-secrets-rotate`
+
+_internalSecretsRotate
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.realm` | String |
+  | `--input.secretName` | String |
+  | `--input.secretValue` | String |
+
+### `internal-secrets-set`
+
+_internalSecretsSet
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.algo` | String |
+  | `--input.clientMutationId` | String |
+  | `--input.scopeDatabaseId` | UUID |
+  | `--input.secretName` | String |
+  | `--input.secretRealm` | String |
+  | `--input.secretValue` | String |
 
 ### `secrets-del`
 
@@ -329,7 +495,6 @@ platformInternalSecretsDel
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.namespaceId` | UUID |
   | `--input.realm` | String |
   | `--input.secretName` | String |
 
@@ -343,7 +508,6 @@ platformInternalSecretsRemoveArray
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.namespaceId` | UUID |
   | `--input.realm` | String |
   | `--input.secretNames` | String |
 
@@ -358,7 +522,6 @@ platformInternalSecretsRotate
   |----------|------|
   | `--input.algo` | String |
   | `--input.clientMutationId` | String |
-  | `--input.namespaceId` | UUID |
   | `--input.realm` | String |
   | `--input.secretName` | String |
   | `--input.secretValue` | String |
@@ -375,7 +538,6 @@ platformInternalSecretsSet
   | `--input.algo` | String |
   | `--input.clientMutationId` | String |
   | `--input.secretName` | String |
-  | `--input.secretNamespaceId` | UUID |
   | `--input.secretRealm` | String |
   | `--input.secretValue` | String |
 

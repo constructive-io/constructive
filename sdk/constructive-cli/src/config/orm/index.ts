@@ -6,7 +6,10 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { ConfigModel } from './models/config';
+import { InternalConfigModel } from './models/internalConfig';
+import { InternalSecretModel } from './models/internalSecret';
 import { PlatformConfigModel } from './models/platformConfig';
+import { PlatformInternalConfigModel } from './models/platformInternalConfig';
 import { PlatformInternalSecretModel } from './models/platformInternalSecret';
 import { PlatformSecretModel } from './models/platformSecret';
 import { SecretModel } from './models/secret';
@@ -44,7 +47,10 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     config: new ConfigModel(client),
+    internalConfig: new InternalConfigModel(client),
+    internalSecret: new InternalSecretModel(client),
     platformConfig: new PlatformConfigModel(client),
+    platformInternalConfig: new PlatformInternalConfigModel(client),
     platformInternalSecret: new PlatformInternalSecretModel(client),
     platformSecret: new PlatformSecretModel(client),
     secret: new SecretModel(client),

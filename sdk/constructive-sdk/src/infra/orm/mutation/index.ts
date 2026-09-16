@@ -9,15 +9,24 @@ import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   PlatformInfraInitEmptyRepoInput,
   PlatformInfraInsertNodeAtPathInput,
+  PlatformInfraInsertNodesAtPathsInput,
+  PlatformInfraSetAndCommitInput,
   PlatformInfraSetDataAtPathInput,
+  PlatformInfraSetManyAndCommitInput,
   ProvisionBucketInput,
   PlatformInfraInitEmptyRepoPayload,
   PlatformInfraInsertNodeAtPathPayload,
+  PlatformInfraInsertNodesAtPathsPayload,
+  PlatformInfraSetAndCommitPayload,
   PlatformInfraSetDataAtPathPayload,
+  PlatformInfraSetManyAndCommitPayload,
   ProvisionBucketPayload,
   PlatformInfraInitEmptyRepoPayloadSelect,
   PlatformInfraInsertNodeAtPathPayloadSelect,
+  PlatformInfraInsertNodesAtPathsPayloadSelect,
+  PlatformInfraSetAndCommitPayloadSelect,
   PlatformInfraSetDataAtPathPayloadSelect,
+  PlatformInfraSetManyAndCommitPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -27,8 +36,17 @@ export interface PlatformInfraInitEmptyRepoVariables {
 export interface PlatformInfraInsertNodeAtPathVariables {
   input: PlatformInfraInsertNodeAtPathInput;
 }
+export interface PlatformInfraInsertNodesAtPathsVariables {
+  input: PlatformInfraInsertNodesAtPathsInput;
+}
+export interface PlatformInfraSetAndCommitVariables {
+  input: PlatformInfraSetAndCommitInput;
+}
 export interface PlatformInfraSetDataAtPathVariables {
   input: PlatformInfraSetDataAtPathInput;
+}
+export interface PlatformInfraSetManyAndCommitVariables {
+  input: PlatformInfraSetManyAndCommitInput;
 }
 /**
  * Variables for provisionBucket
@@ -103,6 +121,67 @@ export function createMutationOperations(client: OrmClient) {
           'PlatformInfraInsertNodeAtPathPayload'
         ),
       }),
+    platformInfraInsertNodesAtPaths: <S extends PlatformInfraInsertNodesAtPathsPayloadSelect>(
+      args: PlatformInfraInsertNodesAtPathsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraInsertNodesAtPathsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraInsertNodesAtPaths: InferSelectResult<
+          PlatformInfraInsertNodesAtPathsPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraInsertNodesAtPaths',
+        fieldName: 'platformInfraInsertNodesAtPaths',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraInsertNodesAtPaths',
+          'platformInfraInsertNodesAtPaths',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraInsertNodesAtPathsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraInsertNodesAtPathsPayload'
+        ),
+      }),
+    platformInfraSetAndCommit: <S extends PlatformInfraSetAndCommitPayloadSelect>(
+      args: PlatformInfraSetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraSetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraSetAndCommit: InferSelectResult<PlatformInfraSetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraSetAndCommit',
+        fieldName: 'platformInfraSetAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraSetAndCommit',
+          'platformInfraSetAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraSetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraSetAndCommitPayload'
+        ),
+      }),
     platformInfraSetDataAtPath: <S extends PlatformInfraSetDataAtPathPayloadSelect>(
       args: PlatformInfraSetDataAtPathVariables,
       options: {
@@ -130,6 +209,38 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'PlatformInfraSetDataAtPathPayload'
+        ),
+      }),
+    platformInfraSetManyAndCommit: <S extends PlatformInfraSetManyAndCommitPayloadSelect>(
+      args: PlatformInfraSetManyAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, PlatformInfraSetManyAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        platformInfraSetManyAndCommit: InferSelectResult<
+          PlatformInfraSetManyAndCommitPayload,
+          S
+        > | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'PlatformInfraSetManyAndCommit',
+        fieldName: 'platformInfraSetManyAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'PlatformInfraSetManyAndCommit',
+          'platformInfraSetManyAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'PlatformInfraSetManyAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'PlatformInfraSetManyAndCommitPayload'
         ),
       }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(

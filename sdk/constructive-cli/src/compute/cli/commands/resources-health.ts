@@ -17,10 +17,12 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
+  catalogImageId: 'uuid',
   cpuLimitMillicores: 'int',
   cpuRequestMillicores: 'int',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   errorCount: 'int',
   id: 'uuid',
@@ -48,6 +50,7 @@ const fieldSchema: FieldSchema = {
   storageSizeBytes: 'int',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nresources-health <command>\n\nCommands:\n  list                  List resourcesHealth records\n  find-first            Find first matching resourcesHealth record\n  create                Create a new resourcesHealth\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -95,10 +98,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       cpuLimitMillicores: true,
       cpuRequestMillicores: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
@@ -126,6 +131,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       storageSizeBytes: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy> & {
@@ -147,10 +153,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       annotations: true,
+      catalogImageId: true,
       cpuLimitMillicores: true,
       cpuRequestMillicores: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       errorCount: true,
       id: true,
@@ -178,6 +186,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       storageSizeBytes: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourcesHealthSelect, ResourcesHealthFilter, ResourcesHealthOrderBy> & {
@@ -206,6 +215,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'catalogImageId',
+        message: 'catalogImageId',
+        required: true,
+      },
+      {
+        type: 'text',
         name: 'cpuLimitMillicores',
         message: 'cpuLimitMillicores',
         required: true,
@@ -220,6 +235,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: true,
       },
       {
@@ -372,6 +393,12 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'updatedBy',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -383,9 +410,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           annotations: cleanedData.annotations,
+          catalogImageId: cleanedData.catalogImageId,
           cpuLimitMillicores: cleanedData.cpuLimitMillicores,
           cpuRequestMillicores: cleanedData.cpuRequestMillicores,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           errorCount: cleanedData.errorCount,
           installationId: cleanedData.installationId,
@@ -411,13 +440,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           storageClass: cleanedData.storageClass,
           storageSizeBytes: cleanedData.storageSizeBytes,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
+          catalogImageId: true,
           cpuLimitMillicores: true,
           cpuRequestMillicores: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           errorCount: true,
           id: true,
@@ -445,6 +477,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           storageSizeBytes: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

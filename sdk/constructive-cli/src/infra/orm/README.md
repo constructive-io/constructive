@@ -21,6 +21,7 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
+| `contentPreset` | findMany, findOne, create, update, delete |
 | `dbPreset` | findMany, findOne, create, update, delete |
 | `namespace` | findMany, findOne, create, update, delete |
 | `namespaceEvent` | findMany, findOne, create, update, delete |
@@ -33,6 +34,45 @@ const db = createClient({
 | `platformNamespaceEvent` | findMany, findOne, create, update, delete |
 
 ## Table Operations
+
+### `db.contentPreset`
+
+CRUD operations for ContentPreset records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `active` | Boolean | Yes |
+| `commitId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `definition` | JSON | Yes |
+| `description` | String | Yes |
+| `id` | UUID | No |
+| `kind` | String | Yes |
+| `label` | String | Yes |
+| `slug` | String | Yes |
+| `storeId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all contentPreset records
+const items = await db.contentPreset.findMany({ select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.contentPreset.findOne({ id: '<UUID>', select: { active: true, commitId: true, createdAt: true, definition: true, description: true, id: true, kind: true, label: true, slug: true, storeId: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.contentPreset.create({ data: { active: '<Boolean>', commitId: '<UUID>', definition: '<JSON>', description: '<String>', kind: '<String>', label: '<String>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.contentPreset.update({ where: { id: '<UUID>' }, data: { active: '<Boolean>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.contentPreset.delete({ where: { id: '<UUID>' } }).execute();
+```
 
 ### `db.dbPreset`
 
@@ -424,6 +464,36 @@ platformInfraInsertNodeAtPath
 const result = await db.mutation.platformInfraInsertNodeAtPath({ input: '<PlatformInfraInsertNodeAtPathInput>' }).execute();
 ```
 
+### `db.mutation.platformInfraInsertNodesAtPaths`
+
+platformInfraInsertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraInsertNodesAtPathsInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraInsertNodesAtPaths({ input: '<PlatformInfraInsertNodesAtPathsInput>' }).execute();
+```
+
+### `db.mutation.platformInfraSetAndCommit`
+
+platformInfraSetAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraSetAndCommit({ input: '<PlatformInfraSetAndCommitInput>' }).execute();
+```
+
 ### `db.mutation.platformInfraSetDataAtPath`
 
 platformInfraSetDataAtPath
@@ -437,6 +507,21 @@ platformInfraSetDataAtPath
 
 ```typescript
 const result = await db.mutation.platformInfraSetDataAtPath({ input: { data: '<JSON>', path: '<String>', root: '<UUID>', sId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.platformInfraSetManyAndCommit`
+
+platformInfraSetManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | PlatformInfraSetManyAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.platformInfraSetManyAndCommit({ input: { entries: '<JSON>', message: '<String>', refname: '<String>', sId: '<UUID>', storeId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.provisionBucket`

@@ -7,8 +7,8 @@ Message within an agent thread with TextPart/ToolPart jsonb parts
 ## Usage
 
 ```typescript
-useAgentMessagesQuery({ selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, model: true, parts: true, threadId: true, updatedAt: true } } })
-useAgentMessageQuery({ id: '<UUID>', selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, model: true, parts: true, threadId: true, updatedAt: true } } })
+useAgentMessagesQuery({ selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, kind: true, model: true, parts: true, threadId: true, updatedAt: true, visibility: true } } })
+useAgentMessageQuery({ id: '<UUID>', selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, kind: true, model: true, parts: true, threadId: true, updatedAt: true, visibility: true } } })
 useCreateAgentMessageMutation({ selection: { fields: { id: true } } })
 useUpdateAgentMessageMutation({ selection: { fields: { id: true } } })
 useDeleteAgentMessageMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentMessageMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentMessagesQuery({
-  selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, model: true, parts: true, threadId: true, updatedAt: true } },
+  selection: { fields: { actorId: true, agentId: true, authorRole: true, createdAt: true, databaseId: true, id: true, kind: true, model: true, parts: true, threadId: true, updatedAt: true, visibility: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentMessagesQuery({
 const { mutate } = useCreateAgentMessageMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', model: '<String>', parts: '<JSON>', threadId: '<UUID>' });
+mutate({ actorId: '<UUID>', agentId: '<UUID>', authorRole: '<String>', databaseId: '<UUID>', kind: '<String>', model: '<String>', parts: '<JSON>', threadId: '<UUID>', visibility: '<String>' });
 ```

@@ -18,8 +18,7 @@ import {
   apiKeys,
   apiSchemaKeys,
   apiSettingKeys,
-  appComponentKeys,
-  appKeys,
+  astMigrationKeys,
   checkConstraintKeys,
   compositeTypeKeys,
   corsSettingKeys,
@@ -45,7 +44,6 @@ import {
   fullTextSearchKeys,
   functionKeys,
   hostnameBindingKeys,
-  httpRouteKeys,
   indexKeys,
   managedDomainKeys,
   nodeTypeRegistryKeys,
@@ -74,6 +72,7 @@ import {
   policyKeys,
   primaryKeyConstraintKeys,
   pubkeySettingKeys,
+  redirectKeys,
   rlsSettingKeys,
   routeBindingKeys,
   routeKeys,
@@ -88,6 +87,7 @@ import {
   siteThemeKeys,
   siteWebConfigKeys,
   spatialRelationKeys,
+  sqlActionKeys,
   tableBehaviorKeys,
   tableKeys,
   tableGrantKeys,
@@ -170,35 +170,21 @@ export const invalidate = {
         queryKey: apiSettingKeys.detail(id),
       }),
   },
-  /** Invalidate appComponent queries */ appComponent: {
-    /** Invalidate all appComponent queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate astMigration queries */ astMigration: {
+    /** Invalidate all astMigration queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: appComponentKeys.all,
+        queryKey: astMigrationKeys.all,
       }),
-    /** Invalidate appComponent list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate astMigration list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: appComponentKeys.lists(),
+        queryKey: astMigrationKeys.lists(),
       }),
-    /** Invalidate a specific appComponent */ detail: (
+    /** Invalidate a specific astMigration */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: appComponentKeys.detail(id),
-      }),
-  },
-  /** Invalidate app queries */ app: {
-    /** Invalidate all app queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.all,
-      }),
-    /** Invalidate app list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.lists(),
-      }),
-    /** Invalidate a specific app */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: appKeys.detail(id),
+        queryKey: astMigrationKeys.detail(id),
       }),
   },
   /** Invalidate checkConstraint queries */ checkConstraint: {
@@ -606,23 +592,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: hostnameBindingKeys.detail(id),
-      }),
-  },
-  /** Invalidate httpRoute queries */ httpRoute: {
-    /** Invalidate all httpRoute queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.all,
-      }),
-    /** Invalidate httpRoute list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.lists(),
-      }),
-    /** Invalidate a specific httpRoute */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: httpRouteKeys.detail(id),
       }),
   },
   /** Invalidate index queries */ index: {
@@ -1092,6 +1061,20 @@ export const invalidate = {
         queryKey: pubkeySettingKeys.detail(id),
       }),
   },
+  /** Invalidate redirect queries */ redirect: {
+    /** Invalidate all redirect queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: redirectKeys.all,
+      }),
+    /** Invalidate redirect list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: redirectKeys.lists(),
+      }),
+    /** Invalidate a specific redirect */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: redirectKeys.detail(id),
+      }),
+  },
   /** Invalidate rlsSetting queries */ rlsSetting: {
     /** Invalidate all rlsSetting queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1319,6 +1302,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: spatialRelationKeys.detail(id),
+      }),
+  },
+  /** Invalidate sqlAction queries */ sqlAction: {
+    /** Invalidate all sqlAction queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sqlActionKeys.all,
+      }),
+    /** Invalidate sqlAction list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sqlActionKeys.lists(),
+      }),
+    /** Invalidate a specific sqlAction */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: sqlActionKeys.detail(id),
       }),
   },
   /** Invalidate tableBehavior queries */ tableBehavior: {
@@ -1561,17 +1561,12 @@ export const remove = {
       queryKey: apiSettingKeys.detail(id),
     });
   },
-  /** Remove appComponent from cache */ appComponent: (
+  /** Remove astMigration from cache */ astMigration: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: appComponentKeys.detail(id),
-    });
-  },
-  /** Remove app from cache */ app: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: appKeys.detail(id),
+      queryKey: astMigrationKeys.detail(id),
     });
   },
   /** Remove checkConstraint from cache */ checkConstraint: (
@@ -1754,11 +1749,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: hostnameBindingKeys.detail(id),
-    });
-  },
-  /** Remove httpRoute from cache */ httpRoute: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: httpRouteKeys.detail(id),
     });
   },
   /** Remove index from cache */ index: (queryClient: QueryClient, id: string | number) => {
@@ -1973,6 +1963,11 @@ export const remove = {
       queryKey: pubkeySettingKeys.detail(id),
     });
   },
+  /** Remove redirect from cache */ redirect: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: redirectKeys.detail(id),
+    });
+  },
   /** Remove rlsSetting from cache */ rlsSetting: (
     queryClient: QueryClient,
     id: string | number
@@ -2071,6 +2066,11 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: spatialRelationKeys.detail(id),
+    });
+  },
+  /** Remove sqlAction from cache */ sqlAction: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: sqlActionKeys.detail(id),
     });
   },
   /** Remove tableBehavior from cache */ tableBehavior: (
