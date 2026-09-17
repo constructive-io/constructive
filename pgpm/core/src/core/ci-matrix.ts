@@ -8,6 +8,7 @@ import {
   parseDocument,
   Scalar,
   stringify,
+  visit,
   YAMLSeq
 } from 'yaml';
 
@@ -92,12 +93,29 @@ const renderCommentBefore = (comment: string | null | undefined, indent: string)
     .map((line) => `${indent}#${line}`)
     .join('\n');
 
-const countComments = (entries: Entry[]): number =>
-  entries.reduce(
-    (count, entry) =>
-      count + commentLines(entry.commentBefore).length + (entry.comment ? 1 : 0),
-    0
-  );
+const commentsOf = (doc: Document): string[] => {
+  const comments: string[] = [];
+  const add = (comment: string | null | undefined, multiline = false) => {
+    if (comment === null || comment === undefined) return;
+    const values = multiline ? comment.split('\n') : [comment];
+    comments.push(...values.map((value) => value.trim()));
+  };
+
+  add(doc.comment);
+  add(doc.commentBefore, true);
+  if (doc.contents) {
+    visit(doc.contents, (_key, node) => {
+      if (!node || typeof node !== 'object') return;
+      const commented = node as {
+        comment?: string | null;
+        commentBefore?: string | null;
+      };
+      add(commented.comment);
+      add(commented.commentBefore, true);
+    });
+  }
+  return comments.sort();
+};
 
 /** Re-render a sequence in the style and at the indent it was written with. */
 const renderSeq = (
@@ -196,13 +214,20 @@ export const addToMatrixYaml = (source: string, entry: string): string => {
     // a block sequence's range extends to the next token; keep that whitespace
     const [trailing] = /\s*$/.exec(source.slice(originalStart, end)) as [string];
     const rendered = renderSeq(seq, next, source, firstCommentStart !== undefined);
-    const sourceComments = countComments(entriesWithComments);
-    const renderedComments = countComments(next);
-    if (sourceComments !== renderedComments) continue;
+    const replacement = rendered + trailing;
+    const candidate =
+      source.slice(0, start) + replacement + source.slice(end);
+    const candidateDoc = parseDocument(candidate);
+    if (
+      candidateDoc.errors.length ||
+      commentsOf(candidateDoc).join('\0') !== commentsOf(doc).join('\0')
+    ) {
+      continue;
+    }
     edits.push({
       start,
       end,
-      text: rendered + trailing
+      text: replacement
     });
   }
 

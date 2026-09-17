@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { parseDocument, visit } from 'yaml';
 
 import { addToCiMatrix, addToMatrixYaml } from '../../src/core/ci-matrix';
 
@@ -21,7 +22,306 @@ ${matrix}
 
 const flowWorkflow = workflow('        package: [packages/beta]');
 
+const commentMultiset = (source: string): string[] => {
+  const doc = parseDocument(source);
+  const comments: string[] = [];
+  const add = (comment: string | null | undefined, multiline = false) => {
+    if (comment === null || comment === undefined) return;
+    const values = multiline ? comment.split('\n') : [comment];
+    comments.push(...values.map((value) => value.trim()));
+  };
+
+  add(doc.comment);
+  add(doc.commentBefore, true);
+  if (doc.contents) {
+    visit(doc.contents, (_key, node) => {
+      if (!node || typeof node !== 'object') return;
+      const commented = node as {
+        comment?: string | null;
+        commentBefore?: string | null;
+      };
+      add(commented.comment);
+      add(commented.commentBefore, true);
+    });
+  }
+  return comments.sort();
+};
+
+const commentInvariantCases: [string, string][] = [
+  [
+    'flow, extra spaces',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [  packages/beta ,   packages/delta  ]
+`
+  ],
+  [
+    'flow, multiline',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [
+          packages/beta,
+          packages/delta
+        ]
+`
+  ],
+  [
+    'flow, trailing comma + comment',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [packages/beta, packages/delta] # keep sorted
+`
+  ],
+  [
+    'block, comment between items',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          # the api
+          - packages/beta
+          - packages/delta
+`
+  ],
+  [
+    'block, inline comments',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta   # api
+          - packages/delta  # web
+`
+  ],
+  [
+    'block, blank line between items',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+
+          - packages/delta
+`
+  ],
+  [
+    'block, 2-space indent',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+        - packages/beta
+        - packages/delta
+`
+  ],
+  [
+    'quoted with spaces in value',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: ["packages/my thing", 'packages/delta']
+`
+  ],
+  [
+    'block, quoted',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - "packages/beta"
+          - 'packages/delta'
+`
+  ],
+  [
+    'flow, empty with spaces',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [ ]
+`
+  ],
+  [
+    'CRLF',
+    `jobs:\r
+  test:\r
+    strategy:\r
+      matrix:\r
+        package: [packages/beta]\r
+`
+  ],
+  [
+    'matrix with other keys after',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [packages/beta]
+        node: [20, 22]
+`
+  ],
+  [
+    'block, other key after',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+        node: [20]
+`
+  ],
+  [
+    'anchor',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: &pkgs [packages/beta]
+`
+  ],
+  [
+    'entry equals existing but quoted',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: ['packages/alpha', packages/beta]
+`
+  ],
+  [
+    'comment after last block item',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+          - packages/delta # last
+`
+  ],
+  [
+    'comment above package key',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        # package list
+        package: [packages/beta, packages/delta]
+`
+  ],
+  [
+    'hash inside quoted flow value',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: ["packages/#beta", packages/delta]
+`
+  ],
+  [
+    'hash inside quoted block value',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - "packages/#beta"
+          - packages/delta
+`
+  ],
+  [
+    'blank line and comment above first item',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+
+          # first
+          - packages/beta
+          - packages/delta
+`
+  ],
+  [
+    'two-line comment block above first item',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          # first
+          # item
+          - packages/beta
+          - packages/delta
+`
+  ],
+  [
+    'comment above item two',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+          # second
+          - packages/delta
+`
+  ],
+  [
+    'comment on last line',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+          - packages/delta # end`
+  ],
+  [
+    'null matrix',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: null
+`
+  ],
+  [
+    'commented multiline flow',
+    `jobs:
+  test:
+    strategy:
+      matrix:
+        package: [
+          packages/beta, # beta
+          packages/delta
+        ]
+`
+  ]
+];
+
 describe('addToMatrixYaml', () => {
+  it.each(commentInvariantCases)(
+    'preserves the comment multiset for %s',
+    (_name, source) => {
+      const output = addToMatrixYaml(source, 'packages/alpha');
+      expect(commentMultiset(output)).toEqual(commentMultiset(source));
+    }
+  );
+
   it('adds to a flow sequence in sorted order', () => {
     expect(addToMatrixYaml(flowWorkflow, 'packages/alpha')).toBe(
       workflow('        package: [packages/alpha, packages/beta]')
