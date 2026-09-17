@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.3.0...@agentic-kit/pi-host@0.4.0) (2026-09-17)
+
+### Bug Fixes
+
+- **pi-host:** depend on @constructive-io/coerce via workspace:^ ([71a4b78](https://github.com/constructive-io/constructive/commit/71a4b78ce419c34427175723318081eae3ec1155))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.2.1...@agentic-kit/pi-host@0.3.0) (2026-09-17)
 
 **Note:** Version bump only for package @agentic-kit/pi-host

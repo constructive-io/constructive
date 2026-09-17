@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/graphile-scoped-introspection@0.2.0...graphile-scoped-introspection@0.3.0) (2026-09-17)
+
+### Bug Fixes
+
+- **graphile-scoped-introspection:** ESM tsconfig uses es2022/bundler like every other package ([20b36fc](https://github.com/constructive-io/constructive/commit/20b36fc8a0027e7b41b56966fab356a707fbe8d0))
+
 # 0.2.0 (2026-09-17)
 
 ### Bug Fixes

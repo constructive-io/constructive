@@ -19,7 +19,7 @@ import type { Operation, Table, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateMultiTargetBarrel,generateRootBarrel } from './codegen/barrel';
 import type { MultiTargetCliTarget } from './codegen/cli';
-import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
+import { generateCli as generateCliFiles, generateMultiTargetCli, resolveBuiltinNames } from './codegen/cli';
 import type { MultiTargetDocsInput } from './codegen/cli/docs-generator';
 import {
   generateAgentsDocs as generateCliAgentsDocs,
@@ -760,7 +760,6 @@ export async function generateMulti(
 
       const firstTargetDocsConfig = names.length > 0 && configs[names[0]]?.docs;
       const docsConfig = resolveDocsConfig(firstTargetDocsConfig);
-      const { resolveBuiltinNames } = await import('./codegen/cli');
       const builtinNames = resolveBuiltinNames(
         cliTargets.map((t) => t.name),
         cliConfig.builtinNames,
@@ -800,8 +799,7 @@ export async function generateMulti(
         const agents = generateMultiTargetAgentsDocs(docsInput);
         cliFilesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
       }
-      const { writeGeneratedFiles: writeFiles } = await import('./output');
-      await writeFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
+      await writeGeneratedFiles(cliFilesToWrite, '.', [], { pruneStaleFiles: false });
 
       if (docsConfig.skills) {
         const cliSkillsToWrite = generateMultiTargetSkills(docsInput).map((skill) => ({
@@ -817,17 +815,15 @@ export async function generateMulti(
           firstTargetResolved,
           firstTargetResolved.output,
         );
-        await writeFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+        await writeGeneratedFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
 
       }
     }
 
     // Generate root-root README and barrel if multi-target
     if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
-      const { writeGeneratedFiles: writeFiles } = await import('./output');
-
       const rootReadme = generateRootRootReadme(targetInfos);
-      await writeFiles(
+      await writeGeneratedFiles(
         [{ path: rootReadme.fileName, content: rootReadme.content }],
         '.',
         [],
@@ -844,7 +840,7 @@ export async function generateMulti(
         const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
         const outputRoot = path.dirname(firstOutput);
         const barrelContent = generateMultiTargetBarrel(successfulNames);
-        await writeFiles(
+        await writeGeneratedFiles(
           [{ path: 'index.ts', content: barrelContent }],
           outputRoot,
           [],

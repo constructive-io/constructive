@@ -40,7 +40,7 @@ function createOllamaEmbedder(
   return async (text: string): Promise<number[]> => {
     if (!clientP) {
       clientP = import('@agentic-kit/ollama')
-        .then((m) => new m.default(baseUrl))
+        .then((m) => new m.OllamaClient(baseUrl))
         .catch(() => {
           throw new Error(
             'The ollama embedder requires @agentic-kit/ollama. Install it: npm i @agentic-kit/ollama'

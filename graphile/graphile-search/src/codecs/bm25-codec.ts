@@ -15,6 +15,7 @@
 import 'graphile-build-pg';
 
 import type { GraphileConfig } from 'graphile-config';
+import { Pool } from 'pg';
 import sql from 'pg-sql2';
 
 /**
@@ -135,8 +136,6 @@ export const Bm25CodecPlugin: GraphileConfig.Plugin = {
             return;
           }
 
-          // Import pg dynamically for the discovery query
-          const { Pool } = await import('pg');
           const existingPool = adaptorSettings.pool;
           const pool = existingPool ?? new Pool({
             connectionString: adaptorSettings.connectionString,
