@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { Logger } from '@pgpmjs/logger';
 import express from 'express';
 import { grafserv } from 'grafserv/express/v4';
+import { RealtimeManager } from 'graphile-realtime-subscriptions';
 import { postgraphile } from 'postgraphile';
 
 import type { GraphileCacheEntry } from './graphile-cache';
@@ -60,8 +61,6 @@ export const createGraphileInstance = async (
 
   if (enableRealtime) {
     try {
-      const { RealtimeManager } = await import('graphile-realtime-subscriptions');
-
       // Extract PgSubscriber and pool from the resolved preset's pgServices.
       // The pool is the same instance managed by pg-cache (via getPgPool)
       // and threaded into the preset by makePgService({ pool, schemas }).

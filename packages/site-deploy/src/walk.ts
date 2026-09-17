@@ -45,7 +45,7 @@ export async function* walkDirectory(
 
 async function loadFs() {
   try {
-    return await import('fs/promises');
+    return loadBuiltin<typeof import('fs/promises')>('fs/promises');
   } catch (err) {
     throw new DeployError(
       'INVALID_PATH',
@@ -56,5 +56,16 @@ async function loadFs() {
 }
 
 async function loadPath() {
-  return import('path');
+  return loadBuiltin<typeof import('path')>('path');
+}
+
+/**
+ * `process.getBuiltinModule` (Node >= 22.3) resolves a builtin from both CJS
+ * and ESM without `require` or a dynamic `import()`, and is simply absent in a
+ * browser, where the caller reports the path as unusable.
+ */
+function loadBuiltin<T>(id: string): T {
+  const mod = globalThis.process?.getBuiltinModule?.(id) as T | undefined;
+  if (!mod) throw new Error(`Node builtin "${id}" is not available in this runtime`);
+  return mod;
 }
