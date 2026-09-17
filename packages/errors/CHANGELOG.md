@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.16.1...@constructive-io/errors@0.17.0) (2026-09-17)
+
+### Features
+
+- **errors:** register GUARD_STEP_UP_MIN_AGE_ANCHOR condition codes ([1bc15c2](https://github.com/constructive-io/constructive/commit/1bc15c2dee77c4a3f40f48c17eb0f00d6f947ee0)), closes [constructive-io/constructive-db#3765](https://github.com/constructive-io/constructive-db/issues/3765)
+
 ## [0.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.16.0...@constructive-io/errors@0.16.1) (2026-09-15)
 
 **Note:** Version bump only for package @constructive-io/errors

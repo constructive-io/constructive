@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.33.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.32.2...@constructive-io/graphql-env@3.33.0) (2026-09-17)
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))
+- **graphql-env:** configure scoped introspection via environment ([7eeeef3](https://github.com/constructive-io/constructive/commit/7eeeef3de0b754c29e759394e5fcf4e630ce60f9))
+
 ## [3.32.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.32.1...@constructive-io/graphql-env@3.32.2) (2026-09-15)
 
 **Note:** Version bump only for package @constructive-io/graphql-env

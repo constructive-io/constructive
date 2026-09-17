@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.22.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.21.9...graphile-settings@6.22.0) (2026-09-17)
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))
+
 ## [6.21.9](https://github.com/constructive-io/constructive/compare/graphile-settings@6.21.8...graphile-settings@6.21.9) (2026-09-15)
 
 ### Bug Fixes

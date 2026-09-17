@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.31.2...@constructive-io/graphql-types@3.32.0) (2026-09-17)
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))
+
 ## [3.31.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.31.1...@constructive-io/graphql-types@3.31.2) (2026-09-15)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

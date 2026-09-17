@@ -1297,12 +1297,12 @@ importers:
       makage:
         specifier: ^0.8.0
         version: 0.8.0
-      postgraphile:
-        specifier: 5.1.4
-        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
+      postgraphile:
+        specifier: 5.1.4
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     publishDirectory: dist
 
   graphile/graphile-search:

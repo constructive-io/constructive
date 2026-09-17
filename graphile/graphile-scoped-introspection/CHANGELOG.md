@@ -1,0 +1,14 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.2.0 (2026-09-17)
+
+### Bug Fixes
+
+- align scoped introspection peer with runtime version guard ([a60e2c4](https://github.com/constructive-io/constructive/commit/a60e2c47903ede286478916ddf5c7e8441c12d44))
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))

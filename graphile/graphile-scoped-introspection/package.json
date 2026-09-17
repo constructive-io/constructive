@@ -1,6 +1,6 @@
 {
   "name": "graphile-scoped-introspection",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Opt-in schema-scoped PostgreSQL introspection for Graphile",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -35,8 +35,8 @@
     "@types/node": "^22.19.11",
     "graphql": "16.13.0",
     "makage": "^0.8.0",
-    "postgraphile": "5.1.4",
-    "pgsql-test": "workspace:^"
+    "pgsql-test": "workspace:^",
+    "postgraphile": "5.1.4"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",
