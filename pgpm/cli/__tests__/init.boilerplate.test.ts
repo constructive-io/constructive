@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 
 import {
+  isScaffoldableInPlace,
   persistBoilerplateSource,
   readBoilerplateSource,
   resolveInitTemplateRepo,
@@ -95,5 +96,35 @@ describe('persist/read boilerplate source', () => {
       `${JSON.stringify({ packages: ['packages/*'] }, null, 2)}\n`
     );
     expect(readBoilerplateSource(dir)).toBeUndefined();
+  });
+});
+
+describe('isScaffoldableInPlace', () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-in-place-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('accepts an empty directory', () => {
+    expect(isScaffoldableInPlace(dir)).toBe(true);
+  });
+
+  it('accepts a directory containing only .git', () => {
+    fs.mkdirSync(path.join(dir, '.git'));
+    expect(isScaffoldableInPlace(dir)).toBe(true);
+  });
+
+  it('rejects a directory containing README.md', () => {
+    fs.writeFileSync(path.join(dir, 'README.md'), '# project\n');
+    expect(isScaffoldableInPlace(dir)).toBe(false);
+  });
+
+  it('rejects a missing directory', () => {
+    expect(isScaffoldableInPlace(path.join(dir, 'missing'))).toBe(false);
   });
 });

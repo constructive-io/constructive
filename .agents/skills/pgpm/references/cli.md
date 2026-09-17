@@ -165,7 +165,15 @@ pgpm init --template pnpm/module -w
 
 # Use custom template repository
 pgpm init --repo https://github.com/org/templates.git --template my-template
+
+# Refresh a stale cached template repository
+pgpm init --refresh
 ```
+
+Non-interactive init requires every question to be answered by flags; see
+[starter-kits.md](starter-kits.md)'s non-interactive flag table for
+`--name --fullName --email --username --repoName --license`, plus module
+`--moduleName --packageIdentifier --moduleDesc --access`.
 
 ### Change Management
 

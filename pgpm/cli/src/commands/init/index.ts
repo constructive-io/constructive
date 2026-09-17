@@ -2,14 +2,17 @@ import {
   BoilerplateSkill,
   DEFAULT_TEMPLATE_REPO,
   DEFAULT_TEMPLATE_TOOL_NAME,
+  describeTemplateSource,
   inspectTemplate,
   PgpmPackage,
+  refreshTemplateCache,
   resolveBoilerplateBaseDir,
   scaffoldTemplate,
   scanBoilerplates,
   SkillInstaller,
   sluggify,
   spawnSyncChecked,
+  TemplateSourceInfo,
 } from '@pgpmjs/core';
 import { resolveWorkspaceByType } from '@pgpmjs/env';
 import { errors } from '@pgpmjs/types';
@@ -19,6 +22,7 @@ import path from 'path';
 
 import { isNoTtyRequested } from '../../utils';
 import {
+  isScaffoldableInPlace,
   persistBoilerplateSource,
   readBoilerplateSource,
   resolveInitTemplateRepo,
@@ -50,6 +54,7 @@ Options:
                           Sugar for --repo https://github.com/constructive-io/pglite-boilerplates.git.
                           Recorded on the workspace so later \`init\` calls inherit it automatically.
   --from-branch <branch>  Branch/tag to use when cloning repo
+  --refresh, --no-cache    Re-fetch the template repo instead of using the cached copy
   --dir <variant>         Template variant directory (e.g., supabase, drizzle)
   --template, -t <path>   Full template path (e.g., pnpm/module) - combines dir and fromPath
   --boilerplate           Prompt to select from available boilerplates
@@ -58,6 +63,8 @@ Options:
   --extensions <a,b>      Extensions to require in the new module (default: none).
                           Add them later instead with \`${binaryName} extension\`.
   --with-extensions       Prompt interactively for extensions during module init
+
+Non-interactive runs must answer every question with flags; use --no-tty.
 
 Examples:
   ${binaryName} init                                   Initialize new module (default, no extensions)
@@ -100,6 +107,12 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     pglite: Boolean(argv.pglite),
   });
   const branch = argv.fromBranch as string | undefined;
+  const forceRefresh = Boolean(
+    argv.refresh ||
+    argv['no-cache'] ||
+    argv.noCache ||
+    argv.cache === false
+  );
   const noTty = isNoTtyRequested(argv);
   const useBoilerplatePrompt = Boolean(argv.boilerplate);
   const createWorkspace = Boolean(argv.createWorkspace || argv['create-workspace'] || argv.w);
@@ -128,6 +141,13 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
 
   // Handle --boilerplate flag: separate path from regular init
   if (useBoilerplatePrompt) {
+    const source = refreshTemplateCache({
+      templateRepo,
+      branch,
+      toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+      cwd,
+      force: forceRefresh,
+    });
     return handleBoilerplateInit(argv, prompter, {
       positionalFromPath,
       templateRepo,
@@ -136,6 +156,8 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
       noTty,
       cwd,
       useNpxSkills,
+      forceRefresh,
+      source,
     });
   }
 
@@ -143,6 +165,14 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
   const fromPath = templateFromPath || positionalFromPath || 'module';
   // Track if user explicitly requested module (e.g., `pgpm init module` or `--template pnpm/module`)
   const wasExplicitModuleRequest = positionalFromPath === 'module' || templateFromPath === 'module';
+
+  const source = refreshTemplateCache({
+    templateRepo,
+    branch,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    cwd,
+    force: forceRefresh,
+  });
 
   // Inspect the template to get its type
   const inspection = inspectTemplate({
@@ -167,6 +197,8 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
       cwd,
       useNpxSkills,
       repoWasExplicit,
+      source,
+      forceRefresh,
     });
   }
 
@@ -182,6 +214,8 @@ async function handleInit(argv: Partial<Record<string, any>>, prompter: Inquirer
     createWorkspace,
     useNpxSkills,
     repoWasExplicit,
+    source,
+    forceRefresh,
   }, wasExplicitModuleRequest);
 }
 
@@ -193,6 +227,8 @@ interface BoilerplateInitContext {
   noTty: boolean;
   cwd: string;
   useNpxSkills?: boolean;
+  forceRefresh?: boolean;
+  source?: TemplateSourceInfo;
 }
 
 async function handleBoilerplateInit(
@@ -275,6 +311,7 @@ async function handleBoilerplateInit(
       noTty: ctx.noTty,
       cwd: ctx.cwd,
       useNpxSkills: ctx.useNpxSkills,
+      source: ctx.source,
     });
   }
 
@@ -289,6 +326,8 @@ async function handleBoilerplateInit(
     cwd: ctx.cwd,
     requiresWorkspace: inspection.config?.requiresWorkspace,
     useNpxSkills: ctx.useNpxSkills,
+    forceRefresh: ctx.forceRefresh,
+    source: ctx.source,
   }, true);
 }
 
@@ -318,6 +357,8 @@ interface InitContext {
    * recorded boilerplate repo (see `PgpmWorkspaceConfig.boilerplates`).
    */
   repoWasExplicit?: boolean;
+  source?: TemplateSourceInfo;
+  forceRefresh?: boolean;
 }
 
 function installSkills(skills: BoilerplateSkill[], cwd: string, useNpxSkills: boolean): void {
@@ -403,7 +444,22 @@ async function handleWorkspaceInit(
   ];
 
   const answers = await prompter.prompt(argv, workspaceQuestions);
-  const targetPath = path.join(ctx.cwd, sluggify(answers.name));
+  let targetPath = path.join(ctx.cwd, sluggify(answers.name));
+  const slug = sluggify(answers.name);
+  const inPlace = path.basename(ctx.cwd) === slug && isScaffoldableInPlace(ctx.cwd);
+  if (inPlace) {
+    targetPath = ctx.cwd;
+    process.stdout.write(
+      `Scaffolding into current directory ./ (it is empty and named "${answers.name}")\n`
+    );
+  }
+  const source = ctx.source ?? refreshTemplateCache({
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    cwd: ctx.cwd,
+  });
+  process.stdout.write(`${describeTemplateSource(source)}\n`);
 
   // Register workspace.dirname resolver so boilerplate templates can use it via defaultFrom/setFrom
   const dirName = path.basename(targetPath);
@@ -467,7 +523,8 @@ async function handleWorkspaceInit(
   }
 
   const relPath = path.relative(process.cwd(), targetPath);
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
+  process.stdout.write('\n✨ Enjoy!\n');
+  if (relPath) process.stdout.write(`\ncd ./${relPath}\n`);
 
   return { ...argv, ...answers, cwd: targetPath };
 }
@@ -543,8 +600,22 @@ async function handleModuleInit(
       ctx.templateRepo = inherited.repo;
       ctx.branch = inherited.branch;
       ctx.dir = inherited.dir;
+      ctx.source = refreshTemplateCache({
+        templateRepo: ctx.templateRepo,
+        branch: ctx.branch,
+        toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+        cwd: ctx.cwd,
+        force: ctx.forceRefresh,
+      });
     }
   }
+  const source = ctx.source ?? refreshTemplateCache({
+    templateRepo: ctx.templateRepo,
+    branch: ctx.branch,
+    toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+    cwd: ctx.cwd,
+    force: ctx.forceRefresh,
+  });
 
   // Determine workspace requirement (defaults to 'pgpm' for backward compatibility)
   const workspaceType = ctx.requiresWorkspace ?? 'pgpm';
@@ -590,6 +661,13 @@ async function handleModuleInit(
           noTty: ctx.noTty,
           cwd: ctx.cwd,
           repoWasExplicit: ctx.repoWasExplicit,
+          source: refreshTemplateCache({
+            templateRepo: workspaceTemplateConfig.repo,
+            branch: workspaceTemplateConfig.branch,
+            toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+            cwd: ctx.cwd,
+            force: ctx.forceRefresh,
+          }),
         });
 
         // Update context to point to new workspace and continue with module creation
@@ -639,6 +717,13 @@ async function handleModuleInit(
               noTty: ctx.noTty,
               cwd: ctx.cwd,
               repoWasExplicit: ctx.repoWasExplicit,
+              source: refreshTemplateCache({
+                templateRepo: ctx.templateRepo,
+                branch: ctx.branch,
+                toolName: DEFAULT_TEMPLATE_TOOL_NAME,
+                cwd: ctx.cwd,
+                force: ctx.forceRefresh,
+              }),
             });
           }
         }
@@ -719,6 +804,7 @@ async function handleModuleInit(
 
   // Determine output path based on whether we're in a workspace
   let modulePath: string;
+  process.stdout.write(`${describeTemplateSource(source)}\n`);
   if (project.workspacePath) {
     // PGPM workspace - use workspace-aware initModule
     await project.initModule({
@@ -810,7 +896,8 @@ async function handleModuleInit(
   }
 
   const relPath = path.relative(process.cwd(), modulePath);
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
+  process.stdout.write('\n✨ Enjoy!\n');
+  if (relPath) process.stdout.write(`\ncd ./${relPath}\n`);
 
   return { ...argv, ...answers };
 }
