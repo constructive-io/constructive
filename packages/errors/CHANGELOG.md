@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.18.0...@constructive-io/errors@0.19.0) (2026-09-17)
+
+### Features
+
+- **errors:** register IDENTIFIER_CONFLICT, INVITE_ACCOUNT_EXISTS_UNVERIFIED, ALREADY_AUTHENTICATED_USE_LINK ([3b72fcf](https://github.com/constructive-io/constructive/commit/3b72fcf529a31b27d55bfe87b0d57c98237ab373)), closes [constructive-db#3806](https://github.com/constructive-db/issues/3806)
+
 # [0.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.17.0...@constructive-io/errors@0.18.0) (2026-09-17)
 
 **Note:** Version bump only for package @constructive-io/errors

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.31.0...@pgpmjs/core@7.32.0) (2026-09-17)
+
+### Bug Fixes
+
+- **pgpm:** never let CI matrix update fail init ([689657b](https://github.com/constructive-io/constructive/commit/689657b763fefef11fc25853c47880e3d7b33d4a))
+- **pgpm:** preserve CI matrix comments and flow formatting ([2730821](https://github.com/constructive-io/constructive/commit/2730821f9a9999fba1acdba9d7f061a8c67469ca))
+- **pgpm:** validate preserved CI matrix comments ([8bca250](https://github.com/constructive-io/constructive/commit/8bca2500ca375b57f4262408a5cc3dfbe0227670))
+
+### Features
+
+- **pgpm:** init adds each new module to the workspace CI matrix, sorted ([2fad719](https://github.com/constructive-io/constructive/commit/2fad719dbc951bcc219ed2436ea056a4ec629c00))
+
 # [7.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.30.0...@pgpmjs/core@7.31.0) (2026-09-17)
 
 **Note:** Version bump only for package @pgpmjs/core
