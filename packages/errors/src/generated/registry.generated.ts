@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (801 distinct codes
+ * Source of truth: the constructive-db error audit (804 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 801 total, 591 public, 210 internal.
+ * Counts: 804 total, 594 public, 210 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -29,6 +29,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'ACCOUNT_LOCKED_EXCEED_ATTEMPTS': defineError({ code: 'ACCOUNT_LOCKED_EXCEED_ATTEMPTS', class: 'public', http: 423, message: 'Account locked exceed attempts.' }),
   'ACCOUNT_NOT_FOUND': defineError({ code: 'ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Account not found.' }),
   'ACTOR_CLAIM_REQUIRED': defineError({ code: 'ACTOR_CLAIM_REQUIRED', class: 'internal', http: 500, message: 'Actor claim required.' }),
+  'ALREADY_AUTHENTICATED_USE_LINK': defineError({ code: 'ALREADY_AUTHENTICATED_USE_LINK', class: 'public', http: 409, message: 'Already authenticated use link.' }),
   'ALREADY_SCHEDULED': defineError({ code: 'ALREADY_SCHEDULED', class: 'public', http: 409, message: 'Already scheduled.' }),
   'ALTER_TABLE_ADD_COLUMN': defineError({ code: 'ALTER_TABLE_ADD_COLUMN', class: 'internal', http: 500, message: 'ALTER_TABLE_ADD_COLUMN: a column cannot be both generated and an identity column' }),
   'API_KEYS_DISABLED': defineError({ code: 'API_KEYS_DISABLED', class: 'public', http: 403, message: 'Api keys disabled.' }),
@@ -419,6 +420,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'HISTORY': defineError({ code: 'HISTORY', class: 'internal', http: 500, message: 'HISTORY: history {{arg0}}.{{arg1}} registration has no copy_fields', positional: ['arg0', 'arg1'] }),
   'HOSTNAME_BINDING_SYNC': defineError({ code: 'HOSTNAME_BINDING_SYNC', class: 'internal', http: 500, message: 'HOSTNAME_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
   'HOSTNAME_CLAIMED_IN_OTHER_PLANE': defineError({ code: 'HOSTNAME_CLAIMED_IN_OTHER_PLANE', class: 'public', http: 400, message: 'Hostname claimed in other plane.' }),
+  'IDENTIFIER_CONFLICT': defineError({ code: 'IDENTIFIER_CONFLICT', class: 'public', http: 400, message: 'Identifier conflict.' }),
   'IDENTITY_ACCOUNT_NOT_FOUND': defineError({ code: 'IDENTITY_ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Identity account not found.' }),
   'IDENTITY_ALREADY_LINKED': defineError({ code: 'IDENTITY_ALREADY_LINKED', class: 'public', http: 409, message: 'Identity already linked.' }),
   'IDENTITY_LINK_AVAILABLE': defineError({ code: 'IDENTITY_LINK_AVAILABLE', class: 'public', http: 400, message: 'Identity link available.' }),
@@ -456,6 +458,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'INVALID_TOKEN': defineError({ code: 'INVALID_TOKEN', class: 'public', http: 401, message: 'Invalid token.' }),
   'INVALID_USER': defineError({ code: 'INVALID_USER', class: 'public', http: 400, message: 'Invalid user.' }),
   'INVALID_WORKER_ID': defineError({ code: 'INVALID_WORKER_ID', class: 'internal', http: 500, message: 'Invalid worker id.' }),
+  'INVITE_ACCOUNT_EXISTS_UNVERIFIED': defineError({ code: 'INVITE_ACCOUNT_EXISTS_UNVERIFIED', class: 'public', http: 400, message: 'Invite account exists unverified.' }),
   'INVITE_ADDRESS_REQUIRED': defineError({ code: 'INVITE_ADDRESS_REQUIRED', class: 'public', http: 400, message: 'Invite address required.' }),
   'INVITE_EMAIL_NOT_FOUND': defineError({ code: 'INVITE_EMAIL_NOT_FOUND', class: 'public', http: 404, message: 'Invite email not found.' }),
   'INVITE_LIMIT': defineError({ code: 'INVITE_LIMIT', class: 'public', http: 429, message: 'Invite limit.' }),
@@ -834,6 +837,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'ACCOUNT_LOCKED_EXCEED_ATTEMPTS': { class: 'public', dynamic: false, generatedOnly: false },
   'ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'ACTOR_CLAIM_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
+  'ALREADY_AUTHENTICATED_USE_LINK': { class: 'public', dynamic: false, generatedOnly: false },
   'ALREADY_SCHEDULED': { class: 'public', dynamic: false, generatedOnly: true },
   'ALTER_TABLE_ADD_COLUMN': { class: 'internal', dynamic: true, generatedOnly: false },
   'API_KEYS_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
@@ -1224,6 +1228,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'HISTORY': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_CLAIMED_IN_OTHER_PLANE': { class: 'public', dynamic: false, generatedOnly: true },
+  'IDENTIFIER_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ALREADY_LINKED': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_LINK_AVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1261,6 +1266,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'INVALID_TOKEN': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_USER': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_WORKER_ID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'INVITE_ACCOUNT_EXISTS_UNVERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_ADDRESS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_EMAIL_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1633,4 +1639,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 801;
+export const GENERATED_CODE_COUNT = 804;

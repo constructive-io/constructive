@@ -39,6 +39,14 @@
     "n_generated": 4,
     "class": "internal"
   },
+  "ALREADY_AUTHENTICATED_USE_LINK": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "ALREADY_AUTHENTICATED_USE_LINK",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
   "ALREADY_SCHEDULED": {
     "count": 8,
     "dynamic": false,
@@ -3115,6 +3123,14 @@
     "n_generated": 4,
     "class": "public"
   },
+  "IDENTIFIER_CONFLICT": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "IDENTIFIER_CONFLICT",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
   "IDENTITY_ACCOUNT_NOT_FOUND": {
     "count": 10,
     "dynamic": false,
@@ -3404,6 +3420,14 @@
     "sample": "INVALID_WORKER_ID",
     "n_source": 0,
     "n_generated": 6
+  },
+  "INVITE_ACCOUNT_EXISTS_UNVERIFIED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "INVITE_ACCOUNT_EXISTS_UNVERIFIED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
   },
   "INVITE_ADDRESS_REQUIRED": {
     "count": 6,
