@@ -21,6 +21,6 @@
     "graphql": "16.13.0",
     "pgsql-test": "workspace:^",
     "ts-jest": "^29.4.12",
-    "typescript": "^5.0.0"
+    "typescript": "^6.0.3"
   }
 }
