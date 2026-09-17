@@ -3,7 +3,7 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 process.env.PGPM_SKIP_SKILL_INSTALL = 'true';
 
 import { PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
@@ -91,6 +91,33 @@ describe('cmds:init', () => {
       },
       'workspace'
     );
+  });
+
+  it('scaffolds a workspace in place when cwd is an empty named directory', async () => {
+    const workspaceDir = path.join(fixture.tempDir, 'foo');
+    mkdirSync(workspaceDir);
+    const { mockInput, mockOutput } = environment;
+    const prompter = new Inquirerer({
+      input: mockInput,
+      output: mockOutput,
+      noTty: true
+    });
+
+    await commands(withInitDefaults({
+      _: ['init', 'workspace'],
+      cwd: workspaceDir,
+      name: 'foo',
+      workspace: true
+    }), prompter, {
+      noTty: true,
+      input: mockInput,
+      output: mockOutput,
+      version: '1.0.0',
+      minimistOpts: {}
+    });
+
+    expect(existsSync(path.join(workspaceDir, 'pgpm.json'))).toBe(true);
+    expect(existsSync(path.join(workspaceDir, 'foo'))).toBe(false);
   });
 
   it('initializes module', async () => {

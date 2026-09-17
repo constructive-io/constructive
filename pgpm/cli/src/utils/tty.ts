@@ -7,7 +7,8 @@ export const isNoTtyRequested = (argv: Partial<Record<string, any>>): boolean =>
     argv.noTty ||
     argv['no-tty'] ||
     argv.tty === false ||
-    process.env.CI === 'true'
+    process.env.CI === 'true' ||
+    process.stdin.isTTY !== true
   );
 
 /**
@@ -17,4 +18,5 @@ export const isNoTtyRequested = (argv: Partial<Record<string, any>>): boolean =>
 export const detectNoTtyFromProcess = (argv: string[] = process.argv): boolean =>
   argv.includes('--no-tty') ||
   argv.includes('--noTty') ||
-  process.env.CI === 'true';
+  process.env.CI === 'true' ||
+  process.stdin.isTTY !== true;
