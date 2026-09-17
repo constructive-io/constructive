@@ -10,6 +10,7 @@
     "sourceMap": false,
     "declaration": true,
     "resolveJsonModule": true,
+    "types": ["node", "jest"],
     "moduleResolution": "nodenext",
     "typeRoots": ["./types", "./node_modules/@types"]
   },

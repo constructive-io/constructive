@@ -50,7 +50,7 @@
     "pg": "^8.21.0",
     "pgsql-test": "workspace:^",
     "postgraphile": "5.1.4",
-    "typescript": "^5.0.0"
+    "typescript": "^6.0.3"
   },
   "keywords": [
     "testing",
