@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "7.30.0",
+  "version": "7.31.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -67,8 +67,8 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.3.6",
-    "pgsql-parser": "^18.2.6",
+    "pgsql-deparser": "^18.3.7",
+    "pgsql-parser": "^18.2.7",
     "yaml": "^2.9.0",
     "yanse": "^0.2.2"
   }
