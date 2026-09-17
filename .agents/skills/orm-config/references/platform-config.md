@@ -9,7 +9,7 @@ Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-
 ```typescript
 db.platformConfig.findMany({ select: { id: true } }).execute()
 db.platformConfig.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformConfig.create({ data: { annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' }, select: { id: true } }).execute()
+db.platformConfig.create({ data: { annotations: '<JSON>', createdByPrincipal: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', updatedByPrincipal: '<UUID>', value: '<String>' }, select: { id: true } }).execute()
 db.platformConfig.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute()
 db.platformConfig.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.platformConfig.findMany({
 
 ```typescript
 const item = await db.platformConfig.create({
-  data: { annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' },
+  data: { annotations: '<JSON>', createdByPrincipal: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', updatedByPrincipal: '<UUID>', value: '<String>' },
   select: { id: true }
 }).execute();
 ```

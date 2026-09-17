@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   async: 'boolean',
+  bootstrapActorId: 'uuid',
   bootstrapError: 'string',
   bootstrapStatus: 'string',
   bootstrapUser: 'boolean',
@@ -88,6 +89,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       async: true,
+      bootstrapActorId: true,
       bootstrapError: true,
       bootstrapStatus: true,
       bootstrapUser: true,
@@ -131,6 +133,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       async: true,
+      bootstrapActorId: true,
       bootstrapError: true,
       bootstrapStatus: true,
       bootstrapUser: true,
@@ -186,6 +189,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           async: true,
+          bootstrapActorId: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,
@@ -223,6 +227,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'boolean',
         name: 'async',
         message: 'async',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'bootstrapActorId',
+        message: 'bootstrapActorId',
         required: false,
         skipPrompt: true,
       },
@@ -339,6 +350,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           async: cleanedData.async,
+          bootstrapActorId: cleanedData.bootstrapActorId,
           bootstrapError: cleanedData.bootstrapError,
           bootstrapStatus: cleanedData.bootstrapStatus,
           bootstrapUser: cleanedData.bootstrapUser,
@@ -357,6 +369,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           async: true,
+          bootstrapActorId: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,
@@ -400,6 +413,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'boolean',
         name: 'async',
         message: 'async',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'bootstrapActorId',
+        message: 'bootstrapActorId',
         required: false,
         skipPrompt: true,
       },
@@ -516,6 +536,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           async: cleanedData.async,
+          bootstrapActorId: cleanedData.bootstrapActorId,
           bootstrapError: cleanedData.bootstrapError,
           bootstrapStatus: cleanedData.bootstrapStatus,
           bootstrapUser: cleanedData.bootstrapUser,
@@ -534,6 +555,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           async: true,
+          bootstrapActorId: true,
           bootstrapError: true,
           bootstrapStatus: true,
           bootstrapUser: true,

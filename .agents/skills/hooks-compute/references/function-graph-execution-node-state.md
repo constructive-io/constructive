@@ -7,8 +7,8 @@ Per-node execution state — tracks individual node lifecycle for debugging
 ## Usage
 
 ```typescript
-useFunctionGraphExecutionNodeStatesQuery({ selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true } } })
-useFunctionGraphExecutionNodeStateQuery({ id: '<UUID>', selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true } } })
+useFunctionGraphExecutionNodeStatesQuery({ selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } } })
+useFunctionGraphExecutionNodeStateQuery({ id: '<UUID>', selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } } })
 useCreateFunctionGraphExecutionNodeStateMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionGraphExecutionNodeStateMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionGraphExecutionNodeStateMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionGraphExecutionNodeStateMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionGraphExecutionNodeStatesQuery({
-  selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true } },
+  selection: { fields: { callbackInputs: true, callbackMeta: true, callbackTokenHash: true, completedAt: true, createdAt: true, errorCode: true, errorMessage: true, executionId: true, expiryDefaultOutput: true, expiryEscalatedAt: true, expiryPolicy: true, id: true, nodeName: true, nodePath: true, outputId: true, scopeId: true, startedAt: true, status: true, waitingDeadlineAt: true, waitingOn: true, waitingSince: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionGraphExecutionNodeStatesQuery({
 const { mutate } = useCreateFunctionGraphExecutionNodeStateMutation({
   selection: { fields: { id: true } },
 });
-mutate({ callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>' });
+mutate({ callbackInputs: '<JSON>', callbackMeta: '<JSON>', callbackTokenHash: '<String>', completedAt: '<Datetime>', errorCode: '<String>', errorMessage: '<String>', executionId: '<UUID>', expiryDefaultOutput: '<JSON>', expiryEscalatedAt: '<Datetime>', expiryPolicy: '<String>', nodeName: '<String>', nodePath: '<String>', outputId: '<UUID>', scopeId: '<UUID>', startedAt: '<Datetime>', status: '<String>', waitingDeadlineAt: '<Datetime>', waitingOn: '<String>', waitingSince: '<Datetime>' });
 ```

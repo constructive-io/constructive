@@ -16,14 +16,29 @@
 import type { QueryClient } from '@tanstack/react-query';
 import {
   agentKeys,
+  agentEventKeys,
   agentMessageKeys,
   agentPersonaKeys,
   agentPlanKeys,
   agentPromptKeys,
   agentResourceChunkKeys,
   agentResourceKeys,
+  agentRunKeys,
+  agentRunWorkspaceKeys,
   agentTaskKeys,
   agentThreadKeys,
+  platformAgentKeys,
+  platformAgentEventKeys,
+  platformAgentMessageKeys,
+  platformAgentPersonaKeys,
+  platformAgentPlanKeys,
+  platformAgentPromptKeys,
+  platformAgentResourceChunkKeys,
+  platformAgentResourceKeys,
+  platformAgentRunKeys,
+  platformAgentRunWorkspaceKeys,
+  platformAgentTaskKeys,
+  platformAgentThreadKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -57,6 +72,23 @@ export const invalidate = {
     /** Invalidate a specific agent */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: agentKeys.detail(id),
+      }),
+  },
+  /** Invalidate agentEvent queries */ agentEvent: {
+    /** Invalidate all agentEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentEventKeys.all,
+      }),
+    /** Invalidate agentEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentEventKeys.lists(),
+      }),
+    /** Invalidate a specific agentEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentEventKeys.detail(id),
       }),
   },
   /** Invalidate agentMessage queries */ agentMessage: {
@@ -161,6 +193,37 @@ export const invalidate = {
         queryKey: agentResourceKeys.detail(id),
       }),
   },
+  /** Invalidate agentRun queries */ agentRun: {
+    /** Invalidate all agentRun queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunKeys.all,
+      }),
+    /** Invalidate agentRun list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunKeys.lists(),
+      }),
+    /** Invalidate a specific agentRun */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunKeys.detail(id),
+      }),
+  },
+  /** Invalidate agentRunWorkspace queries */ agentRunWorkspace: {
+    /** Invalidate all agentRunWorkspace queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunWorkspaceKeys.all,
+      }),
+    /** Invalidate agentRunWorkspace list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunWorkspaceKeys.lists(),
+      }),
+    /** Invalidate a specific agentRunWorkspace */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: agentRunWorkspaceKeys.detail(id),
+      }),
+  },
   /** Invalidate agentTask queries */ agentTask: {
     /** Invalidate all agentTask queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -195,6 +258,210 @@ export const invalidate = {
         queryKey: agentThreadKeys.detail(id),
       }),
   },
+  /** Invalidate platformAgent queries */ platformAgent: {
+    /** Invalidate all platformAgent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentKeys.all,
+      }),
+    /** Invalidate platformAgent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentEvent queries */ platformAgentEvent: {
+    /** Invalidate all platformAgentEvent queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentEventKeys.all,
+      }),
+    /** Invalidate platformAgentEvent list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentEventKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentEvent */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentEventKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentMessage queries */ platformAgentMessage: {
+    /** Invalidate all platformAgentMessage queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentMessageKeys.all,
+      }),
+    /** Invalidate platformAgentMessage list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentMessageKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentMessage */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentMessageKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentPersona queries */ platformAgentPersona: {
+    /** Invalidate all platformAgentPersona queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPersonaKeys.all,
+      }),
+    /** Invalidate platformAgentPersona list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPersonaKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentPersona */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPersonaKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentPlan queries */ platformAgentPlan: {
+    /** Invalidate all platformAgentPlan queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPlanKeys.all,
+      }),
+    /** Invalidate platformAgentPlan list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPlanKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentPlan */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPlanKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentPrompt queries */ platformAgentPrompt: {
+    /** Invalidate all platformAgentPrompt queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPromptKeys.all,
+      }),
+    /** Invalidate platformAgentPrompt list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPromptKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentPrompt */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentPromptKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentResourceChunk queries */ platformAgentResourceChunk: {
+    /** Invalidate all platformAgentResourceChunk queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceChunkKeys.all,
+      }),
+    /** Invalidate platformAgentResourceChunk list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceChunkKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentResourceChunk */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceChunkKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentResource queries */ platformAgentResource: {
+    /** Invalidate all platformAgentResource queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceKeys.all,
+      }),
+    /** Invalidate platformAgentResource list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentResource */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentResourceKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentRun queries */ platformAgentRun: {
+    /** Invalidate all platformAgentRun queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunKeys.all,
+      }),
+    /** Invalidate platformAgentRun list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentRun */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentRunWorkspace queries */ platformAgentRunWorkspace: {
+    /** Invalidate all platformAgentRunWorkspace queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunWorkspaceKeys.all,
+      }),
+    /** Invalidate platformAgentRunWorkspace list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunWorkspaceKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentRunWorkspace */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentRunWorkspaceKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentTask queries */ platformAgentTask: {
+    /** Invalidate all platformAgentTask queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentTaskKeys.all,
+      }),
+    /** Invalidate platformAgentTask list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentTaskKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentTask */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentTaskKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformAgentThread queries */ platformAgentThread: {
+    /** Invalidate all platformAgentThread queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentThreadKeys.all,
+      }),
+    /** Invalidate platformAgentThread list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentThreadKeys.lists(),
+      }),
+    /** Invalidate a specific platformAgentThread */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformAgentThreadKeys.detail(id),
+      }),
+  },
 } as const;
 /**
 
@@ -211,6 +478,14 @@ export const remove = {
   /** Remove agent from cache */ agent: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: agentKeys.detail(id),
+    });
+  },
+  /** Remove agentEvent from cache */ agentEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: agentEventKeys.detail(id),
     });
   },
   /** Remove agentMessage from cache */ agentMessage: (
@@ -258,6 +533,19 @@ export const remove = {
       queryKey: agentResourceKeys.detail(id),
     });
   },
+  /** Remove agentRun from cache */ agentRun: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: agentRunKeys.detail(id),
+    });
+  },
+  /** Remove agentRunWorkspace from cache */ agentRunWorkspace: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: agentRunWorkspaceKeys.detail(id),
+    });
+  },
   /** Remove agentTask from cache */ agentTask: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: agentTaskKeys.detail(id),
@@ -269,6 +557,102 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: agentThreadKeys.detail(id),
+    });
+  },
+  /** Remove platformAgent from cache */ platformAgent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentEvent from cache */ platformAgentEvent: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentEventKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentMessage from cache */ platformAgentMessage: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentMessageKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentPersona from cache */ platformAgentPersona: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentPersonaKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentPlan from cache */ platformAgentPlan: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentPlanKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentPrompt from cache */ platformAgentPrompt: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentPromptKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentResourceChunk from cache */ platformAgentResourceChunk: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentResourceChunkKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentResource from cache */ platformAgentResource: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentResourceKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentRun from cache */ platformAgentRun: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentRunKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentRunWorkspace from cache */ platformAgentRunWorkspace: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentRunWorkspaceKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentTask from cache */ platformAgentTask: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentTaskKeys.detail(id),
+    });
+  },
+  /** Remove platformAgentThread from cache */ platformAgentThread: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformAgentThreadKeys.detail(id),
     });
   },
 } as const;

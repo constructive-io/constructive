@@ -230,8 +230,33 @@ export interface UUIDListFilter {
   anyGreaterThan?: string;
   anyGreaterThanOrEqualTo?: string;
 }
-/** Database provisioning preset catalog — merkle-versioned head over the infra store */
+/** Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store */
 // ============ Entity Types ============
+export interface ContentPreset {
+  /** Whether this preset is selectable at provision time */
+  active?: boolean | null;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string | null;
+  /** Timestamp of preset creation */
+  createdAt?: string | null;
+  /** The seed document itself, in the shape the kind's seed function takes — the readily-cached head; history lives in the infra store */
+  definition?: Record<string, unknown> | null;
+  /** Human-readable description of the preset */
+  description?: string | null;
+  /** Unique preset identifier */
+  id: string;
+  /** What the definition seeds — the module option that resolves it (limit_defaults, trust_ladder, ...) */
+  kind?: string | null;
+  /** Human-readable preset name */
+  label?: string | null;
+  /** Preset slug (unique per kind per scope); the preset's path in the infra tree is [content_preset, kind, slug] */
+  slug?: string | null;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string | null;
+  /** Timestamp of last modification */
+  updatedAt?: string | null;
+}
+/** Database provisioning preset catalog — merkle-versioned head over the infra store */
 export interface DbPreset {
   /** Whether this preset is selectable for new databases */
   active?: boolean | null;
@@ -260,6 +285,8 @@ export interface DbPreset {
 export interface Namespace {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown> | null;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string | null;
   createdAt?: string | null;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
@@ -284,7 +311,7 @@ export interface Namespace {
 }
 /** Namespace lifecycle events — audit log of creation, activation, deactivation, label changes */
 export interface NamespaceEvent {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string | null;
   /** Event timestamp (partition key) */
   createdAt?: string | null;
@@ -371,6 +398,8 @@ export interface PlatformInfraStore {
 export interface PlatformNamespace {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown> | null;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string | null;
   createdAt?: string | null;
   /** Optional human-readable description of this namespace */
   description?: string | null;
@@ -393,7 +422,7 @@ export interface PlatformNamespace {
 }
 /** Namespace lifecycle events — audit log of creation, activation, deactivation, label changes */
 export interface PlatformNamespaceEvent {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string | null;
   /** Event timestamp (partition key) */
   createdAt?: string | null;
@@ -421,6 +450,7 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface ContentPresetRelations {}
 export interface DbPresetRelations {}
 export interface NamespaceRelations {}
 export interface NamespaceEventRelations {}
@@ -432,6 +462,7 @@ export interface PlatformInfraStoreRelations {}
 export interface PlatformNamespaceRelations {}
 export interface PlatformNamespaceEventRelations {}
 // ============ Entity Types With Relations ============
+export type ContentPresetWithRelations = ContentPreset & ContentPresetRelations;
 export type DbPresetWithRelations = DbPreset & DbPresetRelations;
 export type NamespaceWithRelations = Namespace & NamespaceRelations;
 export type NamespaceEventWithRelations = NamespaceEvent & NamespaceEventRelations;
@@ -445,6 +476,19 @@ export type PlatformNamespaceWithRelations = PlatformNamespace & PlatformNamespa
 export type PlatformNamespaceEventWithRelations = PlatformNamespaceEvent &
   PlatformNamespaceEventRelations;
 // ============ Entity Select Types ============
+export type ContentPresetSelect = {
+  active?: boolean;
+  commitId?: boolean;
+  createdAt?: boolean;
+  definition?: boolean;
+  description?: boolean;
+  id?: boolean;
+  kind?: boolean;
+  label?: boolean;
+  slug?: boolean;
+  storeId?: boolean;
+  updatedAt?: boolean;
+};
 export type DbPresetSelect = {
   active?: boolean;
   commitId?: boolean;
@@ -460,6 +504,7 @@ export type DbPresetSelect = {
 };
 export type NamespaceSelect = {
   annotations?: boolean;
+  clusterId?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
   description?: boolean;
@@ -522,6 +567,7 @@ export type PlatformInfraStoreSelect = {
 };
 export type PlatformNamespaceSelect = {
   annotations?: boolean;
+  clusterId?: boolean;
   createdAt?: boolean;
   description?: boolean;
   id?: boolean;
@@ -544,6 +590,36 @@ export type PlatformNamespaceEventSelect = {
   namespaceId?: boolean;
 };
 // ============ Table Filter Types ============
+export interface ContentPresetFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ContentPresetFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Negates the expression. */
+  not?: ContentPresetFilter;
+  /** Checks for any expressions in this list. */
+  or?: ContentPresetFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
 export interface DbPresetFilter {
   /** Filter by the object’s `active` field. */
   active?: BooleanFilter;
@@ -579,6 +655,8 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -726,6 +804,8 @@ export interface PlatformNamespaceFilter {
   and?: PlatformNamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `description` field. */
@@ -776,6 +856,32 @@ export interface PlatformNamespaceEventFilter {
   or?: PlatformNamespaceEventFilter[];
 }
 // ============ OrderBy Types ============
+export type ContentPresetOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type DbPresetOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -805,6 +911,8 @@ export type DbPresetOrderBy =
 export type NamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -929,6 +1037,8 @@ export type PlatformInfraStoreOrderBy =
 export type PlatformNamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DESCRIPTION_ASC'
@@ -973,6 +1083,38 @@ export type PlatformNamespaceEventOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC';
 // ============ CRUD Input Types ============
+export interface CreateContentPresetInput {
+  clientMutationId?: string;
+  contentPreset: {
+    active?: boolean;
+    commitId?: string;
+    definition: Record<string, unknown>;
+    description?: string;
+    kind: string;
+    label?: string;
+    slug: string;
+    storeId?: string;
+  };
+}
+export interface ContentPresetPatch {
+  active?: boolean | null;
+  commitId?: string | null;
+  definition?: Record<string, unknown> | null;
+  description?: string | null;
+  kind?: string | null;
+  label?: string | null;
+  slug?: string | null;
+  storeId?: string | null;
+}
+export interface UpdateContentPresetInput {
+  clientMutationId?: string;
+  id: string;
+  contentPresetPatch: ContentPresetPatch;
+}
+export interface DeleteContentPresetInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateDbPresetInput {
   clientMutationId?: string;
   dbPreset: {
@@ -1009,6 +1151,7 @@ export interface CreateNamespaceInput {
   clientMutationId?: string;
   namespace: {
     annotations?: Record<string, unknown>;
+    clusterId?: string;
     databaseId: string;
     description?: string;
     isActive?: boolean;
@@ -1022,6 +1165,7 @@ export interface CreateNamespaceInput {
 }
 export interface NamespacePatch {
   annotations?: Record<string, unknown> | null;
+  clusterId?: string | null;
   databaseId?: string | null;
   description?: string | null;
   isActive?: boolean | null;
@@ -1195,6 +1339,7 @@ export interface CreatePlatformNamespaceInput {
   clientMutationId?: string;
   platformNamespace: {
     annotations?: Record<string, unknown>;
+    clusterId?: string;
     description?: string;
     isActive?: boolean;
     isManaged?: boolean;
@@ -1207,6 +1352,7 @@ export interface CreatePlatformNamespaceInput {
 }
 export interface PlatformNamespacePatch {
   annotations?: Record<string, unknown> | null;
+  clusterId?: string | null;
   description?: string | null;
   isActive?: boolean | null;
   isManaged?: boolean | null;
@@ -1268,12 +1414,40 @@ export interface PlatformInfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface PlatformInfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: Record<string, unknown>[];
+  kidsList?: Record<string, unknown>;
+  ktreeList?: Record<string, unknown>;
+  paths?: Record<string, unknown>;
+  root?: string;
+  sId?: string;
+}
+export interface PlatformInfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: Record<string, unknown>;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface PlatformInfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: Record<string, unknown>;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface PlatformInfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: Record<string, unknown>;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -1283,6 +1457,31 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
+}
+/** An input for mutations affecting `ContentPreset` */
+export interface ContentPresetInput {
+  /** Whether this preset is selectable at provision time */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of preset creation */
+  createdAt?: string;
+  /** The seed document itself, in the shape the kind's seed function takes — the readily-cached head; history lives in the infra store */
+  definition: Record<string, unknown>;
+  /** Human-readable description of the preset */
+  description?: string;
+  /** Unique preset identifier */
+  id?: string;
+  /** What the definition seeds — the module option that resolves it (limit_defaults, trust_ladder, ...) */
+  kind: string;
+  /** Human-readable preset name */
+  label?: string;
+  /** Preset slug (unique per kind per scope); the preset's path in the infra tree is [content_preset, kind, slug] */
+  slug: string;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
 }
 /** An input for mutations affecting `DbPreset` */
 export interface DbPresetInput {
@@ -1313,6 +1512,8 @@ export interface DbPresetInput {
 export interface NamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
@@ -1337,7 +1538,7 @@ export interface NamespaceInput {
 }
 /** An input for mutations affecting `NamespaceEvent` */
 export interface NamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -1420,6 +1621,8 @@ export interface PlatformInfraStoreInput {
 export interface PlatformNamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: Record<string, unknown>;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Optional human-readable description of this namespace */
   description?: string;
@@ -1442,7 +1645,7 @@ export interface PlatformNamespaceInput {
 }
 /** An input for mutations affecting `PlatformNamespaceEvent` */
 export interface PlatformNamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -1472,6 +1675,28 @@ export type PlatformInfraInsertNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface PlatformInfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type PlatformInfraInsertNodesAtPathsPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface PlatformInfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
+export type PlatformInfraSetAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInfraCommitEdge?: {
+    select: PlatformInfraCommitEdgeSelect;
+  };
+  result?: {
+    select: PlatformInfraCommitSelect;
+  };
+};
 export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -1480,27 +1705,79 @@ export type PlatformInfraSetDataAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface PlatformInfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
+export type PlatformInfraSetManyAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  platformInfraCommitEdge?: {
+    select: PlatformInfraCommitEdgeSelect;
+  };
+  result?: {
+    select: PlatformInfraCommitSelect;
+  };
+};
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export type ProvisionBucketPayloadSelect = {
-  accessType?: boolean;
-  bucketName?: boolean;
-  endpoint?: boolean;
-  error?: boolean;
-  provider?: boolean;
-  success?: boolean;
+  bucketId?: boolean;
+  bucketKey?: boolean;
+  jobId?: boolean;
+  physicalName?: boolean;
+};
+export interface CreateContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was created by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
+}
+export type CreateContentPresetPayloadSelect = {
+  clientMutationId?: boolean;
+  contentPreset?: {
+    select: ContentPresetSelect;
+  };
+  contentPresetEdge?: {
+    select: ContentPresetEdgeSelect;
+  };
+};
+export interface UpdateContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was updated by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
+}
+export type UpdateContentPresetPayloadSelect = {
+  clientMutationId?: boolean;
+  contentPreset?: {
+    select: ContentPresetSelect;
+  };
+  contentPresetEdge?: {
+    select: ContentPresetEdgeSelect;
+  };
+};
+export interface DeleteContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was deleted by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
+}
+export type DeleteContentPresetPayloadSelect = {
+  clientMutationId?: boolean;
+  contentPreset?: {
+    select: ContentPresetSelect;
+  };
+  contentPresetEdge?: {
+    select: ContentPresetEdgeSelect;
+  };
 };
 export interface CreateDbPresetPayload {
   clientMutationId?: string | null;
@@ -1907,6 +2184,30 @@ export type DeletePlatformNamespaceEventPayloadSelect = {
     select: PlatformNamespaceEventEdgeSelect;
   };
 };
+/** A `PlatformInfraCommit` edge in the connection. */
+export interface PlatformInfraCommitEdge {
+  cursor?: string | null;
+  /** The `PlatformInfraCommit` at the end of the edge. */
+  node?: PlatformInfraCommit | null;
+}
+export type PlatformInfraCommitEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformInfraCommitSelect;
+  };
+};
+/** A `ContentPreset` edge in the connection. */
+export interface ContentPresetEdge {
+  cursor?: string | null;
+  /** The `ContentPreset` at the end of the edge. */
+  node?: ContentPreset | null;
+}
+export type ContentPresetEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ContentPresetSelect;
+  };
+};
 /** A `DbPreset` edge in the connection. */
 export interface DbPresetEdge {
   cursor?: string | null;
@@ -1941,18 +2242,6 @@ export type NamespaceEventEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: NamespaceEventSelect;
-  };
-};
-/** A `PlatformInfraCommit` edge in the connection. */
-export interface PlatformInfraCommitEdge {
-  cursor?: string | null;
-  /** The `PlatformInfraCommit` at the end of the edge. */
-  node?: PlatformInfraCommit | null;
-}
-export type PlatformInfraCommitEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformInfraCommitSelect;
   };
 };
 /** A `PlatformInfraObject` edge in the connection. */

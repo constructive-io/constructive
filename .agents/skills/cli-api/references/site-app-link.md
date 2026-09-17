@@ -12,8 +12,8 @@ csdk site-app-link list --where.<field>.<op> <value> --orderBy <values>
 csdk site-app-link list --limit 10 --after <cursor>
 csdk site-app-link find-first --where.<field>.<op> <value>
 csdk site-app-link get --id <UUID>
-csdk site-app-link create --appIdentifier <String> --databaseId <UUID> --platform <String> --siteId <UUID> [--pathComponents <String>] [--sha256CertFingerprints <String>] [--storeUrl <String>] [--teamId <String>] [--webcredentials <Boolean>]
-csdk site-app-link update --id <UUID> [--appIdentifier <String>] [--databaseId <UUID>] [--pathComponents <String>] [--platform <String>] [--sha256CertFingerprints <String>] [--siteId <UUID>] [--storeUrl <String>] [--teamId <String>] [--webcredentials <Boolean>]
+csdk site-app-link create --appStoreIdentityId <UUID> --databaseId <UUID> --siteId <UUID> [--pathComponents <String>] [--webcredentials <Boolean>]
+csdk site-app-link update --id <UUID> [--appStoreIdentityId <UUID>] [--databaseId <UUID>] [--pathComponents <String>] [--siteId <UUID>] [--webcredentials <Boolean>]
 csdk site-app-link delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk site-app-link list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a siteAppLink
 
 ```bash
-csdk site-app-link create --appIdentifier <String> --databaseId <UUID> --platform <String> --siteId <UUID> [--pathComponents <String>] [--sha256CertFingerprints <String>] [--storeUrl <String>] [--teamId <String>] [--webcredentials <Boolean>]
+csdk site-app-link create --appStoreIdentityId <UUID> --databaseId <UUID> --siteId <UUID> [--pathComponents <String>] [--webcredentials <Boolean>]
 ```
 
 ### Get a siteAppLink by id

@@ -9,7 +9,7 @@ Site-owned page content — merkle-versioned head over the infra store; never a 
 ```typescript
 db.page.findMany({ select: { id: true } }).execute()
 db.page.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.page.create({ data: { commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
+db.page.create({ data: { commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
 db.page.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.page.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.page.findMany({
 
 ```typescript
 const item = await db.page.create({
-  data: { commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' },
+  data: { commitId: '<UUID>', content: '<JSON>', databaseId: '<UUID>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

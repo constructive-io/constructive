@@ -12,8 +12,8 @@ csdk platform-function-deployment list --where.<field>.<op> <value> --orderBy <v
 csdk platform-function-deployment list --limit 10 --after <cursor>
 csdk platform-function-deployment find-first --where.<field>.<op> <value>
 csdk platform-function-deployment get --id <UUID>
-csdk platform-function-deployment create --image <String> --namespaceId <UUID> [--annotations <JSON>] [--concurrency <Int>] [--errorCount <Int>] [--handlerName <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>]
-csdk platform-function-deployment update --id <UUID> [--annotations <JSON>] [--concurrency <Int>] [--errorCount <Int>] [--handlerName <String>] [--image <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--namespaceId <UUID>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>]
+csdk platform-function-deployment create --image <String> --namespaceId <UUID> [--annotations <JSON>] [--concurrency <Int>] [--createdByPrincipal <UUID>] [--errorCount <Int>] [--handlerName <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--realm <String>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>] [--updatedByPrincipal <UUID>]
+csdk platform-function-deployment update --id <UUID> [--annotations <JSON>] [--concurrency <Int>] [--createdByPrincipal <UUID>] [--errorCount <Int>] [--handlerName <String>] [--image <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--namespaceId <UUID>] [--realm <String>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>] [--updatedByPrincipal <UUID>]
 csdk platform-function-deployment delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-function-deployment list --where.id.equalTo <value> --orderBy ID_A
 ### Create a platformFunctionDeployment
 
 ```bash
-csdk platform-function-deployment create --image <String> --namespaceId <UUID> [--annotations <JSON>] [--concurrency <Int>] [--errorCount <Int>] [--handlerName <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>]
+csdk platform-function-deployment create --image <String> --namespaceId <UUID> [--annotations <JSON>] [--concurrency <Int>] [--createdByPrincipal <UUID>] [--errorCount <Int>] [--handlerName <String>] [--imageVersion <String>] [--labels <JSON>] [--lastError <String>] [--lastErrorAt <Datetime>] [--realm <String>] [--resources <JSON>] [--revision <Int>] [--scaleMax <Int>] [--scaleMin <Int>] [--serviceName <String>] [--serviceUrl <String>] [--status <String>] [--timeoutSeconds <Int>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a platformFunctionDeployment by id
