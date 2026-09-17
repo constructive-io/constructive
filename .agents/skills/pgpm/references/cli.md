@@ -175,6 +175,30 @@ Non-interactive init requires every question to be answered by flags; see
 `--name --fullName --email --username --repoName --license`, plus module
 `--moduleName --packageIdentifier --moduleDesc --access`.
 
+### Workspace Inspection
+
+**pgpm ls** — List the pgpm modules in the current workspace
+
+```bash
+# Human-readable listing
+pgpm ls
+
+# Names or workspace-relative paths, one per line
+pgpm ls --names
+pgpm ls --paths
+
+# JSON output for scripts and CI
+pgpm ls --json
+pgpm ls --paths --json
+```
+
+For CI package matrices, use the workspace-relative paths directly:
+
+```yaml
+- id: list
+  run: echo "packages=$(pnpm exec pgpm ls --paths --json)" >> "$GITHUB_OUTPUT"
+```
+
 ### Change Management
 
 **pgpm add** — Add a new database change

@@ -19,6 +19,7 @@ export { default as _export } from './commands/export';
 export { default as extension } from './commands/extension';
 export { default as install } from './commands/install';
 export { default as kill } from './commands/kill';
+export { default as ls } from './commands/ls';
 export { default as migrate } from './commands/migrate';
 export { default as _package } from './commands/package';
 export { default as plan } from './commands/plan';
