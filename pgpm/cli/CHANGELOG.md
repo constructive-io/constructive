@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.33.0](https://github.com/constructive-io/constructive/compare/pgpm@5.32.0...pgpm@5.33.0) (2026-09-17)
+
+### Features
+
+- **pgpm:** add `pgpm ls` for listing workspace modules ([5bed508](https://github.com/constructive-io/constructive/commit/5bed50811d9c7e540d3126b69c4a8e0d1ba78d53))
+- **pgpm:** improve init template caching and scaffolding ([8611bf7](https://github.com/constructive-io/constructive/commit/8611bf72b6bc862ee419d5859df057ba55c27cbe))
+
 # [5.32.0](https://github.com/constructive-io/constructive/compare/pgpm@5.31.0...pgpm@5.32.0) (2026-09-17)
 
 **Note:** Version bump only for package pgpm

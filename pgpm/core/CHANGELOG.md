@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.30.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.29.0...@pgpmjs/core@7.30.0) (2026-09-17)
+
+### Features
+
+- **pgpm:** improve init template caching and scaffolding ([8611bf7](https://github.com/constructive-io/constructive/commit/8611bf72b6bc862ee419d5859df057ba55c27cbe))
+
 # [7.29.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.28.0...@pgpmjs/core@7.29.0) (2026-09-17)
 
 **Note:** Version bump only for package @pgpmjs/core
