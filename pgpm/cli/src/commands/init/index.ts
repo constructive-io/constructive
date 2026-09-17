@@ -1,4 +1,5 @@
 import {
+  addToCiMatrix,
   BoilerplateSkill,
   DEFAULT_TEMPLATE_REPO,
   DEFAULT_TEMPLATE_TOOL_NAME,
@@ -864,6 +865,16 @@ async function handleModuleInit(
       cwd: ctx.cwd,
       prompter
     });
+  }
+
+  if (resolvedWorkspacePath) {
+    const matrixFiles = addToCiMatrix(
+      resolvedWorkspacePath,
+      path.relative(resolvedWorkspacePath, modulePath)
+    );
+    for (const file of matrixFiles) {
+      process.stdout.write(`Added ${modName} to the CI matrix in ${file}\n`);
+    }
   }
 
   const motdPath = path.join(modulePath, '.motd');
