@@ -1,22 +1,123 @@
 import fs from 'fs';
 import path from 'path';
+import {
+  Document,
+  isMap,
+  isScalar,
+  isSeq,
+  parseDocument,
+  Scalar,
+  stringify,
+  YAMLSeq
+} from 'yaml';
 
 const WORKFLOW_DIR = path.join('.github', 'workflows');
 const MATRIX_KEY = 'package';
 
-const parseFlowEntries = (raw: string): string[] =>
-  raw
-    .split(',')
-    .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ''))
-    .filter(Boolean);
+/** A matrix entry: its parsed value plus the source text that produced it. */
+interface Entry {
+  value: string;
+  text: string;
+}
 
-const sortEntries = (entries: string[]): string[] =>
-  [...new Set(entries)].sort((left, right) => left.localeCompare(right));
+/** Column the node starts at, i.e. the indent of its first line. */
+const columnOf = (source: string, offset: number): number =>
+  offset - (source.lastIndexOf('\n', offset - 1) + 1);
+
+/** Every `jobs.<job>.strategy.matrix.package` sequence in a workflow. */
+const findMatrixSeqs = (doc: Document): YAMLSeq[] => {
+  const jobs = doc.get('jobs', true);
+  if (!isMap(jobs)) return [];
+
+  const seqs: YAMLSeq[] = [];
+  for (const job of jobs.items) {
+    if (!isScalar(job.key)) continue;
+    const seq = doc.getIn(
+      ['jobs', job.key.value as string, 'strategy', 'matrix', MATRIX_KEY],
+      true
+    );
+    if (isSeq(seq)) seqs.push(seq);
+  }
+  return seqs;
+};
 
 /**
- * Add a module to the `package:` matrix of a workspace's CI workflows, keeping
- * the list sorted. The list stays a plain, hand-editable array: workflows
- * without one, or without the key, are left alone.
+ * The sequence's entries with their original source text (so quoting survives),
+ * or `null` if any item isn't a plain string scalar.
+ */
+const entriesOf = (seq: YAMLSeq, source: string): Entry[] | null => {
+  const entries: Entry[] = [];
+  for (const item of seq.items) {
+    if (!isScalar(item) || typeof (item as Scalar).value !== 'string') {
+      return null;
+    }
+    const [start, end] = (item as Scalar).range ?? [];
+    entries.push({
+      value: (item as Scalar).value as string,
+      text: source.slice(start, end).trim()
+    });
+  }
+  return entries;
+};
+
+/** Re-render a sequence in the style and at the indent it was written with. */
+const renderSeq = (seq: YAMLSeq, entries: Entry[], source: string): string => {
+  const texts = entries.map((entry) => entry.text);
+  if (seq.flow) return `[${texts.join(', ')}]`;
+  const indent = ' '.repeat(columnOf(source, seq.range[0]));
+  return texts
+    .map((text, index) => `${index === 0 ? '' : indent}- ${text}`)
+    .join('\n');
+};
+
+/**
+ * Insert `entry` into every test matrix of a workflow, keeping the list sorted.
+ * Only the byte range of each matrix sequence is rewritten; the rest of the
+ * source passes through untouched, so comments and formatting survive.
+ */
+export const addToMatrixYaml = (source: string, entry: string): string => {
+  const doc = parseDocument(source);
+  if (doc.errors.length) return source;
+
+  const added: Entry = { value: entry, text: stringify(entry).trim() };
+  const edits: { start: number; end: number; text: string }[] = [];
+
+  for (const seq of findMatrixSeqs(doc)) {
+    const entries = entriesOf(seq, source);
+    if (!entries) continue;
+    if (entries.some((existing) => existing.value === entry)) continue;
+
+    const next = [...entries, added]
+      .filter(
+        (item, index, all) =>
+          all.findIndex((other) => other.value === item.value) === index
+      )
+      .sort((left, right) => left.value.localeCompare(right.value));
+
+    const [start, end] = seq.range;
+    // a block sequence's range extends to the next token; keep that whitespace
+    const [trailing] = /\s*$/.exec(source.slice(start, end)) as [string];
+    edits.push({
+      start,
+      end,
+      text: renderSeq(seq, next, source) + trailing
+    });
+  }
+
+  // Last edit first, so earlier ranges keep their offsets.
+  return edits
+    .sort((left, right) => right.start - left.start)
+    .reduce(
+      (text, edit) =>
+        text.slice(0, edit.start) + edit.text + text.slice(edit.end),
+      source
+    );
+};
+
+/**
+ * Add a module to the test matrix of a workspace's CI workflows, keeping the
+ * list sorted. The matrix stays a plain, hand-editable array: workflows without
+ * a `jobs.<job>.strategy.matrix.package` sequence are left alone.
  *
  * Returns the workflow files that changed, relative to `workspacePath`.
  */
@@ -41,57 +142,4 @@ export const addToCiMatrix = (
   }
 
   return changed;
-};
-
-/**
- * Insert `entry` into the first `package:` sequence of a workflow, in either
- * flow (`package: [a, b]`) or block form, preserving indentation, comments and
- * everything else in the file.
- */
-export const addToMatrixYaml = (source: string, entry: string): string => {
-  const lines = source.split('\n');
-
-  for (let index = 0; index < lines.length; index += 1) {
-    const flow = lines[index].match(
-      new RegExp(`^(\\s*)${MATRIX_KEY}:\\s*\\[(.*)\\]\\s*$`)
-    );
-    if (flow) {
-      const [, indent, raw] = flow;
-      const entries = parseFlowEntries(raw);
-      if (entries.includes(entry)) return source;
-      const next = sortEntries([...entries, entry]);
-      lines[index] = `${indent}${MATRIX_KEY}: [${next.join(', ')}]`;
-      return lines.join('\n');
-    }
-
-    const block = lines[index].match(new RegExp(`^(\\s*)${MATRIX_KEY}:\\s*$`));
-    if (!block) continue;
-
-    const [, indent] = block;
-    const items: { line: number; value: string }[] = [];
-    let cursor = index + 1;
-    let itemIndent: string | undefined;
-
-    while (cursor < lines.length) {
-      const item = lines[cursor].match(/^(\s*)-\s*(.*?)\s*$/);
-      if (!item || item[1].length <= indent.length) break;
-      if (itemIndent === undefined) itemIndent = item[1];
-      if (item[1] !== itemIndent) break;
-      items.push({ line: cursor, value: item[2].replace(/^['"]|['"]$/g, '') });
-      cursor += 1;
-    }
-
-    // A `package:` key with nothing under it is a mapping we don't understand;
-    // only rewrite a sequence we fully parsed.
-    if (!items.length) continue;
-
-    const values = items.map((item) => item.value);
-    if (values.includes(entry)) return source;
-    const next = sortEntries([...values, entry]);
-    const rendered = next.map((value) => `${itemIndent}- ${value}`);
-    lines.splice(items[0].line, items.length, ...rendered);
-    return lines.join('\n');
-  }
-
-  return source;
 };

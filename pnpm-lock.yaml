@@ -3209,6 +3209,9 @@ importers:
       pgsql-parser:
         specifier: ^18.2.6
         version: 18.2.6
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
       yanse:
         specifier: ^0.2.2
         version: 0.2.2

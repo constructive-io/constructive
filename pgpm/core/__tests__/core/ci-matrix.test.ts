@@ -4,67 +4,117 @@ import path from 'path';
 
 import { addToCiMatrix, addToMatrixYaml } from '../../src/core/ci-matrix';
 
-const flowWorkflow = `name: CI
+const workflow = (matrix: string) => `name: CI
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         # \`pgpm init\` keeps this list sorted.
-        package: [packages/beta]
+${matrix}
     steps:
-      - run: pnpm test
+      - uses: actions/checkout@v4
+        with:
+          package: not-a-matrix
+      - run: cd ./\${{ matrix.package }} && pnpm test
 `;
+
+const flowWorkflow = workflow('        package: [packages/beta]');
 
 describe('addToMatrixYaml', () => {
   it('adds to a flow sequence in sorted order', () => {
-    expect(addToMatrixYaml(flowWorkflow, 'packages/alpha')).toContain(
-      '        package: [packages/alpha, packages/beta]'
+    expect(addToMatrixYaml(flowWorkflow, 'packages/alpha')).toBe(
+      workflow('        package: [packages/alpha, packages/beta]')
     );
   });
 
-  it('keeps comments and the rest of the workflow', () => {
-    const updated = addToMatrixYaml(flowWorkflow, 'packages/alpha');
-    expect(updated).toContain('# `pgpm init` keeps this list sorted.');
-    expect(updated).toContain('      - run: pnpm test');
-  });
-
   it('fills an empty array', () => {
-    expect(addToMatrixYaml('        package: []\n', 'packages/alpha')).toBe(
-      '        package: [packages/alpha]\n'
+    expect(addToMatrixYaml(workflow('        package: []'), 'packages/alpha')).toBe(
+      workflow('        package: [packages/alpha]')
     );
   });
 
   it('adds to a block sequence in sorted order', () => {
-    const source = `      matrix:
-        package:
-          - packages/beta
-          - packages/delta
-`;
-    expect(addToMatrixYaml(source, 'packages/charlie')).toBe(`      matrix:
-        package:
-          - packages/beta
-          - packages/charlie
-          - packages/delta
-`);
+    const source = workflow(
+      ['        package:', '          - packages/beta', '          - packages/delta'].join('\n')
+    );
+    expect(addToMatrixYaml(source, 'packages/charlie')).toBe(
+      workflow(
+        [
+          '        package:',
+          '          - packages/beta',
+          '          - packages/charlie',
+          '          - packages/delta'
+        ].join('\n')
+      )
+    );
   });
 
   it('is a no-op when the entry is already listed', () => {
     expect(addToMatrixYaml(flowWorkflow, 'packages/beta')).toBe(flowWorkflow);
   });
 
-  it('leaves quoted entries unquoted but keeps their values', () => {
-    expect(addToMatrixYaml(`        package: ['packages/beta']\n`, 'packages/alpha')).toBe(
-      '        package: [packages/alpha, packages/beta]\n'
-    );
+  it('keeps existing entries verbatim, quotes only what needs it', () => {
+    expect(
+      addToMatrixYaml(workflow(`        package: ['packages/beta']`), 'packages/alpha')
+    ).toBe(workflow(`        package: [packages/alpha, 'packages/beta']`));
   });
 
-  it('leaves a workflow without the key alone', () => {
-    const source = 'name: CI\njobs:\n  test:\n    steps:\n      - run: pnpm test\n';
+  it('updates the matrix of every job that has one', () => {
+    const source = `name: CI
+jobs:
+  test:
+    strategy:
+      matrix:
+        package: [packages/beta]
+  lint:
+    strategy:
+      matrix:
+        package:
+          - packages/beta
+`;
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(`name: CI
+jobs:
+  test:
+    strategy:
+      matrix:
+        package: [packages/alpha, packages/beta]
+  lint:
+    strategy:
+      matrix:
+        package:
+          - packages/alpha
+          - packages/beta
+`);
+  });
+
+  it('ignores a `package` key that is not a job matrix', () => {
+    const source = `name: CI
+env:
+  package: packages/beta
+jobs:
+  test:
+    steps:
+      - uses: some/action@v1
+        with:
+          package: [packages/beta]
+`;
     expect(addToMatrixYaml(source, 'packages/alpha')).toBe(source);
   });
 
-  it('leaves a `package` mapping that is not a sequence alone', () => {
-    const source = 'package:\n  name: something\n';
+  it('leaves a matrix that is not a plain list of strings alone', () => {
+    const source = `name: CI
+jobs:
+  test:
+    strategy:
+      matrix:
+        package: \${{ fromJSON(needs.discover.outputs.packages) }}
+`;
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(source);
+  });
+
+  it('leaves an unparseable workflow alone', () => {
+    const source = 'jobs:\n  test:\n   :\n  - broken: [\n';
     expect(addToMatrixYaml(source, 'packages/alpha')).toBe(source);
   });
 });
@@ -95,7 +145,7 @@ describe('addToCiMatrix', () => {
     expect(changed).toEqual(['.github/workflows/ci.yml']);
     expect(
       fs.readFileSync(path.join(workspace, '.github/workflows/ci.yml'), 'utf8')
-    ).toContain('package: [packages/alpha, packages/beta]');
+    ).toBe(workflow('        package: [packages/alpha, packages/beta]'));
   });
 
   it('does nothing when the workspace has no workflows', () => {

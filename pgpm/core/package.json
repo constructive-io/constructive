@@ -69,6 +69,7 @@
     "pg-env": "workspace:^",
     "pgsql-deparser": "^18.3.6",
     "pgsql-parser": "^18.2.6",
+    "yaml": "^2.9.0",
     "yanse": "^0.2.2"
   }
 }
