@@ -50,6 +50,107 @@ describe('addToMatrixYaml', () => {
     );
   });
 
+  it('keeps trailing comments attached to their entries', () => {
+    const source = workflow(
+      [
+        '        package:',
+        '          - packages/beta   # api',
+        '          - packages/delta  # web'
+      ].join('\n')
+    );
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      workflow(
+        [
+          '        package:',
+          '          - packages/alpha',
+          '          - packages/beta  # api',
+          '          - packages/delta  # web'
+        ].join('\n')
+      )
+    );
+  });
+
+  it('moves a comment line with its block entry', () => {
+    const source = workflow(
+      [
+        '        package:',
+        '          # the api',
+        '          - packages/beta',
+        '          - packages/delta'
+      ].join('\n')
+    );
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      workflow(
+        [
+          '        package:',
+          '          - packages/alpha',
+          '          # the api',
+          '          - packages/beta',
+          '          - packages/delta'
+        ].join('\n')
+      )
+    );
+  });
+
+  it('moves an inter-item comment with its block entry', () => {
+    const source = workflow(
+      [
+        '        package:',
+        '          - packages/beta',
+        '          # the web',
+        '          - packages/delta'
+      ].join('\n')
+    );
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      workflow(
+        [
+          '        package:',
+          '          - packages/alpha',
+          '          - packages/beta',
+          '          # the web',
+          '          - packages/delta'
+        ].join('\n')
+      )
+    );
+  });
+
+  it('preserves multiline flow formatting', () => {
+    const source = workflow(
+      [
+        '        package: [',
+        '          packages/beta,',
+        '          packages/delta',
+        '        ]'
+      ].join('\n')
+    );
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      workflow(
+        [
+          '        package: [',
+          '          packages/alpha,',
+          '          packages/beta,',
+          '          packages/delta',
+          '        ]'
+        ].join('\n')
+      )
+    );
+  });
+
+  it('leaves a flow sequence with comments untouched', () => {
+    const source = workflow('        package: [packages/beta, packages/delta] # keep');
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(source);
+  });
+
+  it('leaves a flow item with a comment untouched', () => {
+    const source = workflow('        package: [packages/beta, packages/delta] # keep');
+    const commented = source.replace(
+      'package: [packages/beta, packages/delta]',
+      `package: [packages/beta, # keep beta
+          packages/delta]`
+    );
+    expect(addToMatrixYaml(commented, 'packages/alpha')).toBe(commented);
+  });
+
   it('is a no-op when the entry is already listed', () => {
     expect(addToMatrixYaml(flowWorkflow, 'packages/beta')).toBe(flowWorkflow);
   });
@@ -116,6 +217,39 @@ jobs:
   it('leaves an unparseable workflow alone', () => {
     const source = 'jobs:\n  test:\n   :\n  - broken: [\n';
     expect(addToMatrixYaml(source, 'packages/alpha')).toBe(source);
+  });
+
+  it('keeps CRLF workflows unchanged outside the matrix edit', () => {
+    const source = `name: CI\r\njobs:\r\n  test:\r\n    strategy:\r\n      matrix:\r\n        package: [packages/beta]\r\n`;
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      `name: CI\r\njobs:\r\n  test:\r\n    strategy:\r\n      matrix:\r\n        package: [packages/alpha, packages/beta]\r\n`
+    );
+  });
+
+  it('keeps anchors and sibling matrix keys intact', () => {
+    const source = `jobs:
+  test:
+    strategy:
+      matrix:
+        package: &pkgs [packages/beta]
+        node: [20, 22]
+`;
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(`jobs:
+  test:
+    strategy:
+      matrix:
+        package: &pkgs [packages/alpha, packages/beta]
+        node: [20, 22]
+`);
+  });
+
+  it('keeps quoted values containing spaces', () => {
+    const source = workflow(
+      `        package: ["packages/my thing", 'packages/delta']`
+    );
+    expect(addToMatrixYaml(source, 'packages/alpha')).toBe(
+      workflow(`        package: [packages/alpha, 'packages/delta', "packages/my thing"]`)
+    );
   });
 });
 
