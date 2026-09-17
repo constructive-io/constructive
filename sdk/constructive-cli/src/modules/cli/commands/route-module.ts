@@ -17,9 +17,11 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiName: 'string',
+  appLinksFunctionName: 'string',
   catalogModuleId: 'uuid',
   databaseId: 'uuid',
-  defaultPermissions: 'string',
+  deepLinkFunctionName: 'string',
+  defaultCapabilities: 'string',
   domainModuleId: 'uuid',
   entityField: 'string',
   entityTableId: 'uuid',
@@ -33,6 +35,8 @@ const fieldSchema: FieldSchema = {
   privateSchemaName: 'string',
   provisions: 'json',
   publicSchemaName: 'string',
+  redirectsTableId: 'uuid',
+  redirectsTableName: 'string',
   resolverFunctionName: 'string',
   routeBindingsTableId: 'uuid',
   routeBindingsTableName: 'string',
@@ -40,6 +44,8 @@ const fieldSchema: FieldSchema = {
   routesTableName: 'string',
   schemaId: 'uuid',
   scope: 'string',
+  servingSiteField: 'string',
+  storageKey: 'string',
 };
 const usage =
   '\nroute-module <command>\n\nCommands:\n  list                  List routeModule records\n  find-first            Find first matching routeModule record\n  get                   Get a routeModule by ID\n  create                Create a new routeModule\n  update                Update an existing routeModule\n  delete                Delete a routeModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -93,9 +99,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       apiName: true,
+      appLinksFunctionName: true,
       catalogModuleId: true,
       databaseId: true,
-      defaultPermissions: true,
+      deepLinkFunctionName: true,
+      defaultCapabilities: true,
       domainModuleId: true,
       entityField: true,
       entityTableId: true,
@@ -109,6 +117,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       privateSchemaName: true,
       provisions: true,
       publicSchemaName: true,
+      redirectsTableId: true,
+      redirectsTableName: true,
       resolverFunctionName: true,
       routeBindingsTableId: true,
       routeBindingsTableName: true,
@@ -116,6 +126,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       routesTableName: true,
       schemaId: true,
       scope: true,
+      servingSiteField: true,
+      storageKey: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy> & {
@@ -137,9 +149,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       apiName: true,
+      appLinksFunctionName: true,
       catalogModuleId: true,
       databaseId: true,
-      defaultPermissions: true,
+      deepLinkFunctionName: true,
+      defaultCapabilities: true,
       domainModuleId: true,
       entityField: true,
       entityTableId: true,
@@ -153,6 +167,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       privateSchemaName: true,
       provisions: true,
       publicSchemaName: true,
+      redirectsTableId: true,
+      redirectsTableName: true,
       resolverFunctionName: true,
       routeBindingsTableId: true,
       routeBindingsTableName: true,
@@ -160,6 +176,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       routesTableName: true,
       schemaId: true,
       scope: true,
+      servingSiteField: true,
+      storageKey: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<RouteModuleSelect, RouteModuleFilter, RouteModuleOrderBy> & {
@@ -193,9 +211,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
-          defaultPermissions: true,
+          deepLinkFunctionName: true,
+          defaultCapabilities: true,
           domainModuleId: true,
           entityField: true,
           entityTableId: true,
@@ -209,6 +229,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          redirectsTableId: true,
+          redirectsTableName: true,
           resolverFunctionName: true,
           routeBindingsTableId: true,
           routeBindingsTableName: true,
@@ -216,6 +238,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           routesTableName: true,
           schemaId: true,
           scope: true,
+          servingSiteField: true,
+          storageKey: true,
         },
       })
       .execute();
@@ -240,6 +264,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'appLinksFunctionName',
+        message: 'appLinksFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'catalogModuleId',
         message: 'catalogModuleId',
         required: false,
@@ -253,8 +284,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'deepLinkFunctionName',
+        message: 'deepLinkFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -344,6 +382,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'redirectsTableId',
+        message: 'redirectsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'redirectsTableName',
+        message: 'redirectsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'resolverFunctionName',
         message: 'resolverFunctionName',
         required: false,
@@ -390,6 +442,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'servingSiteField',
+        message: 'servingSiteField',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'storageKey',
+        message: 'storageKey',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -401,9 +467,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           apiName: cleanedData.apiName,
+          appLinksFunctionName: cleanedData.appLinksFunctionName,
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          deepLinkFunctionName: cleanedData.deepLinkFunctionName,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           domainModuleId: cleanedData.domainModuleId,
           entityField: cleanedData.entityField,
           entityTableId: cleanedData.entityTableId,
@@ -416,6 +484,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           provisions: cleanedData.provisions,
           publicSchemaName: cleanedData.publicSchemaName,
+          redirectsTableId: cleanedData.redirectsTableId,
+          redirectsTableName: cleanedData.redirectsTableName,
           resolverFunctionName: cleanedData.resolverFunctionName,
           routeBindingsTableId: cleanedData.routeBindingsTableId,
           routeBindingsTableName: cleanedData.routeBindingsTableName,
@@ -423,12 +493,16 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           routesTableName: cleanedData.routesTableName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          servingSiteField: cleanedData.servingSiteField,
+          storageKey: cleanedData.storageKey,
         },
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
-          defaultPermissions: true,
+          deepLinkFunctionName: true,
+          defaultCapabilities: true,
           domainModuleId: true,
           entityField: true,
           entityTableId: true,
@@ -442,6 +516,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          redirectsTableId: true,
+          redirectsTableName: true,
           resolverFunctionName: true,
           routeBindingsTableId: true,
           routeBindingsTableName: true,
@@ -449,6 +525,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           routesTableName: true,
           schemaId: true,
           scope: true,
+          servingSiteField: true,
+          storageKey: true,
         },
       })
       .execute();
@@ -479,6 +557,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'appLinksFunctionName',
+        message: 'appLinksFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'catalogModuleId',
         message: 'catalogModuleId',
         required: false,
@@ -492,8 +577,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'defaultPermissions',
-        message: 'defaultPermissions',
+        name: 'deepLinkFunctionName',
+        message: 'deepLinkFunctionName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'defaultCapabilities',
+        message: 'defaultCapabilities',
         required: false,
         skipPrompt: true,
       },
@@ -583,6 +675,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'redirectsTableId',
+        message: 'redirectsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'redirectsTableName',
+        message: 'redirectsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'resolverFunctionName',
         message: 'resolverFunctionName',
         required: false,
@@ -629,6 +735,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'servingSiteField',
+        message: 'servingSiteField',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'storageKey',
+        message: 'storageKey',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as RouteModulePatch;
@@ -640,9 +760,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           apiName: cleanedData.apiName,
+          appLinksFunctionName: cleanedData.appLinksFunctionName,
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
-          defaultPermissions: cleanedData.defaultPermissions,
+          deepLinkFunctionName: cleanedData.deepLinkFunctionName,
+          defaultCapabilities: cleanedData.defaultCapabilities,
           domainModuleId: cleanedData.domainModuleId,
           entityField: cleanedData.entityField,
           entityTableId: cleanedData.entityTableId,
@@ -655,6 +777,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           provisions: cleanedData.provisions,
           publicSchemaName: cleanedData.publicSchemaName,
+          redirectsTableId: cleanedData.redirectsTableId,
+          redirectsTableName: cleanedData.redirectsTableName,
           resolverFunctionName: cleanedData.resolverFunctionName,
           routeBindingsTableId: cleanedData.routeBindingsTableId,
           routeBindingsTableName: cleanedData.routeBindingsTableName,
@@ -662,12 +786,16 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           routesTableName: cleanedData.routesTableName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          servingSiteField: cleanedData.servingSiteField,
+          storageKey: cleanedData.storageKey,
         },
         select: {
           apiName: true,
+          appLinksFunctionName: true,
           catalogModuleId: true,
           databaseId: true,
-          defaultPermissions: true,
+          deepLinkFunctionName: true,
+          defaultCapabilities: true,
           domainModuleId: true,
           entityField: true,
           entityTableId: true,
@@ -681,6 +809,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          redirectsTableId: true,
+          redirectsTableName: true,
           resolverFunctionName: true,
           routeBindingsTableId: true,
           routeBindingsTableName: true,
@@ -688,6 +818,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           routesTableName: true,
           schemaId: true,
           scope: true,
+          servingSiteField: true,
+          storageKey: true,
         },
       })
       .execute();

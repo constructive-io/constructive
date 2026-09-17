@@ -7,7 +7,7 @@ React Query mutation hook for signUpMagicLink
 ## Usage
 
 ```typescript
-const { mutate } = useSignUpMagicLinkMutation(); mutate({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } });
+const { mutate } = useSignUpMagicLinkMutation(); mutate({ input: { credentialKind: '<String>', deviceToken: '<String>', inviteToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignUpMagicLinkMutation(); mutate({ input: { credentialKin
 
 ```typescript
 const { mutate, isLoading } = useSignUpMagicLinkMutation();
-mutate({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } });
+mutate({ input: { credentialKind: '<String>', deviceToken: '<String>', inviteToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } });
 ```

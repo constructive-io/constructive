@@ -12,8 +12,8 @@ csdk webhook-endpoint list --where.<field>.<op> <value> --orderBy <values>
 csdk webhook-endpoint list --limit 10 --after <cursor>
 csdk webhook-endpoint find-first --where.<field>.<op> <value>
 csdk webhook-endpoint get --id <UUID>
-csdk webhook-endpoint create --databaseId <UUID> --functionDefinitionId <UUID> --host <String> --namespaceId <UUID> --path <String> --signingSecretName <String> [--active <Boolean>] [--createdBy <UUID>] [--provider <String>] [--replayWindowSeconds <Int>] [--updatedBy <UUID>]
-csdk webhook-endpoint update --id <UUID> [--active <Boolean>] [--createdBy <UUID>] [--databaseId <UUID>] [--functionDefinitionId <UUID>] [--host <String>] [--namespaceId <UUID>] [--path <String>] [--provider <String>] [--replayWindowSeconds <Int>] [--signingSecretName <String>] [--updatedBy <UUID>]
+csdk webhook-endpoint create --databaseId <UUID> --functionDefinitionId <UUID> --host <String> --namespaceId <UUID> --path <String> --signingSecretName <String> [--active <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--provider <String>] [--replayWindowSeconds <Int>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk webhook-endpoint update --id <UUID> [--active <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--functionDefinitionId <UUID>] [--host <String>] [--namespaceId <UUID>] [--path <String>] [--provider <String>] [--replayWindowSeconds <Int>] [--signingSecretName <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk webhook-endpoint delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk webhook-endpoint list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a webhookEndpoint
 
 ```bash
-csdk webhook-endpoint create --databaseId <UUID> --functionDefinitionId <UUID> --host <String> --namespaceId <UUID> --path <String> --signingSecretName <String> [--active <Boolean>] [--createdBy <UUID>] [--provider <String>] [--replayWindowSeconds <Int>] [--updatedBy <UUID>]
+csdk webhook-endpoint create --databaseId <UUID> --functionDefinitionId <UUID> --host <String> --namespaceId <UUID> --path <String> --signingSecretName <String> [--active <Boolean>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--provider <String>] [--replayWindowSeconds <Int>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a webhookEndpoint by id

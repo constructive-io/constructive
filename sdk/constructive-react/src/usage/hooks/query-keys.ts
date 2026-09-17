@@ -19,69 +19,6 @@
 // Entity Query Keys
 // ============================================================================
 
-export const appAchievementRewardKeys = {
-  /** All appAchievementReward queries */ all: ['appachievementreward'] as const,
-  /** List query keys */ lists: () => [...appAchievementRewardKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appAchievementRewardKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appAchievementRewardKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appAchievementRewardKeys.details(), id] as const,
-} as const;
-export const appEventAggregateKeys = {
-  /** All appEventAggregate queries */ all: ['appeventaggregate'] as const,
-  /** List query keys */ lists: () => [...appEventAggregateKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appEventAggregateKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appEventAggregateKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appEventAggregateKeys.details(), id] as const,
-} as const;
-export const appEventKeys = {
-  /** All appEvent queries */ all: ['appevent'] as const,
-  /** List query keys */ lists: () => [...appEventKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appEventKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appEventKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appEventKeys.details(), id] as const,
-} as const;
-export const appEventTypeKeys = {
-  /** All appEventType queries */ all: ['appeventtype'] as const,
-  /** List query keys */ lists: () => [...appEventTypeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appEventTypeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appEventTypeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appEventTypeKeys.details(), id] as const,
-} as const;
-export const appLevelKeys = {
-  /** All appLevel queries */ all: ['applevel'] as const,
-  /** List query keys */ lists: () => [...appLevelKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appLevelKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appLevelKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appLevelKeys.details(), id] as const,
-} as const;
-export const appLevelGrantKeys = {
-  /** All appLevelGrant queries */ all: ['applevelgrant'] as const,
-  /** List query keys */ lists: () => [...appLevelGrantKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appLevelGrantKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appLevelGrantKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appLevelGrantKeys.details(), id] as const,
-} as const;
-export const appLevelRequirementKeys = {
-  /** All appLevelRequirement queries */ all: ['applevelrequirement'] as const,
-  /** List query keys */ lists: () => [...appLevelRequirementKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appLevelRequirementKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appLevelRequirementKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appLevelRequirementKeys.details(), id] as const,
-} as const;
 export const appLimitCapKeys = {
   /** All appLimitCap queries */ all: ['applimitcap'] as const,
   /** List query keys */ lists: () => [...appLimitCapKeys.all, 'list'] as const,
@@ -172,60 +109,6 @@ export const appLimitWarningKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appLimitWarningKeys.details(), id] as const,
 } as const;
-export const billingUsageSummaryKeys = {
-  /** All billingUsageSummary queries */ all: ['billingusagesummary'] as const,
-  /** List query keys */ lists: () => [...billingUsageSummaryKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...billingUsageSummaryKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...billingUsageSummaryKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...billingUsageSummaryKeys.details(), id] as const,
-} as const;
-export const ledgerKeys = {
-  /** All ledger queries */ all: ['ledger'] as const,
-  /** List query keys */ lists: () => [...ledgerKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...ledgerKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...ledgerKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...ledgerKeys.details(), id] as const,
-} as const;
-export const meterKeys = {
-  /** All meter queries */ all: ['meter'] as const,
-  /** List query keys */ lists: () => [...meterKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...meterKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...meterKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...meterKeys.details(), id] as const,
-} as const;
-export const meterCreditKeys = {
-  /** All meterCredit queries */ all: ['metercredit'] as const,
-  /** List query keys */ lists: () => [...meterCreditKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...meterCreditKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...meterCreditKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...meterCreditKeys.details(), id] as const,
-} as const;
-export const meterDefaultKeys = {
-  /** All meterDefault queries */ all: ['meterdefault'] as const,
-  /** List query keys */ lists: () => [...meterDefaultKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...meterDefaultKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...meterDefaultKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...meterDefaultKeys.details(), id] as const,
-} as const;
-export const meterSourceKeys = {
-  /** All meterSource queries */ all: ['metersource'] as const,
-  /** List query keys */ lists: () => [...meterSourceKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...meterSourceKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...meterSourceKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...meterSourceKeys.details(), id] as const,
-} as const;
 export const orgLimitAggregateKeys = {
   /** All orgLimitAggregate queries */ all: ['orglimitaggregate'] as const,
   /** List query keys */ lists: () => [...orgLimitAggregateKeys.all, 'list'] as const,
@@ -298,69 +181,6 @@ export const orgLimitWarningKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitWarningKeys.details(), id] as const,
 } as const;
-export const planCapKeys = {
-  /** All planCap queries */ all: ['plancap'] as const,
-  /** List query keys */ lists: () => [...planCapKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planCapKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planCapKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planCapKeys.details(), id] as const,
-} as const;
-export const planKeys = {
-  /** All plan queries */ all: ['plan'] as const,
-  /** List query keys */ lists: () => [...planKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planKeys.details(), id] as const,
-} as const;
-export const planLimitKeys = {
-  /** All planLimit queries */ all: ['planlimit'] as const,
-  /** List query keys */ lists: () => [...planLimitKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planLimitKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planLimitKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planLimitKeys.details(), id] as const,
-} as const;
-export const planMeterLimitKeys = {
-  /** All planMeterLimit queries */ all: ['planmeterlimit'] as const,
-  /** List query keys */ lists: () => [...planMeterLimitKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planMeterLimitKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planMeterLimitKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planMeterLimitKeys.details(), id] as const,
-} as const;
-export const planOverrideKeys = {
-  /** All planOverride queries */ all: ['planoverride'] as const,
-  /** List query keys */ lists: () => [...planOverrideKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planOverrideKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planOverrideKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planOverrideKeys.details(), id] as const,
-} as const;
-export const planPricingKeys = {
-  /** All planPricing queries */ all: ['planpricing'] as const,
-  /** List query keys */ lists: () => [...planPricingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planPricingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planPricingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planPricingKeys.details(), id] as const,
-} as const;
-export const planSubscriptionKeys = {
-  /** All planSubscription queries */ all: ['plansubscription'] as const,
-  /** List query keys */ lists: () => [...planSubscriptionKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...planSubscriptionKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...planSubscriptionKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...planSubscriptionKeys.details(), id] as const,
-} as const;
 
 // ============================================================================
 // Custom Query Keys
@@ -371,11 +191,6 @@ export const customQueryKeys = {
     ['captureAppLimitDefaults'] as const,
   /** Query key for captureOrgLimitDefaults */ captureOrgLimitDefaults: () =>
     ['captureOrgLimitDefaults'] as const,
-  /** Query key for captureTrustLadder */ captureTrustLadder: () => ['captureTrustLadder'] as const,
-  /** Query key for eventsAchieved */ eventsAchieved: (variables?: object) =>
-    ['eventsAchieved', variables] as const,
-  /** Query key for eventsRequired */ eventsRequired: (variables?: object) =>
-    ['eventsRequired', variables] as const,
 } as const;
 /**
 
@@ -400,13 +215,6 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  appAchievementReward: appAchievementRewardKeys,
-  appEventAggregate: appEventAggregateKeys,
-  appEvent: appEventKeys,
-  appEventType: appEventTypeKeys,
-  appLevel: appLevelKeys,
-  appLevelGrant: appLevelGrantKeys,
-  appLevelRequirement: appLevelRequirementKeys,
   appLimitCap: appLimitCapKeys,
   appLimitCapsDefault: appLimitCapsDefaultKeys,
   appLimit: appLimitKeys,
@@ -417,12 +225,6 @@ export const queryKeys = {
   appLimitDefault: appLimitDefaultKeys,
   appLimitEvent: appLimitEventKeys,
   appLimitWarning: appLimitWarningKeys,
-  billingUsageSummary: billingUsageSummaryKeys,
-  ledger: ledgerKeys,
-  meter: meterKeys,
-  meterCredit: meterCreditKeys,
-  meterDefault: meterDefaultKeys,
-  meterSource: meterSourceKeys,
   orgLimitAggregate: orgLimitAggregateKeys,
   orgLimitCap: orgLimitCapKeys,
   orgLimitCapsDefault: orgLimitCapsDefaultKeys,
@@ -431,13 +233,6 @@ export const queryKeys = {
   orgLimitDefault: orgLimitDefaultKeys,
   orgLimitEvent: orgLimitEventKeys,
   orgLimitWarning: orgLimitWarningKeys,
-  planCap: planCapKeys,
-  plan: planKeys,
-  planLimit: planLimitKeys,
-  planMeterLimit: planMeterLimitKeys,
-  planOverride: planOverrideKeys,
-  planPricing: planPricingKeys,
-  planSubscription: planSubscriptionKeys,
   custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */

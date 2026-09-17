@@ -7,7 +7,7 @@ Execute the signUpMagicLink mutation
 ## Usage
 
 ```typescript
-db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute()
+db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', inviteToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: 
 ### Run signUpMagicLink
 
 ```typescript
-const result = await db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
+const result = await db.mutation.signUpMagicLink({ input: { credentialKind: '<String>', deviceToken: '<String>', inviteToken: '<String>', rememberMe: '<Boolean>', token: '<String>' } }).execute();
 ```

@@ -5,7 +5,68 @@
  */
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeImage = unknown;
+export type ConstructiveInternalTypeUpload = unknown;
 export type ResourceRequirement = unknown;
+export interface Build {
+  actorId: string | null;
+  attempt: number | null;
+  commitSha: string | null;
+  conclusion: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  eventId: string | null;
+  finishedAt: string | null;
+  id: string | null;
+  imageRef: string | null;
+  jobId: string | null;
+  logs: ConstructiveInternalTypeUpload | null;
+  matrixKey: string | null;
+  metadata: unknown | null;
+  proposalId: string | null;
+  ref: string | null;
+  repositoryId: string | null;
+  startedAt: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  workflowId: string | null;
+}
+export interface BuildStep {
+  buildId: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  exitCode: number | null;
+  finishedAt: string | null;
+  id: string | null;
+  kind: string | null;
+  logBytes: string | null;
+  logOffset: string | null;
+  name: string | null;
+  parentSeq: number | null;
+  recordedAt: string | null;
+  seq: number | null;
+  startedAt: string | null;
+  status: string | null;
+  summary: unknown | null;
+}
+export interface BuilderBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  installationId: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface ContentPreset {
   active: boolean | null;
   commitId: string | null;
@@ -18,6 +79,121 @@ export interface ContentPreset {
   slug: string | null;
   storeId: string | null;
   updatedAt: string | null;
+}
+export interface DatabaseFunctionGraph {
+  context: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  databaseId: string | null;
+  definitionsCommitId: string | null;
+  description: string | null;
+  id: string | null;
+  isValid: boolean | null;
+  name: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+  validationErrors: unknown | null;
+}
+export interface DatabaseFunctionGraphExecution {
+  actorId: string | null;
+  completedAt: string | null;
+  currentWave: number | null;
+  databaseId: string | null;
+  definitionsCommitId: string | null;
+  entityId: string | null;
+  entityType: string | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  executionPlan: unknown | null;
+  graphId: string | null;
+  id: string | null;
+  inputPayload: unknown | null;
+  invocationCreatedAt: string | null;
+  invocationId: string | null;
+  lastProgressAt: string | null;
+  maxPendingJobs: number | null;
+  maxTicks: number | null;
+  nodeOutputs: unknown | null;
+  organizationId: string | null;
+  outputNames: string[] | null;
+  outputNode: string | null;
+  outputPayload: unknown | null;
+  outputPort: string | null;
+  parentExecutionId: string | null;
+  parentInvocationId: string | null;
+  parentNodeName: string | null;
+  principalId: string | null;
+  startedAt: string | null;
+  status: string | null;
+  tickCount: number | null;
+  timeoutAt: string | null;
+}
+export interface DatabaseFunctionGraphExecutionNodeState {
+  callbackInputs: unknown | null;
+  callbackMeta: unknown | null;
+  callbackTokenHash: string | null;
+  completedAt: string | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  executionId: string | null;
+  expiryDefaultOutput: unknown | null;
+  expiryEscalatedAt: string | null;
+  expiryPolicy: string | null;
+  id: string | null;
+  nodeName: string | null;
+  nodePath: string[] | null;
+  outputId: string | null;
+  startedAt: string | null;
+  status: string | null;
+  waitingDeadlineAt: string | null;
+  waitingOn: string | null;
+  waitingSince: string | null;
+}
+export interface DatabaseFunctionGraphExecutionOutput {
+  createdAt: string | null;
+  data: unknown | null;
+  databaseId: string | null;
+  hash: Base64EncodedBinary | null;
+  id: string | null;
+}
+export interface DatabaseGraphCommit {
+  authorId: string | null;
+  committerId: string | null;
+  databaseId: string | null;
+  date: string | null;
+  id: string | null;
+  message: string | null;
+  parentIds: string[] | null;
+  storeId: string | null;
+  treeId: string | null;
+}
+export interface DatabaseGraphGetAllTreeNodesRecord {
+  data: unknown | null;
+  path: string[] | null;
+}
+export interface DatabaseGraphObject {
+  createdAt: string | null;
+  data: unknown | null;
+  databaseId: string | null;
+  id: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+}
+export interface DatabaseGraphRef {
+  commitId: string | null;
+  databaseId: string | null;
+  id: string | null;
+  name: string | null;
+  storeId: string | null;
+}
+export interface DatabaseGraphStore {
+  createdAt: string | null;
+  databaseId: string | null;
+  hash: string | null;
+  id: string | null;
+  name: string | null;
 }
 export interface DbPreset {
   active: boolean | null;
@@ -55,11 +231,13 @@ export interface FunctionCapabilityBinding {
 }
 export interface FunctionDefinition {
   accessChannels: string[] | null;
+  anonymousCallable: boolean | null;
   category: string | null;
   concurrency: number | null;
   cpuLimitMillicores: string | null;
   cpuRequestMillicores: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   description: string | null;
   fnCategory: string | null;
@@ -84,6 +262,7 @@ export interface FunctionDefinition {
   publishedAt: string | null;
   queueName: string | null;
   requiredBuckets: string[] | null;
+  requiredCapabilities: unknown | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
   requiredModules: string[] | null;
@@ -97,12 +276,14 @@ export interface FunctionDefinition {
   taskIdentifier: string | null;
   timeoutSeconds: number | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   volatile: boolean | null;
 }
 export interface FunctionDeployment {
   annotations: unknown | null;
   concurrency: number | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   errorCount: number | null;
   handlerName: string | null;
@@ -123,6 +304,7 @@ export interface FunctionDeployment {
   status: string | null;
   timeoutSeconds: number | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface FunctionDeploymentEvent {
   actorId: string | null;
@@ -213,6 +395,9 @@ export interface FunctionGraphExecutionNodeState {
   errorCode: string | null;
   errorMessage: string | null;
   executionId: string | null;
+  expiryDefaultOutput: unknown | null;
+  expiryEscalatedAt: string | null;
+  expiryPolicy: string | null;
   id: string | null;
   nodeName: string | null;
   nodePath: string[] | null;
@@ -220,6 +405,9 @@ export interface FunctionGraphExecutionNodeState {
   scopeId: string | null;
   startedAt: string | null;
   status: string | null;
+  waitingDeadlineAt: string | null;
+  waitingOn: string | null;
+  waitingSince: string | null;
 }
 export interface FunctionGraphExecutionOutput {
   createdAt: string | null;
@@ -271,16 +459,21 @@ export interface FunctionInvocation {
   channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   definitionScope: string | null;
   durationMs: number | null;
+  entityId: string | null;
+  entityType: string | null;
   error: string | null;
   functionDefinitionId: string | null;
   graphExecutionId: string | null;
   id: string | null;
   jobId: string | null;
+  organizationId: string | null;
   parentInvocationId: string | null;
   payload: unknown | null;
+  principalId: string | null;
   provenance: unknown | null;
   result: unknown | null;
   startedAt: string | null;
@@ -290,6 +483,41 @@ export interface FunctionInvocation {
 export interface GetAllTreeNodesRecord {
   data: unknown | null;
   path: string[] | null;
+}
+export interface Image {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  description: string | null;
+  digest: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  labels: unknown | null;
+  metadata: unknown | null;
+  name: string | null;
+  ownerId: string | null;
+  platformOnly: boolean | null;
+  registryHost: string | null;
+  repository: string | null;
+  runtime: string | null;
+  tag: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface ImageGrant {
+  actions: string[] | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  expiresAt: string | null;
+  grantedBy: string | null;
+  granteeKey: string | null;
+  granteeScope: string | null;
+  id: string | null;
+  imageId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface InfraCommit {
   authorId: string | null;
@@ -344,6 +572,7 @@ export interface IntegrationProvider {
 }
 export interface Namespace {
   annotations: unknown | null;
+  clusterId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   description: string | null;
@@ -367,6 +596,63 @@ export interface NamespaceEvent {
   metadata: unknown | null;
   namespaceId: string | null;
 }
+export interface PlatformBuild {
+  actorId: string | null;
+  attempt: number | null;
+  commitSha: string | null;
+  conclusion: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  eventId: string | null;
+  finishedAt: string | null;
+  id: string | null;
+  imageRef: string | null;
+  jobId: string | null;
+  logs: ConstructiveInternalTypeUpload | null;
+  matrixKey: string | null;
+  metadata: unknown | null;
+  proposalId: string | null;
+  ref: string | null;
+  repositoryId: string | null;
+  startedAt: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  workflowId: string | null;
+}
+export interface PlatformBuildStep {
+  buildId: string | null;
+  createdByPrincipal: string | null;
+  exitCode: number | null;
+  finishedAt: string | null;
+  id: string | null;
+  kind: string | null;
+  logBytes: string | null;
+  logOffset: string | null;
+  name: string | null;
+  parentSeq: number | null;
+  recordedAt: string | null;
+  seq: number | null;
+  startedAt: string | null;
+  status: string | null;
+  summary: unknown | null;
+}
+export interface PlatformBuilderBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  installationId: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformFunctionApiBinding {
   alias: string | null;
   apiId: string | null;
@@ -389,12 +675,14 @@ export interface PlatformFunctionCapabilityBinding {
 }
 export interface PlatformFunctionDefinition {
   accessChannels: string[] | null;
+  anonymousCallable: boolean | null;
   billable: boolean | null;
   category: string | null;
   concurrency: number | null;
   cpuLimitMillicores: string | null;
   cpuRequestMillicores: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   description: string | null;
   fnCategory: string | null;
   functionColumns: unknown | null;
@@ -418,6 +706,7 @@ export interface PlatformFunctionDefinition {
   publishedAt: string | null;
   queueName: string | null;
   requiredBuckets: string[] | null;
+  requiredCapabilities: unknown | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredModels: string[] | null;
   requiredModules: string[] | null;
@@ -432,12 +721,14 @@ export interface PlatformFunctionDefinition {
   taskIdentifier: string | null;
   timeoutSeconds: number | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
   volatile: boolean | null;
 }
 export interface PlatformFunctionDeployment {
   annotations: unknown | null;
   concurrency: number | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   errorCount: number | null;
   handlerName: string | null;
   id: string | null;
@@ -457,6 +748,7 @@ export interface PlatformFunctionDeployment {
   status: string | null;
   timeoutSeconds: number | null;
   updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformFunctionDeploymentEvent {
   actorId: string | null;
@@ -497,21 +789,59 @@ export interface PlatformFunctionInvocation {
   channel: string | null;
   completedAt: string | null;
   createdAt: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   definitionScope: string | null;
   durationMs: number | null;
+  entityId: string | null;
+  entityType: string | null;
   error: string | null;
   functionDefinitionId: string | null;
   graphExecutionId: string | null;
   id: string | null;
   jobId: string | null;
+  organizationId: string | null;
   parentInvocationId: string | null;
   payload: unknown | null;
+  principalId: string | null;
   provenance: unknown | null;
   result: unknown | null;
   startedAt: string | null;
   status: string | null;
   taskIdentifier: string | null;
+}
+export interface PlatformImage {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  description: string | null;
+  digest: string | null;
+  expiresAt: string | null;
+  id: string | null;
+  isPublished: boolean | null;
+  labels: unknown | null;
+  metadata: unknown | null;
+  name: string | null;
+  ownerId: string | null;
+  platformOnly: boolean | null;
+  registryHost: string | null;
+  repository: string | null;
+  runtime: string | null;
+  tag: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformImageGrant {
+  actions: string[] | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  expiresAt: string | null;
+  grantedBy: string | null;
+  granteeKey: string | null;
+  granteeScope: string | null;
+  id: string | null;
+  imageId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformInfraCommit {
   authorId: string | null;
@@ -550,8 +880,33 @@ export interface PlatformInfraStore {
   name: string | null;
   scopeId: string | null;
 }
+export interface PlatformK8sResourceKind {
+  active: boolean | null;
+  commitId: string | null;
+  createdAt: string | null;
+  definition: unknown | null;
+  description: string | null;
+  id: string | null;
+  label: string | null;
+  slug: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+}
+export interface PlatformK8sSpecRule {
+  active: boolean | null;
+  commitId: string | null;
+  createdAt: string | null;
+  definition: unknown | null;
+  description: string | null;
+  id: string | null;
+  label: string | null;
+  slug: string | null;
+  storeId: string | null;
+  updatedAt: string | null;
+}
 export interface PlatformNamespace {
   annotations: unknown | null;
+  clusterId: string | null;
   createdAt: string | null;
   description: string | null;
   id: string | null;
@@ -573,14 +928,268 @@ export interface PlatformNamespaceEvent {
   metadata: unknown | null;
   namespaceId: string | null;
 }
+export interface PlatformProposalComment {
+  actorId: string | null;
+  attachments: ConstructiveInternalTypeUpload[] | null;
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  line: number | null;
+  outdatedAt: string | null;
+  path: string | null;
+  pathTrgmSimilarity: number | null;
+  proposalId: string | null;
+  resolvedAt: string | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformProposal {
+  actorId: string | null;
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  closedReason: string | null;
+  closedReasonTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  decidedAt: string | null;
+  dueAt: string | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  kind: string | null;
+  kindTrgmSimilarity: number | null;
+  labels: string[] | null;
+  mergeCommit: string | null;
+  mergeCommitTrgmSimilarity: number | null;
+  mergeMethod: string | null;
+  mergeMethodTrgmSimilarity: number | null;
+  mergeRequestedAt: string | null;
+  mergedAt: string | null;
+  metadata: unknown | null;
+  parentId: string | null;
+  priority: string | null;
+  repositoryId: string | null;
+  resolution: string | null;
+  resolutionTrgmSimilarity: number | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  sourceRef: string | null;
+  sourceRefTrgmSimilarity: number | null;
+  status: string | null;
+  statusTrgmSimilarity: number | null;
+  targetRef: string | null;
+  targetRefTrgmSimilarity: number | null;
+  title: string | null;
+  titleTrgmSimilarity: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformProposalFileView {
+  blobSha: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  path: string | null;
+  proposalId: string | null;
+  reviewerId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  viewedAt: string | null;
+}
+export interface PlatformProposalReaction {
+  actorId: string | null;
+  commentId: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  emoji: string | null;
+  id: string | null;
+  proposalId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformProposalReview {
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  commitSha: string | null;
+  commitShaTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  proposalId: string | null;
+  reviewerId: string | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  submittedAt: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  verdict: string | null;
+  verdictTrgmSimilarity: number | null;
+}
+export interface PlatformProposalsChunk {
+  actorId: string | null;
+  body: string | null;
+  chunkIndex: number | null;
+  createdAt: string | null;
+  embedding: number[] | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  metadata: unknown | null;
+  platformProposalsId: string | null;
+  searchScore: number | null;
+  updatedAt: string | null;
+}
+export interface PlatformRegistryBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedCredentialVersion: string | null;
+  pullSecretName: string | null;
+  realm: string | null;
+  registryHost: string | null;
+  registryId: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformRegistry {
+  authMode: string | null;
+  basePath: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  credentialSecretName: string | null;
+  host: string | null;
+  id: string | null;
+  installationId: string | null;
+  isPublished: boolean | null;
+  kind: string | null;
+  labels: unknown | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  name: string | null;
+  platformOnly: boolean | null;
+  role: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformRegistryGrant {
+  actions: string[] | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  expiresAt: string | null;
+  grantedBy: string | null;
+  granteeKey: string | null;
+  granteeScope: string | null;
+  id: string | null;
+  registryId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformRepository {
+  cloneUrl: string | null;
+  cloneUrlTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  defaultBranch: string | null;
+  defaultBranchTrgmSimilarity: number | null;
+  description: string | null;
+  descriptionTrgmSimilarity: number | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  externalId: string | null;
+  externalIdTrgmSimilarity: number | null;
+  id: string | null;
+  isArchived: boolean | null;
+  metadata: unknown | null;
+  name: string | null;
+  nameTrgmSimilarity: number | null;
+  ownerId: string | null;
+  provider: string | null;
+  providerTrgmSimilarity: number | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  slug: string | null;
+  slugTrgmSimilarity: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+  visibility: string | null;
+  visibilityTrgmSimilarity: number | null;
+}
+export interface PlatformRepositoryEvent {
+  actorId: string | null;
+  commitSha: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  deliveryId: string | null;
+  eventType: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  payload: unknown | null;
+  ref: string | null;
+  repositoryId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformRepositoryRequiredCheck {
+  createdAt: string | null;
+  id: string | null;
+  repositoryId: string | null;
+  updatedAt: string | null;
+  workflowId: string | null;
+}
+export interface PlatformRepositoryWorkflow {
+  cancelInProgress: boolean | null;
+  concurrencyKey: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  eventType: string | null;
+  graphId: string | null;
+  id: string | null;
+  inputs: unknown | null;
+  isEnabled: boolean | null;
+  name: string | null;
+  refPattern: string | null;
+  repositoryId: string | null;
+  requiredSecrets: string[] | null;
+  slug: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformResource {
   annotations: unknown | null;
   cpuLimitMillicores: string | null;
   cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   errorCount: number | null;
   id: string | null;
+  imageRef: string | null;
   installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
@@ -602,8 +1211,10 @@ export interface PlatformResource {
   statusObserved: unknown | null;
   storageClass: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformResourceDeclaredCapacity {
   cpuLimitMillicores: string | null;
@@ -619,11 +1230,13 @@ export interface PlatformResourceDeclaredCapacity {
   source: string | null;
   sourceId: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
 }
 export interface PlatformResourceDefinition {
   annotations: unknown | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   defaultSpec: unknown | null;
   description: string | null;
   id: string | null;
@@ -639,6 +1252,7 @@ export interface PlatformResourceDefinition {
   stepUpMinAge: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformResourceEvent {
   actorId: string | null;
@@ -653,6 +1267,7 @@ export interface PlatformResourceInstallation {
   commitId: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   id: string | null;
   name: string | null;
   namespaceId: string | null;
@@ -663,6 +1278,27 @@ export interface PlatformResourceInstallation {
   storeId: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface PlatformResourceObservedStorage {
+  capacity: string | null;
+  capacityBytes: string | null;
+  claimName: string | null;
+  declaredStorageClass: string | null;
+  declaredStorageSizeBytes: string | null;
+  declaredStorageTotalBytes: string | null;
+  installationId: string | null;
+  isBound: boolean | null;
+  kind: string | null;
+  namespaceId: string | null;
+  phase: string | null;
+  requested: string | null;
+  requestedBytes: string | null;
+  resourceId: string | null;
+  resourceStatus: string | null;
+  slug: string | null;
+  storageClass: string | null;
+  storageName: string | null;
 }
 export interface PlatformResourceStatusCheck {
   completedAt: string | null;
@@ -722,8 +1358,10 @@ export interface PlatformResourcesHealth {
   cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   errorCount: number | null;
   id: string | null;
+  imageRef: string | null;
   installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
@@ -746,8 +1384,10 @@ export interface PlatformResourcesHealth {
   statusObserved: unknown | null;
   storageClass: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformResourcesRequirementsState {
   configHash: string | null;
@@ -775,6 +1415,7 @@ export interface PlatformWebhookEndpoint {
   active: boolean | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   functionDefinitionId: string | null;
   host: string | null;
   id: string | null;
@@ -785,6 +1426,7 @@ export interface PlatformWebhookEndpoint {
   signingSecretName: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformWebhookEvent {
   createdAt: string | null;
@@ -800,15 +1442,282 @@ export interface PlatformWebhookEvent {
   status: string | null;
   updatedAt: string | null;
 }
+export interface ProposalComment {
+  actorId: string | null;
+  attachments: ConstructiveInternalTypeUpload[] | null;
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  line: number | null;
+  outdatedAt: string | null;
+  path: string | null;
+  pathTrgmSimilarity: number | null;
+  proposalId: string | null;
+  resolvedAt: string | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface Proposal {
+  actorId: string | null;
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  closedReason: string | null;
+  closedReasonTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  decidedAt: string | null;
+  dueAt: string | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  kind: string | null;
+  kindTrgmSimilarity: number | null;
+  labels: string[] | null;
+  mergeCommit: string | null;
+  mergeCommitTrgmSimilarity: number | null;
+  mergeMethod: string | null;
+  mergeMethodTrgmSimilarity: number | null;
+  mergeRequestedAt: string | null;
+  mergedAt: string | null;
+  metadata: unknown | null;
+  parentId: string | null;
+  priority: string | null;
+  repositoryId: string | null;
+  resolution: string | null;
+  resolutionTrgmSimilarity: number | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  sourceRef: string | null;
+  sourceRefTrgmSimilarity: number | null;
+  status: string | null;
+  statusTrgmSimilarity: number | null;
+  targetRef: string | null;
+  targetRefTrgmSimilarity: number | null;
+  title: string | null;
+  titleTrgmSimilarity: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface ProposalFileView {
+  blobSha: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  path: string | null;
+  proposalId: string | null;
+  reviewerId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  viewedAt: string | null;
+}
+export interface ProposalReaction {
+  actorId: string | null;
+  commentId: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  emoji: string | null;
+  id: string | null;
+  proposalId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface ProposalReview {
+  body: string | null;
+  bodyTrgmSimilarity: number | null;
+  commitSha: string | null;
+  commitShaTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  proposalId: string | null;
+  reviewerId: string | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  submittedAt: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+  verdict: string | null;
+  verdictTrgmSimilarity: number | null;
+}
+export interface ProposalsChunk {
+  actorId: string | null;
+  body: string | null;
+  chunkIndex: number | null;
+  createdAt: string | null;
+  databaseId: string | null;
+  embedding: number[] | null;
+  embeddingVectorDistance: number | null;
+  id: string | null;
+  metadata: unknown | null;
+  proposalsId: string | null;
+  searchScore: number | null;
+  updatedAt: string | null;
+}
+export interface RegistryBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedCredentialVersion: string | null;
+  pullSecretName: string | null;
+  realm: string | null;
+  registryHost: string | null;
+  registryId: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface Registry {
+  authMode: string | null;
+  basePath: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  credentialSecretName: string | null;
+  databaseId: string | null;
+  host: string | null;
+  id: string | null;
+  installationId: string | null;
+  isPublished: boolean | null;
+  kind: string | null;
+  labels: unknown | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  name: string | null;
+  platformOnly: boolean | null;
+  role: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface RegistryGrant {
+  actions: string[] | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  expiresAt: string | null;
+  grantedBy: string | null;
+  granteeKey: string | null;
+  granteeScope: string | null;
+  id: string | null;
+  registryId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface Repository {
+  cloneUrl: string | null;
+  cloneUrlTrgmSimilarity: number | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  defaultBranch: string | null;
+  defaultBranchTrgmSimilarity: number | null;
+  description: string | null;
+  descriptionTrgmSimilarity: number | null;
+  embedding: number[] | null;
+  embeddingUpdatedAt: string | null;
+  embeddingVectorDistance: number | null;
+  externalId: string | null;
+  externalIdTrgmSimilarity: number | null;
+  id: string | null;
+  isArchived: boolean | null;
+  metadata: unknown | null;
+  name: string | null;
+  nameTrgmSimilarity: number | null;
+  ownerId: string | null;
+  provider: string | null;
+  providerTrgmSimilarity: number | null;
+  search: string | null;
+  searchScore: number | null;
+  searchTsvRank: number | null;
+  slug: string | null;
+  slugTrgmSimilarity: number | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+  visibility: string | null;
+  visibilityTrgmSimilarity: number | null;
+}
+export interface RepositoryEvent {
+  actorId: string | null;
+  commitSha: string | null;
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  deliveryId: string | null;
+  eventType: string | null;
+  id: string | null;
+  metadata: unknown | null;
+  payload: unknown | null;
+  ref: string | null;
+  repositoryId: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface RepositoryRequiredCheck {
+  createdAt: string | null;
+  databaseId: string | null;
+  id: string | null;
+  repositoryId: string | null;
+  updatedAt: string | null;
+  workflowId: string | null;
+}
+export interface RepositoryWorkflow {
+  cancelInProgress: boolean | null;
+  concurrencyKey: string | null;
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  eventType: string | null;
+  graphId: string | null;
+  id: string | null;
+  inputs: unknown | null;
+  isEnabled: boolean | null;
+  name: string | null;
+  refPattern: string | null;
+  repositoryId: string | null;
+  requiredSecrets: string[] | null;
+  slug: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface Resource {
   annotations: unknown | null;
   cpuLimitMillicores: string | null;
   cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   errorCount: number | null;
   id: string | null;
+  imageRef: string | null;
   installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
@@ -830,8 +1739,10 @@ export interface Resource {
   statusObserved: unknown | null;
   storageClass: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface ResourceDeclaredCapacity {
   cpuLimitMillicores: string | null;
@@ -847,11 +1758,13 @@ export interface ResourceDeclaredCapacity {
   source: string | null;
   sourceId: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
 }
 export interface ResourceDefinition {
   annotations: unknown | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   defaultSpec: unknown | null;
   description: string | null;
@@ -868,6 +1781,7 @@ export interface ResourceDefinition {
   stepUpMinAge: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface ResourceEvent {
   actorId: string | null;
@@ -883,6 +1797,7 @@ export interface ResourceInstallation {
   commitId: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   id: string | null;
   name: string | null;
@@ -894,6 +1809,27 @@ export interface ResourceInstallation {
   storeId: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
+export interface ResourceObservedStorage {
+  capacity: string | null;
+  capacityBytes: string | null;
+  claimName: string | null;
+  declaredStorageClass: string | null;
+  declaredStorageSizeBytes: string | null;
+  declaredStorageTotalBytes: string | null;
+  installationId: string | null;
+  isBound: boolean | null;
+  kind: string | null;
+  namespaceId: string | null;
+  phase: string | null;
+  requested: string | null;
+  requestedBytes: string | null;
+  resourceId: string | null;
+  resourceStatus: string | null;
+  slug: string | null;
+  storageClass: string | null;
+  storageName: string | null;
 }
 export interface ResourceStatusCheck {
   completedAt: string | null;
@@ -956,9 +1892,11 @@ export interface ResourcesHealth {
   cpuRequestMillicores: string | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   errorCount: number | null;
   id: string | null;
+  imageRef: string | null;
   installationId: string | null;
   integrations: string[] | null;
   kind: string | null;
@@ -981,8 +1919,10 @@ export interface ResourcesHealth {
   statusObserved: unknown | null;
   storageClass: string | null;
   storageSizeBytes: string | null;
+  storageTotalBytes: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface ResourcesRequirementsState {
   configHash: string | null;
@@ -1010,6 +1950,7 @@ export interface WebhookEndpoint {
   active: boolean | null;
   createdAt: string | null;
   createdBy: string | null;
+  createdByPrincipal: string | null;
   databaseId: string | null;
   functionDefinitionId: string | null;
   host: string | null;
@@ -1021,6 +1962,7 @@ export interface WebhookEndpoint {
   signingSecretName: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface WebhookEvent {
   createdAt: string | null;

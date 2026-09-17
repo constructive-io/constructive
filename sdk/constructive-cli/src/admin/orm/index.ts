@@ -6,18 +6,18 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { AppAdminGrantModel } from './models/appAdminGrant';
+import { AppCapabilityDefaultCapabilityModel } from './models/appCapabilityDefaultCapability';
+import { AppCapabilityDefaultGrantModel } from './models/appCapabilityDefaultGrant';
 import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { AppGrantModel } from './models/appGrant';
 import { AppInviteModel } from './models/appInvite';
 import { AppMembershipModel } from './models/appMembership';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
-import { AppPermissionModel } from './models/appPermission';
-import { AppPermissionDefaultModel } from './models/appPermissionDefault';
-import { AppPermissionDefaultGrantModel } from './models/appPermissionDefaultGrant';
-import { AppPermissionDefaultPermissionModel } from './models/appPermissionDefaultPermission';
 import { MembershipTypeModel } from './models/membershipType';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
+import { OrgCapabilityDefaultCapabilityModel } from './models/orgCapabilityDefaultCapability';
+import { OrgCapabilityDefaultGrantModel } from './models/orgCapabilityDefaultGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
@@ -31,10 +31,6 @@ import { OrgMembershipModel } from './models/orgMembership';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
-import { OrgPermissionModel } from './models/orgPermission';
-import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
-import { OrgPermissionDefaultGrantModel } from './models/orgPermissionDefaultGrant';
-import { OrgPermissionDefaultPermissionModel } from './models/orgPermissionDefaultPermission';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -71,18 +67,18 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     appAdminGrant: new AppAdminGrantModel(client),
+    appCapabilityDefaultCapability: new AppCapabilityDefaultCapabilityModel(client),
+    appCapabilityDefaultGrant: new AppCapabilityDefaultGrantModel(client),
     appClaimedInvite: new AppClaimedInviteModel(client),
     appGrant: new AppGrantModel(client),
     appInvite: new AppInviteModel(client),
     appMembership: new AppMembershipModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
-    appPermission: new AppPermissionModel(client),
-    appPermissionDefault: new AppPermissionDefaultModel(client),
-    appPermissionDefaultGrant: new AppPermissionDefaultGrantModel(client),
-    appPermissionDefaultPermission: new AppPermissionDefaultPermissionModel(client),
     membershipType: new MembershipTypeModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
+    orgCapabilityDefaultCapability: new OrgCapabilityDefaultCapabilityModel(client),
+    orgCapabilityDefaultGrant: new OrgCapabilityDefaultGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
@@ -96,10 +92,6 @@ export function createClient(config: OrmClientConfig) {
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     orgMembershipSetting: new OrgMembershipSettingModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
-    orgPermission: new OrgPermissionModel(client),
-    orgPermissionDefault: new OrgPermissionDefaultModel(client),
-    orgPermissionDefaultGrant: new OrgPermissionDefaultGrantModel(client),
-    orgPermissionDefaultPermission: new OrgPermissionDefaultPermissionModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

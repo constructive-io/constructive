@@ -26,6 +26,14 @@ export const agentMutationKeys = {
   /** Delete agent mutation key */ delete: (id: string | number) =>
     ['mutation', 'agent', 'delete', id] as const,
 } as const;
+export const agentEventMutationKeys = {
+  /** All agentEvent mutation keys */ all: ['mutation', 'agentevent'] as const,
+  /** Create agentEvent mutation key */ create: () => ['mutation', 'agentevent', 'create'] as const,
+  /** Update agentEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentevent', 'update', id] as const,
+  /** Delete agentEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentevent', 'delete', id] as const,
+} as const;
 export const agentMessageMutationKeys = {
   /** All agentMessage mutation keys */ all: ['mutation', 'agentmessage'] as const,
   /** Create agentMessage mutation key */ create: () =>
@@ -79,6 +87,23 @@ export const agentResourceMutationKeys = {
   /** Delete agentResource mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentresource', 'delete', id] as const,
 } as const;
+export const agentRunMutationKeys = {
+  /** All agentRun mutation keys */ all: ['mutation', 'agentrun'] as const,
+  /** Create agentRun mutation key */ create: () => ['mutation', 'agentrun', 'create'] as const,
+  /** Update agentRun mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentrun', 'update', id] as const,
+  /** Delete agentRun mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentrun', 'delete', id] as const,
+} as const;
+export const agentRunWorkspaceMutationKeys = {
+  /** All agentRunWorkspace mutation keys */ all: ['mutation', 'agentrunworkspace'] as const,
+  /** Create agentRunWorkspace mutation key */ create: () =>
+    ['mutation', 'agentrunworkspace', 'create'] as const,
+  /** Update agentRunWorkspace mutation key */ update: (id: string | number) =>
+    ['mutation', 'agentrunworkspace', 'update', id] as const,
+  /** Delete agentRunWorkspace mutation key */ delete: (id: string | number) =>
+    ['mutation', 'agentrunworkspace', 'delete', id] as const,
+} as const;
 export const agentTaskMutationKeys = {
   /** All agentTask mutation keys */ all: ['mutation', 'agenttask'] as const,
   /** Create agentTask mutation key */ create: () => ['mutation', 'agenttask', 'create'] as const,
@@ -95,6 +120,123 @@ export const agentThreadMutationKeys = {
     ['mutation', 'agentthread', 'update', id] as const,
   /** Delete agentThread mutation key */ delete: (id: string | number) =>
     ['mutation', 'agentthread', 'delete', id] as const,
+} as const;
+export const platformAgentMutationKeys = {
+  /** All platformAgent mutation keys */ all: ['mutation', 'platformagent'] as const,
+  /** Create platformAgent mutation key */ create: () =>
+    ['mutation', 'platformagent', 'create'] as const,
+  /** Update platformAgent mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagent', 'update', id] as const,
+  /** Delete platformAgent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagent', 'delete', id] as const,
+} as const;
+export const platformAgentEventMutationKeys = {
+  /** All platformAgentEvent mutation keys */ all: ['mutation', 'platformagentevent'] as const,
+  /** Create platformAgentEvent mutation key */ create: () =>
+    ['mutation', 'platformagentevent', 'create'] as const,
+  /** Update platformAgentEvent mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentevent', 'update', id] as const,
+  /** Delete platformAgentEvent mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentevent', 'delete', id] as const,
+} as const;
+export const platformAgentMessageMutationKeys = {
+  /** All platformAgentMessage mutation keys */ all: ['mutation', 'platformagentmessage'] as const,
+  /** Create platformAgentMessage mutation key */ create: () =>
+    ['mutation', 'platformagentmessage', 'create'] as const,
+  /** Update platformAgentMessage mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentmessage', 'update', id] as const,
+  /** Delete platformAgentMessage mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentmessage', 'delete', id] as const,
+} as const;
+export const platformAgentPersonaMutationKeys = {
+  /** All platformAgentPersona mutation keys */ all: ['mutation', 'platformagentpersona'] as const,
+  /** Create platformAgentPersona mutation key */ create: () =>
+    ['mutation', 'platformagentpersona', 'create'] as const,
+  /** Update platformAgentPersona mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentpersona', 'update', id] as const,
+  /** Delete platformAgentPersona mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentpersona', 'delete', id] as const,
+} as const;
+export const platformAgentPlanMutationKeys = {
+  /** All platformAgentPlan mutation keys */ all: ['mutation', 'platformagentplan'] as const,
+  /** Create platformAgentPlan mutation key */ create: () =>
+    ['mutation', 'platformagentplan', 'create'] as const,
+  /** Update platformAgentPlan mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentplan', 'update', id] as const,
+  /** Delete platformAgentPlan mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentplan', 'delete', id] as const,
+} as const;
+export const platformAgentPromptMutationKeys = {
+  /** All platformAgentPrompt mutation keys */ all: ['mutation', 'platformagentprompt'] as const,
+  /** Create platformAgentPrompt mutation key */ create: () =>
+    ['mutation', 'platformagentprompt', 'create'] as const,
+  /** Update platformAgentPrompt mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentprompt', 'update', id] as const,
+  /** Delete platformAgentPrompt mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentprompt', 'delete', id] as const,
+} as const;
+export const platformAgentResourceChunkMutationKeys = {
+  /** All platformAgentResourceChunk mutation keys */ all: [
+    'mutation',
+    'platformagentresourcechunk',
+  ] as const,
+  /** Create platformAgentResourceChunk mutation key */ create: () =>
+    ['mutation', 'platformagentresourcechunk', 'create'] as const,
+  /** Update platformAgentResourceChunk mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentresourcechunk', 'update', id] as const,
+  /** Delete platformAgentResourceChunk mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentresourcechunk', 'delete', id] as const,
+} as const;
+export const platformAgentResourceMutationKeys = {
+  /** All platformAgentResource mutation keys */ all: [
+    'mutation',
+    'platformagentresource',
+  ] as const,
+  /** Create platformAgentResource mutation key */ create: () =>
+    ['mutation', 'platformagentresource', 'create'] as const,
+  /** Update platformAgentResource mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentresource', 'update', id] as const,
+  /** Delete platformAgentResource mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentresource', 'delete', id] as const,
+} as const;
+export const platformAgentRunMutationKeys = {
+  /** All platformAgentRun mutation keys */ all: ['mutation', 'platformagentrun'] as const,
+  /** Create platformAgentRun mutation key */ create: () =>
+    ['mutation', 'platformagentrun', 'create'] as const,
+  /** Update platformAgentRun mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentrun', 'update', id] as const,
+  /** Delete platformAgentRun mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentrun', 'delete', id] as const,
+} as const;
+export const platformAgentRunWorkspaceMutationKeys = {
+  /** All platformAgentRunWorkspace mutation keys */ all: [
+    'mutation',
+    'platformagentrunworkspace',
+  ] as const,
+  /** Create platformAgentRunWorkspace mutation key */ create: () =>
+    ['mutation', 'platformagentrunworkspace', 'create'] as const,
+  /** Update platformAgentRunWorkspace mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentrunworkspace', 'update', id] as const,
+  /** Delete platformAgentRunWorkspace mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentrunworkspace', 'delete', id] as const,
+} as const;
+export const platformAgentTaskMutationKeys = {
+  /** All platformAgentTask mutation keys */ all: ['mutation', 'platformagenttask'] as const,
+  /** Create platformAgentTask mutation key */ create: () =>
+    ['mutation', 'platformagenttask', 'create'] as const,
+  /** Update platformAgentTask mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagenttask', 'update', id] as const,
+  /** Delete platformAgentTask mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagenttask', 'delete', id] as const,
+} as const;
+export const platformAgentThreadMutationKeys = {
+  /** All platformAgentThread mutation keys */ all: ['mutation', 'platformagentthread'] as const,
+  /** Create platformAgentThread mutation key */ create: () =>
+    ['mutation', 'platformagentthread', 'create'] as const,
+  /** Update platformAgentThread mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformagentthread', 'update', id] as const,
+  /** Delete platformAgentThread mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformagentthread', 'delete', id] as const,
 } as const;
 
 // ============================================================================
@@ -131,13 +273,28 @@ export const customMutationKeys = {
  */
 export const mutationKeys = {
   agent: agentMutationKeys,
+  agentEvent: agentEventMutationKeys,
   agentMessage: agentMessageMutationKeys,
   agentPersona: agentPersonaMutationKeys,
   agentPlan: agentPlanMutationKeys,
   agentPrompt: agentPromptMutationKeys,
   agentResourceChunk: agentResourceChunkMutationKeys,
   agentResource: agentResourceMutationKeys,
+  agentRun: agentRunMutationKeys,
+  agentRunWorkspace: agentRunWorkspaceMutationKeys,
   agentTask: agentTaskMutationKeys,
   agentThread: agentThreadMutationKeys,
+  platformAgent: platformAgentMutationKeys,
+  platformAgentEvent: platformAgentEventMutationKeys,
+  platformAgentMessage: platformAgentMessageMutationKeys,
+  platformAgentPersona: platformAgentPersonaMutationKeys,
+  platformAgentPlan: platformAgentPlanMutationKeys,
+  platformAgentPrompt: platformAgentPromptMutationKeys,
+  platformAgentResourceChunk: platformAgentResourceChunkMutationKeys,
+  platformAgentResource: platformAgentResourceMutationKeys,
+  platformAgentRun: platformAgentRunMutationKeys,
+  platformAgentRunWorkspace: platformAgentRunWorkspaceMutationKeys,
+  platformAgentTask: platformAgentTaskMutationKeys,
+  platformAgentThread: platformAgentThreadMutationKeys,
   custom: customMutationKeys,
 } as const;

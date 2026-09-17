@@ -9,7 +9,7 @@ Site-owned page content — merkle-versioned head over the infra store; never a 
 ```typescript
 db.platformPage.findMany({ select: { id: true } }).execute()
 db.platformPage.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformPage.create({ data: { commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
+db.platformPage.create({ data: { commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' }, select: { id: true } }).execute()
 db.platformPage.update({ where: { id: '<UUID>' }, data: { commitId: '<UUID>' }, select: { id: true } }).execute()
 db.platformPage.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.platformPage.findMany({
 
 ```typescript
 const item = await db.platformPage.create({
-  data: { commitId: '<UUID>', content: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' },
+  data: { commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

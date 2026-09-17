@@ -1,13 +1,13 @@
 ---
 name: cli-config
-description: CLI tool (csdk) for the config API — provides CRUD commands for 5 tables and 13 custom operations
+description: CLI tool (csdk) for the config API — provides CRUD commands for 9 tables and 21 custom operations
 ---
 
 # cli-config
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the config API — provides CRUD commands for 5 tables and 13 custom operations
+CLI tool (csdk) for the config API — provides CRUD commands for 9 tables and 21 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. config)
-csdk config list
-csdk config get --id <value>
-csdk config create --<field> <value>
+# CRUD for any table (e.g. app-internal-secret)
+csdk app-internal-secret list
+csdk app-internal-secret get --id <value>
+csdk app-internal-secret create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty config list
+csdk --no-tty app-internal-secret list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty config list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk config list
+csdk app-internal-secret list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty config create --<field> <value>
+csdk --no-tty app-internal-secret create --<field> <value>
 ```
 
 ## References
@@ -56,15 +56,27 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
+- [app-internal-secret](references/app-internal-secret.md)
 - [config](references/config.md)
+- [internal-config](references/internal-config.md)
+- [internal-secret](references/internal-secret.md)
 - [platform-config](references/platform-config.md)
+- [platform-internal-config](references/platform-internal-config.md)
 - [platform-internal-secret](references/platform-internal-secret.md)
 - [platform-secret](references/platform-secret.md)
 - [secret](references/secret.md)
+- [internal-secrets-del](references/internal-secrets-del.md)
+- [internal-secrets-remove-array](references/internal-secrets-remove-array.md)
+- [internal-secrets-rotate](references/internal-secrets-rotate.md)
+- [internal-secrets-set](references/internal-secrets-set.md)
 - [secrets-del](references/secrets-del.md)
 - [secrets-remove-array](references/secrets-remove-array.md)
 - [secrets-rotate](references/secrets-rotate.md)
 - [secrets-set](references/secrets-set.md)
+- [app-internal-secrets-del](references/app-internal-secrets-del.md)
+- [app-internal-secrets-remove-array](references/app-internal-secrets-remove-array.md)
+- [app-internal-secrets-rotate](references/app-internal-secrets-rotate.md)
+- [app-internal-secrets-set](references/app-internal-secrets-set.md)
 - [platform-internal-secrets-del](references/platform-internal-secrets-del.md)
 - [platform-internal-secrets-remove-array](references/platform-internal-secrets-remove-array.md)
 - [platform-internal-secrets-rotate](references/platform-internal-secrets-rotate.md)
