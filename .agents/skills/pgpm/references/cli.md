@@ -175,6 +175,11 @@ Non-interactive init requires every question to be answered by flags; see
 `--name --fullName --email --username --repoName --license`, plus module
 `--moduleName --packageIdentifier --moduleDesc --access`.
 
+When a module is created, `pgpm init` also adds its workspace-relative path to
+the `package:` matrix of every workflow under the workspace's
+`.github/workflows/` (sorted, in place). The list stays a plain YAML array you
+can hand-edit; workflows without a `package:` list are left alone.
+
 ### Workspace Inspection
 
 **pgpm ls** — List the pgpm modules in the current workspace
