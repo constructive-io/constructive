@@ -245,6 +245,7 @@ export const addToMatrixYaml = (source: string, entry: string): string => {
  * Add a module to the test matrix of a workspace's CI workflows, keeping the
  * list sorted. The matrix stays a plain, hand-editable array: workflows without
  * a `jobs.<job>.strategy.matrix.package` sequence are left alone.
+ * Best-effort: unreadable or unwritable workflows are skipped, never thrown.
  *
  * Returns the workflow files that changed, relative to `workspacePath`.
  */
@@ -253,19 +254,27 @@ export const addToCiMatrix = (
   modulePackagePath: string
 ): string[] => {
   const dir = path.join(workspacePath, WORKFLOW_DIR);
-  if (!fs.existsSync(dir)) return [];
-
   const entry = modulePackagePath.split(path.sep).join('/');
   const changed: string[] = [];
 
-  for (const file of fs.readdirSync(dir).sort()) {
-    if (!/\.ya?ml$/.test(file)) continue;
-    const filePath = path.join(dir, file);
-    const original = fs.readFileSync(filePath, 'utf8');
-    const updated = addToMatrixYaml(original, entry);
-    if (updated === original) continue;
-    fs.writeFileSync(filePath, updated);
-    changed.push(path.join(WORKFLOW_DIR, file).split(path.sep).join('/'));
+  try {
+    if (!fs.existsSync(dir)) return changed;
+
+    for (const file of fs.readdirSync(dir).sort()) {
+      if (!/\.ya?ml$/.test(file)) continue;
+      try {
+        const filePath = path.join(dir, file);
+        const original = fs.readFileSync(filePath, 'utf8');
+        const updated = addToMatrixYaml(original, entry);
+        if (updated === original) continue;
+        fs.writeFileSync(filePath, updated);
+        changed.push(path.join(WORKFLOW_DIR, file).split(path.sep).join('/'));
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    return changed;
   }
 
   return changed;

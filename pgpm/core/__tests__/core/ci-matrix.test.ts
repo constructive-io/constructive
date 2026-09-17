@@ -585,4 +585,22 @@ describe('addToCiMatrix', () => {
   it('does nothing when the workspace has no workflows', () => {
     expect(addToCiMatrix(workspace, 'packages/alpha')).toEqual([]);
   });
+
+  it('skips workflow directories without blocking other files', () => {
+    const dir = path.join(workspace, '.github', 'workflows');
+    fs.mkdirSync(path.join(dir, 'ci.yml'), { recursive: true });
+    writeWorkflow('other.yml', flowWorkflow);
+
+    expect(addToCiMatrix(workspace, 'packages/alpha')).toEqual([
+      '.github/workflows/other.yml'
+    ]);
+  });
+
+  it('does nothing when the workflows path is a file', () => {
+    const githubDir = path.join(workspace, '.github');
+    fs.mkdirSync(githubDir, { recursive: true });
+    fs.writeFileSync(path.join(githubDir, 'workflows'), 'not a directory');
+
+    expect(addToCiMatrix(workspace, 'packages/alpha')).toEqual([]);
+  });
 });
