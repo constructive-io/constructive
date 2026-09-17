@@ -9,6 +9,7 @@ export const usageText = `
 
   Project Management:
     init               Initialize workspace or module
+    ls                 List the modules in the current workspace (alias: list)
     extension          Manage module dependencies
     plan               Generate module deployment plans
     regen              Generate revert/verify scripts from deploy scripts
