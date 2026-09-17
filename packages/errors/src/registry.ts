@@ -114,6 +114,19 @@ export const registry = {
     http: 409,
     message: 'An account with this email already exists. Please sign in or use a different email.'
   }),
+  ALREADY_AUTHENTICATED_USE_LINK: defineError({
+    code: 'ALREADY_AUTHENTICATED_USE_LINK',
+    class: 'public',
+    http: 409,
+    message:
+      'You are already signed in. Add this email or phone number to your current account instead of creating a new one.'
+  }),
+  IDENTIFIER_CONFLICT: defineError({
+    code: 'IDENTIFIER_CONFLICT',
+    class: 'public',
+    http: 409,
+    message: 'The email and phone number belong to different accounts. Provide only one of them.'
+  }),
   ACCOUNT_NOT_FOUND: defineError({
     code: 'ACCOUNT_NOT_FOUND',
     class: 'public',
@@ -313,6 +326,13 @@ export const registry = {
     class: 'public',
     http: 429,
     message: 'This invitation has reached its usage limit. Please request a new invitation.'
+  }),
+  INVITE_ACCOUNT_EXISTS_UNVERIFIED: defineError({
+    code: 'INVITE_ACCOUNT_EXISTS_UNVERIFIED',
+    class: 'public',
+    http: 409,
+    message:
+      'An unverified account already exists for this identifier and has no active invitation. Ask the user to verify their account instead.'
   }),
   INVITE_EMAIL_NOT_FOUND: defineError({
     code: 'INVITE_EMAIL_NOT_FOUND',
