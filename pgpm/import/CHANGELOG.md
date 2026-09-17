@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.6.0...@pgpmjs/import@0.7.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/import
+
 # [0.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.5.6...@pgpmjs/import@0.6.0) (2026-09-17)
 
 **Note:** Version bump only for package @pgpmjs/import
