@@ -5825,14 +5825,6 @@
     "n_generated": 3,
     "class": "public"
   },
-  "STORAGE_ACCESS_CLAIM_MISMATCH": {
-    "count": 18,
-    "dynamic": false,
-    "sample": "STORAGE_ACCESS_CLAIM_MISMATCH",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
-  },
   "STORAGE_API_NOT_PROVISIONED": {
     "count": 2,
     "dynamic": false,
@@ -5864,14 +5856,6 @@
     "n_source": 1,
     "n_generated": 4,
     "class": "internal"
-  },
-  "STORAGE_FILE_NOT_FOUND": {
-    "count": 6,
-    "dynamic": false,
-    "sample": "STORAGE_FILE_NOT_FOUND",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
   },
   "STORAGE_GC_CONTENT_HASH_UNSUPPORTED": {
     "count": 2,
@@ -5945,22 +5929,6 @@
     "n_generated": 1,
     "class": "internal"
   },
-  "STORAGE_INVALID_COMPLETION_RESULT": {
-    "count": 6,
-    "dynamic": false,
-    "sample": "STORAGE_INVALID_COMPLETION_RESULT",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
-  },
-  "STORAGE_INVALID_UPLOAD_DOCUMENT": {
-    "count": 6,
-    "dynamic": false,
-    "sample": "STORAGE_INVALID_UPLOAD_DOCUMENT",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "internal"
-  },
   "STORAGE_MODULE_ENTITY_FIELD_INVALID": {
     "count": 2,
     "dynamic": false,
@@ -5977,14 +5945,6 @@
     "n_generated": 1,
     "class": "internal"
   },
-  "STORAGE_PROCESSING_CONFLICT": {
-    "count": 6,
-    "dynamic": false,
-    "sample": "STORAGE_PROCESSING_CONFLICT",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
-  },
   "STORAGE_PROMOTION_DESTINATION_MISMATCH": {
     "count": 7,
     "dynamic": false,
@@ -6000,22 +5960,6 @@
     "n_source": 1,
     "n_generated": 4,
     "class": "internal"
-  },
-  "STORAGE_SOURCE_HASH_MISMATCH": {
-    "count": 6,
-    "dynamic": false,
-    "sample": "STORAGE_SOURCE_HASH_MISMATCH",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
-  },
-  "STORAGE_SOURCE_HASH_REQUIRED": {
-    "count": 12,
-    "dynamic": false,
-    "sample": "STORAGE_SOURCE_HASH_REQUIRED",
-    "n_source": 1,
-    "n_generated": 4,
-    "class": "public"
   },
   "STORAGE_STAGING_BUCKET_NO_DESTINATION": {
     "count": 7,
