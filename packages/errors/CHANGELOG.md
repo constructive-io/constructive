@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.19.0...@constructive-io/errors@0.20.0) (2026-09-19)
+
+### Features
+
+- **errors:** register verified-only identifier claim codes (IDENTIFIER_VERIFIED_ELSEWHERE, IDENTIFIER_UNVERIFIED_AMBIGUOUS, IDENTIFIER_CLAIM_LIMIT, MFA_IDENTIFIER_UNVERIFIED) ([c2bc7a6](https://github.com/constructive-io/constructive/commit/c2bc7a607cac65754eb1fb41362e75ecf4635623)), closes [#3830](https://github.com/constructive-io/constructive/issues/3830)
+
 # [0.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.18.0...@constructive-io/errors@0.19.0) (2026-09-17)
 
 ### Features
