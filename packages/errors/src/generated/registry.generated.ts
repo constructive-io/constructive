@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (804 distinct codes
+ * Source of truth: the constructive-db error audit (824 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 804 total, 594 public, 210 internal.
+ * Counts: 824 total, 604 public, 220 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -44,6 +44,9 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'APP_INSTALLATION_MISSING': defineError({ code: 'APP_INSTALLATION_MISSING', class: 'public', http: 400, message: 'App installation missing.' }),
   'APP_INSTALL_NO_SERVICE': defineError({ code: 'APP_INSTALL_NO_SERVICE', class: 'public', http: 400, message: 'App install no service.' }),
   'ASSIGN_PROFILES_CAPABILITY_REQUIRED': defineError({ code: 'ASSIGN_PROFILES_CAPABILITY_REQUIRED', class: 'internal', http: 500, message: 'Assign profiles capability required.' }),
+  'AST_OPTIONS_NOT_OBJECT': defineError({ code: 'AST_OPTIONS_NOT_OBJECT', class: 'internal', http: 500, message: 'Ast options not object.' }),
+  'AST_OPTION_REQUIRED': defineError({ code: 'AST_OPTION_REQUIRED', class: 'internal', http: 500, message: 'Ast option required.' }),
+  'AST_OPTION_UNKNOWN': defineError({ code: 'AST_OPTION_UNKNOWN', class: 'internal', http: 500, message: 'Ast option unknown.' }),
   'ATTRIBUTION_REQUIRED': defineError({ code: 'ATTRIBUTION_REQUIRED', class: 'internal', http: 500, message: 'Attribution required.' }),
   'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED': defineError({ code: 'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED', class: 'public', http: 400, message: 'Authz column security authz node required.' }),
   'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED': defineError({ code: 'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED', class: 'public', http: 400, message: 'Authz column security columns required.' }),
@@ -81,6 +84,17 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'BAD_VIEW_EXPRESSION': defineError({ code: 'BAD_VIEW_EXPRESSION', class: 'public', http: 400, message: 'Bad view expression.' }),
   'BEHAVIOR_FRAGMENT_EMPTY': defineError({ code: 'BEHAVIOR_FRAGMENT_EMPTY', class: 'internal', http: 500, message: 'Behavior fragment empty.' }),
   'BILLING_DISPUTE_BALANCE_NOT_FOUND': defineError({ code: 'BILLING_DISPUTE_BALANCE_NOT_FOUND', class: 'internal', http: 500, message: 'Billing dispute balance not found.' }),
+  'BILLING_ENTITY_BUSY': defineError({ code: 'BILLING_ENTITY_BUSY', class: 'public', http: 400, message: 'Billing entity busy.' }),
+  'BILLING_HEALTH_INVALID': defineError({ code: 'BILLING_HEALTH_INVALID', class: 'internal', http: 500, message: 'Billing health invalid.' }),
+  'BILLING_NOT_READY': defineError({ code: 'BILLING_NOT_READY', class: 'public', http: 400, message: 'Billing not ready.' }),
+  'BILLING_OBSERVATION_INVALID': defineError({ code: 'BILLING_OBSERVATION_INVALID', class: 'internal', http: 500, message: 'Billing observation invalid.' }),
+  'BILLING_OPERATION_CONFLICT': defineError({ code: 'BILLING_OPERATION_CONFLICT', class: 'public', http: 400, message: 'Billing operation conflict.' }),
+  'BILLING_OPERATION_INVALID': defineError({ code: 'BILLING_OPERATION_INVALID', class: 'public', http: 400, message: 'Billing operation invalid.' }),
+  'BILLING_OPERATION_NOT_FOUND': defineError({ code: 'BILLING_OPERATION_NOT_FOUND', class: 'internal', http: 500, message: 'Billing operation not found.' }),
+  'BILLING_OPERATION_SETTLED': defineError({ code: 'BILLING_OPERATION_SETTLED', class: 'internal', http: 500, message: 'Billing operation settled.' }),
+  'BILLING_OPERATION_STATE_INVALID': defineError({ code: 'BILLING_OPERATION_STATE_INVALID', class: 'internal', http: 500, message: 'Billing operation state invalid.' }),
+  'BILLING_RECONCILE_BOUNDS_REQUIRED': defineError({ code: 'BILLING_RECONCILE_BOUNDS_REQUIRED', class: 'internal', http: 500, message: 'Billing reconcile bounds required.' }),
+  'BILLING_SCHEDULED_CHANGE_INVALID': defineError({ code: 'BILLING_SCHEDULED_CHANGE_INVALID', class: 'internal', http: 500, message: 'Billing scheduled change invalid.' }),
   'BLUEPRINT_MODULE_NOT_INSTALLED': defineError({ code: 'BLUEPRINT_MODULE_NOT_INSTALLED', class: 'public', http: 400, message: 'Blueprint module not installed.' }),
   'BLUEPRINT_MODULE_REF_AMBIGUOUS': defineError({ code: 'BLUEPRINT_MODULE_REF_AMBIGUOUS', class: 'public', http: 400, message: 'Blueprint module ref ambiguous.' }),
   'BLUEPRINT_MODULE_REF_INVALID': defineError({ code: 'BLUEPRINT_MODULE_REF_INVALID', class: 'public', http: 400, message: 'Blueprint module ref invalid.' }),
@@ -372,7 +386,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'GRAPH_TREE_NOT_FOUND': defineError({ code: 'GRAPH_TREE_NOT_FOUND', class: 'internal', http: 500, message: 'Graph tree not found.' }),
   'GRAPH_VALIDATION_FAILED': defineError({ code: 'GRAPH_VALIDATION_FAILED', class: 'internal', http: 500, message: 'GRAPH_VALIDATION_FAILED: graph {{arg0}} failed pre-execution validation: {{arg1}}', positional: ['arg0', 'arg1'] }),
   'GROUPS_REQ_ENTITIES': defineError({ code: 'GROUPS_REQ_ENTITIES', class: 'public', http: 400, message: 'Groups req entities.' }),
-  'GUARD_STEP_UP': defineError({ code: 'GUARD_STEP_UP', class: 'internal', http: 500, message: 'GUARD_STEP_UP: unknown event {{arg0}}, expected INSERT, UPDATE, or DELETE', positional: ['arg0'] }),
+  'GUARD_STEP_UP': defineError({ code: 'GUARD_STEP_UP', class: 'internal', http: 500, message: 'GUARD_STEP_UP: min_age anchor takes fk_col or anchor_conditions, not both' }),
   'GUARD_STEP_UP_CONDITIONS_CONDITION_FIELD_CONFLICT': defineError({ code: 'GUARD_STEP_UP_CONDITIONS_CONDITION_FIELD_CONFLICT', class: 'public', http: 403, message: 'Guard step up conditions condition field conflict.' }),
   'GUARD_STEP_UP_CONDITIONS_WATCH_FIELDS_CONFLICT': defineError({ code: 'GUARD_STEP_UP_CONDITIONS_WATCH_FIELDS_CONFLICT', class: 'public', http: 403, message: 'Guard step up conditions watch fields conflict.' }),
   'GUARD_STEP_UP_CONDITION_FIELD_NOT_FOUND': defineError({ code: 'GUARD_STEP_UP_CONDITION_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Guard step up condition field not found.' }),
@@ -420,7 +434,10 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'HISTORY': defineError({ code: 'HISTORY', class: 'internal', http: 500, message: 'HISTORY: history {{arg0}}.{{arg1}} registration has no copy_fields', positional: ['arg0', 'arg1'] }),
   'HOSTNAME_BINDING_SYNC': defineError({ code: 'HOSTNAME_BINDING_SYNC', class: 'internal', http: 500, message: 'HOSTNAME_BINDING_SYNC: unknown event {{arg0}}, expected UPSERT or DELETE', positional: ['arg0'] }),
   'HOSTNAME_CLAIMED_IN_OTHER_PLANE': defineError({ code: 'HOSTNAME_CLAIMED_IN_OTHER_PLANE', class: 'public', http: 400, message: 'Hostname claimed in other plane.' }),
+  'IDENTIFIER_CLAIM_LIMIT': defineError({ code: 'IDENTIFIER_CLAIM_LIMIT', class: 'public', http: 429, message: 'Identifier claim limit.' }),
   'IDENTIFIER_CONFLICT': defineError({ code: 'IDENTIFIER_CONFLICT', class: 'public', http: 400, message: 'Identifier conflict.' }),
+  'IDENTIFIER_UNVERIFIED_AMBIGUOUS': defineError({ code: 'IDENTIFIER_UNVERIFIED_AMBIGUOUS', class: 'public', http: 400, message: 'Identifier unverified ambiguous.' }),
+  'IDENTIFIER_VERIFIED_ELSEWHERE': defineError({ code: 'IDENTIFIER_VERIFIED_ELSEWHERE', class: 'public', http: 400, message: 'Identifier verified elsewhere.' }),
   'IDENTITY_ACCOUNT_NOT_FOUND': defineError({ code: 'IDENTITY_ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Identity account not found.' }),
   'IDENTITY_ALREADY_LINKED': defineError({ code: 'IDENTITY_ALREADY_LINKED', class: 'public', http: 409, message: 'Identity already linked.' }),
   'IDENTITY_LINK_AVAILABLE': defineError({ code: 'IDENTITY_LINK_AVAILABLE', class: 'public', http: 400, message: 'Identity link available.' }),
@@ -547,6 +564,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'MERKLE_REF_NOT_FOUND': defineError({ code: 'MERKLE_REF_NOT_FOUND', class: 'public', http: 404, message: 'Merkle ref not found.' }),
   'METER_RATE_LIMIT': defineError({ code: 'METER_RATE_LIMIT', class: 'internal', http: 500, message: 'METER_RATE_LIMIT: unknown event {{arg0}}, expected INSERT or UPDATE', positional: ['arg0'] }),
   'MFA_CHALLENGE_EXPIRED': defineError({ code: 'MFA_CHALLENGE_EXPIRED', class: 'public', http: 403, message: 'Mfa challenge expired.' }),
+  'MFA_IDENTIFIER_UNVERIFIED': defineError({ code: 'MFA_IDENTIFIER_UNVERIFIED', class: 'public', http: 403, message: 'Mfa identifier unverified.' }),
   'MFA_REQUIRED': defineError({ code: 'MFA_REQUIRED', class: 'public', http: 403, message: 'Mfa required.' }),
   'MISSING_FIXTURE_TYPE': defineError({ code: 'MISSING_FIXTURE_TYPE', class: 'internal', http: 500, message: 'Missing fixture type.' }),
   'MISSING_REQUIRED_FIELD': defineError({ code: 'MISSING_REQUIRED_FIELD', class: 'public', http: 400, message: 'Missing required field.' }),
@@ -726,6 +744,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'SITE_SURFACE_NOT_PROVISIONED': defineError({ code: 'SITE_SURFACE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Site surface not provisioned.' }),
   'SMS_SIGN_IN_DISABLED': defineError({ code: 'SMS_SIGN_IN_DISABLED', class: 'public', http: 403, message: 'Sms sign in disabled.' }),
   'SMS_SIGN_UP_DISABLED': defineError({ code: 'SMS_SIGN_UP_DISABLED', class: 'public', http: 403, message: 'Sms sign up disabled.' }),
+  'SMS_VERIFICATION_DISABLED': defineError({ code: 'SMS_VERIFICATION_DISABLED', class: 'public', http: 403, message: 'Sms verification disabled.' }),
   'SOURCE_COMMIT_NOT_FOUND': defineError({ code: 'SOURCE_COMMIT_NOT_FOUND', class: 'internal', http: 500, message: 'Source commit not found.' }),
   'SOURCE_EMAILS_NOT_FOUND': defineError({ code: 'SOURCE_EMAILS_NOT_FOUND', class: 'internal', http: 500, message: 'Source emails not found.' }),
   'SOURCE_SECRETS_NOT_FOUND': defineError({ code: 'SOURCE_SECRETS_NOT_FOUND', class: 'internal', http: 500, message: 'Source secrets not found.' }),
@@ -803,6 +822,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'TRIGGER_WHEN_AST_ROW_UNAVAILABLE': defineError({ code: 'TRIGGER_WHEN_AST_ROW_UNAVAILABLE', class: 'public', http: 400, message: 'Trigger when ast row unavailable.' }),
   'TRUST_LADDER_OPTION_INVALID': defineError({ code: 'TRUST_LADDER_OPTION_INVALID', class: 'internal', http: 500, message: 'Trust ladder option invalid.' }),
   'UNAUTHENTICATED': defineError({ code: 'UNAUTHENTICATED', class: 'public', http: 401, message: 'Unauthenticated.' }),
+  'UNKNOWN_METER': defineError({ code: 'UNKNOWN_METER', class: 'public', http: 400, message: 'Unknown meter.' }),
   'UNKNOWN_POLICY_TYPE': defineError({ code: 'UNKNOWN_POLICY_TYPE', class: 'public', http: 400, message: 'Unknown policy type.' }),
   'UNKNOWN_VIEW_TYPE': defineError({ code: 'UNKNOWN_VIEW_TYPE', class: 'public', http: 400, message: 'Unknown view type.', positional: ['arg0'] }),
   'UNSUPPORTED': defineError({ code: 'UNSUPPORTED', class: 'internal', http: 500, message: 'UNSUPPORTED POLICY ({{arg0}})', positional: ['arg0'] }),
@@ -852,6 +872,9 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'APP_INSTALLATION_MISSING': { class: 'public', dynamic: false, generatedOnly: false },
   'APP_INSTALL_NO_SERVICE': { class: 'public', dynamic: false, generatedOnly: false },
   'ASSIGN_PROFILES_CAPABILITY_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
+  'AST_OPTIONS_NOT_OBJECT': { class: 'internal', dynamic: false, generatedOnly: false },
+  'AST_OPTION_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
+  'AST_OPTION_UNKNOWN': { class: 'internal', dynamic: false, generatedOnly: false },
   'ATTRIBUTION_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -889,6 +912,17 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'BAD_VIEW_EXPRESSION': { class: 'public', dynamic: false, generatedOnly: false },
   'BEHAVIOR_FRAGMENT_EMPTY': { class: 'internal', dynamic: false, generatedOnly: false },
   'BILLING_DISPUTE_BALANCE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
+  'BILLING_ENTITY_BUSY': { class: 'public', dynamic: false, generatedOnly: true },
+  'BILLING_HEALTH_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_NOT_READY': { class: 'public', dynamic: false, generatedOnly: false },
+  'BILLING_OBSERVATION_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_OPERATION_CONFLICT': { class: 'public', dynamic: false, generatedOnly: true },
+  'BILLING_OPERATION_INVALID': { class: 'public', dynamic: false, generatedOnly: true },
+  'BILLING_OPERATION_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_OPERATION_SETTLED': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_OPERATION_STATE_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_RECONCILE_BOUNDS_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_SCHEDULED_CHANGE_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
   'BLUEPRINT_MODULE_NOT_INSTALLED': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_REF_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_REF_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1228,7 +1262,10 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'HISTORY': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_BINDING_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
   'HOSTNAME_CLAIMED_IN_OTHER_PLANE': { class: 'public', dynamic: false, generatedOnly: true },
+  'IDENTIFIER_CLAIM_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTIFIER_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
+  'IDENTIFIER_UNVERIFIED_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
+  'IDENTIFIER_VERIFIED_ELSEWHERE': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_ALREADY_LINKED': { class: 'public', dynamic: false, generatedOnly: false },
   'IDENTITY_LINK_AVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1355,6 +1392,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'MERKLE_REF_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'METER_RATE_LIMIT': { class: 'internal', dynamic: true, generatedOnly: false },
   'MFA_CHALLENGE_EXPIRED': { class: 'public', dynamic: false, generatedOnly: false },
+  'MFA_IDENTIFIER_UNVERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
   'MFA_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'MISSING_FIXTURE_TYPE': { class: 'internal', dynamic: false, generatedOnly: false },
   'MISSING_REQUIRED_FIELD': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1534,6 +1572,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'SITE_SURFACE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'SMS_SIGN_IN_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
   'SMS_SIGN_UP_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
+  'SMS_VERIFICATION_DISABLED': { class: 'public', dynamic: false, generatedOnly: false },
   'SOURCE_COMMIT_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'SOURCE_EMAILS_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'SOURCE_SECRETS_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1611,6 +1650,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'TRIGGER_WHEN_AST_ROW_UNAVAILABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'TRUST_LADDER_OPTION_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'UNAUTHENTICATED': { class: 'public', dynamic: false, generatedOnly: false },
+  'UNKNOWN_METER': { class: 'public', dynamic: false, generatedOnly: true },
   'UNKNOWN_POLICY_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
   'UNKNOWN_VIEW_TYPE': { class: 'public', dynamic: true, generatedOnly: false },
   'UNSUPPORTED': { class: 'internal', dynamic: true, generatedOnly: false },
@@ -1639,4 +1679,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 804;
+export const GENERATED_CODE_COUNT = 824;
