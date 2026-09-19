@@ -175,6 +175,16 @@ Non-interactive init requires every question to be answered by flags; see
 `--name --fullName --email --username --repoName --license`, plus module
 `--moduleName --packageIdentifier --moduleDesc --access`.
 
+When a module is created, `pgpm init` also adds its workspace-relative path to
+each `jobs.<job>.strategy.matrix.package` list in the workspace's
+`.github/workflows/*.yml` (sorted, in place). The workflow is parsed with `yaml`
+to address that path, and only the matrix list's own byte range is rewritten, so
+comments and formatting survive where they can be preserved. A matrix whose
+comments cannot be preserved is left untouched. The list stays a plain YAML
+array you can hand-edit; workflows without such a matrix — or whose matrix isn't
+a plain list of strings — or that can't be read or written — are left alone
+silently; the update is best-effort and never warns.
+
 ### Workspace Inspection
 
 **pgpm ls** — List the pgpm modules in the current workspace
