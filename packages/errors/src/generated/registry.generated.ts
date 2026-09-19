@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (824 distinct codes
+ * Source of truth: the constructive-db error audit (817 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 824 total, 604 public, 220 internal.
+ * Counts: 817 total, 598 public, 219 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -763,12 +763,10 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': defineError({ code: 'STEP_UP_REQUIRED_FRESH_AUTH', class: 'public', http: 403, message: 'Please verify your identity to continue.' }),
   'STEP_UP_REQUIRED_MFA': defineError({ code: 'STEP_UP_REQUIRED_MFA', class: 'public', http: 403, message: 'Please enter a code from your authenticator app to continue.' }),
   'STEP_UP_REQUIRED_PASSWORD': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD', class: 'public', http: 403, message: 'Please re-enter your password to continue.' }),
-  'STORAGE_ACCESS_CLAIM_MISMATCH': defineError({ code: 'STORAGE_ACCESS_CLAIM_MISMATCH', class: 'public', http: 400, message: 'Storage access claim mismatch.' }),
   'STORAGE_API_NOT_PROVISIONED': defineError({ code: 'STORAGE_API_NOT_PROVISIONED', class: 'public', http: 400, message: 'Storage api not provisioned.' }),
   'STORAGE_DESTINATION_REQUIRES_TEMP': defineError({ code: 'STORAGE_DESTINATION_REQUIRES_TEMP', class: 'internal', http: 500, message: 'Storage destination requires temp.' }),
   'STORAGE_FILE_BUCKET_IMMUTABLE': defineError({ code: 'STORAGE_FILE_BUCKET_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file bucket immutable.' }),
   'STORAGE_FILE_KEY_IMMUTABLE': defineError({ code: 'STORAGE_FILE_KEY_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file key immutable.' }),
-  'STORAGE_FILE_NOT_FOUND': defineError({ code: 'STORAGE_FILE_NOT_FOUND', class: 'public', http: 404, message: 'Storage file not found.' }),
   'STORAGE_GC_CONTENT_HASH_UNSUPPORTED': defineError({ code: 'STORAGE_GC_CONTENT_HASH_UNSUPPORTED', class: 'internal', http: 500, message: 'Storage gc content hash unsupported.' }),
   'STORAGE_GC_FILES_TABLE_MISSING': defineError({ code: 'STORAGE_GC_FILES_TABLE_MISSING', class: 'internal', http: 500, message: 'Storage gc files table missing.' }),
   'STORAGE_GC_MODULE_AMBIGUOUS': defineError({ code: 'STORAGE_GC_MODULE_AMBIGUOUS', class: 'internal', http: 500, message: 'Storage gc module ambiguous.' }),
@@ -778,15 +776,10 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STORAGE_GC_REF_CROSS_DATABASE': defineError({ code: 'STORAGE_GC_REF_CROSS_DATABASE', class: 'internal', http: 500, message: 'Storage gc ref cross database.' }),
   'STORAGE_GC_REF_FIELD_MISSING': defineError({ code: 'STORAGE_GC_REF_FIELD_MISSING', class: 'internal', http: 500, message: 'Storage gc ref field missing.' }),
   'STORAGE_GC_REF_TABLE_MISSING': defineError({ code: 'STORAGE_GC_REF_TABLE_MISSING', class: 'internal', http: 500, message: 'Storage gc ref table missing.' }),
-  'STORAGE_INVALID_COMPLETION_RESULT': defineError({ code: 'STORAGE_INVALID_COMPLETION_RESULT', class: 'public', http: 400, message: 'Storage invalid completion result.' }),
-  'STORAGE_INVALID_UPLOAD_DOCUMENT': defineError({ code: 'STORAGE_INVALID_UPLOAD_DOCUMENT', class: 'internal', http: 500, message: 'Storage invalid upload document.' }),
   'STORAGE_MODULE_ENTITY_FIELD_INVALID': defineError({ code: 'STORAGE_MODULE_ENTITY_FIELD_INVALID', class: 'internal', http: 500, message: 'Storage module entity field invalid.' }),
   'STORAGE_MODULE_NOT_FOUND': defineError({ code: 'STORAGE_MODULE_NOT_FOUND', class: 'internal', http: 500, message: 'Storage module not found.' }),
-  'STORAGE_PROCESSING_CONFLICT': defineError({ code: 'STORAGE_PROCESSING_CONFLICT', class: 'public', http: 400, message: 'Storage processing conflict.' }),
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_DESTINATION_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion destination mismatch.' }),
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_VISIBILITY_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion visibility mismatch.' }),
-  'STORAGE_SOURCE_HASH_MISMATCH': defineError({ code: 'STORAGE_SOURCE_HASH_MISMATCH', class: 'public', http: 400, message: 'Storage source hash mismatch.' }),
-  'STORAGE_SOURCE_HASH_REQUIRED': defineError({ code: 'STORAGE_SOURCE_HASH_REQUIRED', class: 'public', http: 400, message: 'Storage source hash required.' }),
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': defineError({ code: 'STORAGE_STAGING_BUCKET_NO_DESTINATION', class: 'internal', http: 500, message: 'Storage staging bucket no destination.' }),
   'STORAGE_STAGING_BUCKET_NO_TTL': defineError({ code: 'STORAGE_STAGING_BUCKET_NO_TTL', class: 'internal', http: 500, message: 'Storage staging bucket no ttl.' }),
   'STORAGE_STAGING_DESTINATION_INVALID': defineError({ code: 'STORAGE_STAGING_DESTINATION_INVALID', class: 'internal', http: 500, message: 'Storage staging destination invalid.' }),
@@ -1591,12 +1584,10 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_PASSWORD': { class: 'public', dynamic: false, generatedOnly: false },
-  'STORAGE_ACCESS_CLAIM_MISMATCH': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_API_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_DESTINATION_REQUIRES_TEMP': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_BUCKET_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_KEY_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_FILE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_GC_CONTENT_HASH_UNSUPPORTED': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_FILES_TABLE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_MODULE_AMBIGUOUS': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1606,15 +1597,10 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STORAGE_GC_REF_CROSS_DATABASE': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_FIELD_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_TABLE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_INVALID_COMPLETION_RESULT': { class: 'public', dynamic: false, generatedOnly: false },
-  'STORAGE_INVALID_UPLOAD_DOCUMENT': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_MODULE_ENTITY_FIELD_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_MODULE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_PROCESSING_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_SOURCE_HASH_MISMATCH': { class: 'public', dynamic: false, generatedOnly: false },
-  'STORAGE_SOURCE_HASH_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_BUCKET_NO_TTL': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_DESTINATION_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1679,4 +1665,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 824;
+export const GENERATED_CODE_COUNT = 817;
