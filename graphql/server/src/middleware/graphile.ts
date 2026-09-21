@@ -1,19 +1,21 @@
 import './types'; // for Request type
 
 import { errors } from '@constructive-io/errors';
-import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
+import {
+  createGraphileBuildCacheKey,
+  createGraphileInstance,
+  graphileCache,
+  snapshotGraphileBuildValue,
+  type GraphileCacheEntry
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import {
-  createConstructivePreset,
-  createGrafastCacheLimitsPreset
-} from 'graphile-settings';
+import { createConstructivePreset, createGrafastCacheLimitsPreset } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -23,10 +25,10 @@ import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
-import type { DatabaseSettings } from '../types';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import { createGraphileServerBuildSnapshot } from './graphile-build-snapshot';
 
 const isDev = (): boolean => getNodeEnv() === 'development';
 
@@ -76,29 +78,20 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
  * (everything on except aggregates).
  */
 const buildPreset = async (
-  pool: import('pg').Pool,
-  schemas: string[],
-  anonRole: string,
-  roleName: string,
-  introspectionRole: string | undefined,
-  graphileOptions: ConstructiveOptions['graphile'],
-  databaseSettings?: DatabaseSettings,
-  apiId?: string,
-  compute?: ComputeConfig
+  snapshot: ReturnType<typeof createGraphileServerBuildSnapshot>,
+  pool: import('pg').Pool
 ): Promise<GraphileConfig.Preset> => {
-  const introspection = await makeIntrospectionWiring(pool, schemas, graphileOptions, undefined, introspectionRole);
-  const configuredPreset = graphileOptions?.preset ?? {};
-  const grafastCachePreset = createGrafastCacheLimitsPreset(graphileOptions?.grafastCache);
+  const introspection = await makeIntrospectionWiring(pool, snapshot.schemas, snapshot.graphileOptions, undefined, snapshot.introspectionRole);
+  const configuredPreset = snapshot.graphileOptions?.preset ?? {};
+  const grafastCachePreset = createGrafastCacheLimitsPreset(snapshot.graphileOptions?.grafastCache);
   return {
     ...configuredPreset,
     extends: [
-      createConstructivePreset(databaseSettings),
-      ...(graphileOptions?.extends ?? []),
+      createConstructivePreset(snapshot.databaseSettings),
+      ...(snapshot.graphileOptions?.extends ?? []),
       ...(configuredPreset.extends ?? []),
       ...introspection.presets,
-      ...(Object.keys(grafastCachePreset).length > 0
-        ? [grafastCachePreset]
-        : [])
+      ...(Object.keys(grafastCachePreset).length > 0 ? [grafastCachePreset] : [])
     ],
     plugins: [
       ...(configuredPreset.plugins ?? []),
@@ -109,11 +102,11 @@ const buildPreset = async (
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
       // no fallbacks or discovery of its own.
-      ...(apiId && compute?.modules.length
+      ...(snapshot.apiId && snapshot.computeModules.length
         ? [
           createFunctionBindingsPlugin({
-            apiId,
-            modules: compute.modules.map((m) => ({
+            apiId: snapshot.apiId,
+            modules: snapshot.computeModules.map((m) => ({
               computeSchema: m.schemaName,
               bindingsTable: m.bindingsTableName,
               definitionsTable: m.definitionsTableName,
@@ -126,15 +119,9 @@ const buildPreset = async (
         : [])
     ],
     pgServices: [introspection.pgService],
-    grafserv: {
-      graphqlPath: '/graphql',
-      graphiqlPath: '/graphiql',
-      graphiql: true,
-      graphiqlOnGraphQLGET: false,
-      maskError
-    },
+    grafserv: snapshot.grafserv,
     grafast: {
-      explain: process.env.NODE_ENV === 'development',
+      explain: snapshot.explain,
       context: (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
         const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
@@ -173,7 +160,7 @@ const buildPreset = async (
           if (req.token?.user_id) {
             const pgSettings: Record<string, string> = {
               ...timeouts,
-              role: roleName,
+              role: snapshot.roleName,
               'jwt.claims.token_id': req.token.id,
               'jwt.claims.user_id': req.token.user_id,
               ...context
@@ -227,7 +214,7 @@ const buildPreset = async (
           if (req.api?.isPublic === false && headerActorId) {
             const pgSettings: Record<string, string> = {
               ...timeouts,
-              role: roleName,
+              role: snapshot.roleName,
               'jwt.claims.user_id': headerActorId,
               'jwt.claims.principal_id': headerActorId,
               ...context
@@ -260,7 +247,7 @@ const buildPreset = async (
         // (`ATTRIBUTION_REQUIRED`), so a public mutation cannot enqueue a job.
         const anonSettings: Record<string, string> = {
           ...timeouts,
-          role: anonRole,
+          role: snapshot.anonRole,
           ...context
         };
         if (req?.databaseId) {
@@ -281,6 +268,7 @@ const buildPreset = async (
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+  const ownerIdentity = {};
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -291,8 +279,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(res, errors.INTERNAL_FAILURE({ details: 'Missing API info' }));
         return;
       }
-      const key = req.svc_key;
-      if (!key) {
+      const serviceKey = req.svc_key;
+      if (!serviceKey) {
         log.error(`${label} Missing service cache key`);
         respondWithGraphQLError(
           res,
@@ -301,49 +289,67 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         return;
       }
       const { dbname, anonRole, roleName, schema } = api;
-      const schemaLabel = schema?.join(',') || 'unknown';
+      const schemas = [...(schema ?? [])];
+      const schemaLabel = schemas.join(',') || 'unknown';
+      const pgConfig = snapshotGraphileBuildValue(getPgEnvOptions({
+        ...opts.pg,
+        database: dbname
+      }));
 
-      // =========================================================================
-      // Phase A: Cache Check (fast path)
-      // =========================================================================
+      // Route through pg-cache so the pool is tracked and can be cleaned up
+      // properly, preventing leaked connections during database teardown.
+      const pool = getPgPool(pgConfig);
+
+      const databaseId = api.databaseId ?? null;
+      const apiId = api.apiId;
+      const databaseSettings = api.databaseSettings
+        ? snapshotGraphileBuildValue(api.databaseSettings)
+        : undefined;
+      const introspectionRole = opts.api?.introspectionRole;
+      const explain = getNodeEnv() === 'development';
+      const snapshotInput = {
+        ownerIdentity,
+        serviceKey,
+        pool,
+        pgConfig,
+        databaseName: dbname,
+        databaseId,
+        apiId,
+        schemas,
+        anonRole,
+        roleName,
+        introspectionRole,
+        databaseSettings,
+        graphileOptions: snapshotGraphileBuildValue(opts.graphile),
+        explain,
+        maskError
+      };
+      // Resolve the request-owned compute snapshot before cache lookup because
+      // its provisioned bindings change the exact Graphile schema.
+      const compute = apiId ? await req.constructive?.useModule('compute') : undefined;
+      const snapshot = createGraphileServerBuildSnapshot({ ...snapshotInput, compute });
+      const key = createGraphileBuildCacheKey('server', snapshot);
+
       const cached = graphileCache.get(key);
       if (cached) {
         log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
         return cached.handler(req, res, next);
       }
-
       log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
 
-      // =========================================================================
-      // Phase B: In-Flight Check (single-flight coalescing)
-      // =========================================================================
       const inFlight = creating.get(key);
       if (inFlight) {
-        log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
           return instance.handler(req, res, next);
         } catch (error) {
           log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`);
-          // Fall through to Phase C to retry creation
         }
       }
-
-      // =========================================================================
-      // Phase C: Create New Handler (first request for this key)
-      // =========================================================================
-
-      // Re-check cache after coalesced request failure (another retry may have succeeded)
       const recheckedCache = graphileCache.get(key);
-      if (recheckedCache) {
-        log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
-        return recheckedCache.handler(req, res, next);
-      }
-
-      // Re-check in-flight map (another retry may have started creation)
+      if (recheckedCache) return recheckedCache.handler(req, res, next);
       const retryInFlight = creating.get(key);
       if (retryInFlight) {
-        log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
         return retryInstance.handler(req, res, next);
       }
@@ -352,48 +358,27 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname
-      });
-
-      // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
-
-      // Register the creation promise before any asynchronous preset work so
-      // concurrent requests coalesce while optional plugin modules load.
-      const creationPromise = (async () => {
-        const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-        const preset = await buildPreset(
-          pool,
-          schema || [],
-          anonRole,
-          roleName,
-          opts.api?.introspectionRole,
-          opts.graphile,
-          api.databaseSettings,
-          api.apiId,
-          compute
-        );
+      const creationPromise = Promise.resolve().then(async () => {
+        const preset = await buildPreset(snapshot, pool);
         return observeGraphileBuild(
-          {
-            cacheKey: key,
-            serviceKey: key,
-            databaseId: api.databaseId ?? null
-          },
+          { cacheKey: key, serviceKey, databaseId },
           () => createGraphileInstance({
             preset,
             cacheKey: key,
-            enableRealtime: api.databaseSettings?.enableRealtime
+            enableRealtime: snapshot.databaseSettings?.enableRealtime
           }),
           { enabled: observabilityEnabled }
         );
-      })();
+      });
       creating.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
+        Object.assign(instance, {
+          serviceKey,
+          databaseId,
+          poolKey: snapshot.poolKey
+        } satisfies Partial<GraphileCacheEntry>);
         graphileCache.set(key, instance);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
         return instance.handler(req, res, next);

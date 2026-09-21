@@ -86,6 +86,12 @@ export interface GraphileCacheEntry {
   httpServer: HttpServer;
   cacheKey: string;
   createdAt: number;
+  /** Logical service that owns this build (for example an API key or explorer route). */
+  serviceKey?: string;
+  /** Resolved database identifier, when the serving surface has one. */
+  databaseId?: string | null;
+  /** pg-cache's physical pool key (currently the resolved database name). */
+  poolKey?: string;
   /** Idempotent release for pgServices owned by this exact preset generation. */
   releasePresetServices?: () => Promise<void>;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
@@ -269,19 +275,36 @@ export function clearMatchingEntries(pattern: RegExp): number {
   return cleared;
 }
 
+const clearEntries = (matches: (key: string, entry: GraphileCacheEntry) => boolean): number => {
+  let cleared = 0;
+  for (const [key, entry] of graphileCache.entries()) {
+    if (!matches(key, entry)) continue;
+    manualEvictionKeys.add(key);
+    graphileCache.delete(key);
+    cleared++;
+  }
+  return cleared;
+};
+
+/** Clear all cached build variants owned by one logical service. */
+export const clearGraphileEntriesForService = (serviceKey: string): number =>
+  clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
+
+/** Clear all cached build variants for one resolved database identifier. */
+export const clearGraphileEntriesForDatabase = (databaseId: string): number =>
+  clearEntries((_key, entry) => entry.databaseId === databaseId);
+
+/** Clear all cached build variants backed by one pg-cache pool key. */
+export const clearGraphileEntriesForPool = (poolKey: string): number =>
+  clearEntries((_key, entry) => entry.poolKey === poolKey);
+
+
 // Register cleanup callback with pgCache
 // When a pg pool is disposed, clean up any graphile instances using it
 const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
   log.debug(`pgPool[${pgPoolKey}] disposed - checking graphile entries`);
-
-  // Remove graphile entries that reference this pool key
-  graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
-      log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
-      manualEvictionKeys.add(k);
-      graphileCache.delete(k);
-    }
-  });
+  const cleared = clearGraphileEntriesForPool(pgPoolKey);
+  if (cleared > 0) log.debug(`Removed ${cleared} graphile entries for pgPool[${pgPoolKey}]`);
 });
 
 // Enhanced close function that handles all caches

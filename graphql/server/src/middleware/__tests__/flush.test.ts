@@ -35,16 +35,57 @@ const opts = (flushToken?: string): ConstructiveOptions =>
   ({ api: { ...(flushToken && { flushToken }) } } as ConstructiveOptions);
 
 describe('createFlushMiddleware', () => {
+  const hashedVariantKeys = [
+    'graphile:server:variant-one',
+    'graphile:server:variant-two',
+    'graphile:explorer:other-service'
+  ];
+
   let next: NextFunction;
 
   beforeEach(() => {
-    graphileCache.set('tenant.example.com', { cached: true } as any);
+    graphileCache.set('tenant.example.com', {
+      cacheKey: 'tenant.example.com',
+      pgl: { release: jest.fn() },
+      serv: {},
+      handler: {},
+      httpServer: { listening: false },
+      createdAt: Date.now()
+    } as any);
+    graphileCache.set(hashedVariantKeys[0], {
+      cacheKey: hashedVariantKeys[0],
+      serviceKey: 'tenant.example.com',
+      pgl: { release: jest.fn() },
+      serv: {},
+      handler: {},
+      httpServer: { listening: false },
+      createdAt: Date.now()
+    } as any);
+    graphileCache.set(hashedVariantKeys[1], {
+      cacheKey: hashedVariantKeys[1],
+      serviceKey: 'tenant.example.com',
+      pgl: { release: jest.fn() },
+      serv: {},
+      handler: {},
+      httpServer: { listening: false },
+      createdAt: Date.now()
+    } as any);
+    graphileCache.set(hashedVariantKeys[2], {
+      cacheKey: hashedVariantKeys[2],
+      serviceKey: 'other.example.com',
+      pgl: { release: jest.fn() },
+      serv: {},
+      handler: {},
+      httpServer: { listening: false },
+      createdAt: Date.now()
+    } as any);
     svcCache.set('tenant.example.com', { cached: true } as any);
     next = jest.fn();
   });
 
   afterEach(() => {
     graphileCache.delete('tenant.example.com');
+    for (const key of hashedVariantKeys) graphileCache.delete(key);
     svcCache.delete('tenant.example.com');
   });
 
@@ -64,6 +105,9 @@ describe('createFlushMiddleware', () => {
     );
     expect(res.statusCode).toBe(200);
     expect(graphileCache.get('tenant.example.com')).toBeUndefined();
+    expect(graphileCache.has(hashedVariantKeys[0])).toBe(false);
+    expect(graphileCache.has(hashedVariantKeys[1])).toBe(false);
+    expect(graphileCache.has(hashedVariantKeys[2])).toBe(true);
     expect(svcCache.get('tenant.example.com')).toBeUndefined();
   });
 

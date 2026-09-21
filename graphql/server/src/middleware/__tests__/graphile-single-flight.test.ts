@@ -4,14 +4,19 @@ const mockCreateGraphileInstance = jest.fn();
 const mockGetPgPool = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
 const mockCreateGrafastCacheLimitsPreset = jest.fn();
+const mockRegisterPoolCleanup = jest.fn(() => jest.fn());
 
-jest.mock('graphile-cache', () => ({
-  createGraphileInstance: mockCreateGraphileInstance,
-  graphileCache: {
-    get: mockCacheGet,
-    set: mockCacheSet
-  }
-}));
+jest.mock('graphile-cache', () => {
+  const actual = jest.requireActual('graphile-cache');
+  return {
+    ...actual,
+    createGraphileInstance: mockCreateGraphileInstance,
+    graphileCache: {
+      get: mockCacheGet,
+      set: mockCacheSet
+    }
+  };
+});
 
 jest.mock('graphile-settings', () => ({
   createConstructivePreset: jest.fn(() => ({})),
@@ -19,7 +24,11 @@ jest.mock('graphile-settings', () => ({
 }));
 
 jest.mock('pg-cache', () => ({
-  getPgPool: mockGetPgPool
+  getPgPool: mockGetPgPool,
+  pgCache: {
+    registerCleanupCallback: mockRegisterPoolCleanup,
+    close: jest.fn()
+  }
 }));
 
 jest.mock('../graphile-introspection', () => ({

@@ -541,6 +541,9 @@ importers:
 
   graphile/graphile-cache:
     dependencies:
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       12factor-env:
         specifier: workspace:^
         version: link:../../packages/12factor-env/dist

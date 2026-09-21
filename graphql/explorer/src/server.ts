@@ -3,7 +3,15 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
+import {
+  clearGraphileEntriesForService,
+  createGraphileBuildCacheKey,
+  createGraphileInstance,
+  graphileCache,
+  GraphileCacheEntry,
+  referenceGraphileBuildValue,
+  snapshotGraphileBuildValue
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
@@ -14,6 +22,7 @@ import { getGraphilePreset } from './settings';
 
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
+  const ownerIdentity = {};
 
   const { pg, server } = opts;
 
@@ -21,13 +30,6 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     dbname: string,
     schemaname: string
   ): Promise<GraphileCacheEntry> => {
-    const key = `${dbname}.${schemaname}`;
-
-    const cached = graphileCache.get(key);
-    if (cached) {
-      return cached;
-    }
-
     const pgConfig = getPgEnvOptions({
       ...pg,
       database: dbname,
@@ -37,20 +39,45 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     // properly, preventing leaked connections during database teardown.
     const pool = getPgPool(pgConfig);
 
-    const basePreset = getGraphilePreset(opts);
-    const preset: GraphileConfig.Preset = {
-      ...basePreset,
-      pgServices: [
-        makePgService({ pool, schemas: [schemaname] }),
-      ],
-      grafserv: {
+    const serviceKey = `${dbname}.${schemaname}`;
+    const snapshot = snapshotGraphileBuildValue({
+      ownerIdentity: referenceGraphileBuildValue(ownerIdentity),
+      serviceKey,
+      poolIdentity: referenceGraphileBuildValue(pool),
+      poolKey: pgConfig.database,
+      pgConfig,
+      databaseName: dbname,
+      databaseId: null,
+      apiId: null,
+      schemas: [schemaname],
+      role: pg.user ?? 'postgres',
+      surface: {
         graphqlPath: '/graphql',
         graphiqlPath: '/graphiql',
         graphiql: true,
       },
+      explain: undefined,
+      enableRealtime: false,
+    });
+    const key = createGraphileBuildCacheKey('explorer', snapshot);
+    const cached = graphileCache.get(key);
+    if (cached) return cached;
+
+    const basePreset = getGraphilePreset(opts, snapshot.role);
+    const preset: GraphileConfig.Preset = {
+      ...basePreset,
+      pgServices: [
+        makePgService({ pool, schemas: snapshot.schemas }),
+      ],
+      grafserv: snapshot.surface,
     };
 
     const instance = await createGraphileInstance({ preset, cacheKey: key });
+    Object.assign(instance, {
+      serviceKey,
+      databaseId: snapshot.databaseId,
+      poolKey: snapshot.poolKey,
+    } satisfies Partial<GraphileCacheEntry>);
     graphileCache.set(key, instance);
     return instance;
   };
@@ -130,6 +157,11 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     if (req.urlDomains?.subdomains.length === 2) {
       const [schemaName, dbName] = req.urlDomains.subdomains;
       try {
+        if (req.url === '/flush') {
+          clearGraphileEntriesForService(`${dbName}.${schemaName}`);
+          res.status(200).send('OK');
+          return;
+        }
         const instance = await getGraphileInstanceObj(dbName, schemaName);
         instance.handler(req, res, next);
         return;
@@ -137,17 +169,6 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         res.status(500).send(e.message);
         return;
       }
-    }
-    return next();
-  });
-
-  app.use(async (req: Request, res: Response, next: NextFunction) => {
-    if (req.urlDomains?.subdomains.length === 2 && req.url === '/flush') {
-      const [schemaName, dbName] = req.urlDomains.subdomains;
-      const key = `${dbName}.${schemaName}`;
-      graphileCache.delete(key);
-      res.status(200).send('OK');
-      return;
     }
     return next();
   });
