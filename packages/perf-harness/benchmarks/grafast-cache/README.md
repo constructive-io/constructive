@@ -5,6 +5,11 @@ cache capacities. It lives entirely in the private perf-harness workspace packag
 and uses its existing fresh-process runner, randomized blocked scheduling,
 production environment, GC protocol, validation and JSON reporting.
 
+TypeScript sources live in `src/benchmarks/grafast-cache/` and compile with the
+existing package build into `dist/benchmarks/grafast-cache/`. The scripts start
+those compiled JavaScript workers directly with Node; no runtime TS loader is used.
+The TypeScript analyzer reuses the harness statistics and writes both summaries.
+
 Workers configure the public `GraphQLSchema.extensions.grafast` settings directly.
 They do not import CNC configuration, graphile-settings, the PR preset, or ts-node.
 Each successful worker checks its loaded module paths for those dependencies.
@@ -77,17 +82,20 @@ not pooled request counts, and do not infer production speedups from these fixtu
 Replace all three reports together after a new full run, then regenerate summaries:
 
 ```sh
-python3 - <<'PY'
-import gzip
-from pathlib import Path
-out = Path('packages/perf-harness/benchmarks/grafast-cache/results')
-for name in ('micro', 'variants', 'postgres'):
-    data = Path(f'/tmp/cache-{name}.json').read_bytes()
-    (out / f'{name}.json.gz').write_bytes(gzip.compress(data, mtime=0))
-PY
-python3 packages/perf-harness/benchmarks/grafast-cache/analyze.py
-python3 packages/perf-harness/benchmarks/grafast-cache/analyze-postgres.py
+node --input-type=module - <<'JS'
+import { readFileSync, writeFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
+const out = 'packages/perf-harness/benchmarks/grafast-cache/results';
+for (const name of ['micro', 'variants', 'postgres']) {
+  writeFileSync(`${out}/${name}.json.gz`, gzipSync(readFileSync(`/tmp/cache-${name}.json`)));
+}
+JS
+pnpm --filter @constructive-io/perf-harness cache:analyze
 ```
+
+`cache:analyze --results-dir /absolute/path/to/results` analyzes another directory
+containing the three gzip reports. It validates samples before writing
+`summary.json` and `postgres-summary.json`.
 
 Update report interpretation and provenance/checksums alongside the regenerated
 results. Smoke runs do not belong in the final reports. `pnpm --filter

@@ -4,15 +4,15 @@ import { resolve } from 'node:path';
 import { runWorkerProcess } from '../src/process';
 
 const root = resolve(__dirname, '..');
-const suite = resolve(root, 'benchmarks/grafast-cache');
+const suite = resolve(root, 'dist/benchmarks/grafast-cache');
 
 describe('standalone Grafast cache benchmarks', () => {
   test('imports all workers and the built harness without application configuration', () => {
     const result = spawnSync(process.execPath, ['--eval', `
       for (const name of ['micro', 'postgres', 'variants']) {
-        require('./benchmarks/grafast-cache/' + name + '.cjs');
+        require('./dist/benchmarks/grafast-cache/' + name + '.js');
       }
-      require('./benchmarks/grafast-cache/settings.cjs').assertIndependent();
+      require('./dist/benchmarks/grafast-cache/settings.js').assertIndependent();
     `], { cwd: root, encoding: 'utf8', timeout: 15_000 });
     expect(result.error).toBeUndefined();
     expect(result.status).toBe(0);
@@ -21,7 +21,7 @@ describe('standalone Grafast cache benchmarks', () => {
   });
 
   test.each(['omitted', 'explicit'])('executes hot queries with %s defaults', async (arm) => {
-    const { result } = await runWorkerProcess(resolve(suite, 'micro.cjs'), 'unused://in-memory', {
+    const { result } = await runWorkerProcess(resolve(suite, 'micro.js'), 'unused://in-memory', {
       name: `hot-${arm}`, workerConfig: { workload: 'hot', arm, seed: 20260921 },
     });
     expect(result.status).toBe('ok');
@@ -34,7 +34,7 @@ describe('standalone Grafast cache benchmarks', () => {
   }, 30_000);
 
   test.each([8, 128])('enforces plan capacity %i for one operation', async (cap) => {
-    const { result } = await runWorkerProcess(resolve(suite, 'variants.cjs'), 'unused://in-memory', {
+    const { result } = await runWorkerProcess(resolve(suite, 'variants.js'), 'unused://in-memory', {
       name: `variants-${cap}`, workerConfig: { cap, seed: 20260921 },
     });
     expect(result.status).toBe('ok');

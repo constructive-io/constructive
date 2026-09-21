@@ -112,5 +112,6 @@ reproduction command, measured results, and the individual timing/memory samples
 The [Grafast cache suite](benchmarks/grafast-cache/README.md) compares native
 cache capacities using this package alone. Run `cache:micro`, `cache:postgres`
 and `cache:variants` for in-memory traffic, PostgreSQL confirmation and multiple
-plans per operation. Its [PR #1746 evaluation](benchmarks/grafast-cache/results/REPORT.md)
+plans per operation. TypeScript sources build into `dist` with the rest of the
+package; `cache:analyze` validates the raw reports and produces both summaries. Its [PR #1746 evaluation](benchmarks/grafast-cache/results/REPORT.md)
 records raw results, tradeoffs and reproduction instructions.
