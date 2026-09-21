@@ -17,7 +17,7 @@ const median = (values: readonly number[]): number => {
     : sorted[middle];
 };
 
-const metricSummary = (values: number[]): MetricSummary => ({
+export const metricSummary = (values: number[]): MetricSummary => ({
   median: median(values),
   min: Math.min(...values),
   max: Math.max(...values),

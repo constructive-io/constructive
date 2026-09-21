@@ -10,7 +10,10 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
-import { createConstructivePreset } from 'graphile-settings';
+import {
+  createConstructivePreset,
+  createGrafastCacheLimitsPreset
+} from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
@@ -85,13 +88,17 @@ const buildPreset = async (
 ): Promise<GraphileConfig.Preset> => {
   const introspection = await makeIntrospectionWiring(pool, schemas, graphileOptions, undefined, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
+  const grafastCachePreset = createGrafastCacheLimitsPreset(graphileOptions?.grafastCache);
   return {
     ...configuredPreset,
     extends: [
       createConstructivePreset(databaseSettings),
       ...(graphileOptions?.extends ?? []),
       ...(configuredPreset.extends ?? []),
-      ...introspection.presets
+      ...introspection.presets,
+      ...(Object.keys(grafastCachePreset).length > 0
+        ? [grafastCachePreset]
+        : [])
     ],
     plugins: [
       ...(configuredPreset.plugins ?? []),

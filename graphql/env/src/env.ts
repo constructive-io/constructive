@@ -1,6 +1,10 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
+import {
+  normalizeGrafastCacheLimits,
+  parseGrafastCacheLimitEnv
+} from './grafast-cache-limits';
 import { getScopedIntrospectionEnv } from './scoped-introspection';
 
 /**
@@ -10,6 +14,9 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   const scopedIntrospection = getScopedIntrospectionEnv(env);
   const {
     GRAPHILE_SCHEMA,
+    GRAPHILE_QUERY_CACHE_MAX_LENGTH,
+    GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
+    GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH,
 
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
@@ -43,6 +50,11 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // let an absent env var overwrite pgpm.json or consumer-specific values.
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
+  const hasGrafastCacheLimits = [
+    GRAPHILE_QUERY_CACHE_MAX_LENGTH,
+    GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
+    GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH
+  ].some(value => value !== undefined);
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -59,6 +71,22 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
             pgScopedIntrospection: { main: scopedIntrospection }
           }
         }
+      }),
+      ...(hasGrafastCacheLimits && {
+        grafastCache: normalizeGrafastCacheLimits({
+          queryCacheMaxLength: parseGrafastCacheLimitEnv(
+            GRAPHILE_QUERY_CACHE_MAX_LENGTH,
+            'GRAPHILE_QUERY_CACHE_MAX_LENGTH'
+          ),
+          operationsCacheMaxLength: parseGrafastCacheLimitEnv(
+            GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
+            'GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH'
+          ),
+          operationOperationPlansCacheMaxLength: parseGrafastCacheLimitEnv(
+            GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH,
+            'GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH'
+          )
+        })
       }),
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')

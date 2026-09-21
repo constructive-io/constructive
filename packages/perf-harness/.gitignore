@@ -1,0 +1,5 @@
+# Local outputs from the Grafast cache suite
+/benchmarks/grafast-cache/results/
+/cache-micro-report.json
+/cache-postgres-report.json
+/cache-variants-report.json

@@ -3,6 +3,7 @@ const mockCacheSet = jest.fn();
 const mockCreateGraphileInstance = jest.fn();
 const mockGetPgPool = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
+const mockCreateGrafastCacheLimitsPreset = jest.fn();
 
 jest.mock('graphile-cache', () => ({
   createGraphileInstance: mockCreateGraphileInstance,
@@ -13,7 +14,8 @@ jest.mock('graphile-cache', () => ({
 }));
 
 jest.mock('graphile-settings', () => ({
-  createConstructivePreset: jest.fn(() => ({}))
+  createConstructivePreset: jest.fn(() => ({})),
+  createGrafastCacheLimitsPreset: mockCreateGrafastCacheLimitsPreset
 }));
 
 jest.mock('pg-cache', () => ({
@@ -56,6 +58,9 @@ describe('graphile single-flight handler creation', () => {
       handler: jest.fn()
     });
     mockMakeIntrospectionWiring.mockReset();
+    mockCreateGrafastCacheLimitsPreset.mockReset().mockReturnValue({
+      plugins: [{ name: 'GrafastCacheLimitsPlugin', version: '1.0.0' }]
+    });
   });
 
   it('coalesces requests while asynchronous preset wiring is pending', async () => {
@@ -70,6 +75,7 @@ describe('graphile single-flight handler creation', () => {
 
     const middleware = graphile({
       graphile: {
+        grafastCache: { queryCacheMaxLength: 16 },
         extends: [
           {
             gather: {
@@ -101,6 +107,12 @@ describe('graphile single-flight handler creation', () => {
     await Promise.all([first, second]);
 
     expect(mockCreateGraphileInstance).toHaveBeenCalledTimes(1);
+    expect(mockCreateGrafastCacheLimitsPreset).toHaveBeenCalledWith({
+      queryCacheMaxLength: 16
+    });
+    expect(mockCreateGraphileInstance.mock.calls[0][0].preset.extends).toContainEqual({
+      plugins: [{ name: 'GrafastCacheLimitsPlugin', version: '1.0.0' }]
+    });
     expect(mockCacheSet).toHaveBeenCalledTimes(1);
     expect(getInFlightCount()).toBe(0);
     expect(mockCreateGraphileInstance.mock.calls[0][0].preset.gather).toEqual({
