@@ -60,6 +60,11 @@ entry's public release interfaces, and publishes only after the ready result pas
 Upstream background UNLISTEN/client return is outside that public release boundary.
 The count includes reservations, residents, and disposal in progress. A disposal
 failure blocks further admission instead of treating uncertain resources as free.
+This process-wide fence requires a process restart. Disposal counters track pending
+work and can reach zero after a rejected release; neither emptying the cache nor
+reconfiguring limits proves that the failed release reclaimed its resources.
+The public release interfaces provide no verified retry-completion signal, so
+automatically reopening admission would abandon the capacity guarantee.
 
 `configureGraphileAdmission` accepts `max`, `heapMaxBytes`, and
 `buildReserveBytes`. The server exposes these as `graphile.cache` options and

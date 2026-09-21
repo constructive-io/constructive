@@ -25,6 +25,19 @@ describe('Graphile cache identity invalidation', () => {
     await clearGraphileCache();
   });
 
+  it.each([undefined, null, ''])('ignores an absent service key (%s)', (serviceKey) => {
+    const legacy = makeEntry('legacy-key', {});
+    const tagged = makeEntry('graphile:server:one', { serviceKey: 'service-a' });
+    graphileCache.set(legacy.cacheKey, legacy);
+    graphileCache.set(tagged.cacheKey, tagged);
+
+    expect(clearGraphileEntriesForService(serviceKey as unknown as string)).toBe(0);
+    expect(graphileCache.get(legacy.cacheKey)).toBe(legacy);
+    expect(graphileCache.get(tagged.cacheKey)).toBe(tagged);
+    expect(legacy.pgl.release).not.toHaveBeenCalled();
+    expect(tagged.pgl.release).not.toHaveBeenCalled();
+  });
+
   it('clears every exact-key variant for only the matching service', () => {
     const variants = [
       makeEntry('graphile:server:one', { serviceKey: 'service-a', databaseId: 'db-a', poolKey: 'pool-a' }),
