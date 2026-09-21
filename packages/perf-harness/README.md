@@ -104,8 +104,9 @@ versions and catalog sizes; runtime validation and process startup are outside
 `buildMs`. `processPeakRss` is the worker peak measured after runtime validation,
 before service release.
 
-The [default scoped comparison](benchmarks/scoped-introspection.md) includes a
-reproduction command, measured results, and the individual timing/memory samples.
+The [default scoped comparison](benchmarks/scoped-introspection.md) records the
+historical method, summarized results, limitations, and a reproduction command
+for the typed runner. Generated reports and per-sample results stay local.
 
 ## Cache capacity experiments
 
