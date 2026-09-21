@@ -15,13 +15,19 @@
     "build:dev": "makage build --dev",
     "cperf": "node dist/cli.js",
     "lint": "eslint . --fix",
-    "test": "pnpm run build && jest"
+    "test": "pnpm run build && jest",
+    "cache:micro": "node benchmarks/grafast-cache/micro.cjs",
+    "cache:postgres": "node benchmarks/grafast-cache/postgres.cjs",
+    "cache:variants": "node benchmarks/grafast-cache/variants.cjs"
   },
   "dependencies": {
+    "@dataplan/pg": "1.1.1",
+    "grafast": "1.1.2",
     "graphile-build": "5.1.1",
     "graphile-build-pg": "5.1.3",
     "graphile-config": "1.1.0",
     "graphile-scoped-introspection": "workspace:^",
+    "graphile-utils": "5.0.3",
     "graphql": "16.13.0",
     "pg": "^8.21.0",
     "postgraphile": "5.1.4"

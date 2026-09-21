@@ -4,12 +4,14 @@ import gzip
 import statistics
 from pathlib import Path
 
-directory = Path(__file__).resolve().parent
+directory = Path(__file__).resolve().parent / "results"
 all_pids = []
 summaries = {}
 for filename in ("micro.json", "postgres.json", "variants.json"):
     report = json.loads(gzip.decompress((directory / (filename + ".gz")).read_bytes()))
     assert report["config"]["repetitions"] == 8
+    expected_cases = {"micro.json": 20, "postgres.json": 6, "variants.json": 3}[filename]
+    assert len(report["runs"]) == expected_cases * 8
     assert not report["validation"]["errors"]
     for flag in ("allRunsSucceeded", "freshProcessPerRun", "caseValidationPassed", "schemaGroupsEquivalent"):
         assert report["validation"][flag], (filename, flag)
@@ -20,6 +22,7 @@ for filename in ("micro.json", "postgres.json", "variants.json"):
         assert result["status"] == "ok"
         all_pids.append(result["pid"])
         metadata = result["metadata"]
+        assert metadata["configurationSource"] == "grafast-schema-extensions"
         group = metadata.get("workload", str(metadata.get("distinct", "variants")))
         input_hashes.setdefault(group, set()).add(metadata.get("inputHash", metadata.get("queryStreamHash")))
         cases.setdefault(run["caseName"], []).append(metadata)
@@ -43,6 +46,7 @@ for filename in ("micro.json", "postgres.json", "variants.json"):
         print(case, " ".join(f"{key}={value[key]['median']:.4f}" for key in (
             "requestMeanMs", "cpuMsPerRequest", "retainedMiB", "newPlans")))
     summaries[filename] = summary
+assert len(all_pids) == 232
 assert len(all_pids) == len(set(all_pids)), "worker PID reused across final suites"
 output = {"finalFreshProcesses": len(all_pids), "reports": summaries}
 (directory / "summary.json").write_text(json.dumps(output, indent=2) + "\n")

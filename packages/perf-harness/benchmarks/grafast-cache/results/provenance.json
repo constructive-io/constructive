@@ -1,0 +1,78 @@
+{
+  "pr": "https://github.com/constructive-io/constructive/pull/1746",
+  "prFeatureHead": "67f47e488de11fe6a21d2c4327b2ceb3ef780983",
+  "workspaceParentBeforeMigration": "31fb3412d34bf31ded3e179962d3faa64e5646a6",
+  "sourceIdentity": "Benchmark sources at run time are identified by SHA-256 below; migration is committed after collecting reports.",
+  "configurationSource": "grafast-schema-extensions",
+  "applicationConfigurationLoaded": false,
+  "node": "v22.22.0",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "cpu": "Apple M3",
+  "memoryBytes": 17179869184,
+  "cpuAffinity": "unset, shared desktop; no unrelated processes stopped",
+  "lockfileSha256": "bfb2d7a88d43d756db67324c96b97bb9a5e68858e14f6f3c90b0465089a20b9c",
+  "resolvedDependencyVersionsChanged": false,
+  "genericHarnessSourceChanged": false,
+  "grafast": "1.1.2",
+  "graphql": "16.13.0",
+  "postgraphile": "5.1.4",
+  "postgresql": "18.4 (local Docker; shared server cache not reset)",
+  "fixtureSchema": "cperf_cache1746_harness_20260921",
+  "fixtureRemovedAfterRun": true,
+  "finalWorkers": 232,
+  "seed": 20260921,
+  "repetitionsPerCase": 8,
+  "serialSuites": [
+    "micro",
+    "postgres",
+    "variants"
+  ],
+  "flags": [
+    "--expose-gc"
+  ],
+  "workerEnvironment": {
+    "NODE_ENV": "production",
+    "GRAPHILE_ENV": "production"
+  },
+  "validation": {
+    "harnessTests": 70,
+    "featureCorrectnessTests": 25,
+    "sharedCaseComparison": "All 232 samples match previous reports at workspaceParentBeforeMigration in input hashes, schema hashes, request counts, planning counts and cache state; old parent-only hot case removed."
+  },
+  "generatedAt": {
+    "micro": "2026-09-21T03:27:35.979Z",
+    "postgres": "2026-09-21T03:31:06.763Z",
+    "variants": "2026-09-21T03:31:25.228Z"
+  },
+  "files": {
+    "packages/perf-harness/__tests__/grafast-cache.test.ts": "f90e41a0b5b8c8fcd7bdb0e98ecdd6ecd84a76b7e390f2ab672fcd88600d5894",
+    "packages/perf-harness/benchmarks/grafast-cache/README.md": "e76baac5870d69f6a7999ea4fa38f8124699a9108025a60257c8357f0058ba81",
+    "packages/perf-harness/benchmarks/grafast-cache/analyze-postgres.py": "3b0f39f5a778db34cec9b3d31ccbbe0445e734aef7b617633c4b8449ef414637",
+    "packages/perf-harness/benchmarks/grafast-cache/analyze.py": "6f8f8f16845faca56018b7eb31a6192ffe6c0b8ffc6c54730dc0d562a2681781",
+    "packages/perf-harness/benchmarks/grafast-cache/micro.cjs": "51ffcfe77f31b065baf3b4e129abca63e4077cdb1c78dccd1d76b591e74ac85d",
+    "packages/perf-harness/benchmarks/grafast-cache/postgres.cjs": "886cd3315ff0257d9e4d5823ae69a8a5ff39d149a84676a2a149617d2ff55a6c",
+    "packages/perf-harness/benchmarks/grafast-cache/seed.sql": "500d443e084234e51dc673852bb03e0a5c32f6d3fa97d2be29bc33b28019f213",
+    "packages/perf-harness/benchmarks/grafast-cache/settings.cjs": "f4877665cce9e1efa7ceca6dfa8f4a5b3e7301a4dfa62e27670430db2f0cd4b1",
+    "packages/perf-harness/benchmarks/grafast-cache/variants.cjs": "f0d3bb3bb0b61b20894736c6f663888a4d810c08df6e0c940394a19ff26eeab2",
+    "packages/perf-harness/package.json": "e3e038604588107a9cf8563de3bc74bc4bcd3ffb9f6026891325f63a19834248",
+    "packages/perf-harness/src/cli.ts": "498a8b716b0a3f2f6777c1861cd2ea034960fff05e6f3d960a091fd494d5dea1",
+    "packages/perf-harness/src/fixture.ts": "a6a4a6c761f33831cbfeff1dd84bd13b92cfb6f76defe98065ef0af79d67ee19",
+    "packages/perf-harness/src/index.ts": "12b04abf334f48f69810c5efec4de8a52f24bde0639cacb282e0887502be539e",
+    "packages/perf-harness/src/metrics.ts": "98683aff68d85fbe7f27a5616298fbef7b144521d7d77f54710f7dd095e01b1c",
+    "packages/perf-harness/src/process.ts": "6df73b7760bc201ee267cd29636d64e53b6d75bb88545d51d5a5c36b56e711fc",
+    "packages/perf-harness/src/report.ts": "e5b53edf399922cd3b14aed53e2903dce428e3c8d3071410519d208903a4cf07",
+    "packages/perf-harness/src/run.ts": "cefdf41f1259eb05843a5811519cfd722fb51889fd8c9574d7fe356af9ad1d72",
+    "packages/perf-harness/src/schedule.ts": "f28167c3a8b3bb61de19c91a1bfb0615ef1e961570c2d1e94b7ba47d98a9ded2",
+    "packages/perf-harness/src/stock-worker.ts": "7eacbb37d4a4668d76370ef537fce762c2ac02b341f112ad6b572d11bb925481",
+    "packages/perf-harness/src/types.ts": "329685db9197089f74066c3e77ecfdc39327ad440a17495bb5cdf36256315667"
+  },
+  "reports": {
+    "summary.json": "b1059b6b049cf10d1dcd2a8245cf777059dbd2bee60636d78090464da54555b9",
+    "micro.json.gz": "d519693f3ae40d44d14a5020b8c967d15249e9db054e31e6acf0c16a291494fe",
+    "variants.json.gz": "ffbed7e1bee962f596b419d6dd527b6431c7102455d72db8ee627c2696a19655",
+    "postgres.json.gz": "9826640d2af41efd00f111c53207ea817b4444e36bcf606e69a9d869d428d0ca",
+    "postgres-summary.json": "a682dc6e02a36bc1e3bac73ee0b0a62a59f6f00b00de41fbd12b76397a1d90d0",
+    "REPORT.md": "476f8eb30896e2527f1e3df42b67eddf8c9fbabaad57d3b7d04d757ec943ba54"
+  },
+  "rawReportsEncoding": "gzip; decompressed files are unchanged fresh perf-harness JSON reports"
+}

@@ -2,13 +2,10 @@
 // The existing perf-harness owns process isolation, scheduling and reporting.
 const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
-const { createRequire } = require('node:module');
-const { resolve } = require('node:path');
 const os = require('node:os');
 const { performance } = require('node:perf_hooks');
-const root = resolve(__dirname, '../../../..');
-const ownerRequire = createRequire(resolve(root, 'graphile/graphile-settings/package.json'));
-const harness = require(resolve(root, 'packages/perf-harness/dist'));
+const harness = require('../../dist');
+const { applyCacheLimits, assertIndependent } = require('./settings.cjs');
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const limits = {
   defaults: undefined,
@@ -70,15 +67,13 @@ async function worker() {
   let result;
   const errors = [];
   try {
-    ownerRequire('ts-node').register({ transpileOnly: true, project: resolve(root, 'tsconfig.json') });
-    const { createGrafastCacheLimitsPreset } = require(resolve(root, 'graphile/graphile-settings/src/grafast-cache-limits.ts'));
-    const { makeSchema, defaultPreset } = ownerRequire('graphile-build');
-    const pgPreset = ownerRequire('graphile-build-pg').defaultPreset;
-    const { makePgService } = ownerRequire('postgraphile/adaptors/pg');
-    const { withPgClientFromPgService } = ownerRequire('@dataplan/pg');
-    const { grafast, constant } = ownerRequire('grafast');
-    const { extendSchema } = ownerRequire('graphile-utils');
-    const { printSchema, lexicographicSortSchema } = ownerRequire('graphql');
+    const { makeSchema, defaultPreset } = require('graphile-build');
+    const pgPreset = require('graphile-build-pg').defaultPreset;
+    const { makePgService } = require('postgraphile/adaptors/pg');
+    const { withPgClientFromPgService } = require('@dataplan/pg');
+    const { grafast, constant } = require('grafast');
+    const { extendSchema } = require('graphile-utils');
+    const { printSchema, lexicographicSortSchema } = require('graphql');
     let plans = 0;
     const probe = extendSchema({ typeDefs: 'extend type Query { cacheProbe: Int! }',
       plans: { Query: { cacheProbe() { plans++; return constant(1); } } } });
@@ -87,10 +82,11 @@ async function worker() {
     service = makePgService({ connectionString: databaseUrl, schemas: [config.schema], pubsub: false });
     const baseline = snapshot();
     const started = performance.now();
-    const { schema, resolvedPreset } = await makeSchema({
-      extends: [defaultPreset, pgPreset, createGrafastCacheLimitsPreset(limits[config.arm])],
+    let { schema, resolvedPreset } = await makeSchema({
+      extends: [defaultPreset, pgPreset],
       plugins: [probe], pgServices: [service],
     });
+    schema = applyCacheLimits(schema, limits[config.arm]);
     const buildMs = performance.now() - started;
     const afterSchema = snapshot();
     const contextValue = { pgSettings: {}, withPgClient: (settings, callback) => withPgClientFromPgService(service, settings, callback) };
@@ -123,13 +119,14 @@ async function worker() {
     assert.equal(plans - plansBefore, expectedPlans, 'cyclic working-set replanning invariant');
     times.sort((a, b) => a - b);
     const percentile = (q) => times[Math.min(times.length - 1, Math.ceil(q * times.length) - 1)];
+    assertIndependent();
     result = {
       status: 'ok', pid: process.pid, caseName, buildMs,
       schemaHash: hash(printSchema(lexicographicSortSchema(schema))),
       schemaTypeCount: Object.keys(schema.getTypeMap()).length, runtimeVerified: true,
       caseValidation: { passed: true, errors: [] },
       memory: { baseline, afterBuild: afterSchema, delta: delta(afterSchema, baseline), processPeakRss: process.resourceUsage().maxRSS * 1024 },
-      metadata: { scope: 'PostGraphile + local PostgreSQL; sequential queries, no HTTP', arm: config.arm,
+      metadata: { configurationSource: 'grafast-schema-extensions', scope: 'PostGraphile + local PostgreSQL; sequential queries, no HTTP', arm: config.arm,
         distinct: config.distinct, requests: times.length, queryStreamHash: hash(JSON.stringify(order.map(query))),
         coldMs, warmupRequests: 2 * config.distinct, warmupPlans: plansBefore,
         measuredPlans: plans - plansBefore, wallMs, cpuMs: (cpu.user + cpu.system) / 1000,
@@ -166,5 +163,7 @@ async function main() {
   console.log(JSON.stringify({ output, validation: report.validation }));
   if (report.validation.errors.length) process.exitCode = 1;
 }
-if (process.argv.includes('--worker-config')) void worker();
-else void main().catch(error => { console.error(error); process.exitCode = 1; });
+if (require.main === module) {
+  if (process.argv.includes('--worker-config')) void worker();
+  else void main().catch(error => { console.error(error); process.exitCode = 1; });
+}

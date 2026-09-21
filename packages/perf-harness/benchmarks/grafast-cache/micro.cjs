@@ -1,11 +1,9 @@
 const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
-const { createRequire } = require('node:module');
-const { resolve } = require('node:path');
 const { performance } = require('node:perf_hooks');
 const os = require('node:os');
-const root = resolve(__dirname, '../../../..');
-const harness = require(resolve(root, 'packages/perf-harness/dist'));
+const harness = require('../../dist');
+const { applyCacheLimits, assertIndependent } = require('./settings.cjs');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const defaults = { queryCacheMaxLength: 525, operationsCacheMaxLength: 500, operationOperationPlansCacheMaxLength: 50 };
 const arms = {
@@ -52,36 +50,23 @@ async function worker() {
   const { databaseUrl, envelope } = harness.parseWorkerProcessArgs(process.argv.slice(2));
   const { caseName, workerConfig: config } = envelope;
   try {
-    const sourceRoot = config.sourceRoot ?? root;
-    const req = createRequire(resolve(sourceRoot, 'graphile/graphile-settings/package.json'));
-    const { grafastSync, makeGrafastSchema, constant, lambda } = req('grafast');
-    const { GraphQLSchema, printSchema, lexicographicSortSchema } = req('graphql');
-    // Load identical benchmark tooling for parent/head; this is outside timing.
-    req('ts-node').register({ transpileOnly: true, project: resolve(sourceRoot, 'tsconfig.json') });
-    let preset = {};
-    let createPreset;
-    if (!config.parent) {
-      createPreset = require(resolve(sourceRoot, 'graphile/graphile-settings/src/grafast-cache-limits.ts')).createGrafastCacheLimitsPreset;
-    }
+    const { grafastSync, makeGrafastSchema, constant, lambda } = require('grafast');
+    const { printSchema, lexicographicSortSchema } = require('graphql');
     const stream = indices(config.workload, config.seed);
     const poolSize = Math.max(...stream.warm, ...stream.measured) + 1;
     const sources = Array.from({ length: poolSize }, (_, i) => `query Q${i}($input:Int!) { probe value(input:$input) a b c d e f }`);
     let planCount = 0;
     const baseline = memory();
-    const setupStart = performance.now();
-    if (createPreset) preset = createPreset(arms[config.arm]);
-    const configurationMs = performance.now() - setupStart;
     const buildStart = performance.now();
     const schemas = Array.from({ length: stream.schemaCount }, () => {
-      let schema = makeGrafastSchema({ typeDefs: 'type Query { probe:Int! value(input:Int!):Int! a:Int! b:Int! c:Int! d:Int! e:Int! f:Int! }',
+      const schema = makeGrafastSchema({ typeDefs: 'type Query { probe:Int! value(input:Int!):Int! a:Int! b:Int! c:Int! d:Int! e:Int! f:Int! }',
         objects: { Query: { plans: {
           probe() { planCount++; return constant(1); },
           value(_, args) { return lambda(args.getRaw('input'), value => value + 1); },
           ...Object.fromEntries(['a', 'b', 'c', 'd', 'e', 'f'].map((field, i) => [field, () => constant(i)])),
         } } },
       });
-      for (const plugin of preset.plugins ?? []) schema = new GraphQLSchema(plugin.schema.hooks.GraphQLSchema(schema.toConfig(), {}, {}));
-      return schema;
+      return applyCacheLimits(schema, arms[config.arm]);
     });
     const buildMs = performance.now() - buildStart;
     const afterSchema = memory();
@@ -124,13 +109,14 @@ async function worker() {
     }
     times.sort((a, b) => a - b);
     const percentile = q => times[Math.min(times.length - 1, Math.ceil(times.length * q) - 1)];
+    assertIndependent();
     harness.writeWorkerResult({
       status: 'ok', pid: process.pid, caseName, buildMs,
       schemaHash: hash(printSchema(lexicographicSortSchema(schemas[0]))), schemaTypeCount: Object.keys(schemas[0].getTypeMap()).length,
       runtimeVerified: true, caseValidation: { passed: true, errors: [] },
       memory: { baseline, afterBuild: afterSchema, delta: difference(afterSchema, baseline), processPeakRss: process.resourceUsage().maxRSS * 1024 },
-      metadata: { scope: 'Grafast in-memory cache mechanism; no SQL or HTTP', parent: !!config.parent,
-        configurationMs, coldMs, workload: config.workload, arm: config.arm, schemaCount: schemas.length,
+      metadata: { configurationSource: 'grafast-schema-extensions', scope: 'Grafast in-memory cache mechanism; no SQL or HTTP',
+        coldMs, workload: config.workload, arm: config.arm, schemaCount: schemas.length,
         inputHash: hash(JSON.stringify({ sources, warm: stream.warm, measured: stream.measured })),
         requests: times.length, warmupRequests: schemas.length * stream.warm.length, warmupPlans: beforePlans, measuredPlans,
         wallMs, cpuMs: (cpu.user + cpu.system) / 1000,
@@ -149,8 +135,7 @@ async function main() {
   const args = harness.parseValueArgs(process.argv.slice(2)).values;
   const seed = Number(args.get('seed') ?? 20260921);
   const cases = [];
-  function add(workload, arm, extra = {}) { cases.push({ name: `${workload}-${extra.parent ? 'parent' : arm}`, expectedSchemaGroup: 'cache-micro', workerConfig: { workload, arm, seed, ...extra } }); }
-  if (args.has('baseline-root')) add('hot', 'omitted', { parent: true, sourceRoot: resolve(args.get('baseline-root')) });
+  function add(workload, arm) { cases.push({ name: `${workload}-${arm}`, expectedSchemaGroup: 'cache-micro', workerConfig: { workload, arm, seed } }); }
   ['omitted', 'explicit', 'example', 'large'].forEach(arm => add('hot', arm));
   ['omitted', 'small', 'example', 'large'].forEach(arm => add('mixed', arm));
   ['omitted', 'example', 'large'].forEach(arm => add('churn', arm));
@@ -164,5 +149,7 @@ async function main() {
   console.log(JSON.stringify({ output, validation: report.validation }));
   if (report.validation.errors.length) process.exitCode = 1;
 }
-if (process.argv.includes('--worker-config')) void worker();
-else void main().catch(error => { console.error(error); process.exitCode = 1; });
+if (require.main === module) {
+  if (process.argv.includes('--worker-config')) void worker();
+  else void main().catch(error => { console.error(error); process.exitCode = 1; });
+}

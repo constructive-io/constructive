@@ -4,7 +4,7 @@ import gzip
 import statistics
 from pathlib import Path
 
-directory = Path(__file__).resolve().parent
+directory = Path(__file__).resolve().parent / "results"
 report = json.loads(gzip.decompress((directory / "postgres.json.gz").read_bytes()))
 assert all(report["validation"][key] for key in (
     "allRunsSucceeded", "freshProcessPerRun", "caseValidationPassed",
