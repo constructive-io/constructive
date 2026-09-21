@@ -1,5 +1,6 @@
 export * from './core/boilerplate-scanner';
 export * from './core/boilerplate-types';
+export * from './core/ci-matrix';
 export * from './core/class/pgpm';
 export * from './core/template-scaffold';
 export * from './diff';

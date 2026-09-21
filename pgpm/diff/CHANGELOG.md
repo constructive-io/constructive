@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.8.1...@pgpmjs/diff@0.8.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.8.0...@pgpmjs/diff@0.8.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.7.0...@pgpmjs/diff@0.8.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.6.0...@pgpmjs/diff@0.7.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.5.6...@pgpmjs/diff@0.6.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
+## [0.5.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.5.5...@pgpmjs/diff@0.5.6) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
 ## [0.5.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.5.4...@pgpmjs/diff@0.5.5) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/diff

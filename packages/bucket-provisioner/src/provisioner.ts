@@ -3,7 +3,7 @@
  *
  * Orchestrates S3 bucket creation, privacy configuration, CORS setup,
  * versioning, and lifecycle rules. Uses the AWS SDK S3 client for all
- * operations, which works with any S3-compatible backend (MinIO, R2, etc.).
+ * operations, which works with any S3-compatible backend (RustFS, MinIO, R2, etc.).
  *
  * Privacy model:
  * - Private/temp buckets: Block All Public Access, no bucket policy, presigned URLs only
@@ -73,9 +73,9 @@ export interface BucketProvisionerOptions {
  *   connection: {
  *     provider: 'minio',
  *     region: 'us-east-1',
- *     endpoint: 'http://minio:9000',
- *     accessKeyId: 'minioadmin',
- *     secretAccessKey: 'minioadmin',
+ *     endpoint: 'http://rustfs:9000',
+ *     accessKeyId: 'constructive',
+ *     secretAccessKey: 'constructive-dev-secret',
  *   },
  *   allowedOrigins: ['https://app.example.com'],
  * });

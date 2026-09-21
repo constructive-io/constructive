@@ -3,7 +3,7 @@ process.env.PGPM_SKIP_UPDATE_CHECK = 'true';
 process.env.PGPM_SKIP_SKILL_INSTALL = 'true';
 
 import { PgpmPackage, TEMPLATE_REPOS } from '@pgpmjs/core';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer, ParsedArgs } from 'inquirerer';
 import * as path from 'path';
@@ -91,6 +91,33 @@ describe('cmds:init', () => {
       },
       'workspace'
     );
+  });
+
+  it('scaffolds a workspace in place when cwd is an empty named directory', async () => {
+    const workspaceDir = path.join(fixture.tempDir, 'foo');
+    mkdirSync(workspaceDir);
+    const { mockInput, mockOutput } = environment;
+    const prompter = new Inquirerer({
+      input: mockInput,
+      output: mockOutput,
+      noTty: true
+    });
+
+    await commands(withInitDefaults({
+      _: ['init', 'workspace'],
+      cwd: workspaceDir,
+      name: 'foo',
+      workspace: true
+    }), prompter, {
+      noTty: true,
+      input: mockInput,
+      output: mockOutput,
+      version: '1.0.0',
+      minimistOpts: {}
+    });
+
+    expect(existsSync(path.join(workspaceDir, 'pgpm.json'))).toBe(true);
+    expect(existsSync(path.join(workspaceDir, 'foo'))).toBe(false);
   });
 
   it('initializes module', async () => {
@@ -510,6 +537,72 @@ describe('cmds:init', () => {
       expect(existsSync(modDir)).toBe(true);
       expect(existsSync(path.join(modDir, 'pgpm.plan'))).toBe(true);
       expect(existsSync(path.join(modDir, 'package.json'))).toBe(true);
+    });
+
+    it('adds each new module to the CI matrix, sorted', async () => {
+      const { mockInput, mockOutput } = environment;
+      const prompter = new Inquirerer({
+        input: mockInput,
+        output: mockOutput,
+        noTty: true
+      });
+
+      const wsName = 'ws-ci-matrix';
+      const wsRoot = path.join(fixture.tempDir, wsName);
+
+      await commands(withInitDefaults({
+        _: ['init', 'workspace'],
+        cwd: fixture.tempDir,
+        name: wsName,
+        workspace: true
+      }), prompter, {
+        noTty: true,
+        input: mockInput,
+        output: mockOutput,
+        version: '1.0.0',
+        minimistOpts: {}
+      });
+
+      const workflow = path.join(wsRoot, '.github', 'workflows', 'ci.yml');
+      mkdirSync(path.dirname(workflow), { recursive: true });
+      writeFileSync(workflow, [
+        'jobs:',
+        '  test:',
+        '    strategy:',
+        '      matrix:',
+        '        # kept sorted by pgpm init',
+        '        package: []',
+        '    steps:',
+        '      - run: cd ./${{ matrix.package }} && pnpm test',
+        ''
+      ].join('\n'));
+
+      for (const modName of ['zeta', 'alpha']) {
+        await commands(withInitDefaults({
+          _: ['init'],
+          cwd: wsRoot,
+          moduleName: modName,
+          name: modName
+        }), prompter, {
+          noTty: true,
+          input: mockInput,
+          output: mockOutput,
+          version: '1.0.0',
+          minimistOpts: {}
+        });
+      }
+
+      expect(readFileSync(workflow, 'utf8')).toBe([
+        'jobs:',
+        '  test:',
+        '    strategy:',
+        '      matrix:',
+        '        # kept sorted by pgpm init',
+        '        package: [packages/alpha, packages/zeta]',
+        '    steps:',
+        '      - run: cd ./${{ matrix.package }} && pnpm test',
+        ''
+      ].join('\n'));
     });
   });
 

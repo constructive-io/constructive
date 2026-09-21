@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "5.20.12",
+  "version": "5.23.2",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -99,6 +99,6 @@
     "react": "^19.2.8",
     "ts-jest": "^29.4.12",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

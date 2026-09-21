@@ -12,6 +12,15 @@ export interface BoilerplateSource {
   dir?: string;
 }
 
+export function isScaffoldableInPlace(dir: string): boolean {
+  try {
+    return fs.statSync(dir).isDirectory() &&
+      fs.readdirSync(dir).filter((entry) => entry !== '.git').length === 0;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Resolve the template repo for an `init` invocation from its flags.
  *

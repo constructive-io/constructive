@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -31,6 +31,8 @@ describe('built package entry points', () => {
       '--eval',
       `const assert = require('node:assert/strict');
        const library = require(${JSON.stringify(entry)});
+       const scoped = require(${JSON.stringify(resolve(artifactRoot, 'benchmarks/scoped-introspection/run.js'))});
+       assert.equal(typeof scoped.main, 'function');
        assert.equal(typeof library.runBenchmarkSuite, 'function');
        assert.equal(typeof library.prepareFixture, 'function');`,
     ]);
@@ -51,6 +53,8 @@ describe('built package entry points', () => {
       ],
       `import assert from 'node:assert/strict';
        import * as library from ${JSON.stringify(entry)};
+       import * as scoped from ${JSON.stringify(pathToFileURL(resolve(artifactRoot, 'esm/benchmarks/scoped-introspection/run.js')).href)};
+       assert.equal(typeof scoped.main, 'function');
        assert.equal(typeof require, 'undefined');
        assert.equal(typeof module, 'undefined');
        assert.equal(typeof library.runBenchmarkSuite, 'function');
@@ -112,5 +116,48 @@ describe('built package entry points', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('--database-url is required');
+  });
+
+  test('shows scoped introspection help without opening a database', () => {
+    const result = node([
+      resolve(artifactRoot, 'benchmarks/scoped-introspection/run.js'),
+      '--help',
+    ]);
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Usage: scoped:introspection [--output DIRECTORY]');
+    expect(result.stderr).toBe('');
+  });
+
+  test.each([
+    [['--output'], 'expected --name value'],
+    [['--output', ''], '--output must be a non-empty directory'],
+    [['--unknown', 'value'], "unsupported argument '--unknown'"],
+  ])('rejects invalid scoped introspection arguments %j', (args, message) => {
+    const result = node([
+      resolve(artifactRoot, 'benchmarks/scoped-introspection/run.js'),
+      ...args,
+    ]);
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain(message);
+  });
+
+  test('rejects a file as the scoped output directory before opening a database', async () => {
+    const directory = await mkdtemp(resolve(tmpdir(), 'cperf-scoped-entry-'));
+    const output = resolve(directory, 'existing-file');
+    try {
+      await writeFile(output, 'preserve me');
+      const result = node([
+        resolve(artifactRoot, 'benchmarks/scoped-introspection/run.js'),
+        '--output', output,
+      ]);
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('EEXIST');
+      expect(await readFile(output, 'utf8')).toBe('preserve me');
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 });

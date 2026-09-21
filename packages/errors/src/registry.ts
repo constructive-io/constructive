@@ -30,6 +30,54 @@ export const registry = {
     http: 409,
     message: 'An account with this email already exists. Please sign in or use a different email.'
   }),
+  ALREADY_AUTHENTICATED_USE_LINK: defineError({
+    code: 'ALREADY_AUTHENTICATED_USE_LINK',
+    class: 'public',
+    http: 409,
+    message:
+      'You are already signed in. Add this email or phone number to your current account instead of creating a new one.'
+  }),
+  IDENTIFIER_CONFLICT: defineError({
+    code: 'IDENTIFIER_CONFLICT',
+    class: 'public',
+    http: 409,
+    message: 'The email and phone number belong to different accounts. Provide only one of them.'
+  }),
+  // Verified-only identifier uniqueness: an email/phone may sit unverified on
+  // several accounts, but only one account may hold it verified.
+  IDENTIFIER_VERIFIED_ELSEWHERE: defineError({
+    code: 'IDENTIFIER_VERIFIED_ELSEWHERE',
+    class: 'public',
+    http: 409,
+    message:
+      'This email or phone number is already verified on another account. Sign in to that account or use a different one.'
+  }),
+  IDENTIFIER_UNVERIFIED_AMBIGUOUS: defineError({
+    code: 'IDENTIFIER_UNVERIFIED_AMBIGUOUS',
+    class: 'public',
+    http: 409,
+    message:
+      'This email or phone number is pending verification on more than one account. Verify it first to continue.'
+  }),
+  IDENTIFIER_CLAIM_LIMIT: defineError<{ limit?: number }>({
+    code: 'IDENTIFIER_CLAIM_LIMIT',
+    class: 'public',
+    http: 429,
+    message:
+      'This account has too many unverified emails or phone numbers. Verify or remove one before adding another.'
+  }),
+  MFA_IDENTIFIER_UNVERIFIED: defineError({
+    code: 'MFA_IDENTIFIER_UNVERIFIED',
+    class: 'public',
+    http: 403,
+    message: 'Verify this email or phone number before using it for multi-factor authentication.'
+  }),
+  SMS_VERIFICATION_DISABLED: defineError({
+    code: 'SMS_VERIFICATION_DISABLED',
+    class: 'public',
+    http: 403,
+    message: 'Phone number verification is not enabled.'
+  }),
   ACCOUNT_NOT_FOUND: defineError({
     code: 'ACCOUNT_NOT_FOUND',
     class: 'public',
@@ -90,6 +138,12 @@ export const registry = {
     class: 'public',
     http: 403,
     message: 'Sign-up is currently disabled.'
+  }),
+  SIGN_UP_REQUIRES_INVITE: defineError({
+    code: 'SIGN_UP_REQUIRES_INVITE',
+    class: 'public',
+    http: 403,
+    message: 'Sign-up is by invitation only. Please provide a valid invite code.'
   }),
 
   // ===========================================================================
@@ -224,12 +278,38 @@ export const registry = {
     http: 429,
     message: 'This invitation has reached its usage limit. Please request a new invitation.'
   }),
+  INVITE_ACCOUNT_EXISTS_UNVERIFIED: defineError({
+    code: 'INVITE_ACCOUNT_EXISTS_UNVERIFIED',
+    class: 'public',
+    http: 409,
+    message:
+      'An unverified account already exists for this identifier and has no active invitation. Ask the user to verify their account instead.'
+  }),
   INVITE_EMAIL_NOT_FOUND: defineError({
     code: 'INVITE_EMAIL_NOT_FOUND',
     class: 'public',
     http: 404,
     message:
       'This email is not associated with the invitation. Please use the email address the invitation was sent to.'
+  }),
+  INVITE_PHONE_NOT_FOUND: defineError({
+    code: 'INVITE_PHONE_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message:
+      'This phone number is not associated with the invitation. Please use the phone number the invitation was sent to.'
+  }),
+  INVITE_ADDRESS_REQUIRED: defineError({
+    code: 'INVITE_ADDRESS_REQUIRED',
+    class: 'public',
+    http: 400,
+    message: 'An email address or phone number is required.'
+  }),
+  INVITE_USERS_INVALID: defineError({
+    code: 'INVITE_USERS_INVALID',
+    class: 'public',
+    http: 400,
+    message: 'The users payload must be a JSON array.'
   }),
 
   // ===========================================================================
@@ -311,6 +391,40 @@ export const registry = {
     class: 'public',
     http: 429,
     message: 'Too many requests. Please slow down and try again shortly.'
+  }),
+
+  // ===========================================================================
+  // Billing provider operations (public)
+  // ===========================================================================
+  BILLING_NOT_READY: defineError<{ database_id?: string; checked_at?: string | null; ready?: boolean | null }>({
+    code: 'BILLING_NOT_READY',
+    class: 'public',
+    http: 409,
+    message: 'Billing is not ready for this database yet. Please try again shortly.'
+  }),
+  BILLING_ENTITY_BUSY: defineError<{ entity_id?: string }>({
+    code: 'BILLING_ENTITY_BUSY',
+    class: 'public',
+    http: 409,
+    message: 'Another billing operation is already in progress for this account. Please wait for it to finish.'
+  }),
+  BILLING_OPERATION_CONFLICT: defineError<{ operation_id?: string }>({
+    code: 'BILLING_OPERATION_CONFLICT',
+    class: 'public',
+    http: 409,
+    message: 'This billing operation ID was already used for a different request.'
+  }),
+  BILLING_OPERATION_INVALID: defineError({
+    code: 'BILLING_OPERATION_INVALID',
+    class: 'public',
+    http: 400,
+    message: 'The billing operation request is invalid.'
+  }),
+  UNKNOWN_METER: defineError<{ meter_slug?: string }>({
+    code: 'UNKNOWN_METER',
+    class: 'public',
+    http: 404,
+    message: 'The requested meter does not exist.'
   }),
 
   // ===========================================================================

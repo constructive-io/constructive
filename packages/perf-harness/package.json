@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/perf-harness",
-  "version": "0.1.1",
+  "version": "0.4.2",
   "private": true,
   "description": "Reusable fresh-process Graphile performance harness",
   "main": "index.js",
@@ -15,12 +15,21 @@
     "build:dev": "makage build --dev",
     "cperf": "node dist/cli.js",
     "lint": "eslint . --fix",
-    "test": "pnpm run build && jest"
+    "test": "pnpm run build && jest",
+    "cache:micro": "node dist/benchmarks/grafast-cache/micro.js",
+    "cache:postgres": "node dist/benchmarks/grafast-cache/postgres.js",
+    "cache:variants": "node dist/benchmarks/grafast-cache/variants.js",
+    "cache:analyze": "node dist/benchmarks/grafast-cache/analyze.js",
+    "scoped:introspection": "node dist/benchmarks/scoped-introspection/run.js"
   },
   "dependencies": {
+    "@dataplan/pg": "1.1.1",
+    "grafast": "1.1.2",
     "graphile-build": "5.1.1",
     "graphile-build-pg": "5.1.3",
     "graphile-config": "1.1.0",
+    "graphile-scoped-introspection": "workspace:^",
+    "graphile-utils": "5.0.3",
     "graphql": "16.13.0",
     "pg": "^8.21.0",
     "postgraphile": "5.1.4"
@@ -30,6 +39,7 @@
     "@types/pg": "^8.20.4",
     "graphile-cache": "workspace:^",
     "makage": "^0.8.0",
+    "pg-cache": "workspace:^",
     "pgsql-test": "workspace:^"
   },
   "engines": {

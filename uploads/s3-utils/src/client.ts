@@ -6,7 +6,7 @@
  * instead of wiring up @aws-sdk/client-s3 directly.
  *
  * Handles provider-specific defaults:
- * - minio: forces path-style URLs, requires endpoint
+ * - minio: forces path-style URLs, requires endpoint (RustFS or MinIO)
  * - rustfs: forces path-style URLs, requires endpoint
  * - r2: forces path-style URLs, requires endpoint
  * - gcs: forces path-style URLs, requires endpoint
@@ -20,9 +20,9 @@
  * const client = createS3Client({
  *   provider: 'minio',
  *   region: 'us-east-1',
- *   endpoint: 'http://minio:9000',
- *   accessKeyId: 'minioadmin',
- *   secretAccessKey: 'minioadmin',
+ *   endpoint: 'http://rustfs:9000',
+ *   accessKeyId: 'constructive',
+ *   secretAccessKey: 'constructive-dev-secret',
  * });
  * ```
  */
@@ -34,7 +34,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 /**
  * Supported storage provider identifiers.
  *
- * Used to select provider-specific behavior (e.g., path-style URLs for MinIO,
+ * Used to select provider-specific behavior (e.g., path-style URLs for RustFS or MinIO,
  * jurisdiction headers for R2).
  */
 export type StorageProvider = 's3' | 'minio' | 'rustfs' | 'r2' | 'gcs' | 'spaces';
@@ -44,20 +44,20 @@ export type StorageProvider = 's3' | 'minio' | 'rustfs' | 'r2' | 'gcs' | 'spaces
  *
  * This is the input you provide to connect to your storage provider.
  * For AWS S3, only `region` and credentials are needed.
- * For MinIO/RustFS/R2/etc., also provide `endpoint`.
+ * For RustFS/MinIO/R2/etc., also provide `endpoint`.
  */
 export interface StorageConnectionConfig {
   /** Storage provider type */
   provider: StorageProvider;
   /** S3 region (e.g., "us-east-1"). Required for AWS S3. */
   region: string;
-  /** S3-compatible endpoint URL (e.g., "http://minio:9000"). Required for non-AWS providers. */
+  /** S3-compatible endpoint URL (e.g., "http://rustfs:9000"). Required for non-AWS providers. */
   endpoint?: string;
   /** AWS access key ID */
   accessKeyId: string;
   /** AWS secret access key */
   secretAccessKey: string;
-  /** Use path-style URLs (required for MinIO, optional for others) */
+  /** Use path-style URLs (required for RustFS and MinIO, optional for others) */
   forcePathStyle?: boolean;
 }
 
@@ -82,7 +82,7 @@ export class S3ConfigError extends Error {
  * Create an S3Client from a storage connection config.
  *
  * Provider-specific defaults:
- * - `minio`: forces path-style URLs (required by MinIO)
+ * - `minio`: path-style S3-compatible storage (RustFS or MinIO)
  * - `rustfs`: forces path-style URLs
  * - `r2`: forces path-style URLs (required by Cloudflare R2)
  * - `s3`: uses virtual-hosted style (AWS default)

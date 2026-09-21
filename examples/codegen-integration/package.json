@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/examples-codegen-integration",
-  "version": "2.15.12",
+  "version": "2.18.2",
   "private": true,
   "scripts": {
     "codegen": "tsx scripts/codegen-runner.ts",
@@ -19,6 +19,6 @@
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "tsx": "^4.20.3",
-    "typescript": "^5.1.6"
+    "typescript": "^6.0.3"
   }
 }

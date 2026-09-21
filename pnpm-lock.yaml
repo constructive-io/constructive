@@ -29,7 +29,7 @@ importers:
     devDependencies:
       '@constructive-io/eslint-config':
         specifier: ^0.2.0
-        version: 0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+        version: 0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       '@constructive-io/pnpm-policy':
         specifier: 0.3.1
         version: 0.3.1
@@ -53,10 +53,10 @@ importers:
         version: 8.20.4
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.66.0
-        version: 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+        version: 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/parser':
         specifier: ^8.66.0
-        version: 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+        version: 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.7.0)
@@ -68,10 +68,10 @@ importers:
         version: 12.1.1(eslint@9.39.2(jiti@2.7.0))
       eslint-plugin-unused-imports:
         specifier: ^4.4.1
-        version: 4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))
+        version: 4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))
       jest:
         specifier: ^30.4.2
-        version: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+        version: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       jest-in-case:
         specifier: ^1.0.2
         version: 1.0.2
@@ -92,13 +92,13 @@ importers:
         version: 6.1.3
       ts-jest:
         specifier: ^29.4.12
-        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
+        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))(typescript@6.0.3)
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
       typescript:
-        specifier: ^5.1.6
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
 
   agentic/agent:
     dependencies:
@@ -109,6 +109,9 @@ importers:
       '@agentic-kit/openai':
         specifier: workspace:*
         version: link:../openai/dist
+    publishDirectory: dist
+
+  agentic/agent-conversation:
     publishDirectory: dist
 
   agentic/agentic-kit:
@@ -291,6 +294,28 @@ importers:
         version: 0.79.6(ws@8.20.1)(zod@4.4.3)
     publishDirectory: dist
 
+  agentic/pi-host:
+    dependencies:
+      '@agentic-kit/agent':
+        specifier: workspace:^
+        version: link:../agent/dist
+      '@agentic-kit/agent-conversation':
+        specifier: workspace:^
+        version: link:../agent-conversation/dist
+      '@agentic-kit/chat':
+        specifier: workspace:^
+        version: link:../chat/dist
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@agentic-kit/pi':
+        specifier: workspace:^
+        version: link:../pi/dist
+      '@constructive-io/coerce':
+        specifier: workspace:^
+        version: link:../../packages/coerce/dist
+    publishDirectory: dist
+
   agentic/protocol:
     publishDirectory: dist
 
@@ -329,6 +354,23 @@ importers:
   agentic/run-log:
     publishDirectory: dist
 
+  agentic/run-log-client:
+    dependencies:
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
+    publishDirectory: dist
+
+  agentic/run-log-gate:
+    dependencies:
+      '@agentic-kit/harness':
+        specifier: workspace:^
+        version: link:../harness/dist
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
+    publishDirectory: dist
+
   examples/codegen-integration:
     dependencies:
       '@0no-co/graphql.web':
@@ -360,8 +402,8 @@ importers:
         specifier: ^4.20.3
         version: 4.21.0
       typescript:
-        specifier: ^5.1.6
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
 
   examples/pglite-socket:
     devDependencies:
@@ -409,8 +451,8 @@ importers:
         specifier: ^4.20.3
         version: 4.21.0
       typescript:
-        specifier: ^5.1.6
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
 
   graphile/graphile-bucket-provisioner-plugin:
     dependencies:
@@ -446,7 +488,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -481,7 +523,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -522,7 +564,7 @@ importers:
         version: link:../../postgres/pg-cache/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -538,7 +580,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   graphile/graphile-connection-filter:
@@ -566,7 +608,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(3cfb8ae93140145a791ab179ae3cec49)
+        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -660,7 +702,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(9d965dba21fac51f59273c4256716137)
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -713,7 +755,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(9d965dba21fac51f59273c4256716137)
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     devDependencies:
       '@types/accept-language-parser':
         specifier: ^1.5.4
@@ -778,7 +820,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -825,7 +867,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -863,7 +905,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(9d965dba21fac51f59273c4256716137)
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -901,7 +943,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -942,7 +984,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(9d965dba21fac51f59273c4256716137)
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -977,7 +1019,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(3cfb8ae93140145a791ab179ae3cec49)
+        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
     devDependencies:
       '@types/geojson':
         specifier: ^7946.0.14
@@ -1045,7 +1087,7 @@ importers:
         version: link:../../uploads/mime-bytes/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@constructive-io/s3-utils':
         specifier: workspace:^
@@ -1083,7 +1125,7 @@ importers:
         version: 8.21.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       '@types/pg':
         specifier: ^8.20.4
@@ -1124,7 +1166,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(92324343608439594bbe299323c80ef9)
+        version: 5.1.4(138876491c004694bff1843ee79c8872)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1190,7 +1232,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     publishDirectory: dist
 
   graphile/graphile-schema:
@@ -1225,7 +1267,45 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
+    publishDirectory: dist
+
+  graphile/graphile-scoped-introspection:
+    dependencies:
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
+      '@dataplan/pg':
+        specifier: 1.1.1
+        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      graphile-build:
+        specifier: 5.1.1
+        version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.1.3
+        version: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config:
+        specifier: 1.1.0
+        version: 1.1.0
+      pg-introspection:
+        specifier: 1.0.1
+        version: 1.0.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.19
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      makage:
+        specifier: ^0.8.0
+        version: 0.8.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+      postgraphile:
+        specifier: 5.1.4
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     publishDirectory: dist
 
   graphile/graphile-search:
@@ -1253,7 +1333,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(3cfb8ae93140145a791ab179ae3cec49)
+        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1408,7 +1488,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
@@ -1439,7 +1519,7 @@ importers:
         version: 3.1.14
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   graphile/graphile-sql-expression-validator:
@@ -1460,11 +1540,11 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       pgsql-parser:
-        specifier: ^18.2.6
-        version: 18.2.6
+        specifier: ^18.2.8
+        version: 18.2.8
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1521,7 +1601,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       '@types/pg':
         specifier: ^8.20.4
@@ -1550,7 +1630,7 @@ importers:
         version: 16.13.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(3cfb8ae93140145a791ab179ae3cec49)
+        version: 5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -1649,19 +1729,19 @@ importers:
         version: 19.2.18
       jest:
         specifier: ^30.4.2
-        version: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+        version: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       react:
         specifier: ^19.2.8
         version: 19.2.8
       ts-jest:
         specifier: ^29.4.12
-        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
+        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))(typescript@6.0.3)
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     publishDirectory: dist
 
   graphql/dev-server:
@@ -1722,7 +1802,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -1795,7 +1875,7 @@ importers:
         version: link:../../postgres/pg-env/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -1808,7 +1888,7 @@ importers:
         version: 3.1.14
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   graphql/gql-ast:
@@ -1859,10 +1939,10 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       ts-jest:
         specifier: ^29.4.12
-        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
+        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))(typescript@6.0.3)
       typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
 
   graphql/playwright-test:
     dependencies:
@@ -1960,7 +2040,7 @@ importers:
         version: 11.2.7
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
     devDependencies:
       makage:
         specifier: ^0.8.0
@@ -2004,7 +2084,7 @@ importers:
         version: 8.20.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(fdde9aa28a0299d2757f9ae98191ef07)
+        version: 5.1.4(cf7ef086788d1d3f644d1dc7345cb344)
       ws:
         specifier: ^8.20.0
         version: 8.20.1
@@ -2103,6 +2183,9 @@ importers:
       graphile-function-bindings:
         specifier: workspace:^
         version: link:../../graphile/graphile-function-bindings/dist
+      graphile-scoped-introspection:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-scoped-introspection/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
@@ -2135,7 +2218,7 @@ importers:
         version: 5.0.1
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
@@ -2181,7 +2264,7 @@ importers:
         version: 7.2.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   graphql/server-test:
@@ -2316,10 +2399,10 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(278bb7eee576e8287d20e8783c1ec9ea)
+        version: 5.1.4(b3fb9399b7b000ca872a8f427cb73d08)
       typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     devDependencies:
       '@types/pg':
         specifier: ^8.20.4
@@ -2378,8 +2461,8 @@ importers:
         specifier: ^4.20.3
         version: 4.21.0
       typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
       vite:
         specifier: ^6.3.5
         version: 6.4.1(@types/node@25.9.1)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0)
@@ -2421,7 +2504,7 @@ importers:
         version: 0.8.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/bucket-provisioner:
@@ -2500,7 +2583,7 @@ importers:
     devDependencies:
       '@inquirerer/test':
         specifier: ^1.4.6
-        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))
+        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -2524,7 +2607,7 @@ importers:
         version: 8.21.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/client:
@@ -2558,7 +2641,7 @@ importers:
         version: 0.8.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/csv-to-pg:
@@ -2567,8 +2650,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.2.8
-        version: 18.2.8
+        specifier: ^18.2.10
+        version: 18.2.10
       csv-parser:
         specifier: ^3.2.1
         version: 3.2.1
@@ -2579,8 +2662,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.1
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9
@@ -2589,8 +2672,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       pgsql-parser:
-        specifier: ^18.2.6
-        version: 18.2.6
+        specifier: ^18.2.8
+        version: 18.2.8
     publishDirectory: dist
 
   packages/errors:
@@ -2603,7 +2686,7 @@ importers:
         version: 0.8.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/express-context:
@@ -2669,11 +2752,11 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.2.8
-        version: 18.2.8
+        specifier: ^18.2.10
+        version: 18.2.10
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       schema-typescript:
         specifier: ^0.14.4
         version: 0.14.4
@@ -2697,7 +2780,7 @@ importers:
         version: 0.8.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/orm:
@@ -2716,6 +2799,12 @@ importers:
 
   packages/perf-harness:
     dependencies:
+      '@dataplan/pg':
+        specifier: 1.1.1
+        version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      grafast:
+        specifier: 1.1.2
+        version: 1.1.2(graphql@16.13.0)
       graphile-build:
         specifier: 5.1.1
         version: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
@@ -2725,6 +2814,12 @@ importers:
       graphile-config:
         specifier: 1.1.0
         version: 1.1.0
+      graphile-scoped-introspection:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-scoped-introspection/dist
+      graphile-utils:
+        specifier: 5.0.3
+        version: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -2733,7 +2828,7 @@ importers:
         version: 8.21.0
       postgraphile:
         specifier: 5.1.4
-        version: 5.1.4(9d965dba21fac51f59273c4256716137)
+        version: 5.1.4(f282a162d8bd20a217e08c60f5396af8)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
@@ -2747,6 +2842,9 @@ importers:
       makage:
         specifier: ^0.8.0
         version: 0.8.0
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
@@ -2784,11 +2882,11 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
       '@pgsql/lint':
-        specifier: ^18.2.5
-        version: 18.2.5
+        specifier: ^18.2.8
+        version: 18.2.8
       '@pgsql/traverse':
-        specifier: ^18.7.7
-        version: 18.7.7
+        specifier: ^18.7.10
+        version: 18.7.10
       '@pgsql/types':
         specifier: ^18.0.0
         version: 18.0.0
@@ -2808,11 +2906,11 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       pgsql-parser:
-        specifier: ^18.2.6
-        version: 18.2.6
+        specifier: ^18.2.8
+        version: 18.2.8
       yanse:
         specifier: ^0.2.2
         version: 0.2.2
@@ -2860,7 +2958,7 @@ importers:
         version: 0.8.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/site-deploy:
@@ -2903,7 +3001,7 @@ importers:
         version: 3.18.4
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@25.9.1)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.9.1)(typescript@6.0.3)
     publishDirectory: dist
 
   packages/upload-client:
@@ -3022,8 +3120,8 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       semver:
         specifier: ^7.8.5
         version: 7.8.5
@@ -3036,7 +3134,7 @@ importers:
     devDependencies:
       '@inquirerer/test':
         specifier: ^1.4.6
-        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))
+        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
       '@types/cross-spawn':
         specifier: ^6.0.6
         version: 6.0.6
@@ -3066,7 +3164,7 @@ importers:
         version: 8.21.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     publishDirectory: dist
 
   pgpm/core:
@@ -3126,11 +3224,14 @@ importers:
         specifier: workspace:^
         version: link:../../postgres/pg-env/dist
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       pgsql-parser:
-        specifier: ^18.2.6
-        version: 18.2.6
+        specifier: ^18.2.8
+        version: 18.2.8
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
       yanse:
         specifier: ^0.2.2
         version: 0.2.2
@@ -3315,8 +3416,8 @@ importers:
         specifier: ^10.2.6
         version: 10.2.6
       plpgsql-parser:
-        specifier: ^18.5.7
-        version: 18.5.7
+        specifier: ^18.5.10
+        version: 18.5.10
     devDependencies:
       makage:
         specifier: ^0.8.0
@@ -3332,17 +3433,17 @@ importers:
         specifier: workspace:^
         version: link:../naming-spec/dist
       '@pgsql/scripts':
-        specifier: ^18.4.5
-        version: 18.4.5
+        specifier: ^18.4.8
+        version: 18.4.8
       '@pgsql/semantics':
-        specifier: ^18.1.6
-        version: 18.1.6
+        specifier: ^18.1.9
+        version: 18.1.9
       '@pgsql/transform':
-        specifier: ^18.17.5
-        version: 18.17.5
+        specifier: ^18.17.8
+        version: 18.17.8
       plpgsql-parser:
-        specifier: ^18.5.7
-        version: 18.5.7
+        specifier: ^18.5.10
+        version: 18.5.10
     devDependencies:
       '@pgpmjs/bundle':
         specifier: workspace:^
@@ -3473,8 +3574,8 @@ importers:
         specifier: ^1.32.5
         version: 1.32.5
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
     publishDirectory: dist
 
   postgres/pg-cache:
@@ -3761,8 +3862,8 @@ importers:
         specifier: workspace:^
         version: link:../pg-ast/dist
       pgsql-deparser:
-        specifier: ^18.3.6
-        version: 18.3.6
+        specifier: ^18.3.8
+        version: 18.3.8
       query-spec:
         specifier: workspace:^
         version: link:../../packages/query-spec/dist
@@ -3841,8 +3942,8 @@ importers:
         specifier: ^4.19.0
         version: 4.21.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     publishDirectory: dist
 
   sdk/constructive-react:
@@ -3885,8 +3986,8 @@ importers:
         specifier: ^4.19.0
         version: 4.21.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     publishDirectory: dist
 
   sdk/constructive-sdk:
@@ -3920,8 +4021,8 @@ importers:
         specifier: ^4.19.0
         version: 4.21.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     publishDirectory: dist
 
   sdk/migrate-client:
@@ -3949,8 +4050,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     publishDirectory: dist
 
   uploads/content-type-stream:
@@ -6679,10 +6780,10 @@ packages:
         integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==,
       }
 
-  '@pgsql/lint@18.2.5':
+  '@pgsql/lint@18.2.8':
     resolution:
       {
-        integrity: sha512-qjDN6vXt4IYlEaoVxgFZvj4lkDLMSdHFc1Hbyve3XJDIZbhUiq8kn1fcdxWqRbfCLEhtAko5IFjG05mkyZowCg==,
+        integrity: sha512-G+JpYZZecVBR4+VsSkLqkvTiQblDs5rvCuOrZ/oP6ZngtG9xJg0QC57GSsCKx+iOF9NxUxaBCn9msIHWcDetGA==,
       }
     hasBin: true
 
@@ -6692,28 +6793,28 @@ packages:
         integrity: sha512-muCDdPu/bM/f9d7IquBNfkMgiRPehv6vvjdhSMxXeVKwJKPX9xIscDu11ju15s7UeEXoWntE8zrSaR9wQ9wgCg==,
       }
 
-  '@pgsql/scripts@18.4.5':
+  '@pgsql/scripts@18.4.8':
     resolution:
       {
-        integrity: sha512-hXv+csLboEX11UtJ9qlnYEhg5HegmR3FD7WNrBy4cWIqmmOv2jvfdiG+sHjh9oOXm/BSIiSPhvkgWWUJl94CLg==,
+        integrity: sha512-uXvGUV537cvmJBjWUJTjJFfsb7PL59xyaX6R1+0wsxdmfL3zz1RZW3A995llSfLCD2p/d1G21Puyv7p4+N3Z1g==,
       }
 
-  '@pgsql/semantics@18.1.6':
+  '@pgsql/semantics@18.1.9':
     resolution:
       {
-        integrity: sha512-ZdB+vBR+THE8JfwpGJ/A/Fw7s4fARXtk1yiIzeoK2BXtEiqem9UBR1GGL9+mKLu4+zvxYaeelhQQZKFXNu1KQA==,
+        integrity: sha512-Crd9/rfgyxwJmT1ZCqmG6hRhCLEfKxYr3TFdtQcwFY3YkrPiTxx0NlCRklrS7qwMg+Y69tYyKXx4dYUbN/xfrA==,
       }
 
-  '@pgsql/transform@18.17.5':
+  '@pgsql/transform@18.17.8':
     resolution:
       {
-        integrity: sha512-BPENEY7aZYparGSqKYmAd28heQ3oBX72mAdAcwS8iJciz0K082tqGVTopgS9EAN+mY6YTbIHxkhxK7BhPuOp7Q==,
+        integrity: sha512-lohH+au5p/qSnxFWaGqgBHHtgJxdeimz1WWeR1AhsgRHgyUwj1IHmpB7XJWkO1io5LILx8VwpEx5aGCWU3+nYA==,
       }
 
-  '@pgsql/traverse@18.7.7':
+  '@pgsql/traverse@18.7.10':
     resolution:
       {
-        integrity: sha512-WHPNa+2/g5lpAAKHxAizSci84d8FXnBK76pqHIKc9UeyRcAmq3gjnSww6z9AZcUXRVuzf6xpPpN68z1jAMdk6w==,
+        integrity: sha512-A7p6LJfTcslZbp3/JcSIxRUAAXjY0Bx/jkaFpwkYsbbXtjBopbGEhJ+B65KQIbbCDQwTH4i/zPS/wwL4AUx0lw==,
       }
 
   '@pgsql/types@18.0.0':
@@ -6722,10 +6823,10 @@ packages:
         integrity: sha512-jtAY4JU7jdVYZ/Vv3zlZqVP+FRWZokyCLKPPCnAApiaJAElpyyiMC3HRiquBu29kSrVs+rkqZD50SUIb/zyEGw==,
       }
 
-  '@pgsql/utils@18.2.8':
+  '@pgsql/utils@18.2.10':
     resolution:
       {
-        integrity: sha512-BgWSjJ8McbAppf1kw3n5SGD/B8yEh3wk3d3l5IMGz2YBfvHfuXx0qpfpT0g6PVgONwYVk33jpaKvyoNhHDPMTg==,
+        integrity: sha512-k60x8sYXzArt+CQanxg4hln28haa74F6wNpUcFlKvDYW9Ma7oIQtZU4c6A86wuSFB7ZVhRS0pCpdSdbqSBH1Tg==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -12056,6 +12157,12 @@ packages:
         integrity: sha512-6jF9qn9ln4yLnmSF+bS/DBvAfNcPhGI05+pkQy+n3cRd3p9aO8LWjquEin8SLO0k7zYk745ZGBXYUiL9AUI7gA==,
       }
 
+  libpg-query@18.1.5:
+    resolution:
+      {
+        integrity: sha512-xsksgH106LyVUylIp2bJz1MPFmVVIGKbB8belGWmh+J8/i38w8eM1twDIBnd97tzeNQFctH9MWKMthl22+fWcQ==,
+      }
+
   lines-and-columns@1.2.4:
     resolution:
       {
@@ -13393,16 +13500,16 @@ packages:
         integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==,
       }
 
-  pgsql-deparser@18.3.6:
+  pgsql-deparser@18.3.8:
     resolution:
       {
-        integrity: sha512-JJOkNr3JqKNEqmf0mBb7/2HAU9kh75AX81oB6ppstFuLVeVBYoWfSgnZVSmMWRgwtjEnYL2+IUpk/Ir7fvceTg==,
+        integrity: sha512-/q26n9UumKXxN7UuBEpxS8+kSUfZcHBk3u1LQ2hVm1IoGMFN9bk2GmRBugIWrDbPrs8+uskEgPOcezxcA6t0ww==,
       }
 
-  pgsql-parser@18.2.6:
+  pgsql-parser@18.2.8:
     resolution:
       {
-        integrity: sha512-PC/d/Ht0cpBSnA4aYd/UOf9YV1pgKFnX70xfIRC6r30SvzTLgnLs0iR5BlMZrQrBeiKnL3pc7yDvIJjTi0isfw==,
+        integrity: sha512-3VnjwhKHAIWCpy0SKmjMQ2f1laAtZKmLN4tU+1M/QppGk+Qn3Y/YKHca5WdMgMiHwst0LA+KqK4JBK55Npg/ZQ==,
       }
 
   picocolors@1.1.1:
@@ -13497,16 +13604,16 @@ packages:
     engines: { node: '>=20' }
     hasBin: true
 
-  plpgsql-deparser@18.2.7:
+  plpgsql-deparser@18.2.10:
     resolution:
       {
-        integrity: sha512-n56eIFH0DREyrIXbG2hikiXzs2NCuM2pv5nkbUIVhy8nOnMQ1BqdvUUdmoSWcNzSvasCgPA7pUXBaB6tqjwXHw==,
+        integrity: sha512-npy1Ef3NKA1Ib4ZLQEfxZVZR5dUwkKYeTeD3DCaSTmvPZfWOWepcXvrchBTtw1eG0eYF+1f23JlEwuWsYynvjg==,
       }
 
-  plpgsql-parser@18.5.7:
+  plpgsql-parser@18.5.10:
     resolution:
       {
-        integrity: sha512-Mp5sttG2nC0CIAypLzytLIngpUbu2g3m+rqccgbYUmFk7RCBnvfCZWLp4NKFBIPWzoszmZ+VqjxBJ5L07c3vUA==,
+        integrity: sha512-HHUBm+KpC3rQ3IYFoGBRhT64oXCGsRcBnF6e8KojVRtWb3HWqo4I94k6FGHN+oiOCZyoNQpgLZpByZe6V2Klog==,
       }
 
   pluralize@7.0.0:
@@ -15058,6 +15165,14 @@ packages:
     engines: { node: '>=14.17' }
     hasBin: true
 
+  typescript@6.0.3:
+    resolution:
+      {
+        integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==,
+      }
+    engines: { node: '>=14.17' }
+    hasBin: true
+
   uc.micro@2.1.0:
     resolution:
       {
@@ -16261,15 +16376,15 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@constructive-io/eslint-config@0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+  '@constructive-io/eslint-config@0.2.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint/js': 9.39.2
-      '@typescript-eslint/eslint-plugin': 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       eslint: 9.39.2(jiti@2.7.0)
       eslint-config-prettier: 10.1.8(eslint@9.39.2(jiti@2.7.0))
       eslint-plugin-simple-import-sort: 12.1.1(eslint@9.39.2(jiti@2.7.0))
-      eslint-plugin-unused-imports: 4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))
+      eslint-plugin-unused-imports: 4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))
       globals: 17.8.0
     transitivePeerDependencies:
       - supports-color
@@ -17062,12 +17177,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.19.11
 
-  '@inquirerer/test@1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))':
+  '@inquirerer/test@1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))':
     dependencies:
       clean-ansi: 0.2.2
       inquirerer: 4.9.4
     optionalDependencies:
-      jest: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      jest: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
 
   '@inquirerer/utils@3.3.13':
     dependencies:
@@ -17111,7 +17226,7 @@ snapshots:
       jest-util: 30.4.1
       slash: 3.0.0
 
-  '@jest/core@30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))':
+  '@jest/core@30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))':
     dependencies:
       '@jest/console': 30.4.1
       '@jest/pattern': 30.4.0
@@ -17127,7 +17242,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       graceful-fs: 4.2.11
       jest-changed-files: 30.4.1
-      jest-config: 30.4.2(@types/node@22.19.19)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      jest-config: 30.4.2(@types/node@22.19.19)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       jest-haste-map: 30.4.1
       jest-message-util: 30.4.1
       jest-regex-util: 30.4.0
@@ -17830,54 +17945,54 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
-  '@pgsql/lint@18.2.5':
+  '@pgsql/lint@18.2.8':
     dependencies:
-      '@pgsql/traverse': 18.7.7
+      '@pgsql/traverse': 18.7.10
       chalk: 4.1.2
       git-changed: 0.3.0
-      libpg-query: 18.1.4
+      libpg-query: 18.1.5
       minimist: 1.2.8
-      pgsql-parser: 18.2.6
+      pgsql-parser: 18.2.8
     transitivePeerDependencies:
       - supports-color
 
   '@pgsql/quotes@18.2.4': {}
 
-  '@pgsql/scripts@18.4.5':
+  '@pgsql/scripts@18.4.8':
     dependencies:
       '@pgsql/quotes': 18.2.4
-      '@pgsql/transform': 18.17.5
-      plpgsql-parser: 18.5.7
+      '@pgsql/transform': 18.17.8
+      plpgsql-parser: 18.5.10
     transitivePeerDependencies:
       - supports-color
 
-  '@pgsql/semantics@18.1.6':
+  '@pgsql/semantics@18.1.9':
     dependencies:
-      '@pgsql/traverse': 18.7.7
-      plpgsql-parser: 18.5.7
+      '@pgsql/traverse': 18.7.10
+      plpgsql-parser: 18.5.10
     transitivePeerDependencies:
       - supports-color
 
-  '@pgsql/transform@18.17.5':
+  '@pgsql/transform@18.17.8':
     dependencies:
       '@pgsql/quotes': 18.2.4
-      '@pgsql/semantics': 18.1.6
-      '@pgsql/traverse': 18.7.7
-      plpgsql-parser: 18.5.7
+      '@pgsql/semantics': 18.1.9
+      '@pgsql/traverse': 18.7.10
+      plpgsql-parser: 18.5.10
     transitivePeerDependencies:
       - supports-color
 
-  '@pgsql/traverse@18.7.7':
+  '@pgsql/traverse@18.7.10':
     dependencies:
       '@pgsql/types': 18.0.0
       pg-proto-parser: 1.32.5
-      plpgsql-deparser: 18.2.7
+      plpgsql-deparser: 18.2.10
     transitivePeerDependencies:
       - supports-color
 
   '@pgsql/types@18.0.0': {}
 
-  '@pgsql/utils@18.2.8':
+  '@pgsql/utils@18.2.10':
     dependencies:
       '@pgsql/types': 18.0.0
       nested-obj: 0.2.3
@@ -18803,40 +18918,40 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/scope-manager': 8.66.0
-      '@typescript-eslint/type-utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/type-utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.66.0
       eslint: 9.39.2(jiti@2.7.0)
       ignore: 7.0.5
       natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+  '@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.66.0
       '@typescript-eslint/types': 8.66.0
-      '@typescript-eslint/typescript-estree': 8.66.0(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.66.0(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.66.0
       debug: 4.4.3(supports-color@5.5.0)
       eslint: 9.39.2(jiti@2.7.0)
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.66.0(typescript@5.9.3)':
+  '@typescript-eslint/project-service@8.66.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.66.0(typescript@5.9.3)
+      '@typescript-eslint/tsconfig-utils': 8.66.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.66.0
       debug: 4.4.3(supports-color@5.5.0)
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -18845,47 +18960,47 @@ snapshots:
       '@typescript-eslint/types': 8.66.0
       '@typescript-eslint/visitor-keys': 8.66.0
 
-  '@typescript-eslint/tsconfig-utils@8.66.0(typescript@5.9.3)':
+  '@typescript-eslint/tsconfig-utils@8.66.0(typescript@6.0.3)':
     dependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
-  '@typescript-eslint/type-utils@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+  '@typescript-eslint/type-utils@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/types': 8.66.0
-      '@typescript-eslint/typescript-estree': 8.66.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.66.0(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
       debug: 4.4.3(supports-color@5.5.0)
       eslint: 9.39.2(jiti@2.7.0)
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.66.0': {}
 
-  '@typescript-eslint/typescript-estree@8.66.0(typescript@5.9.3)':
+  '@typescript-eslint/typescript-estree@8.66.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.66.0(typescript@5.9.3)
-      '@typescript-eslint/tsconfig-utils': 8.66.0(typescript@5.9.3)
+      '@typescript-eslint/project-service': 8.66.0(typescript@6.0.3)
+      '@typescript-eslint/tsconfig-utils': 8.66.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.66.0
       '@typescript-eslint/visitor-keys': 8.66.0
       debug: 4.4.3(supports-color@5.5.0)
       minimatch: 10.2.6
       semver: 7.8.5
       tinyglobby: 0.2.16
-      ts-api-utils: 2.5.0(typescript@5.9.3)
-      typescript: 5.9.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)':
+  '@typescript-eslint/utils@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.7.0))
       '@typescript-eslint/scope-manager': 8.66.0
       '@typescript-eslint/types': 8.66.0
-      '@typescript-eslint/typescript-estree': 8.66.0(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.66.0(typescript@6.0.3)
       eslint: 9.39.2(jiti@2.7.0)
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -19786,11 +19901,11 @@ snapshots:
     dependencies:
       eslint: 9.39.2(jiti@2.7.0)
 
-  eslint-plugin-unused-imports@4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0)):
+  eslint-plugin-unused-imports@4.4.1(@typescript-eslint/eslint-plugin@8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0)):
     dependencies:
       eslint: 9.39.2(jiti@2.7.0)
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.2(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.66.0(@typescript-eslint/parser@8.66.0(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.2(jiti@2.7.0))(typescript@6.0.3)
 
   eslint-scope@8.4.0:
     dependencies:
@@ -20970,15 +21085,15 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)):
+  jest-cli@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)):
     dependencies:
-      '@jest/core': 30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      '@jest/core': 30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       '@jest/test-result': 30.4.1
       '@jest/types': 30.4.1
       chalk: 4.1.2
       exit-x: 0.2.2
       import-local: 3.2.0
-      jest-config: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      jest-config: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       jest-util: 30.4.1
       jest-validate: 30.4.1
       yargs: 17.7.2
@@ -20989,7 +21104,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-config@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)):
+  jest-config@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)):
     dependencies:
       '@babel/core': 7.29.0
       '@jest/get-type': 30.1.0
@@ -21016,12 +21131,12 @@ snapshots:
       strip-json-comments: 3.1.1
     optionalDependencies:
       '@types/node': 22.19.11
-      ts-node: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+      ts-node: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
 
-  jest-config@30.4.2(@types/node@22.19.19)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)):
+  jest-config@30.4.2(@types/node@22.19.19)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)):
     dependencies:
       '@babel/core': 7.29.0
       '@jest/get-type': 30.1.0
@@ -21048,7 +21163,7 @@ snapshots:
       strip-json-comments: 3.1.1
     optionalDependencies:
       '@types/node': 22.19.19
-      ts-node: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+      ts-node: 10.9.2(@types/node@22.19.11)(typescript@6.0.3)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -21333,12 +21448,12 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)):
+  jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)):
     dependencies:
-      '@jest/core': 30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      '@jest/core': 30.4.2(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       '@jest/types': 30.4.1
       import-local: 3.2.0
-      jest-cli: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      jest-cli: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -21588,6 +21703,10 @@ snapshots:
       - supports-color
 
   libpg-query@18.1.4:
+    dependencies:
+      '@pgsql/types': 18.0.0
+
+  libpg-query@18.1.5:
     dependencies:
       '@pgsql/types': 18.0.0
 
@@ -22438,16 +22557,16 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
-  pgsql-deparser@18.3.6:
+  pgsql-deparser@18.3.8:
     dependencies:
       '@pgsql/quotes': 18.2.4
       '@pgsql/types': 18.0.0
 
-  pgsql-parser@18.2.6:
+  pgsql-parser@18.2.8:
     dependencies:
       '@pgsql/types': 18.0.0
-      libpg-query: 18.1.4
-      pgsql-deparser: 18.3.6
+      libpg-query: 18.1.5
+      pgsql-deparser: 18.3.8
 
   picocolors@1.1.1: {}
 
@@ -22481,18 +22600,19 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  plpgsql-deparser@18.2.7:
+  plpgsql-deparser@18.2.10:
     dependencies:
       '@pgsql/types': 18.0.0
-      pgsql-deparser: 18.3.6
+      libpg-query: 18.1.5
+      pgsql-deparser: 18.3.8
 
-  plpgsql-parser@18.5.7:
+  plpgsql-parser@18.5.10:
     dependencies:
-      '@pgsql/traverse': 18.7.7
+      '@pgsql/traverse': 18.7.10
       '@pgsql/types': 18.0.0
-      libpg-query: 18.1.4
-      pgsql-deparser: 18.3.6
-      plpgsql-deparser: 18.2.7
+      libpg-query: 18.1.5
+      pgsql-deparser: 18.3.8
+      plpgsql-deparser: 18.2.10
     transitivePeerDependencies:
       - supports-color
 
@@ -22514,61 +22634,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postgraphile@5.1.4(278bb7eee576e8287d20e8783c1ec9ea):
-    dependencies:
-      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
-      '@graphile/lru': 5.0.0
-      '@types/node': 22.19.19
-      '@types/pg': 8.20.4
-      debug: 4.4.3(supports-color@5.5.0)
-      grafast: 1.1.2(graphql@16.13.0)
-      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
-      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
-      graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
-      graphql: 16.13.0
-      iterall: 1.3.0
-      jsonwebtoken: 9.0.3
-      pg: 8.21.0
-      pg-sql2: 5.0.1
-      tamedevil: 0.1.1
-      tslib: 2.8.1
-      ws: 8.20.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  postgraphile@5.1.4(3cfb8ae93140145a791ab179ae3cec49):
-    dependencies:
-      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
-      '@graphile/lru': 5.0.0
-      '@types/node': 22.19.19
-      '@types/pg': 8.20.4
-      debug: 4.4.3(supports-color@5.5.0)
-      grafast: 1.1.2(graphql@16.13.0)
-      grafserv: 1.0.1(@types/node@22.19.11)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
-      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
-      graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
-      graphql: 16.13.0
-      iterall: 1.3.0
-      jsonwebtoken: 9.0.3
-      pg: 8.21.0
-      pg-sql2: 5.0.1
-      tamedevil: 0.1.1
-      tslib: 2.8.1
-      ws: 8.20.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  postgraphile@5.1.4(92324343608439594bbe299323c80ef9):
+  postgraphile@5.1.4(138876491c004694bff1843ee79c8872):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
       '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
@@ -22595,7 +22661,61 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  postgraphile@5.1.4(9d965dba21fac51f59273c4256716137):
+  postgraphile@5.1.4(b3fb9399b7b000ca872a8f427cb73d08):
+    dependencies:
+      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
+      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
+      '@graphile/lru': 5.0.0
+      '@types/node': 22.19.19
+      '@types/pg': 8.20.4
+      debug: 4.4.3(supports-color@5.5.0)
+      grafast: 1.1.2(graphql@16.13.0)
+      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
+      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
+      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
+      graphile-config: 1.1.0
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      iterall: 1.3.0
+      jsonwebtoken: 9.0.3
+      pg: 8.21.0
+      pg-sql2: 5.0.1
+      tamedevil: 0.1.1
+      tslib: 2.8.1
+      ws: 8.20.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  postgraphile@5.1.4(cf7ef086788d1d3f644d1dc7345cb344):
+    dependencies:
+      '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
+      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
+      '@graphile/lru': 5.0.0
+      '@types/node': 22.19.19
+      '@types/pg': 8.20.4
+      debug: 4.4.3(supports-color@5.5.0)
+      grafast: 1.1.2(graphql@16.13.0)
+      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
+      graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
+      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
+      graphile-config: 1.1.0
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphql: 16.13.0
+      iterall: 1.3.0
+      jsonwebtoken: 9.0.3
+      pg: 8.20.0
+      pg-sql2: 5.0.1
+      tamedevil: 0.1.1
+      tslib: 2.8.1
+      ws: 8.20.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  postgraphile@5.1.4(f282a162d8bd20a217e08c60f5396af8):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
       '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
@@ -22622,24 +22742,24 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  postgraphile@5.1.4(fdde9aa28a0299d2757f9ae98191ef07):
+  postgraphile@5.1.4(f51a9bb2feb8b06fca136f1c2a1a2f6a):
     dependencies:
       '@dataplan/json': 1.0.1(grafast@1.1.2(graphql@16.13.0))
-      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)
+      '@dataplan/pg': 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@graphile/lru': 5.0.0
       '@types/node': 22.19.19
       '@types/pg': 8.20.4
       debug: 4.4.3(supports-color@5.5.0)
       grafast: 1.1.2(graphql@16.13.0)
-      grafserv: 1.0.1(@types/node@25.9.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
+      grafserv: 1.0.1(@types/node@22.19.11)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))(ws@8.20.1)
       graphile-build: 5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)
-      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1)
+      graphile-build-pg: 5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1)
       graphile-config: 1.1.0
-      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.20.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
+      graphile-utils: 5.0.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build-pg@5.1.3(@dataplan/pg@1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0))(grafast@1.1.2(graphql@16.13.0))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)(tamedevil@0.1.1))(graphile-build@5.1.1(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(tamedevil@0.1.1)
       graphql: 16.13.0
       iterall: 1.3.0
       jsonwebtoken: 9.0.3
-      pg: 8.20.0
+      pg: 8.21.0
       pg-sql2: 5.0.1
       tamedevil: 0.1.1
       tslib: 2.8.1
@@ -23563,22 +23683,22 @@ snapshots:
 
   ts-algebra@2.0.0: {}
 
-  ts-api-utils@2.5.0(typescript@5.9.3):
+  ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
-  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3):
+  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))(typescript@6.0.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       handlebars: 4.7.9
-      jest: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
+      jest: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.8.5
       type-fest: 4.41.0
-      typescript: 5.9.3
+      typescript: 6.0.3
       yargs-parser: 21.1.1
     optionalDependencies:
       '@babel/core': 7.29.0
@@ -23587,7 +23707,7 @@ snapshots:
       babel-jest: 30.4.1(@babel/core@7.29.0)
       jest-util: 30.4.1
 
-  ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
@@ -23601,11 +23721,11 @@ snapshots:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.9.3
+      typescript: 6.0.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  ts-node@10.9.2(@types/node@25.9.1)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@25.9.1)(typescript@6.0.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
@@ -23619,7 +23739,7 @@ snapshots:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.9.3
+      typescript: 6.0.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
@@ -23675,6 +23795,8 @@ snapshots:
   typedarray@0.0.6: {}
 
   typescript@5.9.3: {}
+
+  typescript@6.0.3: {}
 
   uc.micro@2.1.0: {}
 

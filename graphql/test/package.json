@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-test",
-  "version": "5.16.8",
+  "version": "5.19.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Testing with all plugins loaded",
   "main": "index.js",
@@ -50,7 +50,7 @@
     "pg": "^8.21.0",
     "pgsql-test": "workspace:^",
     "postgraphile": "5.1.4",
-    "typescript": "^5.0.0"
+    "typescript": "^6.0.3"
   },
   "keywords": [
     "testing",

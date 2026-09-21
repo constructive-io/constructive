@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.28.1...@pgpmjs/transform@0.28.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.28.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.28.0...@pgpmjs/transform@0.28.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+# [0.28.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.27.0...@pgpmjs/transform@0.28.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.26.0...@pgpmjs/transform@0.27.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+# [0.26.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.25.6...@pgpmjs/transform@0.26.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.25.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.25.5...@pgpmjs/transform@0.25.6) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
 ## [0.25.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.25.4...@pgpmjs/transform@0.25.5) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/transform

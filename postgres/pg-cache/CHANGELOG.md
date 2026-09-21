@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.29.2](https://github.com/constructive-io/constructive/compare/pg-cache@3.29.1...pg-cache@3.29.2) (2026-09-19)
+
+**Note:** Version bump only for package pg-cache
+
+## [3.29.1](https://github.com/constructive-io/constructive/compare/pg-cache@3.29.0...pg-cache@3.29.1) (2026-09-17)
+
+**Note:** Version bump only for package pg-cache
+
+# [3.29.0](https://github.com/constructive-io/constructive/compare/pg-cache@3.28.0...pg-cache@3.29.0) (2026-09-17)
+
+**Note:** Version bump only for package pg-cache
+
+# [3.28.0](https://github.com/constructive-io/constructive/compare/pg-cache@3.27.6...pg-cache@3.28.0) (2026-09-17)
+
+**Note:** Version bump only for package pg-cache
+
+## [3.27.6](https://github.com/constructive-io/constructive/compare/pg-cache@3.27.5...pg-cache@3.27.6) (2026-09-15)
+
+**Note:** Version bump only for package pg-cache
+
 ## [3.27.5](https://github.com/constructive-io/constructive/compare/pg-cache@3.27.4...pg-cache@3.27.5) (2026-09-08)
 
 **Note:** Version bump only for package pg-cache

@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.2](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.18.1...graphile-postgis@3.18.2) (2026-09-19)
+
+**Note:** Version bump only for package graphile-postgis
+
+## [3.18.1](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.18.0...graphile-postgis@3.18.1) (2026-09-17)
+
+**Note:** Version bump only for package graphile-postgis
+
+# [3.18.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.17.1...graphile-postgis@3.18.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-postgis
+
+## [3.17.1](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.17.0...graphile-postgis@3.17.1) (2026-09-17)
+
+**Note:** Version bump only for package graphile-postgis
+
+# [3.17.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.16.0...graphile-postgis@3.17.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-postgis
+
+# [3.16.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.15.7...graphile-postgis@3.16.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-postgis
+
+## [3.15.7](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.15.6...graphile-postgis@3.15.7) (2026-09-15)
+
+**Note:** Version bump only for package graphile-postgis
+
 ## [3.15.6](https://github.com/constructive-io/constructive/compare/graphile-postgis@3.15.5...graphile-postgis@3.15.6) (2026-09-08)
 
 **Note:** Version bump only for package graphile-postgis

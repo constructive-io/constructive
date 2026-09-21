@@ -1,6 +1,6 @@
 {
   "name": "graphql-orm-test",
-  "version": "1.15.12",
+  "version": "1.18.2",
   "private": true,
   "author": "Constructive <developers@constructive.io>",
   "description": "ORM integration tests against real PostgreSQL via graphile-test",
@@ -21,6 +21,6 @@
     "graphql": "16.13.0",
     "pgsql-test": "workspace:^",
     "ts-jest": "^29.4.12",
-    "typescript": "^5.0.0"
+    "typescript": "^6.0.3"
   }
 }

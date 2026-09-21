@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.10.1...@pgpmjs/portability@0.10.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+## [0.10.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.10.0...@pgpmjs/portability@0.10.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+# [0.10.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.9.1...@pgpmjs/portability@0.10.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+## [0.9.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.9.0...@pgpmjs/portability@0.9.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.8.0...@pgpmjs/portability@0.9.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.7.7...@pgpmjs/portability@0.8.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
+## [0.7.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.7.6...@pgpmjs/portability@0.7.7) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
 ## [0.7.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.7.5...@pgpmjs/portability@0.7.6) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/portability

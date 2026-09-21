@@ -25,7 +25,6 @@ PostgreSQL Options:
   --shm-size <size>  Shared memory size for container (default: 2g)
 
 Additional Services:
-  --minio            Include MinIO S3-compatible object storage (API: 9000, Console: 9001)
   --rustfs           Include RustFS S3-compatible object storage (API: 9000, Console: 9001)
   --ollama           Include Ollama LLM inference server (API: 11434)
   --gpu              Enable NVIDIA GPU passthrough for Ollama (requires NVIDIA Container Toolkit)
@@ -36,16 +35,13 @@ General Options:
 
 Examples:
   pgpm docker start                           Start PostgreSQL only
-  pgpm docker start --minio                   Start PostgreSQL + MinIO
   pgpm docker start --rustfs                  Start PostgreSQL + RustFS
   pgpm docker start --ollama                  Start PostgreSQL + Ollama (CPU)
   pgpm docker start --ollama --gpu            Start PostgreSQL + Ollama (NVIDIA GPU)
   pgpm docker start --port 5433               Start on custom port
   pgpm docker start --shm-size 4g             Start with 4GB shared memory
   pgpm docker start --recreate                Remove and recreate containers
-  pgpm docker start --recreate --minio        Recreate PostgreSQL + MinIO
   pgpm docker stop                            Stop PostgreSQL
-  pgpm docker stop --minio                    Stop PostgreSQL + MinIO
   pgpm docker stop --rustfs                   Stop PostgreSQL + RustFS
   pgpm docker stop --ollama                   Stop PostgreSQL + Ollama
   pgpm docker ls                              List services and status
@@ -82,30 +78,16 @@ interface ServiceDefinition {
 }
 
 const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
-  minio: {
-    name: 'minio',
-    image: 'minio/minio',
-    ports: [
-      { host: 9000, container: 9000 },
-      { host: 9001, container: 9001 }
-    ],
-    env: {
-      MINIO_ROOT_USER: 'minioadmin',
-      MINIO_ROOT_PASSWORD: 'minioadmin'
-    },
-    command: ['server', '/data', '--console-address', ':9001'],
-    volumes: [{ name: 'minio-data', containerPath: '/data' }]
-  },
   rustfs: {
     name: 'rustfs',
-    image: 'rustfs/rustfs',
+    image: 'rustfs/rustfs:1.0.0-rc.5',
     ports: [
       { host: 9000, container: 9000 },
       { host: 9001, container: 9001 }
     ],
     env: {
-      RUSTFS_ACCESS_KEY: 'minioadmin',
-      RUSTFS_SECRET_KEY: 'minioadmin',
+      RUSTFS_ACCESS_KEY: 'constructive',
+      RUSTFS_SECRET_KEY: 'constructive-dev-secret',
       RUSTFS_ADDRESS: ':9000',
       RUSTFS_CONSOLE_ADDRESS: ':9001',
       RUSTFS_CONSOLE_ENABLE: 'true'

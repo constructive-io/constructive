@@ -93,7 +93,12 @@ const run = async (): Promise<void> => {
   const sampler = setInterval(sample, 2);
   const newService = () => {
     created++;
-    return makePgService({ pool, schemas: ['cperf_lifecycle'] });
+    const service = makePgService({ pool, schemas: ['cperf_lifecycle'] });
+    const upstreamRelease = service.release.bind(service);
+    // Measure the actual public call in every path, including failed builds
+    // and disposal started by cache replacement. Do not infer cleanup counts.
+    service.release = () => releaseCall(upstreamRelease);
+    return service;
   };
   const releaseCall = async (release: () => void | PromiseLike<void>): Promise<void> => {
     const start = performance.now();
@@ -149,7 +154,7 @@ const run = async (): Promise<void> => {
             try {
               if (config.mode !== 'idle') await subscribe(service, id);
             } finally {
-              await releaseCall(() => service.release());
+              await service.release();
             }
             return;
           }
@@ -169,7 +174,6 @@ const run = async (): Promise<void> => {
           }).catch((error): GraphileCacheEntry | null => {
             if (config.mode !== 'failed-build' || error !== failure) throw error;
             expectedBuildFailures++;
-            released++;
             return null;
           });
           if (!entry) return;
@@ -187,7 +191,7 @@ const run = async (): Promise<void> => {
               // Reuse each key across generations while the old teardown runs.
               graphileCache.set(entry.cacheKey, entry);
             } else {
-              await releaseCall(() => disposeUncachedEntry(entry));
+              await disposeUncachedEntry(entry);
             }
           } catch (error) {
             await disposeUncachedEntry(entry);
@@ -199,7 +203,6 @@ const run = async (): Promise<void> => {
         if ((offset + config.concurrency) % 64 === 0 || offset + config.concurrency >= config.cycles) {
           if (config.mode === 'replacement') {
             await clearGraphileCache();
-            released = created;
           }
           await waitForActiveDisposals();
           maxSettleMs = Math.max(maxSettleMs, await waitUntil(
@@ -236,7 +239,8 @@ const run = async (): Promise<void> => {
         metadata: { ...config, poolMax: poolConfig.max, idleTimeoutMs: poolConfig.idleTimeoutMillis,
           created, released, expectedBuildFailures, pendingAtReturn,
           peakTotal, peakCheckedOut, peakWaiting, maxSettleMs, baselineBackends,
-          finalBackends, backendSettleMs, releaseP99Ms: releaseTimes[Math.floor(releaseTimes.length * 0.99)] ?? 0,
+          finalBackends, backendSettleMs, releaseSamples: releaseTimes.length,
+          releaseP99Ms: releaseTimes[Math.floor(releaseTimes.length * 0.99)],
           checkpoints, poolErrors, peakNotificationListeners, peakErrorListeners, listenerWarnings },
       };
     });

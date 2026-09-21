@@ -128,12 +128,12 @@ const deployOptions = getDeploymentEnvOptions();
 
 | Variable | Description |
 |----------|-------------|
-| `BUCKET_PROVIDER` | Storage provider (s3, minio, rustfs, gcs) — defaults to minio |
+| `BUCKET_PROVIDER` | Storage provider (s3, minio, rustfs, gcs) — `minio` is path-style S3-compatible storage (RustFS, MinIO) |
 | `BUCKET_NAME` | Bucket name |
 | `AWS_REGION` | AWS region |
 | `AWS_ACCESS_KEY_ID` | AWS access key |
 | `AWS_SECRET_ACCESS_KEY` | AWS secret key |
-| `MINIO_ENDPOINT` | S3-compatible endpoint URL (MinIO or RustFS; both listen on 9000) |
+| `OBJECT_STORE_ENDPOINT` | S3-compatible endpoint URL (RustFS or MinIO; both listen on 9000) |
 
 ### Jobs Configuration
 

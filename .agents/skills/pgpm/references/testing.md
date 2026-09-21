@@ -76,7 +76,7 @@ Returns:
 | `db.query(sql, params?)` | Execute SQL query |
 | `db.beforeEach()` | Start savepoint (call in beforeEach) |
 | `db.afterEach()` | Rollback to savepoint (call in afterEach) |
-| `db.setContext(key, value)` | Set session context variable |
+| `db.setContext(context)` | Set session context variables |
 | `db.getPool()` | Get underlying pg Pool |
 
 ## Seeding Data
@@ -161,12 +161,33 @@ For RLS (Row Level Security) testing:
 
 ```typescript
 test('user can only see own data', async () => {
-  await db.setContext('user_id', 'user-123');
+  db.setContext({ role: 'authenticated', 'jwt.claims.user_id': 'user-1' });
 
   const result = await db.query('SELECT * FROM user_data');
-  // Only returns rows where user_id = 'user-123'
+  // Only returns rows where user_id = 'user-1'
 });
 ```
+
+### RLS testing
+
+`db` from `getConnections()` connects as `app_user`, so grant access to the
+schema and table before testing whether RLS policies allow a row:
+
+```sql
+GRANT USAGE ON SCHEMA app_public TO authenticated;
+GRANT SELECT, INSERT ON app_public.posts TO authenticated;
+GRANT USAGE ON SEQUENCE app_public.posts_id_seq TO authenticated;
+```
+
+Then set the role and claims on the same client before querying:
+
+```typescript
+db.setContext({ role: 'authenticated', 'jwt.claims.user_id': 'user-1' });
+```
+
+The `pg` and `db` clients are separate connections with separate savepoints.
+A row inserted through `db` is invisible to `pg` in the same test; perform
+superuser-visibility assertions through the same client that inserted the row.
 
 ### Multiple Connections
 

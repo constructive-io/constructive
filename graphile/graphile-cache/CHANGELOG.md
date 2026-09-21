@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.2](https://github.com/constructive-io/constructive/compare/graphile-cache@4.14.1...graphile-cache@4.14.2) (2026-09-19)
+
+**Note:** Version bump only for package graphile-cache
+
+## [4.14.1](https://github.com/constructive-io/constructive/compare/graphile-cache@4.14.0...graphile-cache@4.14.1) (2026-09-17)
+
+**Note:** Version bump only for package graphile-cache
+
+# [4.14.0](https://github.com/constructive-io/constructive/compare/graphile-cache@4.13.0...graphile-cache@4.14.0) (2026-09-17)
+
+### Bug Fixes
+
+- drop runtime dynamic import() of hard deps/builtins in CJS packages ([daec863](https://github.com/constructive-io/constructive/commit/daec8633121b05503622816e8ab110a56771f924))
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/graphile-cache@4.12.6...graphile-cache@4.13.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-cache
+
+## [4.12.6](https://github.com/constructive-io/constructive/compare/graphile-cache@4.12.5...graphile-cache@4.12.6) (2026-09-15)
+
+**Note:** Version bump only for package graphile-cache
+
 ## [4.12.5](https://github.com/constructive-io/constructive/compare/graphile-cache@4.12.4...graphile-cache@4.12.5) (2026-09-08)
 
 **Note:** Version bump only for package graphile-cache

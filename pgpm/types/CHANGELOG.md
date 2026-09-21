@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.55.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.55.1...@pgpmjs/types@2.55.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/types
+
+## [2.55.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.55.0...@pgpmjs/types@2.55.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/types
+
+# [2.55.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.54.0...@pgpmjs/types@2.55.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/types
+
+# [2.54.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.53.4...@pgpmjs/types@2.54.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/types
+
+## [2.53.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.53.3...@pgpmjs/types@2.53.4) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/types
+
 ## [2.53.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.53.2...@pgpmjs/types@2.53.3) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/types

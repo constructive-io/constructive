@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.28.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.28.1...@constructive-io/graphql-server@5.28.2) (2026-09-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.28.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.28.0...@constructive-io/graphql-server@5.28.1) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [5.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.27.1...@constructive-io/graphql-server@5.28.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.27.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.27.0...@constructive-io/graphql-server@5.27.1) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [5.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.26.0...@constructive-io/graphql-server@5.27.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [5.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.2...@constructive-io/graphql-server@5.26.0) (2026-09-17)
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))
+
+## [5.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.1...@constructive-io/graphql-server@5.25.2) (2026-09-15)
+
+### Bug Fixes
+
+- **graphql-server:** bound introspection depth with its own fixed ceiling ([8d20e5c](https://github.com/constructive-io/constructive/commit/8d20e5c4f69bea16c5d02e35662a31dfce1a3ece))
+- rely on merged CDN defaults ([9296f54](https://github.com/constructive-io/constructive/commit/9296f5435640f65d627615630c4a11b9061b8cc5))
+
 ## [5.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.25.0...@constructive-io/graphql-server@5.25.1) (2026-09-08)
 
 ### Bug Fixes

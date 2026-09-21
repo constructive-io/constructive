@@ -1,4 +1,6 @@
-import { BoilerplateConfig as GenomicBoilerplateConfig,TemplateScaffolder } from 'genomic';
+import { execFileSync } from 'child_process';
+import fs from 'fs';
+import { BoilerplateConfig as GenomicBoilerplateConfig, CacheManager, GitCloner, TemplateScaffolder } from 'genomic';
 import os from 'os';
 import path from 'path';
 export type { BoilerplateSkill } from 'genomic';
@@ -115,6 +117,24 @@ export const DEFAULT_TEMPLATE_REPO = TEMPLATE_REPOS.default;
 export const DEFAULT_TEMPLATE_TTL_MS = 1 * 24 * 60 * 60 * 1000; // 1 day
 export const DEFAULT_TEMPLATE_TOOL_NAME = 'pgpm';
 
+export interface TemplateSourceInfo {
+  repo: string;
+  branch?: string;
+  remoteSha?: string;
+  refreshed: boolean;
+  offline: boolean;
+  local: boolean;
+}
+
+export interface RefreshTemplateCacheOptions {
+  templateRepo?: string;
+  branch?: string;
+  toolName?: string;
+  cacheBaseDir?: string;
+  cwd?: string;
+  force?: boolean;
+}
+
 function resolveCacheBaseDir(cacheBaseDir?: string): string | undefined {
   if (cacheBaseDir) {
     return cacheBaseDir;
@@ -126,6 +146,177 @@ function resolveCacheBaseDir(cacheBaseDir?: string): string | undefined {
     return path.join(os.tmpdir(), `pgpm-cache-${process.env.JEST_WORKER_ID}`);
   }
   return undefined;
+}
+
+const templateRefreshMemo = new Map<string, TemplateSourceInfo>();
+
+/**
+ * Clear the per-process refresh memo. Primarily useful for tests and callers
+ * that begin a new init run in the same process.
+ */
+export function _resetTemplateRefreshMemo(): void {
+  templateRefreshMemo.clear();
+}
+
+/**
+ * Check the remote template revision and clear a stale local clone.
+ *
+ * Set PGPM_TEMPLATE_OFFLINE to skip `git ls-remote`, which is useful for tests
+ * and environments that must not make network requests.
+ */
+export function refreshTemplateCache(
+  options: RefreshTemplateCacheOptions = {}
+): TemplateSourceInfo {
+  const {
+    templateRepo = DEFAULT_TEMPLATE_REPO,
+    branch,
+    toolName = DEFAULT_TEMPLATE_TOOL_NAME,
+    cacheBaseDir,
+    cwd,
+    force = false,
+  } = options;
+
+  const template =
+    templateRepo.startsWith('.') ||
+    templateRepo.startsWith('/') ||
+    templateRepo.startsWith('~')
+      ? path.resolve(cwd ?? process.cwd(), templateRepo)
+      : templateRepo;
+
+  if (
+    templateRepo.startsWith('.') ||
+    templateRepo.startsWith('/') ||
+    templateRepo.startsWith('~')
+  ) {
+    return {
+      repo: template,
+      branch,
+      refreshed: false,
+      offline: false,
+      local: true,
+    };
+  }
+
+  const url = new GitCloner().normalizeUrl(templateRepo);
+  const cm = new CacheManager({
+    toolName,
+    baseDir: resolveCacheBaseDir(cacheBaseDir),
+  });
+  const key = cm.createKey(url, branch);
+  const memoKey = `${key}|${force}`;
+  const memoized = templateRefreshMemo.get(memoKey);
+  if (memoized) return memoized;
+
+  if (process.env.PGPM_TEMPLATE_OFFLINE) {
+    const info = {
+      repo: url,
+      branch,
+      refreshed: false,
+      offline: true,
+      local: false,
+    };
+    templateRefreshMemo.set(memoKey, info);
+    return info;
+  }
+
+  let remoteSha: string;
+  try {
+    const output = execFileSync(
+      'git',
+      ['ls-remote', '--', url, branch ?? 'HEAD'],
+      { stdio: 'pipe', encoding: 'utf-8', timeout: 15_000 }
+    );
+    const match = output.match(/\b([0-9a-f]{40})\b/i);
+    if (!match) throw new Error('git ls-remote returned no commit SHA');
+    remoteSha = match[1];
+  } catch {
+    const info = {
+      repo: url,
+      branch,
+      refreshed: false,
+      offline: true,
+      local: false,
+    };
+    templateRefreshMemo.set(memoKey, info);
+    return info;
+  }
+
+  const refPath = path.join(cm.getMetadataDir(), `${key}.ref.json`);
+  let previousSha: string | undefined;
+  try {
+    const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
+    previousSha = typeof ref.sha === 'string' ? ref.sha : undefined;
+  } catch {
+    // A missing or malformed sidecar is treated as unknown.
+  }
+
+  const cachePath = path.join(cm.getReposDir(), key);
+  const refreshed =
+    force ||
+    previousSha !== remoteSha ||
+    (fs.existsSync(cachePath) && !previousSha);
+  if (refreshed) cm.clear(key);
+
+  fs.mkdirSync(cm.getMetadataDir(), { recursive: true });
+  fs.writeFileSync(
+    refPath,
+    JSON.stringify({ sha: remoteSha, checkedAt: Date.now() }, null, 2)
+  );
+
+  const info = {
+    repo: url,
+    branch,
+    remoteSha,
+    refreshed,
+    offline: false,
+    local: false,
+  };
+  templateRefreshMemo.set(memoKey, info);
+  return info;
+}
+
+function formatAge(lastUpdated: number): string {
+  const seconds = Math.max(0, Math.floor((Date.now() - lastUpdated) / 1000));
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
+}
+
+export function describeTemplateSource(
+  info: TemplateSourceInfo,
+  opts: { toolName?: string; cacheBaseDir?: string } = {}
+): string {
+  if (info.local) return `using local template ${info.repo}`;
+
+  const repoDisplay = info.repo
+    .replace(/^https:\/\/github\.com\//, '')
+    .replace(/\.git$/, '');
+  const label = `${repoDisplay}@${info.branch ?? 'HEAD'}`;
+  const shortSha = info.remoteSha?.slice(0, 7);
+  let fetched: string | undefined;
+  if (info.refreshed) {
+    fetched = 'fetched just now';
+  } else if (info.remoteSha) {
+    const url = new GitCloner().normalizeUrl(info.repo);
+    const cm = new CacheManager({
+      toolName: opts.toolName ?? DEFAULT_TEMPLATE_TOOL_NAME,
+      baseDir: resolveCacheBaseDir(opts.cacheBaseDir),
+    });
+    const key = cm.createKey(url, info.branch);
+    const metadata = cm.getMetadata(key);
+    if (metadata?.lastUpdated) fetched = `fetched ${formatAge(metadata.lastUpdated)} ago`;
+  }
+
+  const details = [
+    shortSha,
+    fetched,
+  ].filter(Boolean).join(', ');
+  let result = `using ${label}${details ? ` (${details})` : ''}`;
+  if (info.offline) result += ' (offline, using cached copy)';
+  return result;
 }
 
 export function inspectTemplate(

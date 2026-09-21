@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.19.0...@constructive-io/errors@0.20.0) (2026-09-19)
+
+### Features
+
+- **errors:** register verified-only identifier claim codes (IDENTIFIER_VERIFIED_ELSEWHERE, IDENTIFIER_UNVERIFIED_AMBIGUOUS, IDENTIFIER_CLAIM_LIMIT, MFA_IDENTIFIER_UNVERIFIED) ([c2bc7a6](https://github.com/constructive-io/constructive/commit/c2bc7a607cac65754eb1fb41362e75ecf4635623)), closes [#3830](https://github.com/constructive-io/constructive/issues/3830)
+
+# [0.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.18.0...@constructive-io/errors@0.19.0) (2026-09-17)
+
+### Features
+
+- **errors:** register IDENTIFIER_CONFLICT, INVITE_ACCOUNT_EXISTS_UNVERIFIED, ALREADY_AUTHENTICATED_USE_LINK ([3b72fcf](https://github.com/constructive-io/constructive/commit/3b72fcf529a31b27d55bfe87b0d57c98237ab373)), closes [constructive-db#3806](https://github.com/constructive-db/issues/3806)
+
+# [0.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.17.0...@constructive-io/errors@0.18.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/errors
+
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.16.1...@constructive-io/errors@0.17.0) (2026-09-17)
+
+### Features
+
+- **errors:** register GUARD_STEP_UP_MIN_AGE_ANCHOR condition codes ([1bc15c2](https://github.com/constructive-io/constructive/commit/1bc15c2dee77c4a3f40f48c17eb0f00d6f947ee0)), closes [constructive-io/constructive-db#3765](https://github.com/constructive-io/constructive-db/issues/3765)
+
+## [0.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.16.0...@constructive-io/errors@0.16.1) (2026-09-15)
+
+**Note:** Version bump only for package @constructive-io/errors
+
+# [0.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.14.0...@constructive-io/errors@0.16.0) (2026-09-15)
+
+### Features
+
+- **errors:** register INVITE_ADDRESS_REQUIRED and INVITE_USERS_INVALID ([a7af570](https://github.com/constructive-io/constructive/commit/a7af570f135be4b062db1aa9d3b55f2a9701ff67))
+- **errors:** register SIGN_UP_REQUIRES_INVITE and INVITE_PHONE_NOT_FOUND ([ea074ed](https://github.com/constructive-io/constructive/commit/ea074ed85e6a014925c3688c46bbc082ce9d5246)), closes [constructive-db#3730](https://github.com/constructive-db/issues/3730)
+- **errors:** register storage file processing lifecycle errors ([ecf19ca](https://github.com/constructive-io/constructive/commit/ecf19ca29074321d4752e6315bb900cf56308751))
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.13.0...@constructive-io/errors@0.14.0) (2026-09-08)
 
 ### Features

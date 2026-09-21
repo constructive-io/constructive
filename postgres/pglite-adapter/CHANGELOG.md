@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.18.1...@pgpmjs/pglite-adapter@1.18.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+## [1.18.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.18.0...@pgpmjs/pglite-adapter@1.18.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+# [1.18.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.17.1...@pgpmjs/pglite-adapter@1.18.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+## [1.17.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.17.0...@pgpmjs/pglite-adapter@1.17.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+# [1.17.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.16.0...@pgpmjs/pglite-adapter@1.17.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+# [1.16.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.15.13...@pgpmjs/pglite-adapter@1.16.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
+## [1.15.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.15.12...@pgpmjs/pglite-adapter@1.15.13) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/pglite-adapter
+
 ## [1.15.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/pglite-adapter@1.15.11...@pgpmjs/pglite-adapter@1.15.12) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/pglite-adapter

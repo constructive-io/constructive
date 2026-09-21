@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.45.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.45.1...@pgpmjs/env@2.45.2) (2026-09-19)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.45.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.45.0...@pgpmjs/env@2.45.1) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.45.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.44.0...@pgpmjs/env@2.45.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+# [2.44.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.43.6...@pgpmjs/env@2.44.0) (2026-09-17)
+
+**Note:** Version bump only for package @pgpmjs/env
+
+## [2.43.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.43.5...@pgpmjs/env@2.43.6) (2026-09-15)
+
+**Note:** Version bump only for package @pgpmjs/env
+
 ## [2.43.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/env@2.43.4...@pgpmjs/env@2.43.5) (2026-09-08)
 
 **Note:** Version bump only for package @pgpmjs/env

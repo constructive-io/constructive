@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.2](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.9.1...@constructive-io/examples-pgpm-projections@0.9.2) (2026-09-19)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.9.1](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.9.0...@constructive-io/examples-pgpm-projections@0.9.1) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.8.1...@constructive-io/examples-pgpm-projections@0.9.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.8.0...@constructive-io/examples-pgpm-projections@0.8.1) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.7.0...@constructive-io/examples-pgpm-projections@0.8.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.6.13...@constructive-io/examples-pgpm-projections@0.7.0) (2026-09-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.6.13](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.6.12...@constructive-io/examples-pgpm-projections@0.6.13) (2026-09-15)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
 ## [0.6.12](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.6.11...@constructive-io/examples-pgpm-projections@0.6.12) (2026-09-08)
 
 **Note:** Version bump only for package @constructive-io/examples-pgpm-projections

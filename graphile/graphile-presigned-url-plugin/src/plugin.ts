@@ -136,6 +136,7 @@ export function createPresignedUrlPlugin(
               GraphQLObjectType,
               GraphQLInputObjectType,
               GraphQLList,
+              isOutputType,
             },
           } = build;
 
@@ -143,7 +144,8 @@ export function createPresignedUrlPlugin(
           // scalar whenever the schema has a jsonb column, which any storage-equipped
           // database does; if it is absent the payload simply omits the field rather
           // than failing schema build over a field nothing can have asked for yet.
-          const jsonType = build.getTypeByName('JSON') ?? null;
+          const jsonNamedType = build.getTypeByName('JSON');
+          const jsonType = jsonNamedType && isOutputType(jsonNamedType) ? jsonNamedType : null;
           if (!jsonType) {
             log.warn('No JSON scalar in this schema; upload payloads will omit the `file` projection');
           }

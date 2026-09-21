@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.2](https://github.com/constructive-io/constructive/compare/pg-codegen@5.25.1...pg-codegen@5.25.2) (2026-09-19)
+
+**Note:** Version bump only for package pg-codegen
+
+## [5.25.1](https://github.com/constructive-io/constructive/compare/pg-codegen@5.25.0...pg-codegen@5.25.1) (2026-09-17)
+
+**Note:** Version bump only for package pg-codegen
+
+# [5.25.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.24.1...pg-codegen@5.25.0) (2026-09-17)
+
+**Note:** Version bump only for package pg-codegen
+
+## [5.24.1](https://github.com/constructive-io/constructive/compare/pg-codegen@5.24.0...pg-codegen@5.24.1) (2026-09-17)
+
+**Note:** Version bump only for package pg-codegen
+
+# [5.24.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.23.0...pg-codegen@5.24.0) (2026-09-17)
+
+**Note:** Version bump only for package pg-codegen
+
+# [5.23.0](https://github.com/constructive-io/constructive/compare/pg-codegen@5.22.13...pg-codegen@5.23.0) (2026-09-17)
+
+**Note:** Version bump only for package pg-codegen
+
+## [5.22.13](https://github.com/constructive-io/constructive/compare/pg-codegen@5.22.12...pg-codegen@5.22.13) (2026-09-15)
+
+**Note:** Version bump only for package pg-codegen
+
 ## [5.22.12](https://github.com/constructive-io/constructive/compare/pg-codegen@5.22.11...pg-codegen@5.22.12) (2026-09-08)
 
 **Note:** Version bump only for package pg-codegen

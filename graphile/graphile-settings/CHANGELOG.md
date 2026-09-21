@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.24.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.24.1...graphile-settings@6.24.2) (2026-09-19)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.24.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.24.0...graphile-settings@6.24.1) (2026-09-17)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.24.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.23.1...graphile-settings@6.24.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.23.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.23.0...graphile-settings@6.23.1) (2026-09-17)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.23.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.22.0...graphile-settings@6.23.0) (2026-09-17)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.22.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.21.9...graphile-settings@6.22.0) (2026-09-17)
+
+### Features
+
+- add scoped introspection aligned with Crystal configuration ([66c6bf8](https://github.com/constructive-io/constructive/commit/66c6bf8b7892a0a19169ddf9ae36b157707abef5))
+
+## [6.21.9](https://github.com/constructive-io/constructive/compare/graphile-settings@6.21.8...graphile-settings@6.21.9) (2026-09-15)
+
+### Bug Fixes
+
+- rely on merged CDN defaults ([9296f54](https://github.com/constructive-io/constructive/commit/9296f5435640f65d627615630c4a11b9061b8cc5))
+
 ## [6.21.8](https://github.com/constructive-io/constructive/compare/graphile-settings@6.21.7...graphile-settings@6.21.8) (2026-09-08)
 
 **Note:** Version bump only for package graphile-settings

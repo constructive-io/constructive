@@ -1,6 +1,6 @@
 {
   "name": "pgpm",
-  "version": "5.30.5",
+  "version": "5.35.1",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Package Manager - Database migration and package management CLI",
   "main": "index.js",
@@ -65,7 +65,7 @@
     "js-yaml": "^4.1.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.3.6",
+    "pgsql-deparser": "^18.3.8",
     "semver": "^7.8.5",
     "shelljs": "^0.10.0",
     "yanse": "^0.2.2"

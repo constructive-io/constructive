@@ -8,10 +8,10 @@
     "class": "public"
   },
   "ACCOUNT_EXISTS": {
-    "count": 34,
+    "count": 26,
     "dynamic": false,
     "sample": "ACCOUNT_EXISTS",
-    "n_source": 9,
+    "n_source": 5,
     "n_generated": 8,
     "class": "public"
   },
@@ -24,7 +24,7 @@
     "class": "public"
   },
   "ACCOUNT_NOT_FOUND": {
-    "count": 12,
+    "count": 14,
     "dynamic": false,
     "sample": "ACCOUNT_NOT_FOUND",
     "n_source": 4,
@@ -38,6 +38,14 @@
     "n_source": 0,
     "n_generated": 4,
     "class": "internal"
+  },
+  "ALREADY_AUTHENTICATED_USE_LINK": {
+    "count": 8,
+    "dynamic": false,
+    "sample": "ALREADY_AUTHENTICATED_USE_LINK",
+    "n_source": 2,
+    "n_generated": 4,
+    "class": "public"
   },
   "ALREADY_SCHEDULED": {
     "count": 8,
@@ -145,6 +153,30 @@
     "sample": "ASSIGN_PROFILES_CAPABILITY_REQUIRED",
     "n_source": 2,
     "n_generated": 4
+  },
+  "AST_OPTIONS_NOT_OBJECT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "AST_OPTIONS_NOT_OBJECT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
+  "AST_OPTION_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "AST_OPTION_REQUIRED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
+  "AST_OPTION_UNKNOWN": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "AST_OPTION_UNKNOWN",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
   },
   "ATTRIBUTION_REQUIRED": {
     "count": 4,
@@ -438,6 +470,94 @@
     "dynamic": false,
     "sample": "BILLING_DISPUTE_BALANCE_NOT_FOUND",
     "n_source": 1,
+    "n_generated": 3,
+    "class": "internal"
+  },
+  "BILLING_ENTITY_BUSY": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_ENTITY_BUSY",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "public"
+  },
+  "BILLING_HEALTH_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_HEALTH_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_NOT_READY": {
+    "count": 3,
+    "dynamic": false,
+    "sample": "BILLING_NOT_READY",
+    "n_source": 1,
+    "n_generated": 2,
+    "class": "public"
+  },
+  "BILLING_OBSERVATION_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OBSERVATION_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_OPERATION_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OPERATION_CONFLICT",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "public"
+  },
+  "BILLING_OPERATION_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OPERATION_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "public"
+  },
+  "BILLING_OPERATION_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OPERATION_NOT_FOUND",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_OPERATION_SETTLED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OPERATION_SETTLED",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_OPERATION_STATE_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_OPERATION_STATE_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_RECONCILE_BOUNDS_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_RECONCILE_BOUNDS_REQUIRED",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "BILLING_SCHEDULED_CHANGE_INVALID": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "BILLING_SCHEDULED_CHANGE_INVALID",
+    "n_source": 0,
     "n_generated": 3,
     "class": "internal"
   },
@@ -1170,7 +1290,7 @@
     "class": "public"
   },
   "DATA_FILE_REF": {
-    "count": 20,
+    "count": 28,
     "dynamic": false,
     "sample": "DATA_FILE_REF",
     "n_source": 1,
@@ -1856,7 +1976,7 @@
     "class": "public"
   },
   "DATA_PERMISSIONS_MODULE_AMBIGUOUS": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "DATA_PERMISSIONS_MODULE_AMBIGUOUS",
     "n_source": 1,
@@ -1867,6 +1987,14 @@
     "count": 2,
     "dynamic": false,
     "sample": "DATA_PERMISSIONS_MODULE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_PERMISSIONS_MODULE_REF_INVALID": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "DATA_PERMISSIONS_MODULE_REF_INVALID",
     "n_source": 1,
     "n_generated": 1,
     "class": "public"
@@ -2056,11 +2184,11 @@
     "class": "public"
   },
   "DOMAIN_ALREADY_CLAIMED": {
-    "count": 2,
+    "count": 6,
     "dynamic": false,
     "sample": "DOMAIN_ALREADY_CLAIMED",
     "n_source": 1,
-    "n_generated": 1,
+    "n_generated": 5,
     "class": "public"
   },
   "DOMAIN_CHECK_CERT_NOT_ISSUING": {
@@ -2085,16 +2213,16 @@
     "n_generated": 6
   },
   "DOMAIN_ISSUE_CERT_FORBIDDEN": {
-    "count": 2,
+    "count": 6,
     "dynamic": false,
     "sample": "DOMAIN_ISSUE_CERT_FORBIDDEN",
     "n_source": 0,
-    "n_generated": 2,
+    "n_generated": 6,
     "class": "public"
   },
   "DOMAIN_ISSUE_CERT_NOT_VERIFIED": {
     "count": 8,
-    "dynamic": true,
+    "dynamic": false,
     "sample": "DOMAIN_ISSUE_CERT_NOT_VERIFIED",
     "n_source": 1,
     "n_generated": 7,
@@ -2164,11 +2292,12 @@
     "n_generated": 6
   },
   "EMAIL_NOT_VERIFIED": {
-    "count": 12,
+    "count": 6,
     "dynamic": false,
     "sample": "EMAIL_NOT_VERIFIED",
-    "n_source": 2,
-    "n_generated": 4
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
   },
   "ENTITY_CLAIM_REQUIRED": {
     "count": 4,
@@ -2187,19 +2316,19 @@
     "class": "public"
   },
   "ENTITY_NOT_FOUND": {
-    "count": 8,
+    "count": 12,
     "dynamic": false,
     "sample": "ENTITY_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 7,
     "class": "public"
   },
   "ENTITY_REQUIRED": {
-    "count": 4,
+    "count": 8,
     "dynamic": false,
     "sample": "ENTITY_REQUIRED",
     "n_source": 1,
-    "n_generated": 3,
+    "n_generated": 4,
     "class": "internal"
   },
   "ENTITY_TYPE_CLAIM_REQUIRED": {
@@ -2219,11 +2348,11 @@
     "class": "public"
   },
   "ENTITY_TYPE_NOT_FOUND": {
-    "count": 8,
+    "count": 12,
     "dynamic": false,
     "sample": "ENTITY_TYPE_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 7,
     "class": "public"
   },
   "ENTITY_TYPE_PROVISION": {
@@ -2528,11 +2657,11 @@
     "class": "internal"
   },
   "FORBIDDEN": {
-    "count": 44,
+    "count": 70,
     "dynamic": false,
     "sample": "FORBIDDEN",
     "n_source": 4,
-    "n_generated": 22,
+    "n_generated": 35,
     "class": "public"
   },
   "FOREIGN_KEY_CONSTRAINT_NOT_FOUND": {
@@ -2729,9 +2858,9 @@
     "class": "public"
   },
   "GUARD_STEP_UP": {
-    "count": 10,
+    "count": 12,
     "dynamic": true,
-    "sample": "GUARD_STEP_UP: unknown event %, expected INSERT, UPDATE, or DELETE",
+    "sample": "GUARD_STEP_UP: min_age anchor takes fk_col or anchor_conditions, not both",
     "n_source": 1,
     "n_generated": 1
   },
@@ -2779,6 +2908,22 @@
     "count": 2,
     "dynamic": false,
     "sample": "GUARD_STEP_UP_INVALID_STEP_UP_TYPE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "GUARD_STEP_UP_MIN_AGE_ANCHOR_CONDITION_FIELD_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "GUARD_STEP_UP_MIN_AGE_ANCHOR_FK_FIELD_CONDITIONS_CONFLICT",
     "n_source": 1,
     "n_generated": 1,
     "class": "public"
@@ -3047,11 +3192,11 @@
     "n_generated": 3
   },
   "HIERARCHY_DEPTH_EXCEEDED": {
-    "count": 8,
+    "count": 12,
     "dynamic": false,
     "sample": "HIERARCHY_DEPTH_EXCEEDED",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 7,
     "class": "public"
   },
   "HIERARCHY_INACTIVE_MEMBER": {
@@ -3081,6 +3226,46 @@
     "sample": "HOSTNAME_BINDING_SYNC: unknown event %, expected UPSERT or DELETE",
     "n_source": 1,
     "n_generated": 1
+  },
+  "HOSTNAME_CLAIMED_IN_OTHER_PLANE": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "HOSTNAME_CLAIMED_IN_OTHER_PLANE",
+    "n_source": 0,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "IDENTIFIER_CLAIM_LIMIT": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "IDENTIFIER_CLAIM_LIMIT",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "IDENTIFIER_CONFLICT": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "IDENTIFIER_CONFLICT",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "IDENTIFIER_UNVERIFIED_AMBIGUOUS": {
+    "count": 19,
+    "dynamic": false,
+    "sample": "IDENTIFIER_UNVERIFIED_AMBIGUOUS",
+    "n_source": 1,
+    "n_generated": 8,
+    "class": "public"
+  },
+  "IDENTIFIER_VERIFIED_ELSEWHERE": {
+    "count": 44,
+    "dynamic": false,
+    "sample": "IDENTIFIER_VERIFIED_ELSEWHERE",
+    "n_source": 1,
+    "n_generated": 10,
+    "class": "public"
   },
   "IDENTITY_ACCOUNT_NOT_FOUND": {
     "count": 10,
@@ -3233,10 +3418,10 @@
     "class": "public"
   },
   "INTERNAL_ERROR": {
-    "count": 452,
+    "count": 460,
     "dynamic": false,
     "sample": "INTERNAL_ERROR",
-    "n_source": 95,
+    "n_source": 96,
     "n_generated": 4,
     "class": "internal"
   },
@@ -3288,11 +3473,11 @@
     "class": "public"
   },
   "INVALID_DEFAULT_LIMIT_ID": {
-    "count": 10,
+    "count": 12,
     "dynamic": false,
     "sample": "INVALID_DEFAULT_LIMIT_ID",
     "n_source": 1,
-    "n_generated": 4
+    "n_generated": 6
   },
   "INVALID_DOMAIN_BASE_TYPE": {
     "count": 2,
@@ -3372,26 +3557,61 @@
     "n_source": 0,
     "n_generated": 6
   },
+  "INVITE_ACCOUNT_EXISTS_UNVERIFIED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "INVITE_ACCOUNT_EXISTS_UNVERIFIED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "INVITE_ADDRESS_REQUIRED": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "INVITE_ADDRESS_REQUIRED",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
   "INVITE_EMAIL_NOT_FOUND": {
-    "count": 16,
+    "count": 6,
     "dynamic": false,
     "sample": "INVITE_EMAIL_NOT_FOUND",
-    "n_source": 2,
-    "n_generated": 4
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
   },
   "INVITE_LIMIT": {
-    "count": 12,
+    "count": 6,
     "dynamic": false,
     "sample": "INVITE_LIMIT",
-    "n_source": 2,
-    "n_generated": 4
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
   },
   "INVITE_NOT_FOUND": {
-    "count": 12,
+    "count": 18,
     "dynamic": false,
     "sample": "INVITE_NOT_FOUND",
-    "n_source": 2,
-    "n_generated": 4
+    "n_source": 3,
+    "n_generated": 6,
+    "class": "public"
+  },
+  "INVITE_PHONE_NOT_FOUND": {
+    "count": 8,
+    "dynamic": false,
+    "sample": "INVITE_PHONE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "INVITE_USERS_INVALID": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "INVITE_USERS_INVALID",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
   },
   "INVOCATION_ANONYMOUS_NOT_AUTHORIZED": {
     "count": 2,
@@ -4041,6 +4261,14 @@
     "n_generated": 3,
     "class": "public"
   },
+  "MFA_IDENTIFIER_UNVERIFIED": {
+    "count": 16,
+    "dynamic": false,
+    "sample": "MFA_IDENTIFIER_UNVERIFIED",
+    "n_source": 4,
+    "n_generated": 6,
+    "class": "public"
+  },
   "MFA_REQUIRED": {
     "count": 6,
     "dynamic": false,
@@ -4097,11 +4325,11 @@
     "class": "internal"
   },
   "MODULE_ENTRY_MALFORMED": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "MODULE_ENTRY_MALFORMED",
     "n_source": 1,
-    "n_generated": 0,
+    "n_generated": 1,
     "class": "internal"
   },
   "MODULE_SECURITY_POLICY_ENTRY_MISSING_TYPE": {
@@ -4150,11 +4378,11 @@
     "class": "public"
   },
   "NOT_AUTHENTICATED": {
-    "count": 122,
+    "count": 130,
     "dynamic": false,
     "sample": "NOT_AUTHENTICATED",
-    "n_source": 29,
-    "n_generated": 31,
+    "n_source": 30,
+    "n_generated": 33,
     "class": "public"
   },
   "NOT_AUTHORIZED": {
@@ -4214,10 +4442,10 @@
     "class": "public"
   },
   "OBJECT_NOT_FOUND": {
-    "count": 26,
+    "count": 20,
     "dynamic": false,
     "sample": "OBJECT_NOT_FOUND",
-    "n_source": 9,
+    "n_source": 8,
     "n_generated": 5,
     "class": "public"
   },
@@ -4262,11 +4490,11 @@
     "class": "internal"
   },
   "PARENT_ENTITY_TYPE_NOT_FOUND": {
-    "count": 8,
+    "count": 12,
     "dynamic": false,
     "sample": "PARENT_ENTITY_TYPE_NOT_FOUND",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 7,
     "class": "public"
   },
   "PARENT_EXECUTION_NOT_FOUND": {
@@ -4314,6 +4542,14 @@
     "sample": "PASSWORD_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 2,
+    "class": "public"
+  },
+  "PERMISSION_DENIED": {
+    "count": 42,
+    "dynamic": false,
+    "sample": "PERMISSION_DENIED",
+    "n_source": 2,
+    "n_generated": 10,
     "class": "public"
   },
   "PLAN_REQUIRED": {
@@ -4411,11 +4647,11 @@
     "class": "public"
   },
   "PRINCIPAL_CANNOT_CREATE_PRINCIPAL": {
-    "count": 12,
+    "count": 19,
     "dynamic": false,
     "sample": "PRINCIPAL_CANNOT_CREATE_PRINCIPAL",
-    "n_source": 3,
-    "n_generated": 5,
+    "n_source": 4,
+    "n_generated": 7,
     "class": "public"
   },
   "PRINCIPAL_CANNOT_DELETE_PRINCIPAL": {
@@ -4865,6 +5101,13 @@
     "n_source": 1,
     "n_generated": 1
   },
+  "ROUTE_DOMAIN_REQUIRED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "ROUTE_DOMAIN_REQUIRED",
+    "n_source": 0,
+    "n_generated": 4
+  },
   "ROUTE_PRIVILEGED_TARGET_FORBIDDEN": {
     "count": 4,
     "dynamic": false,
@@ -5297,11 +5540,19 @@
     "class": "public"
   },
   "SIGN_UP_DISABLED": {
-    "count": 6,
+    "count": 8,
     "dynamic": false,
     "sample": "SIGN_UP_DISABLED",
     "n_source": 0,
-    "n_generated": 4,
+    "n_generated": 5,
+    "class": "public"
+  },
+  "SIGN_UP_REQUIRES_INVITE": {
+    "count": 13,
+    "dynamic": false,
+    "sample": "SIGN_UP_REQUIRES_INVITE",
+    "n_source": 1,
+    "n_generated": 6,
     "class": "public"
   },
   "SITE_INSTALLATION_MEMBER_NOT_SERVABLE": {
@@ -5312,11 +5563,11 @@
     "n_generated": 4
   },
   "SITE_NOT_FOUND": {
-    "count": 20,
+    "count": 24,
     "dynamic": false,
     "sample": "SITE_NOT_FOUND",
     "n_source": 4,
-    "n_generated": 1,
+    "n_generated": 5,
     "class": "public"
   },
   "SITE_NOT_PROVISIONED": {
@@ -5421,6 +5672,14 @@
     "sample": "SMS_SIGN_UP_DISABLED",
     "n_source": 0,
     "n_generated": 2,
+    "class": "public"
+  },
+  "SMS_VERIFICATION_DISABLED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "SMS_VERIFICATION_DISABLED",
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "SOURCE_COMMIT_NOT_FOUND": {
@@ -5535,11 +5794,11 @@
     "class": "public"
   },
   "STEP_UP_REQUIRED": {
-    "count": 23,
+    "count": 19,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED",
     "n_source": 1,
-    "n_generated": 11,
+    "n_generated": 10,
     "class": "public"
   },
   "STEP_UP_REQUIRED_FRESH_AUTH": {
@@ -5551,11 +5810,11 @@
     "class": "public"
   },
   "STEP_UP_REQUIRED_MFA": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_MFA",
     "n_source": 1,
-    "n_generated": 3,
+    "n_generated": 4,
     "class": "public"
   },
   "STEP_UP_REQUIRED_PASSWORD": {
@@ -5863,11 +6122,11 @@
     "class": "public"
   },
   "TOO_MANY_REQUESTS": {
-    "count": 51,
+    "count": 59,
     "dynamic": false,
     "sample": "TOO_MANY_REQUESTS",
-    "n_source": 1,
-    "n_generated": 25,
+    "n_source": 2,
+    "n_generated": 27,
     "class": "public"
   },
   "TOTP_ALREADY_ENABLED": {
@@ -5979,6 +6238,14 @@
     "sample": "UNAUTHENTICATED",
     "n_source": 3,
     "n_generated": 4,
+    "class": "public"
+  },
+  "UNKNOWN_METER": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "UNKNOWN_METER",
+    "n_source": 0,
+    "n_generated": 2,
     "class": "public"
   },
   "UNKNOWN_POLICY_TYPE": {

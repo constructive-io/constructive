@@ -81,6 +81,44 @@ may be visible to other local processes.
 The PostgreSQL fixture command only creates a previously absent schema whose
 name starts with `cperf_`; it never drops or replaces schemas.
 
+## Scoped introspection comparison
+
+`makeScopedIntrospectionSuite({ schemas })` compares stock introspection with
+`gather.pgScopedIntrospection.main: true` using `scoped-introspection-worker.js`.
+Both cases use the same upstream service factory and its default session settings.
+The scoped case uses the copied CNC plugin and its default `catalogTypes: 'all'`;
+there is no legacy mode, dependency-schema allowlist, or performance-only tuning.
+The stock case does not load the scoped plugin.
+
+Pass an optional `runtimeCheck: { query, expectedData }` to the suite to verify
+actual table, relation, or function results after each build. A result mismatch
+fails the sample. Without this option, the worker performs the minimal
+`{ __typename }` smoke check. Schema hash equivalence is checked separately by
+the runner. Service release completes before the worker reports success.
+
+For performance comparisons, keep target schemas fixed while increasing unrelated
+catalog objects, discard a warm-up pair, and use repeated fresh-process samples
+with the runner's seeded case ordering. Fresh Node processes do not imply cold
+PostgreSQL caches. Report medians and sample ranges together with PostgreSQL/Node
+versions and catalog sizes; runtime validation and process startup are outside
+`buildMs`. `processPeakRss` is the worker peak measured after runtime validation,
+before service release.
+
+The [default scoped comparison](benchmarks/scoped-introspection.md) records the
+historical method, summarized results, limitations, and a reproduction command
+for the typed runner. Generated reports and per-sample results stay local.
+
+## Cache capacity experiments
+
+The [Grafast cache suite](benchmarks/grafast-cache/README.md) compares native
+cache capacities using this package alone. Run `cache:micro`, `cache:postgres`
+and `cache:variants` for in-memory traffic, PostgreSQL confirmation and multiple
+plans per operation. TypeScript sources build into `dist` with the rest of the
+package; `cache:analyze` validates local raw reports and produces both summaries.
+Generated results are not committed. The [PR #1746 description](https://github.com/constructive-io/constructive/pull/1746)
+records the measured results and tradeoffs; the suite README contains reproduction
+instructions.
+
 ## Connection lifecycle stability suite
 
 The TypeScript entry points in `src/connection-lifecycle` exercise the unpatched
