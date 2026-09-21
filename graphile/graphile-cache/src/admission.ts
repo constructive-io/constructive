@@ -67,7 +67,11 @@ export class GraphileAdmission {
     return { ...this.policy, reserved: this.reserved, failed: this.failed };
   }
 
-  /** Failed disposal cannot be treated as reclaimed capacity. */
+  /**
+   * Failed disposal permanently blocks admission until process restart.
+   * Settled bookkeeping can reach zero after rejection without proving that
+   * resources were released; the owner has no verified cleanup retry signal.
+   */
   fail(error: unknown): void {
     this.failed = true;
     this.failure = error;

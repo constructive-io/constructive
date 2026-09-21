@@ -53,7 +53,7 @@ describe('resident admission', () => {
     reservation.release();
   });
 
-  it('does not pretend a failed disposal reclaimed capacity', async () => {
+  it('does not recover from failed disposal when ownership counters reach zero', async () => {
     const error = new Error('release failed');
     const admission = new GraphileAdmission({ occupied: () => 0, evict: async () => false }, 2, () => 10, 100);
     admission.configure({ buildReserveBytes: 10 });
@@ -62,6 +62,9 @@ describe('resident admission', () => {
     expect(() => reservation.assertPublishable()).toThrow(error);
     await expect(admission.reserve()).rejects.toBe(error);
     reservation.release();
+    expect(admission.stats).toMatchObject({ reserved: 0, failed: true });
+    admission.configure({ buildReserveBytes: 10 });
+    await expect(admission.reserve()).rejects.toBe(error);
   });
 
   it('combines process owners conservatively and rejects impossible or malformed budgets', () => {

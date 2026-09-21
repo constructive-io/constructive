@@ -273,6 +273,8 @@ const admission = new GraphileAdmission({
 
 export const configureGraphileAdmission = (options?: GraphileAdmissionOptions): void => admission.configure(options);
 export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
+// Rejected cleanup can finish bookkeeping without releasing resources. Keep
+// both owners fenced until process restart, even after pending work reaches zero.
 export const markGraphileCapacityUnavailable = (error: unknown): void => {
   admission.fail(error);
   graphileBuildCoordinator.fail();
@@ -388,6 +390,7 @@ const clearEntries = (matches: (key: string, entry: GraphileCacheEntry) => boole
 
 /** Clear all cached build variants owned by one logical service. */
 export const clearGraphileEntriesForService = (serviceKey: string): number => {
+  if (typeof serviceKey !== 'string' || serviceKey.length === 0) return 0;
   graphileBuildFlights.invalidate((metadata) => metadata.serviceKey === serviceKey);
   return clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
 };
