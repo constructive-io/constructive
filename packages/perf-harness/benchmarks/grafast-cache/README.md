@@ -72,20 +72,24 @@ version-specific contract changes. It does not replace caches or execution.
 
 ## Results and interpretation
 
-The committed [evaluation](results/REPORT.md) includes scope, limitations and the
-necessity assessment for #1746. Raw reports retain individual process samples,
+The [PR #1746 description](https://github.com/constructive-io/constructive/pull/1746)
+records the measured revision, environment, key results, limitations and necessity
+assessment. Generated reports stay local; they are not committed or required by
+tests. Raw reports retain individual process samples,
 latency percentiles, CPU, heap, RSS, input hashes, configuration and validation.
 Retained memory is forced-GC heap after workload minus heap after schema creation;
 it is not total service memory or a pure cache byte count. Compare process samples,
 not pooled request counts, and do not infer production speedups from these fixtures.
 
-Replace all three reports together after a new full run, then regenerate summaries:
+After a full run, collect all three reports in the ignored local results directory
+and generate summaries:
 
 ```sh
 node --input-type=module - <<'JS'
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 const out = 'packages/perf-harness/benchmarks/grafast-cache/results';
+mkdirSync(out, { recursive: true });
 for (const name of ['micro', 'variants', 'postgres']) {
   writeFileSync(`${out}/${name}.json.gz`, gzipSync(readFileSync(`/tmp/cache-${name}.json`)));
 }
@@ -97,7 +101,10 @@ pnpm --filter @constructive-io/perf-harness cache:analyze
 containing the three gzip reports. It validates samples before writing
 `summary.json` and `postgres-summary.json`.
 
-Update report interpretation and provenance/checksums alongside the regenerated
-results. Smoke runs do not belong in the final reports. `pnpm --filter
+Summarize the measured revision, environment, configuration, results and limitations
+in the PR description. If raw samples are needed for review, share them separately
+(for example as temporary CI artifacts). Smoke runs do not belong in final reports.
+Analyzer tests construct deterministic synthetic inputs and hand-calculated expected
+statistics; they do not read local benchmark outputs. `pnpm --filter
 @constructive-io/perf-harness test --runInBand` builds the package and checks the
 standalone workers and actual capacity behavior without timing thresholds.
