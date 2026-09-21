@@ -287,8 +287,10 @@ const clearEntries = (matches: (key: string, entry: GraphileCacheEntry) => boole
 };
 
 /** Clear all cached build variants owned by one logical service. */
-export const clearGraphileEntriesForService = (serviceKey: string): number =>
-  clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
+export const clearGraphileEntriesForService = (serviceKey: string): number => {
+  if (typeof serviceKey !== 'string' || serviceKey.length === 0) return 0;
+  return clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
+};
 
 /** Clear all cached build variants for one resolved database identifier. */
 export const clearGraphileEntriesForDatabase = (databaseId: string): number =>
