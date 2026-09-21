@@ -14,6 +14,18 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  SCHEMA_BUILD_INVALIDATED: defineError({
+    code: 'SCHEMA_BUILD_INVALIDATED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema build was invalidated.'
+  }),
+  SCHEMA_BUILDS_CLOSED: defineError({
+    code: 'SCHEMA_BUILDS_CLOSED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema builds are closed.'
+  }),
   SCHEMA_CAPACITY_EXHAUSTED: defineError({
     code: 'SCHEMA_CAPACITY_EXHAUSTED',
     class: 'internal',

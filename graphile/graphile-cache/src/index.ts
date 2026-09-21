@@ -24,6 +24,8 @@ export {
   getCacheStats,
   // Cache instance and entry type
   graphileCache,
+  graphileBuildFlights,
+  reopenGraphileBuilds,
   GraphileCacheEntry,
   // Time constants
   ONE_HOUR_MS,
@@ -44,3 +46,5 @@ export type { GraphileAdmissionOptions } from './admission';
 
 // Generic module config cache for plugin lookups
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';
+
+export type { GraphileBuildFlightScope, GraphileBuildScopeMetadata } from './build-flights';

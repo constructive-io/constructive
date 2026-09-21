@@ -4,12 +4,12 @@ import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import {
-  buildAdmittedGraphileInstance,
   clearGraphileEntriesForService,
   configureGraphileAdmission,
   createGraphileBuildCacheKey,
   createGraphileInstance,
-  graphileCache,
+  graphileBuildFlights,
+  reopenGraphileBuilds,
   GraphileCacheEntry,
   referenceGraphileBuildValue,
   snapshotGraphileBuildValue
@@ -25,6 +25,7 @@ import { getGraphilePreset } from './settings';
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
   configureGraphileAdmission(opts.graphile?.cache);
+  reopenGraphileBuilds();
   const ownerIdentity = {};
 
   const { pg, server } = opts;
@@ -63,10 +64,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
       enableRealtime: false,
     });
     const key = createGraphileBuildCacheKey('explorer', snapshot);
-    const cached = graphileCache.get(key);
-    if (cached) return cached;
-
-    return buildAdmittedGraphileInstance(
+    return graphileBuildFlights.getOrCreate(
       { cacheKey: key, serviceKey, databaseId: null, poolKey: snapshot.poolKey },
       async () => {
         const basePreset = getGraphilePreset(opts, snapshot.role);
