@@ -3,3 +3,6 @@
 /cache-micro-report.json
 /cache-postgres-report.json
 /cache-variants-report.json
+
+# Local outputs from the scoped introspection benchmark
+/benchmarks/scoped-introspection/results/

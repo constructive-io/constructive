@@ -19,7 +19,8 @@
     "cache:micro": "node dist/benchmarks/grafast-cache/micro.js",
     "cache:postgres": "node dist/benchmarks/grafast-cache/postgres.js",
     "cache:variants": "node dist/benchmarks/grafast-cache/variants.js",
-    "cache:analyze": "node dist/benchmarks/grafast-cache/analyze.js"
+    "cache:analyze": "node dist/benchmarks/grafast-cache/analyze.js",
+    "scoped:introspection": "node dist/benchmarks/scoped-introspection/run.js"
   },
   "dependencies": {
     "@dataplan/pg": "1.1.1",
@@ -36,7 +37,9 @@
   "devDependencies": {
     "@types/node": "^22.19.11",
     "@types/pg": "^8.20.4",
-    "makage": "^0.8.0"
+    "makage": "^0.8.0",
+    "pg-cache": "workspace:^",
+    "pgsql-test": "workspace:^"
   },
   "engines": {
     "node": ">=22"

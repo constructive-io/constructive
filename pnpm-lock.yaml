@@ -2836,6 +2836,12 @@ importers:
       makage:
         specifier: ^0.8.0
         version: 0.8.0
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
 
   packages/postmaster:
     dependencies:
