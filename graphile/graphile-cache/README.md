@@ -52,6 +52,25 @@ from the fingerprint. Use `clearGraphileEntriesForService`,
 `clearGraphileEntriesForDatabase`, or `clearGraphileEntriesForPool` to invalidate
 all build variants for that owner. Pool cleanup matches `poolKey` exactly.
 
+### Resident admission
+
+Server and Explorer builds use `buildAdmittedGraphileInstance(metadata, factory)`.
+It reserves capacity before the factory allocates services, waits for an evicted
+entry's public release interfaces, and publishes only after the ready result passes its heap check.
+Upstream background UNLISTEN/client return is outside that public release boundary.
+The count includes reservations, residents, and disposal in progress. A disposal
+failure blocks further admission instead of treating uncertain resources as free.
+
+`configureGraphileAdmission` accepts `max`, `heapMaxBytes`, and
+`buildReserveBytes`. The server exposes these as `graphile.cache` options and
+`GRAPHILE_CACHE_MAX`, `GRAPHILE_CACHE_HEAP_MAX_BYTES`, and
+`GRAPHILE_CACHE_BUILD_RESERVE_BYTES`. Defaults retain the existing LRU ceiling,
+use 85% of the V8 heap limit as a watermark, and reserve 64 MiB per pending build.
+Multiple owners in one process use the strictest limits. This is a conservative
+process-heap admission check, not an exact per-instance memory measurement or an
+RSS limit; garbage collection may delay admission after eviction. Raw
+`graphileCache.set` is a low-level API and does not reserve capacity.
+
 ### Basic Usage
 
 ```typescript

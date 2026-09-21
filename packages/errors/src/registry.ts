@@ -14,6 +14,12 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  SCHEMA_CAPACITY_EXHAUSTED: defineError({
+    code: 'SCHEMA_CAPACITY_EXHAUSTED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema capacity is unavailable.'
+  }),
   STORAGE_BUCKET_NOT_RECONCILED: defineError({
     code: 'STORAGE_BUCKET_NOT_RECONCILED',
     class: 'public',

@@ -1,5 +1,3 @@
-const mockCacheGet = jest.fn();
-const mockCacheSet = jest.fn();
 const mockCreateGraphileInstance = jest.fn();
 const mockGetPgPool = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
@@ -10,11 +8,7 @@ jest.mock('graphile-cache', () => {
   const actual = jest.requireActual('graphile-cache');
   return {
     ...actual,
-    createGraphileInstance: mockCreateGraphileInstance,
-    graphileCache: {
-      get: mockCacheGet,
-      set: mockCacheSet
-    }
+    createGraphileInstance: mockCreateGraphileInstance
   };
 });
 
@@ -36,6 +30,12 @@ jest.mock('../graphile-introspection', () => ({
 }));
 
 import type { Request, Response } from 'express';
+import {
+  clearGraphileCache,
+  configureGraphileAdmission,
+  graphileCache,
+  type GraphileCacheEntry
+} from 'graphile-cache';
 
 import {
   clearInFlightMap,
@@ -58,14 +58,20 @@ const makeRequest = (): Request =>
   }) as unknown as Request;
 
 describe('graphile single-flight handler creation', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await clearGraphileCache();
+    configureGraphileAdmission({ buildReserveBytes: 0 });
     clearInFlightMap();
-    mockCacheGet.mockReset().mockReturnValue(undefined);
-    mockCacheSet.mockReset();
     mockGetPgPool.mockReset().mockReturnValue({});
-    mockCreateGraphileInstance.mockReset().mockResolvedValue({
-      handler: jest.fn()
-    });
+    mockCreateGraphileInstance.mockReset().mockImplementation(async ({ cacheKey }: any) => ({
+      pgl: { release: jest.fn().mockResolvedValue(undefined) },
+      serv: {},
+      handler: jest.fn(),
+      httpServer: { listening: false },
+      cacheKey,
+      createdAt: Date.now(),
+      releasePresetServices: jest.fn().mockResolvedValue(undefined)
+    }));
     mockMakeIntrospectionWiring.mockReset();
     mockCreateGrafastCacheLimitsPreset.mockReset().mockReturnValue({
       plugins: [{ name: 'GrafastCacheLimitsPlugin', version: '1.0.0' }]
@@ -84,6 +90,7 @@ describe('graphile single-flight handler creation', () => {
 
     const middleware = graphile({
       graphile: {
+        cache: { buildReserveBytes: 0 },
         grafastCache: { queryCacheMaxLength: 16 },
         extends: [
           {
@@ -103,9 +110,9 @@ describe('graphile single-flight handler creation', () => {
     const next = jest.fn();
     const first = middleware(makeRequest(), response, next);
 
-    // Let the first request enter the registered creation promise before the
-    // second request checks the in-flight map.
-    await Promise.resolve();
+    // Admission awaits before starting the preset build, so let the first
+    // request register its creation promise before the second request checks.
+    await new Promise<void>((resolve) => setImmediate(resolve));
     expect(getInFlightCount()).toBe(1);
 
     const second = middleware(makeRequest(), response, next);
@@ -122,10 +129,21 @@ describe('graphile single-flight handler creation', () => {
     expect(mockCreateGraphileInstance.mock.calls[0][0].preset.extends).toContainEqual({
       plugins: [{ name: 'GrafastCacheLimitsPlugin', version: '1.0.0' }]
     });
-    expect(mockCacheSet).toHaveBeenCalledTimes(1);
+    expect(graphileCache.size).toBe(1);
+    const entry = graphileCache.values().next().value as GraphileCacheEntry;
+    expect(entry).toEqual(expect.objectContaining({
+      serviceKey: 'service-key',
+      databaseId: 'database-id',
+      poolKey: expect.any(String)
+    }));
     expect(getInFlightCount()).toBe(0);
     expect(mockCreateGraphileInstance.mock.calls[0][0].preset.gather).toEqual({
       pgScopedIntrospection: { main: false }
     });
+
+    await clearGraphileCache();
+    expect(graphileCache.size).toBe(0);
+    expect(entry.pgl.release).toHaveBeenCalledTimes(1);
+    expect(entry.releasePresetServices).toHaveBeenCalledTimes(1);
   });
 });

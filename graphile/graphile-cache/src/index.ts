@@ -15,6 +15,7 @@ export {
   // Clear matching entries
   clearMatchingEntries,
   closeAllCaches,
+  configureGraphileAdmission,
   disposeUncachedEntry,
   // Eviction tracking
   EvictionReason,
@@ -38,6 +39,8 @@ export type { GraphileBuildReference } from './build-identity';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';
+export { buildAdmittedGraphileInstance, type GraphileBuildMetadata } from './admitted-build';
+export type { GraphileAdmissionOptions } from './admission';
 
 // Generic module config cache for plugin lookups
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';

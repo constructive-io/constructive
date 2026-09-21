@@ -43,6 +43,15 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 
 ### GraphQL Schema
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
+- `GRAPHILE_CACHE_MAX` - Positive safe integer cap on the number of cached plans
+- `GRAPHILE_CACHE_HEAP_MAX_BYTES` - Positive safe integer heap limit in bytes used to size the cache
+- `GRAPHILE_CACHE_BUILD_RESERVE_BYTES` - Nonnegative safe integer heap reserve in bytes for schema builds
+
+These variables map to `graphile.cache.max`, `graphile.cache.heapMaxBytes`, and
+`graphile.cache.buildReserveBytes`. The same values can be set in `pgpm.json` or
+runtime options. If both heap byte values are explicit, the build reserve must
+be smaller than the heap limit; when no heap limit is set, the cache runtime
+derives it from the V8 heap limit.
 
 Schema-scoped introspection is configured through the Graphile preset in
 `pgpm.json` or runtime options. The map is keyed by the final PostgreSQL

@@ -8,6 +8,7 @@ import { postgraphile } from 'postgraphile';
 
 import { awaitGraphileBuildReadiness } from './build-readiness';
 import type { GraphileCacheEntry } from './graphile-cache';
+import { markGraphileCapacityUnavailable } from './graphile-cache';
 import { createPresetServicesReleaser } from './preset-services';
 
 const log = new Logger('graphile-cache:create');
@@ -80,6 +81,7 @@ export const createGraphileInstance = async (
     ready: () => serv.ready(),
     release: releaseFailedBuild,
     onReleaseError: (releaseError) => {
+      markGraphileCapacityUnavailable(releaseError);
       log.error(
         `Failed to release PostGraphile[${cacheKey}] after build failure:`,
         releaseError

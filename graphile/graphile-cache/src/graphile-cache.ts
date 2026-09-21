@@ -8,6 +8,8 @@ import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { PostGraphileInstance } from 'postgraphile';
 
+import { GraphileAdmission, type GraphileAdmissionOptions, type GraphileAdmissionReservation } from './admission';
+
 const log = new Logger('graphile-cache');
 
 // --- Time Constants ---
@@ -168,6 +170,7 @@ const scheduleDisposal = (
   activeDisposals.add(pending);
   void pending
     .catch((error) => {
+      admission.fail(error);
       log.error(`Failed to dispose PostGraphile[${key}]:`, error);
     })
     .finally(() => activeDisposals.delete(pending));
@@ -223,14 +226,35 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
     // Determine eviction reason before disposal
     const reason = getEvictionReason(key, entry);
 
+    // Teardown must be scheduled even if an eviction listener throws.
+    scheduleDisposal(entry, key);
+
     // Emit eviction event
     cacheEvents.emitEviction({ key, reason, entry });
 
     log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
-
-    scheduleDisposal(entry, key);
   }
 });
+
+const admission = new GraphileAdmission({
+  occupied: () => graphileCache.size + activeDisposals.size,
+  evict: async () => {
+    const entry = graphileCache.pop();
+    if (entry) {
+      await waitForEntryDisposal(entry);
+      return true;
+    }
+    if (activeDisposals.size > 0) {
+      await waitForActiveDisposals();
+      return true;
+    }
+    return false;
+  }
+}, initialConfig.max);
+
+export const configureGraphileAdmission = (options?: GraphileAdmissionOptions): void => admission.configure(options);
+export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
+export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -238,6 +262,11 @@ export interface CacheStats {
   max: number;
   ttl: number;
   keys: string[];
+  reserved: number;
+  disposing: number;
+  heapMaxBytes: number;
+  buildReserveBytes: number;
+  admissionFailed: boolean;
 }
 
 /**
@@ -247,9 +276,14 @@ export function getCacheStats(): CacheStats {
   const config = getCacheConfig();
   return {
     size: graphileCache.size,
-    max: config.max,
+    max: admission.stats.max,
     ttl: config.ttl,
-    keys: [...graphileCache.keys()]
+    keys: [...graphileCache.keys()],
+    reserved: admission.stats.reserved,
+    disposing: activeDisposals.size,
+    heapMaxBytes: admission.stats.heapMaxBytes,
+    buildReserveBytes: admission.stats.buildReserveBytes,
+    admissionFailed: admission.stats.failed
   };
 }
 
