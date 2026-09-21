@@ -86,6 +86,29 @@ published, and cannot erase a replacement flight. Closing caches rejects callers
 promptly while draining the underlying work and its cleanup before pool close.
 `reopenGraphileBuilds` only reopens a fully drained registry.
 
+### Global build coordination
+
+Every unique admitted build runs through one process-wide coordinator. It uses
+one active permit and a bounded FIFO queue (default 16); same-key callers join
+the existing flight without consuming another queue slot. The permit covers
+capacity admission and eviction waits, preset allocation, readiness, publication,
+and failed-generation cleanup. Overflow refuses work before admission.
+
+`graphile.build` / `configureGraphileBuilds` configure `queueMax`, `watchdogMs`
+(default 300000), and `shutdownTimeoutMs` (default 30000). Corresponding environment
+variables are `GRAPHILE_BUILD_QUEUE_MAX`, `GRAPHILE_BUILD_WATCHDOG_MS`, and
+`GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS`. Multiple owners retain the strictest limits;
+active work cannot have its watchdog policy changed.
+
+The watchdog fences publication before rejecting active and queued callers. It
+cannot cancel JavaScript work: the permit and any reservation remain owned until
+the actual task and cleanup settle. Watchdog, drain timeout, or failed cleanup
+permanently makes the coordinator unavailable; process restart is required.
+`closeGraphileBuilds` returns false if its single deadline expires, and
+`closeAllCaches` throws without closing pools in that case. Server cache shutdown
+fences builds before waiting for HTTP requests that may be awaiting those builds.
+This is build drain; full request and WebSocket retirement is a separate concern.
+
 ### Basic Usage
 
 ```typescript

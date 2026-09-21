@@ -26,6 +26,10 @@ export {
   graphileCache,
   graphileBuildFlights,
   reopenGraphileBuilds,
+  configureGraphileBuilds,
+  beginGraphileBuildShutdown,
+  closeGraphileBuilds,
+  getGraphileBuildStats,
   GraphileCacheEntry,
   // Time constants
   ONE_HOUR_MS,
@@ -48,3 +52,5 @@ export type { GraphileAdmissionOptions } from './admission';
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';
 
 export type { GraphileBuildFlightScope, GraphileBuildScopeMetadata } from './build-flights';
+
+export type { GraphileBuildOptions } from './build-coordinator';

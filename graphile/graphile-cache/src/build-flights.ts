@@ -23,6 +23,8 @@ export interface GraphileBuildFlightScope {
 }
 
 export interface GraphileBuildFlightsOptions {
+  /** Synchronous unique-work admission, before allocating a pending flight. */
+  assertCanBuild?(): void;
   /** Read the existing resident cache; this registry does not own cache entries. */
   get(key: string): GraphileCacheEntry | undefined;
   /** Build and publish through the existing admitted-build owner. */
@@ -132,6 +134,8 @@ export class GraphileBuildFlights {
 
     const existing = this.pending.get(metadata.cacheKey);
     if (existing) return existing.promise;
+    try { this.options.assertCanBuild?.(); }
+    catch (error) { return Promise.reject(error); }
 
     const frozenMetadata = copyMetadata(metadata);
     let resolve!: (entry: GraphileCacheEntry) => void;
@@ -155,8 +159,19 @@ export class GraphileBuildFlights {
     // Register both the flight and its owned scope before invoking the build
     // hook or the user factory, even if a caller immediately invalidates it.
     this.pending.set(metadata.cacheKey, flight);
-    const task = Promise.resolve()
-      .then(() => this.options.build(frozenMetadata, create, scope.assertCurrent))
+    let building: Promise<GraphileCacheEntry>;
+    try {
+      // The shared owner synchronously reserves its bounded coordinator slot;
+      // actual work still starts asynchronously under that coordinator.
+      building = this.options.build(frozenMetadata, create, scope.assertCurrent);
+    } catch (error) {
+      if (this.pending.get(metadata.cacheKey) === flight) this.pending.delete(metadata.cacheKey);
+      scope.release();
+      flight.callerSettled = true;
+      flight.reject(error);
+      return promise;
+    }
+    const task = Promise.resolve(building)
       .then(
         (entry) => {
           if (!flight.callerSettled) {

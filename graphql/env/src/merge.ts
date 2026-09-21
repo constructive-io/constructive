@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge';
 
 import { getGraphQLEnvVars } from './env';
 import { normalizeGrafastCacheLimits } from './grafast-cache-limits';
-import { validateGraphileCacheOptions } from './validation';
+import { validateGraphileOptions } from './validation';
 
 /**
  * Get Constructive environment options by merging:
@@ -60,7 +60,7 @@ export const getEnvOptions = (
   if (grafastCache !== undefined && options.graphile) {
     options.graphile = { ...options.graphile, grafastCache };
   }
-  validateGraphileCacheOptions(options);
+  validateGraphileOptions(options);
   return options;
 };
 

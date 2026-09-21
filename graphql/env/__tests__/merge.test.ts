@@ -278,6 +278,117 @@ describe('getEnvOptions', () => {
     });
   });
 
+  it('parses explicit Graphile build environment variables without injecting defaults', () => {
+    const result = getGraphQLEnvVars({
+      GRAPHILE_BUILD_QUEUE_MAX: '0',
+      GRAPHILE_BUILD_WATCHDOG_MS: '300000',
+      GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS: '30000'
+    });
+
+    expect(result.graphile?.build).toEqual({
+      queueMax: 0,
+      watchdogMs: 300000,
+      shutdownTimeoutMs: 30000
+    });
+    expect(getGraphQLEnvVars({}).graphile?.build).toBeUndefined();
+  });
+
+  it('accepts Node timer delays through the signed 32-bit millisecond limit', () => {
+    const result = getGraphQLEnvVars({
+      GRAPHILE_BUILD_WATCHDOG_MS: '2147483647',
+      GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS: '2147483647'
+    });
+
+    expect(result.graphile?.build).toEqual({
+      watchdogMs: 2147483647,
+      shutdownTimeoutMs: 2147483647
+    });
+  });
+
+  it('preserves configured Graphile build settings when environment values are absent', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-build-'));
+    writeConfig(tempDir, {
+      graphile: {
+        build: {
+          queueMax: 8,
+          watchdogMs: 240000,
+          shutdownTimeoutMs: 45000
+        }
+      }
+    });
+
+    const result = getEnvOptions({}, tempDir, {});
+
+    expect(result.graphile?.build).toEqual({
+      queueMax: 8,
+      watchdogMs: 240000,
+      shutdownTimeoutMs: 45000
+    });
+  });
+
+  it('merges Graphile build config, environment, and runtime overrides in priority order', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-build-priority-'));
+    writeConfig(tempDir, {
+      graphile: {
+        build: {
+          queueMax: 8,
+          watchdogMs: 240000,
+          shutdownTimeoutMs: 45000
+        }
+      }
+    });
+
+    const result = getEnvOptions(
+      { graphile: { build: { watchdogMs: 120000 } } },
+      tempDir,
+      {
+        GRAPHILE_BUILD_QUEUE_MAX: '12',
+        GRAPHILE_BUILD_WATCHDOG_MS: '180000'
+      }
+    );
+
+    expect(result.graphile?.build).toEqual({
+      queueMax: 12,
+      watchdogMs: 120000,
+      shutdownTimeoutMs: 45000
+    });
+  });
+
+  it.each([
+    ['queue max negative', 'GRAPHILE_BUILD_QUEUE_MAX', '-1'],
+    ['queue max fractional', 'GRAPHILE_BUILD_QUEUE_MAX', '1.5'],
+    ['queue max above safe integer range', 'GRAPHILE_BUILD_QUEUE_MAX', '9007199254740992'],
+    ['blank watchdog', 'GRAPHILE_BUILD_WATCHDOG_MS', ''],
+    ['zero watchdog', 'GRAPHILE_BUILD_WATCHDOG_MS', '0'],
+    ['watchdog timer overflow', 'GRAPHILE_BUILD_WATCHDOG_MS', '2147483648'],
+    ['fractional shutdown timeout', 'GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS', '10.5'],
+    ['shutdown timer overflow', 'GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS', '2147483648']
+  ])('rejects malformed Graphile build environment value (%s)', (_label, name, value) => {
+    expect(() => getGraphQLEnvVars({ [name]: value })).toThrow(new RegExp(name));
+  });
+
+  it.each([
+    ['negative queue max', { queueMax: -1 }],
+    ['fractional queue max', { queueMax: 1.5 }],
+    ['unsafe queue max', { queueMax: 9007199254740992 }],
+    ['zero watchdog', { watchdogMs: 0 }],
+    ['watchdog timer overflow', { watchdogMs: 2147483648 }],
+    ['shutdown timer overflow', { shutdownTimeoutMs: 2147483648 }]
+  ])('rejects invalid final Graphile build config (%s)', (_label, build) => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-build-invalid-'));
+    writeConfig(tempDir, { graphile: { build } });
+
+    expect(() => getEnvOptions({}, tempDir, {})).toThrow(/graphile\.build/);
+  });
+
+  it('validates explicit Graphile build runtime overrides', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-build-runtime-'));
+
+    expect(() =>
+      getEnvOptions({ graphile: { build: { queueMax: 1.5 } } }, tempDir, {})
+    ).toThrow(/graphile\.build\.queueMax/);
+  });
+
   it.each([
     ['zero max', { graphile: { cache: { max: 0 } } }],
     ['fractional heap limit', { graphile: { cache: { heapMaxBytes: 1.5 } } }],

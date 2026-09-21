@@ -304,4 +304,27 @@ describe('GraphileBuildFlights', () => {
     expect(flights.pendingCount).toBe(0);
     expect(flights.activeScopeCount).toBe(0);
   });
+  it('refuses unique work before registration and cleans up a synchronous build failure', async () => {
+    const failure = new Error('queue full');
+    const build = jest.fn();
+    const refused = new GraphileBuildFlights({
+      get: () => undefined,
+      assertCanBuild: () => { throw failure; },
+      build
+    });
+    const pending = refused.getOrCreate(makeMetadata('refused'), jest.fn());
+    expect(refused.pendingCount).toBe(0);
+    expect(refused.activeScopeCount).toBe(0);
+    expect(refused.activeTaskCount).toBe(0);
+    expect(build).not.toHaveBeenCalled();
+    await expect(pending).rejects.toBe(failure);
+
+    const { flights } = makeFlights({ build: () => { throw failure; } });
+    const failed = flights.getOrCreate(makeMetadata('failed'), jest.fn());
+    expect(flights.pendingCount).toBe(0);
+    expect(flights.activeScopeCount).toBe(0);
+    expect(flights.activeTaskCount).toBe(0);
+    await expect(failed).rejects.toBe(failure);
+  });
+
 });
