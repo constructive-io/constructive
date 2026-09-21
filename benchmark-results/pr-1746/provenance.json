@@ -1,0 +1,43 @@
+{
+  "pr": "https://github.com/constructive-io/constructive/pull/1746",
+  "head": "67f47e488de11fe6a21d2c4327b2ceb3ef780983",
+  "parent": "7d28f718c049ae43aa9f04e1f7e1e6b39083ada4",
+  "node": "v22.22.0",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "cpu": "Apple M3",
+  "memoryBytes": 17179869184,
+  "cpuAffinity": "unset, shared desktop; no unrelated processes stopped",
+  "lockfileSha256": "9f79c641de216c0fba2d218e4ea14b27a1c1847a72c1a6efbb446e9b24acf77c",
+  "parentLockfileIdentical": true,
+  "harnessRunIdentical": true,
+  "grafast": "1.1.2",
+  "graphql": "16.13.0",
+  "postgraphile": "5.1.4",
+  "postgresql": "18.4 (local Docker; shared server cache not reset)",
+  "finalWorkers": 240,
+  "seed": 20260921,
+  "repetitionsPerCase": 8,
+  "flags": [
+    "--expose-gc"
+  ],
+  "workerEnvironment": {
+    "NODE_ENV": "production",
+    "GRAPHILE_ENV": "production"
+  },
+  "files": {
+    "graphile/graphile-settings/benchmarks/grafast-cache-postgres/run.cjs": "b74464dc5ca0a157bf9500e374774aa507545c04c4836af072e77f07b3d97d40",
+    "graphile/graphile-settings/benchmarks/grafast-cache-postgres/seed.sql": "02f0c04a9937776ab848fcd36c46c80ca7f3cd6ca8f1f69ff7def819a85ad22d",
+    "graphile/graphile-settings/benchmarks/grafast-cache-postgres/README.md": "22737a0698616fa80b2756dd0fbe450b70c6997ab3421f33a37e23e2715bdb9b",
+    "graphile/graphile-settings/benchmarks/grafast-cache-micro/run.cjs": "77b0780a8a6acb02ab837d56ff73fb65b1b6880d0ca6e7e4709c6fb183506503",
+    "graphile/graphile-settings/benchmarks/grafast-cache-micro/README.md": "36520713fd44ddfb3abc7803358e0addbeb707831f0f0a17ea47a8710493f21c",
+    "graphile/graphile-settings/benchmarks/grafast-cache-variants/run.cjs": "a1594a8d8b191c2981635bad52939cc6415109db38284e3dcd31069047af55cc"
+  },
+  "reports": {
+    "summary.json": "11ecf5dd0e85466e5166523860df68e896f61519475f3211adaa039a5b4bf44e",
+    "micro.json.gz": "8129470896d5b8798fed61225854cbba14e92ec5fae16352f6d36b6e2509386a",
+    "variants.json.gz": "a1b0212ea103a6c0c680a5da6214a6d68443c52a79addfc12566ceafabff5e67",
+    "postgres.json.gz": "f05086868eee8b5ac6e0bdbc2217fd3a808a6c6ac0456e23c2f50661d8298c77",
+    "postgres-summary.json": "ae83000e559db0526a4194a0c143df105c5523db4f84b81cc734ff9fded9525d"
+  },
+  "rawReportsEncoding": "gzip; decompressed files are the unchanged original perf-harness JSON reports"
+}
