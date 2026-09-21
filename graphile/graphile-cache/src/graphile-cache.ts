@@ -174,7 +174,7 @@ export const disposeUncachedEntry = (
   key = entry.cacheKey
 ): Promise<void> => scheduleDisposal(entry, key);
 
-/** Await the terminal result for an entry whose disposal has been scheduled. */
+/** Await disposal calls, not background connection cleanup inside upstream. */
 export const waitForEntryDisposal = (
   entry: GraphileCacheEntry
 ): Promise<void> => disposalPromises.get(entry) ?? Promise.resolve();

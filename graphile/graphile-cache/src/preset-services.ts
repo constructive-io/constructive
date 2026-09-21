@@ -2,7 +2,12 @@ interface ReleasablePresetService {
   release?: () => void | PromiseLike<void>;
 }
 
-/** Own and release the unique pgServices for one resolved preset generation. */
+/**
+ * Own and release the unique pgServices for one resolved preset generation.
+ * Success means the public release calls returned successfully (including any
+ * promise they expose). Upstream may continue subscriber UNLISTEN/client return
+ * in the background; this does not promise that the pool is already idle.
+ */
 export const createPresetServicesReleaser = (resolvedPreset: {
   pgServices?: readonly ReleasablePresetService[];
 }): (() => Promise<void>) => {
