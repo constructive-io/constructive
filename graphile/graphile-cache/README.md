@@ -92,6 +92,21 @@ process-heap admission check, not an exact per-instance memory measurement or an
 RSS limit; garbage collection may delay admission after eviction. Raw
 `graphileCache.set` is a low-level API and does not reserve capacity.
 
+### Exact-key build flights
+
+Server and Explorer use the shared `graphileBuildFlights.getOrCreate` owner.
+It registers a flight synchronously, shares its promise for an exact build key,
+and publishes through resident admission only after readiness. A failed flight
+is shared with its current callers; a later request may start a new attempt.
+There is no implicit retry by joined callers.
+
+Preparation scopes fence asynchronous metadata lookup before the exact key is
+known. Service/database/pool invalidation, key deletion, and cache clear fence
+old work before removing residents. Late results are disposed instead of
+published, and cannot erase a replacement flight. Closing caches rejects callers
+promptly while draining the underlying work and its cleanup before pool close.
+`reopenGraphileBuilds` only reopens a fully drained registry.
+
 ### Basic Usage
 
 ```typescript

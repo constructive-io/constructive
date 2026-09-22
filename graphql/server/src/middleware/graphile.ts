@@ -6,13 +6,13 @@ import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
-  buildAdmittedGraphileInstance,
   configureGraphileAdmission,
   createGraphileBuildCacheKey,
   createGraphileInstance,
-  graphileCache,
+  graphileBuildFlights,
+  reopenGraphileBuilds,
   snapshotGraphileBuildValue,
-  type GraphileCacheEntry
+  type GraphileBuildFlightScope
 } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
@@ -28,38 +28,18 @@ import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import { createGraphileServerBuildSnapshot } from './graphile-build-snapshot';
 
-// =============================================================================
-// Single-Flight Pattern: In-Flight Tracking
-// =============================================================================
-
-/**
- * Tracks in-flight handler creation promises to prevent duplicate creations.
- * When multiple concurrent requests arrive for the same cache key, only the
- * first request creates the handler while others wait on the same promise.
- */
-const creating = new Map<string, Promise<GraphileCacheEntry>>();
-
-/**
- * Returns the number of currently in-flight handler creation operations.
- * Useful for monitoring and debugging.
- */
+/** Shared exact-key flights include both Server and Explorer builds. */
 export function getInFlightCount(): number {
-  return creating.size;
+  return graphileBuildFlights.pendingCount;
 }
 
-/**
- * Returns the cache keys for all currently in-flight handler creation operations.
- * Useful for monitoring and debugging.
- */
 export function getInFlightKeys(): string[] {
-  return [...creating.keys()];
+  return [...graphileBuildFlights.pendingKeys];
 }
 
-/**
- * Clears the in-flight map. Used for testing purposes.
- */
+/** Fence callers and late publication; retain actual work until cleanup ends. */
 export function clearInFlightMap(): void {
-  creating.clear();
+  graphileBuildFlights.invalidateAll();
 }
 
 const log = new Logger('graphile');
@@ -131,8 +111,10 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
   const ownerIdentity = {};
   configureGraphileAdmission(opts.graphile?.cache);
+  reopenGraphileBuilds();
 
   return async (req: Request, res: Response, next: NextFunction) => {
+    let preparationScope: GraphileBuildFlightScope | undefined;
     try {
       const context = req.constructive;
       if (!context) {
@@ -169,33 +151,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         explain,
         maskError
       };
+      preparationScope = graphileBuildFlights.capture({
+        serviceKey, databaseId, poolKey: dbname
+      });
       // Resolve the request-owned compute snapshot before cache lookup because
       // its provisioned bindings change the exact Graphile schema.
       const compute = apiId ? await context.useModule('compute') : undefined;
       const snapshot = createGraphileServerBuildSnapshot({ ...snapshotInput, compute });
       const key = createGraphileBuildCacheKey('server', snapshot);
 
-      const cached = graphileCache.get(key);
-      if (cached) {
-        log.debug('Graphile cache hit', { requestId: context.requestId });
-        return cached.handler(req, res, next);
-      }
-      log.debug('Graphile cache miss', { requestId: context.requestId });
-
-      const inFlight = creating.get(key);
-      if (inFlight) {
-        const instance = await inFlight;
-        return instance.handler(req, res, next);
-      }
-      const recheckedCache = graphileCache.get(key);
-      if (recheckedCache) return recheckedCache.handler(req, res, next);
-      const retryInFlight = creating.get(key);
-      if (retryInFlight) {
-        const retryInstance = await retryInFlight;
-        return retryInstance.handler(req, res, next);
-      }
-
-      const creationPromise = buildAdmittedGraphileInstance(
+      const creationPromise = graphileBuildFlights.getOrCreate(
         { cacheKey: key, serviceKey, databaseId, poolKey: snapshot.poolKey },
         async () => {
           const preset = await buildPreset(snapshot, pool);
@@ -208,18 +173,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
             }),
             { enabled: observabilityEnabled }
           );
-        }
+        },
+        preparationScope
       );
-      creating.set(key, creationPromise);
 
-      try {
-        const instance = await creationPromise;
-        log.debug('Graphile handler ready', { requestId: context.requestId });
-        return instance.handler(req, res, next);
-      } finally {
-        // Always clean up in-flight tracker
-        creating.delete(key);
-      }
+      const instance = await creationPromise;
+      log.debug('Graphile handler ready', { requestId: context.requestId });
+      return instance.handler(req, res, next);
     } catch (error) {
       const failure = normalizeError(error);
       log.error('Graphile request refused', {
@@ -231,6 +191,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         return;
       }
       next(failure);
+    } finally {
+      preparationScope?.release();
     }
   };
 };

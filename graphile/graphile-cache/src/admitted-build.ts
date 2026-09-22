@@ -15,13 +15,16 @@ export interface GraphileBuildMetadata {
 /** Reserve capacity before allocating preset services or starting a build. */
 export const buildAdmittedGraphileInstance = async (
   metadata: GraphileBuildMetadata,
-  create: () => Promise<GraphileCacheEntry>
+  create: () => Promise<GraphileCacheEntry>,
+  assertCurrent: () => void = () => undefined
 ): Promise<GraphileCacheEntry> => {
   const reservation = await reserveGraphileCapacity();
   let entry: GraphileCacheEntry | undefined;
   try {
+    assertCurrent();
     entry = await create();
     reservation.assertPublishable();
+    assertCurrent();
     Object.assign(entry, metadata);
     graphileCache.set(metadata.cacheKey, entry);
     return entry;
