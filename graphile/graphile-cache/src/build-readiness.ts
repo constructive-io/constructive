@@ -28,7 +28,13 @@ export const awaitGraphileBuildReadiness = async (
     try {
       await build.release();
     } catch (releaseError) {
-      build.onReleaseError?.(releaseError);
+      const failures = [error, releaseError];
+      try {
+        build.onReleaseError?.(releaseError);
+      } catch (observerError) {
+        failures.push(observerError);
+      }
+      throw new AggregateError(failures, 'Graphile build and cleanup failed', { cause: error });
     }
     throw error;
   }

@@ -100,6 +100,10 @@ export interface GraphileCacheEntry {
 
 const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
 const activeDisposals = new Set<Promise<void>>();
+// Retain failed generations until a bulk drain observes them. Successful work
+// is removed immediately; exact-entry outcomes remain in the WeakMap above.
+const disposalRecords = new Map<number, Promise<void>>();
+let disposalSequence = 0;
 
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
@@ -117,39 +121,35 @@ const releaseEntry = async (
   key: string
 ): Promise<void> => {
   log.debug(`Disposing PostGraphile[${key}]`);
-  let firstError: unknown;
-  let failed = false;
+  const failures: unknown[] = [];
   try {
     if (entry.httpServer?.listening) {
-      await new Promise<void>((resolve) => {
-        entry.httpServer.close(() => resolve());
+      await new Promise<void>((resolve, reject) => {
+        entry.httpServer.close((error) => error ? reject(error) : resolve());
       });
     }
   } catch (error) {
-    firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     if (entry.realtimeManager) {
       await entry.realtimeManager.stop();
     }
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     await entry.pgl.release();
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     await entry.releasePresetServices?.();
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
-  if (failed) throw firstError;
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile resource cleanup failed');
 };
 
 /**
@@ -166,9 +166,12 @@ const scheduleDisposal = (
 
   disposalPromises.set(entry, pending);
   activeDisposals.add(pending);
+  const sequence = ++disposalSequence;
+  disposalRecords.set(sequence, pending);
   void pending
-    .catch((error) => {
-      log.error(`Failed to dispose PostGraphile[${key}]:`, error);
+    .then(() => { disposalRecords.delete(sequence); }, () => {
+      // The original rejection remains observable through the owner APIs.
+      log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
   return pending;
@@ -185,11 +188,21 @@ export const waitForEntryDisposal = (
   entry: GraphileCacheEntry
 ): Promise<void> => disposalPromises.get(entry) ?? Promise.resolve();
 
-/** Await every disposal that is active at or begins during this drain. */
+/**
+ * Await disposals scheduled before this call, including failures that already
+ * settled. Later generations belong to the next drain. Concurrent callers hold
+ * their own snapshot, so acknowledging a failure cannot hide it from a peer.
+ */
 export const waitForActiveDisposals = async (): Promise<void> => {
-  while (activeDisposals.size > 0) {
-    await Promise.allSettled([...activeDisposals]);
-  }
+  const records = [...disposalRecords];
+  const outcomes = await Promise.allSettled(records.map(([, pending]) => pending));
+  const failures: unknown[] = [];
+  outcomes.forEach((outcome, index) => {
+    disposalRecords.delete(records[index][0]);
+    if (outcome.status === 'rejected') failures.push(outcome.reason);
+  });
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile disposal drain failed');
 };
 
 /**
@@ -318,8 +331,11 @@ export const clearGraphileCache = async (): Promise<void> => {
     manualEvictionKeys.add(key);
   }
   graphileCache.clear();
-  await waitForActiveDisposals();
-  manualEvictionKeys.clear();
+  try {
+    await waitForActiveDisposals();
+  } finally {
+    manualEvictionKeys.clear();
+  }
 };
 
 /**
@@ -340,10 +356,20 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
-      await clearGraphileCache();
-
-      // Close pg pools
-      await pgCache.close();
+      const failures: unknown[] = [];
+      try {
+        await clearGraphileCache();
+      } catch (error) {
+        failures.push(error);
+      }
+      // Attempt pool cleanup even when a generation's release rejected.
+      try {
+        await pgCache.close();
+      } catch (error) {
+        failures.push(error);
+      }
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) throw new AggregateError(failures, 'Server cache cleanup failed');
 
       if (verbose) log.success('All caches disposed.');
     } finally {

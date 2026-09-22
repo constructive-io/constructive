@@ -1,5 +1,4 @@
 import type { DatabaseSettings } from '@constructive-io/express-context';
-import type { PgConfig } from 'pg-env';
 import type { Pool } from 'pg';
 
 import { createGraphileBuildCacheKey } from 'graphile-cache';
@@ -14,12 +13,6 @@ const makeInput = (overrides: Record<string, unknown> = {}) => ({
   ownerIdentity: owner,
   serviceKey: 'api:db-1:main',
   pool,
-  pgConfig: {
-    host: 'localhost',
-    port: 5432,
-    database: 'tenant_one',
-    password: 'private-password'
-  } as PgConfig,
   databaseName: 'tenant_one',
   databaseId: 'db-1',
   apiId: 'api-1',
@@ -50,7 +43,6 @@ describe('server Graphile build snapshot', () => {
   it.each([
     ['service key', { serviceKey: 'api:db-2:main' }],
     ['pool object', { pool: {} as Pool }],
-    ['normalized PostgreSQL config', { pgConfig: { ...makeInput().pgConfig, database: 'tenant_two' } }],
     ['database name', { databaseName: 'tenant_two' }],
     ['database id', { databaseId: 'db-2' }],
     ['API id', { apiId: 'api-2' }],
@@ -84,13 +76,11 @@ describe('server Graphile build snapshot', () => {
     const before = createGraphileBuildCacheKey('server', snapshot);
 
     input.schemas.push('private');
-    (input.pgConfig as PgConfig).database = 'changed';
     (input.databaseSettings as DatabaseSettings).enableSearch = false;
     input.compute.modules[0].bindingsTableName = 'changed';
 
     expect(createGraphileBuildCacheKey('server', snapshot)).toBe(before);
     expect(snapshot.schemas).toEqual(['app', 'auth']);
-    expect(snapshot.pgConfig.database).toBe('tenant_one');
     expect(snapshot.databaseSettings?.enableSearch).toBe(true);
     expect(snapshot.computeModules[0].bindingsTableName).toBe('bindings');
     expect(Object.isFrozen(snapshot)).toBe(true);
