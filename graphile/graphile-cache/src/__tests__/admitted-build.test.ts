@@ -3,7 +3,9 @@ import {
   clearGraphileCache,
   configureGraphileAdmission,
   getCacheStats,
+  getGraphileBuildStats,
   graphileCache,
+  reopenGraphileBuilds,
   type GraphileCacheEntry
 } from '../graphile-cache';
 
@@ -64,9 +66,11 @@ it('refuses new builds after an eviction cannot release its resources', async ()
   await buildAdmittedGraphileInstance(metadata('failed-release'), async () =>
     entry('failed-release', jest.fn(async () => { throw failure; })));
   const create = jest.fn(async () => entry('replacement'));
-  await expect(buildAdmittedGraphileInstance(metadata('replacement'), create)).rejects.toBe(failure);
+  await expect(buildAdmittedGraphileInstance(metadata('replacement'), create)).rejects.toMatchObject({ code: 'SCHEMA_BUILD_STUCK' });
   expect(create).not.toHaveBeenCalled();
-  expect(getCacheStats()).toMatchObject({ admissionFailed: true, reserved: 0 });
-  await expect(buildAdmittedGraphileInstance(metadata('later'), create)).rejects.toBe(failure);
   await expect(clearGraphileCache()).rejects.toBe(failure);
+  expect(getCacheStats()).toMatchObject({ size: 0, disposing: 0, reserved: 0, admissionFailed: true });
+  expect(getGraphileBuildStats()).toMatchObject({ state: 'stuck', active: 0, queued: 0 });
+  expect(() => reopenGraphileBuilds()).toThrow(expect.objectContaining({ code: 'SCHEMA_BUILD_STUCK' }));
+  await expect(buildAdmittedGraphileInstance(metadata('later'), create)).rejects.toMatchObject({ code: 'SCHEMA_BUILD_STUCK' });
 });

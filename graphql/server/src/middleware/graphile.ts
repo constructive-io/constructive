@@ -10,7 +10,7 @@ import {
   createGraphileBuildCacheKey,
   createGraphileInstance,
   graphileBuildFlights,
-  reopenGraphileBuilds,
+  configureGraphileBuilds,
   snapshotGraphileBuildValue,
   type GraphileBuildFlightScope
 } from 'graphile-cache';
@@ -111,7 +111,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
   const ownerIdentity = {};
   configureGraphileAdmission(opts.graphile?.cache);
-  reopenGraphileBuilds();
+  configureGraphileBuilds(opts.graphile?.build);
 
   return async (req: Request, res: Response, next: NextFunction) => {
     let preparationScope: GraphileBuildFlightScope | undefined;

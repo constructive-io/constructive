@@ -12,6 +12,7 @@ import { GraphileAdmission, type GraphileAdmissionOptions, type GraphileAdmissio
 
 import { buildAdmittedGraphileInstance } from './admitted-build';
 import { GraphileBuildFlights } from './build-flights';
+import { graphileBuildCoordinator, type GraphileBuildOptions } from './build-coordinator';
 
 const log = new Logger('graphile-cache');
 
@@ -163,7 +164,7 @@ const scheduleDisposal = (
   disposalRecords.set(sequence, pending);
   void pending
     .then(() => { disposalRecords.delete(sequence); }, (error) => {
-      admission.fail(error);
+      markGraphileCapacityUnavailable(error);
       log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
@@ -302,10 +303,16 @@ export const configureGraphileAdmission = (options: GraphileCacheConfiguration =
   cacheConfigured = true;
 };
 export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
-export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
+// Rejected cleanup can finish bookkeeping without releasing resources. Keep
+// both owners fenced until process restart, even after pending work reaches zero.
+export const markGraphileCapacityUnavailable = (error: unknown): void => {
+  admission.fail(error);
+  graphileBuildCoordinator.fail();
+};
 
 /** Shared by all cached Server and Explorer producers in this process. */
 export const graphileBuildFlights = new GraphileBuildFlights({
+  assertCanBuild: () => graphileBuildCoordinator.assertAccepting(),
   get: (key) => graphileCache.get(key),
   // Delay binding to avoid a circular initialization dependency with the owner.
   build: (metadata, create, assertCurrent) =>
@@ -315,8 +322,32 @@ activeBuildFlights = graphileBuildFlights;
 
 /** Reopening cannot abandon a prior generation's work or preparation. */
 export const reopenGraphileBuilds = (): void => {
-  if (!graphileBuildFlights.reopen()) throw errors.SCHEMA_BUILDS_CLOSED();
+  if (graphileBuildCoordinator.stats.state === 'stuck') throw errors.SCHEMA_BUILD_STUCK();
+  if (graphileBuildCoordinator.stats.state === 'closed' &&
+      (graphileBuildCoordinator.stats.active > 0 || graphileBuildFlights.activeTaskCount > 0 || graphileBuildFlights.activeScopeCount > 0)) {
+    throw errors.SCHEMA_BUILDS_CLOSED();
+  }
+  if (!graphileBuildCoordinator.reopen() || !graphileBuildFlights.reopen()) throw errors.SCHEMA_BUILDS_CLOSED();
 };
+
+export const configureGraphileBuilds = (options?: GraphileBuildOptions): void => {
+  graphileBuildCoordinator.configure(options);
+  reopenGraphileBuilds();
+};
+
+/** Fence builds before waiting for HTTP requests that may be awaiting them. */
+export const beginGraphileBuildShutdown = (): void => {
+  graphileBuildFlights.close();
+  graphileBuildCoordinator.close();
+};
+
+/** One deadline covers flights, actual builds, reservations, and build cleanup. */
+export const closeGraphileBuilds = async (timeoutMs?: number): Promise<boolean> => {
+  beginGraphileBuildShutdown();
+  return graphileBuildCoordinator.closeAndDrain(timeoutMs, graphileBuildFlights.drain());
+};
+
+export const getGraphileBuildStats = () => graphileBuildCoordinator.stats;
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -426,6 +457,7 @@ export const clearGraphileCache = async (): Promise<void> => {
   graphileCache.clear();
   try {
     await graphileBuildFlights.drain();
+    await graphileBuildCoordinator.drain();
     await waitForActiveDisposals();
   } finally {
     manualEvictionKeys.clear();
@@ -450,7 +482,7 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
-      graphileBuildFlights.close();
+      if (!await closeGraphileBuilds()) throw errors.SCHEMA_BUILD_DRAIN_TIMEOUT();
       const failures: unknown[] = [];
       try {
         await clearGraphileCache();

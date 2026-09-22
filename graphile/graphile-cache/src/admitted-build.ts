@@ -1,3 +1,5 @@
+import { graphileBuildCoordinator } from './build-coordinator';
+
 import {
   disposeUncachedEntry,
   graphileCache,
@@ -13,17 +15,23 @@ export interface GraphileBuildMetadata {
 }
 
 /** Reserve capacity before allocating preset services or starting a build. */
-export const buildAdmittedGraphileInstance = async (
+export const buildAdmittedGraphileInstance = (
   metadata: GraphileBuildMetadata,
   create: () => Promise<GraphileCacheEntry>,
   assertCurrent: () => void = () => undefined
-): Promise<GraphileCacheEntry> => {
+): Promise<GraphileCacheEntry> => graphileBuildCoordinator.run(async (lease) => {
+  // Admission itself may await an evicted generation's release. It belongs
+  // inside the bounded, watched work rather than an unbounded queue before it.
+  assertCurrent();
+  lease.assertCurrent();
   const reservation = await reserveGraphileCapacity();
   let entry: GraphileCacheEntry | undefined;
   try {
+    lease.assertCurrent();
     assertCurrent();
     entry = await create();
     reservation.assertPublishable();
+    lease.assertCurrent();
     assertCurrent();
     Object.assign(entry, metadata);
     graphileCache.set(metadata.cacheKey, entry);
@@ -41,4 +49,4 @@ export const buildAdmittedGraphileInstance = async (
   } finally {
     reservation.release();
   }
-};
+});

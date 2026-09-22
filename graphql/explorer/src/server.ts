@@ -11,7 +11,7 @@ import {
   createGraphileBuildCacheKey,
   createGraphileInstance,
   graphileBuildFlights,
-  reopenGraphileBuilds,
+  configureGraphileBuilds,
   GraphileCacheEntry,
   referenceGraphileBuildValue,
   snapshotGraphileBuildValue
@@ -38,7 +38,7 @@ const respondError = (res: Response, error: unknown): void => {
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
   configureGraphileAdmission(opts.graphile?.cache);
-  reopenGraphileBuilds();
+  configureGraphileBuilds(opts.graphile?.build);
   const ownerIdentity = {};
 
   const { pg, server } = opts;

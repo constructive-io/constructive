@@ -5,6 +5,7 @@ export {
   GrafastCacheLimits,
   graphileDefaults,
   graphileFeatureDefaults,
+  GraphileBuildOptions,
   GraphileCacheOptions,
   GraphileFeatureOptions,
   GraphileOptions,
