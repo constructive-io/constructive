@@ -36,3 +36,11 @@ it('preserves a registered refusal status and code without exposing a message ov
   expect(normalized.cause).toBe(original);
   expect(normalized.message).not.toContain('private');
 });
+
+it('preserves capacity refusal classification through HTTP normalization', () => {
+  const original = errors.SCHEMA_CAPACITY_EXHAUSTED();
+  const normalized = normalizeError(original);
+  expect(normalized.code).toBe('SCHEMA_CAPACITY_EXHAUSTED');
+  expect(normalized.http).toBe(503);
+  expect(normalized.cause).toBe(original);
+});

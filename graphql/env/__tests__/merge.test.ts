@@ -144,7 +144,11 @@ describe('getEnvOptions', () => {
     expect(result.graphile).toEqual({
       schema: [],
       extends: [],
-      preset: {}
+      preset: {},
+      cache: {
+        max: 50,
+        ttl: 31622400000
+      }
     });
   });
 
@@ -203,6 +207,152 @@ describe('getEnvOptions', () => {
         baseUrl: 'http://localhost:4000'
       }
     });
+  });
+
+  it('parses Graphile cache admission environment variables into typed options', () => {
+    const result = getGraphQLEnvVars({
+      GRAPHILE_CACHE_MAX: '500',
+      GRAPHILE_CACHE_TTL_MS: '60000',
+      GRAPHILE_CACHE_HEAP_MAX_BYTES: '536870912',
+      GRAPHILE_CACHE_BUILD_RESERVE_BYTES: '67108864'
+    });
+
+    expect(result.graphile?.cache).toEqual({
+      max: 500,
+      ttl: 60000,
+      heapMaxBytes: 536870912,
+      buildReserveBytes: 67108864
+    });
+  });
+
+  it.each([
+    ['blank', ''],
+    ['NaN', 'NaN'],
+    ['Infinity', 'Infinity'],
+    ['fractional', '1.5'],
+    ['trailing text', '12items'],
+    ['outside safe integer range', '9007199254740992']
+  ])('rejects a %s GRAPHILE_CACHE_MAX value', (_label, value) => {
+    expect(() => getGraphQLEnvVars({ GRAPHILE_CACHE_MAX: value })).toThrow(
+      /GRAPHILE_CACHE_MAX/
+    );
+  });
+
+  it.each([
+    ['blank', ''],
+    ['NaN', 'NaN'],
+    ['Infinity', 'Infinity'],
+    ['fractional', '1.5'],
+    ['trailing text', '12items'],
+    ['outside safe integer range', '9007199254740992']
+  ])('rejects a %s GRAPHILE_CACHE_TTL_MS value', (_label, value) => {
+    expect(() => getGraphQLEnvVars({ GRAPHILE_CACHE_TTL_MS: value })).toThrow(
+      /GRAPHILE_CACHE_TTL_MS/
+    );
+  });
+
+  it('preserves file cache options when cache environment variables are absent', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-cache-'));
+    writeConfig(tempDir, {
+      graphile: {
+        cache: {
+          max: 120,
+          heapMaxBytes: 536870912,
+          buildReserveBytes: 67108864
+        }
+      }
+    });
+
+    const result = getEnvOptions({}, tempDir, {});
+
+    expect(result.graphile?.cache).toEqual({
+      max: 120,
+      ttl: 31622400000,
+      heapMaxBytes: 536870912,
+      buildReserveBytes: 67108864
+    });
+  });
+
+  it('merges Graphile cache config, environment, and runtime overrides in priority order', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-cache-priority-'));
+    writeConfig(tempDir, {
+      graphile: {
+        cache: {
+          max: 120,
+          heapMaxBytes: 536870912,
+          buildReserveBytes: 67108864
+        }
+      }
+    });
+
+    const result = getEnvOptions(
+      { graphile: { cache: { max: 400 } } },
+      tempDir,
+      { GRAPHILE_CACHE_MAX: '200' }
+    );
+
+    expect(result.graphile?.cache).toEqual({
+      max: 400,
+      ttl: 31622400000,
+      heapMaxBytes: 536870912,
+      buildReserveBytes: 67108864
+    });
+  });
+
+  it('uses injected environment defaults while runtime cache options override environment values', () => {
+    const development = getEnvOptions(
+      { graphile: { cache: { max: 20, ttl: 20 } } },
+      process.cwd(),
+      {
+        NODE_ENV: 'development',
+        GRAPHILE_CACHE_MAX: '10',
+        GRAPHILE_CACHE_TTL_MS: '10'
+      }
+    );
+    expect(development.graphile?.cache).toEqual({
+      max: 20,
+      ttl: 20
+    });
+
+    const production = getEnvOptions({}, process.cwd(), { NODE_ENV: 'production' });
+    expect(production.graphile?.cache).toEqual({
+      max: 50,
+      ttl: 31622400000
+    });
+  });
+
+  it.each([
+    ['zero max', { graphile: { cache: { max: 0 } } }],
+    ['zero ttl', { graphile: { cache: { ttl: 0 } } }],
+    ['fractional heap limit', { graphile: { cache: { heapMaxBytes: 1.5 } } }],
+    ['negative reserve', { graphile: { cache: { buildReserveBytes: -1 } } }],
+    [
+      'reserve equal to the explicit heap limit',
+      { graphile: { cache: { heapMaxBytes: 100, buildReserveBytes: 100 } } }
+    ]
+  ])('rejects invalid final Graphile cache options (%s)', (_label, config) => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphile-cache-invalid-'));
+    writeConfig(tempDir, config);
+
+    expect(() => getEnvOptions({}, tempDir, {})).toThrow(/graphile\.cache/);
+  });
+
+  it('rejects explicit null cache numeric fields instead of replacing them with defaults', () => {
+    expect(() =>
+      getEnvOptions({
+        graphile: {
+          cache: { max: null as unknown as number }
+        }
+      })
+    ).toThrow(/graphile\.cache\.max/);
+
+    expect(() =>
+      getEnvOptions({
+        graphile: {
+          cache: { ttl: null as unknown as number }
+        }
+      })
+    ).toThrow(/graphile\.cache\.ttl/);
   });
 
   it('accepts custom SMS provider names', () => {

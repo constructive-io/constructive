@@ -7,7 +7,7 @@ import { RealtimeManager } from 'graphile-realtime-subscriptions';
 import { postgraphile } from 'postgraphile';
 
 import { awaitGraphileBuildReadiness } from './build-readiness';
-import { disposeUncachedEntry, type GraphileCacheEntry } from './graphile-cache';
+import { disposeUncachedEntry, markGraphileCapacityUnavailable, type GraphileCacheEntry } from './graphile-cache';
 import { createPresetServicesReleaser } from './preset-services';
 
 const log = new Logger('graphile-cache:create');
@@ -78,6 +78,7 @@ export const createGraphileInstance = async (
     ready: () => serv.ready(),
     release: releaseFailedBuild,
     onReleaseError: (releaseError) => {
+      markGraphileCapacityUnavailable(releaseError);
       log.error(
         'Graphile build cleanup failed',
         { stage: 'failed-build-release' }

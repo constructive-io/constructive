@@ -63,6 +63,35 @@ call. Work scheduled later belongs to the next drain. An observed bulk failure
 is acknowledged for reporting, while its exact-entry release promise remains
 rejected; acknowledging an error never establishes successful resource release.
 
+### Resident admission
+
+Server and Explorer builds use `buildAdmittedGraphileInstance(metadata, factory)`.
+It reserves capacity before the factory allocates services, waits for an evicted
+entry's public release interfaces, and publishes only after the ready result passes its heap check.
+Upstream background UNLISTEN/client return is outside that public release boundary.
+The count includes reservations, residents, and disposal in progress. A disposal
+failure blocks further admission instead of treating uncertain resources as free.
+This process-wide fence requires a process restart. Disposal counters track pending
+work and can reach zero after a rejected release; neither emptying the cache nor
+reconfiguring limits proves that the failed release reclaimed its resources.
+The public release interfaces provide no verified retry-completion signal, so
+automatically reopening admission would abandon the capacity guarantee.
+
+`configureGraphileAdmission` accepts `max`, `ttl`, `heapMaxBytes`, and
+`buildReserveBytes`. The server exposes these as `graphile.cache` options and
+`GRAPHILE_CACHE_MAX`, `GRAPHILE_CACHE_TTL_MS`, `GRAPHILE_CACHE_HEAP_MAX_BYTES`, and
+`GRAPHILE_CACHE_BUILD_RESERVE_BYTES`. `graphql-env` owns environment parsing and
+defaults; runtime options override environment and file configuration. This
+package reads no environment variables. Defaults retain the 50-entry ceiling,
+use 85% of the V8 heap limit as a watermark, and reserve 64 MiB per pending build.
+The first owner can replace the fallback limits, including raising the resident
+ceiling above 50. Later owners use the strictest limits. TTL changes require an
+empty cache; lowering capacity below owned residents/reservations is rejected.
+TTL expiry remains lazy, with expired entries reclaimed before admission. This is a conservative
+process-heap admission check, not an exact per-instance memory measurement or an
+RSS limit; garbage collection may delay admission after eviction. Raw
+`graphileCache.set` is a low-level API and does not reserve capacity.
+
 ### Basic Usage
 
 ```typescript

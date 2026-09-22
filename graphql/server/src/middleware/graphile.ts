@@ -6,6 +6,8 @@ import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
+  buildAdmittedGraphileInstance,
+  configureGraphileAdmission,
   createGraphileBuildCacheKey,
   createGraphileInstance,
   graphileCache,
@@ -128,6 +130,7 @@ const buildPreset = async (
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
   const ownerIdentity = {};
+  configureGraphileAdmission(opts.graphile?.cache);
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -192,28 +195,25 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         return retryInstance.handler(req, res, next);
       }
 
-      const creationPromise = Promise.resolve().then(async () => {
-        const preset = await buildPreset(snapshot, pool);
-        return observeGraphileBuild(
-          { cacheKey: key, serviceKey, databaseId },
-          () => createGraphileInstance({
-            preset,
-            cacheKey: key,
-            enableRealtime: snapshot.databaseSettings?.enableRealtime
-          }),
-          { enabled: observabilityEnabled }
-        );
-      });
+      const creationPromise = buildAdmittedGraphileInstance(
+        { cacheKey: key, serviceKey, databaseId, poolKey: snapshot.poolKey },
+        async () => {
+          const preset = await buildPreset(snapshot, pool);
+          return observeGraphileBuild(
+            { cacheKey: key, serviceKey, databaseId },
+            () => createGraphileInstance({
+              preset,
+              cacheKey: key,
+              enableRealtime: snapshot.databaseSettings?.enableRealtime
+            }),
+            { enabled: observabilityEnabled }
+          );
+        }
+      );
       creating.set(key, creationPromise);
 
       try {
         const instance = await creationPromise;
-        Object.assign(instance, {
-          serviceKey,
-          databaseId,
-          poolKey: snapshot.poolKey
-        } satisfies Partial<GraphileCacheEntry>);
-        graphileCache.set(key, instance);
         log.debug('Graphile handler ready', { requestId: context.requestId });
         return instance.handler(req, res, next);
       } finally {

@@ -1,5 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { parseEnvNumber } from '12factor-env';
+import { errors } from '@constructive-io/errors';
 import { EventEmitter } from 'events';
 import type { Express } from 'express';
 import type { GrafservBase } from 'grafserv';
@@ -7,6 +7,8 @@ import type { Server as HttpServer } from 'http';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { PostGraphileInstance } from 'postgraphile';
+
+import { GraphileAdmission, type GraphileAdmissionOptions, type GraphileAdmissionReservation } from './admission';
 
 const log = new Logger('graphile-cache');
 
@@ -44,28 +46,16 @@ export interface CacheConfig {
   ttl: number;
 }
 
-/**
- * Get cache configuration from environment variables
- *
- * Supports:
- * - GRAPHILE_CACHE_MAX: Maximum number of entries (default: 50)
- * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
- *   - Production default: ONE_YEAR
- *   - Development default: FIVE_MINUTES_MS
- *
- * NOTE: This value should be <= PG_CACHE_MAX (also default: 50) so that
- * every cached PostGraphile instance has a live pool backing it.
- */
+// Environment parsing and deployment defaults belong to graphql-env. Direct
+// consumers receive a finite fallback until the first owner configures it.
+let cacheConfig: CacheConfig = { max: 50, ttl: ONE_YEAR };
+let cacheConfigured = false;
 export function getCacheConfig(): CacheConfig {
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  return { ...cacheConfig };
+}
 
-  const max = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX) ?? 50;
-
-  const ttl =
-    parseEnvNumber(process.env.GRAPHILE_CACHE_TTL_MS) ??
-    (isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR);
-
-  return { max, ttl };
+export interface GraphileCacheConfiguration extends GraphileAdmissionOptions {
+  ttl?: number;
 }
 
 /**
@@ -169,8 +159,8 @@ const scheduleDisposal = (
   const sequence = ++disposalSequence;
   disposalRecords.set(sequence, pending);
   void pending
-    .then(() => { disposalRecords.delete(sequence); }, () => {
-      // The original rejection remains observable through the owner APIs.
+    .then(() => { disposalRecords.delete(sequence); }, (error) => {
+      admission.fail(error);
       log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
@@ -208,42 +198,97 @@ export const waitForActiveDisposals = async (): Promise<void> => {
 /**
  * Determine the eviction reason for a cache entry
  */
-const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
+const getEvictionReason = (key: string, reason: LRUCache.DisposeReason): EvictionReason => {
   if (manualEvictionKeys.has(key)) {
     manualEvictionKeys.delete(key);
     return 'manual';
   }
 
-  // Check if TTL expired
-  const age = Date.now() - entry.createdAt;
-  const config = getCacheConfig();
-  if (age >= config.ttl) {
-    return 'ttl';
-  }
-
-  return 'lru';
+  return reason === 'expire' ? 'ttl' : 'lru';
 };
 
 // Get initial cache configuration
 const initialConfig = getCacheConfig();
 
+// LRU's constructor max is immutable. Keep one dynamically sized LRU store
+// and enforce the owner's finite count on every insertion instead.
+class GraphileResidentCache extends LRUCache<string, GraphileCacheEntry> {
+  override set(
+    key: string,
+    value: GraphileCacheEntry,
+    options?: LRUCache.SetOptions<string, GraphileCacheEntry, unknown>
+  ): this {
+    this.purgeStale();
+    if (!this.has(key)) {
+      while (this.size >= cacheConfig.max) this.pop();
+    }
+    return super.set(key, value, options);
+  }
+}
+
 // --- Graphile Cache ---
-export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
-  max: initialConfig.max,
+export const graphileCache = new GraphileResidentCache({
+  max: 0,
+  maxSize: Number.MAX_SAFE_INTEGER,
+  sizeCalculation: () => 1,
+  ttlAutopurge: false,
   ttl: initialConfig.ttl,
   updateAgeOnGet: true,
-  dispose: (entry, key) => {
+  dispose: (entry, key, disposalReason) => {
     // Determine eviction reason before disposal
-    const reason = getEvictionReason(key, entry);
+    const reason = getEvictionReason(key, disposalReason);
+
+    // Teardown must be scheduled even if an eviction listener throws.
+    scheduleDisposal(entry, key);
 
     // Emit eviction event
     cacheEvents.emitEviction({ key, reason, entry });
 
     log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
-
-    scheduleDisposal(entry, key);
   }
 });
+
+const admission = new GraphileAdmission({
+  occupied: () => {
+    graphileCache.purgeStale();
+    return graphileCache.size + activeDisposals.size;
+  },
+  evict: async () => {
+    const entry = graphileCache.pop();
+    if (entry) {
+      await waitForEntryDisposal(entry);
+      return true;
+    }
+    if (activeDisposals.size > 0) {
+      await waitForActiveDisposals();
+      return true;
+    }
+    return false;
+  }
+}, initialConfig.max);
+
+export const configureGraphileAdmission = (options: GraphileCacheConfiguration = {}): void => {
+  if (Object.values(options).every((value) => value === undefined)) return;
+  if (options.ttl !== undefined && (!Number.isSafeInteger(options.ttl) || options.ttl <= 0)) {
+    throw errors.INTERNAL_FAILURE({ details: 'Invalid schema cache TTL' });
+  }
+  const ttl = cacheConfigured
+    ? Math.min(cacheConfig.ttl, options.ttl ?? cacheConfig.ttl)
+    : options.ttl ?? cacheConfig.ttl;
+  if (ttl !== cacheConfig.ttl && graphileCache.size > 0) {
+    throw errors.INTERNAL_FAILURE({ details: 'Schema cache TTL cannot change while residents exist' });
+  }
+  admission.configure({
+    max: options.max,
+    heapMaxBytes: options.heapMaxBytes,
+    buildReserveBytes: options.buildReserveBytes
+  });
+  cacheConfig = { max: admission.stats.max, ttl };
+  graphileCache.ttl = ttl;
+  cacheConfigured = true;
+};
+export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
+export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -251,6 +296,11 @@ export interface CacheStats {
   max: number;
   ttl: number;
   keys: string[];
+  reserved: number;
+  disposing: number;
+  heapMaxBytes: number;
+  buildReserveBytes: number;
+  admissionFailed: boolean;
 }
 
 /**
@@ -260,9 +310,14 @@ export function getCacheStats(): CacheStats {
   const config = getCacheConfig();
   return {
     size: graphileCache.size,
-    max: config.max,
+    max: admission.stats.max,
     ttl: config.ttl,
-    keys: [...graphileCache.keys()]
+    keys: [...graphileCache.keys()],
+    reserved: admission.stats.reserved,
+    disposing: activeDisposals.size,
+    heapMaxBytes: admission.stats.heapMaxBytes,
+    buildReserveBytes: admission.stats.buildReserveBytes,
+    admissionFailed: admission.stats.failed
   };
 }
 
