@@ -19,6 +19,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH,
     GRAPHILE_CACHE_MAX,
+    GRAPHILE_CACHE_TTL_MS,
     GRAPHILE_CACHE_HEAP_MAX_BYTES,
     GRAPHILE_CACHE_BUILD_RESERVE_BYTES,
 
@@ -60,6 +61,11 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH
   ].some(value => value !== undefined);
   const graphileCacheMax = parseGraphileCacheInteger('GRAPHILE_CACHE_MAX', GRAPHILE_CACHE_MAX, 1);
+  const graphileCacheTtlMs = parseGraphileCacheInteger(
+    'GRAPHILE_CACHE_TTL_MS',
+    GRAPHILE_CACHE_TTL_MS,
+    1
+  );
   const graphileCacheHeapMaxBytes = parseGraphileCacheInteger(
     'GRAPHILE_CACHE_HEAP_MAX_BYTES',
     GRAPHILE_CACHE_HEAP_MAX_BYTES,
@@ -109,10 +115,12 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           : GRAPHILE_SCHEMA
       }),
       ...((graphileCacheMax !== undefined ||
+        graphileCacheTtlMs !== undefined ||
         graphileCacheHeapMaxBytes !== undefined ||
         graphileCacheBuildReserveBytes !== undefined) && {
         cache: {
           ...(graphileCacheMax !== undefined && { max: graphileCacheMax }),
+          ...(graphileCacheTtlMs !== undefined && { ttl: graphileCacheTtlMs }),
           ...(graphileCacheHeapMaxBytes !== undefined && {
             heapMaxBytes: graphileCacheHeapMaxBytes
           }),

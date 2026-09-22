@@ -158,7 +158,7 @@ describe('awaitGraphileBuildReadiness', () => {
         release: jest.fn().mockRejectedValue(cleanupFailure),
         onReleaseError,
       })
-    ).rejects.toBe(failure);
+    ).rejects.toMatchObject({ errors: [failure, cleanupFailure], cause: failure });
     expect(onReleaseError).toHaveBeenCalledWith(cleanupFailure);
   });
 });

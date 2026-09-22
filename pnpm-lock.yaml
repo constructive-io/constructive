@@ -544,9 +544,6 @@ importers:
       '@constructive-io/errors':
         specifier: workspace:^
         version: link:../../packages/errors/dist
-      12factor-env:
-        specifier: workspace:^
-        version: link:../../packages/12factor-env/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -1840,6 +1837,12 @@ importers:
 
   graphql/explorer:
     dependencies:
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist
@@ -2312,6 +2315,9 @@ importers:
         specifier: ^7.0.0
         version: 7.2.2
     devDependencies:
+      graphile-cache:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-cache/dist
       '@0no-co/graphql.web':
         specifier: ^1.3.3
         version: 1.3.3(graphql@16.13.0)

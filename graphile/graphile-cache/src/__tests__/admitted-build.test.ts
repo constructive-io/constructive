@@ -68,4 +68,5 @@ it('refuses new builds after an eviction cannot release its resources', async ()
   expect(create).not.toHaveBeenCalled();
   expect(getCacheStats()).toMatchObject({ admissionFailed: true, reserved: 0 });
   await expect(buildAdmittedGraphileInstance(metadata('later'), create)).rejects.toBe(failure);
+  await expect(clearGraphileCache()).rejects.toBe(failure);
 });

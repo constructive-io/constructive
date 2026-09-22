@@ -53,6 +53,7 @@ export const validateGraphileCacheOptions = (options: ConstructiveOptions): void
 
   const cache = rawCache as GraphileCacheOptions;
   assertSafeInteger(cache, 'max', 1);
+  assertSafeInteger(cache, 'ttl', 1);
   assertSafeInteger(cache, 'heapMaxBytes', 1);
   assertSafeInteger(cache, 'buildReserveBytes', 0);
 

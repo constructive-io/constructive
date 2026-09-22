@@ -1,3 +1,5 @@
+import { normalizeError } from '@constructive-io/errors';
+import { Logger } from '@pgpmjs/logger';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -21,6 +23,17 @@ import { getPgEnvOptions } from 'pg-env';
 
 import { printDatabases, printSchemas } from './render';
 import { getGraphilePreset } from './settings';
+
+const log = new Logger('graphql-explorer');
+const respondError = (res: Response, error: unknown): void => {
+  if ((error as { code?: string })?.code === '3D000') {
+    res.status(404).send('Database not found');
+    return;
+  }
+  const failure = normalizeError(error);
+  log.error('Explorer request refused', { code: failure.code });
+  res.status(failure.http).json({ errors: [{ message: failure.message, extensions: failure.toExtensions() }] });
+};
 
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
@@ -114,12 +127,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         );
         return;
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }
@@ -139,12 +147,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
 
         await pgPool.query('SELECT 1;');
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }
@@ -164,7 +167,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         instance.handler(req, res, next);
         return;
       } catch (e: any) {
-        res.status(500).send(e.message);
+        respondError(res, e);
         return;
       }
     }
@@ -190,12 +193,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         );
         return;
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }

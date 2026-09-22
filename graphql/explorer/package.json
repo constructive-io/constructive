@@ -34,6 +34,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@constructive-io/errors": "workspace:^",
+    "@pgpmjs/logger": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",

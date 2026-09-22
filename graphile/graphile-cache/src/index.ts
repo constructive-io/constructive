@@ -25,6 +25,7 @@ export {
   // Cache instance and entry type
   graphileCache,
   GraphileCacheEntry,
+  GraphileCacheConfiguration,
   // Time constants
   ONE_HOUR_MS,
   waitForActiveDisposals,

@@ -1,4 +1,4 @@
-import { errors } from '@constructive-io/errors';
+import { errors, normalizeError } from '@constructive-io/errors';
 import type { Response } from 'express';
 
 import { respondWithGraphQLError } from '../graphql-response';
@@ -10,6 +10,15 @@ const createMockResponse = () => {
 };
 
 describe('respondWithGraphQLError', () => {
+  it('sends the normalized refusal status without internal cause or credentials', () => {
+    const { res, json } = createMockResponse();
+    const failure = normalizeError(new Error('password=private tenant=hidden'));
+    respondWithGraphQLError(res, failure, { status: failure.http });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(json.mock.calls[0][0].errors[0].extensions.code).toBe('INTERNAL_FAILURE');
+    expect(JSON.stringify(json.mock.calls)).not.toMatch(/private|hidden|cause|stack/);
+  });
+
   it('always emits a top-level message so clients never render an empty error', () => {
     const { res, json } = createMockResponse();
 

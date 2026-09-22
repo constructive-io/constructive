@@ -88,6 +88,7 @@ describe('Graphile cache disposal lifecycle', () => {
     await expect(disposeUncachedEntry(entry)).rejects.toBe(failure);
     expect(release).toHaveBeenCalledTimes(1);
     expect(releasePresetServices).toHaveBeenCalledTimes(1);
+    await expect(clearGraphileCache()).rejects.toBe(failure);
   });
 
   it('lets callers await an eviction through the exact entry', async () => {
@@ -171,5 +172,6 @@ describe('Graphile cache disposal lifecycle', () => {
 
     expect(firstRelease).toHaveBeenCalledTimes(1);
     expect(secondRelease).toHaveBeenCalledTimes(1);
+    await expect(clearGraphileCache()).rejects.toBe(firstFailure);
   });
 });
