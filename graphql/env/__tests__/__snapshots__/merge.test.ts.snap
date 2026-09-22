@@ -69,6 +69,10 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "simpleInflection": true,
   },
   "graphile": {
+    "cache": {
+      "max": 50,
+      "ttl": 31622400000,
+    },
     "extends": [],
     "preset": {},
     "schema": [

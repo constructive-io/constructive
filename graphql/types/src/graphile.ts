@@ -59,6 +59,8 @@ export interface GrafastCacheLimits {
 export interface GraphileCacheOptions {
   /** Maximum number of cache entries. Must be a positive safe integer. */
   max?: number;
+  /** Maximum resident lifetime of a cache entry, in milliseconds. */
+  ttl?: number;
   /** Optional heap limit, in bytes, used to size the cache. */
   heapMaxBytes?: number;
   /** Heap space, in bytes, reserved for building and publishing a schema. */

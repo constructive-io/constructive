@@ -7,6 +7,14 @@ const deferred = () => {
 };
 
 describe('resident admission', () => {
+  it('lets the first owner replace fallback count and heap limits', () => {
+    const admission = new GraphileAdmission({ occupied: () => 0, evict: async () => false }, 10, () => 10, 100);
+    admission.configure({ max: 20, heapMaxBytes: 200, buildReserveBytes: 10 });
+    expect(admission.stats).toMatchObject({ max: 20, heapMaxBytes: 200 });
+    admission.configure({ max: 30, heapMaxBytes: 300 });
+    expect(admission.stats).toMatchObject({ max: 20, heapMaxBytes: 200 });
+  });
+
   it('does not reuse capacity until eviction completes, including concurrent admissions', async () => {
     const disposal = deferred();
     let occupied = 1;

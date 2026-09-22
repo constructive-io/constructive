@@ -68,7 +68,7 @@ it('refuses new builds after an eviction cannot release its resources', async ()
   const create = jest.fn(async () => entry('replacement'));
   await expect(buildAdmittedGraphileInstance(metadata('replacement'), create)).rejects.toMatchObject({ code: 'SCHEMA_BUILD_STUCK' });
   expect(create).not.toHaveBeenCalled();
-  await clearGraphileCache();
+  await expect(clearGraphileCache()).rejects.toBe(failure);
   expect(getCacheStats()).toMatchObject({ size: 0, disposing: 0, reserved: 0, admissionFailed: true });
   expect(getGraphileBuildStats()).toMatchObject({ state: 'stuck', active: 0, queued: 0 });
   expect(() => reopenGraphileBuilds()).toThrow(expect.objectContaining({ code: 'SCHEMA_BUILD_STUCK' }));

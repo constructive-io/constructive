@@ -303,6 +303,8 @@ export interface ConstructiveContext {
   api: ApiStructure;
   /** Authenticated token (null for anonymous requests) */
   token: ConstructiveAPIToken | null;
+  /** Resolved service cache key for the Graphile/runtime route, when present. */
+  serviceKey?: string;
   /** pgSettings for SET LOCAL in tenant transactions */
   pgSettings: Record<string, string>;
   /** Database UUID from the API resolver */

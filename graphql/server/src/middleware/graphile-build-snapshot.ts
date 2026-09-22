@@ -1,6 +1,5 @@
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import type { DatabaseSettings, ComputeConfig, ComputeModuleConfig } from '@constructive-io/express-context';
-import type { PgConfig } from 'pg-env';
 import type { Pool } from 'pg';
 
 import { referenceGraphileBuildValue, snapshotGraphileBuildValue } from 'graphile-cache';
@@ -11,7 +10,6 @@ export interface GraphileServerBuildSnapshot {
   serviceKey: string;
   poolIdentity: GraphileBuildReference<Pool>;
   poolKey: string;
-  pgConfig: PgConfig;
   databaseName: string;
   databaseId: string | null;
   apiId?: string;
@@ -36,7 +34,6 @@ interface GraphileServerBuildSnapshotInput {
   ownerIdentity: object;
   serviceKey: string;
   pool: Pool;
-  pgConfig: PgConfig;
   databaseName: string;
   databaseId?: string | null;
   apiId?: string;
@@ -67,8 +64,7 @@ export const createGraphileServerBuildSnapshot = (
     ownerIdentity: referenceGraphileBuildValue(input.ownerIdentity),
     serviceKey: input.serviceKey,
     poolIdentity: referenceGraphileBuildValue(input.pool),
-    poolKey: input.pgConfig.database,
-    pgConfig: input.pgConfig,
+    poolKey: input.databaseName,
     databaseName: input.databaseName,
     databaseId: input.databaseId ?? null,
     apiId: input.apiId,

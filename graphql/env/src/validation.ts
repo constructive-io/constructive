@@ -65,6 +65,7 @@ export const validateGraphileOptions = (options: ConstructiveOptions): void => {
   const cache = requireOptionsObject(graphileRecord.cache, 'graphile.cache');
   if (cache) {
     assertSafeInteger(cache.max, 'graphile.cache.max', 1);
+    assertSafeInteger(cache.ttl, 'graphile.cache.ttl', 1);
     assertSafeInteger(cache.heapMaxBytes, 'graphile.cache.heapMaxBytes', 1);
     assertSafeInteger(cache.buildReserveBytes, 'graphile.cache.buildReserveBytes', 0);
 
