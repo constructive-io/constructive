@@ -169,6 +169,7 @@ const allowConcurrentRequestToReachGraphile = async (): Promise<void> => {
 describe('Graphile build and cache over the real scoped HTTP server', () => {
   let request: supertest.Agent | undefined;
   let teardown: (() => Promise<void>) | undefined;
+  let transactionCleanup: (() => Promise<void>) | undefined;
   let releaseBuild: (() => void) | undefined;
   const pendingRequests = new Set<Promise<unknown>>();
 
@@ -200,6 +201,15 @@ describe('Graphile build and cache over the real scoped HTTP server', () => {
     );
     request = connection.request;
     teardown = connection.teardown;
+    transactionCleanup = async () => {
+      try {
+        await connection.db.afterEach();
+      } finally {
+        await connection.pg.afterEach();
+      }
+    };
+    await connection.pg.beforeEach();
+    await connection.db.beforeEach();
   };
 
   const postGraphQL = () => {
@@ -239,20 +249,29 @@ describe('Graphile build and cache over the real scoped HTTP server', () => {
     releaseBuild?.();
     releaseBuild = undefined;
     const pending = [...pendingRequests];
-    await waitForSignal(
-      Promise.allSettled(pending).then((): void => undefined),
-      'HTTP requests to finish',
-      15000
-    );
-    pendingRequests.clear();
     const currentTeardown = teardown;
+    const currentTransactionCleanup = transactionCleanup;
     teardown = undefined;
+    transactionCleanup = undefined;
     request = undefined;
     try {
-      // Drain schema handlers before pgsql-test rolls back and drops the
-      // fixture database. The server's close path also drains this cache, but
-      // the explicit ordering keeps failed tests from poisoning teardown.
-      await clearGraphileCache();
+      try {
+        await waitForSignal(
+          Promise.allSettled(pending).then((): void => undefined),
+          'HTTP requests to finish',
+          15000
+        );
+      } finally {
+        pendingRequests.clear();
+      }
+      try {
+        // Drain schema handlers before pgsql-test rolls back and drops the
+        // fixture database. The server's close path also drains this cache, but
+        // the explicit ordering keeps failed tests from poisoning teardown.
+        await clearGraphileCache();
+      } finally {
+        await currentTransactionCleanup?.();
+      }
     } finally {
       await currentTeardown?.();
     }
