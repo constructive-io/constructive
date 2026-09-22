@@ -37,6 +37,32 @@ When you import this package, it automatically registers a cleanup callback with
 
 ## Usage
 
+### Exact build identity
+
+The GraphQL server and Explorer cache by `createGraphileBuildCacheKey(domain,
+snapshot)`. A key includes the effective build inputs, the exact pool reference,
+and the configuration owner. Server and Explorer use separate domains. Plain
+data is copied with `snapshotGraphileBuildValue` before it is used for both the
+fingerprint and the preset; opaque objects and functions retain reference
+identity. Keys are HMAC fingerprints with a process-local secret and must not be
+persisted or compared across processes.
+
+Entries carry `serviceKey`, `databaseId` (when known), and `poolKey` separately
+from the fingerprint. Use `clearGraphileEntriesForService`,
+`clearGraphileEntriesForDatabase`, or `clearGraphileEntriesForPool` to invalidate
+all build variants for that owner. Pool cleanup matches `poolKey` exactly.
+
+The server consumes the API, physical pool, service key, and transaction settings
+from `req.constructive`. Request settings remain request-scoped and are not
+captured in the shared schema. Build refusals retain their canonical error code
+and HTTP status; unknown failures return a generic 500 response with the original
+cause kept internally.
+
+Bulk disposal drains report all failures for generations scheduled before the
+call. Work scheduled later belongs to the next drain. An observed bulk failure
+is acknowledged for reporting, while its exact-entry release promise remains
+rejected; acknowledging an error never establishes successful resource release.
+
 ### Basic Usage
 
 ```typescript

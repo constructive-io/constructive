@@ -9,6 +9,9 @@ export {
   // Cache stats
   CacheStats,
   clearGraphileCache,
+  clearGraphileEntriesForDatabase,
+  clearGraphileEntriesForPool,
+  clearGraphileEntriesForService,
   // Clear matching entries
   clearMatchingEntries,
   closeAllCaches,
@@ -25,6 +28,13 @@ export {
   ONE_HOUR_MS,
   waitForActiveDisposals,
   waitForEntryDisposal} from './graphile-cache';
+
+export {
+  createGraphileBuildCacheKey,
+  referenceGraphileBuildValue,
+  snapshotGraphileBuildValue
+} from './build-identity';
+export type { GraphileBuildReference } from './build-identity';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';

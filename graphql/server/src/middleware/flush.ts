@@ -1,11 +1,15 @@
 import './types'; // for Request type
 
+import { errors } from '@constructive-io/errors';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { createHash, timingSafeEqual } from 'crypto';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { graphileCache } from 'graphile-cache';
+import {
+  clearGraphileEntriesForDatabase,
+  clearGraphileEntriesForService
+} from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 
 import { getRoutingSchema, isValidSchemaName } from './routing';
@@ -61,8 +65,13 @@ export const createFlushMiddleware = (
       return;
     }
 
-    graphileCache.delete((req as any).svc_key);
-    svcCache.delete((req as any).svc_key);
+    const serviceKey = req.constructive?.serviceKey;
+    if (!serviceKey) {
+      next(errors.INTERNAL_FAILURE({ details: 'Missing request context' }));
+      return;
+    }
+    clearGraphileEntriesForService(serviceKey);
+    svcCache.delete(serviceKey);
     res.status(200).send('OK');
   };
 };
@@ -77,14 +86,12 @@ export const flushService = async (
   const api = new RegExp(`^api:${databaseId}:.*`);
   const schemata = new RegExp(`^schemata:${databaseId}:.*`);
   const meta = new RegExp(`^metaschema:api:${databaseId}`);
+  clearGraphileEntriesForDatabase(databaseId);
 
   if (!opts.api.isPublic) {
-    graphileCache.forEach((_, k: string) => {
-      if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
-        svcCache.delete(k);
-      }
-    });
+    for (const key of svcCache.keys()) {
+      if (api.test(key) || schemata.test(key) || meta.test(key)) svcCache.delete(key);
+    }
   }
 
   const routingSchema = getRoutingSchema(opts);
@@ -104,7 +111,7 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
+      clearGraphileEntriesForService(key);
       svcCache.delete(key);
     }
   }

@@ -225,8 +225,8 @@ class Server {
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
 
-    app.use(graphile(effectiveOpts));
     app.use(createFlushMiddleware(effectiveOpts));
+    app.use(graphile(effectiveOpts));
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)
