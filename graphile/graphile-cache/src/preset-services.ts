@@ -17,17 +17,16 @@ export const createPresetServicesReleaser = (resolvedPreset: {
   return (): Promise<void> => {
     if (releasePromise) return releasePromise;
     releasePromise = (async () => {
-      let firstError: unknown;
-      let failed = false;
+      const failures: unknown[] = [];
       for (const service of [...services].reverse()) {
         try {
           await service.release?.();
         } catch (error) {
-          if (!failed) firstError = error;
-          failed = true;
+          failures.push(error);
         }
       }
-      if (failed) throw firstError;
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) throw new AggregateError(failures, 'Graphile service cleanup failed');
     })();
     return releasePromise;
   };

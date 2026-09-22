@@ -27,6 +27,7 @@ export {
   graphileBuildFlights,
   reopenGraphileBuilds,
   GraphileCacheEntry,
+  GraphileCacheConfiguration,
   // Time constants
   ONE_HOUR_MS,
   waitForActiveDisposals,

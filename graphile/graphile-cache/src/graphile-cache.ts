@@ -1,6 +1,5 @@
 import { errors } from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
-import { parseEnvNumber } from '12factor-env';
 import { EventEmitter } from 'events';
 import type { Express } from 'express';
 import type { GrafservBase } from 'grafserv';
@@ -50,28 +49,16 @@ export interface CacheConfig {
   ttl: number;
 }
 
-/**
- * Get cache configuration from environment variables
- *
- * Supports:
- * - GRAPHILE_CACHE_MAX: Maximum number of entries (default: 50)
- * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
- *   - Production default: ONE_YEAR
- *   - Development default: FIVE_MINUTES_MS
- *
- * NOTE: This value should be <= PG_CACHE_MAX (also default: 50) so that
- * every cached PostGraphile instance has a live pool backing it.
- */
+// Environment parsing and deployment defaults belong to graphql-env. Direct
+// consumers receive a finite fallback until the first owner configures it.
+let cacheConfig: CacheConfig = { max: 50, ttl: ONE_YEAR };
+let cacheConfigured = false;
 export function getCacheConfig(): CacheConfig {
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  return { ...cacheConfig };
+}
 
-  const max = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX) ?? 50;
-
-  const ttl =
-    parseEnvNumber(process.env.GRAPHILE_CACHE_TTL_MS) ??
-    (isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR);
-
-  return { max, ttl };
+export interface GraphileCacheConfiguration extends GraphileAdmissionOptions {
+  ttl?: number;
 }
 
 /**
@@ -106,6 +93,10 @@ export interface GraphileCacheEntry {
 
 const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
 const activeDisposals = new Set<Promise<void>>();
+// Retain failed generations until a bulk drain observes them. Successful work
+// is removed immediately; exact-entry outcomes remain in the WeakMap above.
+const disposalRecords = new Map<number, Promise<void>>();
+let disposalSequence = 0;
 
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
@@ -123,39 +114,35 @@ const releaseEntry = async (
   key: string
 ): Promise<void> => {
   log.debug(`Disposing PostGraphile[${key}]`);
-  let firstError: unknown;
-  let failed = false;
+  const failures: unknown[] = [];
   try {
     if (entry.httpServer?.listening) {
-      await new Promise<void>((resolve) => {
-        entry.httpServer.close(() => resolve());
+      await new Promise<void>((resolve, reject) => {
+        entry.httpServer.close((error) => error ? reject(error) : resolve());
       });
     }
   } catch (error) {
-    firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     if (entry.realtimeManager) {
       await entry.realtimeManager.stop();
     }
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     await entry.pgl.release();
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
   try {
     await entry.releasePresetServices?.();
   } catch (error) {
-    if (!failed) firstError = error;
-    failed = true;
+    failures.push(error);
   }
-  if (failed) throw firstError;
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile resource cleanup failed');
 };
 
 /**
@@ -172,10 +159,12 @@ const scheduleDisposal = (
 
   disposalPromises.set(entry, pending);
   activeDisposals.add(pending);
+  const sequence = ++disposalSequence;
+  disposalRecords.set(sequence, pending);
   void pending
-    .catch((error) => {
+    .then(() => { disposalRecords.delete(sequence); }, (error) => {
       admission.fail(error);
-      log.error(`Failed to dispose PostGraphile[${key}]:`, error);
+      log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
   return pending;
@@ -192,30 +181,33 @@ export const waitForEntryDisposal = (
   entry: GraphileCacheEntry
 ): Promise<void> => disposalPromises.get(entry) ?? Promise.resolve();
 
-/** Await every disposal that is active at or begins during this drain. */
+/**
+ * Await disposals scheduled before this call, including failures that already
+ * settled. Later generations belong to the next drain. Concurrent callers hold
+ * their own snapshot, so acknowledging a failure cannot hide it from a peer.
+ */
 export const waitForActiveDisposals = async (): Promise<void> => {
-  while (activeDisposals.size > 0) {
-    await Promise.allSettled([...activeDisposals]);
-  }
+  const records = [...disposalRecords];
+  const outcomes = await Promise.allSettled(records.map(([, pending]) => pending));
+  const failures: unknown[] = [];
+  outcomes.forEach((outcome, index) => {
+    disposalRecords.delete(records[index][0]);
+    if (outcome.status === 'rejected') failures.push(outcome.reason);
+  });
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile disposal drain failed');
 };
 
 /**
  * Determine the eviction reason for a cache entry
  */
-const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
+const getEvictionReason = (key: string, reason: LRUCache.DisposeReason): EvictionReason => {
   if (manualEvictionKeys.has(key)) {
     manualEvictionKeys.delete(key);
     return 'manual';
   }
 
-  // Check if TTL expired
-  const age = Date.now() - entry.createdAt;
-  const config = getCacheConfig();
-  if (age >= config.ttl) {
-    return 'ttl';
-  }
-
-  return 'lru';
+  return reason === 'expire' ? 'ttl' : 'lru';
 };
 
 // Get initial cache configuration
@@ -233,16 +225,32 @@ class GraphileResidentCache extends LRUCache<string, GraphileCacheEntry> {
     activeBuildFlights?.invalidateAll();
     super.clear();
   }
+
+  // LRU's constructor max is immutable; enforce the owner's finite count here.
+  override set(
+    key: string,
+    value: GraphileCacheEntry,
+    options?: LRUCache.SetOptions<string, GraphileCacheEntry, unknown>
+  ): this {
+    this.purgeStale();
+    if (!this.has(key)) {
+      while (this.size >= cacheConfig.max) this.pop();
+    }
+    return super.set(key, value, options);
+  }
 }
 
 // --- Graphile Cache ---
 export const graphileCache = new GraphileResidentCache({
-  max: initialConfig.max,
+  max: 0,
+  maxSize: Number.MAX_SAFE_INTEGER,
+  sizeCalculation: () => 1,
+  ttlAutopurge: false,
   ttl: initialConfig.ttl,
   updateAgeOnGet: true,
-  dispose: (entry, key) => {
+  dispose: (entry, key, disposalReason) => {
     // Determine eviction reason before disposal
-    const reason = getEvictionReason(key, entry);
+    const reason = getEvictionReason(key, disposalReason);
 
     // Teardown must be scheduled even if an eviction listener throws.
     scheduleDisposal(entry, key);
@@ -255,7 +263,10 @@ export const graphileCache = new GraphileResidentCache({
 });
 
 const admission = new GraphileAdmission({
-  occupied: () => graphileCache.size + activeDisposals.size,
+  occupied: () => {
+    graphileCache.purgeStale();
+    return graphileCache.size + activeDisposals.size;
+  },
   evict: async () => {
     const entry = graphileCache.pop();
     if (entry) {
@@ -270,7 +281,26 @@ const admission = new GraphileAdmission({
   }
 }, initialConfig.max);
 
-export const configureGraphileAdmission = (options?: GraphileAdmissionOptions): void => admission.configure(options);
+export const configureGraphileAdmission = (options: GraphileCacheConfiguration = {}): void => {
+  if (Object.values(options).every((value) => value === undefined)) return;
+  if (options.ttl !== undefined && (!Number.isSafeInteger(options.ttl) || options.ttl <= 0)) {
+    throw errors.INTERNAL_FAILURE({ details: 'Invalid schema cache TTL' });
+  }
+  const ttl = cacheConfigured
+    ? Math.min(cacheConfig.ttl, options.ttl ?? cacheConfig.ttl)
+    : options.ttl ?? cacheConfig.ttl;
+  if (ttl !== cacheConfig.ttl && graphileCache.size > 0) {
+    throw errors.INTERNAL_FAILURE({ details: 'Schema cache TTL cannot change while residents exist' });
+  }
+  admission.configure({
+    max: options.max,
+    heapMaxBytes: options.heapMaxBytes,
+    buildReserveBytes: options.buildReserveBytes
+  });
+  cacheConfig = { max: admission.stats.max, ttl };
+  graphileCache.ttl = ttl;
+  cacheConfigured = true;
+};
 export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
 export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
 
@@ -394,9 +424,12 @@ export const clearGraphileCache = async (): Promise<void> => {
     manualEvictionKeys.add(key);
   }
   graphileCache.clear();
-  await graphileBuildFlights.drain();
-  await waitForActiveDisposals();
-  manualEvictionKeys.clear();
+  try {
+    await graphileBuildFlights.drain();
+    await waitForActiveDisposals();
+  } finally {
+    manualEvictionKeys.clear();
+  }
 };
 
 /**
@@ -418,10 +451,20 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
       if (verbose) log.info('Closing all server caches...');
 
       graphileBuildFlights.close();
-      await clearGraphileCache();
-
-      // Close pg pools
-      await pgCache.close();
+      const failures: unknown[] = [];
+      try {
+        await clearGraphileCache();
+      } catch (error) {
+        failures.push(error);
+      }
+      // Attempt pool cleanup even when a generation's release rejected.
+      try {
+        await pgCache.close();
+      } catch (error) {
+        failures.push(error);
+      }
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) throw new AggregateError(failures, 'Server cache cleanup failed');
 
       if (verbose) log.success('All caches disposed.');
     } finally {

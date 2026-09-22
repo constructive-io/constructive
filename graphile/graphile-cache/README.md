@@ -52,6 +52,17 @@ from the fingerprint. Use `clearGraphileEntriesForService`,
 `clearGraphileEntriesForDatabase`, or `clearGraphileEntriesForPool` to invalidate
 all build variants for that owner. Pool cleanup matches `poolKey` exactly.
 
+The server consumes the API, physical pool, service key, and transaction settings
+from `req.constructive`. Request settings remain request-scoped and are not
+captured in the shared schema. Build refusals retain their canonical error code
+and HTTP status; unknown failures return a generic 500 response with the original
+cause kept internally.
+
+Bulk disposal drains report all failures for generations scheduled before the
+call. Work scheduled later belongs to the next drain. An observed bulk failure
+is acknowledged for reporting, while its exact-entry release promise remains
+rejected; acknowledging an error never establishes successful resource release.
+
 ### Resident admission
 
 Server and Explorer builds use `buildAdmittedGraphileInstance(metadata, factory)`.
@@ -66,12 +77,17 @@ reconfiguring limits proves that the failed release reclaimed its resources.
 The public release interfaces provide no verified retry-completion signal, so
 automatically reopening admission would abandon the capacity guarantee.
 
-`configureGraphileAdmission` accepts `max`, `heapMaxBytes`, and
+`configureGraphileAdmission` accepts `max`, `ttl`, `heapMaxBytes`, and
 `buildReserveBytes`. The server exposes these as `graphile.cache` options and
-`GRAPHILE_CACHE_MAX`, `GRAPHILE_CACHE_HEAP_MAX_BYTES`, and
-`GRAPHILE_CACHE_BUILD_RESERVE_BYTES`. Defaults retain the existing LRU ceiling,
+`GRAPHILE_CACHE_MAX`, `GRAPHILE_CACHE_TTL_MS`, `GRAPHILE_CACHE_HEAP_MAX_BYTES`, and
+`GRAPHILE_CACHE_BUILD_RESERVE_BYTES`. `graphql-env` owns environment parsing and
+defaults; runtime options override environment and file configuration. This
+package reads no environment variables. Defaults retain the 50-entry ceiling,
 use 85% of the V8 heap limit as a watermark, and reserve 64 MiB per pending build.
-Multiple owners in one process use the strictest limits. This is a conservative
+The first owner can replace the fallback limits, including raising the resident
+ceiling above 50. Later owners use the strictest limits. TTL changes require an
+empty cache; lowering capacity below owned residents/reservations is rejected.
+TTL expiry remains lazy, with expired entries reclaimed before admission. This is a conservative
 process-heap admission check, not an exact per-instance memory measurement or an
 RSS limit; garbage collection may delay admission after eviction. Raw
 `graphileCache.set` is a low-level API and does not reserve capacity.

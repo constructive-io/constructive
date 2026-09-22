@@ -1,3 +1,6 @@
+import { ConstructiveError } from './error';
+import { errors } from './factory';
+import { format } from './format';
 import { getDefinition } from './registry';
 
 /** Status used when a code carries no mapping. */
@@ -60,4 +63,21 @@ export function httpStatusFor(code: string | null | undefined): HttpStatusResolu
   }
 
   return { status: UNMAPPED_HTTP_STATUS, mapped: false };
+}
+
+/** Preserve the internal cause while exposing only registry-owned diagnostics. */
+export function normalizeError(error: unknown): ConstructiveError {
+  const definition = error instanceof ConstructiveError ? getDefinition(error.code) : undefined;
+  const status = error instanceof ConstructiveError ? httpStatusFor(error.code).status : 500;
+  const fallback = errors.INTERNAL_FAILURE({ details: 'An unexpected error occurred' });
+  return new ConstructiveError({
+    code: definition?.code ?? fallback.code,
+    message: definition && definition.code !== fallback.code
+      ? format(definition.code, error instanceof ConstructiveError && definition.class === 'public' ? error.context : {})
+      : fallback.message,
+    errorClass: definition?.class ?? fallback.errorClass,
+    http: status,
+    context: definition?.class === 'public' && error instanceof ConstructiveError ? error.context : undefined,
+    cause: error
+  });
 }

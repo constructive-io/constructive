@@ -25,7 +25,14 @@ import type { LoaderRegistry } from './loaders/registry';
 import type { LoaderContext } from './loaders/types';
 import { withPgClient as withPgClientFn } from './pg-client';
 import { buildPgSettings } from './pg-settings';
+import type { RequestProtection } from './request-protection';
 import type { BillingConfig, BuiltinModuleMap, ConstructiveContext, InferenceLogConfig, LlmConfig } from './types';
+
+type ContextRequest = Request & {
+  deviceToken?: string;
+  requestProtection?: RequestProtection;
+  svc_key?: string;
+};
 
 export interface ContextMiddlewareOptions {
   /** Base PG options for pool creation (host, port, user, password) */
@@ -70,14 +77,25 @@ export function buildContext(
   const api = req.api;
   if (!api) return null;
 
+  const contextReq = req as ContextRequest;
   const token = req.token ?? null;
   const requestId = req.requestId || '';
 
-  const pgSettings = buildPgSettings({
+  const buildCurrentPgSettings = () => buildPgSettings({
     api,
     token,
     requestId,
-    clientIp: req.clientIp
+    clientIp: contextReq.clientIp,
+    origin: contextReq.get('origin'),
+    userAgent: contextReq.get('User-Agent'),
+    deviceToken: contextReq.deviceToken,
+    requestProtection: contextReq.requestProtection,
+    headers: {
+      actorId: contextReq.get('X-Actor-Id'),
+      entityId: contextReq.get('X-Entity-Id'),
+      entityType: contextReq.get('X-Entity-Type'),
+      organizationId: contextReq.get('X-Organization-Id')
+    }
   });
 
   const tenantPool: Pool = getPgPool({
@@ -100,7 +118,7 @@ export function buildContext(
   }
 
   const withPgClient = <T>(fn: (client: any) => Promise<T>) =>
-    withPgClientFn(tenantPool, pgSettings, fn);
+    withPgClientFn(tenantPool, buildCurrentPgSettings(), fn);
   const useModule = createUseModule(opts.loaders, loaderCtx);
 
   // Lazy-initialized billing client (cached per request)
@@ -111,7 +129,12 @@ export function buildContext(
   return {
     api,
     token,
-    pgSettings,
+    serviceKey: contextReq.svc_key,
+    get pgSettings() {
+      // Request protection is resolved after this middleware, so compute the
+      // settings at read time and keep withPgClient on the same owner path.
+      return buildCurrentPgSettings();
+    },
     databaseId: api.databaseId ?? null,
     userId: token?.user_id ?? null,
     requestId,

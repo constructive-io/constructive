@@ -1,5 +1,6 @@
 import './types'; // for Request type
 
+import { errors } from '@constructive-io/errors';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
@@ -64,7 +65,11 @@ export const createFlushMiddleware = (
       return;
     }
 
-    const serviceKey = (req as any).svc_key;
+    const serviceKey = req.constructive?.serviceKey;
+    if (!serviceKey) {
+      next(errors.INTERNAL_FAILURE({ details: 'Missing request context' }));
+      return;
+    }
     clearGraphileEntriesForService(serviceKey);
     svcCache.delete(serviceKey);
     res.status(200).send('OK');

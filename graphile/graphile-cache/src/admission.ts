@@ -47,8 +47,12 @@ export class GraphileAdmission {
       }
     }
     const next = {
-      max: Math.min(this.policy.max, options.max ?? this.policy.max),
-      heapMaxBytes: Math.min(this.policy.heapMaxBytes, options.heapMaxBytes ?? this.policy.heapMaxBytes),
+      max: this.configured
+        ? Math.min(this.policy.max, options.max ?? this.policy.max)
+        : options.max ?? this.policy.max,
+      heapMaxBytes: this.configured
+        ? Math.min(this.policy.heapMaxBytes, options.heapMaxBytes ?? this.policy.heapMaxBytes)
+        : options.heapMaxBytes ?? this.policy.heapMaxBytes,
       buildReserveBytes: this.configured
         ? Math.max(this.policy.buildReserveBytes, options.buildReserveBytes ?? this.policy.buildReserveBytes)
         : options.buildReserveBytes ?? this.policy.buildReserveBytes

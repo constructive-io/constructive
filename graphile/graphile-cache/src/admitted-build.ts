@@ -34,7 +34,7 @@ export const buildAdmittedGraphileInstance = async (
       try {
         await disposeUncachedEntry(entry);
       } catch (releaseError) {
-        throw new AggregateError([error, releaseError], 'Schema build and release failed');
+        throw new AggregateError([error, releaseError], 'Schema build and release failed', { cause: error });
       }
     }
     throw error;

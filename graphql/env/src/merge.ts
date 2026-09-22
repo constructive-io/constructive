@@ -6,6 +6,49 @@ import { getGraphQLEnvVars } from './env';
 import { normalizeGrafastCacheLimits } from './grafast-cache-limits';
 import { validateGraphileCacheOptions } from './validation';
 
+const FIVE_MINUTES_MS = 1000 * 60 * 5;
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+const ONE_YEAR_MS = ONE_DAY_MS * 366;
+const DEFAULT_GRAPHILE_CACHE_MAX = 50;
+
+const resolveGraphileCacheDefaults = (
+  options: ConstructiveOptions,
+  env: NodeJS.ProcessEnv
+): void => {
+  const graphile = options.graphile;
+  if (!graphile) return;
+
+  const cache = graphile.cache;
+  if (cache === undefined) {
+    options.graphile = {
+      ...graphile,
+      cache: {
+        max: DEFAULT_GRAPHILE_CACHE_MAX,
+        ttl: env.NODE_ENV === 'development' ? FIVE_MINUTES_MS : ONE_YEAR_MS
+      }
+    };
+    return;
+  }
+
+  // Leave malformed values for the final validator to report with the
+  // configuration path rather than masking them while applying defaults.
+  if (cache === null || typeof cache !== 'object' || Array.isArray(cache)) return;
+
+  options.graphile = {
+    ...graphile,
+    cache: {
+      ...cache,
+      max: cache.max === undefined ? DEFAULT_GRAPHILE_CACHE_MAX : cache.max,
+      ttl:
+        cache.ttl === undefined
+          ? env.NODE_ENV === 'development'
+            ? FIVE_MINUTES_MS
+            : ONE_YEAR_MS
+          : cache.ttl
+    }
+  };
+};
+
 /**
  * Get Constructive environment options by merging:
  * 1. Core PGPM defaults (from @pgpmjs/env)
@@ -60,6 +103,7 @@ export const getEnvOptions = (
   if (grafastCache !== undefined && options.graphile) {
     options.graphile = { ...options.graphile, grafastCache };
   }
+  resolveGraphileCacheDefaults(options, env);
   validateGraphileCacheOptions(options);
   return options;
 };
