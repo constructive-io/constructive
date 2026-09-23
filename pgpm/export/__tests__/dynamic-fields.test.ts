@@ -64,7 +64,7 @@ describe('Round-trip field name verification: snake_case → camelCase → snake
    * doesn't preserve when converting back to snake_case.
    * Adding a gqlTypeName override in the config acknowledges the exception.
    */
-  const knownNonRoundTrippingKeys = new Set(['i18n_module']);
+  const knownNonRoundTrippingKeys = new Set(['i18n_module', 'k8s_admission_module']);
 
   it('every META_TABLE_CONFIG table name round-trips through camelCase conversion', () => {
     const failures: string[] = [];

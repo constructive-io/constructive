@@ -241,6 +241,9 @@ export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | '
   },
   i18n_module: {
     gqlTypeName: 'I18NModule' // i18n is a well-known abbreviation; PostGraphile inflector capitalizes the N
+  },
+  k8s_admission_module: {
+    gqlTypeName: 'K8sAdmissionModule' // k8s contains a digit boundary that doesn't round-trip through snake_case; matches PostGraphile's generated type
   }
 };
 
