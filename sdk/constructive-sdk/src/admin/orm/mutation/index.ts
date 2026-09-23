@@ -7,26 +7,63 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
+  AcceptAppInviteInput,
+  AcceptOrgInviteInput,
+  ProvisionAppUserInput,
+  ProvisionAppUsersBulkInput,
   ProvisionBucketInput,
+  ProvisionOrgUserInput,
+  ProvisionOrgUsersBulkInput,
   SubmitAppInviteCodeInput,
   SubmitOrgInviteCodeInput,
+  AcceptAppInvitePayload,
+  AcceptOrgInvitePayload,
+  ProvisionAppUserPayload,
+  ProvisionAppUsersBulkPayload,
   ProvisionBucketPayload,
+  ProvisionOrgUserPayload,
+  ProvisionOrgUsersBulkPayload,
   SubmitAppInviteCodePayload,
   SubmitOrgInviteCodePayload,
+  AcceptAppInvitePayloadSelect,
+  AcceptOrgInvitePayloadSelect,
+  ProvisionAppUserPayloadSelect,
+  ProvisionAppUsersBulkPayloadSelect,
   ProvisionBucketPayloadSelect,
+  ProvisionOrgUserPayloadSelect,
+  ProvisionOrgUsersBulkPayloadSelect,
   SubmitAppInviteCodePayloadSelect,
   SubmitOrgInviteCodePayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface AcceptAppInviteVariables {
+  input: AcceptAppInviteInput;
+}
+export interface AcceptOrgInviteVariables {
+  input: AcceptOrgInviteInput;
+}
+export interface ProvisionAppUserVariables {
+  input: ProvisionAppUserInput;
+}
+export interface ProvisionAppUsersBulkVariables {
+  input: ProvisionAppUsersBulkInput;
+}
 /**
  * Variables for provisionBucket
- * Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+ * Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
  */
 export interface ProvisionBucketVariables {
   input: ProvisionBucketInput;
+}
+export interface ProvisionOrgUserVariables {
+  input: ProvisionOrgUserInput;
+}
+export interface ProvisionOrgUsersBulkVariables {
+  input: ProvisionOrgUsersBulkInput;
 }
 export interface SubmitAppInviteCodeVariables {
   input: SubmitAppInviteCodeInput;
@@ -36,6 +73,122 @@ export interface SubmitOrgInviteCodeVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
+    acceptAppInvite: <S extends AcceptAppInvitePayloadSelect>(
+      args: AcceptAppInviteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AcceptAppInvitePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        acceptAppInvite: InferSelectResult<AcceptAppInvitePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AcceptAppInvite',
+        fieldName: 'acceptAppInvite',
+        ...buildCustomDocument(
+          'mutation',
+          'AcceptAppInvite',
+          'acceptAppInvite',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AcceptAppInviteInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AcceptAppInvitePayload'
+        ),
+      }),
+    acceptOrgInvite: <S extends AcceptOrgInvitePayloadSelect>(
+      args: AcceptOrgInviteVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AcceptOrgInvitePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        acceptOrgInvite: InferSelectResult<AcceptOrgInvitePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AcceptOrgInvite',
+        fieldName: 'acceptOrgInvite',
+        ...buildCustomDocument(
+          'mutation',
+          'AcceptOrgInvite',
+          'acceptOrgInvite',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AcceptOrgInviteInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AcceptOrgInvitePayload'
+        ),
+      }),
+    provisionAppUser: <S extends ProvisionAppUserPayloadSelect>(
+      args: ProvisionAppUserVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionAppUserPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionAppUser: InferSelectResult<ProvisionAppUserPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionAppUser',
+        fieldName: 'provisionAppUser',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionAppUser',
+          'provisionAppUser',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionAppUserInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionAppUserPayload'
+        ),
+      }),
+    provisionAppUsersBulk: <S extends ProvisionAppUsersBulkPayloadSelect>(
+      args: ProvisionAppUsersBulkVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionAppUsersBulkPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionAppUsersBulk: InferSelectResult<ProvisionAppUsersBulkPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionAppUsersBulk',
+        fieldName: 'provisionAppUsersBulk',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionAppUsersBulk',
+          'provisionAppUsersBulk',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionAppUsersBulkInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionAppUsersBulkPayload'
+        ),
+      }),
     provisionBucket: <S extends ProvisionBucketPayloadSelect>(
       args: ProvisionBucketVariables,
       options: {
@@ -63,6 +216,64 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionBucketPayload'
+        ),
+      }),
+    provisionOrgUser: <S extends ProvisionOrgUserPayloadSelect>(
+      args: ProvisionOrgUserVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionOrgUserPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionOrgUser: InferSelectResult<ProvisionOrgUserPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionOrgUser',
+        fieldName: 'provisionOrgUser',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionOrgUser',
+          'provisionOrgUser',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionOrgUserInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionOrgUserPayload'
+        ),
+      }),
+    provisionOrgUsersBulk: <S extends ProvisionOrgUsersBulkPayloadSelect>(
+      args: ProvisionOrgUsersBulkVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionOrgUsersBulkPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionOrgUsersBulk: InferSelectResult<ProvisionOrgUsersBulkPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionOrgUsersBulk',
+        fieldName: 'provisionOrgUsersBulk',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionOrgUsersBulk',
+          'provisionOrgUsersBulk',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionOrgUsersBulkInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionOrgUsersBulkPayload'
         ),
       }),
     submitAppInviteCode: <S extends SubmitAppInviteCodePayloadSelect>(

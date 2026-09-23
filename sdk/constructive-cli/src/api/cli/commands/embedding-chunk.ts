@@ -35,6 +35,7 @@ const fieldSchema: FieldSchema = {
   metric: 'string',
   parentFkFieldId: 'uuid',
   searchIndexes: 'json',
+  sourceFields: 'json',
   tableId: 'uuid',
   updatedAt: 'string',
 };
@@ -108,6 +109,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       metric: true,
       parentFkFieldId: true,
       searchIndexes: true,
+      sourceFields: true,
       tableId: true,
       updatedAt: true,
     };
@@ -149,6 +151,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       metric: true,
       parentFkFieldId: true,
       searchIndexes: true,
+      sourceFields: true,
       tableId: true,
       updatedAt: true,
     };
@@ -202,6 +205,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           metric: true,
           parentFkFieldId: true,
           searchIndexes: true,
+          sourceFields: true,
           tableId: true,
           updatedAt: true,
         },
@@ -339,6 +343,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'json',
+        name: 'sourceFields',
+        message: 'sourceFields',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
@@ -371,6 +382,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           metric: cleanedData.metric,
           parentFkFieldId: cleanedData.parentFkFieldId,
           searchIndexes: cleanedData.searchIndexes,
+          sourceFields: cleanedData.sourceFields,
           tableId: cleanedData.tableId,
         },
         select: {
@@ -393,6 +405,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           metric: true,
           parentFkFieldId: true,
           searchIndexes: true,
+          sourceFields: true,
           tableId: true,
           updatedAt: true,
         },
@@ -536,6 +549,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'json',
+        name: 'sourceFields',
+        message: 'sourceFields',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'tableId',
         message: 'tableId',
@@ -568,6 +588,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           metric: cleanedData.metric,
           parentFkFieldId: cleanedData.parentFkFieldId,
           searchIndexes: cleanedData.searchIndexes,
+          sourceFields: cleanedData.sourceFields,
           tableId: cleanedData.tableId,
         },
         select: {
@@ -590,6 +611,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           metric: true,
           parentFkFieldId: true,
           searchIndexes: true,
+          sourceFields: true,
           tableId: true,
           updatedAt: true,
         },

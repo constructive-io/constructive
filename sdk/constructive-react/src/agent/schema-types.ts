@@ -6,14 +6,29 @@
 
 import type {
   Agent,
+  AgentEvent,
   AgentMessage,
   AgentPersona,
   AgentPlan,
   AgentPrompt,
   AgentResource,
   AgentResourceChunk,
+  AgentRun,
+  AgentRunWorkspace,
   AgentTask,
   AgentThread,
+  PlatformAgent,
+  PlatformAgentEvent,
+  PlatformAgentMessage,
+  PlatformAgentPersona,
+  PlatformAgentPlan,
+  PlatformAgentPrompt,
+  PlatformAgentResource,
+  PlatformAgentResourceChunk,
+  PlatformAgentRun,
+  PlatformAgentRunWorkspace,
+  PlatformAgentTask,
+  PlatformAgentThread,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -32,6 +47,35 @@ import type {
   UUIDListFilter,
   VectorFilter,
 } from './types';
+/** Methods to use when ordering `AgentEvent`. */
+export type AgentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ENTRY_ASC'
+  | 'ENTRY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORDED_AT_ASC'
+  | 'RECORDED_AT_DESC'
+  | 'RUN_ID_ASC'
+  | 'RUN_ID_DESC'
+  | 'SEQ_ASC'
+  | 'SEQ_DESC'
+  | 'TRANSCRIPT_FORMAT_ASC'
+  | 'TRANSCRIPT_FORMAT_DESC'
+  | 'TRANSCRIPT_VERSION_ASC'
+  | 'TRANSCRIPT_VERSION_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Methods to use when ordering `AgentMessage`. */
 export type AgentMessageOrderBy =
   | 'ACTOR_ID_ASC'
@@ -44,8 +88,12 @@ export type AgentMessageOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DELIVERED_RUN_ID_ASC'
+  | 'DELIVERED_RUN_ID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
   | 'MODEL_ASC'
   | 'MODEL_DESC'
   | 'NATURAL'
@@ -56,7 +104,9 @@ export type AgentMessageOrderBy =
   | 'THREAD_ID_ASC'
   | 'THREAD_ID_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Methods to use when ordering `Agent`. */
 export type AgentOrderBy =
   | 'CONFIG_ASC'
@@ -94,6 +144,8 @@ export type AgentPersonaOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -116,7 +168,9 @@ export type AgentPersonaOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `AgentPlan`. */
 export type AgentPlanOrderBy =
   | 'CREATED_AT_ASC'
@@ -139,7 +193,9 @@ export type AgentPlanOrderBy =
   | 'TITLE_ASC'
   | 'TITLE_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Methods to use when ordering `AgentPrompt`. */
 export type AgentPromptOrderBy =
   | 'CONTENT_ASC'
@@ -148,6 +204,8 @@ export type AgentPromptOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -166,7 +224,9 @@ export type AgentPromptOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `AgentResourceChunk`. */
 export type AgentResourceChunkOrderBy =
   | 'AGENT_RESOURCE_ID_ASC'
@@ -177,6 +237,8 @@ export type AgentResourceChunkOrderBy =
   | 'CHUNK_INDEX_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -204,6 +266,8 @@ export type AgentResourceOrderBy =
   | 'CREATED_AT_DESC'
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DESCRIPTION_ASC'
@@ -248,7 +312,111 @@ export type AgentResourceOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `AgentRun`. */
+export type AgentRunOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ARTIFACTS_ASC'
+  | 'ARTIFACTS_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'BASE_COMMIT_ASC'
+  | 'BASE_COMMIT_DESC'
+  | 'BRANCH_ASC'
+  | 'BRANCH_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEADLINE_AT_ASC'
+  | 'DEADLINE_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXECUTION_ID_ASC'
+  | 'EXECUTION_ID_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'HEAD_COMMIT_ASC'
+  | 'HEAD_COMMIT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_EVENT_SEQ_ASC'
+  | 'LAST_EVENT_SEQ_DESC'
+  | 'NATURAL'
+  | 'PARENT_RUN_ID_ASC'
+  | 'PARENT_RUN_ID_DESC'
+  | 'PLACEMENT_ASC'
+  | 'PLACEMENT_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'REPO_URL_ASC'
+  | 'REPO_URL_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'TOKEN_USAGE_ASC'
+  | 'TOKEN_USAGE_DESC'
+  | 'TOTAL_COST_ASC'
+  | 'TOTAL_COST_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `AgentRunWorkspace`. */
+export type AgentRunWorkspaceOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ARTIFACTS_ASC'
+  | 'ARTIFACTS_DESC'
+  | 'BASE_BRANCH_ASC'
+  | 'BASE_BRANCH_DESC'
+  | 'BASE_COMMIT_ASC'
+  | 'BASE_COMMIT_DESC'
+  | 'BRANCH_ASC'
+  | 'BRANCH_DESC'
+  | 'CLONED_AT_ASC'
+  | 'CLONED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'HEAD_COMMIT_ASC'
+  | 'HEAD_COMMIT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
+  | 'NATURAL'
+  | 'ORDINAL_ASC'
+  | 'ORDINAL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PUBLICATION_ASC'
+  | 'PUBLICATION_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'REPO_ASC'
+  | 'REPO_DESC'
+  | 'RUN_ID_ASC'
+  | 'RUN_ID_DESC'
+  | 'STATE_ASC'
+  | 'STATE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Methods to use when ordering `AgentTask`. */
 export type AgentTaskOrderBy =
   | 'ACTOR_ID_ASC'
@@ -285,7 +453,9 @@ export type AgentTaskOrderBy =
   | 'STATUS_ASC'
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Methods to use when ordering `AgentThread`. */
 export type AgentThreadOrderBy =
   | 'AGENT_ID_ASC'
@@ -322,9 +492,514 @@ export type AgentThreadOrderBy =
   | 'TITLE_ASC'
   | 'TITLE_DESC'
   | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentEvent`. */
+export type PlatformAgentEventOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ENTRY_ASC'
+  | 'ENTRY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RECORDED_AT_ASC'
+  | 'RECORDED_AT_DESC'
+  | 'RUN_ID_ASC'
+  | 'RUN_ID_DESC'
+  | 'SEQ_ASC'
+  | 'SEQ_DESC'
+  | 'TRANSCRIPT_FORMAT_ASC'
+  | 'TRANSCRIPT_FORMAT_DESC'
+  | 'TRANSCRIPT_VERSION_ASC'
+  | 'TRANSCRIPT_VERSION_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentMessage`. */
+export type PlatformAgentMessageOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
+  | 'AUTHOR_ROLE_ASC'
+  | 'AUTHOR_ROLE_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DELIVERED_RUN_ID_ASC'
+  | 'DELIVERED_RUN_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'NATURAL'
+  | 'PARTS_ASC'
+  | 'PARTS_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgent`. */
+export type PlatformAgentOrderBy =
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_EPHEMERAL_ASC'
+  | 'IS_EPHEMERAL_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_ID_ASC'
+  | 'PARENT_ID_DESC'
+  | 'PERSONA_ID_ASC'
+  | 'PERSONA_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformAgentPersona`. */
+export type PlatformAgentPersonaOrderBy =
+  | 'CONFIG_ASC'
+  | 'CONFIG_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'RESOURCES_ASC'
+  | 'RESOURCES_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformAgentPlan`. */
+export type PlatformAgentPlanOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentPrompt`. */
+export type PlatformAgentPromptOrderBy =
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_DEFAULT_ASC'
+  | 'IS_DEFAULT_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformAgentResourceChunk`. */
+export type PlatformAgentResourceChunkOrderBy =
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'CHUNK_INDEX_ASC'
+  | 'CHUNK_INDEX_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PLATFORM_AGENT_RESOURCE_ID_ASC'
+  | 'PLATFORM_AGENT_RESOURCE_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformAgentResource`. */
+export type PlatformAgentResourceOrderBy =
+  | 'ARCHIVED_AT_ASC'
+  | 'ARCHIVED_AT_DESC'
+  | 'BODY_ASC'
+  | 'BODY_DESC'
+  | 'BODY_TRGM_SIMILARITY_ASC'
+  | 'BODY_TRGM_SIMILARITY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'EMBEDDING_ASC'
+  | 'EMBEDDING_DESC'
+  | 'EMBEDDING_UPDATED_AT_ASC'
+  | 'EMBEDDING_UPDATED_AT_DESC'
+  | 'EMBEDDING_VECTOR_DISTANCE_ASC'
+  | 'EMBEDDING_VECTOR_DISTANCE_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'KEYWORDS_ASC'
+  | 'KEYWORDS_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'KIND_TRGM_SIMILARITY_ASC'
+  | 'KIND_TRGM_SIMILARITY_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SEARCH_ASC'
+  | 'SEARCH_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC'
+  | 'SEARCH_TSV_RANK_ASC'
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'TITLE_TRGM_SIMILARITY_ASC'
+  | 'TITLE_TRGM_SIMILARITY_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
+/** Methods to use when ordering `PlatformAgentRun`. */
+export type PlatformAgentRunOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ARTIFACTS_ASC'
+  | 'ARTIFACTS_DESC'
+  | 'ATTEMPT_ASC'
+  | 'ATTEMPT_DESC'
+  | 'BASE_COMMIT_ASC'
+  | 'BASE_COMMIT_DESC'
+  | 'BRANCH_ASC'
+  | 'BRANCH_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DEADLINE_AT_ASC'
+  | 'DEADLINE_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'EXECUTION_ID_ASC'
+  | 'EXECUTION_ID_DESC'
+  | 'FINISHED_AT_ASC'
+  | 'FINISHED_AT_DESC'
+  | 'HEAD_COMMIT_ASC'
+  | 'HEAD_COMMIT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_EVENT_SEQ_ASC'
+  | 'LAST_EVENT_SEQ_DESC'
+  | 'NATURAL'
+  | 'PARENT_RUN_ID_ASC'
+  | 'PARENT_RUN_ID_DESC'
+  | 'PLACEMENT_ASC'
+  | 'PLACEMENT_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPAL_ID_ASC'
+  | 'PRINCIPAL_ID_DESC'
+  | 'REPO_URL_ASC'
+  | 'REPO_URL_DESC'
+  | 'STARTED_AT_ASC'
+  | 'STARTED_AT_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'THREAD_ID_ASC'
+  | 'THREAD_ID_DESC'
+  | 'TOKEN_USAGE_ASC'
+  | 'TOKEN_USAGE_DESC'
+  | 'TOTAL_COST_ASC'
+  | 'TOTAL_COST_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentRunWorkspace`. */
+export type PlatformAgentRunWorkspaceOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'ARTIFACTS_ASC'
+  | 'ARTIFACTS_DESC'
+  | 'BASE_BRANCH_ASC'
+  | 'BASE_BRANCH_DESC'
+  | 'BASE_COMMIT_ASC'
+  | 'BASE_COMMIT_DESC'
+  | 'BRANCH_ASC'
+  | 'BRANCH_DESC'
+  | 'CLONED_AT_ASC'
+  | 'CLONED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'HEAD_COMMIT_ASC'
+  | 'HEAD_COMMIT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
+  | 'NATURAL'
+  | 'ORDINAL_ASC'
+  | 'ORDINAL_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'PUBLICATION_ASC'
+  | 'PUBLICATION_DESC'
+  | 'REPOSITORY_ID_ASC'
+  | 'REPOSITORY_ID_DESC'
+  | 'REPO_ASC'
+  | 'REPO_DESC'
+  | 'RUN_ID_ASC'
+  | 'RUN_ID_DESC'
+  | 'STATE_ASC'
+  | 'STATE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentTask`. */
+export type PlatformAgentTaskOrderBy =
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'APPROVAL_FEEDBACK_ASC'
+  | 'APPROVAL_FEEDBACK_DESC'
+  | 'APPROVAL_STATUS_ASC'
+  | 'APPROVAL_STATUS_DESC'
+  | 'APPROVED_AT_ASC'
+  | 'APPROVED_AT_DESC'
+  | 'APPROVED_BY_ASC'
+  | 'APPROVED_BY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'ORDER_INDEX_ASC'
+  | 'ORDER_INDEX_DESC'
+  | 'PLAN_ID_ASC'
+  | 'PLAN_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REQUIRES_APPROVAL_ASC'
+  | 'REQUIRES_APPROVAL_DESC'
+  | 'SOURCE_ASC'
+  | 'SOURCE_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
+/** Methods to use when ordering `PlatformAgentThread`. */
+export type PlatformAgentThreadOrderBy =
+  | 'AGENT_ID_ASC'
+  | 'AGENT_ID_DESC'
+  | 'ARCHIVED_AT_ASC'
+  | 'ARCHIVED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'IS_ARCHIVED_ASC'
+  | 'IS_ARCHIVED_DESC'
+  | 'MODEL_ASC'
+  | 'MODEL_DESC'
+  | 'MODE_ASC'
+  | 'MODE_DESC'
+  | 'NATURAL'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'PARENT_THREAD_ID_ASC'
+  | 'PARENT_THREAD_ID_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PROMPT_TEMPLATE_ID_ASC'
+  | 'PROMPT_TEMPLATE_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'SYSTEM_PROMPT_ASC'
+  | 'SYSTEM_PROMPT_DESC'
+  | 'TAGS_ASC'
+  | 'TAGS_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC';
 /** Similarity metric for vector search */
 export type VectorMetric = 'COSINE' | 'IP' | 'L2';
+/** A filter to be used against `AgentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `entry` field. */
+  entry?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: AgentEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentEventFilter[];
+  /** Filter by the object’s `recordedAt` field. */
+  recordedAt?: DatetimeFilter;
+  /** Filter by the object’s `run` relation. */
+  run?: AgentRunFilter;
+  /** Filter by the object’s `runId` field. */
+  runId?: UUIDFilter;
+  /** Filter by the object’s `seq` field. */
+  seq?: IntFilter;
+  /** Filter by the object’s `transcriptFormat` field. */
+  transcriptFormat?: StringFilter;
+  /** Filter by the object’s `transcriptVersion` field. */
+  transcriptVersion?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `AgentEvent` */
+export interface AgentEventInput {
+  createdAt?: string;
+  /** The agent session entry, verbatim — every rendered surface is a projection of it */
+  entry: unknown;
+  id?: string;
+  /** When the writer produced this entry, by its own clock */
+  recordedAt: string;
+  /** Foreign key to agent_run */
+  runId: string;
+  /** Position of this entry in the run, 1-based and gapless */
+  seq: number;
+  /** Transcript format this entry is encoded in */
+  transcriptFormat?: string;
+  /** Version of that transcript format this entry was written in */
+  transcriptVersion: number;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentEvent`. Fields that are set will be updated. */
+export interface AgentEventPatch {
+  /** User whose run this entry belongs to, inherited from the run */
+  actorId?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** The agent session entry, verbatim — every rendered surface is a projection of it */
+  entry?: unknown;
+  id?: string;
+  /** When the writer produced this entry, by its own clock */
+  recordedAt?: string;
+  /** Foreign key to agent_run */
+  runId?: string;
+  /** Position of this entry in the run, 1-based and gapless */
+  seq?: number;
+  /** Transcript format this entry is encoded in */
+  transcriptFormat?: string;
+  /** Version of that transcript format this entry was written in */
+  transcriptVersion?: number;
+  updatedAt?: string;
+  /** Who may read this entry, inherited from the run */
+  visibility?: string;
+}
 /** A filter to be used against `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentFilter {
   /** Filter by the object’s `agentMessages` relation. */
@@ -420,8 +1095,16 @@ export interface AgentMessageFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deliveredRun` relation. */
+  deliveredRun?: AgentRunFilter;
+  /** A related `deliveredRun` exists. */
+  deliveredRunExists?: boolean;
+  /** Filter by the object’s `deliveredRunId` field. */
+  deliveredRunId?: UUIDFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
   /** Filter by the object’s `model` field. */
   model?: StringFilter;
   /** Negates the expression. */
@@ -436,6 +1119,8 @@ export interface AgentMessageFilter {
   threadId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
 }
 /** An input for mutations affecting `AgentMessage` */
 export interface AgentMessageInput {
@@ -446,9 +1131,11 @@ export interface AgentMessageInput {
   /** Who authored this message: user or assistant */
   authorRole: string;
   createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
+  /** Run that consumed this message; null while it is still queued */
+  deliveredRunId?: string;
   id?: string;
+  /** Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it) */
+  kind?: string;
   /** LLM model that generated this response */
   model?: string;
   /** Message content: TextPart and ToolPart array */
@@ -468,7 +1155,11 @@ export interface AgentMessagePatch {
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
+  /** Run that consumed this message; null while it is still queued */
+  deliveredRunId?: string;
   id?: string;
+  /** Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it) */
+  kind?: string;
   /** LLM model that generated this response */
   model?: string;
   /** Message content: TextPart and ToolPart array */
@@ -476,6 +1167,8 @@ export interface AgentMessagePatch {
   /** Foreign key to agent_thread */
   threadId?: string;
   updatedAt?: string;
+  /** Who may read this message, inherited from the thread */
+  visibility?: string;
 }
 /** Represents an update to a `Agent`. Fields that are set will be updated. */
 export interface AgentPatch {
@@ -515,6 +1208,8 @@ export interface AgentPersonaFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -539,6 +1234,8 @@ export interface AgentPersonaFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `AgentPersona` */
 export interface AgentPersonaInput {
@@ -546,6 +1243,7 @@ export interface AgentPersonaInput {
   config?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Brief description of this persona role */
@@ -563,6 +1261,7 @@ export interface AgentPersonaInput {
   systemPrompt?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `AgentPersona`. Fields that are set will be updated. */
 export interface AgentPersonaPatch {
@@ -570,6 +1269,7 @@ export interface AgentPersonaPatch {
   config?: unknown;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Brief description of this persona role */
@@ -587,6 +1287,7 @@ export interface AgentPersonaPatch {
   systemPrompt?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `Agent` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPersonaToManyAgentFilter {
@@ -629,12 +1330,12 @@ export interface AgentPlanFilter {
   title?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
 }
 /** An input for mutations affecting `AgentPlan` */
 export interface AgentPlanInput {
   createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
   /** Overall goal or context for this plan */
   description?: string;
   id?: string;
@@ -665,6 +1366,8 @@ export interface AgentPlanPatch {
   /** Human-readable plan name */
   title?: string;
   updatedAt?: string;
+  /** Who may read this plan, inherited from the thread */
+  visibility?: string;
 }
 /** A filter to be used against many `AgentTask` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPlanToManyAgentTaskFilter {
@@ -689,6 +1392,8 @@ export interface AgentPromptFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -709,6 +1414,8 @@ export interface AgentPromptFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 /** An input for mutations affecting `AgentPrompt` */
 export interface AgentPromptInput {
@@ -716,6 +1423,7 @@ export interface AgentPromptInput {
   content: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** What this prompt template is for */
@@ -729,6 +1437,7 @@ export interface AgentPromptInput {
   name: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `AgentPrompt`. Fields that are set will be updated. */
 export interface AgentPromptPatch {
@@ -736,6 +1445,7 @@ export interface AgentPromptPatch {
   content?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** What this prompt template is for */
@@ -749,6 +1459,7 @@ export interface AgentPromptPatch {
   name?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentPromptToManyAgentThreadFilter {
@@ -773,6 +1484,8 @@ export interface AgentResourceChunkFilter {
   chunkIndex?: IntFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
   /** Filter by the object’s `id` field. */
@@ -794,6 +1507,8 @@ export interface AgentResourceChunkInput {
   body: string;
   chunkIndex?: number;
   createdAt?: string;
+  /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
+  databaseId?: string;
   embedding?: number[];
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
@@ -807,6 +1522,8 @@ export interface AgentResourceChunkPatch {
   body?: string;
   chunkIndex?: number;
   createdAt?: string;
+  /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
+  databaseId?: string;
   embedding?: number[];
   /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
@@ -830,6 +1547,8 @@ export interface AgentResourceFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
@@ -882,6 +1601,8 @@ export interface AgentResourceFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
   /** VECTOR search on the `embedding` column. */
   vectorEmbedding?: VectorNearbyInput;
 }
@@ -893,6 +1614,7 @@ export interface AgentResourceInput {
   body: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   /** Brief description of this resource */
@@ -917,6 +1639,7 @@ export interface AgentResourceInput {
   title: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** Represents an update to a `AgentResource`. Fields that are set will be updated. */
 export interface AgentResourcePatch {
@@ -926,6 +1649,7 @@ export interface AgentResourcePatch {
   body?: string;
   createdAt?: string;
   createdBy?: string;
+  createdByPrincipal?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
   /** Brief description of this resource */
@@ -950,6 +1674,7 @@ export interface AgentResourcePatch {
   title?: string;
   updatedAt?: string;
   updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceToManyAgentResourceChunkFilter {
@@ -959,6 +1684,333 @@ export interface AgentResourceToManyAgentResourceChunkFilter {
   none?: AgentResourceChunkFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: AgentResourceChunkFilter;
+}
+/** A filter to be used against `AgentRun` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentRunFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `agentEventsByRunId` relation. */
+  agentEventsByRunId?: AgentRunToManyAgentEventFilter;
+  /** `agentEventsByRunId` exist. */
+  agentEventsByRunIdExist?: boolean;
+  /** Filter by the object’s `agentMessagesByDeliveredRunId` relation. */
+  agentMessagesByDeliveredRunId?: AgentRunToManyAgentMessageFilter;
+  /** `agentMessagesByDeliveredRunId` exist. */
+  agentMessagesByDeliveredRunIdExist?: boolean;
+  /** Filter by the object’s `agentRunWorkspacesByRunId` relation. */
+  agentRunWorkspacesByRunId?: AgentRunToManyAgentRunWorkspaceFilter;
+  /** `agentRunWorkspacesByRunId` exist. */
+  agentRunWorkspacesByRunIdExist?: boolean;
+  /** Checks for all expressions in this list. */
+  and?: AgentRunFilter[];
+  /** Filter by the object’s `artifacts` field. */
+  artifacts?: JSONFilter;
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `baseCommit` field. */
+  baseCommit?: StringFilter;
+  /** Filter by the object’s `branch` field. */
+  branch?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deadlineAt` field. */
+  deadlineAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `executionId` field. */
+  executionId?: UUIDFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `headCommit` field. */
+  headCommit?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastEventSeq` field. */
+  lastEventSeq?: IntFilter;
+  /** Negates the expression. */
+  not?: AgentRunFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentRunFilter[];
+  /** Filter by the object’s `parentRunId` field. */
+  parentRunId?: UUIDFilter;
+  /** Filter by the object’s `placement` field. */
+  placement?: StringFilter;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `repoUrl` field. */
+  repoUrl?: StringFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: AgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `tokenUsage` field. */
+  tokenUsage?: JSONFilter;
+  /** Filter by the object’s `totalCost` field. */
+  totalCost?: BigFloatFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `AgentRun` */
+export interface AgentRunInput {
+  /** User who invoked this run (audit/provenance; billing is entity_id) */
+  actorId?: string;
+  /** What the run produced: commits, diffs, pull requests, usage totals */
+  artifacts?: unknown;
+  /** Attempt number within this run lineage */
+  attempt?: number;
+  /** Commit the run started from */
+  baseCommit?: string;
+  /** Branch the run commits to */
+  branch?: string;
+  createdAt?: string;
+  /** When a supervisor should consider this run abandoned */
+  deadlineAt?: string;
+  /** Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves */
+  entityId?: string;
+  /** Failure reason when status is failed */
+  error?: string;
+  /** Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute */
+  executionId?: string;
+  /** When the run reached a terminal status */
+  finishedAt?: string;
+  /** Commit the run has reached */
+  headCommit?: string;
+  id?: string;
+  /** Highest event seq appended for this run; 0 before the first event */
+  lastEventSeq?: number;
+  /** Run this one retries, by id and without a foreign key so lineage survives pruning */
+  parentRunId?: string;
+  /** Where this run executes: cloud (a job) or local (an embedded host) */
+  placement?: string;
+  /** Principal that invoked this run; equals actor_id when the actor acted directly */
+  principalId?: string;
+  /** Git remote the run works against — the workspace sync protocol */
+  repoUrl?: string;
+  /** When the run began executing */
+  startedAt?: string;
+  /** Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  /** Token counts this run accumulated, per model, as the runtime reports them; null until settled */
+  tokenUsage?: unknown;
+  /** Settled cost of this run in the billing currency, summarising its metered rows; null until settled */
+  totalCost?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentRun`. Fields that are set will be updated. */
+export interface AgentRunPatch {
+  /** User who invoked this run (audit/provenance; billing is entity_id) */
+  actorId?: string;
+  /** What the run produced: commits, diffs, pull requests, usage totals */
+  artifacts?: unknown;
+  /** Attempt number within this run lineage */
+  attempt?: number;
+  /** Commit the run started from */
+  baseCommit?: string;
+  /** Branch the run commits to */
+  branch?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** When a supervisor should consider this run abandoned */
+  deadlineAt?: string;
+  /** Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves */
+  entityId?: string;
+  /** Failure reason when status is failed */
+  error?: string;
+  /** Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute */
+  executionId?: string;
+  /** When the run reached a terminal status */
+  finishedAt?: string;
+  /** Commit the run has reached */
+  headCommit?: string;
+  id?: string;
+  /** Highest event seq appended for this run; 0 before the first event */
+  lastEventSeq?: number;
+  /** Run this one retries, by id and without a foreign key so lineage survives pruning */
+  parentRunId?: string;
+  /** Where this run executes: cloud (a job) or local (an embedded host) */
+  placement?: string;
+  /** Principal that invoked this run; equals actor_id when the actor acted directly */
+  principalId?: string;
+  /** Git remote the run works against — the workspace sync protocol */
+  repoUrl?: string;
+  /** When the run began executing */
+  startedAt?: string;
+  /** Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  /** Token counts this run accumulated, per model, as the runtime reports them; null until settled */
+  tokenUsage?: unknown;
+  /** Settled cost of this run in the billing currency, summarising its metered rows; null until settled */
+  totalCost?: string;
+  updatedAt?: string;
+  /** Who may read this run, inherited from the thread */
+  visibility?: string;
+}
+/** A filter to be used against many `AgentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentRunToManyAgentEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentEventFilter;
+}
+/** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentRunToManyAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentMessageFilter;
+}
+/** A filter to be used against many `AgentRunWorkspace` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentRunToManyAgentRunWorkspaceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentRunWorkspaceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentRunWorkspaceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentRunWorkspaceFilter;
+}
+/** A filter to be used against `AgentRunWorkspace` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentRunWorkspaceFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AgentRunWorkspaceFilter[];
+  /** Filter by the object’s `artifacts` field. */
+  artifacts?: JSONFilter;
+  /** Filter by the object’s `baseBranch` field. */
+  baseBranch?: StringFilter;
+  /** Filter by the object’s `baseCommit` field. */
+  baseCommit?: StringFilter;
+  /** Filter by the object’s `branch` field. */
+  branch?: StringFilter;
+  /** Filter by the object’s `clonedAt` field. */
+  clonedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `headCommit` field. */
+  headCommit?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastUsedAt` field. */
+  lastUsedAt?: DatetimeFilter;
+  /** Negates the expression. */
+  not?: AgentRunWorkspaceFilter;
+  /** Checks for any expressions in this list. */
+  or?: AgentRunWorkspaceFilter[];
+  /** Filter by the object’s `ordinal` field. */
+  ordinal?: IntFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `publication` field. */
+  publication?: StringFilter;
+  /** Filter by the object’s `repo` field. */
+  repo?: StringFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `run` relation. */
+  run?: AgentRunFilter;
+  /** Filter by the object’s `runId` field. */
+  runId?: UUIDFilter;
+  /** Filter by the object’s `state` field. */
+  state?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `AgentRunWorkspace` */
+export interface AgentRunWorkspaceInput {
+  /** What publishing this workspace produced: diff stats, a pull request, a stored patch */
+  artifacts?: unknown;
+  /** Branch the workspace was cut from, and what a pull request merges into */
+  baseBranch: string;
+  /** Commit the workspace was cut from; fixed once recorded */
+  baseCommit?: string;
+  /** Branch this run commits to in this repository */
+  branch: string;
+  /** When an execution first cloned this workspace */
+  clonedAt?: string;
+  createdAt?: string;
+  /** Commit the work in this repository has reached */
+  headCommit?: string;
+  id?: string;
+  /** When an execution last worked in this workspace; what a reclaim policy reads */
+  lastUsedAt?: string;
+  /** Position of this workspace among the run's, 1-based and in clone order */
+  ordinal?: number;
+  /** Git host this workspace was cloned from, as the runtime names it: github, local */
+  provider: string;
+  /** How the work is published: pull_request, push, patch_artifact or none */
+  publication?: string;
+  /** Repository as its provider names it (owner/name) */
+  repo: string;
+  /** Catalog repository this workspace was cloned from, when the platform hosts it */
+  repositoryId?: string;
+  /** Foreign key to agent_run */
+  runId: string;
+  /** Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged */
+  state?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `AgentRunWorkspace`. Fields that are set will be updated. */
+export interface AgentRunWorkspacePatch {
+  /** User whose run this workspace belongs to, inherited from the run */
+  actorId?: string;
+  /** What publishing this workspace produced: diff stats, a pull request, a stored patch */
+  artifacts?: unknown;
+  /** Branch the workspace was cut from, and what a pull request merges into */
+  baseBranch?: string;
+  /** Commit the workspace was cut from; fixed once recorded */
+  baseCommit?: string;
+  /** Branch this run commits to in this repository */
+  branch?: string;
+  /** When an execution first cloned this workspace */
+  clonedAt?: string;
+  createdAt?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string;
+  /** Commit the work in this repository has reached */
+  headCommit?: string;
+  id?: string;
+  /** When an execution last worked in this workspace; what a reclaim policy reads */
+  lastUsedAt?: string;
+  /** Position of this workspace among the run's, 1-based and in clone order */
+  ordinal?: number;
+  /** Git host this workspace was cloned from, as the runtime names it: github, local */
+  provider?: string;
+  /** How the work is published: pull_request, push, patch_artifact or none */
+  publication?: string;
+  /** Repository as its provider names it (owner/name) */
+  repo?: string;
+  /** Catalog repository this workspace was cloned from, when the platform hosts it */
+  repositoryId?: string;
+  /** Foreign key to agent_run */
+  runId?: string;
+  /** Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged */
+  state?: string;
+  updatedAt?: string;
+  /** Who may read this workspace, inherited from the run */
+  visibility?: string;
 }
 /** A filter to be used against `AgentTask` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentTaskFilter {
@@ -1002,6 +2054,8 @@ export interface AgentTaskFilter {
   status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
 }
 /** An input for mutations affecting `AgentTask` */
 export interface AgentTaskInput {
@@ -1016,8 +2070,6 @@ export interface AgentTaskInput {
   /** User who approved or rejected this task */
   approvedBy?: string;
   createdAt?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
   /** Natural-language description of the work to do */
   description: string;
   /** Error message captured when the task failed */
@@ -1066,6 +2118,8 @@ export interface AgentTaskPatch {
   /** Current status of this task */
   status?: string;
   updatedAt?: string;
+  /** Who may read this task, inherited from its parent */
+  visibility?: string;
 }
 /** A filter to be used against `AgentThread` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentThreadFilter {
@@ -1083,6 +2137,10 @@ export interface AgentThreadFilter {
   agentPlansByThreadId?: AgentThreadToManyAgentPlanFilter;
   /** `agentPlansByThreadId` exist. */
   agentPlansByThreadIdExist?: boolean;
+  /** Filter by the object’s `agentRunsByThreadId` relation. */
+  agentRunsByThreadId?: AgentThreadToManyAgentRunFilter;
+  /** `agentRunsByThreadId` exist. */
+  agentRunsByThreadIdExist?: boolean;
   /** Filter by the object’s `agentThreadsByParentThreadId` relation. */
   agentThreadsByParentThreadId?: AgentThreadToManyAgentThreadFilter;
   /** `agentThreadsByParentThreadId` exist. */
@@ -1131,6 +2189,8 @@ export interface AgentThreadFilter {
   title?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
 }
 /** An input for mutations affecting `AgentThread` */
 export interface AgentThreadInput {
@@ -1163,6 +2223,8 @@ export interface AgentThreadInput {
   /** Human-readable conversation title */
   title?: string;
   updatedAt?: string;
+  /** Who may read this thread: private (owner only) or entity (the scope's members) */
+  visibility?: string;
 }
 /** Represents an update to a `AgentThread`. Fields that are set will be updated. */
 export interface AgentThreadPatch {
@@ -1195,6 +2257,8 @@ export interface AgentThreadPatch {
   /** Human-readable conversation title */
   title?: string;
   updatedAt?: string;
+  /** Who may read this thread: private (owner only) or entity (the scope's members) */
+  visibility?: string;
 }
 /** A filter to be used against many `AgentMessage` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentThreadToManyAgentMessageFilter {
@@ -1213,6 +2277,15 @@ export interface AgentThreadToManyAgentPlanFilter {
   none?: AgentPlanFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: AgentPlanFilter;
+}
+/** A filter to be used against many `AgentRun` object types. All fields are combined with a logical ‘and.’ */
+export interface AgentThreadToManyAgentRunFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: AgentRunFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AgentRunFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: AgentRunFilter;
 }
 /** A filter to be used against many `AgentThread` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentThreadToManyAgentThreadFilter {
@@ -1250,6 +2323,11 @@ export interface AgentToManyAgentThreadFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: AgentThreadFilter;
 }
+export interface CreateAgentEventInput {
+  /** The `AgentEvent` to be created by this mutation. */
+  agentEvent: AgentEventInput;
+  clientMutationId?: string;
+}
 export interface CreateAgentInput {
   /** The `Agent` to be created by this mutation. */
   agent: AgentInput;
@@ -1285,6 +2363,16 @@ export interface CreateAgentResourceInput {
   agentResource: AgentResourceInput;
   clientMutationId?: string;
 }
+export interface CreateAgentRunInput {
+  /** The `AgentRun` to be created by this mutation. */
+  agentRun: AgentRunInput;
+  clientMutationId?: string;
+}
+export interface CreateAgentRunWorkspaceInput {
+  /** The `AgentRunWorkspace` to be created by this mutation. */
+  agentRunWorkspace: AgentRunWorkspaceInput;
+  clientMutationId?: string;
+}
 export interface CreateAgentTaskInput {
   /** The `AgentTask` to be created by this mutation. */
   agentTask: AgentTaskInput;
@@ -1294,6 +2382,70 @@ export interface CreateAgentThreadInput {
   /** The `AgentThread` to be created by this mutation. */
   agentThread: AgentThreadInput;
   clientMutationId?: string;
+}
+export interface CreatePlatformAgentEventInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentEvent` to be created by this mutation. */
+  platformAgentEvent: PlatformAgentEventInput;
+}
+export interface CreatePlatformAgentInput {
+  clientMutationId?: string;
+  /** The `PlatformAgent` to be created by this mutation. */
+  platformAgent: PlatformAgentInput;
+}
+export interface CreatePlatformAgentMessageInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentMessage` to be created by this mutation. */
+  platformAgentMessage: PlatformAgentMessageInput;
+}
+export interface CreatePlatformAgentPersonaInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentPersona` to be created by this mutation. */
+  platformAgentPersona: PlatformAgentPersonaInput;
+}
+export interface CreatePlatformAgentPlanInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentPlan` to be created by this mutation. */
+  platformAgentPlan: PlatformAgentPlanInput;
+}
+export interface CreatePlatformAgentPromptInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentPrompt` to be created by this mutation. */
+  platformAgentPrompt: PlatformAgentPromptInput;
+}
+export interface CreatePlatformAgentResourceChunkInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentResourceChunk` to be created by this mutation. */
+  platformAgentResourceChunk: PlatformAgentResourceChunkInput;
+}
+export interface CreatePlatformAgentResourceInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentResource` to be created by this mutation. */
+  platformAgentResource: PlatformAgentResourceInput;
+}
+export interface CreatePlatformAgentRunInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentRun` to be created by this mutation. */
+  platformAgentRun: PlatformAgentRunInput;
+}
+export interface CreatePlatformAgentRunWorkspaceInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentRunWorkspace` to be created by this mutation. */
+  platformAgentRunWorkspace: PlatformAgentRunWorkspaceInput;
+}
+export interface CreatePlatformAgentTaskInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentTask` to be created by this mutation. */
+  platformAgentTask: PlatformAgentTaskInput;
+}
+export interface CreatePlatformAgentThreadInput {
+  clientMutationId?: string;
+  /** The `PlatformAgentThread` to be created by this mutation. */
+  platformAgentThread: PlatformAgentThreadInput;
+}
+export interface DeleteAgentEventInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface DeleteAgentInput {
   clientMutationId?: string;
@@ -1323,6 +2475,14 @@ export interface DeleteAgentResourceInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteAgentRunInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAgentRunWorkspaceInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteAgentTaskInput {
   clientMutationId?: string;
   id: string;
@@ -1330,6 +2490,1400 @@ export interface DeleteAgentTaskInput {
 export interface DeleteAgentThreadInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeletePlatformAgentEventInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentPersonaInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentPlanInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentPromptInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentResourceChunkInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentResourceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentRunInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentRunWorkspaceInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePlatformAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+}
+/** A filter to be used against `PlatformAgentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentEventFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentEventFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `entry` field. */
+  entry?: JSONFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentEventFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentEventFilter[];
+  /** Filter by the object’s `recordedAt` field. */
+  recordedAt?: DatetimeFilter;
+  /** Filter by the object’s `run` relation. */
+  run?: PlatformAgentRunFilter;
+  /** Filter by the object’s `runId` field. */
+  runId?: UUIDFilter;
+  /** Filter by the object’s `seq` field. */
+  seq?: IntFilter;
+  /** Filter by the object’s `transcriptFormat` field. */
+  transcriptFormat?: StringFilter;
+  /** Filter by the object’s `transcriptVersion` field. */
+  transcriptVersion?: IntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentEvent` */
+export interface PlatformAgentEventInput {
+  createdAt?: string;
+  /** The agent session entry, verbatim — every rendered surface is a projection of it */
+  entry: unknown;
+  id?: string;
+  /** When the writer produced this entry, by its own clock */
+  recordedAt: string;
+  /** Foreign key to agent_run */
+  runId: string;
+  /** Position of this entry in the run, 1-based and gapless */
+  seq: number;
+  /** Transcript format this entry is encoded in */
+  transcriptFormat?: string;
+  /** Version of that transcript format this entry was written in */
+  transcriptVersion: number;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentEvent`. Fields that are set will be updated. */
+export interface PlatformAgentEventPatch {
+  /** User whose run this entry belongs to, inherited from the run */
+  actorId?: string;
+  createdAt?: string;
+  /** The agent session entry, verbatim — every rendered surface is a projection of it */
+  entry?: unknown;
+  id?: string;
+  /** When the writer produced this entry, by its own clock */
+  recordedAt?: string;
+  /** Foreign key to agent_run */
+  runId?: string;
+  /** Position of this entry in the run, 1-based and gapless */
+  seq?: number;
+  /** Transcript format this entry is encoded in */
+  transcriptFormat?: string;
+  /** Version of that transcript format this entry was written in */
+  transcriptVersion?: number;
+  updatedAt?: string;
+  /** Who may read this entry, inherited from the run */
+  visibility?: string;
+}
+/** A filter to be used against `PlatformAgent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentFilter[];
+  /** Filter by the object’s `childPlatformAgents` relation. */
+  childPlatformAgents?: PlatformAgentToManyPlatformAgentFilter;
+  /** `childPlatformAgents` exist. */
+  childPlatformAgentsExist?: boolean;
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isEphemeral` field. */
+  isEphemeral?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: PlatformAgentFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `persona` relation. */
+  persona?: PlatformAgentPersonaFilter;
+  /** A related `persona` exists. */
+  personaExists?: boolean;
+  /** Filter by the object’s `personaId` field. */
+  personaId?: UUIDFilter;
+  /** Filter by the object’s `platformAgentMessagesByAgentId` relation. */
+  platformAgentMessagesByAgentId?: PlatformAgentToManyPlatformAgentMessageFilter;
+  /** `platformAgentMessagesByAgentId` exist. */
+  platformAgentMessagesByAgentIdExist?: boolean;
+  /** Filter by the object’s `platformAgentThreadsByAgentId` relation. */
+  platformAgentThreadsByAgentId?: PlatformAgentToManyPlatformAgentThreadFilter;
+  /** `platformAgentThreadsByAgentId` exist. */
+  platformAgentThreadsByAgentIdExist?: boolean;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `PlatformAgent` */
+export interface PlatformAgentInput {
+  /** Per-instance config overrides (model, temperature, tools) */
+  config?: unknown;
+  createdAt?: string;
+  id?: string;
+  /** If true, agent is deleted when its spawning thread is deleted */
+  isEphemeral?: boolean;
+  /** Display name for this agent instance */
+  name: string;
+  /** Human who owns/manages this agent */
+  ownerId?: string;
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string;
+  /** Persona template this agent was created from */
+  personaId?: string;
+  /** Agent lifecycle status: active, paused, terminated */
+  status?: string;
+  /** System prompt override (NULL = inherit from persona) */
+  systemPrompt?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentMessageFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `agent` relation. */
+  agent?: PlatformAgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentMessageFilter[];
+  /** Filter by the object’s `authorRole` field. */
+  authorRole?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `deliveredRun` relation. */
+  deliveredRun?: PlatformAgentRunFilter;
+  /** A related `deliveredRun` exists. */
+  deliveredRunExists?: boolean;
+  /** Filter by the object’s `deliveredRunId` field. */
+  deliveredRunId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentMessageFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentMessageFilter[];
+  /** Filter by the object’s `parts` field. */
+  parts?: JSONFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: PlatformAgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentMessage` */
+export interface PlatformAgentMessageInput {
+  /** User who authored this message */
+  actorId?: string;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string;
+  /** Who authored this message: user or assistant */
+  authorRole: string;
+  createdAt?: string;
+  /** Run that consumed this message; null while it is still queued */
+  deliveredRunId?: string;
+  id?: string;
+  /** Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it) */
+  kind?: string;
+  /** LLM model that generated this response */
+  model?: string;
+  /** Message content: TextPart and ToolPart array */
+  parts?: unknown;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentMessage`. Fields that are set will be updated. */
+export interface PlatformAgentMessagePatch {
+  /** User who authored this message */
+  actorId?: string;
+  /** Agent that authored this message (NULL for human messages) */
+  agentId?: string;
+  /** Who authored this message: user or assistant */
+  authorRole?: string;
+  createdAt?: string;
+  /** Run that consumed this message; null while it is still queued */
+  deliveredRunId?: string;
+  id?: string;
+  /** Turn kind: user, assistant, system, or interrupt (arrived mid-run and redirects it) */
+  kind?: string;
+  /** LLM model that generated this response */
+  model?: string;
+  /** Message content: TextPart and ToolPart array */
+  parts?: unknown;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  updatedAt?: string;
+  /** Who may read this message, inherited from the thread */
+  visibility?: string;
+}
+/** Represents an update to a `PlatformAgent`. Fields that are set will be updated. */
+export interface PlatformAgentPatch {
+  /** Per-instance config overrides (model, temperature, tools) */
+  config?: unknown;
+  createdAt?: string;
+  id?: string;
+  /** If true, agent is deleted when its spawning thread is deleted */
+  isEphemeral?: boolean;
+  /** Display name for this agent instance */
+  name?: string;
+  /** Human who owns/manages this agent */
+  ownerId?: string;
+  /** Parent agent (for sub-agent delegation hierarchy) */
+  parentId?: string;
+  /** Persona template this agent was created from */
+  personaId?: string;
+  /** Agent lifecycle status: active, paused, terminated */
+  status?: string;
+  /** System prompt override (NULL = inherit from persona) */
+  systemPrompt?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformAgentPersona` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPersonaFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentPersonaFilter[];
+  /** Filter by the object’s `config` field. */
+  config?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentPersonaFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentPersonaFilter[];
+  /** Filter by the object’s `platformAgentsByPersonaId` relation. */
+  platformAgentsByPersonaId?: PlatformAgentPersonaToManyPlatformAgentFilter;
+  /** `platformAgentsByPersonaId` exist. */
+  platformAgentsByPersonaIdExist?: boolean;
+  /** Filter by the object’s `resources` field. */
+  resources?: StringListFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformAgentPersona` */
+export interface PlatformAgentPersonaInput {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Brief description of this persona role */
+  description?: string;
+  id?: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean;
+  /** Display name for this persona */
+  name: string;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[];
+  /** Unique human-readable identifier for this persona */
+  slug: string;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformAgentPersona`. Fields that are set will be updated. */
+export interface PlatformAgentPersonaPatch {
+  /** Model preferences, temperature, tool access, constraints */
+  config?: unknown;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Brief description of this persona role */
+  description?: string;
+  id?: string;
+  /** Whether this persona is available for use */
+  isActive?: boolean;
+  /** Display name for this persona */
+  name?: string;
+  /** Slugs of agent_resource entries to link when spawning */
+  resources?: string[];
+  /** Unique human-readable identifier for this persona */
+  slug?: string;
+  /** Default system prompt for agents using this persona */
+  systemPrompt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformAgent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPersonaToManyPlatformAgentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentFilter;
+}
+/** A filter to be used against `PlatformAgentPlan` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPlanFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentPlanFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentPlanFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentPlanFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `platformAgentTasksByPlanId` relation. */
+  platformAgentTasksByPlanId?: PlatformAgentPlanToManyPlatformAgentTaskFilter;
+  /** `platformAgentTasksByPlanId` exist. */
+  platformAgentTasksByPlanIdExist?: boolean;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: PlatformAgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentPlan` */
+export interface PlatformAgentPlanInput {
+  createdAt?: string;
+  /** Overall goal or context for this plan */
+  description?: string;
+  id?: string;
+  /** User who owns this plan */
+  ownerId?: string;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  /** Human-readable plan name */
+  title: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentPlan`. Fields that are set will be updated. */
+export interface PlatformAgentPlanPatch {
+  createdAt?: string;
+  /** Overall goal or context for this plan */
+  description?: string;
+  id?: string;
+  /** User who owns this plan */
+  ownerId?: string;
+  /** Plan lifecycle: draft, active, completed, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  /** Human-readable plan name */
+  title?: string;
+  updatedAt?: string;
+  /** Who may read this plan, inherited from the thread */
+  visibility?: string;
+}
+/** A filter to be used against many `PlatformAgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPlanToManyPlatformAgentTaskFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentTaskFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentTaskFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentTaskFilter;
+}
+/** A filter to be used against `PlatformAgentPrompt` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPromptFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentPromptFilter[];
+  /** Filter by the object’s `content` field. */
+  content?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isDefault` field. */
+  isDefault?: BooleanFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentPromptFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentPromptFilter[];
+  /** Filter by the object’s `platformAgentThreadsByPromptTemplateId` relation. */
+  platformAgentThreadsByPromptTemplateId?: PlatformAgentPromptToManyPlatformAgentThreadFilter;
+  /** `platformAgentThreadsByPromptTemplateId` exist. */
+  platformAgentThreadsByPromptTemplateIdExist?: boolean;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformAgentPrompt` */
+export interface PlatformAgentPromptInput {
+  /** The system prompt template content */
+  content: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** What this prompt template is for */
+  description?: string;
+  id?: string;
+  /** Whether this is the default prompt for the entity/app */
+  isDefault?: boolean;
+  /** Variables, tags, category metadata */
+  metadata?: unknown;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformAgentPrompt`. Fields that are set will be updated. */
+export interface PlatformAgentPromptPatch {
+  /** The system prompt template content */
+  content?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** What this prompt template is for */
+  description?: string;
+  id?: string;
+  /** Whether this is the default prompt for the entity/app */
+  isDefault?: boolean;
+  /** Variables, tags, category metadata */
+  metadata?: unknown;
+  /** Unique name for lookup (e.g. default, code-review, sales-assistant) */
+  name?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentPromptToManyPlatformAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentThreadFilter;
+}
+/** A filter to be used against `PlatformAgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentResourceChunkFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentResourceChunkFilter[];
+  /** Filter by the object’s `body` field. */
+  body?: StringFilter;
+  /** Filter by the object’s `chunkIndex` field. */
+  chunkIndex?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentResourceChunkFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentResourceChunkFilter[];
+  /** Filter by the object’s `platformAgentResource` relation. */
+  platformAgentResource?: PlatformAgentResourceFilter;
+  /** Filter by the object’s `platformAgentResourceId` field. */
+  platformAgentResourceId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `PlatformAgentResourceChunk` */
+export interface PlatformAgentResourceChunkInput {
+  body: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  platformAgentResourceId: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentResourceChunk`. Fields that are set will be updated. */
+export interface PlatformAgentResourceChunkPatch {
+  body?: string;
+  chunkIndex?: number;
+  createdAt?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  metadata?: unknown;
+  platformAgentResourceId?: string;
+  updatedAt?: string;
+}
+/** A filter to be used against `PlatformAgentResource` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentResourceFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentResourceFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `body` field. */
+  body?: StringTrgmFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringTrgmFilter;
+  /** Filter by the object’s `embedding` field. */
+  embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingUpdatedAt` field. */
+  embeddingUpdatedAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `keywords` field. */
+  keywords?: StringListFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringTrgmFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentResourceFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentResourceFilter[];
+  /** Filter by the object’s `platformAgentResourceChunks` relation. */
+  platformAgentResourceChunks?: PlatformAgentResourceToManyPlatformAgentResourceChunkFilter;
+  /** `platformAgentResourceChunks` exist. */
+  platformAgentResourceChunksExist?: boolean;
+  /** Filter by the object’s `search` field. */
+  search?: FullTextFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringTrgmFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringTrgmFilter;
+  /** TRGM search on the `body` column. */
+  trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `kind` column. */
+  trgmKind?: TrgmSearchInput;
+  /** TRGM search on the `title` column. */
+  trgmTitle?: TrgmSearchInput;
+  /** TSV search on the `search` column. */
+  tsvSearch?: string;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. When the LLM plugin is active, pgvector also participates via
+   * auto-embedding. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+  /** VECTOR search on the `embedding` column. */
+  vectorEmbedding?: VectorNearbyInput;
+}
+/** An input for mutations affecting `PlatformAgentResource` */
+export interface PlatformAgentResourceInput {
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Brief description of this resource */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[];
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: unknown;
+  /** Unique human-readable identifier for portable references */
+  slug: string;
+  /** Resource name or title */
+  title: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformAgentResource`. Fields that are set will be updated. */
+export interface PlatformAgentResourcePatch {
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  /** Full content (instructions for skills, reference text for knowledge) */
+  body?: string;
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Brief description of this resource */
+  description?: string;
+  embedding?: number[];
+  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  embeddingText?: string;
+  id?: string;
+  /** Whether this resource is active and retrievable */
+  isActive?: boolean;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Keywords for deterministic retrieval routing */
+  keywords?: string[];
+  /** Resource type: skill, knowledge, or convention */
+  kind?: string;
+  /** Structured metadata: category, version, author, custom attributes */
+  metadata?: unknown;
+  /** Unique human-readable identifier for portable references */
+  slug?: string;
+  /** Resource name or title */
+  title?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
+/** A filter to be used against many `PlatformAgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentResourceToManyPlatformAgentResourceChunkFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentResourceChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentResourceChunkFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentResourceChunkFilter;
+}
+/** A filter to be used against `PlatformAgentRun` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentRunFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentRunFilter[];
+  /** Filter by the object’s `artifacts` field. */
+  artifacts?: JSONFilter;
+  /** Filter by the object’s `attempt` field. */
+  attempt?: IntFilter;
+  /** Filter by the object’s `baseCommit` field. */
+  baseCommit?: StringFilter;
+  /** Filter by the object’s `branch` field. */
+  branch?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deadlineAt` field. */
+  deadlineAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `executionId` field. */
+  executionId?: UUIDFilter;
+  /** Filter by the object’s `finishedAt` field. */
+  finishedAt?: DatetimeFilter;
+  /** Filter by the object’s `headCommit` field. */
+  headCommit?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastEventSeq` field. */
+  lastEventSeq?: IntFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentRunFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentRunFilter[];
+  /** Filter by the object’s `parentRunId` field. */
+  parentRunId?: UUIDFilter;
+  /** Filter by the object’s `placement` field. */
+  placement?: StringFilter;
+  /** Filter by the object’s `platformAgentEventsByRunId` relation. */
+  platformAgentEventsByRunId?: PlatformAgentRunToManyPlatformAgentEventFilter;
+  /** `platformAgentEventsByRunId` exist. */
+  platformAgentEventsByRunIdExist?: boolean;
+  /** Filter by the object’s `platformAgentMessagesByDeliveredRunId` relation. */
+  platformAgentMessagesByDeliveredRunId?: PlatformAgentRunToManyPlatformAgentMessageFilter;
+  /** `platformAgentMessagesByDeliveredRunId` exist. */
+  platformAgentMessagesByDeliveredRunIdExist?: boolean;
+  /** Filter by the object’s `platformAgentRunWorkspacesByRunId` relation. */
+  platformAgentRunWorkspacesByRunId?: PlatformAgentRunToManyPlatformAgentRunWorkspaceFilter;
+  /** `platformAgentRunWorkspacesByRunId` exist. */
+  platformAgentRunWorkspacesByRunIdExist?: boolean;
+  /** Filter by the object’s `principalId` field. */
+  principalId?: UUIDFilter;
+  /** Filter by the object’s `repoUrl` field. */
+  repoUrl?: StringFilter;
+  /** Filter by the object’s `startedAt` field. */
+  startedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `thread` relation. */
+  thread?: PlatformAgentThreadFilter;
+  /** Filter by the object’s `threadId` field. */
+  threadId?: UUIDFilter;
+  /** Filter by the object’s `tokenUsage` field. */
+  tokenUsage?: JSONFilter;
+  /** Filter by the object’s `totalCost` field. */
+  totalCost?: BigFloatFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentRun` */
+export interface PlatformAgentRunInput {
+  /** User who invoked this run (audit/provenance; billing is entity_id) */
+  actorId?: string;
+  /** What the run produced: commits, diffs, pull requests, usage totals */
+  artifacts?: unknown;
+  /** Attempt number within this run lineage */
+  attempt?: number;
+  /** Commit the run started from */
+  baseCommit?: string;
+  /** Branch the run commits to */
+  branch?: string;
+  createdAt?: string;
+  /** Tenant database this run is attributed to (usage/billing attribution) */
+  databaseId?: string;
+  /** When a supervisor should consider this run abandoned */
+  deadlineAt?: string;
+  /** Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves */
+  entityId?: string;
+  /** Failure reason when status is failed */
+  error?: string;
+  /** Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute */
+  executionId?: string;
+  /** When the run reached a terminal status */
+  finishedAt?: string;
+  /** Commit the run has reached */
+  headCommit?: string;
+  id?: string;
+  /** Highest event seq appended for this run; 0 before the first event */
+  lastEventSeq?: number;
+  /** Run this one retries, by id and without a foreign key so lineage survives pruning */
+  parentRunId?: string;
+  /** Where this run executes: cloud (a job) or local (an embedded host) */
+  placement?: string;
+  /** Principal that invoked this run; equals actor_id when the actor acted directly */
+  principalId?: string;
+  /** Git remote the run works against — the workspace sync protocol */
+  repoUrl?: string;
+  /** When the run began executing */
+  startedAt?: string;
+  /** Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId: string;
+  /** Token counts this run accumulated, per model, as the runtime reports them; null until settled */
+  tokenUsage?: unknown;
+  /** Settled cost of this run in the billing currency, summarising its metered rows; null until settled */
+  totalCost?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentRun`. Fields that are set will be updated. */
+export interface PlatformAgentRunPatch {
+  /** User who invoked this run (audit/provenance; billing is entity_id) */
+  actorId?: string;
+  /** What the run produced: commits, diffs, pull requests, usage totals */
+  artifacts?: unknown;
+  /** Attempt number within this run lineage */
+  attempt?: number;
+  /** Commit the run started from */
+  baseCommit?: string;
+  /** Branch the run commits to */
+  branch?: string;
+  createdAt?: string;
+  /** Tenant database this run is attributed to (usage/billing attribution) */
+  databaseId?: string;
+  /** When a supervisor should consider this run abandoned */
+  deadlineAt?: string;
+  /** Entity billed for this run: an org the actor invoked on behalf of, or the actor themselves */
+  entityId?: string;
+  /** Failure reason when status is failed */
+  error?: string;
+  /** Execution currently attached to this run, by id and without a foreign key; null when the run holds no compute */
+  executionId?: string;
+  /** When the run reached a terminal status */
+  finishedAt?: string;
+  /** Commit the run has reached */
+  headCommit?: string;
+  id?: string;
+  /** Highest event seq appended for this run; 0 before the first event */
+  lastEventSeq?: number;
+  /** Run this one retries, by id and without a foreign key so lineage survives pruning */
+  parentRunId?: string;
+  /** Where this run executes: cloud (a job) or local (an embedded host) */
+  placement?: string;
+  /** Principal that invoked this run; equals actor_id when the actor acted directly */
+  principalId?: string;
+  /** Git remote the run works against — the workspace sync protocol */
+  repoUrl?: string;
+  /** When the run began executing */
+  startedAt?: string;
+  /** Lifecycle state: pending, running, waiting, idle, interrupted, succeeded, failed, cancelled */
+  status?: string;
+  /** Foreign key to agent_thread */
+  threadId?: string;
+  /** Token counts this run accumulated, per model, as the runtime reports them; null until settled */
+  tokenUsage?: unknown;
+  /** Settled cost of this run in the billing currency, summarising its metered rows; null until settled */
+  totalCost?: string;
+  updatedAt?: string;
+  /** Who may read this run, inherited from the thread */
+  visibility?: string;
+}
+/** A filter to be used against many `PlatformAgentEvent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentRunToManyPlatformAgentEventFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentEventFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentEventFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentEventFilter;
+}
+/** A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentRunToManyPlatformAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentMessageFilter;
+}
+/** A filter to be used against many `PlatformAgentRunWorkspace` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentRunToManyPlatformAgentRunWorkspaceFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentRunWorkspaceFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentRunWorkspaceFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentRunWorkspaceFilter;
+}
+/** A filter to be used against `PlatformAgentRunWorkspace` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentRunWorkspaceFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentRunWorkspaceFilter[];
+  /** Filter by the object’s `artifacts` field. */
+  artifacts?: JSONFilter;
+  /** Filter by the object’s `baseBranch` field. */
+  baseBranch?: StringFilter;
+  /** Filter by the object’s `baseCommit` field. */
+  baseCommit?: StringFilter;
+  /** Filter by the object’s `branch` field. */
+  branch?: StringFilter;
+  /** Filter by the object’s `clonedAt` field. */
+  clonedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `headCommit` field. */
+  headCommit?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `lastUsedAt` field. */
+  lastUsedAt?: DatetimeFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentRunWorkspaceFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentRunWorkspaceFilter[];
+  /** Filter by the object’s `ordinal` field. */
+  ordinal?: IntFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `publication` field. */
+  publication?: StringFilter;
+  /** Filter by the object’s `repo` field. */
+  repo?: StringFilter;
+  /** Filter by the object’s `repositoryId` field. */
+  repositoryId?: UUIDFilter;
+  /** Filter by the object’s `run` relation. */
+  run?: PlatformAgentRunFilter;
+  /** Filter by the object’s `runId` field. */
+  runId?: UUIDFilter;
+  /** Filter by the object’s `state` field. */
+  state?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentRunWorkspace` */
+export interface PlatformAgentRunWorkspaceInput {
+  /** What publishing this workspace produced: diff stats, a pull request, a stored patch */
+  artifacts?: unknown;
+  /** Branch the workspace was cut from, and what a pull request merges into */
+  baseBranch: string;
+  /** Commit the workspace was cut from; fixed once recorded */
+  baseCommit?: string;
+  /** Branch this run commits to in this repository */
+  branch: string;
+  /** When an execution first cloned this workspace */
+  clonedAt?: string;
+  createdAt?: string;
+  /** Commit the work in this repository has reached */
+  headCommit?: string;
+  id?: string;
+  /** When an execution last worked in this workspace; what a reclaim policy reads */
+  lastUsedAt?: string;
+  /** Position of this workspace among the run's, 1-based and in clone order */
+  ordinal?: number;
+  /** Git host this workspace was cloned from, as the runtime names it: github, local */
+  provider: string;
+  /** How the work is published: pull_request, push, patch_artifact or none */
+  publication?: string;
+  /** Repository as its provider names it (owner/name) */
+  repo: string;
+  /** Catalog repository this workspace was cloned from, when the platform hosts it */
+  repositoryId?: string;
+  /** Foreign key to agent_run */
+  runId: string;
+  /** Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged */
+  state?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentRunWorkspace`. Fields that are set will be updated. */
+export interface PlatformAgentRunWorkspacePatch {
+  /** User whose run this workspace belongs to, inherited from the run */
+  actorId?: string;
+  /** What publishing this workspace produced: diff stats, a pull request, a stored patch */
+  artifacts?: unknown;
+  /** Branch the workspace was cut from, and what a pull request merges into */
+  baseBranch?: string;
+  /** Commit the workspace was cut from; fixed once recorded */
+  baseCommit?: string;
+  /** Branch this run commits to in this repository */
+  branch?: string;
+  /** When an execution first cloned this workspace */
+  clonedAt?: string;
+  createdAt?: string;
+  /** Commit the work in this repository has reached */
+  headCommit?: string;
+  id?: string;
+  /** When an execution last worked in this workspace; what a reclaim policy reads */
+  lastUsedAt?: string;
+  /** Position of this workspace among the run's, 1-based and in clone order */
+  ordinal?: number;
+  /** Git host this workspace was cloned from, as the runtime names it: github, local */
+  provider?: string;
+  /** How the work is published: pull_request, push, patch_artifact or none */
+  publication?: string;
+  /** Repository as its provider names it (owner/name) */
+  repo?: string;
+  /** Catalog repository this workspace was cloned from, when the platform hosts it */
+  repositoryId?: string;
+  /** Foreign key to agent_run */
+  runId?: string;
+  /** Whether the tree still exists: active (on disk), cold (reclaimed, restorable from head_commit) or purged */
+  state?: string;
+  updatedAt?: string;
+  /** Who may read this workspace, inherited from the run */
+  visibility?: string;
+}
+/** A filter to be used against `PlatformAgentTask` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentTaskFilter {
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentTaskFilter[];
+  /** Filter by the object’s `approvalFeedback` field. */
+  approvalFeedback?: StringFilter;
+  /** Filter by the object’s `approvalStatus` field. */
+  approvalStatus?: StringFilter;
+  /** Filter by the object’s `approvedAt` field. */
+  approvedAt?: DatetimeFilter;
+  /** Filter by the object’s `approvedBy` field. */
+  approvedBy?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `error` field. */
+  error?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentTaskFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentTaskFilter[];
+  /** Filter by the object’s `orderIndex` field. */
+  orderIndex?: IntFilter;
+  /** Filter by the object’s `plan` relation. */
+  plan?: PlatformAgentPlanFilter;
+  /** Filter by the object’s `planId` field. */
+  planId?: UUIDFilter;
+  /** Filter by the object’s `requiresApproval` field. */
+  requiresApproval?: BooleanFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentTask` */
+export interface PlatformAgentTaskInput {
+  /** User who authored this task */
+  actorId?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  createdAt?: string;
+  /** Natural-language description of the work to do */
+  description: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  id?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Foreign key to agent_plan */
+  planId: string;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Current status of this task */
+  status?: string;
+  updatedAt?: string;
+}
+/** Represents an update to a `PlatformAgentTask`. Fields that are set will be updated. */
+export interface PlatformAgentTaskPatch {
+  /** User who authored this task */
+  actorId?: string;
+  /** Reviewer feedback or reason for the decision */
+  approvalFeedback?: string;
+  /** Approval decision: pending, approved, rejected (NULL if not an approval task) */
+  approvalStatus?: string;
+  /** Timestamp of the approval or rejection decision */
+  approvedAt?: string;
+  /** User who approved or rejected this task */
+  approvedBy?: string;
+  createdAt?: string;
+  /** Natural-language description of the work to do */
+  description?: string;
+  /** Error message captured when the task failed */
+  error?: string;
+  id?: string;
+  /** Position within the plan (for ordered task lists) */
+  orderIndex?: number;
+  /** Foreign key to agent_plan */
+  planId?: string;
+  /** Whether this task is an approval gate requiring human decision */
+  requiresApproval?: boolean;
+  /** Who created the task: agent or user */
+  source?: string;
+  /** Current status of this task */
+  status?: string;
+  updatedAt?: string;
+  /** Who may read this task, inherited from its parent */
+  visibility?: string;
+}
+/** A filter to be used against `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentThreadFilter {
+  /** Filter by the object’s `agent` relation. */
+  agent?: PlatformAgentFilter;
+  /** A related `agent` exists. */
+  agentExists?: boolean;
+  /** Filter by the object’s `agentId` field. */
+  agentId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: PlatformAgentThreadFilter[];
+  /** Filter by the object’s `archivedAt` field. */
+  archivedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isArchived` field. */
+  isArchived?: BooleanFilter;
+  /** Filter by the object’s `mode` field. */
+  mode?: StringFilter;
+  /** Filter by the object’s `model` field. */
+  model?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformAgentThreadFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformAgentThreadFilter[];
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `parentThread` relation. */
+  parentThread?: PlatformAgentThreadFilter;
+  /** A related `parentThread` exists. */
+  parentThreadExists?: boolean;
+  /** Filter by the object’s `parentThreadId` field. */
+  parentThreadId?: UUIDFilter;
+  /** Filter by the object’s `platformAgentMessagesByThreadId` relation. */
+  platformAgentMessagesByThreadId?: PlatformAgentThreadToManyPlatformAgentMessageFilter;
+  /** `platformAgentMessagesByThreadId` exist. */
+  platformAgentMessagesByThreadIdExist?: boolean;
+  /** Filter by the object’s `platformAgentPlansByThreadId` relation. */
+  platformAgentPlansByThreadId?: PlatformAgentThreadToManyPlatformAgentPlanFilter;
+  /** `platformAgentPlansByThreadId` exist. */
+  platformAgentPlansByThreadIdExist?: boolean;
+  /** Filter by the object’s `platformAgentRunsByThreadId` relation. */
+  platformAgentRunsByThreadId?: PlatformAgentThreadToManyPlatformAgentRunFilter;
+  /** `platformAgentRunsByThreadId` exist. */
+  platformAgentRunsByThreadIdExist?: boolean;
+  /** Filter by the object’s `platformAgentThreadsByParentThreadId` relation. */
+  platformAgentThreadsByParentThreadId?: PlatformAgentThreadToManyPlatformAgentThreadFilter;
+  /** `platformAgentThreadsByParentThreadId` exist. */
+  platformAgentThreadsByParentThreadIdExist?: boolean;
+  /** Filter by the object’s `promptTemplate` relation. */
+  promptTemplate?: PlatformAgentPromptFilter;
+  /** A related `promptTemplate` exists. */
+  promptTemplateExists?: boolean;
+  /** Filter by the object’s `promptTemplateId` field. */
+  promptTemplateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `systemPrompt` field. */
+  systemPrompt?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+}
+/** An input for mutations affecting `PlatformAgentThread` */
+export interface PlatformAgentThreadInput {
+  /** Agent instance assigned to this thread */
+  agentId?: string;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  createdAt?: string;
+  id?: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string;
+  /** LLM model id this thread is bound to */
+  model?: string;
+  /** User who owns this thread */
+  ownerId?: string;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string;
+  /** Current status of this thread */
+  status?: string;
+  /** System prompt active for this thread */
+  systemPrompt?: string;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[];
+  /** Human-readable conversation title */
+  title?: string;
+  updatedAt?: string;
+  /** Who may read this thread: private (owner only) or entity (the scope's members) */
+  visibility?: string;
+}
+/** Represents an update to a `PlatformAgentThread`. Fields that are set will be updated. */
+export interface PlatformAgentThreadPatch {
+  /** Agent instance assigned to this thread */
+  agentId?: string;
+  /** Timestamp when this record was archived, NULL if active */
+  archivedAt?: string;
+  createdAt?: string;
+  id?: string;
+  /** Whether this record has been archived by the user */
+  isArchived?: boolean;
+  /** Conversation mode: ask (plain Q&A) or agent (tool-enabled) */
+  mode?: string;
+  /** LLM model id this thread is bound to */
+  model?: string;
+  /** User who owns this thread */
+  ownerId?: string;
+  /** Parent thread that spawned this sub-conversation */
+  parentThreadId?: string;
+  /** Optional FK to a shared prompt template */
+  promptTemplateId?: string;
+  /** Current status of this thread */
+  status?: string;
+  /** System prompt active for this thread */
+  systemPrompt?: string;
+  /** User-defined labels for organizing and filtering threads */
+  tags?: string[];
+  /** Human-readable conversation title */
+  title?: string;
+  updatedAt?: string;
+  /** Who may read this thread: private (owner only) or entity (the scope's members) */
+  visibility?: string;
+}
+/** A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentThreadToManyPlatformAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentMessageFilter;
+}
+/** A filter to be used against many `PlatformAgentPlan` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentThreadToManyPlatformAgentPlanFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentPlanFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentPlanFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentPlanFilter;
+}
+/** A filter to be used against many `PlatformAgentRun` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentThreadToManyPlatformAgentRunFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentRunFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentRunFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentRunFilter;
+}
+/** A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentThreadToManyPlatformAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentThreadFilter;
+}
+/** A filter to be used against many `PlatformAgent` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentToManyPlatformAgentFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentFilter;
+}
+/** A filter to be used against many `PlatformAgentMessage` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentToManyPlatformAgentMessageFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentMessageFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentMessageFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentMessageFilter;
+}
+/** A filter to be used against many `PlatformAgentThread` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformAgentToManyPlatformAgentThreadFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformAgentThreadFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformAgentThreadFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformAgentThreadFilter;
 }
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
@@ -1428,6 +3982,12 @@ export interface TrgmSearchInput {
   /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
   value: string;
 }
+export interface UpdateAgentEventInput {
+  /** An object where the defined keys will be set on the `AgentEvent` being updated. */
+  agentEventPatch: AgentEventPatch;
+  clientMutationId?: string;
+  id: string;
+}
 export interface UpdateAgentInput {
   /** An object where the defined keys will be set on the `Agent` being updated. */
   agentPatch: AgentPatch;
@@ -1470,6 +4030,18 @@ export interface UpdateAgentResourceInput {
   clientMutationId?: string;
   id: string;
 }
+export interface UpdateAgentRunInput {
+  /** An object where the defined keys will be set on the `AgentRun` being updated. */
+  agentRunPatch: AgentRunPatch;
+  clientMutationId?: string;
+  id: string;
+}
+export interface UpdateAgentRunWorkspaceInput {
+  /** An object where the defined keys will be set on the `AgentRunWorkspace` being updated. */
+  agentRunWorkspacePatch: AgentRunWorkspacePatch;
+  clientMutationId?: string;
+  id: string;
+}
 export interface UpdateAgentTaskInput {
   /** An object where the defined keys will be set on the `AgentTask` being updated. */
   agentTaskPatch: AgentTaskPatch;
@@ -1481,6 +4053,78 @@ export interface UpdateAgentThreadInput {
   agentThreadPatch: AgentThreadPatch;
   clientMutationId?: string;
   id: string;
+}
+export interface UpdatePlatformAgentEventInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentEvent` being updated. */
+  platformAgentEventPatch: PlatformAgentEventPatch;
+}
+export interface UpdatePlatformAgentInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgent` being updated. */
+  platformAgentPatch: PlatformAgentPatch;
+}
+export interface UpdatePlatformAgentMessageInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentMessage` being updated. */
+  platformAgentMessagePatch: PlatformAgentMessagePatch;
+}
+export interface UpdatePlatformAgentPersonaInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentPersona` being updated. */
+  platformAgentPersonaPatch: PlatformAgentPersonaPatch;
+}
+export interface UpdatePlatformAgentPlanInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentPlan` being updated. */
+  platformAgentPlanPatch: PlatformAgentPlanPatch;
+}
+export interface UpdatePlatformAgentPromptInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentPrompt` being updated. */
+  platformAgentPromptPatch: PlatformAgentPromptPatch;
+}
+export interface UpdatePlatformAgentResourceChunkInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentResourceChunk` being updated. */
+  platformAgentResourceChunkPatch: PlatformAgentResourceChunkPatch;
+}
+export interface UpdatePlatformAgentResourceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentResource` being updated. */
+  platformAgentResourcePatch: PlatformAgentResourcePatch;
+}
+export interface UpdatePlatformAgentRunInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentRun` being updated. */
+  platformAgentRunPatch: PlatformAgentRunPatch;
+}
+export interface UpdatePlatformAgentRunWorkspaceInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentRunWorkspace` being updated. */
+  platformAgentRunWorkspacePatch: PlatformAgentRunWorkspacePatch;
+}
+export interface UpdatePlatformAgentTaskInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentTask` being updated. */
+  platformAgentTaskPatch: PlatformAgentTaskPatch;
+}
+export interface UpdatePlatformAgentThreadInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformAgentThread` being updated. */
+  platformAgentThreadPatch: PlatformAgentThreadPatch;
 }
 /** Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold. */
 export interface VectorNearbyInput {
@@ -1498,6 +4142,13 @@ export interface VectorNearbyInput {
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
+}
+/** A connection to a list of `AgentEvent` values. */
+export interface AgentEventConnection {
+  edges: AgentEventEdge[];
+  nodes: AgentEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
 }
 /** A connection to a list of `AgentMessage` values. */
 export interface AgentMessageConnection {
@@ -1541,6 +4192,20 @@ export interface AgentResourceConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `AgentRunWorkspace` values. */
+export interface AgentRunWorkspaceConnection {
+  edges: AgentRunWorkspaceEdge[];
+  nodes: AgentRunWorkspace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AgentRun` values. */
+export interface AgentRunConnection {
+  edges: AgentRunEdge[];
+  nodes: AgentRun[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `AgentTask` values. */
 export interface AgentTaskConnection {
   edges: AgentTaskEdge[];
@@ -1562,10 +4227,100 @@ export interface AgentConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformAgentEvent` values. */
+export interface PlatformAgentEventConnection {
+  edges: PlatformAgentEventEdge[];
+  nodes: PlatformAgentEvent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentMessage` values. */
+export interface PlatformAgentMessageConnection {
+  edges: PlatformAgentMessageEdge[];
+  nodes: PlatformAgentMessage[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentPersona` values. */
+export interface PlatformAgentPersonaConnection {
+  edges: PlatformAgentPersonaEdge[];
+  nodes: PlatformAgentPersona[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentPlan` values. */
+export interface PlatformAgentPlanConnection {
+  edges: PlatformAgentPlanEdge[];
+  nodes: PlatformAgentPlan[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentPrompt` values. */
+export interface PlatformAgentPromptConnection {
+  edges: PlatformAgentPromptEdge[];
+  nodes: PlatformAgentPrompt[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentResourceChunk` values. */
+export interface PlatformAgentResourceChunkConnection {
+  edges: PlatformAgentResourceChunkEdge[];
+  nodes: PlatformAgentResourceChunk[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentResource` values. */
+export interface PlatformAgentResourceConnection {
+  edges: PlatformAgentResourceEdge[];
+  nodes: PlatformAgentResource[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentRunWorkspace` values. */
+export interface PlatformAgentRunWorkspaceConnection {
+  edges: PlatformAgentRunWorkspaceEdge[];
+  nodes: PlatformAgentRunWorkspace[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentRun` values. */
+export interface PlatformAgentRunConnection {
+  edges: PlatformAgentRunEdge[];
+  nodes: PlatformAgentRun[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentTask` values. */
+export interface PlatformAgentTaskConnection {
+  edges: PlatformAgentTaskEdge[];
+  nodes: PlatformAgentTask[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgentThread` values. */
+export interface PlatformAgentThreadConnection {
+  edges: PlatformAgentThreadEdge[];
+  nodes: PlatformAgentThread[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `PlatformAgent` values. */
+export interface PlatformAgentConnection {
+  edges: PlatformAgentEdge[];
+  nodes: PlatformAgent[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 export interface CreateAgentPayload {
   /** The `Agent` that was created by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAgentEventPayload {
+  /** The `AgentEvent` that was created by this mutation. */
+  agentEvent?: AgentEvent | null;
+  agentEventEdge?: AgentEventEdge | null;
   clientMutationId?: string | null;
 }
 export interface CreateAgentMessagePayload {
@@ -1604,6 +4359,18 @@ export interface CreateAgentResourceChunkPayload {
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
   clientMutationId?: string | null;
 }
+export interface CreateAgentRunPayload {
+  /** The `AgentRun` that was created by this mutation. */
+  agentRun?: AgentRun | null;
+  agentRunEdge?: AgentRunEdge | null;
+  clientMutationId?: string | null;
+}
+export interface CreateAgentRunWorkspacePayload {
+  /** The `AgentRunWorkspace` that was created by this mutation. */
+  agentRunWorkspace?: AgentRunWorkspace | null;
+  agentRunWorkspaceEdge?: AgentRunWorkspaceEdge | null;
+  clientMutationId?: string | null;
+}
 export interface CreateAgentTaskPayload {
   /** The `AgentTask` that was created by this mutation. */
   agentTask?: AgentTask | null;
@@ -1616,10 +4383,88 @@ export interface CreateAgentThreadPayload {
   agentThreadEdge?: AgentThreadEdge | null;
   clientMutationId?: string | null;
 }
+export interface CreatePlatformAgentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgent` that was created by this mutation. */
+  platformAgent?: PlatformAgent | null;
+  platformAgentEdge?: PlatformAgentEdge | null;
+}
+export interface CreatePlatformAgentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentEvent` that was created by this mutation. */
+  platformAgentEvent?: PlatformAgentEvent | null;
+  platformAgentEventEdge?: PlatformAgentEventEdge | null;
+}
+export interface CreatePlatformAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentMessage` that was created by this mutation. */
+  platformAgentMessage?: PlatformAgentMessage | null;
+  platformAgentMessageEdge?: PlatformAgentMessageEdge | null;
+}
+export interface CreatePlatformAgentPersonaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPersona` that was created by this mutation. */
+  platformAgentPersona?: PlatformAgentPersona | null;
+  platformAgentPersonaEdge?: PlatformAgentPersonaEdge | null;
+}
+export interface CreatePlatformAgentPlanPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPlan` that was created by this mutation. */
+  platformAgentPlan?: PlatformAgentPlan | null;
+  platformAgentPlanEdge?: PlatformAgentPlanEdge | null;
+}
+export interface CreatePlatformAgentPromptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPrompt` that was created by this mutation. */
+  platformAgentPrompt?: PlatformAgentPrompt | null;
+  platformAgentPromptEdge?: PlatformAgentPromptEdge | null;
+}
+export interface CreatePlatformAgentResourcePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResource` that was created by this mutation. */
+  platformAgentResource?: PlatformAgentResource | null;
+  platformAgentResourceEdge?: PlatformAgentResourceEdge | null;
+}
+export interface CreatePlatformAgentResourceChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResourceChunk` that was created by this mutation. */
+  platformAgentResourceChunk?: PlatformAgentResourceChunk | null;
+  platformAgentResourceChunkEdge?: PlatformAgentResourceChunkEdge | null;
+}
+export interface CreatePlatformAgentRunPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRun` that was created by this mutation. */
+  platformAgentRun?: PlatformAgentRun | null;
+  platformAgentRunEdge?: PlatformAgentRunEdge | null;
+}
+export interface CreatePlatformAgentRunWorkspacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRunWorkspace` that was created by this mutation. */
+  platformAgentRunWorkspace?: PlatformAgentRunWorkspace | null;
+  platformAgentRunWorkspaceEdge?: PlatformAgentRunWorkspaceEdge | null;
+}
+export interface CreatePlatformAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentTask` that was created by this mutation. */
+  platformAgentTask?: PlatformAgentTask | null;
+  platformAgentTaskEdge?: PlatformAgentTaskEdge | null;
+}
+export interface CreatePlatformAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentThread` that was created by this mutation. */
+  platformAgentThread?: PlatformAgentThread | null;
+  platformAgentThreadEdge?: PlatformAgentThreadEdge | null;
+}
 export interface DeleteAgentPayload {
   /** The `Agent` that was deleted by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentEventPayload {
+  /** The `AgentEvent` that was deleted by this mutation. */
+  agentEvent?: AgentEvent | null;
+  agentEventEdge?: AgentEventEdge | null;
   clientMutationId?: string | null;
 }
 export interface DeleteAgentMessagePayload {
@@ -1658,6 +4503,18 @@ export interface DeleteAgentResourceChunkPayload {
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
   clientMutationId?: string | null;
 }
+export interface DeleteAgentRunPayload {
+  /** The `AgentRun` that was deleted by this mutation. */
+  agentRun?: AgentRun | null;
+  agentRunEdge?: AgentRunEdge | null;
+  clientMutationId?: string | null;
+}
+export interface DeleteAgentRunWorkspacePayload {
+  /** The `AgentRunWorkspace` that was deleted by this mutation. */
+  agentRunWorkspace?: AgentRunWorkspace | null;
+  agentRunWorkspaceEdge?: AgentRunWorkspaceEdge | null;
+  clientMutationId?: string | null;
+}
 export interface DeleteAgentTaskPayload {
   /** The `AgentTask` that was deleted by this mutation. */
   agentTask?: AgentTask | null;
@@ -1670,24 +4527,97 @@ export interface DeleteAgentThreadPayload {
   agentThreadEdge?: AgentThreadEdge | null;
   clientMutationId?: string | null;
 }
+export interface DeletePlatformAgentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgent` that was deleted by this mutation. */
+  platformAgent?: PlatformAgent | null;
+  platformAgentEdge?: PlatformAgentEdge | null;
+}
+export interface DeletePlatformAgentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentEvent` that was deleted by this mutation. */
+  platformAgentEvent?: PlatformAgentEvent | null;
+  platformAgentEventEdge?: PlatformAgentEventEdge | null;
+}
+export interface DeletePlatformAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentMessage` that was deleted by this mutation. */
+  platformAgentMessage?: PlatformAgentMessage | null;
+  platformAgentMessageEdge?: PlatformAgentMessageEdge | null;
+}
+export interface DeletePlatformAgentPersonaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPersona` that was deleted by this mutation. */
+  platformAgentPersona?: PlatformAgentPersona | null;
+  platformAgentPersonaEdge?: PlatformAgentPersonaEdge | null;
+}
+export interface DeletePlatformAgentPlanPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPlan` that was deleted by this mutation. */
+  platformAgentPlan?: PlatformAgentPlan | null;
+  platformAgentPlanEdge?: PlatformAgentPlanEdge | null;
+}
+export interface DeletePlatformAgentPromptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPrompt` that was deleted by this mutation. */
+  platformAgentPrompt?: PlatformAgentPrompt | null;
+  platformAgentPromptEdge?: PlatformAgentPromptEdge | null;
+}
+export interface DeletePlatformAgentResourcePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResource` that was deleted by this mutation. */
+  platformAgentResource?: PlatformAgentResource | null;
+  platformAgentResourceEdge?: PlatformAgentResourceEdge | null;
+}
+export interface DeletePlatformAgentResourceChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResourceChunk` that was deleted by this mutation. */
+  platformAgentResourceChunk?: PlatformAgentResourceChunk | null;
+  platformAgentResourceChunkEdge?: PlatformAgentResourceChunkEdge | null;
+}
+export interface DeletePlatformAgentRunPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRun` that was deleted by this mutation. */
+  platformAgentRun?: PlatformAgentRun | null;
+  platformAgentRunEdge?: PlatformAgentRunEdge | null;
+}
+export interface DeletePlatformAgentRunWorkspacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRunWorkspace` that was deleted by this mutation. */
+  platformAgentRunWorkspace?: PlatformAgentRunWorkspace | null;
+  platformAgentRunWorkspaceEdge?: PlatformAgentRunWorkspaceEdge | null;
+}
+export interface DeletePlatformAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentTask` that was deleted by this mutation. */
+  platformAgentTask?: PlatformAgentTask | null;
+  platformAgentTaskEdge?: PlatformAgentTaskEdge | null;
+}
+export interface DeletePlatformAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentThread` that was deleted by this mutation. */
+  platformAgentThread?: PlatformAgentThread | null;
+  platformAgentThreadEdge?: PlatformAgentThreadEdge | null;
+}
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
 }
 export interface UpdateAgentPayload {
   /** The `Agent` that was updated by this mutation. */
   agent?: Agent | null;
   agentEdge?: AgentEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentEventPayload {
+  /** The `AgentEvent` that was updated by this mutation. */
+  agentEvent?: AgentEvent | null;
+  agentEventEdge?: AgentEventEdge | null;
   clientMutationId?: string | null;
 }
 export interface UpdateAgentMessagePayload {
@@ -1726,6 +4656,18 @@ export interface UpdateAgentResourceChunkPayload {
   agentResourceChunkEdge?: AgentResourceChunkEdge | null;
   clientMutationId?: string | null;
 }
+export interface UpdateAgentRunPayload {
+  /** The `AgentRun` that was updated by this mutation. */
+  agentRun?: AgentRun | null;
+  agentRunEdge?: AgentRunEdge | null;
+  clientMutationId?: string | null;
+}
+export interface UpdateAgentRunWorkspacePayload {
+  /** The `AgentRunWorkspace` that was updated by this mutation. */
+  agentRunWorkspace?: AgentRunWorkspace | null;
+  agentRunWorkspaceEdge?: AgentRunWorkspaceEdge | null;
+  clientMutationId?: string | null;
+}
 export interface UpdateAgentTaskPayload {
   /** The `AgentTask` that was updated by this mutation. */
   agentTask?: AgentTask | null;
@@ -1737,6 +4679,78 @@ export interface UpdateAgentThreadPayload {
   agentThread?: AgentThread | null;
   agentThreadEdge?: AgentThreadEdge | null;
   clientMutationId?: string | null;
+}
+export interface UpdatePlatformAgentPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgent` that was updated by this mutation. */
+  platformAgent?: PlatformAgent | null;
+  platformAgentEdge?: PlatformAgentEdge | null;
+}
+export interface UpdatePlatformAgentEventPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentEvent` that was updated by this mutation. */
+  platformAgentEvent?: PlatformAgentEvent | null;
+  platformAgentEventEdge?: PlatformAgentEventEdge | null;
+}
+export interface UpdatePlatformAgentMessagePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentMessage` that was updated by this mutation. */
+  platformAgentMessage?: PlatformAgentMessage | null;
+  platformAgentMessageEdge?: PlatformAgentMessageEdge | null;
+}
+export interface UpdatePlatformAgentPersonaPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPersona` that was updated by this mutation. */
+  platformAgentPersona?: PlatformAgentPersona | null;
+  platformAgentPersonaEdge?: PlatformAgentPersonaEdge | null;
+}
+export interface UpdatePlatformAgentPlanPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPlan` that was updated by this mutation. */
+  platformAgentPlan?: PlatformAgentPlan | null;
+  platformAgentPlanEdge?: PlatformAgentPlanEdge | null;
+}
+export interface UpdatePlatformAgentPromptPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentPrompt` that was updated by this mutation. */
+  platformAgentPrompt?: PlatformAgentPrompt | null;
+  platformAgentPromptEdge?: PlatformAgentPromptEdge | null;
+}
+export interface UpdatePlatformAgentResourcePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResource` that was updated by this mutation. */
+  platformAgentResource?: PlatformAgentResource | null;
+  platformAgentResourceEdge?: PlatformAgentResourceEdge | null;
+}
+export interface UpdatePlatformAgentResourceChunkPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentResourceChunk` that was updated by this mutation. */
+  platformAgentResourceChunk?: PlatformAgentResourceChunk | null;
+  platformAgentResourceChunkEdge?: PlatformAgentResourceChunkEdge | null;
+}
+export interface UpdatePlatformAgentRunPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRun` that was updated by this mutation. */
+  platformAgentRun?: PlatformAgentRun | null;
+  platformAgentRunEdge?: PlatformAgentRunEdge | null;
+}
+export interface UpdatePlatformAgentRunWorkspacePayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentRunWorkspace` that was updated by this mutation. */
+  platformAgentRunWorkspace?: PlatformAgentRunWorkspace | null;
+  platformAgentRunWorkspaceEdge?: PlatformAgentRunWorkspaceEdge | null;
+}
+export interface UpdatePlatformAgentTaskPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentTask` that was updated by this mutation. */
+  platformAgentTask?: PlatformAgentTask | null;
+  platformAgentTaskEdge?: PlatformAgentTaskEdge | null;
+}
+export interface UpdatePlatformAgentThreadPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformAgentThread` that was updated by this mutation. */
+  platformAgentThread?: PlatformAgentThread | null;
+  platformAgentThreadEdge?: PlatformAgentThreadEdge | null;
 }
 /** Information about a database table */
 export interface MetaTable {
@@ -1765,11 +4779,11 @@ export interface MetaTable {
   tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
-/** A `AgentMessage` edge in the connection. */
-export interface AgentMessageEdge {
+/** A `AgentEvent` edge in the connection. */
+export interface AgentEventEdge {
   cursor?: string | null;
-  /** The `AgentMessage` at the end of the edge. */
-  node?: AgentMessage | null;
+  /** The `AgentEvent` at the end of the edge. */
+  node?: AgentEvent | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -1781,6 +4795,12 @@ export interface PageInfo {
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
+}
+/** A `AgentMessage` edge in the connection. */
+export interface AgentMessageEdge {
+  cursor?: string | null;
+  /** The `AgentMessage` at the end of the edge. */
+  node?: AgentMessage | null;
 }
 /** A `AgentPersona` edge in the connection. */
 export interface AgentPersonaEdge {
@@ -1812,6 +4832,18 @@ export interface AgentResourceEdge {
   /** The `AgentResource` at the end of the edge. */
   node?: AgentResource | null;
 }
+/** A `AgentRunWorkspace` edge in the connection. */
+export interface AgentRunWorkspaceEdge {
+  cursor?: string | null;
+  /** The `AgentRunWorkspace` at the end of the edge. */
+  node?: AgentRunWorkspace | null;
+}
+/** A `AgentRun` edge in the connection. */
+export interface AgentRunEdge {
+  cursor?: string | null;
+  /** The `AgentRun` at the end of the edge. */
+  node?: AgentRun | null;
+}
 /** A `AgentTask` edge in the connection. */
 export interface AgentTaskEdge {
   cursor?: string | null;
@@ -1829,6 +4861,78 @@ export interface AgentEdge {
   cursor?: string | null;
   /** The `Agent` at the end of the edge. */
   node?: Agent | null;
+}
+/** A `PlatformAgentEvent` edge in the connection. */
+export interface PlatformAgentEventEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentEvent` at the end of the edge. */
+  node?: PlatformAgentEvent | null;
+}
+/** A `PlatformAgentMessage` edge in the connection. */
+export interface PlatformAgentMessageEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentMessage` at the end of the edge. */
+  node?: PlatformAgentMessage | null;
+}
+/** A `PlatformAgentPersona` edge in the connection. */
+export interface PlatformAgentPersonaEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentPersona` at the end of the edge. */
+  node?: PlatformAgentPersona | null;
+}
+/** A `PlatformAgentPlan` edge in the connection. */
+export interface PlatformAgentPlanEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentPlan` at the end of the edge. */
+  node?: PlatformAgentPlan | null;
+}
+/** A `PlatformAgentPrompt` edge in the connection. */
+export interface PlatformAgentPromptEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentPrompt` at the end of the edge. */
+  node?: PlatformAgentPrompt | null;
+}
+/** A `PlatformAgentResourceChunk` edge in the connection. */
+export interface PlatformAgentResourceChunkEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentResourceChunk` at the end of the edge. */
+  node?: PlatformAgentResourceChunk | null;
+}
+/** A `PlatformAgentResource` edge in the connection. */
+export interface PlatformAgentResourceEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentResource` at the end of the edge. */
+  node?: PlatformAgentResource | null;
+}
+/** A `PlatformAgentRunWorkspace` edge in the connection. */
+export interface PlatformAgentRunWorkspaceEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentRunWorkspace` at the end of the edge. */
+  node?: PlatformAgentRunWorkspace | null;
+}
+/** A `PlatformAgentRun` edge in the connection. */
+export interface PlatformAgentRunEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentRun` at the end of the edge. */
+  node?: PlatformAgentRun | null;
+}
+/** A `PlatformAgentTask` edge in the connection. */
+export interface PlatformAgentTaskEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentTask` at the end of the edge. */
+  node?: PlatformAgentTask | null;
+}
+/** A `PlatformAgentThread` edge in the connection. */
+export interface PlatformAgentThreadEdge {
+  cursor?: string | null;
+  /** The `PlatformAgentThread` at the end of the edge. */
+  node?: PlatformAgentThread | null;
+}
+/** A `PlatformAgent` edge in the connection. */
+export interface PlatformAgentEdge {
+  cursor?: string | null;
+  /** The `PlatformAgent` at the end of the edge. */
+  node?: PlatformAgent | null;
 }
 /** Table constraints */
 export interface MetaConstraints {
@@ -1942,10 +5046,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -2027,6 +5139,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

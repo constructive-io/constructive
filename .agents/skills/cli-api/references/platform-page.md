@@ -12,8 +12,8 @@ csdk platform-page list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-page list --limit 10 --after <cursor>
 csdk platform-page find-first --where.<field>.<op> <value>
 csdk platform-page get --id <UUID>
-csdk platform-page create --content <JSON> --siteId <UUID> --slug <String> [--commitId <UUID>] [--storeId <UUID>]
-csdk platform-page update --id <UUID> [--commitId <UUID>] [--content <JSON>] [--siteId <UUID>] [--slug <String>] [--storeId <UUID>]
+csdk platform-page create --content <JSON> --siteId <UUID> --slug <String> [--commitId <UUID>] [--seededFrom <JSON>] [--storeId <UUID>]
+csdk platform-page update --id <UUID> [--commitId <UUID>] [--content <JSON>] [--seededFrom <JSON>] [--siteId <UUID>] [--slug <String>] [--storeId <UUID>]
 csdk platform-page delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-page list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformPage
 
 ```bash
-csdk platform-page create --content <JSON> --siteId <UUID> --slug <String> [--commitId <UUID>] [--storeId <UUID>]
+csdk platform-page create --content <JSON> --siteId <UUID> --slug <String> [--commitId <UUID>] [--seededFrom <JSON>] [--storeId <UUID>]
 ```
 
 ### Get a platformPage by id

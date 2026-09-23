@@ -19,6 +19,7 @@ const fieldSchema: FieldSchema = {
   annotations: 'json',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   defaultSpec: 'json',
   description: 'string',
   id: 'uuid',
@@ -34,6 +35,7 @@ const fieldSchema: FieldSchema = {
   stepUpMinAge: 'string',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 const usage =
   '\nplatform-resource-definition <command>\n\nCommands:\n  list                  List platformResourceDefinition records\n  find-first            Find first matching platformResourceDefinition record\n  get                   Get a platformResourceDefinition by ID\n  create                Create a new platformResourceDefinition\n  update                Update an existing platformResourceDefinition\n  delete                Delete a platformResourceDefinition\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -89,6 +91,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       annotations: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       defaultSpec: true,
       description: true,
       id: true,
@@ -104,6 +107,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       stepUpMinAge: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -131,6 +135,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       annotations: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       defaultSpec: true,
       description: true,
       id: true,
@@ -146,6 +151,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       stepUpMinAge: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -185,6 +191,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           defaultSpec: true,
           description: true,
           id: true,
@@ -200,6 +207,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -226,6 +234,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -316,6 +331,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -328,6 +350,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           annotations: cleanedData.annotations,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           defaultSpec: cleanedData.defaultSpec,
           description: cleanedData.description,
           integrations: cleanedData.integrations,
@@ -341,11 +364,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           stepUpMinAge: cleanedData.stepUpMinAge,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           defaultSpec: true,
           description: true,
           id: true,
@@ -361,6 +386,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -397,6 +423,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'json',
         name: 'defaultSpec',
         message: 'defaultSpec',
@@ -483,6 +516,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformResourceDefinitionPatch;
@@ -495,6 +535,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           annotations: cleanedData.annotations,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           defaultSpec: cleanedData.defaultSpec,
           description: cleanedData.description,
           integrations: cleanedData.integrations,
@@ -508,11 +549,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           stepUpMinAge: cleanedData.stepUpMinAge,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           annotations: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           defaultSpec: true,
           description: true,
           id: true,
@@ -528,6 +571,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           stepUpMinAge: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

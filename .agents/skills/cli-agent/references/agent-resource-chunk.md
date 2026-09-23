@@ -19,8 +19,8 @@ csdk agent-resource-chunk list --limit 10 --after <cursor>
 csdk agent-resource-chunk find-first --where.<field>.<op> <value>
 csdk agent-resource-chunk search <query>
 csdk agent-resource-chunk get --id <UUID>
-csdk agent-resource-chunk create --agentResourceId <UUID> --body <String> [--chunkIndex <Int>] [--embedding <Vector>] [--metadata <JSON>]
-csdk agent-resource-chunk update --id <UUID> [--agentResourceId <UUID>] [--body <String>] [--chunkIndex <Int>] [--embedding <Vector>] [--metadata <JSON>]
+csdk agent-resource-chunk create --agentResourceId <UUID> --body <String> [--chunkIndex <Int>] [--databaseId <UUID>] [--embedding <Vector>] [--metadata <JSON>]
+csdk agent-resource-chunk update --id <UUID> [--agentResourceId <UUID>] [--body <String>] [--chunkIndex <Int>] [--databaseId <UUID>] [--embedding <Vector>] [--metadata <JSON>]
 csdk agent-resource-chunk delete --id <UUID>
 ```
 
@@ -95,7 +95,7 @@ csdk agent-resource-chunk search "query" --limit 10 --select id,title,searchScor
 ### Create a agentResourceChunk
 
 ```bash
-csdk agent-resource-chunk create --agentResourceId <UUID> --body <String> [--chunkIndex <Int>] [--embedding <Vector>] [--metadata <JSON>]
+csdk agent-resource-chunk create --agentResourceId <UUID> --body <String> [--chunkIndex <Int>] [--databaseId <UUID>] [--embedding <Vector>] [--metadata <JSON>]
 ```
 
 ### Get a agentResourceChunk by id

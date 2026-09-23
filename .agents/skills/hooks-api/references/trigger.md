@@ -7,8 +7,8 @@ React Query hooks for Trigger data operations
 ## Usage
 
 ```typescript
-useTriggersQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } } })
-useTriggerQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } } })
+useTriggersQuery({ selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEachRow: true, functionId: true, functionName: true, id: true, kind: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, updatedAt: true, whenAst: true } } })
+useTriggerQuery({ id: '<UUID>', selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEachRow: true, functionId: true, functionName: true, id: true, kind: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, updatedAt: true, whenAst: true } } })
 useCreateTriggerMutation({ selection: { fields: { id: true } } })
 useUpdateTriggerMutation({ selection: { fields: { id: true } } })
 useDeleteTriggerMutation({})
@@ -20,7 +20,7 @@ useDeleteTriggerMutation({})
 
 ```typescript
 const { data, isLoading } = useTriggersQuery({
-  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, functionName: true, id: true, name: true, smartTags: true, tableId: true, tags: true, updatedAt: true } },
+  selection: { fields: { category: true, createdAt: true, databaseId: true, event: true, events: true, forEachRow: true, functionId: true, functionName: true, id: true, kind: true, name: true, smartTags: true, tableId: true, tags: true, timing: true, updatedAt: true, whenAst: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useTriggersQuery({
 const { mutate } = useCreateTriggerMutation({
   selection: { fields: { id: true } },
 });
-mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', functionName: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>' });
+mutate({ category: '<ObjectCategory>', databaseId: '<UUID>', event: '<String>', events: '<String>', forEachRow: '<Boolean>', functionId: '<UUID>', functionName: '<String>', kind: '<String>', name: '<String>', smartTags: '<JSON>', tableId: '<UUID>', tags: '<String>', timing: '<String>', whenAst: '<JSON>' });
 ```

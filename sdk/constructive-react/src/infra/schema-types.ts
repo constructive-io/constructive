@@ -5,6 +5,7 @@
  */
 
 import type {
+  ContentPreset,
   DbPreset,
   Namespace,
   NamespaceEvent,
@@ -33,6 +34,33 @@ import type {
   UUIDListFilter,
   VectorFilter,
 } from './types';
+/** Methods to use when ordering `ContentPreset`. */
+export type ContentPresetOrderBy =
+  | 'ACTIVE_ASC'
+  | 'ACTIVE_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'DEFINITION_ASC'
+  | 'DEFINITION_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `DbPreset`. */
 export type DbPresetOrderBy =
   | 'ACTIVE_ASC'
@@ -85,6 +113,8 @@ export type NamespaceEventOrderBy =
 export type NamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
@@ -205,6 +235,8 @@ export type PlatformNamespaceEventOrderBy =
 export type PlatformNamespaceOrderBy =
   | 'ANNOTATIONS_ASC'
   | 'ANNOTATIONS_DESC'
+  | 'CLUSTER_ID_ASC'
+  | 'CLUSTER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'DESCRIPTION_ASC'
@@ -230,6 +262,92 @@ export type PlatformNamespaceOrderBy =
   | 'STATUS_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** A filter to be used against `ContentPreset` object types. All fields are combined with a logical ‘and.’ */
+export interface ContentPresetFilter {
+  /** Filter by the object’s `active` field. */
+  active?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ContentPresetFilter[];
+  /** Filter by the object’s `commitId` field. */
+  commitId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Negates the expression. */
+  not?: ContentPresetFilter;
+  /** Checks for any expressions in this list. */
+  or?: ContentPresetFilter[];
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `storeId` field. */
+  storeId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** An input for mutations affecting `ContentPreset` */
+export interface ContentPresetInput {
+  /** Whether this preset is selectable at provision time */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of preset creation */
+  createdAt?: string;
+  /** The seed document itself, in the shape the kind's seed function takes — the readily-cached head; history lives in the infra store */
+  definition: unknown;
+  /** Human-readable description of the preset */
+  description?: string;
+  /** Unique preset identifier */
+  id?: string;
+  /** What the definition seeds — the module option that resolves it (limit_defaults, trust_ladder, ...) */
+  kind: string;
+  /** Human-readable preset name */
+  label?: string;
+  /** Preset slug (unique per kind per scope); the preset's path in the infra tree is [content_preset, kind, slug] */
+  slug: string;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
+/** Represents an update to a `ContentPreset`. Fields that are set will be updated. */
+export interface ContentPresetPatch {
+  /** Whether this preset is selectable at provision time */
+  active?: boolean;
+  /** Infra store commit for the current definition (stamped by the versioned trigger on every write) */
+  commitId?: string;
+  /** Timestamp of preset creation */
+  createdAt?: string;
+  /** The seed document itself, in the shape the kind's seed function takes — the readily-cached head; history lives in the infra store */
+  definition?: unknown;
+  /** Human-readable description of the preset */
+  description?: string;
+  /** Unique preset identifier */
+  id?: string;
+  /** What the definition seeds — the module option that resolves it (limit_defaults, trust_ladder, ...) */
+  kind?: string;
+  /** Human-readable preset name */
+  label?: string;
+  /** Preset slug (unique per kind per scope); the preset's path in the infra tree is [content_preset, kind, slug] */
+  slug?: string;
+  /** Infra Merkle store holding this preset's history (stamped by the versioned trigger) */
+  storeId?: string;
+  /** Timestamp of last modification */
+  updatedAt?: string;
+}
+export interface CreateContentPresetInput {
+  clientMutationId?: string;
+  /** The `ContentPreset` to be created by this mutation. */
+  contentPreset: ContentPresetInput;
+}
 export interface CreateDbPresetInput {
   clientMutationId?: string;
   /** The `DbPreset` to be created by this mutation. */
@@ -356,6 +474,11 @@ export interface DbPresetPatch {
   /** Timestamp of last modification */
   updatedAt?: string;
 }
+export interface DeleteContentPresetInput {
+  clientMutationId?: string;
+  /** Unique preset identifier */
+  id: string;
+}
 export interface DeleteDbPresetInput {
   clientMutationId?: string;
   /** Unique preset identifier */
@@ -436,7 +559,7 @@ export interface NamespaceEventFilter {
 }
 /** An input for mutations affecting `NamespaceEvent` */
 export interface NamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -455,7 +578,7 @@ export interface NamespaceEventInput {
 }
 /** Represents an update to a `NamespaceEvent`. Fields that are set will be updated. */
 export interface NamespaceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -478,6 +601,8 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -511,6 +636,8 @@ export interface NamespaceFilter {
 export interface NamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
@@ -537,6 +664,8 @@ export interface NamespaceInput {
 export interface NamespacePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
@@ -642,6 +771,15 @@ export interface PlatformInfraInsertNodeAtPathInput {
   root?: string;
   sId?: string;
 }
+export interface PlatformInfraInsertNodesAtPathsInput {
+  clientMutationId?: string;
+  datas?: unknown[];
+  kidsList?: unknown;
+  ktreeList?: unknown;
+  paths?: unknown;
+  root?: string;
+  sId?: string;
+}
 /** A filter to be used against `PlatformInfraObject` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraObjectFilter {
   /** Checks for all expressions in this list. */
@@ -738,12 +876,31 @@ export interface PlatformInfraRefPatch {
   /** Store this ref belongs to */
   storeId?: string;
 }
+export interface PlatformInfraSetAndCommitInput {
+  clientMutationId?: string;
+  data?: unknown;
+  kids?: string[];
+  ktree?: string[];
+  message?: string;
+  path?: string[];
+  refname?: string;
+  sId?: string;
+  storeId?: string;
+}
 export interface PlatformInfraSetDataAtPathInput {
   clientMutationId?: string;
   data?: unknown;
   path?: string[];
   root?: string;
   sId?: string;
+}
+export interface PlatformInfraSetManyAndCommitInput {
+  clientMutationId?: string;
+  entries?: unknown;
+  message?: string;
+  refname?: string;
+  sId?: string;
+  storeId?: string;
 }
 /** A filter to be used against `PlatformInfraStore` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformInfraStoreFilter {
@@ -815,7 +972,7 @@ export interface PlatformNamespaceEventFilter {
 }
 /** An input for mutations affecting `PlatformNamespaceEvent` */
 export interface PlatformNamespaceEventInput {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -832,7 +989,7 @@ export interface PlatformNamespaceEventInput {
 }
 /** Represents an update to a `PlatformNamespaceEvent`. Fields that are set will be updated. */
 export interface PlatformNamespaceEventPatch {
-  /** User who triggered this event (NULL for system/automated) */
+  /** User who triggered this event; NULL only when no human actor was proven */
   actorId?: string;
   /** Event timestamp (partition key) */
   createdAt?: string;
@@ -853,6 +1010,8 @@ export interface PlatformNamespaceFilter {
   and?: PlatformNamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
+  /** Filter by the object’s `clusterId` field. */
+  clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `description` field. */
@@ -884,6 +1043,8 @@ export interface PlatformNamespaceFilter {
 export interface PlatformNamespaceInput {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Optional human-readable description of this namespace */
   description?: string;
@@ -908,6 +1069,8 @@ export interface PlatformNamespaceInput {
 export interface PlatformNamespacePatch {
   /** Freeform metadata for tooling and operational notes */
   annotations?: unknown;
+  /** Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in */
+  clusterId?: string;
   createdAt?: string;
   /** Optional human-readable description of this namespace */
   description?: string;
@@ -936,6 +1099,13 @@ export interface ProvisionBucketInput {
    * Omit for app-level (database-wide) storage.
    */
   ownerId?: string;
+}
+export interface UpdateContentPresetInput {
+  clientMutationId?: string;
+  /** An object where the defined keys will be set on the `ContentPreset` being updated. */
+  contentPresetPatch: ContentPresetPatch;
+  /** Unique preset identifier */
+  id: string;
 }
 export interface UpdateDbPresetInput {
   clientMutationId?: string;
@@ -1012,6 +1182,13 @@ export interface UpdatePlatformNamespaceInput {
 export interface MetaSchema {
   tables: MetaTable[];
 }
+/** A connection to a list of `ContentPreset` values. */
+export interface ContentPresetConnection {
+  edges: ContentPresetEdge[];
+  nodes: ContentPreset[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `DbPreset` values. */
 export interface DbPresetConnection {
   edges: DbPresetEdge[];
@@ -1082,6 +1259,12 @@ export interface PlatformNamespaceConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+export interface CreateContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was created by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
+}
 export interface CreateDbPresetPayload {
   clientMutationId?: string | null;
   /** The `DbPreset` that was created by this mutation. */
@@ -1135,6 +1318,12 @@ export interface CreatePlatformNamespaceEventPayload {
   /** The `PlatformNamespaceEvent` that was created by this mutation. */
   platformNamespaceEvent?: PlatformNamespaceEvent | null;
   platformNamespaceEventEdge?: PlatformNamespaceEventEdge | null;
+}
+export interface DeleteContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was deleted by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
 }
 export interface DeleteDbPresetPayload {
   clientMutationId?: string | null;
@@ -1197,23 +1386,38 @@ export interface PlatformInfraInsertNodeAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface PlatformInfraInsertNodesAtPathsPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface PlatformInfraSetAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
 export interface PlatformInfraSetDataAtPathPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface PlatformInfraSetManyAndCommitPayload {
+  clientMutationId?: string | null;
+  platformInfraCommitEdge?: PlatformInfraCommitEdge | null;
+  result?: PlatformInfraCommit | null;
+}
 export interface ProvisionBucketPayload {
-  /** The access type applied */
-  accessType: string;
-  /** The S3 bucket name that was provisioned */
-  bucketName: string;
-  /** The S3 endpoint (null for AWS S3 default) */
-  endpoint?: string | null;
-  /** Error message if provisioning failed */
-  error?: string | null;
-  /** The storage provider used */
-  provider: string;
-  /** Whether provisioning succeeded */
-  success: boolean;
+  /** The logical bucket row that was queued for reconciliation. */
+  bucketId: string;
+  bucketKey: string;
+  /** The reconciler job enqueued to provision this bucket. */
+  jobId: string;
+  /** The physical bucket name already recorded, or null when reconciliation has not completed. */
+  physicalName?: string | null;
+}
+export interface UpdateContentPresetPayload {
+  clientMutationId?: string | null;
+  /** The `ContentPreset` that was updated by this mutation. */
+  contentPreset?: ContentPreset | null;
+  contentPresetEdge?: ContentPresetEdge | null;
 }
 export interface UpdateDbPresetPayload {
   clientMutationId?: string | null;
@@ -1296,11 +1500,11 @@ export interface MetaTable {
   tableName: string;
   uniqueConstraints: MetaUniqueConstraint[];
 }
-/** A `DbPreset` edge in the connection. */
-export interface DbPresetEdge {
+/** A `ContentPreset` edge in the connection. */
+export interface ContentPresetEdge {
   cursor?: string | null;
-  /** The `DbPreset` at the end of the edge. */
-  node?: DbPreset | null;
+  /** The `ContentPreset` at the end of the edge. */
+  node?: ContentPreset | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -1312,6 +1516,12 @@ export interface PageInfo {
   hasPreviousPage: boolean;
   /** When paginating backwards, the cursor to continue. */
   startCursor?: string | null;
+}
+/** A `DbPreset` edge in the connection. */
+export interface DbPresetEdge {
+  cursor?: string | null;
+  /** The `DbPreset` at the end of the edge. */
+  node?: DbPreset | null;
 }
 /** A `NamespaceEvent` edge in the connection. */
 export interface NamespaceEventEdge {
@@ -1479,10 +1689,18 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
+  /** GraphQL type name of the plane's buckets table */
+  bucketsType: string;
+  /** Computed download-URL field on the files type; null on the buckets side */
+  downloadUrlField?: string | null;
+  /** GraphQL type name of the plane's files table */
+  filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
+  /** The plane's GraphQL upload surface */
+  upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
 export interface MetaUniqueConstraint {
@@ -1564,6 +1782,27 @@ export interface MetaSearchConfig {
   boostRecent: boolean;
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
+}
+/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+export interface MetaStorageUpload {
+  /** Per-file input type inside the bulk input */
+  bulkFileInputType: string;
+  /** Per-file payload type inside the bulk payload */
+  bulkFilePayloadType: string;
+  /** Input type of the bulk upload mutation */
+  bulkInputType: string;
+  /** Root mutation field for bulk upload */
+  bulkMutation: string;
+  /** Payload type of the bulk upload mutation */
+  bulkPayloadType: string;
+  /** Input type of the single upload mutation */
+  inputType: string;
+  /** Root mutation field for single-file upload (e.g. uploadAppFile) */
+  mutation: string;
+  /** Payload type of the single upload mutation */
+  payloadType: string;
+  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  requiresOwnerId: boolean;
 }
 /** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {

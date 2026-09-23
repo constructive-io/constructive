@@ -4,11 +4,26 @@
  * DO NOT EDIT - changes will be overwritten
  */
 export { AgentModel } from './agent';
+export { AgentEventModel } from './agentEvent';
 export { AgentMessageModel } from './agentMessage';
 export { AgentPersonaModel } from './agentPersona';
 export { AgentPlanModel } from './agentPlan';
 export { AgentPromptModel } from './agentPrompt';
 export { AgentResourceChunkModel } from './agentResourceChunk';
 export { AgentResourceModel } from './agentResource';
+export { AgentRunModel } from './agentRun';
+export { AgentRunWorkspaceModel } from './agentRunWorkspace';
 export { AgentTaskModel } from './agentTask';
 export { AgentThreadModel } from './agentThread';
+export { PlatformAgentModel } from './platformAgent';
+export { PlatformAgentEventModel } from './platformAgentEvent';
+export { PlatformAgentMessageModel } from './platformAgentMessage';
+export { PlatformAgentPersonaModel } from './platformAgentPersona';
+export { PlatformAgentPlanModel } from './platformAgentPlan';
+export { PlatformAgentPromptModel } from './platformAgentPrompt';
+export { PlatformAgentResourceChunkModel } from './platformAgentResourceChunk';
+export { PlatformAgentResourceModel } from './platformAgentResource';
+export { PlatformAgentRunModel } from './platformAgentRun';
+export { PlatformAgentRunWorkspaceModel } from './platformAgentRunWorkspace';
+export { PlatformAgentTaskModel } from './platformAgentTask';
+export { PlatformAgentThreadModel } from './platformAgentThread';

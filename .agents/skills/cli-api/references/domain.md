@@ -12,8 +12,8 @@ csdk domain list --where.<field>.<op> <value> --orderBy <values>
 csdk domain list --limit 10 --after <cursor>
 csdk domain find-first --where.<field>.<op> <value>
 csdk domain get --id <UUID>
-csdk domain create --databaseId <UUID> --hostname <String> [--config <JSON>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
-csdk domain update --id <UUID> [--config <JSON>] [--databaseId <UUID>] [--hostname <String>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
+csdk domain create --databaseId <UUID> --hostname <String> [--config <JSON>] [--createdByPrincipal <UUID>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--updatedByPrincipal <UUID>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
+csdk domain update --id <UUID> [--config <JSON>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--hostname <String>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--updatedByPrincipal <UUID>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
 csdk domain delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk domain list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a domain
 
 ```bash
-csdk domain create --databaseId <UUID> --hostname <String> [--config <JSON>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
+csdk domain create --databaseId <UUID> --hostname <String> [--config <JSON>] [--createdByPrincipal <UUID>] [--isPublished <Boolean>] [--isWildcard <Boolean>] [--managed <Boolean>] [--parentHostname <String>] [--tlsReadyAt <Datetime>] [--tlsSecretName <String>] [--tlsStatus <String>] [--updatedByPrincipal <UUID>] [--verificationStatus <String>] [--verifiedAt <Datetime>]
 ```
 
 ### Get a domain by id
