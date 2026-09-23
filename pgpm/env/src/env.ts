@@ -1,7 +1,19 @@
-import { BucketProvider,PgpmOptions } from '@pgpmjs/types';
+import { BucketProvider, DeferredConstraintsMode, PgpmOptions } from '@pgpmjs/types';
 import { parseEnvBoolean, parseEnvList, parseEnvNumber } from '12factor-env';
 
 export { parseEnvBoolean, parseEnvList, parseEnvNumber };
+
+const DEFERRED_CONSTRAINTS_MODES: DeferredConstraintsMode[] = ['off', 'check', 'immediate'];
+
+const parseDeferredConstraintsMode = (value: string): DeferredConstraintsMode => {
+  const mode = value.trim().toLowerCase() as DeferredConstraintsMode;
+  if (!DEFERRED_CONSTRAINTS_MODES.includes(mode)) {
+    throw new Error(
+      `Invalid DB_DEFERRED_CONSTRAINTS "${value}"; expected one of ${DEFERRED_CONSTRAINTS_MODES.join(', ')}`
+    );
+  }
+  return mode;
+};
 
 /**
  * Parse core PGPM environment variables.
@@ -16,6 +28,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     DB_PREFIX,
     DB_EXTENSIONS,
     DB_CWD,
+    DB_DEFERRED_CONSTRAINTS,
     PGPM_EXTENSIONS_DIR,
     PGPM_ENGINE,
     DB_CONNECTION_USER,
@@ -90,6 +103,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(DB_PREFIX && { prefix: DB_PREFIX }),
       ...(DB_EXTENSIONS && { extensions: DB_EXTENSIONS.split(',').map(ext => ext.trim()) }),
       ...(DB_CWD && { cwd: DB_CWD }),
+      ...(DB_DEFERRED_CONSTRAINTS && { deferredConstraints: parseDeferredConstraintsMode(DB_DEFERRED_CONSTRAINTS) }),
       ...((DB_CONNECTION_USER || DB_CONNECTION_PASSWORD || DB_CONNECTION_ROLE) && {
         connection: {
           ...(DB_CONNECTION_USER && { user: DB_CONNECTION_USER }),

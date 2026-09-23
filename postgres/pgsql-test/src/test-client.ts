@@ -1,3 +1,4 @@
+import { DeferredConstraintsMode } from '@pgpmjs/types';
 import { QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
 import { PgClient, PgClientOpts } from 'pgsql-client';
@@ -15,7 +16,14 @@ export type PgTestClientOpts = PgClientOpts & {
    * Can be disabled by setting enhancedErrors: false.
    */
   enhancedErrors?: boolean;
+  /**
+   * How DEFERRABLE INITIALLY DEFERRED constraints are handled under rollback isolation.
+   * Defaults to 'off'. See {@link DeferredConstraintsMode}.
+   */
+  deferredConstraints?: DeferredConstraintsMode;
 };
+
+const IN_FAILED_SQL_TRANSACTION = '25P02';
 
 export class PgTestClient extends PgClient {
   protected testOpts: PgTestClientOpts;
@@ -50,14 +58,51 @@ export class PgTestClient extends PgClient {
     }
   }
 
+  private get deferredConstraintsMode(): DeferredConstraintsMode {
+    return this.testOpts.deferredConstraints ?? 'off';
+  }
+
   async beforeEach(): Promise<void> {
     await this.begin();
     await this.savepoint();
+    if (this.deferredConstraintsMode === 'immediate') {
+      await this.setConstraintsImmediate();
+    }
   }
 
   async afterEach(): Promise<void> {
+    let violation: unknown;
+    if (this.deferredConstraintsMode === 'check') {
+      try {
+        await this.checkConstraints();
+      } catch (err: any) {
+        if (err?.code !== IN_FAILED_SQL_TRANSACTION) violation = err;
+      }
+    }
     await this.rollback();
     await this.commit();
+    if (violation) throw violation;
+  }
+
+  /**
+   * Run the commit-time checks for every pending deferred constraint now, without committing.
+   * Postgres checks all outstanding deferred constraint events when a constraint switches from
+   * DEFERRED to IMMEDIATE, so this fails exactly where a real COMMIT would have failed.
+   * Once it passes (or throws), the pending events are consumed.
+   */
+  async checkConstraints(): Promise<void> {
+    try {
+      await this.setConstraintsImmediate();
+    } catch (err: any) {
+      if (err?.code !== IN_FAILED_SQL_TRANSACTION) {
+        err.message = `[pgsql-test] deferred constraint violated at end of test (a real COMMIT would have failed here):\n${err.message}`;
+      }
+      throw err;
+    }
+  }
+
+  private async setConstraintsImmediate(): Promise<void> {
+    await this.query('SET CONSTRAINTS ALL IMMEDIATE');
   }
 
   /**
@@ -68,6 +113,9 @@ export class PgTestClient extends PgClient {
     await this.commit();    // make data visible to other sessions
     await this.begin();     // fresh tx
     await this.savepoint(); // keep rollback harness
+    if (this.deferredConstraintsMode === 'immediate') {
+      await this.setConstraintsImmediate();
+    }
     await this.ctxQuery();  // reapply all setContext()
   }
 

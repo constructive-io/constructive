@@ -90,7 +90,9 @@ export const getConnections = async (
   await admin.grantConnect(connOpts.connections!.app!.user!, config.database);
 
   manager = PgTestConnector.getInstance(config);
-  const pg = manager.getClient(config);
+  const pg = manager.getClient(config, {
+    deferredConstraints: connOpts.deferredConstraints
+  });
 
   let teardownPromise: Promise<void> | null = null;
   let teardownOpts: TeardownOptions = {};
@@ -135,7 +137,8 @@ export const getConnections = async (
   
   const db = manager.getClient(dbConfig, {
     auth: connOpts.auth,
-    roles: connOpts.roles
+    roles: connOpts.roles,
+    deferredConstraints: connOpts.deferredConstraints
   });
   db.setContext({ role: getDefaultRole(connOpts) });
   

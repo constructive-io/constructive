@@ -17,9 +17,25 @@ export interface AuthOptions {
 }
 
 /**
+ * How DEFERRABLE INITIALLY DEFERRED constraints are treated inside a test transaction.
+ *
+ * Test isolation rolls every test back instead of committing, so constraints that
+ * Postgres only checks at COMMIT would otherwise never fire.
+ *
+ * - `'off'`       leave them deferred and never checked (default)
+ * - `'check'`     run the commit-time checks at the end of each test, right before the
+ *                 rollback (`SET CONSTRAINTS ALL IMMEDIATE`); deferral still works inside the test
+ * - `'immediate'` `SET CONSTRAINTS ALL IMMEDIATE` at the start of each test so violations
+ *                 fail on the offending statement; disables deferral the code under test may rely on
+ */
+export type DeferredConstraintsMode = 'off' | 'check' | 'immediate';
+
+/**
  * Configuration options for PostgreSQL test database connections
  */
 export interface PgTestConnectionOptions {
+    /** How deferred constraints are handled under rollback-based test isolation (default: 'off') */
+    deferredConstraints?: DeferredConstraintsMode;
     /** The root database to connect to for creating test databases */
     rootDb?: string;
     /** Template database to use when creating test databases */

@@ -131,6 +131,7 @@ The `PgTestClient` returned by `getConnections()` wraps a `pg.Client` and provid
 * `beforeEach()` – Begins a transaction and sets a savepoint (called at the start of each test)
 * `afterEach()` – Rolls back to the savepoint and commits the outer transaction (cleans up test state)
 * `setContext({ key: value })` – Sets PostgreSQL config variables (like `role`) to simulate RLS contexts
+* `checkConstraints()` – Runs the commit-time checks for any pending deferred constraints now, without committing (see [Deferred constraints](#deferred-constraints-under-rollback-isolation))
 * `any`, `one`, `oneOrNone`, `many`, `manyOrNone`, `none`, `result` – Typed query helpers for specific result expectations
 
 These methods make it easier to build expressive and isolated integration tests with strong typing and error handling.
@@ -601,6 +602,34 @@ This table documents the available options for the `getConnections` function. Th
 | `db.template`            | `string`   | `undefined`      | Template database used for faster test DB creation                          |
 | `db.rootDb`              | `string`   | `'postgres'`     | Root database used for administrative operations (e.g., creating databases) |
 | `db.prefix`              | `string`   | `'db-'`          | Prefix used when generating test database names                             |
+| `db.deferredConstraints` | `'off' \| 'check' \| 'immediate'` | `'off'` | How `DEFERRABLE INITIALLY DEFERRED` constraints are handled under rollback isolation (env: `DB_DEFERRED_CONSTRAINTS`). See below. |
+
+### Deferred constraints under rollback isolation
+
+`beforeEach()`/`afterEach()` isolate tests by rolling back instead of committing. Anything Postgres only does **at COMMIT** therefore never happens inside a test. The one that bites is `DEFERRABLE INITIALLY DEFERRED` constraints (FK / UNIQUE / EXCLUDE / `CONSTRAINT TRIGGER`): a test can leave a dangling deferred foreign key and still pass, because the check that would have failed the commit is discarded with the rollback. This is inherent to every rollback-based test harness, not specific to pgsql-test.
+
+`db.deferredConstraints` controls what to do about it:
+
+| Mode          | What happens                                                                                                                                                                                              | Trade-off                                                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `'off'`       | Nothing (default, previous behaviour).                                                                                                                                                                    | Deferred violations pass silently.                                                                                                                                     |
+| `'check'`     | `afterEach()` runs `SET CONSTRAINTS ALL IMMEDIATE` as the last statement before rolling back. Postgres defines this as running exactly the checks COMMIT would have run, so deferral still works *inside* the test and a pending violation fails the test. | The failure surfaces in `afterEach`, not on the offending line (the message names the constraint and table). If the test body already raised a Postgres error, the check is skipped so the original error is not masked. |
+| `'immediate'` | `beforeEach()` runs `SET CONSTRAINTS ALL IMMEDIATE`, so every deferred constraint is checked per statement and a violation fails on the exact line.                                                        | Changes semantics: code that legitimately relies on deferral (insert child before parent, swap two values under a deferred UNIQUE) fails in tests but works in production. |
+
+```ts
+const { db, teardown } = await getConnections({ db: { deferredConstraints: 'check' } });
+```
+
+A test that wants to *assert* that a deferred constraint is enforced can call `checkConstraints()` itself; once it has thrown, the pending events are consumed and `afterEach()` is clean:
+
+```ts
+it('rejects orphan children at commit', async () => {
+  await db.query(`INSERT INTO children (parent_id) VALUES (999)`);
+  await expect(db.checkConstraints()).rejects.toThrow(/children_parent_id_fkey/);
+});
+```
+
+Other commit-only effects — `NOTIFY` delivery and visibility to other sessions — are not covered by any mode; use `publish()` (which really commits) when a test needs them.
 
 ### `pg` Options (PgConfig)
 
