@@ -9,7 +9,7 @@ import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
-import { createActorEntityResolver, hasActorEntityResolver, pgActorEntityQuery } from './actor-entity';
+import { createActorEntityResolver, hasEntityModel, pgActorEntityQuery } from './actor-entity';
 
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';
@@ -34,17 +34,32 @@ const parseCookieToken = (req: Request, cookieName: string): string | undefined 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
 ): RequestHandler => {
+  type Pool = Parameters<typeof pgActorEntityQuery>[0];
   type Resolver = ReturnType<typeof createActorEntityResolver> | null;
-  const resolvers = new Map<string, Promise<Resolver>>();
-  const actorEntityResolver = (dbname: string, pool: Parameters<typeof pgActorEntityQuery>[0]): Promise<Resolver> => {
-    let resolver = resolvers.get(dbname);
-    if (!resolver) {
-      resolver = hasActorEntityResolver(pool).then((present) =>
-        present ? createActorEntityResolver({ query: pgActorEntityQuery(pool) }) : null
-      );
-      resolver.catch(() => resolvers.delete(dbname));
-      resolvers.set(dbname, resolver);
-    }
+  // Whether a database has an entity model is re-probed on a TTL: a users
+  // module deployed while the server runs must start attributing without a
+  // restart, and a negative answer is never sticky.
+  const PROBE_TTL_MS = 60_000;
+  const resolvers = new Map<string, ReturnType<typeof createActorEntityResolver>>();
+  const probes = new Map<string, { resolver: Promise<Resolver>; probedAt: number }>();
+  const actorEntityResolver = (dbname: string, databaseId: string, pool: Pool): Promise<Resolver> => {
+    const key = `${dbname}:${databaseId}`;
+    const hit = probes.get(key);
+    if (hit && hit.probedAt + PROBE_TTL_MS > Date.now()) return hit.resolver;
+    const resolver = hasEntityModel(pool, databaseId).then((present) => {
+      if (!present) {
+        log.debug(`[auth] database ${databaseId} installs no entity model; no entity attribution stamped`);
+        return null;
+      }
+      let cached = resolvers.get(dbname);
+      if (!cached) {
+        cached = createActorEntityResolver({ query: pgActorEntityQuery(pool) });
+        resolvers.set(dbname, cached);
+      }
+      return cached;
+    });
+    resolver.catch(() => probes.delete(key));
+    probes.set(key, { resolver, probedAt: Date.now() });
     return resolver;
   };
 
@@ -139,7 +154,7 @@ export const createAuthenticateMiddleware = (
           log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
 
           if (token?.user_id && api.databaseId) {
-            const resolve = await actorEntityResolver(api.dbname, pool);
+            const resolve = await actorEntityResolver(api.dbname, api.databaseId, pool);
             if (resolve) {
               req.actorEntity = await resolve(api.databaseId, token.user_id);
             }

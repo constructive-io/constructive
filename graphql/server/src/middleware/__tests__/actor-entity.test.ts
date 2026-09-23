@@ -78,11 +78,19 @@ describe('authenticate middleware entity attribution', () => {
   };
 
   const PROBE = /to_regprocedure\('app_scope\.actor_entity/;
-  const withAppScope = (present: boolean, row?: { entity_id: string; entity_type: string }) =>
-    mockQuery.mockImplementation(async (sql: string) =>
-      PROBE.test(sql) ? { rows: [{ present }] } : { rows: row ? [row] : [] }
-    );
-  const entityCalls = () => mockQuery.mock.calls.filter(([sql]) => !PROBE.test(sql));
+  const USERS_MODULE = /FROM metaschema_modules_public\.users_module WHERE database_id = \$1/;
+  /** `present` — app_scope is deployed; `users` — this database installs a users module. */
+  const withEntityModel = (
+    { present, users = present }: { present: boolean; users?: boolean },
+    row?: { entity_id: string; entity_type: string }
+  ) =>
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (PROBE.test(sql)) return { rows: [{ present }] };
+      if (USERS_MODULE.test(sql)) return { rows: [{ installed: users }] };
+      return { rows: row ? [row] : [] };
+    });
+  const entityCalls = () =>
+    mockQuery.mock.calls.filter(([sql]) => !PROBE.test(sql) && !USERS_MODULE.test(sql));
 
   beforeEach(() => {
     mockQuery.mockReset();
@@ -91,7 +99,7 @@ describe('authenticate middleware entity attribution', () => {
 
   it('stamps the actor entity resolved through app_scope.actor_entity for a user token', async () => {
     mockPgQueryContext.mockResolvedValue({ rowCount: 1, rows: [{ user_id: 'user-1', role: 'authenticated' }] });
-    withAppScope(true, { entity_id: 'user-1', entity_type: 'app' });
+    withEntityModel({ present: true }, { entity_id: 'user-1', entity_type: 'app' });
 
     const { req, next } = await run('Bearer tok');
 
@@ -107,7 +115,7 @@ describe('authenticate middleware entity attribution', () => {
       rowCount: 1,
       rows: [{ user_id: 'principal-1', principal_id: 'principal-1', kind: 'principal' }]
     });
-    withAppScope(true, { entity_id: 'org-1', entity_type: 'org' });
+    withEntityModel({ present: true }, { entity_id: 'org-1', entity_type: 'org' });
 
     const { req } = await run('Bearer tok');
 
@@ -117,7 +125,7 @@ describe('authenticate middleware entity attribution', () => {
 
   it('fails the request instead of continuing entityless when the actor cannot be resolved', async () => {
     mockPgQueryContext.mockResolvedValue({ rowCount: 1, rows: [{ user_id: 'user-1' }] });
-    withAppScope(true);
+    withEntityModel({ present: true });
 
     const { req, res, next } = await run('Bearer tok');
 
@@ -132,10 +140,22 @@ describe('authenticate middleware entity attribution', () => {
 
   it('stamps nothing when the tenant database has no app_scope', async () => {
     mockPgQueryContext.mockResolvedValue({ rowCount: 1, rows: [{ user_id: 'user-1' }] });
-    withAppScope(false);
+    withEntityModel({ present: false });
 
     const { req, next } = await run('Bearer tok');
 
+    expect(entityCalls()).toEqual([]);
+    expect(req.actorEntity).toBeUndefined();
+    expect(next).toHaveBeenCalled();
+  });
+
+  it('stamps nothing when app_scope is deployed but this database installs no users module', async () => {
+    mockPgQueryContext.mockResolvedValue({ rowCount: 1, rows: [{ user_id: 'user-1' }] });
+    withEntityModel({ present: true, users: false });
+
+    const { req, next } = await run('Bearer tok');
+
+    expect(mockQuery.mock.calls.some(([sql, params]) => USERS_MODULE.test(sql) && params[0] === 'db-1')).toBe(true);
     expect(entityCalls()).toEqual([]);
     expect(req.actorEntity).toBeUndefined();
     expect(next).toHaveBeenCalled();

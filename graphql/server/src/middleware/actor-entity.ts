@@ -8,10 +8,12 @@
  * maps a principal credential to its owner — a principal is never an entity
  * of its own. Callers cannot supply the pair on the public surface.
  *
- * `app_scope` ships with the Constructive platform modules; a tenant database
- * without it (a bare RLS module) has no entity model, so no pair is stamped.
- * Once the resolver is present, a session that cannot be attributed is a
- * hard failure — work is never created entityless.
+ * A database has an entity model only when it installs the users module
+ * (`app_scope.actor_entity` types an actor by its users row). A database
+ * without one — a bare RLS module, an auth-only fixture — has no entity for
+ * an actor to carry, so no pair is stamped. Once the model is present, a
+ * session that cannot be attributed is a hard failure — work is never
+ * created entityless.
  */
 
 import type { Pool } from 'pg';
@@ -61,12 +63,22 @@ export const createActorEntityResolver = (opts: ActorEntityResolverOptions) => {
   };
 };
 
-/** Whether the tenant database exposes `app_scope.actor_entity`. */
-export const hasActorEntityResolver = async (pool: Pool): Promise<boolean> => {
+/**
+ * Whether `databaseId` has an entity model to attribute against: the
+ * `app_scope.actor_entity` resolver is deployed and the database installs a
+ * users module for it to read.
+ */
+export const hasEntityModel = async (pool: Pool, databaseId: string): Promise<boolean> => {
   const result = await pool.query<{ present: boolean }>(
-    "SELECT to_regprocedure('app_scope.actor_entity(uuid, uuid)') IS NOT NULL AS present"
+    `SELECT to_regprocedure('app_scope.actor_entity(uuid, uuid)') IS NOT NULL
+        AND to_regclass('metaschema_modules_public.users_module') IS NOT NULL AS present`
   );
-  return result.rows[0]?.present === true;
+  if (result.rows[0]?.present !== true) return false;
+  const installed = await pool.query<{ installed: boolean }>(
+    'SELECT EXISTS (SELECT 1 FROM metaschema_modules_public.users_module WHERE database_id = $1) AS installed',
+    [databaseId]
+  );
+  return installed.rows[0]?.installed === true;
 };
 
 export const pgActorEntityQuery = (pool: Pool): ActorEntityQuery =>
