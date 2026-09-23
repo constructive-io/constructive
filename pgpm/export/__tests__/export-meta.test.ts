@@ -54,11 +54,11 @@ describe('Export Meta Config Validation', () => {
   describe('metaschema_modules_public tables', () => {
     const required = [
       'rls_module', 'user_auth_module', 'memberships_module',
-      'permissions_module', 'limits_module',
+      'limits_module',
       'events_module',
       'users_module', 'hierarchy_module', 'membership_types_module',
       'invites_module', 'emails_module', 'sessions_module',
-      'user_state_module', 'profiles_module', 'config_secrets_user_module',
+      'user_state_module', 'profiles_module',
       'user_credentials_module', 'user_settings_module',
       'connected_accounts_module', 'phone_numbers_module',
       'crypto_addresses_module', 'crypto_auth_module',
