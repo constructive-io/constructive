@@ -7,8 +7,8 @@ React Query hooks for AppModule data operations
 ## Usage
 
 ```typescript
-useAppModulesQuery({ selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
-useAppModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
+useAppModulesQuery({ selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appStoreIdentitiesTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
+useAppModuleQuery({ id: '<UUID>', selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appStoreIdentitiesTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } } })
 useCreateAppModuleMutation({ selection: { fields: { id: true } } })
 useUpdateAppModuleMutation({ selection: { fields: { id: true } } })
 useDeleteAppModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteAppModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useAppModulesQuery({
-  selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
+  selection: { fields: { apiName: true, appComponentsTableId: true, appComponentsTableName: true, appStoreIdentitiesTableName: true, appsTableId: true, appsTableName: true, catalogModuleId: true, databaseId: true, defaultCapabilities: true, entityField: true, entityTableId: true, id: true, policies: true, prefix: true, privateApiName: true, privateSchemaId: true, privateSchemaName: true, provisions: true, publicSchemaName: true, schemaId: true, scope: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppModulesQuery({
 const { mutate } = useCreateAppModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ apiName: '<String>', appComponentsTableId: '<UUID>', appComponentsTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
+mutate({ apiName: '<String>', appComponentsTableId: '<UUID>', appComponentsTableName: '<String>', appStoreIdentitiesTableName: '<String>', appsTableId: '<UUID>', appsTableName: '<String>', catalogModuleId: '<UUID>', databaseId: '<UUID>', defaultCapabilities: '<String>', entityField: '<String>', entityTableId: '<UUID>', policies: '<JSON>', prefix: '<String>', privateApiName: '<String>', privateSchemaId: '<UUID>', privateSchemaName: '<String>', provisions: '<JSON>', publicSchemaName: '<String>', schemaId: '<UUID>', scope: '<String>' });
 ```

@@ -7,8 +7,8 @@ Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-
 ## Usage
 
 ```typescript
-usePlatformConfigsQuery({ selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } } })
-usePlatformConfigQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } } })
+usePlatformConfigsQuery({ selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } } })
+usePlatformConfigQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } } })
 useCreatePlatformConfigMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformConfigMutation({ selection: { fields: { id: true } } })
 useDeletePlatformConfigMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformConfigMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformConfigsQuery({
-  selection: { fields: { annotations: true, createdAt: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, value: true } },
+  selection: { fields: { annotations: true, createdAt: true, createdByPrincipal: true, description: true, expiresAt: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, updatedAt: true, updatedByPrincipal: true, value: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformConfigsQuery({
 const { mutate } = useCreatePlatformConfigMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', value: '<String>' });
+mutate({ annotations: '<JSON>', createdByPrincipal: '<UUID>', description: '<String>', expiresAt: '<Datetime>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', updatedByPrincipal: '<UUID>', value: '<String>' });
 ```

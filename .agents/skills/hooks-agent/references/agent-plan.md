@@ -7,8 +7,8 @@ Workflow plan attached to an agent thread with ordered tasks and optional approv
 ## Usage
 
 ```typescript
-useAgentPlansQuery({ selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true } } })
-useAgentPlanQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true } } })
+useAgentPlansQuery({ selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true, visibility: true } } })
+useAgentPlanQuery({ id: '<UUID>', selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true, visibility: true } } })
 useCreateAgentPlanMutation({ selection: { fields: { id: true } } })
 useUpdateAgentPlanMutation({ selection: { fields: { id: true } } })
 useDeleteAgentPlanMutation({})
@@ -20,7 +20,7 @@ useDeleteAgentPlanMutation({})
 
 ```typescript
 const { data, isLoading } = useAgentPlansQuery({
-  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, databaseId: true, description: true, id: true, ownerId: true, status: true, threadId: true, title: true, updatedAt: true, visibility: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentPlansQuery({
 const { mutate } = useCreateAgentPlanMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<UUID>', description: '<String>', ownerId: '<UUID>', status: '<String>', threadId: '<UUID>', title: '<String>' });
+mutate({ databaseId: '<UUID>', description: '<String>', ownerId: '<UUID>', status: '<String>', threadId: '<UUID>', title: '<String>', visibility: '<String>' });
 ```

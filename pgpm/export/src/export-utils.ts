@@ -180,9 +180,8 @@ export interface TableConfig {
   gqlTypeName?: string; // override for GraphQL type name when automatic derivation doesn't match PostGraphile's inflector
   /**
    * Table has no database_id column; rows belong to a tenant through their
-   * domain_id FK (e.g. hostname_bindings, route_bindings). The export filters
-   * them by `domainId in (<tenant's domain ids>)` — the tenant's domain ids
-   * are pre-fetched once per export run.
+   * domain_id FK. The export filters them by `domainId in (<tenant's domain
+   * ids>)` — the tenant's domain ids are pre-fetched once per export run.
    */
   filterViaDomainIds?: boolean;
   /** Columns whose values are environment-specific and should be excluded from the
@@ -212,12 +211,6 @@ export interface MetaExportTableEntry {
  * values must come from DDL defaults at deploy time.
  */
 export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | 'table'>> = {
-  hostname_bindings: {
-    filterViaDomainIds: true
-  },
-  route_bindings: {
-    filterViaDomainIds: true
-  },
   sites: {
     typeOverrides: {
       og_image: 'image',
@@ -248,6 +241,9 @@ export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | '
   },
   i18n_module: {
     gqlTypeName: 'I18NModule' // i18n is a well-known abbreviation; PostGraphile inflector capitalizes the N
+  },
+  k8s_admission_module: {
+    gqlTypeName: 'K8sAdmissionModule' // k8s contains a digit boundary that doesn't round-trip through snake_case; matches PostGraphile's generated type
   }
 };
 

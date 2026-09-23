@@ -9,7 +9,7 @@ Partitioned append-only audit log of authentication events (sign-in, sign-up, pa
 ```typescript
 db.auditLogAuth.findMany({ select: { id: true } }).execute()
 db.auditLogAuth.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.auditLogAuth.create({ data: { actorId: '<UUID>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' }, select: { id: true } }).execute()
+db.auditLogAuth.create({ data: { actorId: '<UUID>', details: '<JSON>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' }, select: { id: true } }).execute()
 db.auditLogAuth.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.auditLogAuth.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.auditLogAuth.findMany({
 
 ```typescript
 const item = await db.auditLogAuth.create({
-  data: { actorId: '<UUID>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' },
+  data: { actorId: '<UUID>', details: '<JSON>', event: '<String>', ipAddress: '<InternetAddress>', origin: '<Origin>', success: '<Boolean>', userAgent: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -33,11 +33,15 @@ csdk auth set-token <your-token>
 | `store` | store CRUD operations |
 | `init-empty-repo` | initEmptyRepo |
 | `insert-node-at-path` | insertNodeAtPath |
-| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings. |
+| `insert-nodes-at-paths` | insertNodesAtPaths |
+| `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors. |
+| `set-and-commit` | setAndCommit |
 | `set-data-at-path` | setDataAtPath |
+| `set-many-and-commit` | setManyAndCommit |
 
 ## Infrastructure Commands
 
@@ -243,12 +247,30 @@ insertNodeAtPath
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
 
+### `insert-nodes-at-paths`
+
+insertNodesAtPaths
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.datas` | JSON |
+  | `--input.kidsList` | JSON |
+  | `--input.ktreeList` | JSON |
+  | `--input.paths` | JSON |
+  | `--input.root` | UUID |
+  | `--input.sId` | UUID |
+
 ### `provision-bucket`
 
-Provision an S3 bucket for a logical bucket in the database.
-Reads the bucket config via RLS, then creates and configures
-the S3 bucket with the appropriate privacy policies, CORS rules,
-and lifecycle settings.
+Reconcile an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then enqueues the same
+storage:provision_bucket job used by the INSERT trigger. This is
+idempotent for an already-reconciled bucket; enqueue failures become
+GraphQL errors.
 
 - **Type:** mutation
 - **Arguments:**
@@ -257,6 +279,25 @@ and lifecycle settings.
   |----------|------|
   | `--input.bucketKey` | String (required) |
   | `--input.ownerId` | UUID |
+
+### `set-and-commit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+  | `--input.message` | String |
+  | `--input.path` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `set-data-at-path`
 
@@ -272,6 +313,22 @@ setDataAtPath
   | `--input.path` | String |
   | `--input.root` | UUID |
   | `--input.sId` | UUID |
+
+### `set-many-and-commit`
+
+setManyAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.entries` | JSON |
+  | `--input.message` | String |
+  | `--input.refname` | String |
+  | `--input.sId` | UUID |
+  | `--input.storeId` | UUID |
 
 ## Output
 

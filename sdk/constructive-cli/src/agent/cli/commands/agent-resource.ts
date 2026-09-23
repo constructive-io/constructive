@@ -21,6 +21,7 @@ const fieldSchema: FieldSchema = {
   bodyTrgmSimilarity: 'float',
   createdAt: 'string',
   createdBy: 'uuid',
+  createdByPrincipal: 'uuid',
   databaseId: 'uuid',
   description: 'string',
   descriptionTrgmSimilarity: 'float',
@@ -42,6 +43,7 @@ const fieldSchema: FieldSchema = {
   titleTrgmSimilarity: 'float',
   updatedAt: 'string',
   updatedBy: 'uuid',
+  updatedByPrincipal: 'uuid',
 };
 import { resolveEmbedder, autoEmbedWhere, autoEmbedInput } from '../embedder';
 const usage =
@@ -101,6 +103,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       body: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       description: true,
       embedding: true,
@@ -114,6 +117,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       title: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy> & {
@@ -148,6 +152,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       body: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       description: true,
       embedding: true,
@@ -161,6 +166,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       title: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy> & {
@@ -224,6 +230,7 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
       body: true,
       createdAt: true,
       createdBy: true,
+      createdByPrincipal: true,
       databaseId: true,
       description: true,
       embedding: true,
@@ -237,6 +244,7 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
       title: true,
       updatedAt: true,
       updatedBy: true,
+      updatedByPrincipal: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentResourceSelect, AgentResourceFilter, AgentResourceOrderBy> & {
@@ -273,6 +281,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           body: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           embedding: true,
@@ -286,6 +295,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           title: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -318,6 +328,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'createdBy',
         message: 'createdBy',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
       },
@@ -395,6 +412,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -418,6 +442,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           archivedAt: cleanedData.archivedAt,
           body: cleanedData.body,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           embedding: cleanedData.embedding,
@@ -429,12 +454,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           title: cleanedData.title,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           archivedAt: true,
           body: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           embedding: true,
@@ -448,6 +475,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           title: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();
@@ -491,6 +519,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'createdByPrincipal',
+        message: 'createdByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -563,6 +598,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'updatedByPrincipal',
+        message: 'updatedByPrincipal',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentResourcePatch;
@@ -586,6 +628,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           archivedAt: cleanedData.archivedAt,
           body: cleanedData.body,
           createdBy: cleanedData.createdBy,
+          createdByPrincipal: cleanedData.createdByPrincipal,
           databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           embedding: cleanedData.embedding,
@@ -597,12 +640,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           slug: cleanedData.slug,
           title: cleanedData.title,
           updatedBy: cleanedData.updatedBy,
+          updatedByPrincipal: cleanedData.updatedByPrincipal,
         },
         select: {
           archivedAt: true,
           body: true,
           createdAt: true,
           createdBy: true,
+          createdByPrincipal: true,
           databaseId: true,
           description: true,
           embedding: true,
@@ -616,6 +661,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           title: true,
           updatedAt: true,
           updatedBy: true,
+          updatedByPrincipal: true,
         },
       })
       .execute();

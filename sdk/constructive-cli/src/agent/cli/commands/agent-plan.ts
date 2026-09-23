@@ -25,6 +25,7 @@ const fieldSchema: FieldSchema = {
   threadId: 'uuid',
   title: 'string',
   updatedAt: 'string',
+  visibility: 'string',
 };
 const usage =
   '\nagent-plan <command>\n\nCommands:\n  list                  List agentPlan records\n  find-first            Find first matching agentPlan record\n  get                   Get a agentPlan by ID\n  create                Create a new agentPlan\n  update                Update an existing agentPlan\n  delete                Delete a agentPlan\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -78,7 +79,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       createdAt: true,
-      databaseId: true,
       description: true,
       id: true,
       ownerId: true,
@@ -107,7 +107,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       createdAt: true,
-      databaseId: true,
       description: true,
       id: true,
       ownerId: true,
@@ -148,7 +147,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           createdAt: true,
-          databaseId: true,
           description: true,
           id: true,
           ownerId: true,
@@ -171,12 +169,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
       {
         type: 'text',
         name: 'description',
@@ -217,7 +209,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.agentPlan
       .create({
         data: {
-          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           ownerId: cleanedData.ownerId,
           status: cleanedData.status,
@@ -226,7 +217,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           createdAt: true,
-          databaseId: true,
           description: true,
           id: true,
           ownerId: true,
@@ -254,12 +244,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: false,
       },
       {
         type: 'text',
@@ -304,7 +288,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
-          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           ownerId: cleanedData.ownerId,
           status: cleanedData.status,
@@ -313,7 +296,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           createdAt: true,
-          databaseId: true,
           description: true,
           id: true,
           ownerId: true,

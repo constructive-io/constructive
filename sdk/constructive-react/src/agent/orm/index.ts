@@ -6,14 +6,29 @@
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { AgentModel } from './models/agent';
+import { AgentEventModel } from './models/agentEvent';
 import { AgentMessageModel } from './models/agentMessage';
 import { AgentPersonaModel } from './models/agentPersona';
 import { AgentPlanModel } from './models/agentPlan';
 import { AgentPromptModel } from './models/agentPrompt';
 import { AgentResourceChunkModel } from './models/agentResourceChunk';
 import { AgentResourceModel } from './models/agentResource';
+import { AgentRunModel } from './models/agentRun';
+import { AgentRunWorkspaceModel } from './models/agentRunWorkspace';
 import { AgentTaskModel } from './models/agentTask';
 import { AgentThreadModel } from './models/agentThread';
+import { PlatformAgentModel } from './models/platformAgent';
+import { PlatformAgentEventModel } from './models/platformAgentEvent';
+import { PlatformAgentMessageModel } from './models/platformAgentMessage';
+import { PlatformAgentPersonaModel } from './models/platformAgentPersona';
+import { PlatformAgentPlanModel } from './models/platformAgentPlan';
+import { PlatformAgentPromptModel } from './models/platformAgentPrompt';
+import { PlatformAgentResourceChunkModel } from './models/platformAgentResourceChunk';
+import { PlatformAgentResourceModel } from './models/platformAgentResource';
+import { PlatformAgentRunModel } from './models/platformAgentRun';
+import { PlatformAgentRunWorkspaceModel } from './models/platformAgentRunWorkspace';
+import { PlatformAgentTaskModel } from './models/platformAgentTask';
+import { PlatformAgentThreadModel } from './models/platformAgentThread';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
@@ -48,14 +63,29 @@ export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
     agent: new AgentModel(client),
+    agentEvent: new AgentEventModel(client),
     agentMessage: new AgentMessageModel(client),
     agentPersona: new AgentPersonaModel(client),
     agentPlan: new AgentPlanModel(client),
     agentPrompt: new AgentPromptModel(client),
     agentResourceChunk: new AgentResourceChunkModel(client),
     agentResource: new AgentResourceModel(client),
+    agentRun: new AgentRunModel(client),
+    agentRunWorkspace: new AgentRunWorkspaceModel(client),
     agentTask: new AgentTaskModel(client),
     agentThread: new AgentThreadModel(client),
+    platformAgent: new PlatformAgentModel(client),
+    platformAgentEvent: new PlatformAgentEventModel(client),
+    platformAgentMessage: new PlatformAgentMessageModel(client),
+    platformAgentPersona: new PlatformAgentPersonaModel(client),
+    platformAgentPlan: new PlatformAgentPlanModel(client),
+    platformAgentPrompt: new PlatformAgentPromptModel(client),
+    platformAgentResourceChunk: new PlatformAgentResourceChunkModel(client),
+    platformAgentResource: new PlatformAgentResourceModel(client),
+    platformAgentRun: new PlatformAgentRunModel(client),
+    platformAgentRunWorkspace: new PlatformAgentRunWorkspaceModel(client),
+    platformAgentTask: new PlatformAgentTaskModel(client),
+    platformAgentThread: new PlatformAgentThreadModel(client),
     mutation: createMutationOperations(client),
   };
 }

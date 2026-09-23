@@ -5,6 +5,7 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { ContentPresetModel } from './models/contentPreset';
 import { DbPresetModel } from './models/dbPreset';
 import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
@@ -48,6 +49,7 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    contentPreset: new ContentPresetModel(client),
     dbPreset: new DbPresetModel(client),
     namespace: new NamespaceModel(client),
     namespaceEvent: new NamespaceEventModel(client),

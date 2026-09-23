@@ -7,8 +7,8 @@ Function deployment bindings — ties a handler image to a namespace for Knative
 ## Usage
 
 ```typescript
-useFunctionDeploymentsQuery({ selection: { fields: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } } })
-useFunctionDeploymentQuery({ id: '<UUID>', selection: { fields: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } } })
+useFunctionDeploymentsQuery({ selection: { fields: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } } })
+useFunctionDeploymentQuery({ id: '<UUID>', selection: { fields: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } } })
 useCreateFunctionDeploymentMutation({ selection: { fields: { id: true } } })
 useUpdateFunctionDeploymentMutation({ selection: { fields: { id: true } } })
 useDeleteFunctionDeploymentMutation({})
@@ -20,7 +20,7 @@ useDeleteFunctionDeploymentMutation({})
 
 ```typescript
 const { data, isLoading } = useFunctionDeploymentsQuery({
-  selection: { fields: { annotations: true, concurrency: true, createdAt: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true } },
+  selection: { fields: { annotations: true, concurrency: true, createdAt: true, createdByPrincipal: true, databaseId: true, errorCount: true, handlerName: true, id: true, image: true, imageVersion: true, labels: true, lastError: true, lastErrorAt: true, namespaceId: true, realm: true, resources: true, revision: true, scaleMax: true, scaleMin: true, serviceName: true, serviceUrl: true, status: true, timeoutSeconds: true, updatedAt: true, updatedByPrincipal: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFunctionDeploymentsQuery({
 const { mutate } = useCreateFunctionDeploymentMutation({
   selection: { fields: { id: true } },
 });
-mutate({ annotations: '<JSON>', concurrency: '<Int>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>' });
+mutate({ annotations: '<JSON>', concurrency: '<Int>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', handlerName: '<String>', image: '<String>', imageVersion: '<String>', labels: '<JSON>', lastError: '<String>', lastErrorAt: '<Datetime>', namespaceId: '<UUID>', realm: '<String>', resources: '<JSON>', revision: '<Int>', scaleMax: '<Int>', scaleMin: '<Int>', serviceName: '<String>', serviceUrl: '<String>', status: '<String>', timeoutSeconds: '<Int>', updatedByPrincipal: '<UUID>' });
 ```
