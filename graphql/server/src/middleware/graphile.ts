@@ -204,6 +204,13 @@ const buildPreset = async (
             // Principal identity — always set; equals user_id for human sessions
             pgSettings['jwt.claims.principal_id'] = req.token.principal_id || req.token.user_id;
 
+            // Entity attribution — resolved server-side by the auth middleware;
+            // a principal credential resolves to its owner's entity pair
+            if (req.actorEntity) {
+              pgSettings['jwt.claims.entity_id'] = req.actorEntity.entityId;
+              pgSettings['jwt.claims.entity_type'] = req.actorEntity.entityType;
+            }
+
             // Enforce read-only transactions for read_only credentials
             if (req.token.access_level === 'read_only') {
               pgSettings['default_transaction_read_only'] = 'on';

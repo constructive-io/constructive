@@ -9,6 +9,7 @@ import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
+import { createActorEntityResolver, hasActorEntityResolver, pgActorEntityQuery } from './actor-entity';
 
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';
@@ -33,6 +34,20 @@ const parseCookieToken = (req: Request, cookieName: string): string | undefined 
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
 ): RequestHandler => {
+  type Resolver = ReturnType<typeof createActorEntityResolver> | null;
+  const resolvers = new Map<string, Promise<Resolver>>();
+  const actorEntityResolver = (dbname: string, pool: Parameters<typeof pgActorEntityQuery>[0]): Promise<Resolver> => {
+    let resolver = resolvers.get(dbname);
+    if (!resolver) {
+      resolver = hasActorEntityResolver(pool).then((present) =>
+        present ? createActorEntityResolver({ query: pgActorEntityQuery(pool) }) : null
+      );
+      resolver.catch(() => resolvers.delete(dbname));
+      resolvers.set(dbname, resolver);
+    }
+    return resolver;
+  };
+
   return async (
     req: Request,
     res: Response,
@@ -122,6 +137,13 @@ export const createAuthenticateMiddleware = (
 
           token = result.rows[0];
           log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
+
+          if (token?.user_id && api.databaseId) {
+            const resolve = await actorEntityResolver(api.dbname, pool);
+            if (resolve) {
+              req.actorEntity = await resolve(api.databaseId, token.user_id);
+            }
+          }
         } catch (e: any) {
           log.error('[auth] Auth error:', e.message);
           respondWithGraphQLError(
