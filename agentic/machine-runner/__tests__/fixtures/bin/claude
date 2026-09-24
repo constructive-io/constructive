@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+
+const readline = require('readline');
+
+const resumeIndex = process.argv.indexOf('--resume');
+const sessionId = resumeIndex >= 0 ? process.argv[resumeIndex + 1] : '2fdfd818-edfa-4869-ab55-59f481af498c';
+let initialized = false;
+let pendingApproval = null;
+
+const emit = value => process.stdout.write(`${JSON.stringify(value)}\n`);
+
+const finishTurn = prompt => {
+  const toolId = 'toolu_fake_bash';
+  if (!initialized) {
+    initialized = true;
+    emit({ type: 'system', subtype: 'init', session_id: sessionId });
+  }
+  emit({
+    type: 'assistant',
+    message: { content: [{ type: 'tool_use', id: toolId, name: 'Bash', input: { command: 'echo hi' } }] }
+  });
+  emit({
+    type: 'user',
+    message: { content: [{ type: 'tool_result', tool_use_id: toolId, content: 'hi' }] }
+  });
+  emit({ type: 'assistant', message: { content: [{ type: 'text', text: `echo:${prompt}` }] } });
+  if (prompt.includes('approve')) {
+    pendingApproval = { prompt, toolId };
+    emit({
+      type: 'control_request',
+      subtype: 'can_use_tool',
+      request_id: 'ecc2f2c7-4182-4e11-bed6-8cfe809b6925',
+      request: {
+        tool_name: 'Bash',
+        input: { command: 'rm -rf /' },
+        decision_reason: 'approval required'
+      }
+    });
+    return;
+  }
+  emit({ type: 'result', subtype: 'success', is_error: false, result: `echo:${prompt}`, usage: {}, total_cost_usd: 0.099364 });
+};
+
+const onLine = line => {
+  let value;
+  try {
+    value = JSON.parse(line);
+  } catch {
+    return;
+  }
+  if (value.type === 'control_response' && pendingApproval) {
+    const { prompt, toolId } = pendingApproval;
+    pendingApproval = null;
+    const response = value.response || {};
+    if (response.request_id !== 'ecc2f2c7-4182-4e11-bed6-8cfe809b6925') {
+      emit({ type: 'result', subtype: 'error', is_error: true, result: `control_response for unknown request ${response.request_id}`, usage: {}, total_cost_usd: 0 });
+      return;
+    }
+    const inner = response.response || {};
+    const allowed = inner.behavior === 'allow';
+    // Report what the runner actually answered, so a test can tell allow
+    // from deny by the transcript alone.
+    emit({
+      type: 'user',
+      message: {
+        content: [{
+          type: 'tool_result',
+          tool_use_id: toolId,
+          content: allowed ? 'removed everything' : `Permission denied: ${inner.message || ''}`,
+          is_error: !allowed
+        }]
+      }
+    });
+    emit({
+      type: 'result',
+      subtype: 'success',
+      is_error: false,
+      result: `${allowed ? 'allowed' : 'denied'}:${prompt}`,
+      usage: {},
+      total_cost_usd: 0.099364
+    });
+    return;
+  }
+  if (value.type === 'user') {
+    const content = value.message && value.message.content;
+    const prompt = Array.isArray(content) && content[0] && content[0].text;
+    if (typeof prompt === 'string') finishTurn(prompt);
+  }
+};
+
+readline.createInterface({ input: process.stdin }).on('line', onLine);

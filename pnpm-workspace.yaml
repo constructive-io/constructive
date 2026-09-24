@@ -105,3 +105,4 @@ packageExtensions:
 allowBuilds:
   "@launchql/protobufjs": true
   core-js-pure: true
+  node-pty: true # node-gyp native pty bindings, compiled at install time

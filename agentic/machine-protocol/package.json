@@ -1,0 +1,38 @@
+{
+  "name": "@constructive-db/machine-protocol",
+  "version": "0.1.0",
+  "description": "Wire protocol shared by the machine relay and the machine runner: the JSON frames a session is made of, and the codec that refuses malformed ones.",
+  "author": "Constructive <developers@constructive.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive",
+    "directory": "agentic/machine-protocol"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "build": "makage build && cp LICENSE dist/LICENSE",
+    "build:dev": "makage build --dev && cp LICENSE dist/LICENSE",
+    "clean": "makage clean",
+    "lint": "eslint . --fix",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.4",
+    "jest": "^29.7.0",
+    "makage": "^0.8.0",
+    "ts-jest": "^29.4.12",
+    "typescript": "^6.0.3"
+  }
+}
