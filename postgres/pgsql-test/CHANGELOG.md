@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.17.0](https://github.com/constructive-io/constructive/compare/pgsql-test@5.16.2...pgsql-test@5.17.0) (2026-09-24)
+
+### Features
+
+- **pgsql-test:** deferredConstraints option — run commit-time deferred constraint checks under rollback isolation ([2ebafde](https://github.com/constructive-io/constructive/commit/2ebafde4974a632bac347fa233a23de8f4900d69))
+
 ## [5.16.2](https://github.com/constructive-io/constructive/compare/pgsql-test@5.16.1...pgsql-test@5.16.2) (2026-09-19)
 
 **Note:** Version bump only for package pgsql-test

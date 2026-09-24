@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.3](https://github.com/constructive-io/constructive/compare/pg-codegen@5.25.2...pg-codegen@5.25.3) (2026-09-24)
+
+### Bug Fixes
+
+- **pg-codegen:** escape JSDoc terminators in emitted column comments ([0d5c551](https://github.com/constructive-io/constructive/commit/0d5c5518095be9ea6694d78d1ef8ffc77f36c9c1))
+
 ## [5.25.2](https://github.com/constructive-io/constructive/compare/pg-codegen@5.25.1...pg-codegen@5.25.2) (2026-09-19)
 
 **Note:** Version bump only for package pg-codegen

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.56.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.55.2...@pgpmjs/types@2.56.0) (2026-09-24)
+
+### Features
+
+- **pgsql-test:** deferredConstraints option — run commit-time deferred constraint checks under rollback isolation ([2ebafde](https://github.com/constructive-io/constructive/commit/2ebafde4974a632bac347fa233a23de8f4900d69))
+
 ## [2.55.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.55.1...@pgpmjs/types@2.55.2) (2026-09-19)
 
 **Note:** Version bump only for package @pgpmjs/types

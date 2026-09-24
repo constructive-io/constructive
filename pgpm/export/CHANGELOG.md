@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.23.2...@pgpmjs/export@1.23.3) (2026-09-24)
+
+### Bug Fixes
+
+- **export:** add k8s_admission_module gqlTypeName override ([b36bb52](https://github.com/constructive-io/constructive/commit/b36bb520343eec19799ddf9ac4d133baeacfa6ae))
+- **export:** drop META_TABLE_OVERRIDES for tables removed from the manifest ([26af6a8](https://github.com/constructive-io/constructive/commit/26af6a8a571fac343785598a1d486d9866bcaae6))
+
 ## [1.23.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.23.1...@pgpmjs/export@1.23.2) (2026-09-19)
 
 **Note:** Version bump only for package @pgpmjs/export
