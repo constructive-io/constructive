@@ -22,7 +22,7 @@ export const generateCode = (statements: t.Statement[]): string => {
 
 /** Attach a JSDoc block as a leading comment. */
 export const withJsDoc = <T extends t.Statement>(node: T, text: string): T => {
-  t.addComment(node, 'leading', `* ${text} `, false);
+  t.addComment(node, 'leading', `* ${text.replace(/\*\//g, '*\\/')} `, false);
   return node;
 };
 
