@@ -1,0 +1,592 @@
+// One outbound connection per enrollment. The runner dials the relay, keeps
+// the socket alive with a reconnect loop, and serves sessions: an `open`
+// frame spawns a pty (after the local policy says yes), `input`/`resize`/
+// `signal` drive it, and its output and exit stream back as frames. Nothing
+// here ever listens on a port.
+//
+// A pty outlives the socket that asked for it. An interactive session is a
+// terminal on this machine, not a state of the connection, so `detach` (and a
+// dropped relay) stop the *streaming* and leave the process running; the bytes
+// it writes while nobody is watching go into a capped ring buffer, and a later
+// `reattach` — from whichever client the tenant then authorizes — replays that
+// ring so the program repaints. The runner is the only place those bytes are
+// held in memory, and it holds a bounded window of them, never a transcript.
+//
+// A session bound to an agent run is headless: it is the run's process, not a
+// terminal anyone types into, so it never gets a pty. It runs on pipes, the way
+// a non-interactive command does. In `cli` mode the command is a coding-agent
+// CLI whose stream-JSON the runner adapts; in `embedded` mode it is an agent
+// host (`constructive-agent-host`) that speaks the machine protocol's events
+// itself, and the runner relays it like any other command. Either way the
+// runner spawns an allow-listed program and moves bytes: what runs inside —
+// which harness, whose run log, which credentials — is that program's concern.
+
+import {
+  AgentBinding,
+  agentBinding,
+  AgentEvent,
+  ApprovalDecision,
+  decodeFrame,
+  encodeFrame,
+  Frame,
+  HEADER_MACHINE_DATABASE,
+  HEADER_MACHINE_ID,
+  OpenFrame,
+  RUNNER_CONNECT_PATH,
+  SignalName
+} from '@constructive-db/machine-protocol';
+import { Logger } from '@pgpmjs/logger';
+import * as pty from 'node-pty';
+import { WebSocket } from 'ws';
+
+import { adapterForCommand } from './agent-cli';
+import { cliProcess } from './cli-session';
+import { Enrollment } from './config';
+import { headlessProcess } from './headless-session';
+import { PolicyViolationError, resolveSpawn, RunnerPolicy, SpawnSpec } from './policy';
+
+/** Stop presenting a credential this long before it expires. */
+const CREDENTIAL_SKEW_MS = 30_000;
+
+/**
+ * How much recent output an unwatched session keeps, in characters. Bounded on
+ * purpose: it is a repaint buffer, not a recording, and the oldest bytes are
+ * dropped rather than growing a detached session without limit.
+ */
+const SCROLLBACK_LIMIT = 64 * 1024;
+
+/**
+ * Signals delivered as the terminal's own control characters instead of to a
+ * pid. `kill(SIGINT)` would signal the session leader — the shell — which
+ * either ignores it or dies; writing the interrupt character lets the pty's
+ * line discipline deliver it to the *foreground* process group, which is how a
+ * keyboard `^C` stops the running command and leaves the shell prompt behind.
+ */
+const CONTROL_CHARACTERS: Partial<Record<SignalName, string>> = {
+  SIGINT: '\x03',
+  SIGQUIT: '\x1c'
+};
+
+/**
+ * What the runner drives, whether it is a pty or a pair of pipes. `resize` is
+ * absent where there is no terminal to resize.
+ */
+export interface SessionProcess {
+  write(data: string): void;
+  resize?(cols: number, rows: number): void;
+  kill(signal?: SignalName): void;
+  onData(listener: (data: string) => void): void;
+  onExit(listener: (event: { exitCode: number; signal?: number }) => void): void;
+  /** The process failed to run at all (a pty reports that by throwing from spawn). */
+  onError(listener: (err: Error) => void): void;
+  onEvent?(listener: (event: AgentEvent) => void): void;
+  onWarning?(listener: (message: string) => void): void;
+  /**
+   * A bound CLI agent asked whether it may use a tool. The process holds the
+   * turn until {@link resolveApproval} answers, or until its own timeout does.
+   */
+  onApprovalRequest?(listener: (request: ApprovalRequest) => void): void;
+  /** Answer a pending request. False when nothing is pending under that id. */
+  resolveApproval?(requestId: string, decision: ApprovalDecision, reason?: string): boolean;
+  /** Deny everything still pending, with the reason the CLI will be shown. */
+  denyPendingApprovals?(reason?: string): void;
+}
+
+export interface ApprovalRequest {
+  requestId: string;
+  tool: string;
+  input: unknown;
+  reason?: string;
+}
+
+function ptyProcess(spec: SpawnSpec, cols: number, rows: number): SessionProcess {
+  const proc = pty.spawn(spec.command, spec.args, {
+    name: 'xterm-256color',
+    cols,
+    rows,
+    cwd: spec.cwd,
+    env: spec.env
+  });
+  return {
+    write: data => proc.write(data),
+    resize: (c, r) => proc.resize(c, r),
+    kill: signal => proc.kill(signal),
+    onData: listener => proc.onData(listener),
+    onExit: listener => proc.onExit(listener),
+    onError: () => {}
+  };
+}
+
+interface RunnerSession {
+  proc: SessionProcess;
+  /** A terminal the tenant may detach from and come back to. */
+  interactive: boolean;
+  /** The agent run this session executes, or null for a plain session. */
+  binding: AgentBinding | null;
+  cols: number;
+  rows: number;
+  /** False while nobody is attached: output is buffered, not sent. */
+  streaming: boolean;
+  /** Recent output, for the repaint a reattach needs. Capped. */
+  scrollback: string;
+  /** True once the cap dropped older bytes. */
+  truncated: boolean;
+}
+
+export interface EnrollmentRunnerOptions {
+  enrollment: Enrollment;
+  policy: RunnerPolicy;
+  logger: Logger;
+  /** First reconnect delay in ms; doubles up to `reconnectMaxMs`. */
+  reconnectInitialMs?: number;
+  reconnectMaxMs?: number;
+}
+
+/** The connection for one enrollment: dial, serve sessions, redial on drop. */
+export class EnrollmentRunner {
+  private readonly enrollment: Enrollment;
+  private readonly policy: RunnerPolicy;
+  private readonly logger: Logger;
+  private readonly reconnectInitialMs: number;
+  private readonly reconnectMaxMs: number;
+
+  private ws: WebSocket | null = null;
+  private readonly sessions = new Map<string, RunnerSession>();
+  /**
+   * The short-lived credential the relay minted for the last dial, held in
+   * memory only: it is never logged and never written beside the enrollment
+   * file, and it is dropped once it can no longer verify so the next dial falls
+   * back to the enrollment token and is issued a fresh one.
+   */
+  private credential: { value: string; expiresAt: number } | null = null;
+  private reconnectDelayMs: number;
+  private reconnectTimer: NodeJS.Timeout | null = null;
+  private stopped = false;
+
+  constructor(options: EnrollmentRunnerOptions) {
+    this.enrollment = options.enrollment;
+    this.policy = options.policy;
+    this.logger = options.logger;
+    this.reconnectInitialMs = options.reconnectInitialMs ?? 250;
+    this.reconnectMaxMs = options.reconnectMaxMs ?? 10_000;
+    this.reconnectDelayMs = this.reconnectInitialMs;
+  }
+
+  start(): void {
+    this.stopped = false;
+    this.connect();
+  }
+
+  stop(): void {
+    this.stopped = true;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    // Stopping the daemon is the one case where a live terminal does not
+    // survive: the process tree it belongs to is going away with it.
+    for (const [sessionId, session] of this.sessions) {
+      session.proc.kill();
+      this.sessions.delete(sessionId);
+    }
+    this.ws?.terminate();
+    this.ws = null;
+  }
+
+  get connected(): boolean {
+    return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  /** Sessions this runner still holds, for tests and a future status frame. */
+  get liveSessions(): string[] {
+    return [...this.sessions.keys()];
+  }
+
+  /** The agent-run binding a live session carries, for tests and PR-4 execution. */
+  sessionBinding(sessionId: string): AgentBinding | null | undefined {
+    return this.sessions.get(sessionId)?.binding;
+  }
+
+  /**
+   * What to present on this dial: the credential from the last exchange while it
+   * still verifies, else the enrollment token. The enrollment token buys an
+   * exchange; it is not the standing credential.
+   */
+  private secret(): string {
+    const held = this.credential;
+    if (held && held.expiresAt * 1000 > Date.now() + CREDENTIAL_SKEW_MS) return held.value;
+    this.credential = null;
+    return this.enrollment.token;
+  }
+
+  /**
+   * Send on whichever socket is current. A session outlives the socket it was
+   * opened on, so its output must never be pinned to a closed one.
+   */
+  private send(frame: Frame): void {
+    const ws = this.ws;
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(encodeFrame(frame));
+  }
+
+  private connect(): void {
+    const { relayUrl, machineId, database } = this.enrollment;
+    const url = new URL(RUNNER_CONNECT_PATH, relayUrl);
+    const ws = new WebSocket(url, {
+      headers: {
+        authorization: `Bearer ${this.secret()}`,
+        [HEADER_MACHINE_ID]: machineId,
+        [HEADER_MACHINE_DATABASE]: database
+      }
+    });
+    this.ws = ws;
+
+    ws.on('open', () => {
+      this.reconnectDelayMs = this.reconnectInitialMs;
+      this.logger.info(`machine-runner: '${machineId}' connected to ${relayUrl}`);
+    });
+
+    ws.on('message', raw => {
+      let frame: Frame;
+      try {
+        frame = decodeFrame(raw.toString());
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        this.logger.error(`machine-runner: bad frame from relay: ${message}`);
+        ws.close(4002, 'protocol error');
+        return;
+      }
+      this.handleFrame(ws, frame);
+    });
+
+    // 'close' always follows an errored socket, so the reconnect is scheduled
+    // there; here the failure only needs to be visible.
+    ws.on('error', err => {
+      this.logger.warn(`machine-runner: '${machineId}' socket error: ${err.message}`);
+    });
+
+    ws.on('close', () => {
+      if (this.ws !== ws) return;
+      this.ws = null;
+      // A dropped relay is a detach the tenant never asked for: an interactive
+      // terminal keeps running and buffers, so a reattach after the relay comes
+      // back finds it alive. A command-mode session has no one to stream to and
+      // nothing to come back for, so it ends with its connection.
+      for (const [sessionId, session] of this.sessions) {
+        session.streaming = false;
+        // A question nobody can answer any more is answered here, before the
+        // process is torn down, so the CLI hears a denial and not silence.
+        session.proc.denyPendingApprovals?.();
+        if (session.interactive) continue;
+        session.proc.kill();
+        this.sessions.delete(sessionId);
+      }
+      if (this.stopped) return;
+      this.logger.warn(
+        `machine-runner: '${machineId}' disconnected, reconnecting in ${this.reconnectDelayMs}ms`
+      );
+      this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = null;
+        this.connect();
+      }, this.reconnectDelayMs);
+      this.reconnectDelayMs = Math.min(this.reconnectDelayMs * 2, this.reconnectMaxMs);
+    });
+  }
+
+  private handleFrame(ws: WebSocket, frame: Frame): void {
+    switch (frame.type) {
+    case 'open':
+      this.openSession(ws, frame);
+      return;
+    case 'input': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      session.proc.write(frame.data);
+      return;
+    }
+    case 'resize': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      if (!session.proc.resize) {
+        ws.send(
+          encodeFrame({
+            type: 'error',
+            sessionId: frame.sessionId,
+            message: 'headless session has no terminal to resize'
+          })
+        );
+        return;
+      }
+      session.cols = frame.cols;
+      session.rows = frame.rows;
+      session.proc.resize(frame.cols, frame.rows);
+      return;
+    }
+    case 'signal': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      this.deliverSignal(session, frame.sessionId, frame.signal);
+      return;
+    }
+    case 'detach': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      // The terminal keeps running; what stops is the streaming. The window it
+      // buffered goes back once, for the ledger to record, and is then dropped
+      // from this side of the wire.
+      session.streaming = false;
+      ws.send(
+        encodeFrame({
+          type: 'scrollback',
+          sessionId: frame.sessionId,
+          data: session.scrollback,
+          truncated: session.truncated
+        })
+      );
+      return;
+    }
+    case 'reattach': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      session.streaming = true;
+      if (frame.cols !== undefined && frame.rows !== undefined && session.proc.resize) {
+        session.cols = frame.cols;
+        session.rows = frame.rows;
+        session.proc.resize(frame.cols, frame.rows);
+      }
+      // Repaint: what the terminal looked like to whoever left it. A full-screen
+      // program redraws on the resize above, so this is what makes a scrolling
+      // session (a shell's history) come back too.
+      if (session.scrollback.length > 0) {
+        ws.send(
+          encodeFrame({ type: 'output', sessionId: frame.sessionId, data: session.scrollback })
+        );
+      }
+      return;
+    }
+    case 'close': {
+      const session = this.sessions.get(frame.sessionId);
+      if (session) {
+        session.proc.kill();
+        this.sessions.delete(frame.sessionId);
+      }
+      return;
+    }
+    case 'approval_decision': {
+      const session = this.require(ws, frame.sessionId);
+      if (!session) return;
+      if (!session.proc.resolveApproval) {
+        this.logger.warn(
+          `machine-runner: session '${frame.sessionId}' is not an agent session and takes no ` +
+            `approval decisions; '${frame.requestId}' ignored`
+        );
+        return;
+      }
+      if (!session.proc.resolveApproval(frame.requestId, frame.decision, frame.reason)) {
+        // A decision for a request this side already settled (its timeout ran
+        // out first, or the relay dropped and came back). An `error` frame is a
+        // session failure to the relay, and this is not one — the CLI was
+        // answered; the late verdict is only worth a line here.
+        this.logger.warn(
+          `machine-runner: session '${frame.sessionId}' has no pending approval ` +
+            `'${frame.requestId}'; the decision arrived after it was settled`
+        );
+      }
+      return;
+    }
+    case 'enrolled':
+      // The exchange's result: the tenant resolved this machine to a principal
+      // and minted a credential to dial with next time. Its value never reaches
+      // the log — only that it exists, and for how long.
+      this.credential = { value: frame.credential, expiresAt: frame.expiresAt };
+      this.logger.info(
+        `machine-runner: '${frame.machineId}' enrolled as principal ${frame.principalId}; ` +
+          `credential valid for ${Math.max(0, frame.expiresAt - Math.floor(Date.now() / 1000))}s`
+      );
+      return;
+    default:
+      this.logger.error(`machine-runner: unexpected '${frame.type}' frame from relay`);
+      ws.close(4002, 'protocol error');
+    }
+  }
+
+  /** The session a frame addresses, or an `error` frame back and undefined. */
+  private require(ws: WebSocket, sessionId: string): RunnerSession | undefined {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      ws.send(encodeFrame({ type: 'error', sessionId, message: 'unknown session' }));
+      return undefined;
+    }
+    return session;
+  }
+
+  /**
+   * Deliver a signal the way a terminal would. The two signals a keyboard
+   * produces go through the line discipline so they reach the foreground
+   * process group; the rest go to the session leader and therefore end the
+   * session, which is what asking for them means.
+   */
+  private deliverSignal(session: RunnerSession, sessionId: string, signal: SignalName): void {
+    const character = CONTROL_CHARACTERS[signal];
+    if (character && session.proc.resize) {
+      session.proc.write(character);
+      return;
+    }
+    try {
+      session.proc.kill(signal);
+    } catch (err) {
+      // node-pty throws when the process is already gone, which is a race the
+      // requester should see rather than a failure of the runner.
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`machine-runner: ${signal} to session '${sessionId}' failed: ${message}`);
+      this.send({ type: 'error', sessionId, message: `${signal} failed: ${message}` });
+    }
+  }
+
+  private openSession(ws: WebSocket, frame: OpenFrame): void {
+    const { sessionId, command } = frame;
+    const args = frame.args ?? [];
+    const interactive = frame.interactive === true;
+    const binding = agentBinding(frame);
+    if (this.sessions.has(sessionId)) {
+      ws.send(encodeFrame({ type: 'error', sessionId, message: 'session id already in use' }));
+      return;
+    }
+    if (binding && interactive) {
+      // The codec refuses this shape already; a relay that sends it anyway is
+      // asking for a terminal on a session that is by definition headless.
+      ws.send(
+        encodeFrame({
+          type: 'error',
+          sessionId,
+          message: 'session bound to an agent run cannot be interactive'
+        })
+      );
+      return;
+    }
+    const cols = frame.cols ?? 80;
+    const rows = frame.rows ?? 24;
+    let proc: SessionProcess;
+    try {
+      if (binding?.agentMode === 'embedded') {
+        // The agent host is a command like any other: allow-listed, spawned on
+        // pipes, its stdio relayed. The binding reaches it as arguments.
+        proc = headlessProcess({
+          policy: this.policy,
+          command,
+          args,
+          runId: binding.runId,
+          cwd: frame.cwd
+        });
+      } else if (binding?.agentMode === 'cli') {
+        const adapter = adapterForCommand(command, args);
+        proc = cliProcess({
+          adapter,
+          policy: this.policy,
+          command,
+          resume: binding.cliSessionId,
+          logger: this.logger
+        });
+      } else {
+        proc = ptyProcess(resolveSpawn(this.policy, command, args), cols, rows);
+      }
+    } catch (err) {
+      // A rejected command is the policy answering "no": the requester learns
+      // why, the machine's log records it, and the connection stays up.
+      const message = err instanceof Error ? err.message : String(err);
+      if (!(err instanceof PolicyViolationError)) {
+        this.logger.error(`machine-runner: spawn '${command}' failed: ${message}`);
+      } else {
+        this.logger.warn(`machine-runner: refused '${command}': ${message}`);
+      }
+      ws.send(encodeFrame({ type: 'error', sessionId, message }));
+      return;
+    }
+    const session: RunnerSession = {
+      proc,
+      interactive,
+      binding,
+      cols,
+      rows,
+      streaming: true,
+      scrollback: '',
+      truncated: false
+    };
+    this.sessions.set(sessionId, session);
+    proc.onData(data => {
+      // Buffered for an interactive session whether or not anyone is watching:
+      // that buffer is the repaint a reattach needs. Command mode streams and
+      // keeps nothing — its transcript is the ledger.
+      if (session.interactive) this.remember(session, data);
+      if (session.streaming) this.send({ type: 'output', sessionId, data });
+    });
+    proc.onEvent?.(event => {
+      if (session.streaming) this.send({ type: 'agent_event', sessionId, event });
+    });
+    proc.onApprovalRequest?.(request => {
+      // Not gated on `streaming`: a headless session has nobody to stream to
+      // but the question still needs an answer, and the relay is who asks.
+      this.send({ type: 'approval_request', sessionId, ...request });
+    });
+    proc.onWarning?.(message => {
+      this.logger.warn(`machine-runner: session '${sessionId}': ${message}`);
+      if (session.streaming) this.send({ type: 'output', sessionId, data: `${message}\n` });
+    });
+    proc.onExit(({ exitCode, signal }) => {
+      this.sessions.delete(sessionId);
+      if (session.streaming) this.send({ type: 'exit', sessionId, exitCode, signal });
+    });
+    proc.onError(err => {
+      this.sessions.delete(sessionId);
+      this.logger.error(`machine-runner: session '${sessionId}' process failed: ${err.message}`);
+      this.send({ type: 'error', sessionId, message: `process failed: ${err.message}` });
+    });
+  }
+
+  /** Append to the capped ring, dropping the oldest bytes past the limit. */
+  private remember(session: RunnerSession, data: string): void {
+    const combined = session.scrollback + data;
+    if (combined.length <= SCROLLBACK_LIMIT) {
+      session.scrollback = combined;
+      return;
+    }
+    session.scrollback = combined.slice(combined.length - SCROLLBACK_LIMIT);
+    session.truncated = true;
+  }
+}
+
+export interface MachineRunnerOptions {
+  enrollments: Enrollment[];
+  policy: RunnerPolicy;
+  logger: Logger;
+  reconnectInitialMs?: number;
+  reconnectMaxMs?: number;
+}
+
+/** The daemon: one EnrollmentRunner per enrollment in the config. */
+export class MachineRunner {
+  readonly runners: EnrollmentRunner[];
+
+  constructor(options: MachineRunnerOptions) {
+    if (options.enrollments.length === 0) {
+      throw new Error('machine-runner: at least one enrollment is required');
+    }
+    this.runners = options.enrollments.map(
+      enrollment =>
+        new EnrollmentRunner({
+          enrollment,
+          policy: options.policy,
+          logger: options.logger,
+          reconnectInitialMs: options.reconnectInitialMs,
+          reconnectMaxMs: options.reconnectMaxMs
+        })
+    );
+  }
+
+  start(): void {
+    for (const runner of this.runners) runner.start();
+  }
+
+  stop(): void {
+    for (const runner of this.runners) runner.stop();
+  }
+}

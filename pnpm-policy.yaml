@@ -63,6 +63,7 @@ intersect: true
 allowBuilds:
   '@launchql/protobufjs': true
   core-js-pure: true
+  node-pty: node-gyp native pty bindings, compiled at install time
 
 # Escape hatch for third-party packages that cannot wait — an urgent security
 # release, typically. A reason is required, and `until` makes the waiver expire
