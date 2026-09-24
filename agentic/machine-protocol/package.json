@@ -26,13 +26,5 @@
     "clean": "makage clean",
     "lint": "eslint . --fix",
     "test": "jest"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.4",
-    "jest": "^29.7.0",
-    "makage": "^0.8.0",
-    "ts-jest": "^29.4.12",
-    "typescript": "^6.0.3"
   }
 }
