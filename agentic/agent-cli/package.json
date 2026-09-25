@@ -1,0 +1,43 @@
+{
+  "name": "@constructive-db/agent-cli",
+  "version": "0.1.0",
+  "description": "constructive-agent-cli: a coding-agent CLI (claude, codex) adapted to the machine protocol's agent stdio contract — prompts and approval decisions in, AgentEvent JSON lines out. Runs on the user's own machine as an ordinary command under the machine runner, which knows nothing about it.",
+  "author": "Constructive <developers@constructive.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive",
+    "directory": "agentic/agent-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "keywords": [
+    "agent",
+    "claude",
+    "codex",
+    "remote-control"
+  ],
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "constructive-agent-cli": "run.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "build": "makage build && cp LICENSE dist/LICENSE",
+    "build:dev": "makage build --dev && cp LICENSE dist/LICENSE",
+    "clean": "makage clean",
+    "lint": "eslint . --fix",
+    "start": "node dist/run.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@constructive-db/machine-protocol": "workspace:*"
+  }
+}

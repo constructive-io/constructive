@@ -1,11 +1,20 @@
 # @constructive-db/machine-runner
 
 The machine runner: the Node daemon a user installs on their own machine for
-Remote Control (constructive-planning#1690, phase 0). It dials **out** to a
-machine relay over WebSocket — it never listens on a port — spawns
-policy-checked processes in a pty (`node-pty`), and streams their bytes back
-as `@constructive-db/machine-protocol` frames. When the relay connection
-drops, it redials with exponential backoff and re-registers the machine.
+Remote Control (constructive-planning#1690). It is a **remote control and
+nothing else**: it dials **out** to a machine relay over WebSocket — it never
+listens on a port — runs the allow-listed commands the relay hands it (in a pty
+for a terminal, on pipes otherwise), streams their bytes back as
+`@constructive-db/machine-protocol` frames, and stops them when told. When the
+relay connection drops, it redials with exponential backoff and re-registers
+the machine.
+
+The runner knows nothing about what it runs. It has no notion of agents,
+Claude, Codex, runs, approvals or events; it never reads a byte of a
+command's output. Everything agentic sits *above* it, as ordinary commands
+(`constructive-agent-cli` from `@constructive-db/agent-cli`,
+`constructive-agent-host` from `@constructive-db/agent-host`) that the relay
+asks it to run and whose stdout the relay interprets. Keep it that way.
 
 ## Install
 
@@ -63,32 +72,29 @@ start in the policy's `cwd`, and the spawned environment contains only the
 allow-listed pass-through variables plus the explicit `set` map — the runner's
 own environment (tokens included) never reaches a session.
 
-## Sessions bound to an agent run
+## What a session is
 
-A session opened with a `runId` is the run's process rather than a terminal:
-it runs on pipes, never in a pty, and its stdout lines that are machine-protocol
-`AgentEvent`s are relayed as `agent_event` frames (the relay ledgers them
-structurally); every other line is ordinary output. The runner spawns and
-relays — it holds no harness, no run log and no model credentials, and depends
-on nothing from `@agentic-kit/*`.
+An `open` frame names a command, its arguments, whether it wants a terminal,
+and optionally a directory. The runner:
 
-- `agentMode: 'cli'` — the command is a coding-agent CLI (`claude`, `codex`)
-  whose stream-JSON the runner adapts; its tool approvals are asked through the
-  relay and answered on the bound run's log.
-- `agentMode: 'embedded'` — the command is an agent host, normally
-  `constructive-agent-host` from `@constructive-db/agent-host`. To the runner it
-  is **an ordinary allow-listed command**: it must appear in `allowedCommands`,
-  it is spawned through the same policy path as everything else (policy `cwd`,
-  allow-listed environment), and the runner adds only the binding as
-  arguments — `--run <run_id>` and, when the client asked for one,
-  `--cwd <dir>` — after the opener's own (`--harness <name>`, …). Which harness
-  runs, where the run's log lives, how approvals are gated and how the host
-  finds its platform credential are the host's concerns, documented in
-  `compute/lib/agent-host`.
+- refuses the command unless it is in `allowedCommands`, and refuses a `cwd`
+  that resolves outside the policy's `cwd` (a sibling such as
+  `/home/me/work-other` is outside `/home/me/work`);
+- spawns it in a pty (`interactive: true`, with `cols`/`rows`) or on pipes,
+  in that directory, with the projected environment;
+- streams `output` frames (pipe output tagged `stdout`/`stderr`; pty output is
+  the terminal's byte stream), writes `input` frames to its stdin, applies
+  `resize` and `signal`, and reports `exit` or `error`;
+- keeps a detached interactive session alive with a bounded scrollback until
+  a client reattaches or the session is closed.
+
+That is the whole contract. An agent session is one of these whose command
+happens to be an agent program — the relay composes that command and reads
+its output; the runner ran an allow-listed command:
 
 ```json
 "policy": {
-  "allowedCommands": ["bash", "git", "constructive-agent-host"],
+  "allowedCommands": ["bash", "git", "constructive-agent-cli", "constructive-agent-host"],
   "cwd": "/home/me/work",
   "env": { "allow": ["PATH", "HOME"] }
 }

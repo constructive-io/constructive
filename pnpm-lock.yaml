@@ -111,6 +111,13 @@ importers:
         version: link:../openai/dist
     publishDirectory: dist
 
+  agentic/agent-cli:
+    dependencies:
+      '@constructive-db/machine-protocol':
+        specifier: workspace:*
+        version: link:../machine-protocol/dist
+    publishDirectory: dist
+
   agentic/agent-conversation:
     publishDirectory: dist
 

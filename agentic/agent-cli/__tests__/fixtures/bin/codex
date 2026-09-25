@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+const args = process.argv.slice(2);
+const resumeIndex = args.indexOf('resume');
+const sessionId = resumeIndex >= 0 ? args[resumeIndex + 1] : '01a0a38b-442f-7f91-a250-72f305c839f7';
+// Like the real CLI: the prompt is the positional after `--`.
+const separator = args.indexOf('--');
+if (separator < 0 || separator === args.length - 1) {
+  process.stderr.write('codex fixture: prompt must follow --\n');
+  process.exit(2);
+}
+const prompt = args[separator + 1];
+const emit = value => process.stdout.write(`${JSON.stringify(value)}\n`);
+
+emit({ type: 'thread.started', thread_id: sessionId });
+emit({
+  type: 'item.completed',
+  item: { id: 'msg_fake', type: 'agent_message', text: `echo:${prompt}` }
+});
+emit({ type: 'turn.completed', usage: {} });

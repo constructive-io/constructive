@@ -1,4 +1,16 @@
-import { agentBinding, assertAgentEvent, decodeFrame, encodeFrame, Frame, isAgentEventLike, OpenFrame } from '../src';
+import {
+  agentBinding,
+  assertAgentEvent,
+  decodeFrame,
+  encodeApprovalDecisionLine,
+  encodeFrame,
+  Frame,
+  isAgentEventLike,
+  LineSplitter,
+  MAX_LINE_LENGTH,
+  OpenFrame,
+  parseApprovalDecisionLine
+} from '../src';
 
 describe('machine-protocol codec', () => {
   it('round-trips every frame type', () => {
@@ -75,23 +87,8 @@ describe('machine-protocol codec', () => {
         sessionId: 's1',
         event: { kind: 'result', ok: true, summary: 'done', usage: { input: 1 }, costUsd: 0.1 }
       },
-      {
-        type: 'approval_request',
-        sessionId: 's1',
-        requestId: 'request-1',
-        tool: 'Bash',
-        input: { command: 'rm -rf build' },
-        reason: 'destructive'
-      },
-      { type: 'approval_request', sessionId: 's1', requestId: 'request-2', tool: 'Edit', input: null },
-      { type: 'approval_decision', sessionId: 's1', requestId: 'request-1', decision: 'allow' },
-      {
-        type: 'approval_decision',
-        sessionId: 's1',
-        requestId: 'request-2',
-        decision: 'deny',
-        reason: 'not now'
-      },
+      { type: 'output', sessionId: 's1', data: '{"kind":"text","text":"hi"}\n', stream: 'stdout' },
+      { type: 'output', sessionId: 's1', data: 'warning: slow\n', stream: 'stderr' },
       {
         type: 'open',
         sessionId: 's1',
@@ -188,39 +185,43 @@ describe('machine-protocol codec', () => {
     ).toThrow(/missing ok/);
   });
 
-  it('validates approval frames', () => {
-    const request = { type: 'approval_request', sessionId: 's', requestId: 'r', tool: 'Bash', input: {} };
-    expect(() => decodeFrame(JSON.stringify({ ...request, requestId: undefined }))).toThrow(
-      /missing requestId/
-    );
-    expect(() => decodeFrame(JSON.stringify({ ...request, requestId: '' }))).toThrow(/missing requestId/);
-    expect(() => decodeFrame(JSON.stringify({ ...request, tool: undefined }))).toThrow(/missing tool/);
-    expect(() => decodeFrame(JSON.stringify({ ...request, reason: 7 }))).toThrow(
-      /reason must be a string/
-    );
-    expect(() => decodeFrame(JSON.stringify({ ...request, sessionId: undefined }))).toThrow(
-      /missing sessionId/
-    );
+  // An approval decision is not a frame the runner sees: it travels to the
+  // program as one line on its stdin, and the program reads it by this codec.
+  it('encodes and parses approval decision lines', () => {
+    const allow = { kind: 'approval_decision' as const, requestId: 'r', decision: 'allow' as const };
+    expect(encodeApprovalDecisionLine(allow)).toBe(`${JSON.stringify(allow)}\n`);
+    expect(parseApprovalDecisionLine(JSON.stringify(allow))).toEqual(allow);
+    expect(
+      parseApprovalDecisionLine(
+        JSON.stringify({ kind: 'approval_decision', requestId: 'r', decision: 'deny', reason: 'not now' })
+      )
+    ).toEqual({ kind: 'approval_decision', requestId: 'r', decision: 'deny', reason: 'not now' });
 
-    const decision = { type: 'approval_decision', sessionId: 's', requestId: 'r', decision: 'allow' };
-    expect(() => decodeFrame(JSON.stringify({ ...decision, requestId: undefined }))).toThrow(
+    // Anything that is not a decision is the program's to read: a prompt, an
+    // unrelated JSON line, an empty line.
+    expect(parseApprovalDecisionLine('hello')).toBeNull();
+    expect(parseApprovalDecisionLine('{"kind":"text"}')).toBeNull();
+    expect(parseApprovalDecisionLine('')).toBeNull();
+
+    const decision = { kind: 'approval_decision', requestId: 'r', decision: 'allow' };
+    expect(() => parseApprovalDecisionLine(JSON.stringify({ ...decision, requestId: undefined }))).toThrow(
       /missing requestId/
     );
-    expect(() => decodeFrame(JSON.stringify({ ...decision, decision: 'maybe' }))).toThrow(
+    expect(() => parseApprovalDecisionLine(JSON.stringify({ ...decision, decision: 'maybe' }))).toThrow(
       /invalid decision/
     );
-    expect(() => decodeFrame(JSON.stringify({ ...decision, decision: undefined }))).toThrow(
+    expect(() => parseApprovalDecisionLine(JSON.stringify({ ...decision, decision: undefined }))).toThrow(
       /invalid decision/
     );
-    expect(() => decodeFrame(JSON.stringify({ ...decision, reason: {} }))).toThrow(
+    expect(() => parseApprovalDecisionLine(JSON.stringify({ ...decision, reason: {} }))).toThrow(
       /reason must be a string/
     );
   });
 
-  // A headless agent process prints events one per line; the runner relaying
-  // it tells an event line from any other by the same rule the codec applies
-  // to an `agent_event` frame, and a line that claims to be one but is not is
-  // a protocol fault, not output.
+  // A bound program prints events one per line; the relay reading its stdout
+  // tells an event line from any other by the same rule the codec applies to
+  // an `agent_event` frame, and a line that claims to be one but is not is a
+  // protocol fault, not output. The runner itself never reads the line.
   it('tells an agent event line from output and checks its shape', () => {
     expect(isAgentEventLike({ kind: 'text', text: 'hi' })).toBe(true);
     expect(isAgentEventLike({ kind: 'nope' })).toBe(false);
@@ -231,6 +232,27 @@ describe('machine-protocol codec', () => {
       /stdout line tool_call event is missing name/
     );
     expect(() => assertAgentEvent(null)).toThrow(/'agent_event' frame is missing event/);
+  });
+
+  it('splits lines across chunks and refuses one that never ends', () => {
+    const lines = new LineSplitter();
+    expect(lines.push('one\r\ntw')).toEqual(['one']);
+    expect(lines.push('o\n\nthree')).toEqual(['two', '']);
+    expect(lines.flush()).toEqual(['three']);
+    expect(lines.flush()).toEqual([]);
+
+    // A line up to the cap is buffered; the byte past it is the fault, and the
+    // reader is left empty rather than holding on to what it refused.
+    const capped = new LineSplitter(8);
+    expect(capped.push('12345678')).toEqual([]);
+    expect(() => capped.push('9')).toThrow(/line exceeds 8 characters without a newline/);
+    expect(capped.flush()).toEqual([]);
+    expect(capped.push('ok\n')).toEqual(['ok']);
+
+    expect(MAX_LINE_LENGTH).toBe(1024 * 1024);
+    const wide = new LineSplitter();
+    expect(wide.push('x'.repeat(MAX_LINE_LENGTH))).toEqual([]);
+    expect(() => wide.push('x')).toThrow(/line exceeds 1048576 characters/);
   });
 
   it('validates the open frame cwd', () => {
