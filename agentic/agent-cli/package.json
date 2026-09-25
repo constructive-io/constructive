@@ -30,6 +30,7 @@
     "directory": "dist"
   },
   "scripts": {
+    "prepack": "npm run build",
     "build": "makage build && cp LICENSE dist/LICENSE",
     "build:dev": "makage build --dev && cp LICENSE dist/LICENSE",
     "clean": "makage clean",
@@ -38,6 +39,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@constructive-db/machine-protocol": "workspace:*"
+    "@constructive-db/machine-protocol": "workspace:^"
   }
 }
