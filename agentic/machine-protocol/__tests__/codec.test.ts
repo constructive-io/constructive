@@ -249,6 +249,16 @@ describe('machine-protocol codec', () => {
     expect(capped.flush()).toEqual([]);
     expect(capped.push('ok\n')).toEqual(['ok']);
 
+    // Complete lines ahead of an oversized tail in one chunk are delivered;
+    // the fault is raised by whatever the reader does next.
+    const mixed = new LineSplitter(8);
+    expect(mixed.push('one\ntwo\n123456789')).toEqual(['one', 'two']);
+    expect(() => mixed.push('x\n')).toThrow(/line exceeds 8 characters/);
+    expect(mixed.push('x\n')).toEqual(['x']);
+    const mixedFlush = new LineSplitter(8);
+    expect(mixedFlush.push('one\n123456789')).toEqual(['one']);
+    expect(() => mixedFlush.flush()).toThrow(/line exceeds 8 characters/);
+
     expect(MAX_LINE_LENGTH).toBe(1024 * 1024);
     const wide = new LineSplitter();
     expect(wide.push('x'.repeat(MAX_LINE_LENGTH))).toEqual([]);

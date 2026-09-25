@@ -78,9 +78,16 @@ export function runAgentCliSession(options: AgentCliSessionOptions): Promise<Age
     const note = (message: string): void => {
       io.stderr.write(`agent-cli: ${message}\n`);
     };
+    /** The session has spoken; nothing that arrives on stdin afterwards may start or feed a CLI. */
+    const conclude = (): void => {
+      exited = true;
+      io.stdin.removeListener('data', onStdinData);
+      io.stdin.removeListener('end', onStdinEnd);
+      io.stdin.removeListener('error', onStdinError);
+    };
     const fail = (err: Error): void => {
       if (exited) return;
-      exited = true;
+      conclude();
       for (const timer of pending.values()) clearTimeout(timer);
       pending.clear();
       child?.kill();
@@ -182,7 +189,7 @@ export function runAgentCliSession(options: AgentCliSessionOptions): Promise<Age
           fail(err instanceof Error ? err : new Error(String(err)));
           return;
         }
-        exited = true;
+        conclude();
         resolve({ exitCode: code ?? -1, ...(signal ? { signal } : {}) });
       });
       // The CLI closing its stdin early (a one-shot `codex exec`) makes the
@@ -198,7 +205,7 @@ export function runAgentCliSession(options: AgentCliSessionOptions): Promise<Age
     };
 
     const onInputLine = (line: string): void => {
-      if (line.length === 0) return;
+      if (exited || line.length === 0) return;
       const decision = parseApprovalDecisionLine(line);
       if (decision) {
         if (!settle(decision.requestId, decision.decision, decision.reason)) {
@@ -223,19 +230,18 @@ export function runAgentCliSession(options: AgentCliSessionOptions): Promise<Age
         child.kill('SIGTERM');
         return;
       }
-      exited = true;
+      conclude();
       resolve({ exitCode: -1, signal: 'SIGTERM' });
     });
 
-    io.stdin.setEncoding('utf8');
-    io.stdin.on('data', (data: string) => {
+    function onStdinData(data: string): void {
       try {
         for (const line of inputLines.push(data)) onInputLine(line);
       } catch (err) {
         fail(err instanceof Error ? err : new Error(String(err)));
       }
-    });
-    io.stdin.on('end', () => {
+    }
+    function onStdinEnd(): void {
       try {
         for (const line of inputLines.flush()) onInputLine(line);
       } catch (err) {
@@ -243,11 +249,17 @@ export function runAgentCliSession(options: AgentCliSessionOptions): Promise<Age
         return;
       }
       // No prompt ever came: there is nothing to run.
-      if (!child) {
-        exited = true;
+      if (!child && !exited) {
+        conclude();
         resolve({ exitCode: 0 });
       }
-    });
-    io.stdin.on('error', err => fail(new Error(`agent-cli: stdin failed: ${err.message}`, { cause: err })));
+    }
+    function onStdinError(err: Error): void {
+      fail(new Error(`agent-cli: stdin failed: ${err.message}`, { cause: err }));
+    }
+    io.stdin.setEncoding('utf8');
+    io.stdin.on('data', onStdinData);
+    io.stdin.on('end', onStdinEnd);
+    io.stdin.on('error', onStdinError);
   });
 }

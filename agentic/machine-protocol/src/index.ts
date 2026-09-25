@@ -375,20 +375,35 @@ export class LineSplitter {
 
   constructor(private readonly maxLineLength = MAX_LINE_LENGTH) {}
 
+  /**
+   * Complete lines are delivered before an oversized tail in the same chunk is
+   * reported: the failure is raised on the next call instead of losing them.
+   */
+  private overflowed = false;
+
   push(chunk: string): string[] {
+    this.raiseOverflow();
     this.tail += chunk;
     const lines = this.tail.split('\n');
     this.tail = lines.pop() ?? '';
     if (this.tail.length > this.maxLineLength) {
       this.tail = '';
-      throw new Error(
-        `machine-protocol: line exceeds ${this.maxLineLength} characters without a newline`
-      );
+      this.overflowed = true;
+      if (lines.length === 0) this.raiseOverflow();
     }
     return lines.map(stripCarriageReturn);
   }
 
+  private raiseOverflow(): void {
+    if (!this.overflowed) return;
+    this.overflowed = false;
+    throw new Error(
+      `machine-protocol: line exceeds ${this.maxLineLength} characters without a newline`
+    );
+  }
+
   flush(): string[] {
+    this.raiseOverflow();
     if (!this.tail) return [];
     const line = stripCarriageReturn(this.tail);
     this.tail = '';

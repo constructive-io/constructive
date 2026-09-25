@@ -401,10 +401,12 @@ export class EnrollmentRunner {
       this.sessions.delete(sessionId);
       if (session.streaming) this.send({ type: 'exit', sessionId, exitCode, signal });
     });
+    // The exit that follows — the process's own, or the one a failed start
+    // reports — is what ends the session.
     proc.onError(err => {
-      this.sessions.delete(sessionId);
       this.logger.error(`machine-runner: session '${sessionId}' process failed: ${err.message}`);
       this.send({ type: 'error', sessionId, message: `process failed: ${err.message}` });
+      proc.kill('SIGTERM');
     });
   }
 

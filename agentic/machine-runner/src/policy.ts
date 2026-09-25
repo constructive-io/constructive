@@ -3,6 +3,7 @@
 // travels over the wire — a compromised relay can ask, but the answer is
 // decided here.
 
+import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
@@ -43,15 +44,35 @@ export interface SpawnSpec {
 }
 
 /**
+ * Where a path really points: symlinks resolved through the deepest ancestor
+ * that exists, the rest appended as written. A path that does not exist yet is
+ * judged by where it would be created.
+ */
+function realPath(target: string): string {
+  let existing = target;
+  const rest: string[] = [];
+  while (!fs.existsSync(existing)) {
+    const parent = path.dirname(existing);
+    if (parent === existing) return target;
+    rest.unshift(path.basename(existing));
+    existing = parent;
+  }
+  return path.join(fs.realpathSync.native(existing), ...rest);
+}
+
+/**
  * The directory a session runs in: the policy root, or a requested directory
- * resolved against it — and refused when it would land outside. The request
- * is the client's; where the root is, is the machine owner's.
+ * resolved against it — and refused when it would land outside, symlinks
+ * included. The request is the client's; where the root is, is the machine
+ * owner's.
  */
 export function resolveCwd(policy: RunnerPolicy, requested?: string): string {
   const root = path.resolve(policy.cwd || os.homedir());
   if (requested === undefined) return root;
   const resolved = path.resolve(root, requested);
-  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+  const realRoot = realPath(root);
+  const real = realPath(resolved);
+  if (real !== realRoot && !real.startsWith(realRoot + path.sep)) {
     throw new PolicyViolationError(`cwd '${requested}' is outside the policy root`);
   }
   return resolved;

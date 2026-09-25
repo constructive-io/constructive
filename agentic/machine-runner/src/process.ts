@@ -73,8 +73,13 @@ export function pipeProcess(spec: SpawnSpec): SessionProcess {
   child.stderr.setEncoding('utf8').on('data', (data: string) => {
     for (const listener of dataListeners) listener(data, 'stderr');
   });
+  // A program that could not start (ENOENT, EACCES) reports once, as an
+  // error and then as the exit it never had; nothing follows.
   child.on('error', err => {
+    if (exited) return;
+    exited = true;
     for (const listener of errorListeners) listener(err);
+    for (const listener of exitListeners) listener({ exitCode: -1 });
   });
   child.on('exit', (code, signal) => {
     if (exited) return;
