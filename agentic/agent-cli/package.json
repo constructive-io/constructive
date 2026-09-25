@@ -39,6 +39,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@constructive-db/machine-protocol": "workspace:^"
+    "@constructive-db/machine-protocol": "workspace:*"
   }
 }
