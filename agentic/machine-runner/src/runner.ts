@@ -1,8 +1,16 @@
 // One outbound connection per enrollment. The runner dials the relay, keeps
 // the socket alive with a reconnect loop, and serves sessions: an `open`
-// frame spawns a pty (after the local policy says yes), `input`/`resize`/
+// frame spawns a process (after the local policy says yes), `input`/`resize`/
 // `signal` drive it, and its output and exit stream back as frames. Nothing
 // here ever listens on a port.
+//
+// The runner is a remote control and nothing more. It runs the command it is
+// handed — in a pty when the session is a terminal, on pipes when it is a
+// command — moves the bytes, and reports the exit. It does not know what the
+// command is. A coding agent, an agent host, a build: each is an allow-listed
+// program on pipes whose stdout the runner forwards without reading. Whatever
+// vocabulary such a program speaks is between it and the relay's clients;
+// none of it is here, and none of it may be added here.
 //
 // A pty outlives the socket that asked for it. An interactive session is a
 // terminal on this machine, not a state of the connection, so `detach` (and a
@@ -11,21 +19,8 @@
 // `reattach` — from whichever client the tenant then authorizes — replays that
 // ring so the program repaints. The runner is the only place those bytes are
 // held in memory, and it holds a bounded window of them, never a transcript.
-//
-// A session bound to an agent run is headless: it is the run's process, not a
-// terminal anyone types into, so it never gets a pty. It runs on pipes, the way
-// a non-interactive command does. In `cli` mode the command is a coding-agent
-// CLI whose stream-JSON the runner adapts; in `embedded` mode it is an agent
-// host (`constructive-agent-host`) that speaks the machine protocol's events
-// itself, and the runner relays it like any other command. Either way the
-// runner spawns an allow-listed program and moves bytes: what runs inside —
-// which harness, whose run log, which credentials — is that program's concern.
 
 import {
-  AgentBinding,
-  agentBinding,
-  AgentEvent,
-  ApprovalDecision,
   decodeFrame,
   encodeFrame,
   Frame,
@@ -36,14 +31,11 @@ import {
   SignalName
 } from '@constructive-db/machine-protocol';
 import { Logger } from '@pgpmjs/logger';
-import * as pty from 'node-pty';
 import { WebSocket } from 'ws';
 
-import { adapterForCommand } from './agent-cli';
-import { cliProcess } from './cli-session';
 import { Enrollment } from './config';
-import { headlessProcess } from './headless-session';
-import { PolicyViolationError, resolveSpawn, RunnerPolicy, SpawnSpec } from './policy';
+import { PolicyViolationError, resolveSpawn, RunnerPolicy } from './policy';
+import { pipeProcess, ptyProcess, SessionProcess } from './process';
 
 /** Stop presenting a credential this long before it expires. */
 const CREDENTIAL_SKEW_MS = 30_000;
@@ -67,62 +59,10 @@ const CONTROL_CHARACTERS: Partial<Record<SignalName, string>> = {
   SIGQUIT: '\x1c'
 };
 
-/**
- * What the runner drives, whether it is a pty or a pair of pipes. `resize` is
- * absent where there is no terminal to resize.
- */
-export interface SessionProcess {
-  write(data: string): void;
-  resize?(cols: number, rows: number): void;
-  kill(signal?: SignalName): void;
-  onData(listener: (data: string) => void): void;
-  onExit(listener: (event: { exitCode: number; signal?: number }) => void): void;
-  /** The process failed to run at all (a pty reports that by throwing from spawn). */
-  onError(listener: (err: Error) => void): void;
-  onEvent?(listener: (event: AgentEvent) => void): void;
-  onWarning?(listener: (message: string) => void): void;
-  /**
-   * A bound CLI agent asked whether it may use a tool. The process holds the
-   * turn until {@link resolveApproval} answers, or until its own timeout does.
-   */
-  onApprovalRequest?(listener: (request: ApprovalRequest) => void): void;
-  /** Answer a pending request. False when nothing is pending under that id. */
-  resolveApproval?(requestId: string, decision: ApprovalDecision, reason?: string): boolean;
-  /** Deny everything still pending, with the reason the CLI will be shown. */
-  denyPendingApprovals?(reason?: string): void;
-}
-
-export interface ApprovalRequest {
-  requestId: string;
-  tool: string;
-  input: unknown;
-  reason?: string;
-}
-
-function ptyProcess(spec: SpawnSpec, cols: number, rows: number): SessionProcess {
-  const proc = pty.spawn(spec.command, spec.args, {
-    name: 'xterm-256color',
-    cols,
-    rows,
-    cwd: spec.cwd,
-    env: spec.env
-  });
-  return {
-    write: data => proc.write(data),
-    resize: (c, r) => proc.resize(c, r),
-    kill: signal => proc.kill(signal),
-    onData: listener => proc.onData(listener),
-    onExit: listener => proc.onExit(listener),
-    onError: () => {}
-  };
-}
-
 interface RunnerSession {
   proc: SessionProcess;
   /** A terminal the tenant may detach from and come back to. */
   interactive: boolean;
-  /** The agent run this session executes, or null for a plain session. */
-  binding: AgentBinding | null;
   cols: number;
   rows: number;
   /** False while nobody is attached: output is buffered, not sent. */
@@ -202,11 +142,6 @@ export class EnrollmentRunner {
     return [...this.sessions.keys()];
   }
 
-  /** The agent-run binding a live session carries, for tests and PR-4 execution. */
-  sessionBinding(sessionId: string): AgentBinding | null | undefined {
-    return this.sessions.get(sessionId)?.binding;
-  }
-
   /**
    * What to present on this dial: the credential from the last exchange while it
    * still verifies, else the enrollment token. The enrollment token buys an
@@ -273,9 +208,6 @@ export class EnrollmentRunner {
       // nothing to come back for, so it ends with its connection.
       for (const [sessionId, session] of this.sessions) {
         session.streaming = false;
-        // A question nobody can answer any more is answered here, before the
-        // process is torn down, so the CLI hears a denial and not silence.
-        session.proc.denyPendingApprovals?.();
         if (session.interactive) continue;
         session.proc.kill();
         this.sessions.delete(sessionId);
@@ -311,7 +243,7 @@ export class EnrollmentRunner {
           encodeFrame({
             type: 'error',
             sessionId: frame.sessionId,
-            message: 'headless session has no terminal to resize'
+            message: 'command session has no terminal to resize'
           })
         );
         return;
@@ -371,28 +303,6 @@ export class EnrollmentRunner {
       }
       return;
     }
-    case 'approval_decision': {
-      const session = this.require(ws, frame.sessionId);
-      if (!session) return;
-      if (!session.proc.resolveApproval) {
-        this.logger.warn(
-          `machine-runner: session '${frame.sessionId}' is not an agent session and takes no ` +
-            `approval decisions; '${frame.requestId}' ignored`
-        );
-        return;
-      }
-      if (!session.proc.resolveApproval(frame.requestId, frame.decision, frame.reason)) {
-        // A decision for a request this side already settled (its timeout ran
-        // out first, or the relay dropped and came back). An `error` frame is a
-        // session failure to the relay, and this is not one — the CLI was
-        // answered; the late verdict is only worth a line here.
-        this.logger.warn(
-          `machine-runner: session '${frame.sessionId}' has no pending approval ` +
-            `'${frame.requestId}'; the decision arrived after it was settled`
-        );
-      }
-      return;
-    }
     case 'enrolled':
       // The exchange's result: the tenant resolved this machine to a principal
       // and minted a credential to dial with next time. Its value never reaches
@@ -446,49 +356,16 @@ export class EnrollmentRunner {
     const { sessionId, command } = frame;
     const args = frame.args ?? [];
     const interactive = frame.interactive === true;
-    const binding = agentBinding(frame);
     if (this.sessions.has(sessionId)) {
       ws.send(encodeFrame({ type: 'error', sessionId, message: 'session id already in use' }));
-      return;
-    }
-    if (binding && interactive) {
-      // The codec refuses this shape already; a relay that sends it anyway is
-      // asking for a terminal on a session that is by definition headless.
-      ws.send(
-        encodeFrame({
-          type: 'error',
-          sessionId,
-          message: 'session bound to an agent run cannot be interactive'
-        })
-      );
       return;
     }
     const cols = frame.cols ?? 80;
     const rows = frame.rows ?? 24;
     let proc: SessionProcess;
     try {
-      if (binding?.agentMode === 'embedded') {
-        // The agent host is a command like any other: allow-listed, spawned on
-        // pipes, its stdio relayed. The binding reaches it as arguments.
-        proc = headlessProcess({
-          policy: this.policy,
-          command,
-          args,
-          runId: binding.runId,
-          cwd: frame.cwd
-        });
-      } else if (binding?.agentMode === 'cli') {
-        const adapter = adapterForCommand(command, args);
-        proc = cliProcess({
-          adapter,
-          policy: this.policy,
-          command,
-          resume: binding.cliSessionId,
-          logger: this.logger
-        });
-      } else {
-        proc = ptyProcess(resolveSpawn(this.policy, command, args), cols, rows);
-      }
+      const spec = resolveSpawn(this.policy, command, args, frame.cwd);
+      proc = interactive ? ptyProcess(spec, cols, rows) : pipeProcess(spec);
     } catch (err) {
       // A rejected command is the policy answering "no": the requester learns
       // why, the machine's log records it, and the connection stays up.
@@ -504,7 +381,6 @@ export class EnrollmentRunner {
     const session: RunnerSession = {
       proc,
       interactive,
-      binding,
       cols,
       rows,
       streaming: true,
@@ -512,33 +388,25 @@ export class EnrollmentRunner {
       truncated: false
     };
     this.sessions.set(sessionId, session);
-    proc.onData(data => {
+    proc.onData((data, stream) => {
       // Buffered for an interactive session whether or not anyone is watching:
       // that buffer is the repaint a reattach needs. Command mode streams and
       // keeps nothing — its transcript is the ledger.
       if (session.interactive) this.remember(session, data);
-      if (session.streaming) this.send({ type: 'output', sessionId, data });
-    });
-    proc.onEvent?.(event => {
-      if (session.streaming) this.send({ type: 'agent_event', sessionId, event });
-    });
-    proc.onApprovalRequest?.(request => {
-      // Not gated on `streaming`: a headless session has nobody to stream to
-      // but the question still needs an answer, and the relay is who asks.
-      this.send({ type: 'approval_request', sessionId, ...request });
-    });
-    proc.onWarning?.(message => {
-      this.logger.warn(`machine-runner: session '${sessionId}': ${message}`);
-      if (session.streaming) this.send({ type: 'output', sessionId, data: `${message}\n` });
+      if (session.streaming) {
+        this.send({ type: 'output', sessionId, data, ...(stream ? { stream } : {}) });
+      }
     });
     proc.onExit(({ exitCode, signal }) => {
       this.sessions.delete(sessionId);
       if (session.streaming) this.send({ type: 'exit', sessionId, exitCode, signal });
     });
+    // The exit that follows — the process's own, or the one a failed start
+    // reports — is what ends the session.
     proc.onError(err => {
-      this.sessions.delete(sessionId);
       this.logger.error(`machine-runner: session '${sessionId}' process failed: ${err.message}`);
       this.send({ type: 'error', sessionId, message: `process failed: ${err.message}` });
+      proc.kill('SIGTERM');
     });
   }
 

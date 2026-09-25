@@ -3,12 +3,17 @@
 // travels over the wire — a compromised relay can ask, but the answer is
 // decided here.
 
+import fs from 'fs';
 import os from 'os';
+import path from 'path';
 
 export interface RunnerPolicy {
   /** Commands (argv[0], exact match) a session may start. */
   allowedCommands: string[];
-  /** Working directory every session starts in. */
+  /**
+   * The root every session runs under: where a session starts by default, and
+   * the directory a requested `cwd` must stay inside.
+   */
   cwd: string;
   /**
    * Environment the spawned process sees: `allow` names process.env vars to
@@ -19,40 +24,6 @@ export interface RunnerPolicy {
     allow?: string[];
     set?: Record<string, string>;
   };
-  /**
-   * How long a bound CLI agent's tool approval may wait for an answer from
-   * the relay before the runner settles it itself. The CLI is never left
-   * hanging: past `timeoutMs` the runner answers with `onTimeout`, which is a
-   * denial unless the machine's owner says otherwise.
-   */
-  approvals?: {
-    timeoutMs?: number;
-    onTimeout?: 'deny' | 'allow';
-  };
-}
-
-/** Five minutes: long enough for a human to look, short enough to notice. */
-export const DEFAULT_APPROVAL_TIMEOUT_MS = 5 * 60_000;
-
-export interface ApprovalPolicy {
-  timeoutMs: number;
-  onTimeout: 'deny' | 'allow';
-}
-
-export function resolveApprovalPolicy(policy: RunnerPolicy): ApprovalPolicy {
-  const timeoutMs = policy.approvals?.timeoutMs ?? DEFAULT_APPROVAL_TIMEOUT_MS;
-  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new PolicyViolationError(
-      `policy.approvals.timeoutMs must be a positive number of milliseconds, got ${timeoutMs}`
-    );
-  }
-  const onTimeout = policy.approvals?.onTimeout ?? 'deny';
-  if (onTimeout !== 'deny' && onTimeout !== 'allow') {
-    throw new PolicyViolationError(
-      `policy.approvals.onTimeout must be 'deny' or 'allow', got ${String(onTimeout)}`
-    );
-  }
-  return { timeoutMs, onTimeout };
 }
 
 /** Pass-through vars a pty session cannot reasonably run without. */
@@ -72,10 +43,46 @@ export interface SpawnSpec {
   env: Record<string, string>;
 }
 
+/**
+ * Where a path really points: symlinks resolved through the deepest ancestor
+ * that exists, the rest appended as written. A path that does not exist yet is
+ * judged by where it would be created.
+ */
+function realPath(target: string): string {
+  let existing = target;
+  const rest: string[] = [];
+  while (!fs.existsSync(existing)) {
+    const parent = path.dirname(existing);
+    if (parent === existing) return target;
+    rest.unshift(path.basename(existing));
+    existing = parent;
+  }
+  return path.join(fs.realpathSync.native(existing), ...rest);
+}
+
+/**
+ * The directory a session runs in: the policy root, or a requested directory
+ * resolved against it — and refused when it would land outside, symlinks
+ * included. The request is the client's; where the root is, is the machine
+ * owner's.
+ */
+export function resolveCwd(policy: RunnerPolicy, requested?: string): string {
+  const root = path.resolve(policy.cwd || os.homedir());
+  if (requested === undefined) return root;
+  const resolved = path.resolve(root, requested);
+  const realRoot = realPath(root);
+  const real = realPath(resolved);
+  if (real !== realRoot && !real.startsWith(realRoot + path.sep)) {
+    throw new PolicyViolationError(`cwd '${requested}' is outside the policy root`);
+  }
+  return resolved;
+}
+
 export function resolveSpawn(
   policy: RunnerPolicy,
   command: string,
-  args: string[] = []
+  args: string[] = [],
+  cwd?: string
 ): SpawnSpec {
   if (!policy.allowedCommands.includes(command)) {
     throw new PolicyViolationError(`command '${command}' is not in the allowed command list`);
@@ -92,7 +99,7 @@ export function resolveSpawn(
   return {
     command,
     args,
-    cwd: policy.cwd || os.homedir(),
+    cwd: resolveCwd(policy, cwd),
     env
   };
 }

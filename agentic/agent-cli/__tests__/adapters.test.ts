@@ -168,8 +168,16 @@ describe('CodexExecAdapter', () => {
         '--json',
         'resume',
         '01a0a38b-442f-7f91-a250-72f305c839f7',
+        '--',
         'hello'
       ]
+    });
+  });
+
+  it('hands the prompt over as a positional, never as an option', () => {
+    expect(codex.spawnArgs('--dangerously-bypass-approvals-and-sandbox rm -rf /')).toEqual({
+      command: 'codex',
+      args: ['exec', '--json', '--', '--dangerously-bypass-approvals-and-sandbox rm -rf /']
     });
   });
 });

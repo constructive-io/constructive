@@ -65,25 +65,6 @@ export function parseRunnerConfig(raw: unknown): RunnerConfig {
   if (typeof policyObj.cwd !== 'string' || policyObj.cwd.length === 0) {
     throw new Error("machine-runner config: 'policy.cwd' is required");
   }
-  if (policyObj.approvals !== undefined) {
-    if (typeof policyObj.approvals !== 'object' || policyObj.approvals === null) {
-      throw new Error("machine-runner config: 'policy.approvals' must be an object");
-    }
-    const approvals = policyObj.approvals as Record<string, unknown>;
-    if (
-      approvals.timeoutMs !== undefined &&
-      (typeof approvals.timeoutMs !== 'number' || !(approvals.timeoutMs > 0))
-    ) {
-      throw new Error("machine-runner config: 'policy.approvals.timeoutMs' must be a positive number");
-    }
-    if (
-      approvals.onTimeout !== undefined &&
-      approvals.onTimeout !== 'deny' &&
-      approvals.onTimeout !== 'allow'
-    ) {
-      throw new Error("machine-runner config: 'policy.approvals.onTimeout' must be 'deny' or 'allow'");
-    }
-  }
   return {
     enrollments,
     policy: policyObj as unknown as RunnerPolicy

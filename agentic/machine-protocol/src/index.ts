@@ -14,6 +14,19 @@
 // a decision. That is what makes a reattach from a different client safe —
 // nothing about the attach that opened the session carries over.
 //
+// Two vocabularies live here, and the line between them is the line between the
+// runner and everything above it:
+//
+// - The *machine* frames (`open` … `exit`, plus enrollment) are the remote
+//   control. A runner speaks only these: it runs an allow-listed command in a
+//   pty or on pipes, moves bytes, reports the exit. It has no notion of what the
+//   command is.
+// - The *agent* vocabulary (`AgentBinding` on an `open`, `AgentEvent`, the
+//   `agent_event` frame, the stdio contract below) is between a client, the
+//   relay and an agent program running *under* the runner. The runner never
+//   reads or writes any of it; to the runner an agent program is a command on
+//   pipes whose stdout happens to be JSON lines.
+//
 // This package is vocabulary, never policy. Everything a socket puts on the wire
 // — its database, its machine id — is a *coordinate*: it says which row the
 // socket is asking about, and the relay answers by asking that database's SQL.
@@ -106,10 +119,13 @@ export type AgentMode = 'cli' | 'embedded';
 export const AGENT_MODES: readonly AgentMode[] = ['cli', 'embedded'];
 
 /**
- * The agent-run binding an `open` frame may carry. A bound session is headless:
- * its process is the agent's, driven by the run rather than by a keyboard, so
- * it never gets a pty. Like every coordinate on this wire the run id is a
- * request — the tenant's SQL decides whether the opener may bind to that run.
+ * The agent-run binding an `open` frame may carry, client → relay. A bound
+ * session is headless: its process is the agent's, driven by the run rather
+ * than by a keyboard, so it never gets a pty. Like every coordinate on this
+ * wire the run id is a request — the tenant's SQL decides whether the opener
+ * may bind to that run. The relay keeps the binding; what reaches the runner
+ * is a plain `open` for the agent program, with the binding folded into its
+ * arguments.
  */
 export interface AgentBinding {
   runId: string;
@@ -127,10 +143,11 @@ export interface OpenFrame {
   cols?: number;
   rows?: number;
   /**
-   * Ask for a terminal rather than a pipe. An interactive session gets a pty,
+   * Ask for a terminal rather than pipes. An interactive session gets a pty,
    * so its output is opaque terminal bytes (escape sequences and all) and its
    * geometry is part of the session — which is what makes `vim` render and
-   * reflow. Command mode (phase 1) is the default and unchanged.
+   * reflow. The default is a command on pipes: stdin in, stdout and stderr out
+   * (each `output` frame says which), no echo, no geometry.
    */
   interactive?: boolean;
   /** Agent run this session executes locally. Requires `agentMode`. */
@@ -140,8 +157,8 @@ export interface OpenFrame {
   /** The CLI's own session identifier; only with `agentMode: 'cli'`. */
   cliSessionId?: string;
   /**
-   * Working directory the session runs in, as a request: the runner's policy
-   * decides whether it is honoured, and a plain command session ignores it.
+   * Working directory the session runs in, as a request: resolved against the
+   * runner's policy root, and refused when it would leave it.
    */
   cwd?: string;
 }
@@ -227,6 +244,13 @@ export interface OutputFrame {
   type: 'output';
   sessionId: string;
   data: string;
+  /**
+   * Which pipe the bytes came from, on a non-interactive session. A terminal
+   * has one stream, so a pty session's output carries none; a program on
+   * pipes has two, and a consumer parsing stdout line by line (an agent's
+   * events) must not have stderr spliced into it.
+   */
+  stream?: 'stdout' | 'stderr';
 }
 
 export type AgentEvent =
@@ -267,29 +291,128 @@ export interface AgentEventFrame {
 
 export type ApprovalDecision = 'allow' | 'deny';
 
-/**
- * Runner → relay: a bound CLI agent asked whether it may use a tool, and the
- * runner is holding the turn until it hears back. The relay answers by writing
- * the request into the bound run's log, where any authorized client resolves
- * it, and then sends an {@link ApprovalDecisionFrame}. Carries no identity:
- * who may answer is the run's RLS, asked under the attaching client's claims.
- */
-export interface ApprovalRequestFrame {
-  type: 'approval_request';
-  sessionId: string;
-  requestId: string;
-  tool: string;
-  input: unknown;
-  reason?: string;
-}
+// ---------------------------------------------------------------------------
+// The agent program contract. An agent runs under the runner as an ordinary
+// non-interactive command; this is what it speaks on its pipes, and the relay
+// is the peer that reads and writes it — not the runner, which sees bytes.
+//
+//   stdin  — one prompt per line, and {@link ApprovalDecisionLine}s as JSON
+//            lines where the relay answers a question the program asked;
+//   stdout — {@link AgentEvent}s as JSON lines; any other line is plain output;
+//   stderr — plain output;
+//   exit   — the program's own.
+//
+// `constructive-agent-host` (`@constructive-db/agent-host`) speaks it natively.
+// `constructive-agent-cli` (`@constructive-db/agent-cli`) speaks it on behalf
+// of a coding-agent CLI (`claude`, `codex`) that does not.
+// ---------------------------------------------------------------------------
 
-/** Relay → runner: the answer to an {@link ApprovalRequestFrame}. */
-export interface ApprovalDecisionFrame {
-  type: 'approval_decision';
-  sessionId: string;
+/**
+ * The program the relay runs for a `cli` binding: it wraps the CLI the opener
+ * named (`claude`, `codex`) and translates its stream to this contract. The
+ * machine's policy must allow it by this exact name.
+ */
+export const AGENT_CLI_COMMAND = 'constructive-agent-cli';
+
+/**
+ * Relay → agent program (a line on its stdin): the answer to an
+ * `approval_requested` event the program emitted. Carries no identity: who
+ * answered was the run's RLS, asked on the bound run's log.
+ */
+export interface ApprovalDecisionLine {
+  kind: 'approval_decision';
   requestId: string;
   decision: ApprovalDecision;
   reason?: string;
+}
+
+export function encodeApprovalDecisionLine(line: ApprovalDecisionLine): string {
+  return `${JSON.stringify(line)}\n`;
+}
+
+/** The decision a stdin line carries, or null when the line is a prompt. */
+export function parseApprovalDecisionLine(line: string): ApprovalDecisionLine | null {
+  if (!line.startsWith('{')) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return null;
+  const value = parsed as Record<string, unknown>;
+  if (value.kind !== 'approval_decision') return null;
+  if (typeof value.requestId !== 'string' || value.requestId.length === 0) {
+    throw new Error('machine-protocol: approval_decision line is missing requestId');
+  }
+  if (value.decision !== 'allow' && value.decision !== 'deny') {
+    throw new Error('machine-protocol: approval_decision line has invalid decision');
+  }
+  const reason = value.reason;
+  if (reason !== undefined && typeof reason !== 'string') {
+    throw new Error('machine-protocol: approval_decision line reason must be a string');
+  }
+  const decoded: ApprovalDecisionLine = {
+    kind: 'approval_decision',
+    requestId: value.requestId,
+    decision: value.decision
+  };
+  if (typeof reason === 'string') decoded.reason = reason;
+  return decoded;
+}
+
+/** The longest line a {@link LineSplitter} buffers before giving up on it. */
+export const MAX_LINE_LENGTH = 1024 * 1024;
+
+/**
+ * Split a stream into the complete lines it has delivered so far. Keeps the
+ * unterminated tail for the next chunk; `flush` hands it over at the end. A
+ * tail that outgrows `maxLineLength` is dropped and reported, so a program
+ * that never writes a newline cannot grow the reader without bound.
+ */
+export class LineSplitter {
+  private tail = '';
+
+  constructor(private readonly maxLineLength = MAX_LINE_LENGTH) {}
+
+  /**
+   * Complete lines are delivered before an oversized tail in the same chunk is
+   * reported: the failure is raised on the next call instead of losing them.
+   */
+  private overflowed = false;
+
+  push(chunk: string): string[] {
+    this.raiseOverflow();
+    this.tail += chunk;
+    const lines = this.tail.split('\n');
+    this.tail = lines.pop() ?? '';
+    if (this.tail.length > this.maxLineLength) {
+      this.tail = '';
+      this.overflowed = true;
+      if (lines.length === 0) this.raiseOverflow();
+    }
+    return lines.map(stripCarriageReturn);
+  }
+
+  private raiseOverflow(): void {
+    if (!this.overflowed) return;
+    this.overflowed = false;
+    throw new Error(
+      `machine-protocol: line exceeds ${this.maxLineLength} characters without a newline`
+    );
+  }
+
+  flush(): string[] {
+    this.raiseOverflow();
+    if (!this.tail) return [];
+    const line = stripCarriageReturn(this.tail);
+    this.tail = '';
+    return [line];
+  }
+}
+
+function stripCarriageReturn(line: string): string {
+  return line.endsWith('\r') ? line.slice(0, -1) : line;
 }
 
 /** Runner → client: the process ended. */
@@ -391,8 +514,6 @@ export type RunnerToClientFrame =
 export type Frame =
   | ClientToRunnerFrame
   | RunnerToClientFrame
-  | ApprovalRequestFrame
-  | ApprovalDecisionFrame
   | AttachedFrame
   | DetachedFrame
   | ReattachedFrame
@@ -408,8 +529,6 @@ const FRAME_TYPES: ReadonlySet<string> = new Set([
   'close',
   'output',
   'agent_event',
-  'approval_request',
-  'approval_decision',
   'exit',
   'error',
   'scrollback',
@@ -430,18 +549,10 @@ const SESSION_FRAME_TYPES: ReadonlySet<string> = new Set([
   'close',
   'output',
   'agent_event',
-  'approval_request',
-  'approval_decision',
   'exit',
   'scrollback',
   'detached',
   'reattached'
-]);
-
-/** Frame types that carry a `requestId` pairing a request with its answer. */
-const REQUEST_FRAME_TYPES: ReadonlySet<string> = new Set([
-  'approval_request',
-  'approval_decision'
 ]);
 
 const SIGNALS: ReadonlySet<string> = new Set(SIGNAL_NAMES);
@@ -599,12 +710,6 @@ export function decodeFrame(raw: string): Frame {
   if (SESSION_FRAME_TYPES.has(type) && typeof frame.sessionId !== 'string') {
     throw new Error(`machine-protocol: '${type}' frame is missing sessionId`);
   }
-  if (
-    REQUEST_FRAME_TYPES.has(type) &&
-    (typeof frame.requestId !== 'string' || frame.requestId.length === 0)
-  ) {
-    throw new Error(`machine-protocol: '${type}' frame is missing requestId`);
-  }
   switch (type) {
   case 'open':
     if (typeof frame.command !== 'string' || frame.command.length === 0) {
@@ -624,25 +729,17 @@ export function decodeFrame(raw: string): Frame {
     if (typeof frame.data !== 'string') {
       throw new Error(`machine-protocol: '${type}' frame is missing data`);
     }
+    if (
+      type === 'output' &&
+      frame.stream !== undefined &&
+      frame.stream !== 'stdout' &&
+      frame.stream !== 'stderr'
+    ) {
+      throw new Error("machine-protocol: 'output' frame stream must be 'stdout' or 'stderr'");
+    }
     break;
   case 'agent_event':
     assertAgentEvent(frame.event);
-    break;
-  case 'approval_request':
-    if (typeof frame.tool !== 'string' || frame.tool.length === 0) {
-      throw new Error("machine-protocol: 'approval_request' frame is missing tool");
-    }
-    if (frame.reason !== undefined && typeof frame.reason !== 'string') {
-      throw new Error("machine-protocol: 'approval_request' frame reason must be a string");
-    }
-    break;
-  case 'approval_decision':
-    if (frame.decision !== 'allow' && frame.decision !== 'deny') {
-      throw new Error("machine-protocol: 'approval_decision' frame has invalid decision");
-    }
-    if (frame.reason !== undefined && typeof frame.reason !== 'string') {
-      throw new Error("machine-protocol: 'approval_decision' frame reason must be a string");
-    }
     break;
   case 'resize':
     if (!validDimension(frame.cols) || !validDimension(frame.rows)) {

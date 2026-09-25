@@ -177,7 +177,16 @@ export class CodexExecAdapter implements AgentCliAdapter {
   spawnArgs(prompt: string, resume?: string): AgentCliSpawn {
     return {
       command: 'codex',
-      args: ['exec', '--json', ...this.extraArgs, ...(resume ? ['resume', resume] : []), prompt]
+      // `--` ends option parsing, so a prompt is a prompt even when it starts
+      // with a dash.
+      args: [
+        'exec',
+        '--json',
+        ...this.extraArgs,
+        ...(resume ? ['resume', resume] : []),
+        '--',
+        prompt
+      ]
     };
   }
 
@@ -248,6 +257,6 @@ export function adapterForCommand(command: string, extraArgs: string[]): AgentCl
   case 'codex':
     return new CodexExecAdapter(extraArgs);
   default:
-    throw new Error(`machine-runner: no CLI adapter for command '${command}'`);
+    throw new Error(`agent-cli: no CLI adapter for command '${command}'`);
   }
 }

@@ -1,4 +1,8 @@
-import { DEFAULT_ENV_ALLOW, PolicyViolationError, resolveSpawn, RunnerPolicy } from '../src';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
+import { DEFAULT_ENV_ALLOW, PolicyViolationError, resolveCwd, resolveSpawn, RunnerPolicy } from '../src';
 
 const policy: RunnerPolicy = {
   allowedCommands: ['echo', 'ls'],
@@ -37,5 +41,26 @@ describe('runner policy', () => {
     );
     expect(Object.keys(spec.env).sort()).toEqual(['MACHINE_SESSION', 'PATH']);
     expect(spec.env.MACHINE_SESSION).toBe('1');
+  });
+});
+
+describe('cwd confinement', () => {
+  let root: string;
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), 'runner-policy-'));
+    fs.mkdirSync(path.join(root, 'inside'));
+    fs.symlinkSync(os.tmpdir(), path.join(root, 'escape'));
+  });
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  it('keeps a session inside the root, following symlinks', () => {
+    const confined: RunnerPolicy = { allowedCommands: ['ls'], cwd: root };
+    expect(resolveCwd(confined)).toBe(root);
+    expect(resolveCwd(confined, 'inside')).toBe(path.join(root, 'inside'));
+    expect(resolveCwd(confined, 'inside/not-yet-created')).toBe(path.join(root, 'inside/not-yet-created'));
+    expect(() => resolveCwd(confined, '..')).toThrow(PolicyViolationError);
+    expect(() => resolveCwd(confined, '/etc')).toThrow(PolicyViolationError);
+    expect(() => resolveCwd(confined, 'escape')).toThrow(PolicyViolationError);
+    expect(() => resolveCwd(confined, 'escape/anything')).toThrow(PolicyViolationError);
   });
 });
