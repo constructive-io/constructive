@@ -1,0 +1,10 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## 0.1.1 (2026-09-25)
+
+### Bug Fixes
+
+- **agentic:** symlink-proof cwd confinement, terminal spawn failures, no CLI spawn after the session concludes, complete lines survive an oversized tail ([d5b9c27](https://github.com/constructive-io/constructive/commit/d5b9c278ae93c127e53b84a0d68d9d8c8716c277))
