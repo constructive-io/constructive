@@ -223,15 +223,11 @@ export async function resolveProjectContext(
     ? deriveSubdomainEndpoint(apiEndpoint, `api-${databaseName}`)
     : '';
 
-  const schemaId = await resolveSchemaId(apiClient, databaseId);
-  if (!schemaId) {
-    return {
-      context: null,
-      reason:
-        'Could not resolve a schema (app_public/public) for this database. The database may not be fully provisioned yet.',
-      code: 'schema-unresolved',
-    };
+  const schema = await resolveSchemaId(apiClient, databaseId);
+  if ('reason' in schema) {
+    return { context: null, reason: schema.reason, code: 'schema-unresolved' };
   }
+  const schemaId = schema.id;
 
   return {
     context: {
@@ -340,23 +336,29 @@ export async function resolveOrgName(ownerId: string): Promise<string | undefine
   }
 }
 
+// `name` is the logical schema name, identical on every backend; the physical
+// (possibly hashed) name is `schemaName`.
 async function resolveSchemaId(
   apiClient: ApiClient,
   databaseId: string,
-): Promise<string | undefined> {
+): Promise<{ id: string } | { reason: string }> {
   const result = await apiClient.schema
     .findMany({
       select: { id: true, name: true },
-      where: { databaseId: { equalTo: databaseId } },
+      where: { databaseId: { equalTo: databaseId }, name: { equalTo: 'app_public' } },
     })
     .execute();
 
-  if (!result.ok) return undefined;
+  if (!result.ok) {
+    const detail = result.errors?.[0]?.message ?? 'unknown error';
+    return { reason: `Could not query the app_public schema for database ${databaseId}: ${detail}` };
+  }
 
-  const nodes = (result.data.schemas?.nodes ?? []).filter((s) => Boolean(s && s.id));
-  const appPublic = nodes.find((s) => s.name === 'app_public');
-  if (appPublic) return appPublic.id;
-  const pub = nodes.find((s) => s.name === 'public');
-  if (pub) return pub.id;
-  return nodes[0]?.id;
+  const appPublic = (result.data.schemas?.nodes ?? []).find((s) => s?.name === 'app_public');
+  if (!appPublic?.id) {
+    return {
+      reason: `Database ${databaseId} has no app_public schema. The database may not be fully provisioned yet.`,
+    };
+  }
+  return { id: appPublic.id };
 }

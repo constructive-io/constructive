@@ -16,7 +16,6 @@ import {
   provisionEnvVars,
 } from '../provision-database/env-file';
 import { loadProvisionManifest } from '../provision-database/manifest';
-import { applySqlFixups } from '../provision-database/pg-fixups';
 import { selectProvisionRequest } from '../provision-database/preset-match';
 import { requestDatabaseProvision } from '../provision-database/request-database';
 import { type ProvisionOverlay, resolveProvisionModules } from '../provision-database/resolve';
@@ -62,7 +61,6 @@ export type ProvisionDatabaseDetails = {
   databaseId?: string;
   databaseName?: string;
   ownerId?: string;
-  fixupNote?: string;
   /** True when an existing live binding was kept — nothing changed. */
   skipped?: boolean;
 };
@@ -93,7 +91,7 @@ export const provisionDatabaseTool: HarnessTool<
   name: 'provision_database',
   label: 'Provision database',
   description:
-    'Bootstrap a new Constructive database for the project under your account: provision the standard module set, enable membership defaults, and write credentials (DATABASE_ID, ACCESS_TOKEN, etc.) to the project .env. Run this ONCE before any schema/record tools. If the project is already bound to a live database under the signed-in account it skips; if the bound database no longer exists on this backend (refreshed/deleted) or belongs to a different account, pass reprovision: true to mint a fresh one (old keys archived in .env, old database kept; rebuild the schema afterwards).',
+    'Bootstrap a new Constructive database for the project under your account: provision the standard module set and write credentials (DATABASE_ID, ACCESS_TOKEN, etc.) to the project .env. Run this ONCE before any schema/record tools. If the project is already bound to a live database under the signed-in account it skips; if the bound database no longer exists on this backend (refreshed/deleted) or belongs to a different account, pass reprovision: true to mint a fresh one (old keys archived in .env, old database kept; rebuild the schema afterwards).',
   promptSnippet:
     'provision_database: one-time bootstrap of the project database (owner + modules + .env). Run before describe_schema/provision_blueprint. Skips when the existing binding is live under the signed-in account; reprovision: true replaces a dead or foreign-account binding (archives old keys, never deletes the old db). Gated.',
   parameters: ProvisionDatabaseZod,
@@ -239,8 +237,6 @@ export const provisionDatabaseTool: HarnessTool<
       );
     }
 
-    const physicalDb = process.env.CONSTRUCTIVE_DB || 'constructive';
-
     // Provision on the API endpoint: requestDatabase claims a warm-pool
     // database when the resolved module set matches a cataloged preset
     // (near-instant) and cold-provisions asynchronously otherwise; the ticket
@@ -267,10 +263,6 @@ export const provisionDatabaseTool: HarnessTool<
         : '';
       return fail(`Database provisioning failed: ${detail}.${nameTakenHint}`);
     }
-
-    // Enable membership defaults + naming settings at the SQL level. Best-effort:
-    // provisioning already succeeded, so a fixup failure is a warning, not an error.
-    const fixup = await applySqlFixups({ databaseName, physicalDb });
 
     // Persist the binding to the project .env (upsert, preserving other keys).
     const merged = mergeEnv(
@@ -301,7 +293,7 @@ export const provisionDatabaseTool: HarnessTool<
       hasBinding && params.reprovision
         ? ' Previous binding archived in .env (old database kept); rebuild the schema with provision_blueprint + run_codegen.'
         : '';
-    const message = `Provisioned database "${databaseName}" (ID: ${databaseId}). Credentials written to .env. ${fixup.note}${prewarmNote}${reprovisionNote}`;
+    const message = `Provisioned database "${databaseName}" (ID: ${databaseId}). Credentials written to .env.${prewarmNote}${reprovisionNote}`;
     return {
       content: [{ type: 'text', text: message }],
       details: {
@@ -310,7 +302,6 @@ export const provisionDatabaseTool: HarnessTool<
         databaseId,
         databaseName,
         ownerId,
-        fixupNote: fixup.note,
       },
     };
   },
