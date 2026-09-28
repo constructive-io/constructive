@@ -134,6 +134,59 @@ describe('resolveProjectContext sources', () => {
   });
 });
 
+describe('resolveProjectContext schema resolution', () => {
+  const source = fromEnvironment({
+    [`${CONTEXT_ENV_PREFIX}ACCESS_TOKEN`]: 'project-key',
+    [`${CONTEXT_ENV_PREFIX}DATABASE_ID`]: 'db-1',
+    [`${CONTEXT_ENV_PREFIX}DATABASE_NAME`]: 'myapp',
+  });
+  const clientReturning = (result: unknown) => {
+    const findMany = jest.fn(() => ({ execute: async () => result }));
+    mockCreateClient.mockReturnValue({ schema: { findMany } });
+    return findMany;
+  };
+
+  it('queries the logical app_public schema, whatever its physical (hashed) name', async () => {
+    const findMany = clientReturning({
+      ok: true,
+      data: {
+        schemas: {
+          nodes: [{ id: 'schema-hashed', name: 'app_public', schemaName: 'myapp-1a2b3c4d-app-public' }],
+        },
+      },
+    });
+
+    const resolved = await resolveProjectContext(source);
+
+    expect(resolved.context?.schemaId).toBe('schema-hashed');
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { databaseId: { equalTo: 'db-1' }, name: { equalTo: 'app_public' } },
+      }),
+    );
+  });
+
+  it('fails hard when the database has no app_public schema, never picking another', async () => {
+    clientReturning({ ok: true, data: { schemas: { nodes: [] } } });
+
+    const resolved = await resolveProjectContext(source);
+
+    expect(resolved.context).toBeNull();
+    expect(resolved.code).toBe('schema-unresolved');
+    expect(resolved.reason).toMatch(/no app_public schema/);
+  });
+
+  it('fails hard with the GraphQL error when the schema query fails', async () => {
+    clientReturning({ ok: false, data: null, errors: [{ message: 'permission denied' }] });
+
+    const resolved = await resolveProjectContext(source);
+
+    expect(resolved.context).toBeNull();
+    expect(resolved.code).toBe('schema-unresolved');
+    expect(resolved.reason).toMatch(/permission denied/);
+  });
+});
+
 describe('fromEnvFile', () => {
   it('parses the project .env, quotes and comments included', async () => {
     writeFileSync(path.join(dir, '.env'), '# comment\nACCESS_TOKEN="quoted key"\nDATABASE_ID=db-1\n');
