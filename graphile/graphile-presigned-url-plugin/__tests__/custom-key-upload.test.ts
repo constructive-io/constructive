@@ -33,6 +33,7 @@ function storageConfig(overrides: Partial<StorageModuleConfig> = {}): StorageMod
     uploadUrlExpirySeconds: 900,
     hasPathShares: false,
     hasVersioning: false,
+    hasContentHash: false,
     hasConfirmUpload: false,
     ...overrides,
   } as unknown as StorageModuleConfig;
@@ -106,6 +107,15 @@ describe('custom-key upload of changed bytes', () => {
       `FILE_NOT_REPLACEABLE: file ${OLD_FILE_ID} at key ${KEY}`,
     );
     expect(queries.some((q) => /record_file\(/.test(q.text))).toBe(false);
+  });
+
+  it('refuses to replace the key when the module is content-addressed without versioning', async () => {
+    const { txClient, queries } = fakeTx('a'.repeat(64));
+
+    await expect(upload(storageConfig({ hasContentHash: true }), txClient)).rejects.toThrow(
+      `STORAGE_REPLACE_UNSUPPORTED: key ${KEY} already holds file ${OLD_FILE_ID}`,
+    );
+    expect(queries).toHaveLength(1);
   });
 
   it('links the new row to the previous version when the module has versioning', async () => {

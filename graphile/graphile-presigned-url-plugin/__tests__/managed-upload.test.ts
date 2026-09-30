@@ -78,6 +78,7 @@ function storageModuleRow(overrides: Record<string, unknown> = {}): Record<strin
     max_bulk_total_size: null,
     has_path_shares: false,
     has_versioning: false,
+    has_content_hash: false,
     entity_schema: null,
     entity_table: null,
     ...overrides,

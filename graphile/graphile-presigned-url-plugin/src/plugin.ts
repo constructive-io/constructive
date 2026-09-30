@@ -725,9 +725,18 @@ export async function processSingleFile(
       } else if (storageConfig.hasVersioning) {
         previousVersionId = existing.id;
         log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
+      } else if (storageConfig.hasContentHash) {
+        // GC of the deleted row counts references by its content hash, which the
+        // replacement does not share, so it would delete the object at this key
+        // after the new bytes land.
+        throw new Error(
+          `STORAGE_REPLACE_UNSUPPORTED: key ${s3Key} already holds file ${existing.id}; ` +
+            'a content-addressed module needs versioning to replace a custom key'
+        );
       } else {
         // Without versioning a key names one row: the new bytes replace the old
         // row in this transaction, and the PUT overwrites the object at the key.
+        // GC of the old row counts references by key, so the replacement keeps it.
         staleFileId = existing.id as string;
         log.info(`Replacing key ${s3Key}: file ${staleFileId} is superseded (module has no versioning)`);
       }
