@@ -52,7 +52,7 @@ const bucket = {
 const s3 = { client: { send: jest.fn() }, bucket: 'site-bucket', region: 'us-east-1' } as unknown as S3Config;
 const options = { s3 } as unknown as PresignedUrlPluginOptions;
 
-function fakeTx(existingHash: string) {
+function fakeTx(existingHash: string, deletable = true) {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
@@ -60,7 +60,9 @@ function fakeTx(existingHash: string) {
       if (/SELECT id, content_hash/.test(opts.text)) {
         return { rows: [{ id: OLD_FILE_ID, content_hash: existingHash }] };
       }
-      if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [] };
+      if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
+        return { rows: deletable ? [{ id: OLD_FILE_ID }] : [] };
+      }
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
     },
@@ -95,6 +97,15 @@ describe('custom-key upload of changed bytes', () => {
     const record = queries[2];
     expect(record.text).not.toContain('previous_version_id');
     expect(record.values).toContain(KEY);
+  });
+
+  it('refuses to replace a row the caller cannot delete', async () => {
+    const { txClient, queries } = fakeTx('a'.repeat(64), false);
+
+    await expect(upload(storageConfig(), txClient)).rejects.toThrow(
+      `FILE_NOT_REPLACEABLE: file ${OLD_FILE_ID} at key ${KEY}`,
+    );
+    expect(queries.some((q) => /record_file\(/.test(q.text))).toBe(false);
   });
 
   it('links the new row to the previous version when the module has versioning', async () => {

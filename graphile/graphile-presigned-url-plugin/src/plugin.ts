@@ -763,10 +763,16 @@ export async function processSingleFile(
   }
 
   if (staleFileId !== null) {
-    await txClient.query({
-      text: `DELETE FROM ${storageConfig.filesQualifiedName} WHERE id = $1`,
+    // The DELETE runs under the request role, so RLS decides whether this caller
+    // may drop the row. A row the caller can see but not delete stays, and the
+    // upload fails here rather than colliding on (bucket_id, key) below.
+    const deleted = await txClient.query({
+      text: `DELETE FROM ${storageConfig.filesQualifiedName} WHERE id = $1 RETURNING id`,
       values: [staleFileId],
     });
+    if (deleted.rows.length === 0) {
+      throw new Error(`FILE_NOT_REPLACEABLE: file ${staleFileId} at key ${s3Key} cannot be replaced by this caller`);
+    }
   }
 
   // Auto-derive ltree path from custom key directory (only when has_path_shares)
