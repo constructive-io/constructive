@@ -26,6 +26,7 @@ function storageConfig(
     cacheTtlSeconds: 300,
     hasPathShares: false,
     hasVersioning: false,
+    hasContentHash: false,
     hasConfirmUpload: false,
     maxBulkFiles: 100,
     maxBulkTotalSize: 1000,
