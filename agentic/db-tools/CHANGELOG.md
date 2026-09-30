@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.8.3...@agentic-kit/db-tools@0.9.0) (2026-09-30)
+
+### Features
+
+- **db-tools:** provision without direct Postgres; resolve app_public by logical name, fail hard ([2b80563](https://github.com/constructive-io/constructive/commit/2b80563f1bc9987c309d75b82a1262c12c90cf97))
+
 ## [0.8.3](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.8.2...@agentic-kit/db-tools@0.8.3) (2026-09-24)
 
 **Note:** Version bump only for package @agentic-kit/db-tools
