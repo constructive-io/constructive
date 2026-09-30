@@ -590,7 +590,7 @@ export function createPresignedUrlPlugin(
 
 // --- Shared upload logic ---
 
-async function processSingleFile(
+export async function processSingleFile(
   options: PresignedUrlPluginOptions,
   txClient: any,
   storageConfig: StorageModuleConfig,
@@ -722,9 +722,14 @@ async function processSingleFile(
         }
         staleFileId = existing.id as string;
         log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} is ${existing.status}, so it carries no bytes`);
-      } else {
+      } else if (storageConfig.hasVersioning) {
         previousVersionId = existing.id;
         log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
+      } else {
+        // Without versioning a key names one row: the new bytes replace the old
+        // row in this transaction, and the PUT overwrites the object at the key.
+        staleFileId = existing.id as string;
+        log.info(`Replacing key ${s3Key}: file ${staleFileId} is superseded (module has no versioning)`);
       }
     }
   } else {
