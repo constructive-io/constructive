@@ -290,7 +290,7 @@
     "class": "public"
   },
   "BAD_EXPRESSION": {
-    "count": 581,
+    "count": 575,
     "dynamic": true,
     "sample": "BAD_EXPRESSION % (unrecognized format)",
     "n_source": 2,
@@ -465,6 +465,14 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "BILLING_CHECKOUT_BINDING_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_CHECKOUT_BINDING_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
   "BILLING_DISPUTE_BALANCE_NOT_FOUND": {
     "count": 4,
     "dynamic": false,
@@ -545,6 +553,14 @@
     "n_generated": 2,
     "class": "internal"
   },
+  "BILLING_QUOTA_EXCEEDED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "BILLING_QUOTA_EXCEEDED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "BILLING_RECONCILE_BOUNDS_REQUIRED": {
     "count": 2,
     "dynamic": false,
@@ -560,6 +576,14 @@
     "n_source": 0,
     "n_generated": 3,
     "class": "internal"
+  },
+  "BILLING_SUBSCRIPTION_ACTIVE": {
+    "count": 3,
+    "dynamic": false,
+    "sample": "BILLING_SUBSCRIPTION_ACTIVE",
+    "n_source": 1,
+    "n_generated": 2,
+    "class": "public"
   },
   "BLUEPRINT_MODULE_NOT_INSTALLED": {
     "count": 2,
@@ -605,6 +629,14 @@
     "count": 2,
     "dynamic": false,
     "sample": "BOOTSTRAP_DATABASE_MISSING",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
+  "BOOTSTRAP_OWNER_NOT_ACTIVE": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "BOOTSTRAP_OWNER_NOT_ACTIVE",
     "n_source": 1,
     "n_generated": 1,
     "class": "internal"
@@ -1219,9 +1251,9 @@
     "class": "public"
   },
   "DATA_BILLING_METER": {
-    "count": 2,
+    "count": 4,
     "dynamic": true,
-    "sample": "DATA_BILLING_METER: unknown event %, expected INSERT, DELETE, or UPDATE",
+    "sample": "DATA_BILLING_METER: unknown event %, expected INSERT, DELETE, UPDATE, GATE or GATE_UPDATE",
     "n_source": 1,
     "n_generated": 1
   },
@@ -2657,11 +2689,11 @@
     "class": "internal"
   },
   "FORBIDDEN": {
-    "count": 70,
+    "count": 76,
     "dynamic": false,
     "sample": "FORBIDDEN",
-    "n_source": 4,
-    "n_generated": 35,
+    "n_source": 6,
+    "n_generated": 36,
     "class": "public"
   },
   "FOREIGN_KEY_CONSTRAINT_NOT_FOUND": {
@@ -2670,14 +2702,6 @@
     "sample": "FOREIGN_KEY_CONSTRAINT_NOT_FOUND",
     "n_source": 1,
     "n_generated": 1,
-    "class": "internal"
-  },
-  "FREE_PLAN_REQUIRED": {
-    "count": 4,
-    "dynamic": false,
-    "sample": "FREE_PLAN_REQUIRED",
-    "n_source": 1,
-    "n_generated": 3,
     "class": "internal"
   },
   "FUNCTION_BODY_DEPARSE_EMPTY": {
@@ -3418,10 +3442,10 @@
     "class": "public"
   },
   "INTERNAL_ERROR": {
-    "count": 460,
+    "count": 464,
     "dynamic": false,
     "sample": "INTERNAL_ERROR",
-    "n_source": 96,
+    "n_source": 98,
     "n_generated": 4,
     "class": "internal"
   },
@@ -4011,7 +4035,7 @@
     "class": "public"
   },
   "LIMIT_TRACK_USAGE_UNKNOWN_EVENT": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "LIMIT_TRACK_USAGE_UNKNOWN_EVENT",
     "n_source": 1,
@@ -4394,10 +4418,10 @@
     "class": "public"
   },
   "NOT_FOUND": {
-    "count": 76,
+    "count": 84,
     "dynamic": false,
     "sample": "NOT_FOUND",
-    "n_source": 20,
+    "n_source": 21,
     "n_generated": 3,
     "class": "public"
   },
@@ -5152,6 +5176,14 @@
     "n_source": 1,
     "n_generated": 4,
     "class": "public"
+  },
+  "SCHEDULED_JOB_NOT_ENQUEUED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "SCHEDULED_JOB_NOT_ENQUEUED",
+    "n_source": 0,
+    "n_generated": 4,
+    "class": "internal"
   },
   "SCOPE_TYPE_BACKFILL": {
     "count": 6,
@@ -6034,10 +6066,10 @@
     "class": "public"
   },
   "SUSPENSION_FORBIDDEN": {
-    "count": 2,
+    "count": 6,
     "dynamic": false,
     "sample": "SUSPENSION_FORBIDDEN",
-    "n_source": 1,
+    "n_source": 3,
     "n_generated": 1,
     "class": "public"
   },

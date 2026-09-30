@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (817 distinct codes
+ * Source of truth: the constructive-db error audit (821 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 817 total, 598 public, 219 internal.
+ * Counts: 821 total, 600 public, 221 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -83,6 +83,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'BAD_RLS_EXPRESSION': defineError({ code: 'BAD_RLS_EXPRESSION', class: 'public', http: 400, message: 'Bad rls expression.' }),
   'BAD_VIEW_EXPRESSION': defineError({ code: 'BAD_VIEW_EXPRESSION', class: 'public', http: 400, message: 'Bad view expression.' }),
   'BEHAVIOR_FRAGMENT_EMPTY': defineError({ code: 'BEHAVIOR_FRAGMENT_EMPTY', class: 'internal', http: 500, message: 'Behavior fragment empty.' }),
+  'BILLING_CHECKOUT_BINDING_INVALID': defineError({ code: 'BILLING_CHECKOUT_BINDING_INVALID', class: 'internal', http: 500, message: 'Billing checkout binding invalid.' }),
   'BILLING_DISPUTE_BALANCE_NOT_FOUND': defineError({ code: 'BILLING_DISPUTE_BALANCE_NOT_FOUND', class: 'internal', http: 500, message: 'Billing dispute balance not found.' }),
   'BILLING_ENTITY_BUSY': defineError({ code: 'BILLING_ENTITY_BUSY', class: 'public', http: 400, message: 'Billing entity busy.' }),
   'BILLING_HEALTH_INVALID': defineError({ code: 'BILLING_HEALTH_INVALID', class: 'internal', http: 500, message: 'Billing health invalid.' }),
@@ -93,14 +94,17 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'BILLING_OPERATION_NOT_FOUND': defineError({ code: 'BILLING_OPERATION_NOT_FOUND', class: 'internal', http: 500, message: 'Billing operation not found.' }),
   'BILLING_OPERATION_SETTLED': defineError({ code: 'BILLING_OPERATION_SETTLED', class: 'internal', http: 500, message: 'Billing operation settled.' }),
   'BILLING_OPERATION_STATE_INVALID': defineError({ code: 'BILLING_OPERATION_STATE_INVALID', class: 'internal', http: 500, message: 'Billing operation state invalid.' }),
+  'BILLING_QUOTA_EXCEEDED': defineError({ code: 'BILLING_QUOTA_EXCEEDED', class: 'public', http: 400, message: 'Billing quota exceeded.' }),
   'BILLING_RECONCILE_BOUNDS_REQUIRED': defineError({ code: 'BILLING_RECONCILE_BOUNDS_REQUIRED', class: 'internal', http: 500, message: 'Billing reconcile bounds required.' }),
   'BILLING_SCHEDULED_CHANGE_INVALID': defineError({ code: 'BILLING_SCHEDULED_CHANGE_INVALID', class: 'internal', http: 500, message: 'Billing scheduled change invalid.' }),
+  'BILLING_SUBSCRIPTION_ACTIVE': defineError({ code: 'BILLING_SUBSCRIPTION_ACTIVE', class: 'public', http: 400, message: 'Billing subscription active.' }),
   'BLUEPRINT_MODULE_NOT_INSTALLED': defineError({ code: 'BLUEPRINT_MODULE_NOT_INSTALLED', class: 'public', http: 400, message: 'Blueprint module not installed.' }),
   'BLUEPRINT_MODULE_REF_AMBIGUOUS': defineError({ code: 'BLUEPRINT_MODULE_REF_AMBIGUOUS', class: 'public', http: 400, message: 'Blueprint module ref ambiguous.' }),
   'BLUEPRINT_MODULE_REF_INVALID': defineError({ code: 'BLUEPRINT_MODULE_REF_INVALID', class: 'public', http: 400, message: 'Blueprint module ref invalid.' }),
   'BLUEPRINT_MODULE_TABLE_UNKNOWN': defineError({ code: 'BLUEPRINT_MODULE_TABLE_UNKNOWN', class: 'public', http: 400, message: 'Blueprint module table unknown.' }),
   'BM25': defineError({ code: 'BM25', class: 'public', http: 400, message: 'Bm25.' }),
   'BOOTSTRAP_DATABASE_MISSING': defineError({ code: 'BOOTSTRAP_DATABASE_MISSING', class: 'internal', http: 500, message: 'Bootstrap database missing.' }),
+  'BOOTSTRAP_OWNER_NOT_ACTIVE': defineError({ code: 'BOOTSTRAP_OWNER_NOT_ACTIVE', class: 'internal', http: 500, message: 'Bootstrap owner not active.' }),
   'BOOTSTRAP_SOURCE_MISSING': defineError({ code: 'BOOTSTRAP_SOURCE_MISSING', class: 'internal', http: 500, message: 'Bootstrap source missing.' }),
   'BOOTSTRAP_TARGET_NOT_EMPTY': defineError({ code: 'BOOTSTRAP_TARGET_NOT_EMPTY', class: 'internal', http: 500, message: 'Bootstrap target not empty.' }),
   'BUILD_CONDITION_EXPR': defineError({ code: 'BUILD_CONDITION_EXPR', class: 'internal', http: 500, message: 'Build condition expr.' }),
@@ -178,7 +182,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'DATABASE_TRANSFER_NOT_PENDING': defineError({ code: 'DATABASE_TRANSFER_NOT_PENDING', class: 'public', http: 400, message: 'Database transfer not pending.' }),
   'DATABASE_TRANSFER_NOT_SOURCE_OWNER': defineError({ code: 'DATABASE_TRANSFER_NOT_SOURCE_OWNER', class: 'public', http: 400, message: 'Database transfer not source owner.' }),
   'DATABASE_TRANSFER_NOT_TARGET_OWNER': defineError({ code: 'DATABASE_TRANSFER_NOT_TARGET_OWNER', class: 'public', http: 400, message: 'Database transfer not target owner.' }),
-  'DATA_BILLING_METER': defineError({ code: 'DATA_BILLING_METER', class: 'internal', http: 500, message: 'DATA_BILLING_METER: unknown event {{arg0}}, expected INSERT, DELETE, or UPDATE', positional: ['arg0'] }),
+  'DATA_BILLING_METER': defineError({ code: 'DATA_BILLING_METER', class: 'internal', http: 500, message: 'DATA_BILLING_METER: unknown event {{arg0}}, expected INSERT, DELETE, UPDATE, GATE or GATE_UPDATE', positional: ['arg0'] }),
   'DATA_COMPOSITE_FIELD_PRIVATE_SCHEMA_NOT_FOUND': defineError({ code: 'DATA_COMPOSITE_FIELD_PRIVATE_SCHEMA_NOT_FOUND', class: 'public', http: 404, message: 'Data composite field private schema not found.' }),
   'DATA_COMPOSITE_FIELD_SOURCE_FIELDS_EMPTY': defineError({ code: 'DATA_COMPOSITE_FIELD_SOURCE_FIELDS_EMPTY', class: 'public', http: 400, message: 'Data composite field source fields empty.' }),
   'DATA_COMPOSITE_FIELD_SOURCE_FIELDS_REQUIRED': defineError({ code: 'DATA_COMPOSITE_FIELD_SOURCE_FIELDS_REQUIRED', class: 'public', http: 400, message: 'Data composite field source fields required.' }),
@@ -362,7 +366,6 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'FILE_REF_FIELD': defineError({ code: 'FILE_REF_FIELD', class: 'internal', http: 500, message: 'File ref field.' }),
   'FORBIDDEN': defineError({ code: 'FORBIDDEN', class: 'public', http: 403, message: 'Forbidden.' }),
   'FOREIGN_KEY_CONSTRAINT_NOT_FOUND': defineError({ code: 'FOREIGN_KEY_CONSTRAINT_NOT_FOUND', class: 'internal', http: 500, message: 'Foreign key constraint not found.' }),
-  'FREE_PLAN_REQUIRED': defineError({ code: 'FREE_PLAN_REQUIRED', class: 'internal', http: 500, message: 'Free plan required.' }),
   'FUNCTION_BODY_DEPARSE_EMPTY': defineError({ code: 'FUNCTION_BODY_DEPARSE_EMPTY', class: 'internal', http: 500, message: 'Function body deparse empty.' }),
   'FUNCTION_ENVELOPE_VIOLATION': defineError({ code: 'FUNCTION_ENVELOPE_VIOLATION', class: 'internal', http: 500, message: 'Function envelope violation.' }),
   'FUNCTION_GRAPH_NOT_FOUND': defineError({ code: 'FUNCTION_GRAPH_NOT_FOUND', class: 'internal', http: 500, message: 'Function graph not found.' }),
@@ -678,6 +681,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'ROUTING_API_TABLES_SCOPE_REQUIRED': defineError({ code: 'ROUTING_API_TABLES_SCOPE_REQUIRED', class: 'public', http: 400, message: 'Routing api tables scope required.' }),
   'ROUTING_SURFACE_NOT_PROVISIONED': defineError({ code: 'ROUTING_SURFACE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Routing surface not provisioned.' }),
   'ROW_LOCKED': defineError({ code: 'ROW_LOCKED', class: 'public', http: 423, message: 'Row locked.' }),
+  'SCHEDULED_JOB_NOT_ENQUEUED': defineError({ code: 'SCHEDULED_JOB_NOT_ENQUEUED', class: 'internal', http: 500, message: 'Scheduled job not enqueued.' }),
   'SCOPE_TYPE_BACKFILL': defineError({ code: 'SCOPE_TYPE_BACKFILL', class: 'internal', http: 500, message: 'SCOPE_TYPE_BACKFILL: the membership types table must be resolved before generating a statement' }),
   'SCOPE_TYPE_SYNC': defineError({ code: 'SCOPE_TYPE_SYNC', class: 'internal', http: 500, message: 'SCOPE_TYPE_SYNC: the scope type projection must be resolved before generating a body' }),
   'SEARCH_BM25': defineError({ code: 'SEARCH_BM25', class: 'public', http: 400, message: 'Search bm25.' }),
@@ -904,6 +908,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'BAD_RLS_EXPRESSION': { class: 'public', dynamic: false, generatedOnly: false },
   'BAD_VIEW_EXPRESSION': { class: 'public', dynamic: false, generatedOnly: false },
   'BEHAVIOR_FRAGMENT_EMPTY': { class: 'internal', dynamic: false, generatedOnly: false },
+  'BILLING_CHECKOUT_BINDING_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
   'BILLING_DISPUTE_BALANCE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'BILLING_ENTITY_BUSY': { class: 'public', dynamic: false, generatedOnly: true },
   'BILLING_HEALTH_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
@@ -914,14 +919,17 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'BILLING_OPERATION_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: true },
   'BILLING_OPERATION_SETTLED': { class: 'internal', dynamic: false, generatedOnly: true },
   'BILLING_OPERATION_STATE_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_QUOTA_EXCEEDED': { class: 'public', dynamic: false, generatedOnly: false },
   'BILLING_RECONCILE_BOUNDS_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'BILLING_SCHEDULED_CHANGE_INVALID': { class: 'internal', dynamic: false, generatedOnly: true },
+  'BILLING_SUBSCRIPTION_ACTIVE': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_NOT_INSTALLED': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_REF_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_REF_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'BLUEPRINT_MODULE_TABLE_UNKNOWN': { class: 'public', dynamic: false, generatedOnly: false },
   'BM25': { class: 'public', dynamic: false, generatedOnly: false },
   'BOOTSTRAP_DATABASE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
+  'BOOTSTRAP_OWNER_NOT_ACTIVE': { class: 'internal', dynamic: false, generatedOnly: false },
   'BOOTSTRAP_SOURCE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'BOOTSTRAP_TARGET_NOT_EMPTY': { class: 'internal', dynamic: false, generatedOnly: false },
   'BUILD_CONDITION_EXPR': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1183,7 +1191,6 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'FILE_REF_FIELD': { class: 'internal', dynamic: false, generatedOnly: false },
   'FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: false },
   'FOREIGN_KEY_CONSTRAINT_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
-  'FREE_PLAN_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'FUNCTION_BODY_DEPARSE_EMPTY': { class: 'internal', dynamic: false, generatedOnly: false },
   'FUNCTION_ENVELOPE_VIOLATION': { class: 'internal', dynamic: false, generatedOnly: false },
   'FUNCTION_GRAPH_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1499,6 +1506,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'ROUTING_API_TABLES_SCOPE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'ROUTING_SURFACE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'ROW_LOCKED': { class: 'public', dynamic: false, generatedOnly: false },
+  'SCHEDULED_JOB_NOT_ENQUEUED': { class: 'internal', dynamic: false, generatedOnly: true },
   'SCOPE_TYPE_BACKFILL': { class: 'internal', dynamic: false, generatedOnly: false },
   'SCOPE_TYPE_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
   'SEARCH_BM25': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1665,4 +1673,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 817;
+export const GENERATED_CODE_COUNT = 821;

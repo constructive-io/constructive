@@ -386,6 +386,12 @@ export const registry = {
     message: 'You have reached a plan limit for this resource.',
     positional: ['resource', 'limit']
   }),
+  BILLING_QUOTA_EXCEEDED: defineError({
+    code: 'BILLING_QUOTA_EXCEEDED',
+    class: 'public',
+    http: 429,
+    message: 'You have used up your usage allowance for this resource.'
+  }),
   RATE_LIMITED: defineError({
     code: 'RATE_LIMITED',
     class: 'public',
@@ -419,6 +425,12 @@ export const registry = {
     class: 'public',
     http: 400,
     message: 'The billing operation request is invalid.'
+  }),
+  BILLING_SUBSCRIPTION_ACTIVE: defineError<{ entity_id?: string; external_subscription_id?: string }>({
+    code: 'BILLING_SUBSCRIPTION_ACTIVE',
+    class: 'public',
+    http: 409,
+    message: 'This account still has an active subscription. Cancel the subscription before deleting the account.'
   }),
   UNKNOWN_METER: defineError<{ meter_slug?: string }>({
     code: 'UNKNOWN_METER',
