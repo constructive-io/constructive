@@ -21,7 +21,8 @@ function index(name: string, method: string, columns: number[], partial = false)
     partial,
     expression: false,
     method,
-    definition: `CREATE INDEX ${name} ON t USING ${method} (...)`
+    definition: `CREATE INDEX ${name} ON t USING ${method} (...)`,
+    attached: false
   };
 }
 

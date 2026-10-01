@@ -28,6 +28,12 @@ export interface IndexInfo {
   /** Access method (`btree`, `gin`, …). */
   method: string;
   definition: string;
+  /**
+   * A partition of an index on the parent partitioned table
+   * (`pg_class.relispartition` on the index). Such an index cannot be dropped
+   * on its own; it exists because the parent's index does.
+   */
+  attached: boolean;
 }
 
 export interface ColumnInfo {
@@ -118,7 +124,8 @@ export async function introspectIndexes(
         (ix.indpred IS NOT NULL)                        AS is_partial,
         (ix.indexprs IS NOT NULL)                       AS is_expression,
         am.amname                                       AS method,
-        pg_get_indexdef(i.oid)                          AS definition
+        pg_get_indexdef(i.oid)                          AS definition,
+        i.relispartition                                AS is_attached
       FROM pg_index ix
       JOIN pg_class i ON i.oid = ix.indexrelid
       JOIN pg_am am ON am.oid = i.relam
@@ -153,7 +160,8 @@ export async function introspectIndexes(
           'partial', x.is_partial,
           'expression', x.is_expression,
           'method', x.method,
-          'definition', x.definition
+          'definition', x.definition,
+          'attached', x.is_attached
         ) ORDER BY x.name) FROM indexes x WHERE x.oid = r.oid),
         '[]'::jsonb
       )                                                 AS indexes,

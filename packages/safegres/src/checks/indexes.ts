@@ -86,12 +86,17 @@ export function checkUnindexedForeignKeys(
  * leading-column prefix of a wider index. Both cost write throughput and
  * disk for nothing. Constraint-backed indexes (PK/UNIQUE/EXCLUDE) are never
  * reported — dropping them would drop the constraint.
+ *
+ * An index attached to a parent's partitioned index is never reported either:
+ * it can only be dropped with the parent's index, and the parent carries that
+ * finding once instead of every partition repeating it. An index created on
+ * the partition alone is the partition's own, and is reported there.
  */
 export function checkRedundantIndexes(table: TableIndexSnapshot): Finding[] {
   const findings: Finding[] = [];
-  const candidates = table.indexes.filter(
-    (i) => !i.primary && !i.constraint && !i.partial && !i.expression && !i.unique
-  );
+  const candidates = new Set(table.indexes.filter(
+    (i) => !i.primary && !i.constraint && !i.partial && !i.expression && !i.unique && !i.attached
+  ));
 
   for (const idx of candidates) {
     const covering = table.indexes.find((other) => {
@@ -99,8 +104,13 @@ export function checkRedundantIndexes(table: TableIndexSnapshot): Finding[] {
       if (other.partial || other.expression) return false;
       if (other.method !== idx.method) return false;
       if (!isPrefix(idx.columns, other.columns)) return false;
-      // Exact duplicates: report only one of the pair, deterministically.
-      if (idx.columns.length === other.columns.length && idx.name < other.name) return false;
+      // Exact duplicates: when both are droppable, report only one of the
+      // pair, deterministically.
+      if (
+        idx.columns.length === other.columns.length
+        && candidates.has(other)
+        && idx.name < other.name
+      ) return false;
       return true;
     });
     if (!covering) continue;
