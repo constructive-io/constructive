@@ -899,10 +899,6 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
         'Module key discriminator. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_buckets. Max 16 chars, lowercase snake_case.'
       ),
       addJSDoc(
-        optionalProp('storage_key', t.tsStringKeyword()),
-        '@deprecated Use `key` instead. Kept for backward compatibility.'
-      ),
-      addJSDoc(
         optionalProp(
           'buckets',
           t.tsArrayType(
