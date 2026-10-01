@@ -3,9 +3,6 @@ import { ConfigStore, createConfigStore } from 'appstash';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { AccountSession, saveSession } from './account-store';
-import { BackendConfig, saveBackendConfig } from './backend-store';
-
 export const DEFAULT_SKILLS_REPO = 'constructive-io/constructive-skills';
 
 /**
@@ -54,57 +51,6 @@ export function defaultManifest(): SkillsManifest {
   };
 }
 
-interface LegacyStoredSession {
-  userId?: string;
-  email?: string;
-  token?: string;
-  accessTokenExpiresAt?: string;
-  apiKey?: string;
-  keyId?: string;
-  apiKeyExpiresAt?: string;
-  signedInAt?: number;
-}
-
-function readLegacyFile<T>(file: string): T | null {
-  if (!fs.existsSync(file)) return null;
-  return JSON.parse(fs.readFileSync(file, 'utf8')) as T;
-}
-
-/**
- * Move a pre-shared-store sign-in (`agent/account.json` +
- * `agent/backend-config.json`) into the store, once. The originals are renamed
- * rather than deleted, so a downgrade still finds them.
- */
-export function importLegacyAgentFiles(store: ConfigStore, legacyDir: string): void {
-  const accountFile = path.join(legacyDir, 'account.json');
-  const backendFile = path.join(legacyDir, 'backend-config.json');
-  if (!fs.existsSync(accountFile) && !fs.existsSync(backendFile)) return;
-
-  const backend = readLegacyFile<BackendConfig>(backendFile);
-  if (backend?.apiEndpoint && backend.authEndpoint && backend.modulesEndpoint) {
-    saveBackendConfig(store, backend);
-  }
-
-  const legacy = readLegacyFile<LegacyStoredSession>(accountFile);
-  if (legacy?.token && legacy.userId) {
-    const session: AccountSession = {
-      userId: legacy.userId,
-      email: legacy.email ?? '',
-      accessToken: legacy.token,
-      accessTokenExpiresAt: legacy.accessTokenExpiresAt,
-      apiKey: legacy.apiKey,
-      keyId: legacy.keyId,
-      apiKeyExpiresAt: legacy.apiKeyExpiresAt,
-      signedInAt: legacy.signedInAt ?? Date.now()
-    };
-    saveSession(store, session);
-  }
-
-  for (const file of [accountFile, backendFile]) {
-    if (fs.existsSync(file)) fs.renameSync(file, `${file}.migrated`);
-  }
-}
-
 export function loadConfig(baseDir?: string): AgentCliConfig {
   const dirs = harnessDirs('constructive', baseDir);
   const agentDir = path.join(dirs.stash.data, 'agent');
@@ -113,7 +59,6 @@ export function loadConfig(baseDir?: string): AgentCliConfig {
   const store = createConfigStore(TOOL_NAME, { stashName: STASH_NAME, baseDir });
   fs.mkdirSync(agentDir, { recursive: true });
   fs.mkdirSync(overlayDir, { recursive: true });
-  importLegacyAgentFiles(store, path.join(dirs.stash.config, 'agent'));
 
   let file: ManifestFile = {};
   if (fs.existsSync(manifestFile)) {

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.21.0...graphile-presigned-url-plugin@1.21.1) (2026-09-30)
+
+### Bug Fixes
+
+- **storage:** fail loudly when the caller cannot delete the row it would replace ([1c592d6](https://github.com/constructive-io/constructive/commit/1c592d6cfb039220601e1e4ee2586491fcf88361))
+- **storage:** refuse a custom-key replace on a content-addressed module without versioning ([3616851](https://github.com/constructive-io/constructive/commit/3616851de2f6717d1860ff76967c166412c3d50f))
+- **storage:** replace the row at a custom key when the module has no versioning ([abebe13](https://github.com/constructive-io/constructive/commit/abebe138c48903363ded7117ca01256ea40106e8))
+
 # [1.21.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.20.0...graphile-presigned-url-plugin@1.21.0) (2026-09-17)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

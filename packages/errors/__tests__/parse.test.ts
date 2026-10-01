@@ -226,11 +226,10 @@ describe('generated registry (full constructive-db audit)', () => {
     // require_step_up() raises one code per factor so the client knows which
     // re-verification to prompt for; a humanized code would prompt for the
     // wrong one, so each needs its own copy.
-    // STEP_UP_REQUIRED_PASSWORD_OR_MFA is deliberately absent: constructive-db
-    // split it into the per-factor codes below (require_step_up.sql).
     const factors = [
       'STEP_UP_REQUIRED_PASSWORD',
       'STEP_UP_REQUIRED_MFA',
+      'STEP_UP_REQUIRED_PASSWORD_OR_MFA',
       'STEP_UP_REQUIRED_FRESH_AUTH'
     ];
     for (const code of factors) {
@@ -238,8 +237,8 @@ describe('generated registry (full constructive-db audit)', () => {
       expect(generatedRegistry[code].http).toBe(403);
       expect(format(code)).not.toMatch(/^Step up required/);
     }
-    expect(format('STEP_UP_REQUIRED_MFA')).not.toBe(
-      format('STEP_UP_REQUIRED_PASSWORD')
+    expect(new Set(factors.map((code) => format(code))).size).toBe(
+      factors.length
     );
     // An unrecognized posture fails closed rather than passing the mutation.
     expect(classify('STEP_UP_INVALID_TYPE')).toBe('public');

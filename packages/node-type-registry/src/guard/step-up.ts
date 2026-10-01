@@ -22,8 +22,10 @@ export const GuardStepUp: NodeTypeDefinition = {
         type: 'string',
         enum: ['password', 'mfa', 'fresh_auth', 'password_or_mfa'],
         description:
-          'Which verification method satisfies the step-up requirement ' +
-          '(password_or_mfa is the legacy spelling of fresh_auth)',
+          'Which recent proof satisfies the step-up requirement: password ' +
+          '(password re-entry), mfa (second factor), password_or_mfa (either ' +
+          'factor; an SSO sign-in alone does not count), or fresh_auth (any ' +
+          'recent sign-in or re-verification, including SSO, magic link and OTP)',
         default: 'fresh_auth',
       },
       events: {

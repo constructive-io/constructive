@@ -62,6 +62,7 @@ const ALL_STORAGE_MODULES_QUERY = `
     sm.max_bulk_total_size,
     sm.has_path_shares,
     sm.has_versioning,
+    sm.has_content_hash,
     sm.has_confirm_upload,
     es.schema_name AS entity_schema,
     et.name AS entity_table
@@ -98,6 +99,7 @@ interface StorageModuleRow {
   max_bulk_total_size: number | null;
   has_path_shares: boolean;
   has_versioning: boolean;
+  has_content_hash: boolean;
   has_confirm_upload: boolean;
   entity_schema: string | null;
   entity_table: string | null;
@@ -134,6 +136,7 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     cacheTtlSeconds,
     hasPathShares: row.has_path_shares ?? false,
     hasVersioning: row.has_versioning ?? false,
+    hasContentHash: row.has_content_hash ?? false,
     hasConfirmUpload: row.has_confirm_upload ?? false,
     maxBulkFiles: row.max_bulk_files ?? DEFAULT_MAX_BULK_FILES,
     maxBulkTotalSize: row.max_bulk_total_size ?? DEFAULT_MAX_BULK_TOTAL_SIZE,

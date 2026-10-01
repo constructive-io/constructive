@@ -81,6 +81,11 @@ export interface StorageModuleConfig {
   hasConfirmUpload: boolean;
   /** Whether the files table carries the versioning chain. */
   hasVersioning: boolean;
+  /**
+   * Whether the module is content-addressed: GC counts an object's references by
+   * `(bucket_id, content_hash)` rather than by `(bucket_id, key)`.
+   */
+  hasContentHash: boolean;
 
   // --- Bulk upload limits ---
 

@@ -349,7 +349,7 @@ export interface DataLockParams {
   /* How a guarded verb is stopped while locked. step_up requires recent strong verification (needs a provisioned user_auth_module); block refuses the verb outright with ROW_LOCKED until unlocked. */
   enforcement?: 'step_up' | 'block';
   /* Verification method satisfying the step-up requirement, for the guarded verbs in step_up mode and for clearing the lock */
-  step_up_type?: 'password' | 'mfa' | 'fresh_auth';
+  step_up_type?: 'password' | 'mfa' | 'fresh_auth' | 'password_or_mfa';
   /* Require step-up to change the lock column itself, so a locked row cannot be quietly unlocked and then deleted. Redundant (and therefore skipped) in step_up mode when UPDATE is already guarded. */
   guard_unlock?: boolean;
   /* For a guarded UPDATE, restrict the guard to changes touching these columns. Empty guards the whole row. */
@@ -565,7 +565,7 @@ export interface EventTrackerParams {
 ;
 /** Attaches a BEFORE trigger that calls require_step_up() to enforce recent strong verification (password, MFA, or identity-provider assertion) before allowing mutations. Requires a provisioned sessions_module (with app_settings_auth) for the target database. The step_up_window is read from app_settings_auth at runtime (default 30 minutes). Supports compound conditions (AND/OR/NOT), watch_fields (fire only when specific fields change), and simple condition_field/condition_value leaf conditions. */
 export interface GuardStepUpParams {
-  /* Which verification method satisfies the step-up requirement (password_or_mfa is the legacy spelling of fresh_auth) */
+  /* Which recent proof satisfies the step-up requirement: password (password re-entry), mfa (second factor), password_or_mfa (either factor; an SSO sign-in alone does not count), or fresh_auth (any recent sign-in or re-verification, including SSO, magic link and OTP) */
   step_up_type?: 'password' | 'mfa' | 'fresh_auth' | 'password_or_mfa';
   /* Which DML events require step-up verification */
   events?: ('INSERT' | 'UPDATE' | 'DELETE')[];

@@ -38,34 +38,6 @@ describe('config', () => {
     // credentials land in the shared stash root, not an agent-only subdirectory
     expect(fs.existsSync(path.join(config.dirs.stash.config, 'credentials.json'))).toBe(true);
   });
-
-  it('imports a legacy account.json + backend-config.json once, then moves them aside', () => {
-    const config = loadConfig(home);
-    const legacyDir = path.join(config.dirs.stash.config, 'agent');
-    fs.mkdirSync(legacyDir, { recursive: true });
-    const accountFile = path.join(legacyDir, 'account.json');
-    const backendFile = path.join(legacyDir, 'backend-config.json');
-    fs.writeFileSync(
-      accountFile,
-      JSON.stringify({
-        userId: 'user-1',
-        email: 'dev@example.com',
-        token: 'access-token',
-        encrypted: false,
-        apiKey: 'cnc_live_sk_abc',
-        keyId: 'key-1',
-        signedInAt: 1754000000000
-      })
-    );
-    fs.writeFileSync(backendFile, JSON.stringify(BACKEND_PRESETS.devnet));
-
-    const migrated = loadConfig(home);
-    expect(loadBackendConfig(migrated.store)).toEqual(BACKEND_PRESETS.devnet);
-    expect(loadSession(migrated.store)).toMatchObject({ userId: 'user-1', accessToken: 'access-token' });
-    expect(fs.existsSync(accountFile)).toBe(false);
-    expect(fs.existsSync(`${accountFile}.migrated`)).toBe(true);
-    expect(fs.existsSync(`${backendFile}.migrated`)).toBe(true);
-  });
 });
 
 describe('account-store', () => {

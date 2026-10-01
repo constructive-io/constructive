@@ -176,6 +176,20 @@ describe('perf dimension', () => {
     expect(duplicate?.context).toMatchObject({ coveredBy: 'widgets_tenant_a_idx', duplicate: true });
   });
 
+  it('X5: reports a partitioned table\'s redundant index on the parent, not on every partition', async () => {
+    await applyFixture('x5-partitions.sql');
+    const report = await audit(pg.client as never, { schemas: ['fx_x5p'], perf: true });
+    const found = report.perf!.findings
+      .filter((f) => f.code === 'X5')
+      .map((f) => `${f.table}:${(f.context as { index: string; coveredBy: string }).index}>${(f.context as { coveredBy: string }).coveredBy}`)
+      .sort();
+    expect(found).toEqual([
+      'events:events_actor_id_idx>events_actor_id_name_idx',
+      'events:events_captured_at_idx>events_pkey',
+      'events_p2:events_p2_local_idx>events_p2_actor_id_idx'
+    ]);
+  });
+
   it('X6: flags tables with no primary key and no replica identity', async () => {
     await applyFixture('x6-no-primary-key.sql');
     const report = await audit(pg.client as never, { schemas: ['fx_x6'], perf: true });

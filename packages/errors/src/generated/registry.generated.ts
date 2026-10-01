@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (821 distinct codes
+ * Source of truth: the constructive-db error audit (816 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 821 total, 600 public, 221 internal.
+ * Counts: 816 total, 600 public, 216 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -28,9 +28,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'ACCOUNT_EXISTS': defineError({ code: 'ACCOUNT_EXISTS', class: 'public', http: 409, message: 'Account exists.' }),
   'ACCOUNT_LOCKED_EXCEED_ATTEMPTS': defineError({ code: 'ACCOUNT_LOCKED_EXCEED_ATTEMPTS', class: 'public', http: 423, message: 'Account locked exceed attempts.' }),
   'ACCOUNT_NOT_FOUND': defineError({ code: 'ACCOUNT_NOT_FOUND', class: 'public', http: 404, message: 'Account not found.' }),
-  'ACTOR_CLAIM_REQUIRED': defineError({ code: 'ACTOR_CLAIM_REQUIRED', class: 'internal', http: 500, message: 'Actor claim required.' }),
   'ALREADY_AUTHENTICATED_USE_LINK': defineError({ code: 'ALREADY_AUTHENTICATED_USE_LINK', class: 'public', http: 409, message: 'Already authenticated use link.' }),
-  'ALREADY_SCHEDULED': defineError({ code: 'ALREADY_SCHEDULED', class: 'public', http: 409, message: 'Already scheduled.' }),
   'ALTER_TABLE_ADD_COLUMN': defineError({ code: 'ALTER_TABLE_ADD_COLUMN', class: 'internal', http: 500, message: 'ALTER_TABLE_ADD_COLUMN: a column cannot be both generated and an identity column' }),
   'API_KEYS_DISABLED': defineError({ code: 'API_KEYS_DISABLED', class: 'public', http: 403, message: 'Api keys disabled.' }),
   'API_KEY_LIMIT_REACHED': defineError({ code: 'API_KEY_LIMIT_REACHED', class: 'public', http: 429, message: 'Api key limit reached.' }),
@@ -47,7 +45,6 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'AST_OPTIONS_NOT_OBJECT': defineError({ code: 'AST_OPTIONS_NOT_OBJECT', class: 'internal', http: 500, message: 'Ast options not object.' }),
   'AST_OPTION_REQUIRED': defineError({ code: 'AST_OPTION_REQUIRED', class: 'internal', http: 500, message: 'Ast option required.' }),
   'AST_OPTION_UNKNOWN': defineError({ code: 'AST_OPTION_UNKNOWN', class: 'internal', http: 500, message: 'Ast option unknown.' }),
-  'ATTRIBUTION_REQUIRED': defineError({ code: 'ATTRIBUTION_REQUIRED', class: 'internal', http: 500, message: 'Attribution required.' }),
   'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED': defineError({ code: 'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED', class: 'public', http: 400, message: 'Authz column security authz node required.' }),
   'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED': defineError({ code: 'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED', class: 'public', http: 400, message: 'Authz column security columns required.' }),
   'AUTHZ_COLUMN_SECURITY_COLUMN_NOT_FOUND': defineError({ code: 'AUTHZ_COLUMN_SECURITY_COLUMN_NOT_FOUND', class: 'public', http: 404, message: 'Authz column security column not found.' }),
@@ -150,6 +147,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'CONSTRUCT_BLUEPRINT_PROVISIONS_WITHOUT_MODULE': defineError({ code: 'CONSTRUCT_BLUEPRINT_PROVISIONS_WITHOUT_MODULE', class: 'public', http: 400, message: 'Construct blueprint provisions without module.' }),
   'CONSTRUCT_BLUEPRINT_SCHEMA_NOT_FOUND': defineError({ code: 'CONSTRUCT_BLUEPRINT_SCHEMA_NOT_FOUND', class: 'internal', http: 500, message: 'Construct blueprint schema not found.' }),
   'CONSTRUCT_BLUEPRINT_STORAGE_ORG_MEMBERSHIP_NOT_FOUND': defineError({ code: 'CONSTRUCT_BLUEPRINT_STORAGE_ORG_MEMBERSHIP_NOT_FOUND', class: 'internal', http: 500, message: 'Construct blueprint storage org membership not found.' }),
+  'CONSTRUCT_BLUEPRINT_TABLES_ORG_MEMBERSHIP_NOT_FOUND': defineError({ code: 'CONSTRUCT_BLUEPRINT_TABLES_ORG_MEMBERSHIP_NOT_FOUND', class: 'internal', http: 500, message: 'Construct blueprint tables org membership not found.' }),
   'CONST_TYPE_FIELDS_IMMUTABLE': defineError({ code: 'CONST_TYPE_FIELDS_IMMUTABLE', class: 'public', http: 403, message: 'Const type fields immutable.' }),
   'CONTENT_PRESET_CATALOG_MISSING': defineError({ code: 'CONTENT_PRESET_CATALOG_MISSING', class: 'internal', http: 500, message: 'Content preset catalog missing.' }),
   'CONTENT_PRESET_EMPTY': defineError({ code: 'CONTENT_PRESET_EMPTY', class: 'public', http: 400, message: 'Content preset empty.' }),
@@ -169,7 +167,6 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'CROSS_DATABASE_CHECK': defineError({ code: 'CROSS_DATABASE_CHECK', class: 'public', http: 400, message: 'Cross database check.' }),
   'CROSS_DATABASE_REF': defineError({ code: 'CROSS_DATABASE_REF', class: 'public', http: 400, message: 'Cross database ref.' }),
   'CSRF_TOKEN_REQUIRED': defineError({ code: 'CSRF_TOKEN_REQUIRED', class: 'public', http: 401, message: 'Csrf token required.' }),
-  'DATABASE_CLAIM_REQUIRED': defineError({ code: 'DATABASE_CLAIM_REQUIRED', class: 'internal', http: 500, message: 'Database claim required.' }),
   'DATABASE_FIELD_RESERVED_WORD': defineError({ code: 'DATABASE_FIELD_RESERVED_WORD', class: 'public', http: 400, message: 'Database field reserved word.' }),
   'DATABASE_FUNCTION_RESERVED_WORD': defineError({ code: 'DATABASE_FUNCTION_RESERVED_WORD', class: 'public', http: 400, message: 'Database function reserved word.' }),
   'DATABASE_HOSTNAME_IDENTITY_AMBIGUOUS': defineError({ code: 'DATABASE_HOSTNAME_IDENTITY_AMBIGUOUS', class: 'public', http: 400, message: 'Database hostname identity ambiguous.' }),
@@ -319,11 +316,9 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'DOMAIN_VERIFY_BAD_METHOD': defineError({ code: 'DOMAIN_VERIFY_BAD_METHOD', class: 'internal', http: 500, message: 'DOMAIN_VERIFY_BAD_METHOD: unsupported verification method {{arg0}}', positional: ['arg0'] }),
   'DOMAIN_VERIFY_NO_CHALLENGE': defineError({ code: 'DOMAIN_VERIFY_NO_CHALLENGE', class: 'internal', http: 500, message: 'DOMAIN_VERIFY_NO_CHALLENGE: no outstanding {{arg0}} challenge for managed_domain {{arg1}}', positional: ['arg0', 'arg1'] }),
   'EMAIL_NOT_VERIFIED': defineError({ code: 'EMAIL_NOT_VERIFIED', class: 'public', http: 400, message: 'Email not verified.' }),
-  'ENTITY_CLAIM_REQUIRED': defineError({ code: 'ENTITY_CLAIM_REQUIRED', class: 'internal', http: 500, message: 'Entity claim required.' }),
   'ENTITY_ID_REQUIRED': defineError({ code: 'ENTITY_ID_REQUIRED', class: 'public', http: 400, message: 'Entity id required.' }),
   'ENTITY_NOT_FOUND': defineError({ code: 'ENTITY_NOT_FOUND', class: 'public', http: 404, message: 'Entity not found.' }),
   'ENTITY_REQUIRED': defineError({ code: 'ENTITY_REQUIRED', class: 'internal', http: 500, message: 'Entity required.' }),
-  'ENTITY_TYPE_CLAIM_REQUIRED': defineError({ code: 'ENTITY_TYPE_CLAIM_REQUIRED', class: 'internal', http: 500, message: 'Entity type claim required.' }),
   'ENTITY_TYPE_MISMATCH': defineError({ code: 'ENTITY_TYPE_MISMATCH', class: 'public', http: 400, message: 'Entity type mismatch.' }),
   'ENTITY_TYPE_NOT_FOUND': defineError({ code: 'ENTITY_TYPE_NOT_FOUND', class: 'public', http: 404, message: 'Entity type not found.' }),
   'ENTITY_TYPE_PROVISION': defineError({ code: 'ENTITY_TYPE_PROVISION', class: 'internal', http: 500, message: 'Entity type provision.' }),
@@ -477,7 +472,6 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'INVALID_PAYLOAD_REF': defineError({ code: 'INVALID_PAYLOAD_REF', class: 'public', http: 400, message: 'Invalid payload ref.' }),
   'INVALID_TOKEN': defineError({ code: 'INVALID_TOKEN', class: 'public', http: 401, message: 'Invalid token.' }),
   'INVALID_USER': defineError({ code: 'INVALID_USER', class: 'public', http: 400, message: 'Invalid user.' }),
-  'INVALID_WORKER_ID': defineError({ code: 'INVALID_WORKER_ID', class: 'internal', http: 500, message: 'Invalid worker id.' }),
   'INVITE_ACCOUNT_EXISTS_UNVERIFIED': defineError({ code: 'INVITE_ACCOUNT_EXISTS_UNVERIFIED', class: 'public', http: 400, message: 'Invite account exists unverified.' }),
   'INVITE_ADDRESS_REQUIRED': defineError({ code: 'INVITE_ADDRESS_REQUIRED', class: 'public', http: 400, message: 'Invite address required.' }),
   'INVITE_EMAIL_NOT_FOUND': defineError({ code: 'INVITE_EMAIL_NOT_FOUND', class: 'public', http: 404, message: 'Invite email not found.' }),
@@ -596,6 +590,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'OWNER_FIELD_NOT_FOUND': defineError({ code: 'OWNER_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Owner field not found.' }),
   'OWNER_FIELD_NOT_IN_OWNER_TABLE': defineError({ code: 'OWNER_FIELD_NOT_IN_OWNER_TABLE', class: 'public', http: 400, message: 'Owner field not in owner table.' }),
   'PAGES_MODULE': defineError({ code: 'PAGES_MODULE', class: 'internal', http: 500, message: 'Pages module.' }),
+  'PARENT_CURSOR_NOT_ADVANCED': defineError({ code: 'PARENT_CURSOR_NOT_ADVANCED', class: 'public', http: 400, message: 'Parent cursor not advanced.' }),
   'PARENT_ENTITY_TYPE_NOT_FOUND': defineError({ code: 'PARENT_ENTITY_TYPE_NOT_FOUND', class: 'public', http: 404, message: 'Parent entity type not found.' }),
   'PARENT_EXECUTION_NOT_FOUND': defineError({ code: 'PARENT_EXECUTION_NOT_FOUND', class: 'internal', http: 500, message: 'Parent execution not found.' }),
   'PASSWORD_INSECURE': defineError({ code: 'PASSWORD_INSECURE', class: 'public', http: 400, message: 'Password insecure.' }),
@@ -681,7 +676,9 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'ROUTING_API_TABLES_SCOPE_REQUIRED': defineError({ code: 'ROUTING_API_TABLES_SCOPE_REQUIRED', class: 'public', http: 400, message: 'Routing api tables scope required.' }),
   'ROUTING_SURFACE_NOT_PROVISIONED': defineError({ code: 'ROUTING_SURFACE_NOT_PROVISIONED', class: 'public', http: 400, message: 'Routing surface not provisioned.' }),
   'ROW_LOCKED': defineError({ code: 'ROW_LOCKED', class: 'public', http: 423, message: 'Row locked.' }),
-  'SCHEDULED_JOB_NOT_ENQUEUED': defineError({ code: 'SCHEDULED_JOB_NOT_ENQUEUED', class: 'internal', http: 500, message: 'Scheduled job not enqueued.' }),
+  'SCHEDULE_FANOUT_LANE_INVALID': defineError({ code: 'SCHEDULE_FANOUT_LANE_INVALID', class: 'internal', http: 500, message: 'Schedule fanout lane invalid.' }),
+  'SCHEDULE_FANOUT_TASK_NOT_ALLOWED': defineError({ code: 'SCHEDULE_FANOUT_TASK_NOT_ALLOWED', class: 'internal', http: 500, message: 'Schedule fanout task not allowed.' }),
+  'SCHEDULE_FANOUT_TENANTS_PER_LANE_INVALID': defineError({ code: 'SCHEDULE_FANOUT_TENANTS_PER_LANE_INVALID', class: 'internal', http: 500, message: 'Schedule fanout tenants per lane invalid.' }),
   'SCOPE_TYPE_BACKFILL': defineError({ code: 'SCOPE_TYPE_BACKFILL', class: 'internal', http: 500, message: 'SCOPE_TYPE_BACKFILL: the membership types table must be resolved before generating a statement' }),
   'SCOPE_TYPE_SYNC': defineError({ code: 'SCOPE_TYPE_SYNC', class: 'internal', http: 500, message: 'SCOPE_TYPE_SYNC: the scope type projection must be resolved before generating a body' }),
   'SEARCH_BM25': defineError({ code: 'SEARCH_BM25', class: 'public', http: 400, message: 'Search bm25.' }),
@@ -763,10 +760,10 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'SSO_STATE_TTL_INVALID': defineError({ code: 'SSO_STATE_TTL_INVALID', class: 'internal', http: 500, message: 'Sso state ttl invalid.' }),
   'STATIC_SITES_LIMIT': defineError({ code: 'STATIC_SITES_LIMIT', class: 'public', http: 429, message: 'Static sites limit.' }),
   'STEP_UP_INVALID_TYPE': defineError({ code: 'STEP_UP_INVALID_TYPE', class: 'public', http: 403, message: 'This action requires verification that is not configured correctly. Please contact support.' }),
-  'STEP_UP_REQUIRED': defineError({ code: 'STEP_UP_REQUIRED', class: 'public', http: 403, message: 'Step up required.' }),
   'STEP_UP_REQUIRED_FRESH_AUTH': defineError({ code: 'STEP_UP_REQUIRED_FRESH_AUTH', class: 'public', http: 403, message: 'Please verify your identity to continue.' }),
   'STEP_UP_REQUIRED_MFA': defineError({ code: 'STEP_UP_REQUIRED_MFA', class: 'public', http: 403, message: 'Please enter a code from your authenticator app to continue.' }),
   'STEP_UP_REQUIRED_PASSWORD': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD', class: 'public', http: 403, message: 'Please re-enter your password to continue.' }),
+  'STEP_UP_REQUIRED_PASSWORD_OR_MFA': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD_OR_MFA', class: 'public', http: 403, message: 'Please re-enter your password or enter a code from your authenticator app to continue.' }),
   'STORAGE_API_NOT_PROVISIONED': defineError({ code: 'STORAGE_API_NOT_PROVISIONED', class: 'public', http: 400, message: 'Storage api not provisioned.' }),
   'STORAGE_DESTINATION_REQUIRES_TEMP': defineError({ code: 'STORAGE_DESTINATION_REQUIRES_TEMP', class: 'internal', http: 500, message: 'Storage destination requires temp.' }),
   'STORAGE_FILE_BUCKET_IMMUTABLE': defineError({ code: 'STORAGE_FILE_BUCKET_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file bucket immutable.' }),
@@ -780,8 +777,6 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STORAGE_GC_REF_CROSS_DATABASE': defineError({ code: 'STORAGE_GC_REF_CROSS_DATABASE', class: 'internal', http: 500, message: 'Storage gc ref cross database.' }),
   'STORAGE_GC_REF_FIELD_MISSING': defineError({ code: 'STORAGE_GC_REF_FIELD_MISSING', class: 'internal', http: 500, message: 'Storage gc ref field missing.' }),
   'STORAGE_GC_REF_TABLE_MISSING': defineError({ code: 'STORAGE_GC_REF_TABLE_MISSING', class: 'internal', http: 500, message: 'Storage gc ref table missing.' }),
-  'STORAGE_MODULE_ENTITY_FIELD_INVALID': defineError({ code: 'STORAGE_MODULE_ENTITY_FIELD_INVALID', class: 'internal', http: 500, message: 'Storage module entity field invalid.' }),
-  'STORAGE_MODULE_NOT_FOUND': defineError({ code: 'STORAGE_MODULE_NOT_FOUND', class: 'internal', http: 500, message: 'Storage module not found.' }),
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_DESTINATION_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion destination mismatch.' }),
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': defineError({ code: 'STORAGE_PROMOTION_VISIBILITY_MISMATCH', class: 'internal', http: 500, message: 'Storage promotion visibility mismatch.' }),
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': defineError({ code: 'STORAGE_STAGING_BUCKET_NO_DESTINATION', class: 'internal', http: 500, message: 'Storage staging bucket no destination.' }),
@@ -853,9 +848,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'ACCOUNT_EXISTS': { class: 'public', dynamic: false, generatedOnly: false },
   'ACCOUNT_LOCKED_EXCEED_ATTEMPTS': { class: 'public', dynamic: false, generatedOnly: false },
   'ACCOUNT_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
-  'ACTOR_CLAIM_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ALREADY_AUTHENTICATED_USE_LINK': { class: 'public', dynamic: false, generatedOnly: false },
-  'ALREADY_SCHEDULED': { class: 'public', dynamic: false, generatedOnly: true },
   'ALTER_TABLE_ADD_COLUMN': { class: 'internal', dynamic: true, generatedOnly: false },
   'API_KEYS_DISABLED': { class: 'public', dynamic: false, generatedOnly: true },
   'API_KEY_LIMIT_REACHED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -872,7 +865,6 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'AST_OPTIONS_NOT_OBJECT': { class: 'internal', dynamic: false, generatedOnly: false },
   'AST_OPTION_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
   'AST_OPTION_UNKNOWN': { class: 'internal', dynamic: false, generatedOnly: false },
-  'ATTRIBUTION_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'AUTHZ_COLUMN_SECURITY_AUTHZ_NODE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'AUTHZ_COLUMN_SECURITY_COLUMNS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'AUTHZ_COLUMN_SECURITY_COLUMN_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
@@ -975,6 +967,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'CONSTRUCT_BLUEPRINT_PROVISIONS_WITHOUT_MODULE': { class: 'public', dynamic: false, generatedOnly: false },
   'CONSTRUCT_BLUEPRINT_SCHEMA_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'CONSTRUCT_BLUEPRINT_STORAGE_ORG_MEMBERSHIP_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
+  'CONSTRUCT_BLUEPRINT_TABLES_ORG_MEMBERSHIP_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'CONST_TYPE_FIELDS_IMMUTABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'CONTENT_PRESET_CATALOG_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'CONTENT_PRESET_EMPTY': { class: 'public', dynamic: false, generatedOnly: false },
@@ -994,7 +987,6 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'CROSS_DATABASE_CHECK': { class: 'public', dynamic: false, generatedOnly: false },
   'CROSS_DATABASE_REF': { class: 'public', dynamic: false, generatedOnly: false },
   'CSRF_TOKEN_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
-  'DATABASE_CLAIM_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'DATABASE_FIELD_RESERVED_WORD': { class: 'public', dynamic: false, generatedOnly: false },
   'DATABASE_FUNCTION_RESERVED_WORD': { class: 'public', dynamic: false, generatedOnly: false },
   'DATABASE_HOSTNAME_IDENTITY_AMBIGUOUS': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1144,11 +1136,9 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DOMAIN_VERIFY_BAD_METHOD': { class: 'internal', dynamic: true, generatedOnly: true },
   'DOMAIN_VERIFY_NO_CHALLENGE': { class: 'internal', dynamic: true, generatedOnly: true },
   'EMAIL_NOT_VERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
-  'ENTITY_CLAIM_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ENTITY_ID_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'ENTITY_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'ENTITY_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: false },
-  'ENTITY_TYPE_CLAIM_REQUIRED': { class: 'internal', dynamic: false, generatedOnly: true },
   'ENTITY_TYPE_MISMATCH': { class: 'public', dynamic: false, generatedOnly: false },
   'ENTITY_TYPE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'ENTITY_TYPE_PROVISION': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1302,7 +1292,6 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'INVALID_PAYLOAD_REF': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_TOKEN': { class: 'public', dynamic: false, generatedOnly: false },
   'INVALID_USER': { class: 'public', dynamic: false, generatedOnly: false },
-  'INVALID_WORKER_ID': { class: 'internal', dynamic: false, generatedOnly: true },
   'INVITE_ACCOUNT_EXISTS_UNVERIFIED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_ADDRESS_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'INVITE_EMAIL_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1421,6 +1410,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'OWNER_FIELD_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'OWNER_FIELD_NOT_IN_OWNER_TABLE': { class: 'public', dynamic: false, generatedOnly: false },
   'PAGES_MODULE': { class: 'internal', dynamic: false, generatedOnly: false },
+  'PARENT_CURSOR_NOT_ADVANCED': { class: 'public', dynamic: false, generatedOnly: false },
   'PARENT_ENTITY_TYPE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'PARENT_EXECUTION_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'PASSWORD_INSECURE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1506,7 +1496,9 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'ROUTING_API_TABLES_SCOPE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'ROUTING_SURFACE_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'ROW_LOCKED': { class: 'public', dynamic: false, generatedOnly: false },
-  'SCHEDULED_JOB_NOT_ENQUEUED': { class: 'internal', dynamic: false, generatedOnly: true },
+  'SCHEDULE_FANOUT_LANE_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
+  'SCHEDULE_FANOUT_TASK_NOT_ALLOWED': { class: 'internal', dynamic: false, generatedOnly: false },
+  'SCHEDULE_FANOUT_TENANTS_PER_LANE_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'SCOPE_TYPE_BACKFILL': { class: 'internal', dynamic: false, generatedOnly: false },
   'SCOPE_TYPE_SYNC': { class: 'internal', dynamic: true, generatedOnly: false },
   'SEARCH_BM25': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1588,10 +1580,10 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'SSO_STATE_TTL_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'STATIC_SITES_LIMIT': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_INVALID_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
-  'STEP_UP_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_FRESH_AUTH': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_PASSWORD': { class: 'public', dynamic: false, generatedOnly: false },
+  'STEP_UP_REQUIRED_PASSWORD_OR_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_API_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_DESTINATION_REQUIRES_TEMP': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_BUCKET_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1605,8 +1597,6 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STORAGE_GC_REF_CROSS_DATABASE': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_FIELD_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_GC_REF_TABLE_MISSING': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_MODULE_ENTITY_FIELD_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
-  'STORAGE_MODULE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_DESTINATION_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_PROMOTION_VISIBILITY_MISMATCH': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_STAGING_BUCKET_NO_DESTINATION': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1673,4 +1663,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 821;
+export const GENERATED_CODE_COUNT = 816;

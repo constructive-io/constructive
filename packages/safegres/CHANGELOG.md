@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.4](https://github.com/constructive-io/constructive/compare/safegres@1.28.3...safegres@1.28.4) (2026-10-01)
+
+### Bug Fixes
+
+- **safegres:** report X5 on a partitioned parent, not on every partition's attached index copies ([a15a10b](https://github.com/constructive-io/constructive/commit/a15a10bdfd955c02970253de15d31a41f1c0ad04))
+
 ## [1.28.3](https://github.com/constructive-io/constructive/compare/safegres@1.28.2...safegres@1.28.3) (2026-09-24)
 
 **Note:** Version bump only for package safegres
