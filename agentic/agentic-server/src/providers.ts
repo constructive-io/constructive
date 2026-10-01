@@ -50,7 +50,7 @@ export function resolveProvider(
     return providers[0];
   }
 
-  // Legacy single-provider mode (default: ollama for local dev)
+  // Single-provider mode (default: ollama for local dev)
   return {
     type: options.providerType || 'ollama',
     baseUrl: options.providerBaseUrl || 'http://localhost:11434',

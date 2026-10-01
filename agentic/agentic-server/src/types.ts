@@ -7,13 +7,13 @@ export interface ProviderConfig {
 
 export interface AgenticServerOptions {
   providers?: ProviderConfig[];
-  /** Legacy single-provider base URL */
+  /** Single-provider base URL */
   providerBaseUrl?: string;
-  /** Legacy API key */
+  /** Single-provider API key */
   providerApiKey?: string;
-  /** Legacy default model */
+  /** Single-provider default model */
   defaultModel?: string;
-  /** Legacy provider type: 'openai' | 'ollama' | 'anthropic' */
+  /** Single-provider type: 'openai' | 'ollama' | 'anthropic' */
   providerType?: string;
   /** Fire-and-forget sink for inference metering. Inject this to record usage
    *  against whatever telemetry/billing backend the consumer owns. When
