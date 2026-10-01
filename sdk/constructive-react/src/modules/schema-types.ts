@@ -505,7 +505,9 @@ export type BillingProviderModuleOrderBy =
   | 'UPSERT_BILLING_SUBSCRIPTION_FUNCTION_ASC'
   | 'UPSERT_BILLING_SUBSCRIPTION_FUNCTION_DESC'
   | 'UPSERT_INVOICE_FUNCTION_ASC'
-  | 'UPSERT_INVOICE_FUNCTION_DESC';
+  | 'UPSERT_INVOICE_FUNCTION_DESC'
+  | 'USAGE_SYNC_SHARD_COUNT_ASC'
+  | 'USAGE_SYNC_SHARD_COUNT_DESC';
 /** Methods to use when ordering `BlueprintConstruction`. */
 export type BlueprintConstructionOrderBy =
   | 'BLUEPRINT_ID_ASC'
@@ -2857,8 +2859,6 @@ export type PlansModuleOrderBy =
   | 'PLAN_LIMITS_TABLE_NAME_DESC'
   | 'PLAN_METER_LIMITS_TABLE_ID_ASC'
   | 'PLAN_METER_LIMITS_TABLE_ID_DESC'
-  | 'PLAN_OVERRIDES_TABLE_ID_ASC'
-  | 'PLAN_OVERRIDES_TABLE_ID_DESC'
   | 'PLAN_PRICING_TABLE_ID_ASC'
   | 'PLAN_PRICING_TABLE_ID_DESC'
   | 'PREFIX_ASC'
@@ -4751,6 +4751,8 @@ export interface BillingProviderModuleFilter {
   upsertBillingSubscriptionFunction?: StringFilter;
   /** Filter by the object’s `upsertInvoiceFunction` field. */
   upsertInvoiceFunction?: StringFilter;
+  /** Filter by the object’s `usageSyncShardCount` field. */
+  usageSyncShardCount?: IntFilter;
 }
 /** An input for mutations affecting `BillingProviderModule` */
 export interface BillingProviderModuleInput {
@@ -4817,6 +4819,7 @@ export interface BillingProviderModuleInput {
   upsertBillingProductFunction?: string;
   upsertBillingSubscriptionFunction?: string;
   upsertInvoiceFunction?: string;
+  usageSyncShardCount?: number;
 }
 /** Represents an update to a `BillingProviderModule`. Fields that are set will be updated. */
 export interface BillingProviderModulePatch {
@@ -4883,6 +4886,7 @@ export interface BillingProviderModulePatch {
   upsertBillingProductFunction?: string;
   upsertBillingSubscriptionFunction?: string;
   upsertInvoiceFunction?: string;
+  usageSyncShardCount?: number;
 }
 /** A filter to be used against `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintConstructionFilter {
@@ -11650,8 +11654,6 @@ export interface PlansModuleFilter {
   planLimitsTableName?: StringFilter;
   /** Filter by the object’s `planMeterLimitsTableId` field. */
   planMeterLimitsTableId?: UUIDFilter;
-  /** Filter by the object’s `planOverridesTableId` field. */
-  planOverridesTableId?: UUIDFilter;
   /** Filter by the object’s `planPricingTableId` field. */
   planPricingTableId?: UUIDFilter;
   /** Filter by the object’s `plansTableId` field. */
@@ -11684,7 +11686,6 @@ export interface PlansModuleInput {
   planLimitsTableId?: string;
   planLimitsTableName?: string;
   planMeterLimitsTableId?: string;
-  planOverridesTableId?: string;
   planPricingTableId?: string;
   plansTableId?: string;
   plansTableName?: string;
@@ -11708,7 +11709,6 @@ export interface PlansModulePatch {
   planLimitsTableId?: string;
   planLimitsTableName?: string;
   planMeterLimitsTableId?: string;
-  planOverridesTableId?: string;
   planPricingTableId?: string;
   plansTableId?: string;
   plansTableName?: string;

@@ -197,6 +197,7 @@ export interface BillingProviderModule {
   upsertBillingProductFunction: string | null;
   upsertBillingSubscriptionFunction: string | null;
   upsertInvoiceFunction: string | null;
+  usageSyncShardCount: number | null;
 }
 export interface Blueprint {
   createdAt: string | null;
@@ -1344,7 +1345,6 @@ export interface PlansModule {
   planLimitsTableId: string | null;
   planLimitsTableName: string | null;
   planMeterLimitsTableId: string | null;
-  planOverridesTableId: string | null;
   planPricingTableId: string | null;
   plansTableId: string | null;
   plansTableName: string | null;
