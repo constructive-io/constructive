@@ -45,7 +45,7 @@ export const DataLock: NodeTypeDefinition = {
       },
       step_up_type: {
         type: 'string',
-        enum: ['password', 'mfa', 'fresh_auth'],
+        enum: ['password', 'mfa', 'fresh_auth', 'password_or_mfa'],
         description:
           'Verification method satisfying the step-up requirement, for the ' +
           'guarded verbs in step_up mode and for clearing the lock',
