@@ -20,10 +20,8 @@ export const GuardStepUp: NodeTypeDefinition = {
     properties: {
       step_up_type: {
         type: 'string',
-        enum: ['password', 'mfa', 'fresh_auth', 'password_or_mfa'],
-        description:
-          'Which verification method satisfies the step-up requirement ' +
-          '(password_or_mfa is the legacy spelling of fresh_auth)',
+        enum: ['password', 'mfa', 'fresh_auth'],
+        description: 'Which verification method satisfies the step-up requirement',
         default: 'fresh_auth',
       },
       events: {
