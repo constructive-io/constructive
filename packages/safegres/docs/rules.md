@@ -366,7 +366,10 @@ entirely.
 An index covers a foreign key only when its *leading* columns are the FK's columns and it covers
 every row — partial and expression indexes don't count, because the planner can't use them for the
 referential-integrity lookup. Constraint-backed, unique, partial, and expression indexes are never
-reported as redundant (X5).
+reported as redundant (X5). On a partitioned table X5 reports on the parent only: a partition's
+copies of the parent's indexes (attached, `pg_class.relispartition`) can't be dropped on their own,
+so they are never reported per partition — a new `pg_partman` partition adds no findings. An index
+created on one partition alone is that partition's own, and is reported there.
 
 ## Policy-aware index rules: X2, X3, X4
 
