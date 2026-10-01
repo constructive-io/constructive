@@ -5825,6 +5825,13 @@
     "n_generated": 3,
     "class": "public"
   },
+  "STEP_UP_REQUIRED_PASSWORD_OR_MFA": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "STEP_UP_REQUIRED_PASSWORD_OR_MFA",
+    "n_source": 1,
+    "n_generated": 1
+  },
   "STORAGE_API_NOT_PROVISIONED": {
     "count": 2,
     "dynamic": false,

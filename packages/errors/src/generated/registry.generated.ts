@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (817 distinct codes
+ * Source of truth: the constructive-db error audit (818 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 817 total, 598 public, 219 internal.
+ * Counts: 818 total, 599 public, 219 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -763,6 +763,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': defineError({ code: 'STEP_UP_REQUIRED_FRESH_AUTH', class: 'public', http: 403, message: 'Please verify your identity to continue.' }),
   'STEP_UP_REQUIRED_MFA': defineError({ code: 'STEP_UP_REQUIRED_MFA', class: 'public', http: 403, message: 'Please enter a code from your authenticator app to continue.' }),
   'STEP_UP_REQUIRED_PASSWORD': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD', class: 'public', http: 403, message: 'Please re-enter your password to continue.' }),
+  'STEP_UP_REQUIRED_PASSWORD_OR_MFA': defineError({ code: 'STEP_UP_REQUIRED_PASSWORD_OR_MFA', class: 'public', http: 403, message: 'Please re-enter your password or enter a code from your authenticator app to continue.' }),
   'STORAGE_API_NOT_PROVISIONED': defineError({ code: 'STORAGE_API_NOT_PROVISIONED', class: 'public', http: 400, message: 'Storage api not provisioned.' }),
   'STORAGE_DESTINATION_REQUIRES_TEMP': defineError({ code: 'STORAGE_DESTINATION_REQUIRES_TEMP', class: 'internal', http: 500, message: 'Storage destination requires temp.' }),
   'STORAGE_FILE_BUCKET_IMMUTABLE': defineError({ code: 'STORAGE_FILE_BUCKET_IMMUTABLE', class: 'internal', http: 500, message: 'Storage file bucket immutable.' }),
@@ -1584,6 +1585,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'STEP_UP_REQUIRED_FRESH_AUTH': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STEP_UP_REQUIRED_PASSWORD': { class: 'public', dynamic: false, generatedOnly: false },
+  'STEP_UP_REQUIRED_PASSWORD_OR_MFA': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_API_NOT_PROVISIONED': { class: 'public', dynamic: false, generatedOnly: false },
   'STORAGE_DESTINATION_REQUIRES_TEMP': { class: 'internal', dynamic: false, generatedOnly: false },
   'STORAGE_FILE_BUCKET_IMMUTABLE': { class: 'internal', dynamic: false, generatedOnly: false },
@@ -1665,4 +1667,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 817;
+export const GENERATED_CODE_COUNT = 818;

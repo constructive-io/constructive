@@ -74,7 +74,8 @@ BASE_COPY = {
     'STEP_UP_REQUIRED_FRESH_AUTH':
         'Please verify your identity to continue.',
     'STEP_UP_REQUIRED_PASSWORD_OR_MFA':
-        'Please verify your identity to continue.',
+        'Please re-enter your password or enter a code from your '
+        'authenticator app to continue.',
     'STEP_UP_INVALID_TYPE':
         'This action requires verification that is not configured correctly. '
         'Please contact support.',
