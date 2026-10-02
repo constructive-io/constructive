@@ -449,9 +449,10 @@ CRUD operations for BillingProviderModule records.
 | `upsertBillingProductFunction` | String |
 | `upsertBillingSubscriptionFunction` | String |
 | `upsertInvoiceFunction` | String |
+| `usageSyncShardCount` | Int |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `activatePlanSubscriptionFunction`, `apiName`, `applyProviderObservationFunction`, `billingCustomersTableId`, `billingCustomersTableName`, `billingDisputesTableId`, `billingDisputesTableName`, `billingHealthTableId`, `billingHealthTableName`, `billingInvoicesTableId`, `billingInvoicesTableName`, `billingOperationsTableId`, `billingOperationsTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingProviderStateTableId`, `billingProviderStateTableName`, `billingRefundsTableId`, `billingRefundsTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `clearScheduledChangeFunction`, `finishBillingOperationFunction`, `getActivePlanPricingFunction`, `getActivePlanSubscriptionFunction`, `getBillingCustomerFunction`, `getBillingPriceFunction`, `getBillingProductFunction`, `getBillingProviderStateFunction`, `getBillingSubscriptionByEntityFunction`, `getBillingSubscriptionByExternalIdFunction`, `getBillingSubscriptionFunction`, `getFallbackFreePlanFunction`, `getPlanPricingByExternalPriceFunction`, `listDueReconciliationsFunction`, `listPendingUsageSyncFunction`, `markUsageSyncedFunction`, `prefix`, `prepareScheduledChangeFunction`, `pricesTableId`, `privateApiName`, `privateSchemaId`, `processBillingEventFunction`, `productsTableId`, `provider`, `recordBillingHealthFunction`, `recordDisputeFunction`, `recordRefundFunction`, `reserveBillingOperationFunction`, `schemaId`, `subscriptionsTableId`, `sweepOverdueSubscriptionsFunction`, `upsertBillingCustomerFunction`, `upsertBillingPriceFunction`, `upsertBillingProductFunction`, `upsertBillingSubscriptionFunction`, `upsertInvoiceFunction`
+**Optional create fields (backend defaults):** `activatePlanSubscriptionFunction`, `apiName`, `applyProviderObservationFunction`, `billingCustomersTableId`, `billingCustomersTableName`, `billingDisputesTableId`, `billingDisputesTableName`, `billingHealthTableId`, `billingHealthTableName`, `billingInvoicesTableId`, `billingInvoicesTableName`, `billingOperationsTableId`, `billingOperationsTableName`, `billingPricesTableId`, `billingPricesTableName`, `billingProductsTableId`, `billingProductsTableName`, `billingProviderStateTableId`, `billingProviderStateTableName`, `billingRefundsTableId`, `billingRefundsTableName`, `billingSubscriptionsTableId`, `billingSubscriptionsTableName`, `billingWebhookEventsTableId`, `billingWebhookEventsTableName`, `clearScheduledChangeFunction`, `finishBillingOperationFunction`, `getActivePlanPricingFunction`, `getActivePlanSubscriptionFunction`, `getBillingCustomerFunction`, `getBillingPriceFunction`, `getBillingProductFunction`, `getBillingProviderStateFunction`, `getBillingSubscriptionByEntityFunction`, `getBillingSubscriptionByExternalIdFunction`, `getBillingSubscriptionFunction`, `getFallbackFreePlanFunction`, `getPlanPricingByExternalPriceFunction`, `listDueReconciliationsFunction`, `listPendingUsageSyncFunction`, `markUsageSyncedFunction`, `prefix`, `prepareScheduledChangeFunction`, `pricesTableId`, `privateApiName`, `privateSchemaId`, `processBillingEventFunction`, `productsTableId`, `provider`, `recordBillingHealthFunction`, `recordDisputeFunction`, `recordRefundFunction`, `reserveBillingOperationFunction`, `schemaId`, `subscriptionsTableId`, `sweepOverdueSubscriptionsFunction`, `upsertBillingCustomerFunction`, `upsertBillingPriceFunction`, `upsertBillingProductFunction`, `upsertBillingSubscriptionFunction`, `upsertInvoiceFunction`, `usageSyncShardCount`
 
 ### `blueprint`
 
@@ -2640,7 +2641,6 @@ CRUD operations for PlansModule records.
 | `planLimitsTableId` | UUID |
 | `planLimitsTableName` | String |
 | `planMeterLimitsTableId` | UUID |
-| `planOverridesTableId` | UUID |
 | `planPricingTableId` | UUID |
 | `plansTableId` | UUID |
 | `plansTableName` | String |
@@ -2652,7 +2652,7 @@ CRUD operations for PlansModule records.
 | `schemaId` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `apiName`, `applyBillingPlanFunction`, `applyPlanAggregateFunction`, `applyPlanCapsFunction`, `applyPlanFunction`, `planCapsTableId`, `planLimitsTableId`, `planLimitsTableName`, `planMeterLimitsTableId`, `planOverridesTableId`, `planPricingTableId`, `plansTableId`, `plansTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `applyBillingPlanFunction`, `applyPlanAggregateFunction`, `applyPlanCapsFunction`, `applyPlanFunction`, `planCapsTableId`, `planLimitsTableId`, `planLimitsTableName`, `planMeterLimitsTableId`, `planPricingTableId`, `plansTableId`, `plansTableName`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `schemaId`
 
 ### `principal-auth-module`
 

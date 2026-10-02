@@ -1349,6 +1349,7 @@ type BillingProviderModule {
   upsertBillingProductFunction: String!
   upsertBillingSubscriptionFunction: String!
   upsertInvoiceFunction: String!
+  usageSyncShardCount: Int!
 }
 
 """A connection to a list of `BillingProviderModule` values."""
@@ -1582,6 +1583,9 @@ input BillingProviderModuleFilter {
 
   """Filter by the object’s `upsertInvoiceFunction` field."""
   upsertInvoiceFunction: StringFilter
+
+  """Filter by the object’s `usageSyncShardCount` field."""
+  usageSyncShardCount: IntFilter
 }
 
 """An input for mutations affecting `BillingProviderModule`"""
@@ -1649,6 +1653,7 @@ input BillingProviderModuleInput {
   upsertBillingProductFunction: String
   upsertBillingSubscriptionFunction: String
   upsertInvoiceFunction: String
+  usageSyncShardCount: Int
 }
 
 """Methods to use when ordering `BillingProviderModule`."""
@@ -1782,6 +1787,8 @@ enum BillingProviderModuleOrderBy {
   UPSERT_BILLING_SUBSCRIPTION_FUNCTION_DESC
   UPSERT_INVOICE_FUNCTION_ASC
   UPSERT_INVOICE_FUNCTION_DESC
+  USAGE_SYNC_SHARD_COUNT_ASC
+  USAGE_SYNC_SHARD_COUNT_DESC
 }
 
 """
@@ -1851,6 +1858,7 @@ input BillingProviderModulePatch {
   upsertBillingProductFunction: String
   upsertBillingSubscriptionFunction: String
   upsertInvoiceFunction: String
+  usageSyncShardCount: Int
 }
 
 """
@@ -25161,7 +25169,6 @@ type PlansModule {
   planLimitsTableId: UUID!
   planLimitsTableName: String!
   planMeterLimitsTableId: UUID
-  planOverridesTableId: UUID
   planPricingTableId: UUID
   plansTableId: UUID!
   plansTableName: String!
@@ -25245,9 +25252,6 @@ input PlansModuleFilter {
   """Filter by the object’s `planMeterLimitsTableId` field."""
   planMeterLimitsTableId: UUIDFilter
 
-  """Filter by the object’s `planOverridesTableId` field."""
-  planOverridesTableId: UUIDFilter
-
   """Filter by the object’s `planPricingTableId` field."""
   planPricingTableId: UUIDFilter
 
@@ -25289,7 +25293,6 @@ input PlansModuleInput {
   planLimitsTableId: UUID
   planLimitsTableName: String
   planMeterLimitsTableId: UUID
-  planOverridesTableId: UUID
   planPricingTableId: UUID
   plansTableId: UUID
   plansTableName: String
@@ -25330,8 +25333,6 @@ enum PlansModuleOrderBy {
   PLAN_LIMITS_TABLE_NAME_DESC
   PLAN_METER_LIMITS_TABLE_ID_ASC
   PLAN_METER_LIMITS_TABLE_ID_DESC
-  PLAN_OVERRIDES_TABLE_ID_ASC
-  PLAN_OVERRIDES_TABLE_ID_DESC
   PLAN_PRICING_TABLE_ID_ASC
   PLAN_PRICING_TABLE_ID_DESC
   PREFIX_ASC
@@ -25365,7 +25366,6 @@ input PlansModulePatch {
   planLimitsTableId: UUID
   planLimitsTableName: String
   planMeterLimitsTableId: UUID
-  planOverridesTableId: UUID
   planPricingTableId: UUID
   plansTableId: UUID
   plansTableName: String

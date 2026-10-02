@@ -51,6 +51,7 @@ const db = createClient({
 | `functionGraphStore` | findMany, findOne, create, update, delete |
 | `functionInvocationAttempt` | findMany, findOne, create, update, delete |
 | `functionInvocation` | findMany, findOne, create, update, delete |
+| `functionSchedule` | findMany, findOne, create, update, delete |
 | `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
 | `image` | findMany, findOne, create, update, delete |
 | `imageGrant` | findMany, findOne, create, update, delete |
@@ -73,6 +74,7 @@ const db = createClient({
 | `platformFunctionExecutionLog` | findMany, findOne, create, update, delete |
 | `platformFunctionInvocationAttempt` | findMany, findOne, create, update, delete |
 | `platformFunctionInvocation` | findMany, findOne, create, update, delete |
+| `platformFunctionSchedule` | findMany, findOne, create, update, delete |
 | `platformImage` | findMany, findOne, create, update, delete |
 | `platformImageGrant` | findMany, findOne, create, update, delete |
 | `platformInfraCommit` | findMany, findOne, create, update, delete |
@@ -1396,6 +1398,46 @@ const updated = await db.functionInvocation.update({ where: { id: '<UUID>' }, da
 const deleted = await db.functionInvocation.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.functionSchedule`
+
+CRUD operations for FunctionSchedule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `databaseId` | UUID | Yes |
+| `description` | String | Yes |
+| `functionDefinitionId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `name` | String | Yes |
+| `payload` | JSON | Yes |
+| `scheduleInfo` | JSON | Yes |
+| `suspendedAt` | Datetime | Yes |
+| `suspendedReason` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all functionSchedule records
+const items = await db.functionSchedule.findMany({ select: { createdAt: true, databaseId: true, description: true, functionDefinitionId: true, id: true, isActive: true, name: true, payload: true, scheduleInfo: true, suspendedAt: true, suspendedReason: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.functionSchedule.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, description: true, functionDefinitionId: true, id: true, isActive: true, name: true, payload: true, scheduleInfo: true, suspendedAt: true, suspendedReason: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.functionSchedule.create({ data: { databaseId: '<UUID>', description: '<String>', functionDefinitionId: '<UUID>', isActive: '<Boolean>', name: '<String>', payload: '<JSON>', scheduleInfo: '<JSON>', suspendedAt: '<Datetime>', suspendedReason: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.functionSchedule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.functionSchedule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.getAllTreeNodesRecord`
 
 CRUD operations for GetAllTreeNodesRecord records.
@@ -2296,6 +2338,45 @@ const updated = await db.platformFunctionInvocation.update({ where: { id: '<UUID
 
 // Delete
 const deleted = await db.platformFunctionInvocation.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformFunctionSchedule`
+
+CRUD operations for PlatformFunctionSchedule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `description` | String | Yes |
+| `functionDefinitionId` | UUID | Yes |
+| `id` | UUID | No |
+| `isActive` | Boolean | Yes |
+| `name` | String | Yes |
+| `payload` | JSON | Yes |
+| `scheduleInfo` | JSON | Yes |
+| `suspendedAt` | Datetime | Yes |
+| `suspendedReason` | String | Yes |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all platformFunctionSchedule records
+const items = await db.platformFunctionSchedule.findMany({ select: { createdAt: true, description: true, functionDefinitionId: true, id: true, isActive: true, name: true, payload: true, scheduleInfo: true, suspendedAt: true, suspendedReason: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.platformFunctionSchedule.findOne({ id: '<UUID>', select: { createdAt: true, description: true, functionDefinitionId: true, id: true, isActive: true, name: true, payload: true, scheduleInfo: true, suspendedAt: true, suspendedReason: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.platformFunctionSchedule.create({ data: { description: '<String>', functionDefinitionId: '<UUID>', isActive: '<Boolean>', name: '<String>', payload: '<JSON>', scheduleInfo: '<JSON>', suspendedAt: '<Datetime>', suspendedReason: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformFunctionSchedule.update({ where: { id: '<UUID>' }, data: { description: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformFunctionSchedule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformImage`

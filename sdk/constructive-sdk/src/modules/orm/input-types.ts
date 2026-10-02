@@ -425,6 +425,7 @@ export interface BillingProviderModule {
   upsertBillingProductFunction?: string | null;
   upsertBillingSubscriptionFunction?: string | null;
   upsertInvoiceFunction?: string | null;
+  usageSyncShardCount?: number | null;
 }
 /** An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. */
 export interface Blueprint {
@@ -1904,7 +1905,6 @@ export interface PlansModule {
   planLimitsTableId?: string | null;
   planLimitsTableName?: string | null;
   planMeterLimitsTableId?: string | null;
-  planOverridesTableId?: string | null;
   planPricingTableId?: string | null;
   plansTableId?: string | null;
   plansTableName?: string | null;
@@ -3120,6 +3120,7 @@ export type BillingProviderModuleSelect = {
   upsertBillingProductFunction?: boolean;
   upsertBillingSubscriptionFunction?: boolean;
   upsertInvoiceFunction?: boolean;
+  usageSyncShardCount?: boolean;
 };
 export type BlueprintSelect = {
   createdAt?: boolean;
@@ -4459,7 +4460,6 @@ export type PlansModuleSelect = {
   planLimitsTableId?: boolean;
   planLimitsTableName?: boolean;
   planMeterLimitsTableId?: boolean;
-  planOverridesTableId?: boolean;
   planPricingTableId?: boolean;
   plansTableId?: boolean;
   plansTableName?: boolean;
@@ -5512,6 +5512,8 @@ export interface BillingProviderModuleFilter {
   upsertBillingSubscriptionFunction?: StringFilter;
   /** Filter by the object’s `upsertInvoiceFunction` field. */
   upsertInvoiceFunction?: StringFilter;
+  /** Filter by the object’s `usageSyncShardCount` field. */
+  usageSyncShardCount?: IntFilter;
 }
 export interface BlueprintFilter {
   /** Checks for all expressions in this list. */
@@ -8168,8 +8170,6 @@ export interface PlansModuleFilter {
   planLimitsTableName?: StringFilter;
   /** Filter by the object’s `planMeterLimitsTableId` field. */
   planMeterLimitsTableId?: UUIDFilter;
-  /** Filter by the object’s `planOverridesTableId` field. */
-  planOverridesTableId?: UUIDFilter;
   /** Filter by the object’s `planPricingTableId` field. */
   planPricingTableId?: UUIDFilter;
   /** Filter by the object’s `plansTableId` field. */
@@ -9897,7 +9897,9 @@ export type BillingProviderModuleOrderBy =
   | 'UPSERT_BILLING_SUBSCRIPTION_FUNCTION_ASC'
   | 'UPSERT_BILLING_SUBSCRIPTION_FUNCTION_DESC'
   | 'UPSERT_INVOICE_FUNCTION_ASC'
-  | 'UPSERT_INVOICE_FUNCTION_DESC';
+  | 'UPSERT_INVOICE_FUNCTION_DESC'
+  | 'USAGE_SYNC_SHARD_COUNT_ASC'
+  | 'USAGE_SYNC_SHARD_COUNT_DESC';
 export type BlueprintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
@@ -12194,8 +12196,6 @@ export type PlansModuleOrderBy =
   | 'PLAN_LIMITS_TABLE_NAME_DESC'
   | 'PLAN_METER_LIMITS_TABLE_ID_ASC'
   | 'PLAN_METER_LIMITS_TABLE_ID_DESC'
-  | 'PLAN_OVERRIDES_TABLE_ID_ASC'
-  | 'PLAN_OVERRIDES_TABLE_ID_DESC'
   | 'PLAN_PRICING_TABLE_ID_ASC'
   | 'PLAN_PRICING_TABLE_ID_DESC'
   | 'PREFIX_ASC'
@@ -13736,6 +13736,7 @@ export interface CreateBillingProviderModuleInput {
     upsertBillingProductFunction?: string;
     upsertBillingSubscriptionFunction?: string;
     upsertInvoiceFunction?: string;
+    usageSyncShardCount?: number;
   };
 }
 export interface BillingProviderModulePatch {
@@ -13801,6 +13802,7 @@ export interface BillingProviderModulePatch {
   upsertBillingProductFunction?: string | null;
   upsertBillingSubscriptionFunction?: string | null;
   upsertInvoiceFunction?: string | null;
+  usageSyncShardCount?: number | null;
 }
 export interface UpdateBillingProviderModuleInput {
   clientMutationId?: string;
@@ -16592,7 +16594,6 @@ export interface CreatePlansModuleInput {
     planLimitsTableId?: string;
     planLimitsTableName?: string;
     planMeterLimitsTableId?: string;
-    planOverridesTableId?: string;
     planPricingTableId?: string;
     plansTableId?: string;
     plansTableName?: string;
@@ -16615,7 +16616,6 @@ export interface PlansModulePatch {
   planLimitsTableId?: string | null;
   planLimitsTableName?: string | null;
   planMeterLimitsTableId?: string | null;
-  planOverridesTableId?: string | null;
   planPricingTableId?: string | null;
   plansTableId?: string | null;
   plansTableName?: string | null;
@@ -18658,6 +18658,7 @@ export interface BillingProviderModuleInput {
   upsertBillingProductFunction?: string;
   upsertBillingSubscriptionFunction?: string;
   upsertInvoiceFunction?: string;
+  usageSyncShardCount?: number;
 }
 /** An input for mutations affecting `Blueprint` */
 export interface BlueprintInput {
@@ -20164,7 +20165,6 @@ export interface PlansModuleInput {
   planLimitsTableId?: string;
   planLimitsTableName?: string;
   planMeterLimitsTableId?: string;
-  planOverridesTableId?: string;
   planPricingTableId?: string;
   plansTableId?: string;
   plansTableName?: string;

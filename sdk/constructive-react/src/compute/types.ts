@@ -480,6 +480,20 @@ export interface FunctionInvocation {
   status: string | null;
   taskIdentifier: string | null;
 }
+export interface FunctionSchedule {
+  createdAt: string | null;
+  databaseId: string | null;
+  description: string | null;
+  functionDefinitionId: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  name: string | null;
+  payload: unknown | null;
+  scheduleInfo: unknown | null;
+  suspendedAt: string | null;
+  suspendedReason: string | null;
+  updatedAt: string | null;
+}
 export interface GetAllTreeNodesRecord {
   data: unknown | null;
   path: string[] | null;
@@ -809,6 +823,19 @@ export interface PlatformFunctionInvocation {
   startedAt: string | null;
   status: string | null;
   taskIdentifier: string | null;
+}
+export interface PlatformFunctionSchedule {
+  createdAt: string | null;
+  description: string | null;
+  functionDefinitionId: string | null;
+  id: string | null;
+  isActive: boolean | null;
+  name: string | null;
+  payload: unknown | null;
+  scheduleInfo: unknown | null;
+  suspendedAt: string | null;
+  suspendedReason: string | null;
+  updatedAt: string | null;
 }
 export interface PlatformImage {
   createdAt: string | null;

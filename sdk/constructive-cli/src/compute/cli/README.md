@@ -56,6 +56,7 @@ csdk auth set-token <your-token>
 | `function-graph-store` | functionGraphStore CRUD operations |
 | `function-invocation-attempt` | functionInvocationAttempt CRUD operations |
 | `function-invocation` | functionInvocation CRUD operations |
+| `function-schedule` | functionSchedule CRUD operations |
 | `get-all-tree-nodes-record` | getAllTreeNodesRecord CRUD operations |
 | `image` | image CRUD operations |
 | `image-grant` | imageGrant CRUD operations |
@@ -78,6 +79,7 @@ csdk auth set-token <your-token>
 | `platform-function-execution-log` | platformFunctionExecutionLog CRUD operations |
 | `platform-function-invocation-attempt` | platformFunctionInvocationAttempt CRUD operations |
 | `platform-function-invocation` | platformFunctionInvocation CRUD operations |
+| `platform-function-schedule` | platformFunctionSchedule CRUD operations |
 | `platform-image` | platformImage CRUD operations |
 | `platform-image-grant` | platformImageGrant CRUD operations |
 | `platform-infra-commit` | platformInfraCommit CRUD operations |
@@ -1289,6 +1291,39 @@ CRUD operations for FunctionInvocation records.
 **Required create fields:** `channel`, `databaseId`, `taskIdentifier`
 **Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `createdByPrincipal`, `definitionScope`, `durationMs`, `entityId`, `entityType`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `organizationId`, `parentInvocationId`, `payload`, `principalId`, `provenance`, `result`, `startedAt`, `status`
 
+### `function-schedule`
+
+CRUD operations for FunctionSchedule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all functionSchedule records |
+| `find-first` | Find first matching functionSchedule record |
+| `get` | Get a functionSchedule by id |
+| `create` | Create a new functionSchedule |
+| `update` | Update an existing functionSchedule |
+| `delete` | Delete a functionSchedule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `databaseId` | UUID |
+| `description` | String |
+| `functionDefinitionId` | UUID |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `payload` | JSON |
+| `scheduleInfo` | JSON |
+| `suspendedAt` | Datetime |
+| `suspendedReason` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `databaseId`, `functionDefinitionId`, `name`, `scheduleInfo`
+**Optional create fields (backend defaults):** `description`, `isActive`, `payload`, `suspendedAt`, `suspendedReason`
+
 ### `get-all-tree-nodes-record`
 
 CRUD operations for GetAllTreeNodesRecord records.
@@ -2034,6 +2069,38 @@ CRUD operations for PlatformFunctionInvocation records.
 
 **Required create fields:** `channel`, `taskIdentifier`
 **Optional create fields (backend defaults):** `actorId`, `apiBindingId`, `completedAt`, `createdByPrincipal`, `databaseId`, `definitionScope`, `durationMs`, `entityId`, `entityType`, `error`, `functionDefinitionId`, `graphExecutionId`, `jobId`, `organizationId`, `parentInvocationId`, `payload`, `principalId`, `provenance`, `result`, `startedAt`, `status`
+
+### `platform-function-schedule`
+
+CRUD operations for PlatformFunctionSchedule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformFunctionSchedule records |
+| `find-first` | Find first matching platformFunctionSchedule record |
+| `get` | Get a platformFunctionSchedule by id |
+| `create` | Create a new platformFunctionSchedule |
+| `update` | Update an existing platformFunctionSchedule |
+| `delete` | Delete a platformFunctionSchedule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `description` | String |
+| `functionDefinitionId` | UUID |
+| `id` | UUID |
+| `isActive` | Boolean |
+| `name` | String |
+| `payload` | JSON |
+| `scheduleInfo` | JSON |
+| `suspendedAt` | Datetime |
+| `suspendedReason` | String |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `functionDefinitionId`, `name`, `scheduleInfo`
+**Optional create fields (backend defaults):** `description`, `isActive`, `payload`, `suspendedAt`, `suspendedReason`
 
 ### `platform-image`
 
