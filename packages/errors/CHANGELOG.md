@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.20.1...@constructive-io/errors@0.21.0) (2026-10-02)
+
+### Features
+
+- **errors:** register billing refusal codes (BILLING_SUBSCRIPTION_ACTIVE, BILLING_QUOTA_EXCEEDED) ([fc65ee6](https://github.com/constructive-io/constructive/commit/fc65ee67443138d76986ece14c7b46db169b3c45))
+- **step-up:** password_or_mfa is a distinct kind with its own error code ([2896778](https://github.com/constructive-io/constructive/commit/28967781b35c4413e3b124aa94929c98a7501f66))
+
 ## [0.20.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.20.0...@constructive-io/errors@0.20.1) (2026-09-24)
 
 **Note:** Version bump only for package @constructive-io/errors

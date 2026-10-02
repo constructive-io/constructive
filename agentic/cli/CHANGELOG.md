@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.16.4...@agentic-kit/cli@0.17.0) (2026-10-02)
+
+### Features
+
+- **agentic-cli:** drop the pre-shared-store account file import ([ed59023](https://github.com/constructive-io/constructive/commit/ed590230d79502294d95d507c466975976fc36e9))
+
 ## [0.16.4](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.16.3...@agentic-kit/cli@0.16.4) (2026-09-30)
 
 **Note:** Version bump only for package @agentic-kit/cli

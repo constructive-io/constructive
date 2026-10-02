@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.20.0](https://github.com/constructive-io/constructive/compare/node-type-registry@1.19.1...node-type-registry@1.20.0) (2026-10-02)
+
+### Features
+
+- **node-type-registry:** GuardStepUp accepts only fresh_auth, not password_or_mfa ([340ccce](https://github.com/constructive-io/constructive/commit/340cccea78dc51edca115c01f1f3f64d71acaf99))
+- **step-up:** password_or_mfa is a distinct kind with its own error code ([2896778](https://github.com/constructive-io/constructive/commit/28967781b35c4413e3b124aa94929c98a7501f66))
+
 ## [1.19.1](https://github.com/constructive-io/constructive/compare/node-type-registry@1.19.0...node-type-registry@1.19.1) (2026-09-24)
 
 **Note:** Version bump only for package node-type-registry
