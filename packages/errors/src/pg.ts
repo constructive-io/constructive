@@ -1,10 +1,15 @@
 import type { PgErrorFields } from './types';
 
+/** SQLSTATE `insufficient_privilege`: a missing grant or a row-level security refusal. */
+export const INSUFFICIENT_PRIVILEGE_SQLSTATE = '42501';
+
 /**
- * PostgreSQL SQLSTATE codes for the native constraint violations we surface as
- * public Constructive codes.
+ * PostgreSQL SQLSTATE codes for the native errors we surface as public
+ * Constructive codes: constraint violations, and privilege refusals (a missing
+ * grant or an RLS policy) as `FORBIDDEN`.
  */
 export const SQLSTATE_TO_CODE: Record<string, string> = {
+  [INSUFFICIENT_PRIVILEGE_SQLSTATE]: 'FORBIDDEN',
   23505: 'UNIQUE_VIOLATION',
   23503: 'FOREIGN_KEY_VIOLATION',
   23502: 'NOT_NULL_VIOLATION',

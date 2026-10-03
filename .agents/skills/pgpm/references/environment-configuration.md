@@ -123,6 +123,7 @@ const deployOptions = getDeploymentEnvOptions();
 | `SERVER_TRUST_PROXY` | Trust proxy headers |
 | `SERVER_ORIGIN` | Server origin URL |
 | `SERVER_STRICT_AUTH` | Strict authentication mode |
+| `SERVER_EXPOSE_ERRORS` | Return raw internal errors to clients (local debugging only; default `false`, masked) |
 
 ### CDN/Storage
 

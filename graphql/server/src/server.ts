@@ -33,7 +33,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
-import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { createErrorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
 import { createFlushMiddleware, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
@@ -230,7 +230,7 @@ class Server {
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)
-    app.use(errorHandler); // Catches all thrown errors
+    app.use(createErrorHandler({ exposeErrors: effectiveOpts.server?.exposeErrors })); // Catches all thrown errors
 
     this.app = app;
     this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;

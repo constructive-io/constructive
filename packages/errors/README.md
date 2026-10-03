@@ -39,7 +39,8 @@ throw errors.ACCOUNT_EXISTS();
 - `parse()` recovers structure from the code's precedence: structured `DETAIL`
   JSON → GraphQL `extensions.code` → a leading ALL_CAPS token in the message
   (legacy DB `RAISE`, incl. `CODE (arg, arg)` positional args) → native
-  SQLSTATE constraint mapping.
+  SQLSTATE mapping (class-23 constraint violations, and `42501`
+  insufficient privilege — a missing grant or RLS refusal — as `FORBIDDEN`).
 - The registry has two layers, merged at lookup time (curated wins):
   - **Generated** (`src/generated/registry.generated.ts`) — every code raised via
     `EXCEPTION`/`THROW` across constructive-db (deploy sources + generated output),
