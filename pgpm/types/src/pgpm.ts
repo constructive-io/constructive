@@ -143,6 +143,11 @@ export interface CDNOptions {
     awsSecretKey?: string;
     /** S3-compatible API endpoint URL (RustFS, MinIO, R2, DO Spaces, GCS, etc.) */
     endpoint?: string;
+    /**
+     * Client-reachable endpoint that presigned URLs are signed for. Set it when
+     * `endpoint` is an internal host (e.g. an in-cluster Service); defaults to `endpoint`.
+     */
+    publicEndpoint?: string;
     /** Public URL prefix for generating download URLs (e.g., CDN domain, S3 public URL) */
     publicUrlPrefix?: string;
 }

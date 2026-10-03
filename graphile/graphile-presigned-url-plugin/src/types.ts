@@ -186,6 +186,14 @@ export interface S3Config {
   bucket: string;
   /** S3 endpoint URL (for RustFS, MinIO, or custom S3) */
   endpoint?: string;
+  /**
+   * Client used only to sign presigned URLs handed to clients, configured with
+   * the client-reachable `publicEndpoint`. SigV4 signs the Host header, so a URL
+   * must be signed for the host the client will call. Defaults to `client`.
+   */
+  presignClient?: S3Client;
+  /** Endpoint `presignClient` signs for */
+  publicEndpoint?: string;
   /** S3 region */
   region?: string;
   /** Whether to use path-style URLs (required for path-style S3-compatible storage) */

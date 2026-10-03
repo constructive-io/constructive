@@ -60,6 +60,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     AWS_SECRET_KEY,
     AWS_SECRET_ACCESS_KEY,
     CDN_ENDPOINT,
+    CDN_PUBLIC_ENDPOINT,
     CDN_PUBLIC_URL_PREFIX,
 
     DEPLOYMENT_USE_TX,
@@ -149,6 +150,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && { awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID }),
       ...((AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY) && { awsSecretKey: AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY }),
       ...(CDN_ENDPOINT && { endpoint: CDN_ENDPOINT }),
+      ...(CDN_PUBLIC_ENDPOINT && { publicEndpoint: CDN_PUBLIC_ENDPOINT }),
       ...(CDN_PUBLIC_URL_PREFIX && { publicUrlPrefix: CDN_PUBLIC_URL_PREFIX }),
     },
     deployment: {

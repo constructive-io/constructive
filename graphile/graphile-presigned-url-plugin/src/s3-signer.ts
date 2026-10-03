@@ -13,6 +13,14 @@ import type { S3Config } from './types';
 
 const log = new Logger('graphile-presigned-url:s3');
 
+/** Presigned URLs go to clients, so they are signed for the client-reachable endpoint. */
+function presignTarget(s3Config: S3Config) {
+  return {
+    client: s3Config.presignClient ?? s3Config.client,
+    endpoint: s3Config.presignClient ? s3Config.publicEndpoint : s3Config.endpoint,
+  };
+}
+
 /**
  * Generate a presigned PUT URL for uploading a file to S3.
  *
@@ -41,13 +49,14 @@ export async function generatePresignedPutUrl(
     ContentLength: contentLength,
   });
 
+  const { client, endpoint } = presignTarget(s3Config);
   let url: string;
   try {
-    url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+    url = await getSignedUrl(client as any, command, { expiresIn });
   } catch (err) {
     throw s3FailureError(
       'PRESIGN_PUT_FAILED',
-      { endpoint: s3Config.endpoint, bucket: s3Config.bucket, key, contentType },
+      { endpoint, bucket: s3Config.bucket, key, contentType },
       err,
     );
   }
@@ -84,11 +93,12 @@ export async function generatePresignedGetUrl(
   }
 
   const command = new GetObjectCommand(params as any);
+  const { client, endpoint } = presignTarget(s3Config);
   let url: string;
   try {
-    url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+    url = await getSignedUrl(client as any, command, { expiresIn });
   } catch (err) {
-    throw s3FailureError('PRESIGN_GET_FAILED', { endpoint: s3Config.endpoint, bucket: s3Config.bucket, key }, err);
+    throw s3FailureError('PRESIGN_GET_FAILED', { endpoint, bucket: s3Config.bucket, key }, err);
   }
   log.debug(`Generated presigned GET URL for key=${key}, expires=${expiresIn}s`);
   return url;

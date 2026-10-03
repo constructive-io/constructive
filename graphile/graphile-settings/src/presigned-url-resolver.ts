@@ -6,6 +6,10 @@
  * initializes an S3Client on first use.
  *
  * Follows the same lazy-init pattern as upload-resolver.ts.
+ *
+ * `cdn.endpoint` (CDN_ENDPOINT) is the host the server talks to; presigned URLs
+ * are signed for `cdn.publicEndpoint` (CDN_PUBLIC_ENDPOINT) when it is set, so a
+ * cluster-internal storage host never reaches a client.
  */
 
 import { getEnvOptions } from '@constructive-io/graphql-env';
@@ -42,7 +46,7 @@ export function getPresignedUrlS3Config(): S3Config {
     );
   }
 
-  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn;
+  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicEndpoint, publicUrlPrefix } = cdn;
 
   if (!awsAccessKey || !awsSecretKey) {
     throw new Error(
@@ -59,23 +63,25 @@ export function getPresignedUrlS3Config(): S3Config {
   }
 
   log.info(
-    `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
+    `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint} ` +
+    `publicEndpoint=${publicEndpoint ?? endpoint}`,
   );
 
-  const client = createS3Client({
+  const connect = (url: string | undefined) => createS3Client({
     provider: (cdn.provider || 'minio') as any,
     region: awsRegion,
     accessKeyId: awsAccessKey,
     secretAccessKey: awsSecretKey,
-    ...(endpoint ? { endpoint } : {}),
+    ...(url ? { endpoint: url } : {}),
   });
 
   s3Config = {
-    client,
+    client: connect(endpoint),
     bucket: bucketName,
     region: awsRegion,
     publicUrlPrefix,
     ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
+    ...(publicEndpoint ? { presignClient: connect(publicEndpoint), publicEndpoint } : {}),
   };
 
   return s3Config;

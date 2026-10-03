@@ -179,6 +179,26 @@ describe('getEnvOptions', () => {
     expect(result).toMatchSnapshot();
   });
 
+  it('maps CDN_ENDPOINT and CDN_PUBLIC_ENDPOINT to separate settings', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-'));
+    writeConfig(tempDir, {});
+
+    const { cdn } = getEnvOptions({}, tempDir, {
+      CDN_ENDPOINT: 'http://rustfs.constructive-infra.svc.cluster.local:9000',
+      CDN_PUBLIC_ENDPOINT: 'https://storage.example.com'
+    });
+
+    expect(cdn.endpoint).toBe('http://rustfs.constructive-infra.svc.cluster.local:9000');
+    expect(cdn.publicEndpoint).toBe('https://storage.example.com');
+  });
+
+  it('leaves cdn.publicEndpoint unset by default', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-'));
+    writeConfig(tempDir, {});
+
+    expect(getEnvOptions({}, tempDir, {}).cdn.publicEndpoint).toBeUndefined();
+  });
+
   it('replaces array fields with later values (overrides win)', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgpm-env-replace-'));
     writeConfig(tempDir, {

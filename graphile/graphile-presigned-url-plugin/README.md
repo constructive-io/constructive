@@ -43,3 +43,22 @@ const preset = {
   ],
 };
 ```
+
+### Internal vs public storage endpoint
+
+`client` is what the server uses to talk to storage. Presigned URLs are handed to
+clients, and SigV4 signs the `Host` header, so they must be signed for the host
+the client will call. When storage is reached over an internal address (e.g. an
+in-cluster Service), pass a second client configured with the public endpoint:
+
+```typescript
+s3: {
+  client: internalClient,        // endpoint: http://minio.storage.svc.cluster.local:9000
+  presignClient: publicClient,   // endpoint: https://storage.example.com
+  publicEndpoint: 'https://storage.example.com',
+  bucket: 'my-uploads',
+}
+```
+
+Without `presignClient`, URLs are signed with `client`. In the Constructive server
+this is `CDN_ENDPOINT` (internal) and `CDN_PUBLIC_ENDPOINT` (public).
