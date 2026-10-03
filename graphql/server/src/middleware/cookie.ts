@@ -34,7 +34,7 @@ export const getSessionCookieConfig = (
   }
 
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
+    secure: authSettings?.cookieSecure ?? true,
     sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: authSettings?.cookieHttponly ?? true,
@@ -48,7 +48,7 @@ export const getSessionCookieConfig = (
  */
 export const getDeviceTokenCookieConfig = (authSettings?: AuthSettings): CookieConfig => {
   return {
-    secure: authSettings?.cookieSecure ?? process.env.NODE_ENV === 'production',
+    secure: authSettings?.cookieSecure ?? true,
     sameSite: (authSettings?.cookieSamesite as 'strict' | 'lax' | 'none') ?? 'lax',
     domain: authSettings?.cookieDomain ?? undefined,
     httpOnly: true,

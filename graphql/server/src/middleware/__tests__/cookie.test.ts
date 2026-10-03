@@ -20,7 +20,7 @@ describe('cookie utilities', () => {
     it('returns default config when no authSettings provided', () => {
       const config = getSessionCookieConfig();
       expect(config).toEqual({
-        secure: false, // NODE_ENV is 'test'
+        secure: true, // Secure by default; cookieSecure: false is the explicit opt-out
         sameSite: 'lax',
         domain: undefined,
         httpOnly: true,

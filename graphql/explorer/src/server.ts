@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
+import { cors, healthz } from '@pgpmjs/server-utils';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
@@ -56,11 +56,11 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   };
 
   const app = express();
+  app.disable('x-powered-by');
 
   healthz(app);
   cors(app, server.origin);
   app.use(parseDomains());
-  app.use(poweredBy('constructive'));
 
   app.use(async (req: Request, res: Response, next: NextFunction) => {
     if (req.urlDomains?.subdomains.length === 1) {

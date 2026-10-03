@@ -7,7 +7,7 @@ const DEFAULT_CONFIG: Required<CsrfConfig> = {
   fieldName: '_csrf',
   cookieOptions: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax',
     maxAge: 86400,
     path: '/',

@@ -64,7 +64,7 @@ export function createOAuthMiddleware(config: OAuthMiddlewareConfig): OAuthRoute
 
       res.cookie(clientConfig.stateCookieName!, state, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         maxAge: (clientConfig.stateCookieMaxAge || 600) * 1000,
         sameSite: 'lax',
       });

@@ -7,7 +7,7 @@ describe('CSRF middleware integration', () => {
   const csrf = createCsrfMiddleware({
     cookieOptions: {
       httpOnly: false,
-      secure: false,
+      secure: true,
       sameSite: 'lax',
     },
   });
@@ -43,6 +43,8 @@ describe('CSRF middleware integration', () => {
           expect.any(String),
           expect.objectContaining({
             httpOnly: false,
+            secure: true,
+            sameSite: 'lax',
           })
         );
         done();

@@ -46,6 +46,7 @@ export const createGraphileInstance = async (
   const serv = pgl.createServ(grafserv);
 
   const handler = express();
+  handler.disable('x-powered-by');
   const httpServer = createServer(handler);
   await serv.addTo(handler, httpServer);
   await serv.ready();
