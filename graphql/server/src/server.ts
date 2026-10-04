@@ -194,7 +194,7 @@ class Server {
     const csrf = createCsrfMiddleware({
       cookieOptions: {
         httpOnly: false, // SPA clients need to read this via document.cookie
-        secure: true, // browsers accept Secure cookies on http://localhost for local dev
+        secure: true, // browsers accept Secure cookies on http://localhost; cookieSecure: false opts out for plain-HTTP deployments
         sameSite: 'lax'
       }
     });
@@ -213,7 +213,9 @@ class Server {
       csrf.protect(req as any, res as any, next);
     };
     const csrfSetToken: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-      csrf.setToken(req as any, res as any, next);
+      csrf.setToken(req as any, res as any, next, {
+        secure: req.api?.authSettings?.cookieSecure ?? true
+      });
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations

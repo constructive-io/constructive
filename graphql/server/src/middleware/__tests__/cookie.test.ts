@@ -29,6 +29,11 @@ describe('cookie utilities', () => {
       });
     });
 
+    it('honors the cookieSecure: false opt-out for plain-HTTP deployments', () => {
+      const config = getSessionCookieConfig({ cookieSecure: false });
+      expect(config.secure).toBe(false);
+    });
+
     it('uses authSettings values when provided', () => {
       const authSettings: AuthSettings = {
         cookieSecure: true,

@@ -99,6 +99,21 @@ describe('createCsrfMiddleware', () => {
       expect(next).toHaveBeenCalled();
     });
 
+    it('should apply per-request cookie option overrides', () => {
+      const csrf = createCsrfMiddleware();
+      const req = createMockReq();
+      const res = createMockRes();
+      const next = jest.fn();
+
+      csrf.setToken(req, res, next, { secure: false });
+
+      expect(res.cookie).toHaveBeenCalledWith(
+        'csrf_token',
+        expect.any(String),
+        expect.objectContaining({ secure: false })
+      );
+    });
+
     it('should use custom cookie name', () => {
       const csrf = createCsrfMiddleware({ cookieName: 'my_csrf' });
       const req = createMockReq();
