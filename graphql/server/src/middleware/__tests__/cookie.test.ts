@@ -20,13 +20,18 @@ describe('cookie utilities', () => {
     it('returns default config when no authSettings provided', () => {
       const config = getSessionCookieConfig();
       expect(config).toEqual({
-        secure: false, // NODE_ENV is 'test'
+        secure: true, // Secure by default; cookieSecure: false is the explicit opt-out
         sameSite: 'lax',
         domain: undefined,
         httpOnly: true,
         maxAge: 86400,
         path: '/',
       });
+    });
+
+    it('honors the cookieSecure: false opt-out for plain-HTTP deployments', () => {
+      const config = getSessionCookieConfig({ cookieSecure: false });
+      expect(config.secure).toBe(false);
     });
 
     it('uses authSettings values when provided', () => {

@@ -17,6 +17,7 @@ export class OAuthClient {
       callbackPath: '/auth/{provider}/callback',
       stateCookieName: 'oauth_state',
       stateCookieMaxAge: 600,
+      stateCookieSecure: true,
       ...config,
     };
   }

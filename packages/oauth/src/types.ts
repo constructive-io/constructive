@@ -31,6 +31,7 @@ export interface OAuthClientConfig {
   callbackPath?: string;
   stateCookieName?: string;
   stateCookieMaxAge?: number;
+  stateCookieSecure?: boolean;
 }
 
 export interface TokenResponse {

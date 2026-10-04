@@ -7,7 +7,7 @@ const DEFAULT_CONFIG: Required<CsrfConfig> = {
   fieldName: '_csrf',
   cookieOptions: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax',
     maxAge: 86400,
     path: '/',
@@ -37,7 +37,8 @@ export interface CsrfMiddlewareResult {
   setToken: (
     req: CsrfRequest,
     res: CsrfResponse,
-    next: (err?: Error) => void
+    next: (err?: Error) => void,
+    cookieOptions?: CookieOptions
   ) => void;
   getToken: (req: CsrfRequest) => string | undefined;
   generateToken: () => string;
@@ -57,12 +58,13 @@ export function createCsrfMiddleware(config: CsrfConfig = {}): CsrfMiddlewareRes
   const setToken = (
     req: CsrfRequest,
     res: CsrfResponse,
-    next: (err?: Error) => void
+    next: (err?: Error) => void,
+    cookieOptions?: CookieOptions
   ): void => {
     const existingToken = req.cookies[cfg.cookieName];
     if (!existingToken) {
       const token = generateToken(cfg.tokenLength);
-      res.cookie(cfg.cookieName, token, cfg.cookieOptions);
+      res.cookie(cfg.cookieName, token, { ...cfg.cookieOptions, ...cookieOptions });
     }
     next();
   };

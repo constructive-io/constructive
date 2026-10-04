@@ -1,7 +1,6 @@
 import './types'; // for Request type
 
 import { errors } from '@constructive-io/errors';
-import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
@@ -11,7 +10,6 @@ import pgQueryContext from 'pg-query-context';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 
 const log = new Logger('auth');
-const isDev = () => getNodeEnv() === 'development';
 
 /** Default cookie name for session tokens. */
 const SESSION_COOKIE_NAME = 'constructive_session';
@@ -127,7 +125,7 @@ export const createAuthenticateMiddleware = (
           respondWithGraphQLError(
             res,
             errors.INTERNAL_FAILURE({
-              details: isDev() ? e.message : 'authentication failed',
+              details: opts.server?.exposeErrors ? e.message : 'authentication failed',
             })
           );
           return;

@@ -62,6 +62,7 @@ exports[`getEnvOptions merges defaults, config, env, and overrides 1`] = `
     "user": "env-user",
   },
   "server": {
+    "exposeErrors": false,
     "host": "localhost",
     "port": 9999,
     "strictAuth": false,

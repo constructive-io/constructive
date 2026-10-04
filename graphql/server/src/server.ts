@@ -5,7 +5,7 @@ import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { Logger } from '@pgpmjs/logger';
-import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
+import { healthz, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
@@ -33,7 +33,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { createCaptchaMiddleware } from './middleware/captcha';
 import { parseCookieValue, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
-import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { createErrorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
 import { createFlushMiddleware, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
@@ -96,6 +96,7 @@ class Server {
     const observabilityEnabled = isGraphqlObservabilityEnabled(effectiveOpts.server?.host);
 
     const app = express();
+    app.disable('x-powered-by');
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const requestLogger = createRequestLogger({ observabilityEnabled });
@@ -153,7 +154,6 @@ class Server {
       }
     }
 
-    app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
@@ -194,7 +194,7 @@ class Server {
     const csrf = createCsrfMiddleware({
       cookieOptions: {
         httpOnly: false, // SPA clients need to read this via document.cookie
-        secure: process.env.NODE_ENV === 'production',
+        secure: true, // browsers accept Secure cookies on http://localhost; cookieSecure: false opts out for plain-HTTP deployments
         sameSite: 'lax'
       }
     });
@@ -213,7 +213,9 @@ class Server {
       csrf.protect(req as any, res as any, next);
     };
     const csrfSetToken: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-      csrf.setToken(req as any, res as any, next);
+      csrf.setToken(req as any, res as any, next, {
+        secure: req.api?.authSettings?.cookieSecure ?? true
+      });
     };
     app.use(csrfSetToken); // Set CSRF token cookie on all requests
     app.use('/graphql', csrfProtect); // Enforce CSRF on GraphQL mutations
@@ -230,7 +232,7 @@ class Server {
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)
-    app.use(errorHandler); // Catches all thrown errors
+    app.use(createErrorHandler({ exposeErrors: effectiveOpts.server?.exposeErrors })); // Catches all thrown errors
 
     this.app = app;
     this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;

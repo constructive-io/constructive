@@ -46,6 +46,18 @@ describe('parse', () => {
     expect(result.context.constraint).toBe('users_email_key');
   });
 
+  it('maps a native privilege refusal (42501) to FORBIDDEN', () => {
+    const result = parse({ message: 'permission denied for table agent_thread', code: '42501' });
+    expect(result.code).toBe('FORBIDDEN');
+    expect(result.class).toBe('public');
+    expect(result.context).toEqual({});
+  });
+
+  it('keeps a registered code raised with SQLSTATE 42501', () => {
+    const result = parse({ message: 'STEP_UP_REQUIRED', code: '42501' });
+    expect(result.code).toBe('STEP_UP_REQUIRED');
+  });
+
   it('classifies unknown codes as internal (masked)', () => {
     const result = parse({ message: 'DATA_INVARIANT_BROKEN', code: 'P0001' });
     expect(result.code).toBe('DATA_INVARIANT_BROKEN');

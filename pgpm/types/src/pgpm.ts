@@ -120,6 +120,12 @@ export interface ServerOptions {
     origin?: string;
     /** Whether to enforce strict authentication */
     strictAuth?: boolean;
+    /**
+     * Return internal error details (raw database messages) to clients instead
+     * of a masked reference id. Local debugging only; never set on a deployed
+     * server. Independent of NODE_ENV.
+     */
+    exposeErrors?: boolean;
 }
 
 /**
@@ -388,7 +394,8 @@ export const pgpmDefaults: PgpmOptions = {
     host: 'localhost',
     port: 3000,
     trustProxy: false,
-    strictAuth: false
+    strictAuth: false,
+    exposeErrors: false
   },
   cdn: {
     provider: 'minio',

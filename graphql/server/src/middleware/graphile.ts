@@ -4,7 +4,6 @@ import { errors } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
@@ -27,8 +26,6 @@ import type { DatabaseSettings } from '../types';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
-
-const isDev = (): boolean => getNodeEnv() === 'development';
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
@@ -82,6 +79,7 @@ const buildPreset = async (
   roleName: string,
   introspectionRole: string | undefined,
   graphileOptions: ConstructiveOptions['graphile'],
+  exposeErrors: boolean,
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig
@@ -131,10 +129,10 @@ const buildPreset = async (
       graphiqlPath: '/graphiql',
       graphiql: true,
       graphiqlOnGraphQLGET: false,
-      maskError
+      maskError: (error) => maskError(error, { exposeErrors })
     },
     grafast: {
-      explain: process.env.NODE_ENV === 'development',
+      explain: exposeErrors,
       context: (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
         const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
@@ -281,6 +279,7 @@ const buildPreset = async (
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+  const exposeErrors = opts.server?.exposeErrors ?? false;
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -372,6 +371,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           roleName,
           opts.api?.introspectionRole,
           opts.graphile,
+          exposeErrors,
           api.databaseSettings,
           api.apiId,
           compute
@@ -416,7 +416,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(
           res,
           errors.INTERNAL_FAILURE({
-            details: isDev() ? e?.message ?? String(e) : 'An unexpected error occurred'
+            details: exposeErrors ? e?.message ?? String(e) : 'An unexpected error occurred'
           })
         );
         return;

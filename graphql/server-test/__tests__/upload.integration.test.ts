@@ -222,11 +222,11 @@ const DELETE_APP_BUCKET = `
  * Assert that a mutation was denied specifically by RLS (not by some other error).
  *
  * PostgreSQL RLS denials surface in three ways through PostGraphile:
- *   1. An explicit PG error — message contains "permission denied",
- *      "new row violates row-level security", or "No values were".
- *   2. A masked internal error — in production mode PostGraphile masks
- *      PG errors with code INTERNAL_SERVER_ERROR (the raw message is
- *      only logged server-side).
+ *   1. A privilege refusal — a missing grant or an RLS refusal (SQLSTATE
+ *      42501) is surfaced as FORBIDDEN, or the mutation matched no row
+ *      ("No values were ...").
+ *   2. A masked internal error — code INTERNAL_SERVER_ERROR (the raw
+ *      message is only logged server-side).
  *   3. The mutation silently affects 0 rows and returns null or an
  *      object with all-null fields (RLS USING clause filtered the row).
  *
@@ -244,9 +244,7 @@ function expectRlsDenied(
     // Reject GraphQL validation errors — these indicate a bug in the test
     expect(code).not.toBe('GRAPHQL_VALIDATION_FAILED');
     expect(
-      msg.includes('permission denied') ||
-        msg.includes('new row violates row-level security') ||
-        msg.includes('insufficient_privilege') ||
+      code === 'FORBIDDEN' ||
         msg.includes('No values were') ||
         code === 'INTERNAL_SERVER_ERROR'
     ).toBe(true);

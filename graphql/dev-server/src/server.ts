@@ -1,7 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
-import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
+import { cors, healthz } from '@pgpmjs/server-utils';
 import express from 'express';
 import { createGraphileInstance, type GraphileCacheEntry } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
@@ -47,9 +47,9 @@ export const createDevServer = async (
   });
 
   const app = express();
+  app.disable('x-powered-by');
   healthz(app);
   cors(app, serverOpts.origin ?? opts.server?.origin);
-  app.use(poweredBy('constructive'));
   app.use((req, res, next) => instance.handler(req, res, next));
 
   const httpServer = await new Promise<import('http').Server>((resolve, reject) => {

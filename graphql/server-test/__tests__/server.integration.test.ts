@@ -575,6 +575,31 @@ describe('Cookie-authenticated GraphQL CSRF flow', () => {
     });
   });
 
+  it('sets the csrf_token cookie with Secure and SameSite on HTTPS requests', async () => {
+    const res = await request
+      .get('/graphql')
+      .set('Host', host)
+      .set('X-Forwarded-Proto', 'https');
+
+    const setCookie = res.headers['set-cookie'];
+    const cookies = (Array.isArray(setCookie) ? setCookie : [setCookie])
+      .filter((cookie): cookie is string => typeof cookie === 'string');
+    const csrfCookie = cookies.find((cookie) => cookie.startsWith('csrf_token='));
+
+    expect(csrfCookie).toBeDefined();
+    expect(csrfCookie).toMatch(/;\s*Secure(;|$)/);
+    expect(csrfCookie).toContain('SameSite=Lax');
+    // Double-submit design: the SPA reads the token via document.cookie, so
+    // this cookie must remain readable (not HttpOnly).
+    expect(csrfCookie).not.toMatch(/;\s*HttpOnly(;|$)/);
+  });
+
+  it('does not send an x-powered-by header', async () => {
+    const res = await request.get('/graphql').set('Host', host);
+
+    expect(res.headers['x-powered-by']).toBeUndefined();
+  });
+
   it('keeps genuinely unknown routes on the HTML 404 path', async () => {
     const res = await request
       .get('/this-route-does-not-exist')

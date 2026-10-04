@@ -1,7 +1,12 @@
 import crypto from 'node:crypto';
 
-import { classify, type ErrorContext, parse } from '@constructive-io/errors';
-import { getNodeEnv } from '@pgpmjs/env';
+import {
+  classify,
+  type ErrorContext,
+  format,
+  INSUFFICIENT_PRIVILEGE_SQLSTATE,
+  parse,
+} from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import { type GraphQLError, type GraphQLFormattedError } from 'graphql';
 
@@ -65,26 +70,59 @@ const BAD_USER_INPUT = 'BAD_USER_INPUT';
  */
 export const normalizeError = (
   error: GraphQLError,
-): { code: string | null; context: ErrorContext; class: 'public' | 'internal' } => {
+): {
+  code: string | null;
+  context: ErrorContext;
+  class: 'public' | 'internal';
+  sqlState?: string;
+} => {
   const original = (error as { originalError?: unknown }).originalError;
   const fromOriginal = original ? parse(original) : null;
   const parsed = fromOriginal?.code ? fromOriginal : parse(error);
-  return { code: parsed.code, context: parsed.context, class: parsed.class };
+  return { code: parsed.code, context: parsed.context, class: parsed.class, sqlState: parsed.sqlState };
 };
 
 /**
- * Production-aware error handling backed by `@constructive-io/errors`.
+ * The message a public error is surfaced with. A native privilege refusal names
+ * the table, function, or policy it hit ("permission denied for table x"), so it
+ * is answered with the registry's message for its code instead.
+ */
+const publicMessage = (
+  error: GraphQLError,
+  code: string | null,
+  context: ErrorContext,
+  sqlState: string | undefined,
+): string =>
+  code && sqlState === INSUFFICIENT_PRIVILEGE_SQLSTATE && error.message !== code
+    ? format(code, context)
+    : error.message;
+
+export interface MaskErrorOptions {
+  /**
+   * Return internal errors to the client unmasked (enriched with their code)
+   * instead of behind a reference id. Local debugging only — wired from
+   * `server.exposeErrors`, never inferred from NODE_ENV, so a deployment that
+   * forgets to set NODE_ENV still masks.
+   */
+  exposeErrors?: boolean;
+}
+
+/**
+ * Client-facing error handling backed by `@constructive-io/errors`.
  *
  * 1. Enrich `extensions.code`/`class`/`context` from the parsed error so clients
  *    always receive a machine-readable code (fixing the gap where database
  *    errors reached clients as a bare message with empty `extensions`).
- * 2. Surface public (registered/allowlisted) errors as-is.
- * 3. In development, pass everything through (enriched) for debugging.
- * 4. In production, mask internal/unknown errors behind a reference ID and log
- *    the original.
+ * 2. Surface public (registered/allowlisted) errors as-is; a native privilege
+ *    refusal (SQLSTATE 42501) surfaces as `FORBIDDEN` with the registry message.
+ * 3. Mask every internal/unknown error behind a reference ID and log the
+ *    original — unless `exposeErrors` was explicitly opted into.
  */
-export const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedError => {
-  const { code, context, class: errorClass } = normalizeError(error);
+export const maskError = (
+  error: GraphQLError,
+  { exposeErrors = false }: MaskErrorOptions = {},
+): GraphQLError | GraphQLFormattedError => {
+  const { code, context, class: errorClass, sqlState } = normalizeError(error);
 
   // Lift the structured code onto extensions for every recognized error so
   // clients always receive a machine-readable code (`extensions` is read-only
@@ -108,11 +146,12 @@ export const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedE
     } as GraphQLFormattedError;
   }
 
-  if (isPublicCode(effectiveCode) || getNodeEnv() === 'development') {
+  const surfaced = isPublicCode(effectiveCode);
+  if (surfaced || exposeErrors) {
     // Note: grafserv strips originalError and internal extensions before
     // serializing to the client, so returning the enriched error is safe.
     return {
-      message: error.message,
+      message: surfaced ? publicMessage(error, code, context, sqlState) : error.message,
       ...(error.locations ? { locations: error.locations } : {}),
       ...(error.path ? { path: error.path } : {}),
       extensions,
@@ -125,6 +164,8 @@ export const maskError = (error: GraphQLError): GraphQLError | GraphQLFormattedE
 
   return {
     message: `An unexpected error occurred. Reference: ${errorId}`,
+    ...(error.locations ? { locations: error.locations } : {}),
+    ...(error.path ? { path: error.path } : {}),
     extensions: {
       code: 'INTERNAL_SERVER_ERROR',
       errorId

@@ -60,8 +60,10 @@ const run = async (query: string, variables?: Record<string, unknown>) => {
 describe('maskError', () => {
   const nodeEnv = process.env.NODE_ENV;
 
+  // Masking must not depend on NODE_ENV: a deployment that leaves it unset (which
+  // reads as development) still masks.
   beforeAll(() => {
-    process.env.NODE_ENV = 'production';
+    process.env.NODE_ENV = 'development';
   });
 
   afterAll(() => {
@@ -113,5 +115,36 @@ describe('maskError', () => {
     expect(result.message).toMatch(/^An unexpected error occurred\. Reference: [0-9a-f]{16}$/);
     expect(result.extensions?.code).toBe('INTERNAL_SERVER_ERROR');
     expect(result.extensions?.errorId).toEqual(expect.any(String));
+  });
+
+  it('passes an internal error through only when exposeErrors is opted into', async () => {
+    const [error] = (await execute({ schema, document: parse('mutation{ brokenField }') })).errors ?? [];
+
+    const result = maskError(error, { exposeErrors: true }) as { message: string };
+
+    expect(result.message).toBe('relation "internal_secrets" does not exist');
+  });
+
+  it('surfaces a native privilege refusal as FORBIDDEN without naming the table', () => {
+    const pgError = Object.assign(new Error('permission denied for table agent_thread'), { code: '42501' });
+    const error = new GraphQLError(pgError.message, { path: ['agentThreads'], originalError: pgError });
+
+    const result = maskError(error) as { message: string; extensions?: Record<string, unknown> };
+
+    expect(result.message).toBe('You do not have permission to do that.');
+    expect(result.message).not.toContain('agent_thread');
+    expect(result.extensions?.code).toBe('FORBIDDEN');
+    expect(result.extensions?.class).toBe('public');
+    expect(result.extensions?.errorId).toBeUndefined();
+  });
+
+  it('passes a registered public code through unchanged', () => {
+    const pgError = Object.assign(new Error('INVITE_ADDRESS_REQUIRED'), { code: 'P0001' });
+    const error = new GraphQLError(pgError.message, { path: ['submitInvite'], originalError: pgError });
+
+    const result = maskError(error) as { message: string; extensions?: Record<string, unknown> };
+
+    expect(result.message).toBe('INVITE_ADDRESS_REQUIRED');
+    expect(result.extensions?.code).toBe('INVITE_ADDRESS_REQUIRED');
   });
 });

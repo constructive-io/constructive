@@ -27,6 +27,7 @@ const IDENTITY_HEADERS = [
  */
 export const createAgenticServer = (options: AgenticServerStartOptions): express.Express => {
   const app = express();
+  app.disable('x-powered-by');
   app.use(express.json());
 
   // When isPublic === true, strip identity headers from all incoming requests.
