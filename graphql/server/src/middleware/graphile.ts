@@ -4,7 +4,6 @@ import { errors } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
-import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createGraphileInstance, graphileCache,type GraphileCacheEntry } from 'graphile-cache';
@@ -24,11 +23,9 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import type { DatabaseSettings } from '../types';
+import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
-import { maskError } from './mask-error';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
-
-const isDev = (): boolean => getNodeEnv() === 'development';
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
@@ -131,10 +128,10 @@ const buildPreset = async (
       graphiqlPath: '/graphiql',
       graphiql: true,
       graphiqlOnGraphQLGET: false,
-      maskError
+      maskError: formatError
     },
     grafast: {
-      explain: process.env.NODE_ENV === 'development',
+      explain: graphileOptions?.explain === true,
       context: (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
         const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
@@ -416,7 +413,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         respondWithGraphQLError(
           res,
           errors.INTERNAL_FAILURE({
-            details: isDev() ? e?.message ?? String(e) : 'An unexpected error occurred'
+            details: e?.message ?? String(e)
           })
         );
         return;
