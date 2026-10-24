@@ -7,13 +7,13 @@
     "@constructive-db/catalog": "6.5.0",
     "@constructive-db/routing": "8.6.0",
     "@constructive-db/routing-platform": "7.5.0",
-    "@pgpm/database-jobs": "0.47.3",
-    "@pgpm/function-resolution": "0.47.3",
-    "@pgpm/inflection-db": "0.47.1",
-    "@pgpm/jwt-claims": "0.47.3",
-    "@pgpm/metaschema-modules": "0.47.3",
-    "@pgpm/metaschema-schema": "0.47.3",
-    "@pgpm/stamps": "0.47.3",
-    "@pgpm/uuid": "0.47.1"
+    "@pgpm/database-jobs": "0.47.7",
+    "@pgpm/function-resolution": "0.47.7",
+    "@pgpm/inflection-db": "0.47.7",
+    "@pgpm/jwt-claims": "0.47.7",
+    "@pgpm/metaschema-modules": "0.47.7",
+    "@pgpm/metaschema-schema": "0.47.7",
+    "@pgpm/stamps": "0.47.7",
+    "@pgpm/uuid": "0.47.7"
   }
 }
