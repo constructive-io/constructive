@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.33.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.0...@constructive-io/graphql-server@5.33.1) (2026-10-24)
+
+### Bug Fixes
+
+- **graphql-server:** call each routing plane's resolver in the schema routing_planes() names ([65ada1f](https://github.com/constructive-io/constructive/commit/65ada1fee96a0a6537dc520a17387dc727d830b5))
+
 # [5.33.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.32.7...@constructive-io/graphql-server@5.33.0) (2026-10-24)
 
 ### Bug Fixes
