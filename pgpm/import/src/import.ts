@@ -180,7 +180,8 @@ const reorderChangeStatements = (content: string): string => {
   const riders = facts.filter(f => !isCreate(f));
   const ordered = [...creates, ...riders];
   if (ordered.every((f, i) => f === facts[i])) return content;
-  return ordered.map(f => statementText(content, f)).join('\n\n') + '\n';
+  const contentBytes = sqlSourceBytes(content);
+  return ordered.map(f => statementText(contentBytes, f)).join('\n\n') + '\n';
 };
 
 /**
@@ -204,7 +205,7 @@ const reorderRevertStatements = (content: string): string => {
     .split('\n')
     .map(line => line.trim())
     .filter(line => line.startsWith('--'));
-  return [...ordered.map(f => statementText(content, f)), ...notes].join('\n\n') + '\n';
+  return [...ordered.map(f => statementText(contentBytes, f)), ...notes].join('\n\n') + '\n';
 };
 
 const SET_CONFIG = /^SELECT\s+(pg_catalog\.)?set_config\s*\(/i;
@@ -214,8 +215,8 @@ const isPreamble = (facts: StatementFacts, text: string): boolean =>
   facts.nodeTag === 'VariableSetStmt' ||
   (facts.nodeTag === 'SelectStmt' && SET_CONFIG.test(text));
 
-const statementText = (sql: string, facts: StatementFacts): string => {
-  const text = sliceStatementBytes(sqlSourceBytes(sql), facts.span.start, facts.span.len).trim();
+const statementText = (sqlBytes: Buffer, facts: StatementFacts): string => {
+  const text = sliceStatementBytes(sqlBytes, facts.span.start, facts.span.len).trim();
   return text.endsWith(';') ? text : `${text};`;
 };
 
@@ -354,6 +355,7 @@ export const importDumpRows = async (
   let skippedData = 0;
 
   const facts = classifyStatements(source.sql);
+  const sourceBytes = sqlSourceBytes(source.sql);
 
   // Main statements (those creating/targeting an object) in dump order, with
   // per-statement rider buckets so riders re-attach right after their host.
@@ -370,7 +372,7 @@ export const importDumpRows = async (
   const ownedSequences: { schema: string | null; name: string; tableKey: string; text: string }[] = [];
 
   for (const f of facts) {
-    const text = statementText(source.sql, f);
+    const text = statementText(sourceBytes, f);
 
     if (isPreamble(f, text)) {
       skippedPreamble++;
