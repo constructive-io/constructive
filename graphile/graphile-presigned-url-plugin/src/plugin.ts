@@ -93,7 +93,6 @@ async function resolveUploadBucket(
 
   const coordinate = await resolveDefaultBucket(
     pgClient,
-    databaseId,
     storageConfig.scope,
     ownerId,
     isPublic,
