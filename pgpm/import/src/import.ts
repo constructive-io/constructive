@@ -21,7 +21,17 @@
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { ObjectIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { ChangeGranularity, classifyStatements, ExportGranularity, loadModule, regenerateScripts, restructureExportRows, StatementFacts } from '@pgpmjs/transform';
+import {
+  ChangeGranularity,
+  classifyStatements,
+  ExportGranularity,
+  loadModule,
+  regenerateScripts,
+  restructureExportRows,
+  sliceStatementBytes,
+  sqlSourceBytes,
+  StatementFacts
+} from '@pgpmjs/transform';
 
 import { copyBlockToInsert, copyTargetOf, DumpSource } from './dump-source';
 
@@ -185,9 +195,10 @@ const reorderRevertStatements = (content: string): string => {
   const isDrop = (f: StatementFacts): boolean => f.nodeTag.startsWith('Drop');
   const ordered = [...facts.filter(f => !isDrop(f)), ...facts.filter(isDrop)];
   if (ordered.every((f, i) => f === facts[i])) return content;
+  const contentBytes = sqlSourceBytes(content);
   let leftover = content;
   for (const f of facts) {
-    leftover = leftover.replace(content.slice(f.span.start, f.span.start + f.span.len), '');
+    leftover = leftover.replace(sliceStatementBytes(contentBytes, f.span.start, f.span.len), '');
   }
   const notes = leftover
     .split('\n')
@@ -204,7 +215,7 @@ const isPreamble = (facts: StatementFacts, text: string): boolean =>
   (facts.nodeTag === 'SelectStmt' && SET_CONFIG.test(text));
 
 const statementText = (sql: string, facts: StatementFacts): string => {
-  const text = sql.slice(facts.span.start, facts.span.start + facts.span.len).trim();
+  const text = sliceStatementBytes(sqlSourceBytes(sql), facts.span.start, facts.span.len).trim();
   return text.endsWith(';') ? text : `${text};`;
 };
 

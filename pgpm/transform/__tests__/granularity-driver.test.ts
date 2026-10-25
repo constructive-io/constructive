@@ -234,4 +234,8 @@ describe('restructureChanges', () => {
     });
     expect(result.changes.map(c => c.name)).toEqual(['obj/app', 'obj/users', 'obj/orders']);
   });
+
+  it('returns no changes for empty input', () => {
+    expect(restructureChanges([], { granularity: 'object' })).toEqual({ changes: [], warnings: [] });
+  });
 });
