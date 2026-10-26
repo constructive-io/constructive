@@ -9,7 +9,7 @@
  *
  * The seeded function_invocations INSERT policy only passes when
  * `jwt.claims.api_id` (set transaction-locally by the server from the
- * hostname → routing_public.resolve_route → api_id resolution)
+ * hostname → routing_private.resolve_route → api_id resolution)
  * matches the binding's api_id — so the happy path also proves the claim is
  * injected.
  *

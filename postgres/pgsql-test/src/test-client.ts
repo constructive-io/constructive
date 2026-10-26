@@ -24,6 +24,45 @@ export type PgTestClientOpts = PgClientOpts & {
 };
 
 const IN_FAILED_SQL_TRANSACTION = '25P02';
+const EXPECT_ERROR_SAVEPOINT = 'pgsql_test_expect_error';
+
+/**
+ * What an expected error must match: a substring or RegExp of the message, or
+ * an object checking the SQLSTATE `code` and/or the `message`.
+ */
+export type ExpectedPgError =
+  | string
+  | RegExp
+  | { code?: string; message?: string | RegExp };
+
+const describeExpected = (expected?: ExpectedPgError): string => {
+  if (expected === undefined) return 'an error';
+  if (typeof expected === 'string' || expected instanceof RegExp) return String(expected);
+  return JSON.stringify({
+    code: expected.code,
+    message: expected.message === undefined ? undefined : String(expected.message)
+  });
+};
+
+const matchesText = (text: string, pattern: string | RegExp): boolean => {
+  if (typeof pattern === 'string') return text.includes(pattern);
+  pattern.lastIndex = 0;
+  return pattern.test(text);
+};
+
+const describeError = (err: any): string =>
+  [err?.code, String(err?.message ?? err).split('\n')[0]].filter(Boolean).join(': ');
+
+const matchesExpected = (err: any, expected?: ExpectedPgError): boolean => {
+  if (expected === undefined) return true;
+  const message = String(err?.message ?? '');
+  if (typeof expected === 'string' || expected instanceof RegExp) {
+    return matchesText(message, expected);
+  }
+  if (expected.code !== undefined && err?.code !== expected.code) return false;
+  if (expected.message !== undefined && !matchesText(message, expected.message)) return false;
+  return true;
+};
 
 export class PgTestClient extends PgClient {
   protected testOpts: PgTestClientOpts;
@@ -82,6 +121,55 @@ export class PgTestClient extends PgClient {
     await this.rollback();
     await this.commit();
     if (violation) throw violation;
+  }
+
+  /**
+   * Assert that `run` fails, and keep the test transaction usable afterwards.
+   *
+   * Wraps `run` in a savepoint on this client, rolls back to it whatever happens
+   * (so the aborted statement, or an unexpected success, leaves no trace), then
+   * releases it. Throws if `run` succeeds or its error does not match `expected`;
+   * otherwise returns the caught error for further assertions.
+   *
+   * `run` must execute on this same client — a savepoint cannot rescue another
+   * connection's aborted transaction.
+   *
+   * @example
+   * await db.expectError(() => db.query('INSERT INTO app.secrets ...'), /permission denied/);
+   * const err = await db.expectError(() => db.query('...'), { code: '23505' });
+   */
+  async expectError<E = any>(run: () => Promise<unknown>, expected?: ExpectedPgError): Promise<E> {
+    await this.savepoint(EXPECT_ERROR_SAVEPOINT);
+    let caught: any;
+    let failed = false;
+    try {
+      await run();
+    } catch (err) {
+      failed = true;
+      caught = err;
+    }
+
+    try {
+      await this.rollback(EXPECT_ERROR_SAVEPOINT);
+      await this.client.query(`RELEASE SAVEPOINT "${EXPECT_ERROR_SAVEPOINT}";`);
+    } catch (cleanupError) {
+      const outcome = failed ? `run() failed with ${describeError(caught)}` : 'run() succeeded';
+      throw new Error(
+        `[pgsql-test] expectError: could not roll back its savepoint (${describeError(cleanupError)}); ${outcome}. ` +
+          'Did run() end the transaction or run on another client?',
+        { cause: failed ? caught : cleanupError }
+      );
+    }
+
+    if (!failed) {
+      throw new Error(`[pgsql-test] expectError: expected ${describeExpected(expected)}, but the statement succeeded`);
+    }
+    if (!matchesExpected(caught, expected)) {
+      throw new Error(`[pgsql-test] expectError: expected ${describeExpected(expected)}, got ${describeError(caught)}`, {
+        cause: caught
+      });
+    }
+    return caught as E;
   }
 
   /**

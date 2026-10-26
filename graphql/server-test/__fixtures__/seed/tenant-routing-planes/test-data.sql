@@ -62,7 +62,7 @@ INSERT INTO routing_public.hostname_bindings
 VALUES (
   (md5(concat('ce55a000-0000-4000-8000-000000000001', '|', 'storage.tess.test.constructive.io')))::uuid,
   'storage.tess.test.constructive.io', 'ce55a000-0000-4000-8000-000000000001', false, NULL, false, 'verified', 'ready', NULL, now()
-) ON CONFLICT (hostname) DO NOTHING;
+) ON CONFLICT (hostname) WHERE verification_status = 'verified' DO NOTHING;
 
 INSERT INTO routing_public.route_bindings
   (id, domain_id, target_api_id, target_site_id, target_function_id, path, method, priority, is_active, updated_at)
@@ -76,6 +76,31 @@ SET session_replication_role TO replica;
 -- ---------------------------------------------------------------------------
 -- 2. Tenant-owned database-scope planes
 -- ---------------------------------------------------------------------------
+
+-- The platform's own routing plane: `routing_public` is the database-scope
+-- plane of the platform database, registered by a `route_module` row like
+-- every other plane. The server finds its own plane in routing_planes() by
+-- this schema and calls the resolver in the plane's private schema.
+INSERT INTO metaschema_public.database (id, owner_id, name, hash)
+VALUES (
+  '0b5e0000-0000-4000-8000-000000000001', NULL, 'platform', '0b5e0000-0000-4000-8000-0000000000aa'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
+VALUES (
+  '0b5e2000-0000-4000-8000-000000000001', '0b5e0000-0000-4000-8000-000000000001',
+  'routing_public', 'routing_public', NULL, true
+), (
+  '0b5e2000-0000-4000-8000-000000000002', '0b5e0000-0000-4000-8000-000000000001',
+  'routing_private', 'routing_private', NULL, false
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO metaschema_modules_public.route_module
+  (id, database_id, scope, schema_id, private_schema_id, resolver_function_name)
+VALUES (
+  '0b5ec000-0000-4000-8000-000000000001', '0b5e0000-0000-4000-8000-000000000001', 'database',
+  '0b5e2000-0000-4000-8000-000000000001', '0b5e2000-0000-4000-8000-000000000002', 'resolve_route'
+) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_public.database (id, owner_id, name, hash)
 VALUES (

@@ -36,7 +36,7 @@ const scopedMetaSchemas = [
   'metaschema_modules_public'
 ];
 
-/** Row shape returned by routing_public.resolve_route(). */
+/** Row shape returned by routing_private.resolve_route(). */
 interface ResolvedRouteRow {
   route_binding_id: string | null;
   hostname: string | null;
@@ -66,7 +66,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
   const resolveRoute = (host: string) =>
     pg.oneOrNone<ResolvedRouteRow>(
-      `SELECT * FROM routing_public.resolve_route($1, '/', NULL)`,
+      `SELECT * FROM routing_private.resolve_route($1, '/', NULL)`,
       [host]
     );
 
@@ -157,7 +157,7 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
 
 /**
  * End-to-end scoped plane: the request is resolved solely by
- * routing_public.resolve_route(). There is
+ * routing_private.resolve_route(). There is
  * no legacy fallback, so a successful request proves the scoped path.
  */
 describe('simple-seed-scoped: GraphQL over scoped routing (e2e)', () => {

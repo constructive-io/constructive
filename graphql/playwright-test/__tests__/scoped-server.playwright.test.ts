@@ -4,7 +4,7 @@
  * Proves the Playwright harness can drive the *production*
  * `@constructive-io/graphql-server` (not the dev server): every request is
  * resolved through the scoped-routing plane
- * (`routing_public.resolve_route()`), so this suite seeds real
+ * (`routing_private.resolve_route()`), so this suite seeds real
  * routing/database records and reaches the api surface via its seeded host.
  *
  * Contrast with `server.playwright.test.ts`, which uses the single-tenant dev
