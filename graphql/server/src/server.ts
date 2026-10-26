@@ -14,7 +14,6 @@ import graphqlUpload from 'graphql-upload';
 import type { Server as HttpServer } from 'http';
 import { Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
-import requestIp from 'request-ip';
 
 import { createAgenticRouter } from './agentic';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
@@ -31,6 +30,7 @@ import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware, getBearerToken } from './middleware/auth';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
 import { createCaptchaMiddleware } from './middleware/captcha';
+import { clientIpMiddleware } from './middleware/client-ip';
 import { parseCookieValue, rejectInvalidSessionCookieHeader, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
@@ -162,7 +162,7 @@ class Server {
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);
     app.use(parseDomains() as RequestHandler);
-    app.use(requestIp.mw());
+    app.use(clientIpMiddleware);
     app.use(requestIdMiddleware());
     app.use(requestLogger);
     app.use(api);
