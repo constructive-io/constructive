@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "5.32.6",
+  "version": "5.33.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -57,6 +57,7 @@
     "@pgpmjs/types": "workspace:^",
     "@pgsql/quotes": "^18.2.4",
     "@simplewebauthn/server": "13.3.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
     "express": "^5.2.1",
@@ -91,7 +92,6 @@
     "@types/graphql-upload": "^8.0.12",
     "@types/pg": "^8.20.4",
     "@types/supertest": "^7.2.1",
-    "cookie-parser": "^1.4.7",
     "graphile-test": "workspace:*",
     "makage": "^0.8.0",
     "nodemon": "^3.1.14",
