@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.33.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.2...@constructive-io/graphql-server@5.33.3) (2026-10-26)
+
+### Bug Fixes
+
+- **graphql-server:** drop a queued request whose client hung up instead of leaking its concurrency slot ([9648a44](https://github.com/constructive-io/constructive/commit/9648a440ca637d839527a80460208fc79af62034))
+
 ## [5.33.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.1...@constructive-io/graphql-server@5.33.2) (2026-10-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

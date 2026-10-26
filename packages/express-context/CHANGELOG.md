@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.35.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.1...@constructive-io/express-context@0.35.2) (2026-10-26)
+
+### Bug Fixes
+
+- **graphql-server:** drop a queued request whose client hung up instead of leaking its concurrency slot ([9648a44](https://github.com/constructive-io/constructive/commit/9648a440ca637d839527a80460208fc79af62034))
+
 ## [0.35.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.0...@constructive-io/express-context@0.35.1) (2026-10-16)
 
 ### Bug Fixes
