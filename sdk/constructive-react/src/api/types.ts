@@ -717,6 +717,16 @@ export interface PlatformPage {
   storeId: string | null;
   updatedAt: string | null;
 }
+export interface PlatformReservedSubdomain {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  label: string | null;
+  match: string | null;
+  reason: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformSiteAppLink {
   appStoreIdentityId: string | null;
   createdAt: string | null;
