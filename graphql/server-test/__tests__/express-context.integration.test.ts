@@ -9,7 +9,7 @@
  *
  * Uses the shared seed fixtures from __fixtures__/seed/ (repo root-level)
  * for the full metaschema + scoped routing plane + app-schemas stack.
- * Host routing resolves through routing_public.resolve_route.
+ * Host routing resolves through routing_private.resolve_route.
  *
  * Run tests:
  *   pnpm test -- --testPathPattern=express-context.integration
