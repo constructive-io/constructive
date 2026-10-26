@@ -31,7 +31,7 @@ export interface ResolvedBucketCoordinate {
 
 const RESOLVE_DEFAULT_BUCKET_QUERY = `
   SELECT bucket_id, resolved_key, bucket_type, physical_name
-  FROM function_resolution.resolve_default_bucket($1, $2, $3, $4, $5)
+  FROM function_resolution.resolve_default_bucket($1, $2, $3, $4)
 `;
 
 /**
@@ -45,7 +45,6 @@ const RESOLVE_DEFAULT_BUCKET_QUERY = `
  */
 export async function resolveDefaultBucket(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
-  databaseId: string,
   scope: string,
   entityId: string | null,
   publicAccess: boolean,
@@ -53,7 +52,7 @@ export async function resolveDefaultBucket(
 ): Promise<ResolvedBucketCoordinate> {
   const result = await pgClient.query({
     text: RESOLVE_DEFAULT_BUCKET_QUERY,
-    values: [databaseId, scope, entityId, publicAccess, bucketKey],
+    values: [scope, entityId, publicAccess, bucketKey],
   });
 
   const row = result.rows[0] as {
@@ -68,12 +67,12 @@ export async function resolveDefaultBucket(
     // result means the function did not run as declared rather than "no bucket".
     throw new Error(
       `STORAGE_DEFAULT_BUCKET_NO_ROW: resolve_default_bucket returned no row for ` +
-      `database=${databaseId} scope=${scope} public=${publicAccess} key=${bucketKey ?? '<default tag>'}`,
+      `scope=${scope} public=${publicAccess} key=${bucketKey ?? '<default tag>'}`,
     );
   }
 
   log.debug(
-    `Resolved bucket ${row.resolved_key} (${row.bucket_type}) for database=${databaseId} scope=${scope}`,
+    `Resolved bucket ${row.resolved_key} (${row.bucket_type}) for scope=${scope}`,
   );
 
   return {
