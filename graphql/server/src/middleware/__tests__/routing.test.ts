@@ -35,7 +35,6 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
   resolved_config: {
     api_id: 'api-1',
     database_id: 'db-1',
-    dbname: 'tenant_db',
     role_name: 'api_role',
     anon_role: 'api_anon',
     is_public: true,
@@ -105,7 +104,7 @@ describe('routeToApiStructure', () => {
       expect.objectContaining({
         apiId: 'api-1',
         databaseId: 'db-1',
-        dbname: 'tenant_db',
+        dbname: 'constructive',
         roleName: 'api_role',
         anonRole: 'api_anon',
         schema: ['app_public'],
@@ -206,7 +205,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
-    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'tenant_db' }));
+    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'constructive' }));
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining(`"routing_private".resolve_route($1, '/', NULL)`),
       ['api.example.com']
@@ -285,7 +284,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
-    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1' }));
+    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'constructive' }));
     expect(query.mock.calls.some(([sql]) => String(sql).includes('public".resolve_route'))).toBe(false);
   });
 
@@ -293,7 +292,6 @@ describe('getApiConfig with scoped routing enabled', () => {
     const routeWithoutDbId = matchedRoute({
       resolved_config: {
         api_id: 'api-1',
-        dbname: 'tenant_db',
         role_name: 'api_role',
         anon_role: 'api_anon',
         is_public: true,

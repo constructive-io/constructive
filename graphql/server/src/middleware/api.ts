@@ -37,7 +37,7 @@ const defaultRegistry: LoaderRegistry = createDefaultRegistry();
 // `is_published` governs cross-scope route visibility, not internal
 // addressability, so it does not filter this lookup.
 const API_BY_NAME_SQL = `
-  SELECT api_id, api_database_id AS database_id, dbname, role_name, anon_role, is_public, schemas
+  SELECT api_id, api_database_id AS database_id, role_name, anon_role, is_public, schemas
   FROM function_resolution.api_by_name($1, $2)
   LIMIT 1
 `;
@@ -49,7 +49,6 @@ const API_BY_NAME_SQL = `
 interface ApiRow {
   api_id: string;
   database_id: string;
-  dbname: string;
   role_name: string;
   anon_role: string;
   is_public: boolean;
@@ -103,9 +102,7 @@ const buildLoaderContext = (
   opts: ApiOptions,
   row: ApiRow
 ): LoaderContext => {
-  // Scoped APIs leave dbname NULL when their schemas live in the serving
-  // database (pooled tenants); fall back to the server's own database.
-  const dbname = row.dbname || opts.pg?.database || '';
+  const dbname = opts.pg?.database || '';
   return {
     routingPool,
     tenantPool: getPgPool({ ...opts.pg, database: dbname }),
@@ -224,7 +221,7 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
   apiId: row.api_id,
-  dbname: row.dbname || opts.pg?.database || '',
+  dbname: opts.pg?.database || '',
   anonRole: requireApiRole('anon_role', row.anon_role, row.api_id),
   roleName: requireApiRole('role_name', row.role_name, row.api_id),
   schema: row.schemas || [],
@@ -359,7 +356,6 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
   const loaderCtx = buildLoaderContext(pool, opts, {
     api_id: structure.apiId,
     database_id: structure.databaseId,
-    dbname: structure.dbname,
     role_name: structure.roleName,
     anon_role: structure.anonRole,
     is_public: structure.isPublic ?? false,

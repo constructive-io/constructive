@@ -231,7 +231,6 @@ export const resolveRouteAcrossPlanes = async (
 interface ApiSurfaceConfig {
   api_id?: string;
   database_id?: string;
-  dbname?: string;
   role_name?: string;
   anon_role?: string;
   is_public?: boolean;
@@ -261,9 +260,7 @@ export const routeToApiStructure = (
 
   return {
     apiId,
-    // Scoped APIs leave dbname NULL when their schemas live in the serving
-    // database; fall back to the server's own database in that case.
-    dbname: config.dbname || opts.pg?.database || '',
+    dbname: opts.pg?.database || '',
     anonRole: requireApiRole('anon_role', config.anon_role, apiId),
     roleName: requireApiRole('role_name', config.role_name, apiId),
     schema: config.schemas,

@@ -76,7 +76,6 @@ describe('api middleware routing priority', () => {
           rows: [{
             api_id: 'api-123',
             database_id: 'db-123',
-            dbname: 'tenant_db',
             role_name: 'api_role',
             anon_role: 'api_anon',
             is_public: false,
@@ -102,7 +101,7 @@ describe('api middleware routing priority', () => {
     expect(req.svc_key).toBe('api:db-123:customer-api');
     expect(result).toMatchObject({
       apiId: 'api-123',
-      dbname: 'tenant_db',
+      dbname: 'constructive',
       anonRole: 'api_anon',
       roleName: 'api_role',
       schema: ['api_public'],
@@ -136,7 +135,6 @@ describe('missing served role on an X-Api-Name row', () => {
           rows: [{
             api_id: 'api-123',
             database_id: 'db-123',
-            dbname: 'tenant_db',
             role_name: 'authenticated',
             anon_role: 'anonymous',
             is_public: false,
