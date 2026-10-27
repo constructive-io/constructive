@@ -313,13 +313,17 @@ export const clientIpFrom = (
 };
 
 /**
- * How many proxies of our own sit in front of the server.
+ * How many proxies of our own sit in front of the server, from
+ * `TRUSTED_PROXY_HOPS`, or `null` when it is unset or not a count.
  *
- * Defaults to 0 — the socket peer, which cannot be forged. A deployment behind
- * an ingress sets `TRUSTED_PROXY_HOPS` to the number of hops it owns; guessing
- * a higher number here would let a direct caller pick its own limiter key.
+ * An explicit `0` is kept as 0 — believe only the socket peer — so it is never
+ * mistaken for "unset" and widened by a caller's fallback. A deployment behind
+ * an ingress sets it to the number of hops it owns; guessing a higher number
+ * would let a direct caller pick its own limiter key.
  */
-export const trustedProxyHops = (): number => {
-  const raw = Number(process.env.TRUSTED_PROXY_HOPS ?? '');
-  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 0;
+export const trustedProxyHops = (): number | null => {
+  const value = process.env.TRUSTED_PROXY_HOPS?.trim();
+  if (!value) return null;
+  const raw = Number(value);
+  return Number.isFinite(raw) && raw >= 0 ? Math.floor(raw) : null;
 };
