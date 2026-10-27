@@ -78,10 +78,7 @@ export function buildContext(
     clientIp: req.clientIp
   });
 
-  const tenantPool: Pool = getPgPool({
-    ...opts.pg,
-    database: api.dbname
-  });
+  const tenantPool = api.tenantPool;
 
   // Build loader context (if registry provided and databaseId known)
   let loaderCtx: LoaderContext | null = null;
@@ -91,8 +88,7 @@ export function buildContext(
       routingPool,
       tenantPool,
       databaseId: api.databaseId,
-      apiId: api.apiId,
-      dbname: api.dbname
+      apiId: api.apiId
     };
   }
 

@@ -15,7 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
-import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure } from './routing';
+import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool } from './routing';
 
 const log = new Logger('api');
 
@@ -101,16 +101,12 @@ const buildLoaderContext = (
   routingPool: Pool,
   opts: ApiOptions,
   row: ApiRow
-): LoaderContext => {
-  const dbname = opts.pg?.database || '';
-  return {
-    routingPool,
-    tenantPool: getPgPool({ ...opts.pg, database: dbname }),
-    databaseId: row.database_id,
-    apiId: row.api_id,
-    dbname
-  };
-};
+): LoaderContext => ({
+  routingPool,
+  tenantPool: servedDatabasePool(opts),
+  databaseId: row.database_id,
+  apiId: row.api_id
+});
 
 /**
  * Resolve all per-database module settings in parallel via the loader registry.
@@ -221,7 +217,7 @@ export const getSvcKey = (opts: ApiOptions, req: Request): string => {
 
 const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleSettings = {}): ApiStructure => ({
   apiId: row.api_id,
-  dbname: opts.pg?.database || '',
+  tenantPool: servedDatabasePool(opts),
   anonRole: requireApiRole('anon_role', row.anon_role, row.api_id),
   roleName: requireApiRole('role_name', row.role_name, row.api_id),
   schema: row.schemas || [],
@@ -241,7 +237,7 @@ const createAdminStructure = (
   schemas: string[],
   databaseId?: string
 ): ApiStructure => ({
-  dbname: opts.pg?.database ?? '',
+  tenantPool: servedDatabasePool(opts),
   anonRole: 'anonymous',
   roleName: 'authenticated',
   schema: schemas,
@@ -349,7 +345,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
     throw error;
   }
 
-  log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} db=${structure.dbname}`);
+  log.debug(`[scoped-routing] resolved host=${host} → api=${structure.apiId} databaseId=${structure.databaseId}`);
 
   if (!structure.databaseId || !structure.apiId) return structure;
 
@@ -478,7 +474,7 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       req.api = apiConfig;
       req.databaseId = apiConfig.databaseId;
-      log.debug(`Resolved API: db=${apiConfig.dbname}, schemas=[${apiConfig.schema?.join(', ')}]`);
+      log.debug(`Resolved API: databaseId=${apiConfig.databaseId}, schemas=[${apiConfig.schema?.join(', ')}]`);
       next();
     } catch (error: unknown) {
       const err = error as Error & { code?: string };

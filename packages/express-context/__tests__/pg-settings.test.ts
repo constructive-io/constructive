@@ -1,9 +1,11 @@
+import type { Pool } from 'pg';
+
 import { buildPgSettings } from '../src/pg-settings';
 import type { ApiStructure, ConstructiveAPIToken } from '../src/types';
 
 const api: ApiStructure = {
   apiId: '6c9997a4-591b-4cb3-9313-4ef45d6f134e',
-  dbname: 'testdb',
+  tenantPool: {} as Pool,
   anonRole: 'anonymous',
   roleName: 'authenticated',
   schema: ['public'],

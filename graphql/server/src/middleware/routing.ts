@@ -1,6 +1,7 @@
 import { Logger } from '@pgpmjs/logger';
 import { QuoteUtils } from '@pgsql/quotes';
 import { Pool } from 'pg';
+import { getPgPool } from 'pg-cache';
 
 import { ApiOptions, ApiStructure } from '../types';
 
@@ -242,6 +243,9 @@ interface ApiSurfaceConfig {
  * rest of the middleware chain. Returns null when the route target is not an
  * api surface or its resolved_config lacks the api essentials (→ 404).
  */
+/** The server always serves its own configured database. */
+export const servedDatabasePool = (opts: ApiOptions): Pool => getPgPool({ ...opts.pg });
+
 export const routeToApiStructure = (
   route: ResolvedRoute,
   opts: ApiOptions
@@ -260,7 +264,7 @@ export const routeToApiStructure = (
 
   return {
     apiId,
-    dbname: opts.pg?.database || '',
+    tenantPool: servedDatabasePool(opts),
     anonRole: requireApiRole('anon_role', config.anon_role, apiId),
     roleName: requireApiRole('role_name', config.role_name, apiId),
     schema: config.schemas,

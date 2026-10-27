@@ -128,8 +128,7 @@ const ctx = (routingPool: Pool, databaseId = 'db-1', apiId?: string): LoaderCont
     routingPool,
     tenantPool: {} as Pool,
     databaseId,
-    apiId,
-    dbname: 'tenant'
+    apiId
   }) as LoaderContext;
 
 describe('requestProtectionLoader', () => {

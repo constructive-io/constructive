@@ -47,8 +47,6 @@ export interface LoaderContext {
   databaseId: string;
   /** UUID of the API (if resolved from domain/api-name lookup) */
   apiId?: string;
-  /** Tenant database name */
-  dbname: string;
 }
 
 /**

@@ -5,7 +5,6 @@ import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { getPgPool } from 'pg-cache';
 import pgQueryContext from 'pg-query-context';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
@@ -54,10 +53,7 @@ export const createAuthenticateMiddleware = (
       return;
     }
 
-    const pool = getPgPool({
-      ...opts.pg,
-      database: api.dbname,
-    });
+    const pool = api.tenantPool;
     const rlsModule = api.rlsModule;
 
     log.info(
