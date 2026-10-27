@@ -1,4 +1,4 @@
-import { clientIpFrom, ConcurrencyLimiter, RateWindow } from '../src/admission';
+import { clientIpFrom, ConcurrencyLimiter, RateWindow, trustedProxyHops } from '../src/admission';
 
 // ─── Concurrency ────────────────────────────────────────────────────────────
 
@@ -278,5 +278,31 @@ describe('clientIpFrom', () => {
 
   it('reports an unknown peer rather than throwing', () => {
     expect(clientIpFrom({ headers: {}, socket: {} }, 0)).toBe('unknown');
+  });
+});
+
+describe('trustedProxyHops', () => {
+  const saved = process.env.TRUSTED_PROXY_HOPS;
+  afterEach(() => {
+    if (saved === undefined) delete process.env.TRUSTED_PROXY_HOPS;
+    else process.env.TRUSTED_PROXY_HOPS = saved;
+  });
+
+  it('is null when unset, empty or not a count', () => {
+    for (const value of [undefined, '', '  ', 'abc', '-1']) {
+      if (value === undefined) delete process.env.TRUSTED_PROXY_HOPS;
+      else process.env.TRUSTED_PROXY_HOPS = value;
+      expect(trustedProxyHops()).toBeNull();
+    }
+  });
+
+  it('keeps an explicit 0 as 0', () => {
+    process.env.TRUSTED_PROXY_HOPS = '0';
+    expect(trustedProxyHops()).toBe(0);
+  });
+
+  it('reads a positive count', () => {
+    process.env.TRUSTED_PROXY_HOPS = '2';
+    expect(trustedProxyHops()).toBe(2);
   });
 });

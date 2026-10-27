@@ -5,7 +5,8 @@ import type { NextFunction, Request, Response } from 'express';
 
 /**
  * How far back through `X-Forwarded-For` to believe: an explicit count, then
- * `TRUSTED_PROXY_HOPS`, then 1 when `SERVER_TRUST_PROXY` puts a proxy in front.
+ * `TRUSTED_PROXY_HOPS` (an explicit 0 included), then 1 when `SERVER_TRUST_PROXY`
+ * puts a proxy in front.
  *
  * Express's `trust proxy` predicate and `req.ip` are not used as the answer:
  * the predicate trusts every hop, which would hand back the leftmost entry —
@@ -14,7 +15,7 @@ import type { NextFunction, Request, Response } from 'express';
 export const resolveProxyHops = (req: Request, configured?: number): number => {
   if (typeof configured === 'number') return configured;
   const fromEnv = trustedProxyHops();
-  if (fromEnv > 0) return fromEnv;
+  if (fromEnv !== null) return fromEnv;
   return req.app?.get('trust proxy') ? 1 : 0;
 };
 
