@@ -476,6 +476,18 @@ export const platformPageMutationKeys = {
   /** Delete platformPage mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformpage', 'delete', id] as const,
 } as const;
+export const platformReservedSubdomainMutationKeys = {
+  /** All platformReservedSubdomain mutation keys */ all: [
+    'mutation',
+    'platformreservedsubdomain',
+  ] as const,
+  /** Create platformReservedSubdomain mutation key */ create: () =>
+    ['mutation', 'platformreservedsubdomain', 'create'] as const,
+  /** Update platformReservedSubdomain mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformreservedsubdomain', 'update', id] as const,
+  /** Delete platformReservedSubdomain mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformreservedsubdomain', 'delete', id] as const,
+} as const;
 export const platformSiteAppLinkMutationKeys = {
   /** All platformSiteAppLink mutation keys */ all: ['mutation', 'platformsiteapplink'] as const,
   /** Create platformSiteAppLink mutation key */ create: () =>
@@ -1072,6 +1084,7 @@ export const mutationKeys = {
   platformGetSitePreviewsRecord: platformGetSitePreviewsRecordMutationKeys,
   platformManagedDomain: platformManagedDomainMutationKeys,
   platformPage: platformPageMutationKeys,
+  platformReservedSubdomain: platformReservedSubdomainMutationKeys,
   platformSiteAppLink: platformSiteAppLinkMutationKeys,
   platformSite: platformSiteMutationKeys,
   platformSiteDeepLink: platformSiteDeepLinkMutationKeys,

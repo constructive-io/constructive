@@ -54,6 +54,7 @@ import type {
   PlatformGetSitePreviewsRecord,
   PlatformManagedDomain,
   PlatformPage,
+  PlatformReservedSubdomain,
   PlatformSite,
   PlatformSiteAppLink,
   PlatformSiteDeepLink,
@@ -1554,6 +1555,27 @@ export type PlatformPageOrderBy =
   | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformReservedSubdomain`. */
+export type PlatformReservedSubdomainOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MATCH_ASC'
+  | 'MATCH_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformSiteAppLink`. */
 export type PlatformSiteAppLinkOrderBy =
   | 'APP_STORE_IDENTITY_ID_ASC'
@@ -3538,6 +3560,11 @@ export interface CreatePlatformPageInput {
   /** The `PlatformPage` to be created by this mutation. */
   platformPage: PlatformPageInput;
 }
+export interface CreatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  /** The `PlatformReservedSubdomain` to be created by this mutation. */
+  platformReservedSubdomain: PlatformReservedSubdomainInput;
+}
 export interface CreatePlatformSiteAppLinkInput {
   clientMutationId?: string;
   /** The `PlatformSiteAppLink` to be created by this mutation. */
@@ -4738,6 +4765,10 @@ export interface DeletePlatformManagedDomainInput {
 export interface DeletePlatformPageInput {
   clientMutationId?: string;
   /** Unique page identifier */
+  id: string;
+}
+export interface DeletePlatformReservedSubdomainInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeletePlatformSiteAppLinkInput {
@@ -8100,6 +8131,59 @@ export interface PlatformProvisionSitePreviewInput {
   commitId?: string;
   name?: string;
   siteId?: string;
+}
+/** A filter to be used against `PlatformReservedSubdomain` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformReservedSubdomainFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `match` field. */
+  match?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformReservedSubdomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformReservedSubdomain` */
+export interface PlatformReservedSubdomainInput {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label: string;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformReservedSubdomain`. Fields that are set will be updated. */
+export interface PlatformReservedSubdomainPatch {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label?: string;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 export interface PlatformSetSitePreviewInput {
   clientMutationId?: string;
@@ -11674,6 +11758,12 @@ export interface UpdatePlatformPageInput {
   /** An object where the defined keys will be set on the `PlatformPage` being updated. */
   platformPagePatch: PlatformPagePatch;
 }
+export interface UpdatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformReservedSubdomain` being updated. */
+  platformReservedSubdomainPatch: PlatformReservedSubdomainPatch;
+}
 export interface UpdatePlatformSiteAppLinkInput {
   clientMutationId?: string;
   id: string;
@@ -12751,6 +12841,13 @@ export interface PlatformPageConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformReservedSubdomain` values. */
+export interface PlatformReservedSubdomainConnection {
+  edges: PlatformReservedSubdomainEdge[];
+  nodes: PlatformReservedSubdomain[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformSiteAppLink` values. */
 export interface PlatformSiteAppLinkConnection {
   edges: PlatformSiteAppLinkEdge[];
@@ -12841,25 +12938,6 @@ export interface RedirectConnection {
   nodes: Redirect[];
   pageInfo: PageInfo;
   totalCount: number;
-}
-export interface ResolveRouteRecord {
-  domainId?: string | null;
-  hostname?: string | null;
-  matchedPath?: string | null;
-  matchedWildcard?: boolean | null;
-  method?: string | null;
-  priority?: number | null;
-  resolvedConfig?: unknown | null;
-  routeBindingId?: string | null;
-  servingLane?: string | null;
-  targetCatalogId?: string | null;
-  targetModule?: string | null;
-  targetOwnerKey?: string | null;
-  targetOwnerScope?: string | null;
-  targetSourceId?: string | null;
-  tlsSecretName?: string | null;
-  tlsStatus?: string | null;
-  verificationStatus?: string | null;
 }
 /** A connection to a list of `RlsSetting` values. */
 export interface RlsSettingConnection {
@@ -13337,6 +13415,12 @@ export interface CreatePlatformPagePayload {
   /** The `PlatformPage` that was created by this mutation. */
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
+}
+export interface CreatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was created by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
 }
 export interface CreatePlatformSitePayload {
   clientMutationId?: string | null;
@@ -13847,6 +13931,12 @@ export interface DeletePlatformPagePayload {
   /** The `PlatformPage` that was deleted by this mutation. */
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
+}
+export interface DeletePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was deleted by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
 }
 export interface DeletePlatformSitePayload {
   clientMutationId?: string | null;
@@ -14472,6 +14562,12 @@ export interface UpdatePlatformPagePayload {
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
 }
+export interface UpdatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was updated by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
+}
 export interface UpdatePlatformSitePayload {
   clientMutationId?: string | null;
   /** The `PlatformSite` that was updated by this mutation. */
@@ -15043,6 +15139,12 @@ export interface PlatformPageEdge {
   cursor?: string | null;
   /** The `PlatformPage` at the end of the edge. */
   node?: PlatformPage | null;
+}
+/** A `PlatformReservedSubdomain` edge in the connection. */
+export interface PlatformReservedSubdomainEdge {
+  cursor?: string | null;
+  /** The `PlatformReservedSubdomain` at the end of the edge. */
+  node?: PlatformReservedSubdomain | null;
 }
 /** A `PlatformSiteAppLink` edge in the connection. */
 export interface PlatformSiteAppLinkEdge {

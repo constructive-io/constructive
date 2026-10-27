@@ -64,6 +64,7 @@ import {
   platformGetSitePreviewsRecordKeys,
   platformManagedDomainKeys,
   platformPageKeys,
+  platformReservedSubdomainKeys,
   platformSiteAppLinkKeys,
   platformSiteKeys,
   platformSiteDeepLinkKeys,
@@ -932,6 +933,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformPageKeys.detail(id),
+      }),
+  },
+  /** Invalidate platformReservedSubdomain queries */ platformReservedSubdomain: {
+    /** Invalidate all platformReservedSubdomain queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformReservedSubdomainKeys.all,
+      }),
+    /** Invalidate platformReservedSubdomain list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformReservedSubdomainKeys.lists(),
+      }),
+    /** Invalidate a specific platformReservedSubdomain */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformReservedSubdomainKeys.detail(id),
       }),
   },
   /** Invalidate platformSiteAppLink queries */ platformSiteAppLink: {
@@ -1974,6 +1992,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformPageKeys.detail(id),
+    });
+  },
+  /** Remove platformReservedSubdomain from cache */ platformReservedSubdomain: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformReservedSubdomainKeys.detail(id),
     });
   },
   /** Remove platformSiteAppLink from cache */ platformSiteAppLink: (

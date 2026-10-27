@@ -20,6 +20,7 @@ const fieldSchema: FieldSchema = {
   catalogModuleId: 'uuid',
   databaseId: 'uuid',
   defaultCapabilities: 'string',
+  defaultReservedSubdomains: 'json',
   domainEventsTableId: 'uuid',
   domainEventsTableName: 'string',
   domainVerificationsTableId: 'uuid',
@@ -38,8 +39,11 @@ const fieldSchema: FieldSchema = {
   privateSchemaName: 'string',
   provisions: 'json',
   publicSchemaName: 'string',
+  reservedSubdomainsTableId: 'uuid',
+  reservedSubdomainsTableName: 'string',
   schemaId: 'uuid',
   scope: 'string',
+  sweepUnverifiedDomainsFunction: 'string',
 };
 const usage =
   '\ndomain-module <command>\n\nCommands:\n  list                  List domainModule records\n  find-first            Find first matching domainModule record\n  get                   Get a domainModule by ID\n  create                Create a new domainModule\n  update                Update an existing domainModule\n  delete                Delete a domainModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -96,6 +100,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       catalogModuleId: true,
       databaseId: true,
       defaultCapabilities: true,
+      defaultReservedSubdomains: true,
       domainEventsTableId: true,
       domainEventsTableName: true,
       domainVerificationsTableId: true,
@@ -114,8 +119,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       privateSchemaName: true,
       provisions: true,
       publicSchemaName: true,
+      reservedSubdomainsTableId: true,
+      reservedSubdomainsTableName: true,
       schemaId: true,
       scope: true,
+      sweepUnverifiedDomainsFunction: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy> & {
@@ -140,6 +148,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       catalogModuleId: true,
       databaseId: true,
       defaultCapabilities: true,
+      defaultReservedSubdomains: true,
       domainEventsTableId: true,
       domainEventsTableName: true,
       domainVerificationsTableId: true,
@@ -158,8 +167,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       privateSchemaName: true,
       provisions: true,
       publicSchemaName: true,
+      reservedSubdomainsTableId: true,
+      reservedSubdomainsTableName: true,
       schemaId: true,
       scope: true,
+      sweepUnverifiedDomainsFunction: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<DomainModuleSelect, DomainModuleFilter, DomainModuleOrderBy> & {
@@ -196,6 +208,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           catalogModuleId: true,
           databaseId: true,
           defaultCapabilities: true,
+          defaultReservedSubdomains: true,
           domainEventsTableId: true,
           domainEventsTableName: true,
           domainVerificationsTableId: true,
@@ -214,8 +227,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          reservedSubdomainsTableId: true,
+          reservedSubdomainsTableName: true,
           schemaId: true,
           scope: true,
+          sweepUnverifiedDomainsFunction: true,
         },
       })
       .execute();
@@ -255,6 +271,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'defaultCapabilities',
         message: 'defaultCapabilities',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'json',
+        name: 'defaultReservedSubdomains',
+        message: 'defaultReservedSubdomains',
         required: false,
         skipPrompt: true,
       },
@@ -379,6 +402,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'reservedSubdomainsTableId',
+        message: 'reservedSubdomainsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'reservedSubdomainsTableName',
+        message: 'reservedSubdomainsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'schemaId',
         message: 'schemaId',
         required: false,
@@ -389,6 +426,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scope',
         message: 'scope',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'sweepUnverifiedDomainsFunction',
+        message: 'sweepUnverifiedDomainsFunction',
+        required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -404,6 +448,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
           defaultCapabilities: cleanedData.defaultCapabilities,
+          defaultReservedSubdomains: cleanedData.defaultReservedSubdomains,
           domainEventsTableId: cleanedData.domainEventsTableId,
           domainEventsTableName: cleanedData.domainEventsTableName,
           domainVerificationsTableId: cleanedData.domainVerificationsTableId,
@@ -421,14 +466,18 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           provisions: cleanedData.provisions,
           publicSchemaName: cleanedData.publicSchemaName,
+          reservedSubdomainsTableId: cleanedData.reservedSubdomainsTableId,
+          reservedSubdomainsTableName: cleanedData.reservedSubdomainsTableName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          sweepUnverifiedDomainsFunction: cleanedData.sweepUnverifiedDomainsFunction,
         },
         select: {
           apiName: true,
           catalogModuleId: true,
           databaseId: true,
           defaultCapabilities: true,
+          defaultReservedSubdomains: true,
           domainEventsTableId: true,
           domainEventsTableName: true,
           domainVerificationsTableId: true,
@@ -447,8 +496,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          reservedSubdomainsTableId: true,
+          reservedSubdomainsTableName: true,
           schemaId: true,
           scope: true,
+          sweepUnverifiedDomainsFunction: true,
         },
       })
       .execute();
@@ -498,6 +550,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
+        type: 'json',
+        name: 'defaultReservedSubdomains',
+        message: 'defaultReservedSubdomains',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'domainEventsTableId',
         message: 'domainEventsTableId',
@@ -618,6 +677,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'reservedSubdomainsTableId',
+        message: 'reservedSubdomainsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'reservedSubdomainsTableName',
+        message: 'reservedSubdomainsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'schemaId',
         message: 'schemaId',
         required: false,
@@ -628,6 +701,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'scope',
         message: 'scope',
         required: false,
+      },
+      {
+        type: 'text',
+        name: 'sweepUnverifiedDomainsFunction',
+        message: 'sweepUnverifiedDomainsFunction',
+        required: false,
+        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -643,6 +723,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           catalogModuleId: cleanedData.catalogModuleId,
           databaseId: cleanedData.databaseId,
           defaultCapabilities: cleanedData.defaultCapabilities,
+          defaultReservedSubdomains: cleanedData.defaultReservedSubdomains,
           domainEventsTableId: cleanedData.domainEventsTableId,
           domainEventsTableName: cleanedData.domainEventsTableName,
           domainVerificationsTableId: cleanedData.domainVerificationsTableId,
@@ -660,14 +741,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: cleanedData.privateSchemaName,
           provisions: cleanedData.provisions,
           publicSchemaName: cleanedData.publicSchemaName,
+          reservedSubdomainsTableId: cleanedData.reservedSubdomainsTableId,
+          reservedSubdomainsTableName: cleanedData.reservedSubdomainsTableName,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          sweepUnverifiedDomainsFunction: cleanedData.sweepUnverifiedDomainsFunction,
         },
         select: {
           apiName: true,
           catalogModuleId: true,
           databaseId: true,
           defaultCapabilities: true,
+          defaultReservedSubdomains: true,
           domainEventsTableId: true,
           domainEventsTableName: true,
           domainVerificationsTableId: true,
@@ -686,8 +771,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           privateSchemaName: true,
           provisions: true,
           publicSchemaName: true,
+          reservedSubdomainsTableId: true,
+          reservedSubdomainsTableName: true,
           schemaId: true,
           scope: true,
+          sweepUnverifiedDomainsFunction: true,
         },
       })
       .execute();
