@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.33.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.3...@constructive-io/graphql-server@5.33.4) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+- **server:** keep an explicit TRUSTED_PROXY_HOPS=0 instead of widening it to SERVER_TRUST_PROXY's one hop ([b877e69](https://github.com/constructive-io/constructive/commit/b877e69ff8d262b58c5c75b3041911ee3d344a9b))
+
 ## [5.33.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.2...@constructive-io/graphql-server@5.33.3) (2026-10-26)
 
 ### Bug Fixes

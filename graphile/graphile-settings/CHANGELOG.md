@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.28.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.2...graphile-settings@6.28.3) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+
 ## [6.28.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.1...graphile-settings@6.28.2) (2026-10-26)
 
 **Note:** Version bump only for package graphile-settings

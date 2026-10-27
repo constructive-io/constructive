@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.34.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.3...graphql-server-test@3.34.4) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+
 ## [3.34.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.2...graphql-server-test@3.34.3) (2026-10-26)
 
 **Note:** Version bump only for package graphql-server-test
