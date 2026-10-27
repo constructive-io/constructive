@@ -22,10 +22,10 @@ UPDATE routing_public.apis
  WHERE id = 'ce554000-0000-4000-8000-000000000001';
 
 INSERT INTO catalog_private.apis
-  (id, owner_scope, owner_key, is_visible, database_id, name, dbname, role_name, anon_role, config)
+  (id, owner_scope, owner_key, is_visible, database_id, name, role_name, anon_role, config)
 VALUES (
   'ce554000-0000-4000-8000-000000000001', 'database', 'ce551000-0000-4000-8000-000000000001', true,
-  'ce551000-0000-4000-8000-000000000001', 'tess-app', current_database(), 'authenticated', 'anonymous',
+  'ce551000-0000-4000-8000-000000000001', 'tess-app', 'authenticated', 'anonymous',
   jsonb_build_object(
     'api_id', 'ce554000-0000-4000-8000-000000000001',
     'database_id', 'ce551000-0000-4000-8000-000000000001',
