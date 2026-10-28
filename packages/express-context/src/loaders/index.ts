@@ -11,6 +11,7 @@
  *   - databaseSettings(routing-plane database_settings)
  *   - requestProtection (routing-plane database_settings/api_settings bounds)
  *   - standing        (metaschema_public.database suspended_at/suspended_reason, 5s TTL)
+ *   - platform        (whether the database is the platform's own, app_scope.platform_database_id())
  *   - pubkeyChallengeSettings (routing-plane pubkey_settings)
  *   - webauthnSettings(routing-plane webauthn_settings)
  *   - authSettings    (metaschema_modules_public.sessions_module → tenant DB)
@@ -57,6 +58,7 @@ export { eventsLoader } from './events';
 export { identityProvidersLoader, requireIdentityProvider } from './identity-providers';
 export { inferenceLogLoader } from './inference-log';
 export { llmLoader } from './llm';
+export { PLATFORM_DATABASE_SQL, platformLoader } from './platform';
 export { pubkeyLoader } from './pubkey';
 export { requestProtectionLoader } from './request-protection';
 export { rlsLoader } from './rls';
@@ -76,6 +78,7 @@ import { databaseSettingsLoader } from './database-settings';
 import { eventsLoader } from './events';
 import { inferenceLogLoader } from './inference-log';
 import { llmLoader } from './llm';
+import { platformLoader } from './platform';
 import { pubkeyLoader } from './pubkey';
 import { createLoaderRegistry } from './registry';
 import { requestProtectionLoader } from './request-protection';
@@ -100,5 +103,6 @@ export function createDefaultRegistry() {
   registry.register(eventsLoader);
   registry.register(requestProtectionLoader);
   registry.register(standingLoader);
+  registry.register(platformLoader);
   return registry;
 }

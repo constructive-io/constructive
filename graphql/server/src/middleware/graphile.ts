@@ -14,6 +14,7 @@ import {
 } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
+import { FunctionFromSourcePreset } from 'graphile-function-source';
 import {
   createConstructivePreset,
   createGrafastCacheLimitsPreset
@@ -86,7 +87,8 @@ const buildPreset = (
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig,
-  webauthn?: boolean
+  webauthn?: boolean,
+  platform?: boolean
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -95,6 +97,9 @@ const buildPreset = (
     ...configuredPreset,
     extends: [
       createConstructivePreset(databaseSettings),
+      // Only on the platform database's own APIs: a tenant never authors
+      // functions through these mutations.
+      ...(platform ? [FunctionFromSourcePreset] : []),
       ...(graphileOptions?.extends ?? []),
       ...(configuredPreset.extends ?? []),
       ...introspection.presets,
@@ -368,6 +373,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // concurrent requests coalesce while optional plugin modules load.
       const creationPromise = (async () => {
         const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
+        const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
         const preset = buildPreset(
           pool,
           schema || [],
@@ -378,7 +384,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           api.databaseSettings,
           api.apiId,
           compute,
-          Boolean(api.webauthnSettings)
+          Boolean(api.webauthnSettings),
+          platform?.platform
         );
         const instance = await observeGraphileBuild(
           {
