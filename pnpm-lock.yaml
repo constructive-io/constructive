@@ -3318,6 +3318,9 @@ importers:
       pgsql-parser:
         specifier: ^18.3.0
         version: 18.3.0
+      semver:
+        specifier: ^7.8.5
+        version: 7.8.5
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
@@ -3334,6 +3337,9 @@ importers:
       '@types/pg':
         specifier: ^8.20.4
         version: 8.20.4
+      '@types/semver':
+        specifier: ^7.8.0
+        version: 7.8.0
       copyfiles:
         specifier: ^2.4.1
         version: 2.4.1
