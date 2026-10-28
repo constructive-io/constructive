@@ -1503,9 +1503,6 @@ importers:
       graphile-connection-filter:
         specifier: workspace:^
         version: link:../graphile-connection-filter/dist
-      graphile-function-source:
-        specifier: workspace:^
-        version: link:../graphile-function-source/dist
       graphile-history:
         specifier: workspace:^
         version: link:../graphile-history/dist
@@ -2266,6 +2263,9 @@ importers:
       graphile-function-bindings:
         specifier: workspace:^
         version: link:../../graphile/graphile-function-bindings/dist
+      graphile-function-source:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-function-source/dist
       graphile-plugin-utils:
         specifier: workspace:^
         version: link:../../graphile/graphile-plugin-utils/dist

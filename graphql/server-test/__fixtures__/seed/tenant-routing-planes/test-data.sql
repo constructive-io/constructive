@@ -81,9 +81,9 @@ SET session_replication_role TO replica;
 -- plane of the platform database, registered by a `route_module` row like
 -- every other plane. The server finds its own plane in routing_planes() by
 -- this schema and calls the resolver in the plane's private schema.
-INSERT INTO metaschema_public.database (id, owner_id, name, hash)
+INSERT INTO metaschema_public.database (id, owner_id, name, hash, platform)
 VALUES (
-  '0b5e0000-0000-4000-8000-000000000001', NULL, 'platform', '0b5e0000-0000-4000-8000-0000000000aa'
+  '0b5e0000-0000-4000-8000-000000000001', NULL, 'platform', '0b5e0000-0000-4000-8000-0000000000aa', true
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)

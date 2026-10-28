@@ -69,6 +69,7 @@
     "graphile-cache": "workspace:^",
     "graphile-config": "1.1.0",
     "graphile-function-bindings": "workspace:^",
+    "graphile-function-source": "workspace:^",
     "graphile-plugin-utils": "workspace:^",
     "graphile-presigned-url-plugin": "workspace:^",
     "graphile-scoped-introspection": "workspace:^",

@@ -256,6 +256,11 @@ export interface DatabaseStanding {
   reason: string | null;
 }
 
+/** Whether a database is the platform's own (`metaschema_public.database.platform`). */
+export interface PlatformDatabase {
+  platform: boolean;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -283,6 +288,7 @@ export interface BuiltinModuleMap {
   events: EventsConfig;
   requestProtection: RequestProtection;
   standing: DatabaseStanding;
+  platform: PlatformDatabase;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────
