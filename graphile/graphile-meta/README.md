@@ -129,7 +129,7 @@ These form fields only describe what the final schema exposes: a column hidden f
   These four are set on the fields under `MetaTable.fields` and are `null` on the fields nested in indexes, constraints and relations.
 - **Detected many-to-many relations.** A table is a detected junction when its exposed non-system columns are exactly the local columns of two foreign keys whose relations have the select behavior. A column is a system column when a client never picks its value in a form:
   1. it's a surrogate key: in the primary key and in no foreign key (a primary key made of the two foreign keys is the classic junction);
-  2. it has a default, which covers generated ids, `owner_id DEFAULT current_user_id()` and `created_at`/`updated_at DEFAULT now()`;
+  2. the database generates its value: identity, serial and generated columns, and any default that isn't a constant, which covers `gen_random_uuid()` ids, `owner_id DEFAULT current_user_id()` and `created_at`/`updated_at DEFAULT now()`. A constant default (`quantity DEFAULT 1`, `status DEFAULT 'pending'`, including casts like `'{}'::jsonb`) is a starting value the client may change, so that column is data;
   3. the create input can't set it (`@behavior -insert`);
   4. it's the table's `@scope` key column.
 

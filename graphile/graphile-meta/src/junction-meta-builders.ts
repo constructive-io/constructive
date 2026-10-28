@@ -16,8 +16,11 @@ export interface JunctionIndex {
  * 1. it is a surrogate key: part of the primary key and of no foreign key (a
  *    primary key made of the two foreign keys is the classic junction, and
  *    those columns are its data);
- * 2. it has a default: generated ids, `owner_id DEFAULT current_user_id()`,
- *    `created_at`/`updated_at DEFAULT now()`;
+ * 2. the database generates its value: identity, serial, generated columns
+ *    and defaults that aren't constants (`gen_random_uuid()`,
+ *    `owner_id DEFAULT current_user_id()`, `created_at DEFAULT now()`). A
+ *    constant default such as `quantity DEFAULT 1` is only a starting value
+ *    the client may change, so that column is data;
  * 3. the create input can't set it (`@behavior -insert`), such as a column a
  *    trigger fills;
  * 4. it is the table's `@scope` key column (e.g. `entity_id`), which clients
@@ -33,7 +36,7 @@ export function isSystemColumn(
   context: BuildContext,
 ): boolean {
   if (surrogateKey.has(attrName)) return true;
-  if (codec.attributes?.[attrName]?.hasDefault) return true;
+  if (codec.attributes?.[attrName]?.extensions?.generatedValue) return true;
   const matches = context.build.behavior?.pgCodecAttributeMatches;
   if (matches && !matches([codec, attrName], 'attribute:insert')) return true;
   return codec.extensions?.tags?.scopeKey === attrName;

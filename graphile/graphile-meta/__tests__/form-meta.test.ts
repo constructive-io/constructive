@@ -28,6 +28,10 @@ function attr(pgType: string, opts: Record<string, unknown> = {}) {
   return { codec: { name: pgType }, notNull: false, hasDefault: false, ...opts };
 }
 
+function generated(pgType: string, opts: Record<string, unknown> = {}) {
+  return attr(pgType, { hasDefault: true, extensions: { generatedValue: true }, ...opts });
+}
+
 function codec(name: string, attributes: Record<string, unknown>, tags: Record<string, unknown> = {}) {
   return { name, attributes, extensions: { pg: { schemaName: 'app_public', name }, tags } };
 }
@@ -151,12 +155,12 @@ describe('junction detection', () => {
     const volunteers = resource(codec('volunteers', { id: attr('uuid', { hasDefault: true }) }), [pk]);
     const signups = resource(
       codec('shift_signups', {
-        id: attr('uuid', { notNull: true, hasDefault: true }),
+        id: generated('uuid', { notNull: true }),
         shift_id: attr('uuid', { notNull: true }),
         volunteer_id: attr('uuid', { notNull: true }),
-        owner_id: attr('uuid', { notNull: true, hasDefault: true }),
-        created_at: attr('timestamptz', { notNull: true, hasDefault: true }),
-        updated_at: attr('timestamptz', { notNull: true, hasDefault: true }),
+        owner_id: generated('uuid', { notNull: true }),
+        created_at: generated('timestamptz', { notNull: true }),
+        updated_at: generated('timestamptz', { notNull: true }),
         ...extra
       }),
       [pk]
@@ -203,6 +207,14 @@ describe('junction detection', () => {
 
     const withData = foodBank({ checked_in_at: attr('timestamptz') });
     expect(byName(collectTablesMeta(build(withData) as any)).shift_signups.isJunction).toBe(false);
+  });
+
+  it('counts a column with a constant default as data', () => {
+    const withQuantity = foodBank({ quantity: attr('int4', { notNull: true, hasDefault: true }) });
+    const tables = byName(collectTablesMeta(build(withQuantity) as any));
+
+    expect(tables.shift_signups.isJunction).toBe(false);
+    expect(tables.shifts.relations.manyToMany).toEqual([]);
   });
 
   it('treats a primary key made of the two foreign keys as the junction itself', () => {
