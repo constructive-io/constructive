@@ -122,8 +122,6 @@ describe('simple-seed-scoped: resolve_route (SQL level)', () => {
       anon_role: 'anonymous',
       schemas
     });
-    // The server needs dbname + schemas to build an ApiStructure.
-    expect(typeof route!.resolved_config!.dbname).toBe('string');
   });
 
   it('resolves the private host to the private api surface', async () => {

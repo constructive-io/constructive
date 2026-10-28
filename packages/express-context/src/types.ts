@@ -137,7 +137,8 @@ export interface IdentityProvidersModule {
 
 export interface ApiStructure {
   apiId?: string;
-  dbname: string;
+  /** Pool for the database this API is served from. */
+  tenantPool: Pool;
   anonRole: string;
   roleName: string;
   schema: string[];

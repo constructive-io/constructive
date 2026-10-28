@@ -16,7 +16,6 @@ const context = (
   tenantPool: pool(),
   databaseId: 'database-a',
   apiId: 'api-a',
-  dbname: 'tenant_a',
   ...overrides
 });
 

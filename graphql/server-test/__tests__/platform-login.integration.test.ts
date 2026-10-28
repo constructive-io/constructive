@@ -201,8 +201,7 @@ const routingSettingsAsLogin = async (): Promise<LoaderContext> => {
     routingPool,
     tenantPool: routingPool,
     databaseId: target.database_id,
-    apiId: target.api_id,
-    dbname: pg.config.database
+    apiId: target.api_id
   };
   for (const loader of ROUTING_LOADERS) loader.invalidate();
   return ctx;
