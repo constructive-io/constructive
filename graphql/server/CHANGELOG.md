@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.33.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.4...@constructive-io/graphql-server@5.33.5) (2026-10-28)
+
+### Bug Fixes
+
+- **server:** always serve the configured database ([39d7752](https://github.com/constructive-io/constructive/commit/39d7752894ae3630859e20dae8bee931fa0095a4))
+
 ## [5.33.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.3...@constructive-io/graphql-server@5.33.4) (2026-10-27)
 
 ### Bug Fixes
