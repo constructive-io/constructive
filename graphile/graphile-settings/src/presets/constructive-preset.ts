@@ -2,7 +2,6 @@ import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
 import { BulkMutationPreset } from 'graphile-bulk-mutations';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
-import { FunctionFromSourcePreset } from 'graphile-function-source';
 import { HistoryPreset } from 'graphile-history';
 import { I18nPreset } from 'graphile-i18n';
 import { GraphileLlmPreset } from 'graphile-llm';
@@ -160,8 +159,7 @@ export function createConstructivePreset(
     NoUniqueLookupPreset,
     MetaSchemaPreset,
     PgTypeMappingsPreset,
-    RequiredInputPreset,
-    FunctionFromSourcePreset
+    RequiredInputPreset
   ];
 
   if (opts.enableConnectionFilter) {

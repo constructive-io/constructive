@@ -40,12 +40,11 @@ VALUES
   ('ce553000-0000-4000-8000-000000000002', 'ce551000-0000-4000-8000-000000000001', 'ce552000-0000-4000-8000-000000000001', 'files', NULL)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
+INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
 VALUES (
   'ce554000-0000-4000-8000-000000000001',
   'ce551000-0000-4000-8000-000000000001',
   'tess-app',
-  current_database(),
   false,
   'authenticated',
   'anonymous'

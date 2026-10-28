@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.29.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.4...graphile-settings@6.29.0) (2026-10-28)
+
+### Features
+
+- **graphql-server:** load function-source only for the platform database ([4121631](https://github.com/constructive-io/constructive/commit/4121631a7fbed43385846dd01ec5d35d602c8dad))
+
+## [6.28.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.3...graphile-settings@6.28.4) (2026-10-28)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.28.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.2...graphile-settings@6.28.3) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+
+## [6.28.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.1...graphile-settings@6.28.2) (2026-10-26)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.28.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.0...graphile-settings@6.28.1) (2026-10-26)
+
+**Note:** Version bump only for package graphile-settings
+
 # [6.28.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.27.1...graphile-settings@6.28.0) (2026-10-24)
 
 **Note:** Version bump only for package graphile-settings

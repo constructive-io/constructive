@@ -14,12 +14,11 @@ import {
 } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
+import { FunctionFromSourcePreset } from 'graphile-function-source';
 import {
   createConstructivePreset,
   createGrafastCacheLimitsPreset
 } from 'graphile-settings';
-import { getPgPool } from 'pg-cache';
-import { getPgEnvOptions } from 'pg-env';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
@@ -88,7 +87,8 @@ const buildPreset = (
   databaseSettings?: DatabaseSettings,
   apiId?: string,
   compute?: ComputeConfig,
-  webauthn?: boolean
+  webauthn?: boolean,
+  platform?: boolean
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -97,6 +97,9 @@ const buildPreset = (
     ...configuredPreset,
     extends: [
       createConstructivePreset(databaseSettings),
+      // Only on the platform database's own APIs: a tenant never authors
+      // functions through these mutations.
+      ...(platform ? [FunctionFromSourcePreset] : []),
       ...(graphileOptions?.extends ?? []),
       ...(configuredPreset.extends ?? []),
       ...introspection.presets,
@@ -311,7 +314,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         );
         return;
       }
-      const { dbname, anonRole, roleName, schema } = api;
+      const { anonRole, roleName, schema } = api;
+      const databaseLabel = api.databaseId ?? 'none';
       const schemaLabel = schema?.join(',') || 'unknown';
 
       // =========================================================================
@@ -319,11 +323,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
-        log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
+        log.debug(`${label} PostGraphile cache hit key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
         return cached.handler(req, res, next);
       }
 
-      log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
+      log.debug(`${label} PostGraphile cache miss key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
 
       // =========================================================================
       // Phase B: In-Flight Check (single-flight coalescing)
@@ -360,22 +364,16 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       }
 
       log.info(
-        `${label} Building PostGraphile v5 handler key=${key} db=${dbname} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
+        `${label} Building PostGraphile v5 handler key=${key} databaseId=${databaseLabel} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
       );
 
-      const pgConfig = getPgEnvOptions({
-        ...opts.pg,
-        database: dbname
-      });
-
-      // Route through pg-cache so the pool is tracked and can be cleaned up
-      // properly, preventing leaked connections during database teardown.
-      const pool = getPgPool(pgConfig);
+      const pool = api.tenantPool;
 
       // Register the creation promise before any asynchronous preset work so
       // concurrent requests coalesce while optional plugin modules load.
       const creationPromise = (async () => {
         const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
+        const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
         const preset = buildPreset(
           pool,
           schema || [],
@@ -386,7 +384,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           api.databaseSettings,
           api.apiId,
           compute,
-          Boolean(api.webauthnSettings)
+          Boolean(api.webauthnSettings),
+          platform?.platform
         );
         const instance = await observeGraphileBuild(
           {
@@ -410,7 +409,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       try {
         const instance = await creationPromise;
-        log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
+        log.info(`${label} Cached PostGraphile v5 handler key=${key} databaseId=${databaseLabel}`);
         return instance.handler(req, res, next);
       } catch (error) {
         log.error(`${label} Failed to create PostGraphile[${key}]:`, error);

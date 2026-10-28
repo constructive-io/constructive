@@ -34,7 +34,9 @@ export type AdmissionRefusal =
   /** The queue was already full, or the tenant chose not to wait. */
   | 'queue_full'
   /** The request waited `maxQueueWaitMs` and no slot came free. */
-  | 'queue_timeout';
+  | 'queue_timeout'
+  /** The caller gave up (`signal` aborted) while still waiting for a slot. */
+  | 'aborted';
 
 /** The outcome of an {@link ConcurrencyLimiter.acquire} call. */
 export interface AdmissionLease {
@@ -64,6 +66,12 @@ export interface AdmissionRequest {
    * unbounded queue converts a saturated tenant into a memory leak.
    */
   queueLimit?: number;
+  /**
+   * Fires when the caller no longer wants the slot — a client that hung up
+   * while queued. The waiter leaves the queue at once instead of being handed
+   * a slot nobody will release.
+   */
+  signal?: AbortSignal;
 }
 
 interface Waiter {
@@ -122,29 +130,38 @@ export class ConcurrencyLimiter {
       return REFUSED('queue_full', 0);
     }
 
+    const signal = request.signal;
+    if (signal?.aborted) {
+      this.evictIfIdle(key, state);
+      return REFUSED('aborted', 0);
+    }
+
     const waitStarted = Date.now();
     const granted = await new Promise<boolean>((resolve) => {
       let settled = false;
+      const leave = () => {
+        const index = state.queue.indexOf(waiter);
+        if (index >= 0) state.queue.splice(index, 1);
+        waiter.settle(false);
+      };
       const waiter: Waiter = {
         settle: (value: boolean) => {
           if (settled) return;
           settled = true;
           clearTimeout(waiter.timer);
+          signal?.removeEventListener('abort', leave);
           resolve(value);
         },
-        timer: setTimeout(() => {
-          const index = state.queue.indexOf(waiter);
-          if (index >= 0) state.queue.splice(index, 1);
-          waiter.settle(false);
-        }, queueWaitMs)
+        timer: setTimeout(leave, queueWaitMs)
       };
+      signal?.addEventListener('abort', leave, { once: true });
       state.queue.push(waiter);
     });
 
     const queuedMs = Date.now() - waitStarted;
     if (!granted) {
       this.evictIfIdle(key, state);
-      return REFUSED('queue_timeout', queuedMs);
+      return REFUSED(signal?.aborted ? 'aborted' : 'queue_timeout', queuedMs);
     }
     // The slot was transferred by `release`, which left `active` untouched.
     return this.lease(key, state, queuedMs);
@@ -296,13 +313,17 @@ export const clientIpFrom = (
 };
 
 /**
- * How many proxies of our own sit in front of the server.
+ * How many proxies of our own sit in front of the server, from
+ * `TRUSTED_PROXY_HOPS`, or `null` when it is unset or not a count.
  *
- * Defaults to 0 — the socket peer, which cannot be forged. A deployment behind
- * an ingress sets `TRUSTED_PROXY_HOPS` to the number of hops it owns; guessing
- * a higher number here would let a direct caller pick its own limiter key.
+ * An explicit `0` is kept as 0 — believe only the socket peer — so it is never
+ * mistaken for "unset" and widened by a caller's fallback. A deployment behind
+ * an ingress sets it to the number of hops it owns; guessing a higher number
+ * would let a direct caller pick its own limiter key.
  */
-export const trustedProxyHops = (): number => {
-  const raw = Number(process.env.TRUSTED_PROXY_HOPS ?? '');
-  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 0;
+export const trustedProxyHops = (): number | null => {
+  const value = process.env.TRUSTED_PROXY_HOPS?.trim();
+  if (!value) return null;
+  const raw = Number(value);
+  return Number.isFinite(raw) && raw >= 0 ? Math.floor(raw) : null;
 };

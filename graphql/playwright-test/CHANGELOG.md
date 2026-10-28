@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.24.6](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.5...@constructive-io/playwright-test@3.24.6) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.5](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.4...@constructive-io/playwright-test@3.24.5) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.4](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.3...@constructive-io/playwright-test@3.24.4) (2026-10-27)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.3](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.2...@constructive-io/playwright-test@3.24.3) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.2](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.1...@constructive-io/playwright-test@3.24.2) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
 ## [3.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.0...@constructive-io/playwright-test@3.24.1) (2026-10-24)
 
 **Note:** Version bump only for package @constructive-io/playwright-test

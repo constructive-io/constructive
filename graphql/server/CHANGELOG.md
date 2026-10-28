@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.34.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.5...@constructive-io/graphql-server@5.34.0) (2026-10-28)
+
+### Features
+
+- **graphql-server:** load function-source only for the platform database ([4121631](https://github.com/constructive-io/constructive/commit/4121631a7fbed43385846dd01ec5d35d602c8dad))
+
+## [5.33.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.4...@constructive-io/graphql-server@5.33.5) (2026-10-28)
+
+### Bug Fixes
+
+- **server:** always serve the configured database ([39d7752](https://github.com/constructive-io/constructive/commit/39d7752894ae3630859e20dae8bee931fa0095a4))
+
+## [5.33.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.3...@constructive-io/graphql-server@5.33.4) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+- **server:** keep an explicit TRUSTED_PROXY_HOPS=0 instead of widening it to SERVER_TRUST_PROXY's one hop ([b877e69](https://github.com/constructive-io/constructive/commit/b877e69ff8d262b58c5c75b3041911ee3d344a9b))
+
+## [5.33.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.2...@constructive-io/graphql-server@5.33.3) (2026-10-26)
+
+### Bug Fixes
+
+- **graphql-server:** drop a queued request whose client hung up instead of leaking its concurrency slot ([9648a44](https://github.com/constructive-io/constructive/commit/9648a440ca637d839527a80460208fc79af62034))
+
+## [5.33.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.1...@constructive-io/graphql-server@5.33.2) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [5.33.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.33.0...@constructive-io/graphql-server@5.33.1) (2026-10-24)
 
 ### Bug Fixes

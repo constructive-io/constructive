@@ -207,7 +207,7 @@ describe('resolveManagedUploadTarget', () => {
 
     const resolveCall = db.queries.find((q) => /resolve_default_bucket/.test(q.text));
     // scope, entity, public_access, and no explicit key: the reserved default tag.
-    expect(resolveCall?.values).toEqual([DATABASE_ID, 'app', null, true, null]);
+    expect(resolveCall?.values).toEqual(['app', null, true, null]);
   });
 
   it('passes a registered field\'s declared bucket key and publicness through', async () => {
@@ -240,7 +240,7 @@ describe('resolveManagedUploadTarget', () => {
     });
 
     const resolveCall = db.queries.find((q) => /resolve_default_bucket/.test(q.text));
-    expect(resolveCall?.values).toEqual([DATABASE_ID, 'app', null, false, 'avatars']);
+    expect(resolveCall?.values).toEqual(['app', null, false, 'avatars']);
     expect(target.bucket.key).toBe('avatars');
   });
 
@@ -344,7 +344,7 @@ describe('resolveManagedUploadTarget', () => {
     expect(target.storageConfig.scope).toBe('database');
     expect(target.physicalName).toBe('myapp-default-public-db');
     const resolveCall = db.queries.find((q) => /resolve_default_bucket/.test(q.text));
-    expect(resolveCall?.values).toEqual([DATABASE_ID, 'database', null, true, null]);
+    expect(resolveCall?.values).toEqual(['database', null, true, null]);
   });
 
   it('refuses to guess between two global planes for an unregistered column', async () => {

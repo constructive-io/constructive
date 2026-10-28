@@ -118,6 +118,47 @@ describe('workspace-level install', () => {
     const forced = await workspace.installWorkspaceDependencies({ force: true });
     expect(forced).toEqual(['@pgpm-testing/base32@1.2.0']);
   });
+
+  it('a later pin\'s dependencies never replace an earlier pin, so deploy order follows requires', async () => {
+    // errors@0.47.1 requires pgpm-defaults; stamps@0.46.0 depends on the older
+    // errors@0.46.0, whose control file does not.
+    const configPath = path.join(workspace.getWorkspacePath()!, 'pgpm.json');
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    config.dependencies = { '@pgpm/errors': '0.47.1', '@pgpm/stamps': '0.46.0' };
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+    await workspace.installWorkspaceDependencies();
+
+    const installedVersion = (pkg: string) => JSON.parse(
+      fs.readFileSync(path.join(workspace.getWorkspacePath()!, 'extensions', pkg, 'package.json'), 'utf-8')
+    ).version;
+    expect(installedVersion('@pgpm/errors')).toBe('0.47.1');
+    expect(installedVersion('@pgpm/stamps')).toBe('0.46.0');
+
+    const reloaded = new PgpmPackage(workspace.getWorkspacePath()!);
+    const modules = reloaded.getModuleMap();
+    expect(modules.errors.requires).toContain('pgpm-defaults');
+
+    const { resolved } = await reloaded.resolveWorkspaceExtensionDependencies();
+    for (const name of Object.keys(modules)) {
+      for (const req of modules[name].requires) {
+        expect(resolved.indexOf(req)).toBeLessThan(resolved.indexOf(name));
+      }
+    }
+  });
+
+  it('keeps the highest version of a module that only arrives as a dependency', async () => {
+    // totp@1.1.0 depends on base32@1.1.0 and verify@1.1.0; the earlier base32@1.2.0
+    // brought verify@1.2.0, which must not be downgraded.
+    await workspace.installModules('@pgpm-testing/base32@1.2.0', '@pgpm-testing/totp@1.1.0');
+
+    const installedVersion = (pkg: string) => JSON.parse(
+      fs.readFileSync(path.join(workspace.getWorkspacePath()!, 'extensions', pkg, 'package.json'), 'utf-8')
+    ).version;
+    expect(installedVersion('@pgpm-testing/totp')).toBe('1.1.0');
+    expect(installedVersion('@pgpm-testing/base32')).toBe('1.2.0');
+    expect(installedVersion('@pgpm-testing/verify')).toBe('1.2.0');
+  });
 });
 
 describe('modulesInstalled()', () => {

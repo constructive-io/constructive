@@ -17,6 +17,7 @@ import type { ApiOptions } from '../../types';
 import { getApiConfig, getSvcKey } from '../api';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const SERVED_DATABASE = 'constructive';
 
 const createRequest = (headers: Record<string, string>): Request => {
   const normalized = new Map(
@@ -32,7 +33,7 @@ const createRequest = (headers: Record<string, string>): Request => {
 
 const createPrivateOptions = (): ApiOptions => ({
   pg: {
-    database: 'constructive'
+    database: SERVED_DATABASE
   },
   api: {
     isPublic: false,
@@ -76,7 +77,6 @@ describe('api middleware routing priority', () => {
           rows: [{
             api_id: 'api-123',
             database_id: 'db-123',
-            dbname: 'tenant_db',
             role_name: 'api_role',
             anon_role: 'api_anon',
             is_public: false,
@@ -88,7 +88,8 @@ describe('api middleware routing priority', () => {
       return { rows: [] };
     });
 
-    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    const pool = { query } as unknown as Pool;
+    mockGetPgPool.mockReturnValue(pool);
 
     const req = createRequest({
       host: 'admin.localhost',
@@ -102,13 +103,14 @@ describe('api middleware routing priority', () => {
     expect(req.svc_key).toBe('api:db-123:customer-api');
     expect(result).toMatchObject({
       apiId: 'api-123',
-      dbname: 'tenant_db',
+      tenantPool: pool,
       anonRole: 'api_anon',
       roleName: 'api_role',
       schema: ['api_public'],
       databaseId: 'db-123',
       isPublic: false
     });
+    expect(mockGetPgPool).toHaveBeenCalledWith(expect.objectContaining({ database: SERVED_DATABASE }));
     expect(svcCache.get('api:db-123:customer-api')).toBe(result);
     expect(query.mock.calls).toEqual(expect.arrayContaining([
       [expect.stringContaining('FROM function_resolution.api_by_name($1, $2)'), ['db-123', 'customer-api']]
@@ -136,7 +138,6 @@ describe('missing served role on an X-Api-Name row', () => {
           rows: [{
             api_id: 'api-123',
             database_id: 'db-123',
-            dbname: 'tenant_db',
             role_name: 'authenticated',
             anon_role: 'anonymous',
             is_public: false,

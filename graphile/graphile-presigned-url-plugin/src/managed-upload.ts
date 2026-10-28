@@ -183,7 +183,6 @@ export async function resolveManagedUploadTarget(args: {
   const coordinate = await withRequestPgClient(withPgClient, pgSettings, (pgClient) =>
     resolveDefaultBucket(
       pgClient,
-      databaseId,
       storageConfig.scope,
       null,
       publicAccess,

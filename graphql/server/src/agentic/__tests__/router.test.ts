@@ -110,7 +110,7 @@ function createMockConstructiveContext(overrides: any = {}) {
   const modules: Record<string, any> = overrides.modules || {};
 
   return {
-    api: { dbname: 'test-db', schema: ['app_public'], ...overrides.api },
+    api: { schema: ['app_public'], ...overrides.api },
     token: overrides.token || { user_id: 'user-123' },
     pgSettings: { role: 'authenticated', 'jwt.claims.user_id': 'user-123' },
     databaseId: overrides.databaseId || 'db-uuid-123',

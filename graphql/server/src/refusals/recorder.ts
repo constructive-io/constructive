@@ -4,14 +4,15 @@ import type { Refusal, RefusalReason, RefusalRecorderStats } from '@constructive
 import {
   clientIpFrom,
   createRecordRefusalsSink,
-  RefusalRecorder,
-  trustedProxyHops
+  RefusalRecorder
 } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { Request } from 'express';
 import type { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
+
+import { resolveProxyHops } from '../middleware/client-ip';
 
 const log = new Logger('refusals');
 
@@ -62,18 +63,6 @@ export const getRefusalRecorderStats = (): RefusalRecorderStats | null => instal
 export const routeKeyOf = (req: Request): string =>
   `${req.method} ${req.baseUrl ?? ''}${req.path ?? req.url ?? ''}`;
 
-/**
- * How far back through `X-Forwarded-For` to believe; mirrors admission
- * control's resolution so the refusal source is the same address the limiter
- * keyed on.
- */
-const resolveHops = (req: Request, configured?: number): number => {
-  if (typeof configured === 'number') return configured;
-  const fromEnv = trustedProxyHops();
-  if (fromEnv > 0) return fromEnv;
-  return req.app?.get('trust proxy') ? 1 : 0;
-};
-
 export interface RecordRefusalOptions {
   /** Overrides the address the refusal is attributed to. */
   sourceIp?: string | null;
@@ -98,7 +87,7 @@ export const recordRefusal = (req: Request, reason: RefusalReason, opts: RecordR
     sourceIp:
       opts.sourceIp !== undefined
         ? opts.sourceIp
-        : clientIpFrom(req, resolveHops(req, opts.trustedProxyHops))
+        : clientIpFrom(req, resolveProxyHops(req, opts.trustedProxyHops))
   };
   try {
     recorder.record(refusal);

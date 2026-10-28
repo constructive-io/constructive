@@ -1,7 +1,6 @@
 const mockCacheGet = jest.fn();
 const mockCacheGraphileInstance = jest.fn();
 const mockCreateGraphileInstance = jest.fn();
-const mockGetPgPool = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
 const mockCreateGrafastCacheLimitsPreset = jest.fn();
 
@@ -16,10 +15,6 @@ jest.mock('graphile-cache', () => ({
 jest.mock('graphile-settings', () => ({
   createConstructivePreset: jest.fn(() => ({})),
   createGrafastCacheLimitsPreset: mockCreateGrafastCacheLimitsPreset
-}));
-
-jest.mock('pg-cache', () => ({
-  getPgPool: mockGetPgPool
 }));
 
 jest.mock('../graphile-introspection', () => ({
@@ -39,7 +34,7 @@ const makeRequest = (): Request =>
     requestId: 'request-id',
     svc_key: 'service-key',
     api: {
-      dbname: 'database',
+      tenantPool: {},
       anonRole: 'anonymous',
       roleName: 'authenticated',
       schema: ['app_public'],
@@ -53,7 +48,6 @@ describe('graphile single-flight handler creation', () => {
     clearInFlightMap();
     mockCacheGet.mockReset().mockReturnValue(undefined);
     mockCacheGraphileInstance.mockReset().mockResolvedValue(undefined);
-    mockGetPgPool.mockReset().mockReturnValue({});
     mockCreateGraphileInstance.mockReset().mockResolvedValue({
       handler: jest.fn()
     });

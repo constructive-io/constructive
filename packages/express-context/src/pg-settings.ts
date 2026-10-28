@@ -19,7 +19,7 @@ export interface PgSettingsInput {
   token: ConstructiveAPIToken | null;
   /** Per-request correlation ID */
   requestId: string;
-  /** Client IP address (from request-ip middleware) */
+  /** Client IP address (the server's trusted-hop `req.clientIp`) */
   clientIp?: string;
 }
 

@@ -22,10 +22,10 @@ UPDATE routing_public.apis
  WHERE id = 'ce554000-0000-4000-8000-000000000001';
 
 INSERT INTO catalog_private.apis
-  (id, owner_scope, owner_key, is_visible, database_id, name, dbname, role_name, anon_role, config)
+  (id, owner_scope, owner_key, is_visible, database_id, name, role_name, anon_role, config)
 VALUES (
   'ce554000-0000-4000-8000-000000000001', 'database', 'ce551000-0000-4000-8000-000000000001', true,
-  'ce551000-0000-4000-8000-000000000001', 'tess-app', current_database(), 'authenticated', 'anonymous',
+  'ce551000-0000-4000-8000-000000000001', 'tess-app', 'authenticated', 'anonymous',
   jsonb_build_object(
     'api_id', 'ce554000-0000-4000-8000-000000000001',
     'database_id', 'ce551000-0000-4000-8000-000000000001',
@@ -62,7 +62,7 @@ INSERT INTO routing_public.hostname_bindings
 VALUES (
   (md5(concat('ce55a000-0000-4000-8000-000000000001', '|', 'storage.tess.test.constructive.io')))::uuid,
   'storage.tess.test.constructive.io', 'ce55a000-0000-4000-8000-000000000001', false, NULL, false, 'verified', 'ready', NULL, now()
-) ON CONFLICT (hostname) DO NOTHING;
+) ON CONFLICT (hostname) WHERE verification_status = 'verified' DO NOTHING;
 
 INSERT INTO routing_public.route_bindings
   (id, domain_id, target_api_id, target_site_id, target_function_id, path, method, priority, is_active, updated_at)
@@ -80,7 +80,7 @@ SET session_replication_role TO replica;
 -- The platform's own routing plane: `routing_public` is the database-scope
 -- plane of the platform database, registered by a `route_module` row like
 -- every other plane. The server finds its own plane in routing_planes() by
--- this schema and calls the resolver in the plane's resolver schema.
+-- this schema and calls the resolver in the plane's private schema.
 INSERT INTO metaschema_public.database (id, owner_id, name, hash)
 VALUES (
   '0b5e0000-0000-4000-8000-000000000001', NULL, 'platform', '0b5e0000-0000-4000-8000-0000000000aa'
@@ -90,13 +90,16 @@ INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, descri
 VALUES (
   '0b5e2000-0000-4000-8000-000000000001', '0b5e0000-0000-4000-8000-000000000001',
   'routing_public', 'routing_public', NULL, true
+), (
+  '0b5e2000-0000-4000-8000-000000000002', '0b5e0000-0000-4000-8000-000000000001',
+  'routing_private', 'routing_private', NULL, false
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_modules_public.route_module
   (id, database_id, scope, schema_id, private_schema_id, resolver_function_name)
 VALUES (
   '0b5ec000-0000-4000-8000-000000000001', '0b5e0000-0000-4000-8000-000000000001', 'database',
-  '0b5e2000-0000-4000-8000-000000000001', '0b5e2000-0000-4000-8000-000000000001', 'resolve_route'
+  '0b5e2000-0000-4000-8000-000000000001', '0b5e2000-0000-4000-8000-000000000002', 'resolve_route'
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO metaschema_public.database (id, owner_id, name, hash)

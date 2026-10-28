@@ -18,6 +18,7 @@ import { getApiConfig } from '../api';
 import { ResolvedRoute, resolveRoute, routeToApiStructure } from '../routing';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
+const SERVED_DATABASE = 'constructive';
 
 const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => ({
   route_binding_id: 'rb-1',
@@ -35,7 +36,6 @@ const matchedRoute = (overrides: Partial<ResolvedRoute> = {}): ResolvedRoute => 
   resolved_config: {
     api_id: 'api-1',
     database_id: 'db-1',
-    dbname: 'tenant_db',
     role_name: 'api_role',
     anon_role: 'api_anon',
     is_public: true,
@@ -97,15 +97,17 @@ describe('resolveRoute', () => {
 });
 
 describe('routeToApiStructure', () => {
-  const opts = { pg: { database: 'constructive' }, api: { isPublic: true } } as unknown as ApiOptions;
+  const opts = { pg: { database: SERVED_DATABASE }, api: { isPublic: true } } as unknown as ApiOptions;
 
   it('maps an api-target route onto ApiStructure', () => {
+    const servedPool = createPool(jest.fn());
+    mockGetPgPool.mockReturnValue(servedPool as never);
     const structure = routeToApiStructure(matchedRoute(), opts);
     expect(structure).toEqual(
       expect.objectContaining({
         apiId: 'api-1',
         databaseId: 'db-1',
-        dbname: 'tenant_db',
+        tenantPool: servedPool,
         roleName: 'api_role',
         anonRole: 'api_anon',
         schema: ['app_public'],
@@ -168,7 +170,7 @@ describe('getApiConfig with scoped routing enabled', () => {
   };
 
   const createOptions = (): ApiOptions => ({
-    pg: { database: 'constructive' },
+    pg: { database: SERVED_DATABASE },
     api: {
       isPublic: true,
       metaSchemas: ['metaschema_public']
@@ -202,11 +204,13 @@ describe('getApiConfig with scoped routing enabled', () => {
       if (sql.includes('resolve_route')) return { rows: [matchedRoute()] };
       throw new Error(`unexpected query: ${sql}`);
     });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
+    const pool = createPool(query);
+    mockGetPgPool.mockReturnValue(pool as never);
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
-    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', dbname: 'tenant_db' }));
+    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', tenantPool: pool }));
+    expect(mockGetPgPool).toHaveBeenCalledWith(expect.objectContaining({ database: SERVED_DATABASE }));
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining(`"routing_private".resolve_route($1, '/', NULL)`),
       ['api.example.com']
@@ -281,11 +285,13 @@ describe('getApiConfig with scoped routing enabled', () => {
       if (sql.includes('"tenant-routing-private".resolve_route')) return { rows: [matchedRoute()] };
       throw new Error(`unexpected query: ${sql}`);
     });
-    mockGetPgPool.mockReturnValue(createPool(query) as never);
+    const pool = createPool(query);
+    mockGetPgPool.mockReturnValue(pool as never);
 
     const result = await getApiConfig(createOptions(), createRequest({ host: 'api.example.com' }));
 
-    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1' }));
+    expect(result).toEqual(expect.objectContaining({ apiId: 'api-1', tenantPool: pool }));
+    expect(mockGetPgPool).toHaveBeenCalledWith(expect.objectContaining({ database: SERVED_DATABASE }));
     expect(query.mock.calls.some(([sql]) => String(sql).includes('public".resolve_route'))).toBe(false);
   });
 
@@ -293,7 +299,6 @@ describe('getApiConfig with scoped routing enabled', () => {
     const routeWithoutDbId = matchedRoute({
       resolved_config: {
         api_id: 'api-1',
-        dbname: 'tenant_db',
         role_name: 'api_role',
         anon_role: 'api_anon',
         is_public: true,

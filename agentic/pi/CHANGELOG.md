@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.5](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.28.4...@agentic-kit/pi@0.28.5) (2026-10-28)
+
+**Note:** Version bump only for package @agentic-kit/pi
+
+## [0.28.4](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.28.3...@agentic-kit/pi@0.28.4) (2026-10-28)
+
+**Note:** Version bump only for package @agentic-kit/pi
+
+## [0.28.3](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.28.2...@agentic-kit/pi@0.28.3) (2026-10-27)
+
+**Note:** Version bump only for package @agentic-kit/pi
+
+## [0.28.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.28.1...@agentic-kit/pi@0.28.2) (2026-10-26)
+
+**Note:** Version bump only for package @agentic-kit/pi
+
+## [0.28.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.28.0...@agentic-kit/pi@0.28.1) (2026-10-26)
+
+**Note:** Version bump only for package @agentic-kit/pi
+
 # [0.28.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi@0.27.5...@agentic-kit/pi@0.28.0) (2026-10-24)
 
 **Note:** Version bump only for package @agentic-kit/pi

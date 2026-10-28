@@ -29,7 +29,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
       finished = true;
       const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
       const apiInfo = req.api
-        ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
+        ? `databaseId=${req.api.databaseId ?? 'none'} schemas=${req.api.schema?.join(',') || 'none'}`
         : 'api=unresolved';
       const authInfo = req.token ? 'auth=token' : 'auth=anon';
       const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
@@ -49,7 +49,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
 
         const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
         const apiInfo = req.api
-          ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
+          ? `databaseId=${req.api.databaseId ?? 'none'} schemas=${req.api.schema?.join(',') || 'none'}`
           : 'api=unresolved';
 
         log.warn(

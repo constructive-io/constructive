@@ -36,8 +36,7 @@ const fakePool = (responses: Array<{ rows: unknown[] }>) => {
 const ctx = (tenantPool: Pool, databaseId = 'db-1'): LoaderContext => ({
   routingPool: {} as Pool,
   tenantPool,
-  databaseId,
-  dbname: 'tenant'
+  databaseId
 });
 
 beforeEach(() => {
