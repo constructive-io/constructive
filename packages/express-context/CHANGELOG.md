@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.36.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.4...@constructive-io/express-context@0.36.0) (2026-10-28)
+
+### Features
+
+- **graphql-server:** load function-source only for the platform database ([4121631](https://github.com/constructive-io/constructive/commit/4121631a7fbed43385846dd01ec5d35d602c8dad))
+
 ## [0.35.4](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.3...@constructive-io/express-context@0.35.4) (2026-10-28)
 
 **Note:** Version bump only for package @constructive-io/express-context
