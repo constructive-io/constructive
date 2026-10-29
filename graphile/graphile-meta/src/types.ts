@@ -325,6 +325,8 @@ export interface PgCodec {
 export interface PgAttributeExtensions extends Record<string, unknown> {
   /** Set at gather time from the column's simple CHECK constraints. */
   allowedValues?: string[] | null;
+  /** Set at gather time: identity, generated column or non-constant default. */
+  generatedValue?: boolean;
   geometrySubtype?: string | null;
   geometrySrid?: number | null;
   vectorDimensions?: number | null;
