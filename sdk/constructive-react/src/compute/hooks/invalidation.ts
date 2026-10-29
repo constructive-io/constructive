@@ -17,7 +17,6 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   buildKeys,
   buildStepKeys,
-  builderBindingKeys,
   contentPresetKeys,
   databaseFunctionGraphKeys,
   databaseFunctionGraphExecutionCancelRequestKeys,
@@ -61,7 +60,6 @@ import {
   namespaceEventKeys,
   platformBuildKeys,
   platformBuildStepKeys,
-  platformBuilderBindingKeys,
   platformFunctionApiBindingKeys,
   platformFunctionCapabilityBindingKeys,
   platformFunctionDefinitionKeys,
@@ -108,6 +106,7 @@ import {
   platformResourcesHealthKeys,
   platformResourcesRequirementsStateKeys,
   platformResourcesResolvedRequirementKeys,
+  platformServiceBindingKeys,
   platformWebhookEndpointKeys,
   platformWebhookEventKeys,
   proposalCommentKeys,
@@ -136,6 +135,7 @@ import {
   resourcesHealthKeys,
   resourcesRequirementsStateKeys,
   resourcesResolvedRequirementKeys,
+  serviceBindingKeys,
   webhookEndpointKeys,
   webhookEventKeys,
 } from './query-keys';
@@ -188,23 +188,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: buildStepKeys.detail(id),
-      }),
-  },
-  /** Invalidate builderBinding queries */ builderBinding: {
-    /** Invalidate all builderBinding queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: builderBindingKeys.all,
-      }),
-    /** Invalidate builderBinding list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: builderBindingKeys.lists(),
-      }),
-    /** Invalidate a specific builderBinding */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: builderBindingKeys.detail(id),
       }),
   },
   /** Invalidate contentPreset queries */ contentPreset: {
@@ -955,23 +938,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: platformBuildStepKeys.detail(id),
-      }),
-  },
-  /** Invalidate platformBuilderBinding queries */ platformBuilderBinding: {
-    /** Invalidate all platformBuilderBinding queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformBuilderBindingKeys.all,
-      }),
-    /** Invalidate platformBuilderBinding list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: platformBuilderBindingKeys.lists(),
-      }),
-    /** Invalidate a specific platformBuilderBinding */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: platformBuilderBindingKeys.detail(id),
       }),
   },
   /** Invalidate platformFunctionApiBinding queries */ platformFunctionApiBinding: {
@@ -1787,6 +1753,23 @@ export const invalidate = {
           queryKey: platformResourcesResolvedRequirementKeys.detail(id),
         }),
     },
+  /** Invalidate platformServiceBinding queries */ platformServiceBinding: {
+    /** Invalidate all platformServiceBinding queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformServiceBindingKeys.all,
+      }),
+    /** Invalidate platformServiceBinding list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: platformServiceBindingKeys.lists(),
+      }),
+    /** Invalidate a specific platformServiceBinding */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: platformServiceBindingKeys.detail(id),
+      }),
+  },
   /** Invalidate platformWebhookEndpoint queries */ platformWebhookEndpoint: {
     /** Invalidate all platformWebhookEndpoint queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -2254,6 +2237,23 @@ export const invalidate = {
         queryKey: resourcesResolvedRequirementKeys.detail(id),
       }),
   },
+  /** Invalidate serviceBinding queries */ serviceBinding: {
+    /** Invalidate all serviceBinding queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: serviceBindingKeys.all,
+      }),
+    /** Invalidate serviceBinding list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: serviceBindingKeys.lists(),
+      }),
+    /** Invalidate a specific serviceBinding */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: serviceBindingKeys.detail(id),
+      }),
+  },
   /** Invalidate webhookEndpoint queries */ webhookEndpoint: {
     /** Invalidate all webhookEndpoint queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -2309,14 +2309,6 @@ export const remove = {
   /** Remove buildStep from cache */ buildStep: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: buildStepKeys.detail(id),
-    });
-  },
-  /** Remove builderBinding from cache */ builderBinding: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: builderBindingKeys.detail(id),
     });
   },
   /** Remove contentPreset from cache */ contentPreset: (
@@ -2641,14 +2633,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: platformBuildStepKeys.detail(id),
-    });
-  },
-  /** Remove platformBuilderBinding from cache */ platformBuilderBinding: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: platformBuilderBindingKeys.detail(id),
     });
   },
   /** Remove platformFunctionApiBinding from cache */ platformFunctionApiBinding: (
@@ -3017,6 +3001,14 @@ export const remove = {
         queryKey: platformResourcesResolvedRequirementKeys.detail(id),
       });
     },
+  /** Remove platformServiceBinding from cache */ platformServiceBinding: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: platformServiceBindingKeys.detail(id),
+    });
+  },
   /** Remove platformWebhookEndpoint from cache */ platformWebhookEndpoint: (
     queryClient: QueryClient,
     id: string | number
@@ -3230,6 +3222,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: resourcesResolvedRequirementKeys.detail(id),
+    });
+  },
+  /** Remove serviceBinding from cache */ serviceBinding: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: serviceBindingKeys.detail(id),
     });
   },
   /** Remove webhookEndpoint from cache */ webhookEndpoint: (

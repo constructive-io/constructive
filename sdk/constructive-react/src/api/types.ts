@@ -10,7 +10,6 @@ export interface Api {
   config: unknown | null;
   createdAt: string | null;
   databaseId: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
@@ -549,7 +548,6 @@ export interface PlatformApi {
   anonRole: string | null;
   config: unknown | null;
   createdAt: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
@@ -716,6 +714,16 @@ export interface PlatformPage {
   slug: string | null;
   storeId: string | null;
   updatedAt: string | null;
+}
+export interface PlatformReservedSubdomain {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  label: string | null;
+  match: string | null;
+  reason: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformSiteAppLink {
   appStoreIdentityId: string | null;

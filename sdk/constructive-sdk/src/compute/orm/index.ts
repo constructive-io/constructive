@@ -7,7 +7,6 @@ import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
 import { BuildModel } from './models/build';
 import { BuildStepModel } from './models/buildStep';
-import { BuilderBindingModel } from './models/builderBinding';
 import { ContentPresetModel } from './models/contentPreset';
 import { DatabaseFunctionGraphModel } from './models/databaseFunctionGraph';
 import { DatabaseFunctionGraphExecutionCancelRequestModel } from './models/databaseFunctionGraphExecutionCancelRequest';
@@ -51,7 +50,6 @@ import { NamespaceModel } from './models/namespace';
 import { NamespaceEventModel } from './models/namespaceEvent';
 import { PlatformBuildModel } from './models/platformBuild';
 import { PlatformBuildStepModel } from './models/platformBuildStep';
-import { PlatformBuilderBindingModel } from './models/platformBuilderBinding';
 import { PlatformFunctionApiBindingModel } from './models/platformFunctionApiBinding';
 import { PlatformFunctionCapabilityBindingModel } from './models/platformFunctionCapabilityBinding';
 import { PlatformFunctionDefinitionModel } from './models/platformFunctionDefinition';
@@ -98,6 +96,7 @@ import { PlatformResourceUtilizationModel } from './models/platformResourceUtili
 import { PlatformResourcesHealthModel } from './models/platformResourcesHealth';
 import { PlatformResourcesRequirementsStateModel } from './models/platformResourcesRequirementsState';
 import { PlatformResourcesResolvedRequirementModel } from './models/platformResourcesResolvedRequirement';
+import { PlatformServiceBindingModel } from './models/platformServiceBinding';
 import { PlatformWebhookEndpointModel } from './models/platformWebhookEndpoint';
 import { PlatformWebhookEventModel } from './models/platformWebhookEvent';
 import { ProposalCommentModel } from './models/proposalComment';
@@ -126,6 +125,7 @@ import { ResourceUtilizationModel } from './models/resourceUtilization';
 import { ResourcesHealthModel } from './models/resourcesHealth';
 import { ResourcesRequirementsStateModel } from './models/resourcesRequirementsState';
 import { ResourcesResolvedRequirementModel } from './models/resourcesResolvedRequirement';
+import { ServiceBindingModel } from './models/serviceBinding';
 import { WebhookEndpointModel } from './models/webhookEndpoint';
 import { WebhookEventModel } from './models/webhookEvent';
 import { createQueryOperations } from './query';
@@ -165,7 +165,6 @@ export function createClient(config: OrmClientConfig) {
   return {
     build: new BuildModel(client),
     buildStep: new BuildStepModel(client),
-    builderBinding: new BuilderBindingModel(client),
     contentPreset: new ContentPresetModel(client),
     databaseFunctionGraph: new DatabaseFunctionGraphModel(client),
     databaseFunctionGraphExecutionCancelRequest:
@@ -212,7 +211,6 @@ export function createClient(config: OrmClientConfig) {
     namespaceEvent: new NamespaceEventModel(client),
     platformBuild: new PlatformBuildModel(client),
     platformBuildStep: new PlatformBuildStepModel(client),
-    platformBuilderBinding: new PlatformBuilderBindingModel(client),
     platformFunctionApiBinding: new PlatformFunctionApiBindingModel(client),
     platformFunctionCapabilityBinding: new PlatformFunctionCapabilityBindingModel(client),
     platformFunctionDefinition: new PlatformFunctionDefinitionModel(client),
@@ -259,6 +257,7 @@ export function createClient(config: OrmClientConfig) {
     platformResourcesHealth: new PlatformResourcesHealthModel(client),
     platformResourcesRequirementsState: new PlatformResourcesRequirementsStateModel(client),
     platformResourcesResolvedRequirement: new PlatformResourcesResolvedRequirementModel(client),
+    platformServiceBinding: new PlatformServiceBindingModel(client),
     platformWebhookEndpoint: new PlatformWebhookEndpointModel(client),
     platformWebhookEvent: new PlatformWebhookEventModel(client),
     proposalComment: new ProposalCommentModel(client),
@@ -287,6 +286,7 @@ export function createClient(config: OrmClientConfig) {
     resourcesHealth: new ResourcesHealthModel(client),
     resourcesRequirementsState: new ResourcesRequirementsStateModel(client),
     resourcesResolvedRequirement: new ResourcesResolvedRequirementModel(client),
+    serviceBinding: new ServiceBindingModel(client),
     webhookEndpoint: new WebhookEndpointModel(client),
     webhookEvent: new WebhookEventModel(client),
     query: createQueryOperations(client),

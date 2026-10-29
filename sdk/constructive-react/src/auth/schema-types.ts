@@ -950,6 +950,12 @@ export interface EnableSmsMfaInput {
 export interface EnableTotpInput {
   clientMutationId?: string;
 }
+export interface ExchangeNativeHandoffInput {
+  clientMutationId?: string;
+  code?: string;
+  codeVerifier?: string;
+  credentialKind?: string;
+}
 export interface ExtendTokenExpiresInput {
   amount?: IntervalInput;
   clientMutationId?: string;
@@ -1292,7 +1298,9 @@ export interface RequestCrossOriginTokenInput {
 }
 export interface RequestMagicLinkInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   email?: string;
+  nativeRedirectUri?: string;
   next?: string;
 }
 export interface ResetPasswordInput {
@@ -1366,6 +1374,7 @@ export interface SetPasswordInput {
   clientMutationId?: string;
   currentPassword?: string;
   newPassword?: string;
+  signOutOtherSessions?: boolean;
 }
 export interface SetPrincipalEntitiesInput {
   clientMutationId?: string;
@@ -2072,6 +2081,26 @@ export interface RoleTypeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+export interface SignInOptionsRecord {
+  allowAnonymousSessions?: boolean | null;
+  allowEmailOtpSignIn?: boolean | null;
+  allowIdentitySignIn?: boolean | null;
+  allowIdentitySignUp?: boolean | null;
+  allowMagicLinkSignIn?: boolean | null;
+  allowMagicLinkSignUp?: boolean | null;
+  allowPasswordSignIn?: boolean | null;
+  allowPasswordSignUp?: boolean | null;
+  allowSignUp?: boolean | null;
+  allowSmsSignIn?: boolean | null;
+  allowSmsSignUp?: boolean | null;
+  allowWebauthnSignIn?: boolean | null;
+  allowWebauthnSignUp?: boolean | null;
+  allowWebauthnUsernameless?: boolean | null;
+  enableCaptcha?: boolean | null;
+  identityProviders?: unknown | null;
+  requireMfa?: boolean | null;
+  signUpRequiresInvite?: boolean | null;
+}
 /** A connection to a list of `UserConnectedAccount` values. */
 export interface UserConnectedAccountConnection {
   edges: UserConnectedAccountEdge[];
@@ -2294,6 +2323,10 @@ export interface EnableTotpPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface ExchangeNativeHandoffPayload {
+  clientMutationId?: string | null;
+  result?: ExchangeNativeHandoffRecord | null;
+}
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
@@ -2498,19 +2531,21 @@ export interface MetaTable {
   constraints: MetaConstraints;
   fields: MetaField[];
   foreignKeyConstraints: MetaForeignKeyConstraint[];
-  /** i18n metadata (null if no @i18n tag) */
+  /** i18n metadata (null if the table is not translatable) */
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Whether this table only links rows of two other tables; the link appears in their manyToMany relations */
+  isJunction: boolean;
   /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
-  /** Realtime metadata (null if no @realtime tag) */
+  /** Realtime metadata (null if the table has no change subscriptions) */
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
-  /** Provisioning scope metadata (null if no @scope tag) */
+  /** Provisioning scope metadata (null if the table has no scope) */
   scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
@@ -2640,6 +2675,14 @@ export interface CreateOrgApiKeyRecord {
   expiresAt?: string | null;
   keyId?: string | null;
 }
+export interface ExchangeNativeHandoffRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  id?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  userId?: string | null;
+}
 export interface ExtendTokenExpiresRecord {
   expiresAt?: string | null;
   id?: string | null;
@@ -2685,9 +2728,11 @@ export interface SignInCrossOriginRecord {
 export interface SignInMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
   deviceApprovalRequired?: boolean | null;
   mfaChallengeToken?: string | null;
   mfaRequired?: boolean | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
@@ -2703,6 +2748,8 @@ export interface SignInSmsOtpRecord {
 export interface SignUpMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
@@ -2720,6 +2767,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only. */
+  allowedValues?: string[] | null;
   /** PostgreSQL column name */
   columnName: string;
   description?: string | null;
@@ -2729,6 +2778,12 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Whether a create must provide this field. Set on a table's own fields only. */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether a create may set this field. Set on a table's own fields only. */
+  isWritableOnCreate?: boolean | null;
+  /** Whether an update may change this field. Set on a table's own fields only. */
+  isWritableOnUpdate?: boolean | null;
   /** Final GraphQL field name */
   name: string;
   type: MetaType;
@@ -2742,7 +2797,7 @@ export interface MetaForeignKeyConstraint {
   referencedFields: string[];
   referencedTable: string;
 }
-/** i18n metadata for a table with @i18n tag */
+/** i18n metadata for a translatable table */
 export interface MetaI18n {
   /** Fields that are translatable */
   translatableFields: MetaI18nField[];
@@ -2757,7 +2812,7 @@ export interface MetaIndex {
   isUnique: boolean;
   name: string;
 }
-/** Table inflection names */
+/** Type and field names generated for this table */
 export interface MetaInflection {
   allRows: string;
   conditionType: string;
@@ -2785,7 +2840,7 @@ export interface MetaQuery {
   one?: string | null;
   update?: string | null;
 }
-/** Realtime metadata for a table with @realtime tag */
+/** Realtime metadata for a table with change subscriptions */
 export interface MetaRealtime {
   /** The generated subscription field name (e.g. onPostChanged) */
   subscriptionFieldName: string;
@@ -2800,13 +2855,13 @@ export interface MetaRelations {
 }
 /** Provisioning scope metadata for a table */
 export interface MetaScope {
-  /** SQL name of the entity table for entity scopes, else null */
+  /** Name of the entity table for entity scopes, else null */
   entityTable?: string | null;
-  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  /** Field name of the scope key (e.g. databaseId, orgId), null for global tiers */
   keyColumn?: string | null;
   /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
   scope: string;
-  /** Provenance of the scope metadata (always 'smartTag') */
+  /** Where this scope metadata comes from */
   source: string;
   /** Coarse bucket: 'global', 'database', or 'entity' */
   tier: string;
@@ -2824,17 +2879,17 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
-  /** GraphQL type name of the plane's buckets table */
+  /** GraphQL type name of the paired buckets table */
   bucketsType: string;
   /** Computed download-URL field on the files type; null on the buckets side */
   downloadUrlField?: string | null;
-  /** GraphQL type name of the plane's files table */
+  /** GraphQL type name of the paired files table */
   filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
-  /** The plane's GraphQL upload surface */
+  /** Upload mutations and types for this storage */
   upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
@@ -2907,7 +2962,7 @@ export interface MetaSearchColumn {
   /** Column name (camelCase) */
   name: string;
 }
-/** Per-table search configuration from @searchConfig smart tag */
+/** Per-table search configuration */
 export interface MetaSearchConfig {
   /** Exponential decay factor per day */
   boostRecencyDecay?: number | null;
@@ -2918,7 +2973,7 @@ export interface MetaSearchConfig {
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
 }
-/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+/** The upload mutations and types for a storage table pair */
 export interface MetaStorageUpload {
   /** Per-file input type inside the bulk input */
   bulkFileInputType: string;
@@ -2936,10 +2991,10 @@ export interface MetaStorageUpload {
   mutation: string;
   /** Payload type of the single upload mutation */
   payloadType: string;
-  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  /** Whether the upload input requires ownerId */
   requiresOwnerId: boolean;
 }
-/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+/** How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {
   /** For 'vector': declared length, else null. */
   dimensions?: number | null;

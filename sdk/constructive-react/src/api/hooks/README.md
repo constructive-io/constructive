@@ -271,6 +271,11 @@ function App() {
 | `useCreatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useUpdatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useDeletePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `usePlatformReservedSubdomainsQuery` | Query | Subdomain labels no tenant may claim under a platform apex |
+| `usePlatformReservedSubdomainQuery` | Query | Subdomain labels no tenant may claim under a platform apex |
+| `useCreatePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
+| `useUpdatePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
+| `useDeletePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
 | `usePlatformSiteAppLinksQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `usePlatformSiteAppLinkQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `useCreatePlatformSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
@@ -476,7 +481,6 @@ function App() {
 | `useCreateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useUpdateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useDeleteWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
-| `useApiSchemaNamesQuery` | Query | apiSchemaNames |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
 | `useEmailSharedAccountQuery` | Query | emailSharedAccount |
 | `useGetSitePreviewCommitQuery` | Query | getSitePreviewCommit |
@@ -488,9 +492,6 @@ function App() {
 | `usePlatformSitesDeepLinkUrlQuery` | Query | platformSitesDeepLinkUrl |
 | `usePlatformSitesSiteOriginQuery` | Query | platformSitesSiteOrigin |
 | `usePlatformVerifySitePreviewTokenQuery` | Query | platformVerifySitePreviewToken |
-| `useResolveDeepLinkQuery` | Query | resolveDeepLink |
-| `useResolveRouteQuery` | Query | resolveRoute |
-| `useResolveSiteAppLinksQuery` | Query | resolveSiteAppLinks |
 | `useSitesDeepLinkUrlQuery` | Query | sitesDeepLinkUrl |
 | `useSitesSiteOriginQuery` | Query | sitesSiteOrigin |
 | `useVerifySitePreviewTokenQuery` | Query | verifySitePreviewToken |
@@ -545,20 +546,20 @@ Example usage:
 ```typescript
 // List all apis
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Get one api
 const { data: item } = useApiQuery({
   id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Create a api
 const { mutate: create } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### ApiSchema
@@ -1295,20 +1296,20 @@ create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', na
 ```typescript
 // List all platformApis
 const { data, isLoading } = usePlatformApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Get one platformApi
 const { data: item } = usePlatformApiQuery({
   id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 
 // Create a platformApi
 const { mutate: create } = useCreatePlatformApiMutation({
   selection: { fields: { id: true } },
 });
-create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+create({ anonRole: '<String>', config: '<JSON>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```
 
 ### PlatformApiSchema
@@ -1555,6 +1556,27 @@ const { mutate: create } = useCreatePlatformPageMutation({
   selection: { fields: { id: true } },
 });
 create({ commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+```
+
+### PlatformReservedSubdomain
+
+```typescript
+// List all platformReservedSubdomains
+const { data, isLoading } = usePlatformReservedSubdomainsQuery({
+  selection: { fields: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformReservedSubdomain
+const { data: item } = usePlatformReservedSubdomainQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformReservedSubdomain
+const { mutate: create } = useCreatePlatformReservedSubdomainMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdByPrincipal: '<UUID>', label: '<String>', match: '<String>', reason: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformSiteAppLink
@@ -2420,17 +2442,6 @@ create({ attestationType: '<String>', challengeExpirySeconds: '<BigInt>', creden
 
 ## Custom Operation Hooks
 
-### `useApiSchemaNamesQuery`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetApiId` | UUID |
-
 ### `useApplyRegistryDefaultsQuery`
 
 applyRegistryDefaults
@@ -2556,42 +2567,6 @@ platformVerifySitePreviewToken
   |----------|------|
   | `siteId` | UUID |
   | `token` | String |
-
-### `useResolveDeepLinkQuery`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `linkSlug` | String |
-  | `targetSiteId` | UUID |
-
-### `useResolveRouteQuery`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
-
-### `useResolveSiteAppLinksQuery`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetSiteId` | UUID |
 
 ### `useSitesDeepLinkUrlQuery`
 
