@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.21.5...@constructive-io/graphql-test@5.22.0) (2026-10-29)
+
+### Features
+
+- **db-tools,graphile-meta:** composed-app codegen, resumable provisions and form metadata in _meta ([#1919](https://github.com/constructive-io/constructive/issues/1919)) ([37fb805](https://github.com/constructive-io/constructive/commit/37fb80597dddf8538699f59d74b66fe2e5c827b6)), closes [constructive-db#4156](https://github.com/constructive-db/issues/4156)
+
 ## [5.21.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.21.4...@constructive-io/graphql-test@5.21.5) (2026-10-28)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

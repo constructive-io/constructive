@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.35.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.0...@pgpmjs/core@7.35.1) (2026-10-29)
+
+### Bug Fixes
+
+- **pgpm:** keep requested module versions when installing several packages ([4782bf0](https://github.com/constructive-io/constructive/commit/4782bf07f1f285ff883d1600dd8ecd406545b0b9))
+
 # [7.35.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.34.0...@pgpmjs/core@7.35.0) (2026-10-24)
 
 ### Bug Fixes

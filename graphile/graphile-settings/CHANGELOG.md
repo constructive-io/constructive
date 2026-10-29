@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.30.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.29.0...graphile-settings@6.30.0) (2026-10-29)
+
+### Features
+
+- **db-tools,graphile-meta:** composed-app codegen, resumable provisions and form metadata in _meta ([#1919](https://github.com/constructive-io/constructive/issues/1919)) ([37fb805](https://github.com/constructive-io/constructive/commit/37fb80597dddf8538699f59d74b66fe2e5c827b6)), closes [constructive-db#4156](https://github.com/constructive-db/issues/4156)
+
 # [6.29.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.28.4...graphile-settings@6.29.0) (2026-10-28)
 
 ### Features
