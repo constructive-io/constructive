@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.0...graphile-meta@1.12.1) (2026-10-29)
+
+### Bug Fixes
+
+- **graphile-meta:** count only generated values as system columns in junction detection ([e980be6](https://github.com/constructive-io/constructive/commit/e980be699a6cb9749703babc6cd5e1cc2200ca4e))
+
 # [1.12.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.11.0...graphile-meta@1.12.0) (2026-10-29)
 
 ### Features
