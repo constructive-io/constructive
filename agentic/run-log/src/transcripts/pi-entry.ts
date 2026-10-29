@@ -55,6 +55,26 @@ export interface PiToolCallContent {
 
 export type PiContent = PiTextContent | PiThinkingContent | PiImageContent | PiToolCallContent;
 
+export interface PiToolDeclaration {
+  name: string;
+  [key: string]: unknown;
+}
+
+/**
+ * The prompt and tool loadout. The first request of a session persists one with
+ * every section and tool; later ones patch `sections` by name (`null` removes
+ * one) and list the tools added or removed.
+ */
+export interface PiSystemMessage {
+  role: 'system';
+  content: string | PiTextContent[];
+  sections?: Record<string, string | null>;
+  toolsAdded?: PiToolDeclaration[];
+  toolsRemoved?: PiToolDeclaration[];
+  timestamp?: number;
+  [key: string]: unknown;
+}
+
 export interface PiUserMessage {
   role: 'user';
   content: string | PiContent[];
@@ -69,7 +89,7 @@ export interface PiAssistantMessage {
   provider?: string;
   model?: string;
   usage?: PiUsage;
-  stopReason?: 'stop' | 'length' | 'toolUse' | 'error' | 'aborted';
+  stopReason?: 'pending' | 'stop' | 'length' | 'toolUse' | 'error' | 'aborted' | 'deferred';
   errorMessage?: string;
   timestamp?: number;
   [key: string]: unknown;
@@ -116,6 +136,7 @@ export interface PiSummaryMessage {
 }
 
 export type PiMessage =
+  | PiSystemMessage
   | PiUserMessage
   | PiAssistantMessage
   | PiToolResultMessage
