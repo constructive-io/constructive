@@ -70,6 +70,7 @@ const db = createClient({
 | `platformGetSitePreviewsRecord` | findMany, findOne, create, update, delete |
 | `platformManagedDomain` | findMany, findOne, create, update, delete |
 | `platformPage` | findMany, findOne, create, update, delete |
+| `platformReservedSubdomain` | findMany, findOne, create, update, delete |
 | `platformSiteAppLink` | findMany, findOne, create, update, delete |
 | `platformSite` | findMany, findOne, create, update, delete |
 | `platformSiteDeepLink` | findMany, findOne, create, update, delete |
@@ -126,7 +127,6 @@ CRUD operations for Api records.
 | `config` | JSON | Yes |
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
-| `dbname` | String | Yes |
 | `id` | UUID | No |
 | `isPublished` | Boolean | Yes |
 | `name` | String | Yes |
@@ -137,13 +137,13 @@ CRUD operations for Api records.
 
 ```typescript
 // List all api records
-const items = await db.api.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+const items = await db.api.findMany({ select: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.api.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+const item = await db.api.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+const created = await db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
@@ -1601,7 +1601,6 @@ CRUD operations for PlatformApi records.
 | `anonRole` | String | Yes |
 | `config` | JSON | Yes |
 | `createdAt` | Datetime | No |
-| `dbname` | String | Yes |
 | `id` | UUID | No |
 | `isPublished` | Boolean | Yes |
 | `name` | String | Yes |
@@ -1612,13 +1611,13 @@ CRUD operations for PlatformApi records.
 
 ```typescript
 // List all platformApi records
-const items = await db.platformApi.findMany({ select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+const items = await db.platformApi.findMany({ select: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.platformApi.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
+const item = await db.platformApi.findOne({ id: '<UUID>', select: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.platformApi.create({ data: { anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
+const created = await db.platformApi.create({ data: { anonRole: '<String>', config: '<JSON>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformApi.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute();
@@ -2098,6 +2097,42 @@ const updated = await db.platformPage.update({ where: { id: '<UUID>' }, data: { 
 
 // Delete
 const deleted = await db.platformPage.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformReservedSubdomain`
+
+CRUD operations for PlatformReservedSubdomain records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `label` | String | Yes |
+| `match` | String | Yes |
+| `reason` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformReservedSubdomain records
+const items = await db.platformReservedSubdomain.findMany({ select: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformReservedSubdomain.findOne({ id: '<UUID>', select: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformReservedSubdomain.create({ data: { createdByPrincipal: '<UUID>', label: '<String>', match: '<String>', reason: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformReservedSubdomain.update({ where: { id: '<UUID>' }, data: { createdByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformReservedSubdomain.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformSiteAppLink`
@@ -3706,21 +3741,6 @@ const deleted = await db.webauthnSetting.delete({ where: { id: '<UUID>' } }).exe
 
 ## Custom Operations
 
-### `db.query.apiSchemaNames`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetApiId` | UUID |
-
-```typescript
-const result = await db.query.apiSchemaNames({ targetApiId: '<UUID>' }).execute();
-```
-
 ### `db.query.applyRegistryDefaults`
 
 applyRegistryDefaults
@@ -3891,54 +3911,6 @@ platformVerifySitePreviewToken
 const result = await db.query.platformVerifySitePreviewToken({ siteId: '<UUID>', token: '<String>' }).execute();
 ```
 
-### `db.query.resolveDeepLink`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `linkSlug` | String |
-  | `targetSiteId` | UUID |
-
-```typescript
-const result = await db.query.resolveDeepLink({ linkSlug: '<String>', targetSiteId: '<UUID>' }).execute();
-```
-
-### `db.query.resolveRoute`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
-
-```typescript
-const result = await db.query.resolveRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
-```
-
-### `db.query.resolveSiteAppLinks`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetSiteId` | UUID |
-
-```typescript
-const result = await db.query.resolveSiteAppLinks({ targetSiteId: '<UUID>' }).execute();
-```
-
 ### `db.query.sitesDeepLinkUrl`
 
 sitesDeepLinkUrl
@@ -4029,21 +4001,6 @@ cancelDatabaseTransfer
 
 ```typescript
 const result = await db.mutation.cancelDatabaseTransfer({ input: { transferId: '<UUID>' } }).execute();
-```
-
-### `db.mutation.createFunctionFromSource`
-
-Creates a `Function` from its `CREATE FUNCTION` source text.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | CreateFunctionFromSourceInput (required) |
-
-```typescript
-const result = await db.mutation.createFunctionFromSource({ input: { apiExposed: '<Boolean>', databaseId: '<UUID>', schemaId: '<UUID>', source: '<String>' } }).execute();
 ```
 
 ### `db.mutation.deleteSitePreview`
@@ -4446,19 +4403,4 @@ unsuspendDatabase
 
 ```typescript
 const result = await db.mutation.unsuspendDatabase({ input: { databaseId: '<UUID>', reason: '<String>' } }).execute();
-```
-
-### `db.mutation.updateFunctionFromSource`
-
-Replaces a `Function`'s definition from its source text; its database, schema and exposure are unchanged.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateFunctionFromSourceInput (required) |
-
-```typescript
-const result = await db.mutation.updateFunctionFromSource({ input: { id: '<UUID>', source: '<String>' } }).execute();
 ```
