@@ -1013,255 +1013,6 @@ input BuildStepPatch {
   summary: JSON
 }
 
-"""
-Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST
-"""
-type BuilderBinding {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID!
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID!
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """Reads a single `Namespace` that is related to this `BuilderBinding`."""
-  namespace: Namespace
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID!
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String!
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
-}
-
-"""A connection to a list of `BuilderBinding` values."""
-type BuilderBindingConnection {
-  """
-  A list of edges which contains the `BuilderBinding` and cursor to aid in pagination.
-  """
-  edges: [BuilderBindingEdge]!
-
-  """A list of `BuilderBinding` objects."""
-  nodes: [BuilderBinding]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `BuilderBinding` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `BuilderBinding` edge in the connection."""
-type BuilderBindingEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `BuilderBinding` at the end of the edge."""
-  node: BuilderBinding
-}
-
-"""
-A filter to be used against `BuilderBinding` object types. All fields are combined with a logical ‘and.’
-"""
-input BuilderBindingFilter {
-  """Checks for all expressions in this list."""
-  and: [BuilderBindingFilter!]
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `createdByPrincipal` field."""
-  createdByPrincipal: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `installationId` field."""
-  installationId: UUIDFilter
-
-  """Filter by the object’s `lastError` field."""
-  lastError: StringFilter
-
-  """Filter by the object’s `metadata` field."""
-  metadata: JSONFilter
-
-  """Filter by the object’s `namespace` relation."""
-  namespace: NamespaceFilter
-
-  """Filter by the object’s `namespaceId` field."""
-  namespaceId: UUIDFilter
-
-  """Negates the expression."""
-  not: BuilderBindingFilter
-
-  """Filter by the object’s `observedHost` field."""
-  observedHost: StringFilter
-
-  """Checks for any expressions in this list."""
-  or: [BuilderBindingFilter!]
-
-  """Filter by the object’s `realm` field."""
-  realm: StringFilter
-
-  """Filter by the object’s `status` field."""
-  status: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
-
-  """Filter by the object’s `updatedByPrincipal` field."""
-  updatedByPrincipal: UUIDFilter
-}
-
-"""An input for mutations affecting `BuilderBinding`"""
-input BuilderBindingInput {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID!
-  id: UUID
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID!
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID!
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
-}
-
-"""Methods to use when ordering `BuilderBinding`."""
-enum BuilderBindingOrderBy {
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  CREATED_BY_PRINCIPAL_ASC
-  CREATED_BY_PRINCIPAL_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  ID_ASC
-  ID_DESC
-  INSTALLATION_ID_ASC
-  INSTALLATION_ID_DESC
-  LAST_ERROR_ASC
-  LAST_ERROR_DESC
-  METADATA_ASC
-  METADATA_DESC
-  NAMESPACE_ID_ASC
-  NAMESPACE_ID_DESC
-  NATURAL
-  OBSERVED_HOST_ASC
-  OBSERVED_HOST_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  REALM_ASC
-  REALM_DESC
-  STATUS_ASC
-  STATUS_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  UPDATED_BY_ASC
-  UPDATED_BY_DESC
-  UPDATED_BY_PRINCIPAL_ASC
-  UPDATED_BY_PRINCIPAL_DESC
-}
-
-"""
-Represents an update to a `BuilderBinding`. Fields that are set will be updated.
-"""
-input BuilderBindingPatch {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-
-  """Database that owns this resource (database-scoped isolation)"""
-  databaseId: UUID
-  id: UUID
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
-}
-
 scalar ConstructiveInternalTypeImage
 
 """
@@ -1771,41 +1522,6 @@ type CreateBuildStepPayload {
     """The method to use when ordering `BuildStep`."""
     orderBy: [BuildStepOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BuildStepEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `BuilderBinding` mutation."""
-input CreateBuilderBindingInput {
-  """The `BuilderBinding` to be created by this mutation."""
-  builderBinding: BuilderBindingInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `BuilderBinding` mutation."""
-type CreateBuilderBindingPayload {
-  """The `BuilderBinding` that was created by this mutation."""
-  builderBinding: BuilderBinding
-
-  """An edge for our `BuilderBinding`. May be used by Relay 1."""
-  builderBindingEdge(
-    """The method to use when ordering `BuilderBinding`."""
-    orderBy: [BuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuilderBindingEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -3235,41 +2951,6 @@ type CreatePlatformBuildStepPayload {
   query: Query
 }
 
-"""All input for the create `PlatformBuilderBinding` mutation."""
-input CreatePlatformBuilderBindingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `PlatformBuilderBinding` to be created by this mutation."""
-  platformBuilderBinding: PlatformBuilderBindingInput!
-}
-
-"""The output of our create `PlatformBuilderBinding` mutation."""
-type CreatePlatformBuilderBindingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformBuilderBinding` that was created by this mutation."""
-  platformBuilderBinding: PlatformBuilderBinding
-
-  """An edge for our `PlatformBuilderBinding`. May be used by Relay 1."""
-  platformBuilderBindingEdge(
-    """The method to use when ordering `PlatformBuilderBinding`."""
-    orderBy: [PlatformBuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformBuilderBindingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the create `PlatformFunctionApiBinding` mutation."""
 input CreatePlatformFunctionApiBindingInput {
   """
@@ -4661,6 +4342,41 @@ type CreatePlatformResourceUsageSummaryPayload {
   query: Query
 }
 
+"""All input for the create `PlatformServiceBinding` mutation."""
+input CreatePlatformServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformServiceBinding` to be created by this mutation."""
+  platformServiceBinding: PlatformServiceBindingInput!
+}
+
+"""The output of our create `PlatformServiceBinding` mutation."""
+type CreatePlatformServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformServiceBinding` that was created by this mutation."""
+  platformServiceBinding: PlatformServiceBinding
+
+  """An edge for our `PlatformServiceBinding`. May be used by Relay 1."""
+  platformServiceBindingEdge(
+    """The method to use when ordering `PlatformServiceBinding`."""
+    orderBy: [PlatformServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformServiceBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformWebhookEndpoint` mutation."""
 input CreatePlatformWebhookEndpointInput {
   """
@@ -5429,6 +5145,41 @@ type CreateResourceUsageSummaryPayload {
     """The method to use when ordering `ResourceUsageSummary`."""
     orderBy: [ResourceUsageSummaryOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ResourceUsageSummaryEdge
+}
+
+"""All input for the create `ServiceBinding` mutation."""
+input CreateServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ServiceBinding` to be created by this mutation."""
+  serviceBinding: ServiceBindingInput!
+}
+
+"""The output of our create `ServiceBinding` mutation."""
+type CreateServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ServiceBinding` that was created by this mutation."""
+  serviceBinding: ServiceBinding
+
+  """An edge for our `ServiceBinding`. May be used by Relay 1."""
+  serviceBindingEdge(
+    """The method to use when ordering `ServiceBinding`."""
+    orderBy: [ServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ServiceBindingEdge
 }
 
 """All input for the create `WebhookEndpoint` mutation."""
@@ -8643,39 +8394,6 @@ type DeleteBuildStepPayload {
   query: Query
 }
 
-"""All input for the `deleteBuilderBinding` mutation."""
-input DeleteBuilderBindingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `BuilderBinding` mutation."""
-type DeleteBuilderBindingPayload {
-  """The `BuilderBinding` that was deleted by this mutation."""
-  builderBinding: BuilderBinding
-
-  """An edge for our `BuilderBinding`. May be used by Relay 1."""
-  builderBindingEdge(
-    """The method to use when ordering `BuilderBinding`."""
-    orderBy: [BuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuilderBindingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `deleteContentPreset` mutation."""
 input DeleteContentPresetInput {
   """
@@ -10167,39 +9885,6 @@ type DeletePlatformBuildStepPayload {
   query: Query
 }
 
-"""All input for the `deletePlatformBuilderBinding` mutation."""
-input DeletePlatformBuilderBindingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `PlatformBuilderBinding` mutation."""
-type DeletePlatformBuilderBindingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformBuilderBinding` that was deleted by this mutation."""
-  platformBuilderBinding: PlatformBuilderBinding
-
-  """An edge for our `PlatformBuilderBinding`. May be used by Relay 1."""
-  platformBuilderBindingEdge(
-    """The method to use when ordering `PlatformBuilderBinding`."""
-    orderBy: [PlatformBuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformBuilderBindingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `deletePlatformFunctionApiBinding` mutation."""
 input DeletePlatformFunctionApiBindingInput {
   """
@@ -11572,6 +11257,39 @@ type DeletePlatformResourceUsageSummaryPayload {
   query: Query
 }
 
+"""All input for the `deletePlatformServiceBinding` mutation."""
+input DeletePlatformServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformServiceBinding` mutation."""
+type DeletePlatformServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformServiceBinding` that was deleted by this mutation."""
+  platformServiceBinding: PlatformServiceBinding
+
+  """An edge for our `PlatformServiceBinding`. May be used by Relay 1."""
+  platformServiceBindingEdge(
+    """The method to use when ordering `PlatformServiceBinding`."""
+    orderBy: [PlatformServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformServiceBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deletePlatformWebhookEndpoint` mutation."""
 input DeletePlatformWebhookEndpointInput {
   """
@@ -12313,6 +12031,39 @@ type DeleteResourceUsageSummaryPayload {
     """The method to use when ordering `ResourceUsageSummary`."""
     orderBy: [ResourceUsageSummaryOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ResourceUsageSummaryEdge
+}
+
+"""All input for the `deleteServiceBinding` mutation."""
+input DeleteServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ServiceBinding` mutation."""
+type DeleteServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ServiceBinding` that was deleted by this mutation."""
+  serviceBinding: ServiceBinding
+
+  """An edge for our `ServiceBinding`. May be used by Relay 1."""
+  serviceBindingEdge(
+    """The method to use when ordering `ServiceBinding`."""
+    orderBy: [ServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ServiceBindingEdge
 }
 
 """All input for the `deleteWebhookEndpoint` mutation."""
@@ -19985,6 +19736,11 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """
+  Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only.
+  """
+  allowedValues: [String!]
+
   """PostgreSQL column name"""
   columnName: String!
   description: String
@@ -19995,6 +19751,19 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """
+  Whether a create must provide this field. Set on a table's own fields only.
+  """
+  isRequiredOnCreate: Boolean
+
+  """Whether a create may set this field. Set on a table's own fields only."""
+  isWritableOnCreate: Boolean
+
+  """
+  Whether an update may change this field. Set on a table's own fields only.
+  """
+  isWritableOnUpdate: Boolean
 
   """Final GraphQL field name"""
   name: String!
@@ -20020,7 +19789,7 @@ type MetaHasRelation {
   type: String
 }
 
-"""i18n metadata for a table with @i18n tag"""
+"""i18n metadata for a translatable table"""
 type MetaI18n {
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
@@ -20047,7 +19816,7 @@ type MetaIndex {
   name: String!
 }
 
-"""Table inflection names"""
+"""Type and field names generated for this table"""
 type MetaInflection {
   allRows: String!
   conditionType: String!
@@ -20092,7 +19861,7 @@ type MetaQuery {
   update: String
 }
 
-"""Realtime metadata for a table with @realtime tag"""
+"""Realtime metadata for a table with change subscriptions"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
@@ -20113,7 +19882,7 @@ type MetaRelations {
 }
 
 """
-How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.
 """
 type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
@@ -20144,11 +19913,11 @@ type MetaSchema {
 
 """Provisioning scope metadata for a table"""
 type MetaScope {
-  """SQL name of the entity table for entity scopes, else null"""
+  """Name of the entity table for entity scopes, else null"""
   entityTable: String
 
   """
-  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  Field name of the scope key (e.g. databaseId, orgId), null for global tiers
   """
   keyColumn: String
 
@@ -20157,7 +19926,7 @@ type MetaScope {
   """
   scope: String!
 
-  """Provenance of the scope metadata (always 'smartTag')"""
+  """Where this scope metadata comes from"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -20188,7 +19957,7 @@ type MetaSearchColumn {
   name: String!
 }
 
-"""Per-table search configuration from @searchConfig smart tag"""
+"""Per-table search configuration"""
 type MetaSearchConfig {
   """Exponential decay factor per day"""
   boostRecencyDecay: Float
@@ -20205,7 +19974,7 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
-  """GraphQL type name of the plane's buckets table"""
+  """GraphQL type name of the paired buckets table"""
   bucketsType: String!
 
   """
@@ -20213,7 +19982,7 @@ type MetaStorage {
   """
   downloadUrlField: String
 
-  """GraphQL type name of the plane's files table"""
+  """GraphQL type name of the paired files table"""
   filesType: String!
 
   """Whether this table is a storage buckets table"""
@@ -20222,13 +19991,11 @@ type MetaStorage {
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
 
-  """The plane's GraphQL upload surface"""
+  """Upload mutations and types for this storage"""
   upload: MetaStorageUpload!
 }
 
-"""
-The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
-"""
+"""The upload mutations and types for a storage table pair"""
 type MetaStorageUpload {
   """Per-file input type inside the bulk input"""
   bulkFileInputType: String!
@@ -20254,7 +20021,7 @@ type MetaStorageUpload {
   """Payload type of the single upload mutation"""
   payloadType: String!
 
-  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  """Whether the upload input requires ownerId"""
   requiresOwnerId: Boolean!
 }
 
@@ -20264,22 +20031,27 @@ type MetaTable {
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
-  """i18n metadata (null if no @i18n tag)"""
+  """i18n metadata (null if the table is not translatable)"""
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """
+  Whether this table only links rows of two other tables; the link appears in their manyToMany relations
+  """
+  isJunction: Boolean!
 
   """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
 
-  """Realtime metadata (null if no @realtime tag)"""
+  """Realtime metadata (null if the table has no change subscriptions)"""
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag)"""
+  """Provisioning scope metadata (null if the table has no scope)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
@@ -20367,14 +20139,6 @@ type Mutation {
     """
     input: CreateBuildStepInput!
   ): CreateBuildStepPayload
-
-  """Creates a single `BuilderBinding`."""
-  createBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateBuilderBindingInput!
-  ): CreateBuilderBindingPayload
 
   """Creates a single `ContentPreset`."""
   createContentPreset(
@@ -20685,14 +20449,6 @@ type Mutation {
     """
     input: CreatePlatformBuildStepInput!
   ): CreatePlatformBuildStepPayload
-
-  """Creates a single `PlatformBuilderBinding`."""
-  createPlatformBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePlatformBuilderBindingInput!
-  ): CreatePlatformBuilderBindingPayload
 
   """Creates a single `PlatformFunctionApiBinding`."""
   createPlatformFunctionApiBinding(
@@ -21006,6 +20762,14 @@ type Mutation {
     input: CreatePlatformResourceUsageSummaryInput!
   ): CreatePlatformResourceUsageSummaryPayload
 
+  """Creates a single `PlatformServiceBinding`."""
+  createPlatformServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformServiceBindingInput!
+  ): CreatePlatformServiceBindingPayload
+
   """Creates a single `PlatformWebhookEndpoint`."""
   createPlatformWebhookEndpoint(
     """
@@ -21182,6 +20946,14 @@ type Mutation {
     input: CreateResourceUsageSummaryInput!
   ): CreateResourceUsageSummaryPayload
 
+  """Creates a single `ServiceBinding`."""
+  createServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateServiceBindingInput!
+  ): CreateServiceBindingPayload
+
   """Creates a single `WebhookEndpoint`."""
   createWebhookEndpoint(
     """
@@ -21321,14 +21093,6 @@ type Mutation {
     """
     input: DeleteBuildStepInput!
   ): DeleteBuildStepPayload
-
-  """Deletes a single `BuilderBinding` using a unique key."""
-  deleteBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteBuilderBindingInput!
-  ): DeleteBuilderBindingPayload
 
   """Deletes a single `ContentPreset` using a unique key."""
   deleteContentPreset(
@@ -21658,14 +21422,6 @@ type Mutation {
     input: DeletePlatformBuildStepInput!
   ): DeletePlatformBuildStepPayload
 
-  """Deletes a single `PlatformBuilderBinding` using a unique key."""
-  deletePlatformBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePlatformBuilderBindingInput!
-  ): DeletePlatformBuilderBindingPayload
-
   """Deletes a single `PlatformFunctionApiBinding` using a unique key."""
   deletePlatformFunctionApiBinding(
     """
@@ -21982,6 +21738,14 @@ type Mutation {
     input: DeletePlatformResourceUsageSummaryInput!
   ): DeletePlatformResourceUsageSummaryPayload
 
+  """Deletes a single `PlatformServiceBinding` using a unique key."""
+  deletePlatformServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformServiceBindingInput!
+  ): DeletePlatformServiceBindingPayload
+
   """Deletes a single `PlatformWebhookEndpoint` using a unique key."""
   deletePlatformWebhookEndpoint(
     """
@@ -22157,6 +21921,14 @@ type Mutation {
     """
     input: DeleteResourceUsageSummaryInput!
   ): DeleteResourceUsageSummaryPayload
+
+  """Deletes a single `ServiceBinding` using a unique key."""
+  deleteServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteServiceBindingInput!
+  ): DeleteServiceBindingPayload
 
   """Deletes a single `WebhookEndpoint` using a unique key."""
   deleteWebhookEndpoint(
@@ -22420,14 +22192,6 @@ type Mutation {
     """
     input: UpdateBuildStepInput!
   ): UpdateBuildStepPayload
-
-  """Updates a single `BuilderBinding` using a unique key and a patch."""
-  updateBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBuilderBindingInput!
-  ): UpdateBuilderBindingPayload
 
   """Updates a single `ContentPreset` using a unique key and a patch."""
   updateContentPreset(
@@ -22774,16 +22538,6 @@ type Mutation {
     """
     input: UpdatePlatformBuildStepInput!
   ): UpdatePlatformBuildStepPayload
-
-  """
-  Updates a single `PlatformBuilderBinding` using a unique key and a patch.
-  """
-  updatePlatformBuilderBinding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePlatformBuilderBindingInput!
-  ): UpdatePlatformBuilderBindingPayload
 
   """
   Updates a single `PlatformFunctionApiBinding` using a unique key and a patch.
@@ -23152,6 +22906,16 @@ type Mutation {
   ): UpdatePlatformResourceUsageSummaryPayload
 
   """
+  Updates a single `PlatformServiceBinding` using a unique key and a patch.
+  """
+  updatePlatformServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformServiceBindingInput!
+  ): UpdatePlatformServiceBindingPayload
+
+  """
   Updates a single `PlatformWebhookEndpoint` using a unique key and a patch.
   """
   updatePlatformWebhookEndpoint(
@@ -23337,6 +23101,14 @@ type Mutation {
     input: UpdateResourceUsageSummaryInput!
   ): UpdateResourceUsageSummaryPayload
 
+  """Updates a single `ServiceBinding` using a unique key and a patch."""
+  updateServiceBinding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateServiceBindingInput!
+  ): UpdateServiceBindingPayload
+
   """Updates a single `WebhookEndpoint` using a unique key and a patch."""
   updateWebhookEndpoint(
     """
@@ -23366,35 +23138,6 @@ Logical namespace containers for grouping secrets, config, functions, and other 
 type Namespace {
   """Freeform metadata for tooling and operational notes"""
   annotations: JSON!
-
-  """Reads and enables pagination through a set of `BuilderBinding`."""
-  builderBindings(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `BuilderBinding`."""
-    orderBy: [BuilderBindingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: BuilderBindingFilter
-  ): BuilderBindingConnection!
 
   """
   Cluster this namespace is projected onto; NULL = the cluster the reconciler runs in
@@ -23575,6 +23318,35 @@ type Namespace {
     """
     where: ResourceFilter
   ): ResourceConnection!
+
+  """Reads and enables pagination through a set of `ServiceBinding`."""
+  serviceBindings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ServiceBinding`."""
+    orderBy: [ServiceBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ServiceBindingFilter
+  ): ServiceBindingConnection!
 
   """
   Namespace provisioning lifecycle status: pending, provisioning, active, failed
@@ -23832,12 +23604,6 @@ input NamespaceFilter {
   """Filter by the object’s `annotations` field."""
   annotations: JSONFilter
 
-  """Filter by the object’s `builderBindings` relation."""
-  builderBindings: NamespaceToManyBuilderBindingFilter
-
-  """`builderBindings` exist."""
-  builderBindingsExist: Boolean
-
   """Filter by the object’s `clusterId` field."""
   clusterId: UUIDFilter
 
@@ -23906,6 +23672,12 @@ input NamespaceFilter {
 
   """`resources` exist."""
   resourcesExist: Boolean
+
+  """Filter by the object’s `serviceBindings` relation."""
+  serviceBindings: NamespaceToManyServiceBindingFilter
+
+  """`serviceBindings` exist."""
+  serviceBindingsExist: Boolean
 
   """Filter by the object’s `status` field."""
   status: StringFilter
@@ -24052,20 +23824,6 @@ input NamespacePatch {
 }
 
 """
-A filter to be used against many `BuilderBinding` object types. All fields are combined with a logical ‘and.’
-"""
-input NamespaceToManyBuilderBindingFilter {
-  """Filters to entities where every related entity matches."""
-  every: BuilderBindingFilter
-
-  """Filters to entities where no related entity matches."""
-  none: BuilderBindingFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: BuilderBindingFilter
-}
-
-"""
 A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’
 """
 input NamespaceToManyFunctionDeploymentFilter {
@@ -24133,6 +23891,20 @@ input NamespaceToManyResourceInstallationFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: ResourceInstallationFilter
+}
+
+"""
+A filter to be used against many `ServiceBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input NamespaceToManyServiceBindingFilter {
+  """Filters to entities where every related entity matches."""
+  every: ServiceBindingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ServiceBindingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: ServiceBindingFilter
 }
 
 """
@@ -24842,245 +24614,6 @@ input PlatformBuildStepPatch {
 
   """Parsed detail: failure message, assertion diff, counts, annotations"""
   summary: JSON
-}
-
-"""
-Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST
-"""
-type PlatformBuilderBinding {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-  id: UUID!
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID!
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """
-  Reads a single `PlatformNamespace` that is related to this `PlatformBuilderBinding`.
-  """
-  namespace: PlatformNamespace
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID!
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String!
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
-}
-
-"""A connection to a list of `PlatformBuilderBinding` values."""
-type PlatformBuilderBindingConnection {
-  """
-  A list of edges which contains the `PlatformBuilderBinding` and cursor to aid in pagination.
-  """
-  edges: [PlatformBuilderBindingEdge]!
-
-  """A list of `PlatformBuilderBinding` objects."""
-  nodes: [PlatformBuilderBinding]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `PlatformBuilderBinding` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A `PlatformBuilderBinding` edge in the connection."""
-type PlatformBuilderBindingEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `PlatformBuilderBinding` at the end of the edge."""
-  node: PlatformBuilderBinding
-}
-
-"""
-A filter to be used against `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformBuilderBindingFilter {
-  """Checks for all expressions in this list."""
-  and: [PlatformBuilderBindingFilter!]
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `createdByPrincipal` field."""
-  createdByPrincipal: UUIDFilter
-
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `installationId` field."""
-  installationId: UUIDFilter
-
-  """Filter by the object’s `lastError` field."""
-  lastError: StringFilter
-
-  """Filter by the object’s `metadata` field."""
-  metadata: JSONFilter
-
-  """Filter by the object’s `namespace` relation."""
-  namespace: PlatformNamespaceFilter
-
-  """Filter by the object’s `namespaceId` field."""
-  namespaceId: UUIDFilter
-
-  """Negates the expression."""
-  not: PlatformBuilderBindingFilter
-
-  """Filter by the object’s `observedHost` field."""
-  observedHost: StringFilter
-
-  """Checks for any expressions in this list."""
-  or: [PlatformBuilderBindingFilter!]
-
-  """Filter by the object’s `realm` field."""
-  realm: StringFilter
-
-  """Filter by the object’s `status` field."""
-  status: StringFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
-
-  """Filter by the object’s `updatedByPrincipal` field."""
-  updatedByPrincipal: UUIDFilter
-}
-
-"""An input for mutations affecting `PlatformBuilderBinding`"""
-input PlatformBuilderBindingInput {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-  id: UUID
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID!
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID!
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
-}
-
-"""Methods to use when ordering `PlatformBuilderBinding`."""
-enum PlatformBuilderBindingOrderBy {
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  CREATED_BY_PRINCIPAL_ASC
-  CREATED_BY_PRINCIPAL_DESC
-  ID_ASC
-  ID_DESC
-  INSTALLATION_ID_ASC
-  INSTALLATION_ID_DESC
-  LAST_ERROR_ASC
-  LAST_ERROR_DESC
-  METADATA_ASC
-  METADATA_DESC
-  NAMESPACE_ID_ASC
-  NAMESPACE_ID_DESC
-  NATURAL
-  OBSERVED_HOST_ASC
-  OBSERVED_HOST_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  REALM_ASC
-  REALM_DESC
-  STATUS_ASC
-  STATUS_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  UPDATED_BY_ASC
-  UPDATED_BY_DESC
-  UPDATED_BY_PRINCIPAL_ASC
-  UPDATED_BY_PRINCIPAL_DESC
-}
-
-"""
-Represents an update to a `PlatformBuilderBinding`. Fields that are set will be updated.
-"""
-input PlatformBuilderBindingPatch {
-  createdAt: Datetime
-  createdBy: UUID
-  createdByPrincipal: UUID
-  id: UUID
-
-  """
-  BuildKit resource installation serving this binding; may belong to another resource scope
-  """
-  installationId: UUID
-
-  """Most recent projection failure"""
-  lastError: String
-
-  """Reconciler detail (projection timestamps and diagnostics)"""
-  metadata: JSON
-
-  """Namespace whose builds use this BuildKit installation"""
-  namespaceId: UUID
-
-  """
-  BuildKit address last projected into the namespace (NULL = never projected)
-  """
-  observedHost: String
-
-  """Lane this binding applies to (NULL = the scope's default lane)"""
-  realm: String
-
-  """Projection state of BUILDKIT_HOST: pending, active, failed"""
-  status: String
-  updatedAt: Datetime
-  updatedBy: UUID
-  updatedByPrincipal: UUID
 }
 
 """
@@ -30311,37 +29844,6 @@ type PlatformNamespace {
   namespaceName: String!
 
   """
-  Reads and enables pagination through a set of `PlatformBuilderBinding`.
-  """
-  platformBuilderBindingsByNamespaceId(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformBuilderBinding`."""
-    orderBy: [PlatformBuilderBindingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformBuilderBindingFilter
-  ): PlatformBuilderBindingConnection!
-
-  """
   Reads and enables pagination through a set of `PlatformFunctionDeployment`.
   """
   platformFunctionDeploymentsByNamespaceId(
@@ -30493,6 +29995,37 @@ type PlatformNamespace {
     """
     where: PlatformResourceFilter
   ): PlatformResourceConnection!
+
+  """
+  Reads and enables pagination through a set of `PlatformServiceBinding`.
+  """
+  platformServiceBindingsByNamespaceId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformServiceBinding`."""
+    orderBy: [PlatformServiceBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformServiceBindingFilter
+  ): PlatformServiceBindingConnection!
 
   """
   Reads and enables pagination through a set of `PlatformWebhookEndpoint`.
@@ -30779,14 +30312,6 @@ input PlatformNamespaceFilter {
   or: [PlatformNamespaceFilter!]
 
   """
-  Filter by the object’s `platformBuilderBindingsByNamespaceId` relation.
-  """
-  platformBuilderBindingsByNamespaceId: PlatformNamespaceToManyPlatformBuilderBindingFilter
-
-  """`platformBuilderBindingsByNamespaceId` exist."""
-  platformBuilderBindingsByNamespaceIdExist: Boolean
-
-  """
   Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation.
   """
   platformFunctionDeploymentsByNamespaceId: PlatformNamespaceToManyPlatformFunctionDeploymentFilter
@@ -30823,6 +30348,14 @@ input PlatformNamespaceFilter {
 
   """`platformResourcesByNamespaceId` exist."""
   platformResourcesByNamespaceIdExist: Boolean
+
+  """
+  Filter by the object’s `platformServiceBindingsByNamespaceId` relation.
+  """
+  platformServiceBindingsByNamespaceId: PlatformNamespaceToManyPlatformServiceBindingFilter
+
+  """`platformServiceBindingsByNamespaceId` exist."""
+  platformServiceBindingsByNamespaceIdExist: Boolean
 
   """
   Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation.
@@ -30963,20 +30496,6 @@ input PlatformNamespacePatch {
 }
 
 """
-A filter to be used against many `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’
-"""
-input PlatformNamespaceToManyPlatformBuilderBindingFilter {
-  """Filters to entities where every related entity matches."""
-  every: PlatformBuilderBindingFilter
-
-  """Filters to entities where no related entity matches."""
-  none: PlatformBuilderBindingFilter
-
-  """Filters to entities where at least one related entity matches."""
-  some: PlatformBuilderBindingFilter
-}
-
-"""
 A filter to be used against many `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’
 """
 input PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
@@ -31044,6 +30563,20 @@ input PlatformNamespaceToManyPlatformResourceInstallationFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: PlatformResourceInstallationFilter
+}
+
+"""
+A filter to be used against many `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformNamespaceToManyPlatformServiceBindingFilter {
+  """Filters to entities where every related entity matches."""
+  every: PlatformServiceBindingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PlatformServiceBindingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PlatformServiceBindingFilter
 }
 
 """
@@ -38784,6 +38317,285 @@ enum PlatformResourcesResolvedRequirementOrderBy {
 }
 
 """
+Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config
+"""
+type PlatformServiceBinding {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+  id: UUID!
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID!
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String!
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String!
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """
+  Reads a single `PlatformNamespace` that is related to this `PlatformServiceBinding`.
+  """
+  namespace: PlatformNamespace
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID!
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `PlatformServiceBinding` values."""
+type PlatformServiceBindingConnection {
+  """
+  A list of edges which contains the `PlatformServiceBinding` and cursor to aid in pagination.
+  """
+  edges: [PlatformServiceBindingEdge]!
+
+  """A list of `PlatformServiceBinding` objects."""
+  nodes: [PlatformServiceBinding]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformServiceBinding` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformServiceBinding` edge in the connection."""
+type PlatformServiceBindingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformServiceBinding` at the end of the edge."""
+  node: PlatformServiceBinding
+}
+
+"""
+A filter to be used against `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformServiceBindingFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformServiceBindingFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `installationId` field."""
+  installationId: UUIDFilter
+
+  """Filter by the object’s `installationScope` field."""
+  installationScope: StringFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Filter by the object’s `lastError` field."""
+  lastError: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `namespace` relation."""
+  namespace: PlatformNamespaceFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: PlatformServiceBindingFilter
+
+  """Filter by the object’s `observedHost` field."""
+  observedHost: StringFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformServiceBindingFilter!]
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformServiceBinding`"""
+input PlatformServiceBindingInput {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+  id: UUID
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID!
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String!
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String!
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID!
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformServiceBinding`."""
+enum PlatformServiceBindingOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  ID_ASC
+  ID_DESC
+  INSTALLATION_ID_ASC
+  INSTALLATION_ID_DESC
+  INSTALLATION_SCOPE_ASC
+  INSTALLATION_SCOPE_DESC
+  KIND_ASC
+  KIND_DESC
+  LAST_ERROR_ASC
+  LAST_ERROR_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NATURAL
+  OBSERVED_HOST_ASC
+  OBSERVED_HOST_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformServiceBinding`. Fields that are set will be updated.
+"""
+input PlatformServiceBindingPatch {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+  id: UUID
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""
 Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window
 """
 type PlatformWebhookEndpoint {
@@ -41601,35 +41413,6 @@ type Query {
     where: BuildStepFilter
   ): BuildStepConnection
 
-  """Reads and enables pagination through a set of `BuilderBinding`."""
-  builderBindings(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `BuilderBinding`."""
-    orderBy: [BuilderBindingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: BuilderBindingFilter
-  ): BuilderBindingConnection
-
   """Reads and enables pagination through a set of `Build`."""
   builds(
     """Read all values in the set after (below) this cursor."""
@@ -42876,37 +42659,6 @@ type Query {
     """
     where: PlatformBuildStepFilter
   ): PlatformBuildStepConnection
-
-  """
-  Reads and enables pagination through a set of `PlatformBuilderBinding`.
-  """
-  platformBuilderBindings(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `PlatformBuilderBinding`."""
-    orderBy: [PlatformBuilderBindingOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PlatformBuilderBindingFilter
-  ): PlatformBuilderBindingConnection
 
   """Reads and enables pagination through a set of `PlatformBuild`."""
   platformBuilds(
@@ -44327,6 +44079,37 @@ type Query {
   ): PlatformResourcesResolvedRequirementConnection
 
   """
+  Reads and enables pagination through a set of `PlatformServiceBinding`.
+  """
+  platformServiceBindings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformServiceBinding`."""
+    orderBy: [PlatformServiceBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformServiceBindingFilter
+  ): PlatformServiceBindingConnection
+
+  """
   Reads and enables pagination through a set of `PlatformWebhookEndpoint`.
   """
   platformWebhookEndpoints(
@@ -45150,6 +44933,35 @@ type Query {
     """
     where: ResourcesResolvedRequirementFilter
   ): ResourcesResolvedRequirementConnection
+
+  """Reads and enables pagination through a set of `ServiceBinding`."""
+  serviceBindings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ServiceBinding`."""
+    orderBy: [ServiceBindingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ServiceBindingFilter
+  ): ServiceBindingConnection
 
   """Reads and enables pagination through a set of `WebhookEndpoint`."""
   webhookEndpoints(
@@ -50981,6 +50793,295 @@ type SaveGraphPayload {
   result: UUID
 }
 
+"""
+Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config
+"""
+type ServiceBinding {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID!
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID!
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String!
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String!
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """Reads a single `Namespace` that is related to this `ServiceBinding`."""
+  namespace: Namespace
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID!
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String!
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `ServiceBinding` values."""
+type ServiceBindingConnection {
+  """
+  A list of edges which contains the `ServiceBinding` and cursor to aid in pagination.
+  """
+  edges: [ServiceBindingEdge]!
+
+  """A list of `ServiceBinding` objects."""
+  nodes: [ServiceBinding]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ServiceBinding` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `ServiceBinding` edge in the connection."""
+type ServiceBindingEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ServiceBinding` at the end of the edge."""
+  node: ServiceBinding
+}
+
+"""
+A filter to be used against `ServiceBinding` object types. All fields are combined with a logical ‘and.’
+"""
+input ServiceBindingFilter {
+  """Checks for all expressions in this list."""
+  and: [ServiceBindingFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `installationId` field."""
+  installationId: UUIDFilter
+
+  """Filter by the object’s `installationScope` field."""
+  installationScope: StringFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Filter by the object’s `lastError` field."""
+  lastError: StringFilter
+
+  """Filter by the object’s `metadata` field."""
+  metadata: JSONFilter
+
+  """Filter by the object’s `namespace` relation."""
+  namespace: NamespaceFilter
+
+  """Filter by the object’s `namespaceId` field."""
+  namespaceId: UUIDFilter
+
+  """Negates the expression."""
+  not: ServiceBindingFilter
+
+  """Filter by the object’s `observedHost` field."""
+  observedHost: StringFilter
+
+  """Checks for any expressions in this list."""
+  or: [ServiceBindingFilter!]
+
+  """Filter by the object’s `realm` field."""
+  realm: StringFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `ServiceBinding`"""
+input ServiceBindingInput {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID!
+  id: UUID
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID!
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String!
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String!
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID!
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `ServiceBinding`."""
+enum ServiceBindingOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  ID_ASC
+  ID_DESC
+  INSTALLATION_ID_ASC
+  INSTALLATION_ID_DESC
+  INSTALLATION_SCOPE_ASC
+  INSTALLATION_SCOPE_DESC
+  KIND_ASC
+  KIND_DESC
+  LAST_ERROR_ASC
+  LAST_ERROR_DESC
+  METADATA_ASC
+  METADATA_DESC
+  NAMESPACE_ID_ASC
+  NAMESPACE_ID_DESC
+  NATURAL
+  OBSERVED_HOST_ASC
+  OBSERVED_HOST_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REALM_ASC
+  REALM_DESC
+  STATUS_ASC
+  STATUS_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `ServiceBinding`. Fields that are set will be updated.
+"""
+input ServiceBindingPatch {
+  createdAt: Datetime
+  createdBy: UUID
+  createdByPrincipal: UUID
+
+  """Database that owns this resource (database-scoped isolation)"""
+  databaseId: UUID
+  id: UUID
+
+  """
+  Resource installation serving this binding, in the installations table of installation_scope
+  """
+  installationId: UUID
+
+  """
+  Scope whose installations table holds installation_id: this scope or platform
+  """
+  installationScope: String
+
+  """
+  Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL)
+  """
+  kind: String
+
+  """Most recent projection failure"""
+  lastError: String
+
+  """Reconciler detail (projection timestamps and diagnostics)"""
+  metadata: JSON
+
+  """Namespace whose builds use this BuildKit installation"""
+  namespaceId: UUID
+
+  """
+  Service address last projected into the namespace (NULL = never projected)
+  """
+  observedHost: String
+
+  """Lane this binding applies to (NULL = the scope's default lane)"""
+  realm: String
+
+  """Projection state of the bound address: pending, active, failed"""
+  status: String
+  updatedAt: Datetime
+  updatedBy: UUID
+  updatedByPrincipal: UUID
+}
+
 """All input for the `setAndCommit` mutation."""
 input SetAndCommitInput {
   """
@@ -51644,44 +51745,6 @@ type UpdateBuildStepPayload {
     """The method to use when ordering `BuildStep`."""
     orderBy: [BuildStepOrderBy!]! = [PRIMARY_KEY_ASC]
   ): BuildStepEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateBuilderBinding` mutation."""
-input UpdateBuilderBindingInput {
-  """
-  An object where the defined keys will be set on the `BuilderBinding` being updated.
-  """
-  builderBindingPatch: BuilderBindingPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our update `BuilderBinding` mutation."""
-type UpdateBuilderBindingPayload {
-  """The `BuilderBinding` that was updated by this mutation."""
-  builderBinding: BuilderBinding
-
-  """An edge for our `BuilderBinding`. May be used by Relay 1."""
-  builderBindingEdge(
-    """The method to use when ordering `BuilderBinding`."""
-    orderBy: [BuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuilderBindingEdge
 
   """
   The exact same `clientMutationId` that was provided in the mutation input,
@@ -53386,44 +53449,6 @@ type UpdatePlatformBuildStepPayload {
   query: Query
 }
 
-"""All input for the `updatePlatformBuilderBinding` mutation."""
-input UpdatePlatformBuilderBindingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `PlatformBuilderBinding` being updated.
-  """
-  platformBuilderBindingPatch: PlatformBuilderBindingPatch!
-}
-
-"""The output of our update `PlatformBuilderBinding` mutation."""
-type UpdatePlatformBuilderBindingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `PlatformBuilderBinding` that was updated by this mutation."""
-  platformBuilderBinding: PlatformBuilderBinding
-
-  """An edge for our `PlatformBuilderBinding`. May be used by Relay 1."""
-  platformBuilderBindingEdge(
-    """The method to use when ordering `PlatformBuilderBinding`."""
-    orderBy: [PlatformBuilderBindingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PlatformBuilderBindingEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the `updatePlatformFunctionApiBinding` mutation."""
 input UpdatePlatformFunctionApiBindingInput {
   """
@@ -54991,6 +55016,44 @@ type UpdatePlatformResourceUsageSummaryPayload {
   query: Query
 }
 
+"""All input for the `updatePlatformServiceBinding` mutation."""
+input UpdatePlatformServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformServiceBinding` being updated.
+  """
+  platformServiceBindingPatch: PlatformServiceBindingPatch!
+}
+
+"""The output of our update `PlatformServiceBinding` mutation."""
+type UpdatePlatformServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformServiceBinding` that was updated by this mutation."""
+  platformServiceBinding: PlatformServiceBinding
+
+  """An edge for our `PlatformServiceBinding`. May be used by Relay 1."""
+  platformServiceBindingEdge(
+    """The method to use when ordering `PlatformServiceBinding`."""
+    orderBy: [PlatformServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformServiceBindingEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformWebhookEndpoint` mutation."""
 input UpdatePlatformWebhookEndpointInput {
   """
@@ -55842,6 +55905,44 @@ type UpdateResourceUsageSummaryPayload {
     """The method to use when ordering `ResourceUsageSummary`."""
     orderBy: [ResourceUsageSummaryOrderBy!]! = [PRIMARY_KEY_ASC]
   ): ResourceUsageSummaryEdge
+}
+
+"""All input for the `updateServiceBinding` mutation."""
+input UpdateServiceBindingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ServiceBinding` being updated.
+  """
+  serviceBindingPatch: ServiceBindingPatch!
+}
+
+"""The output of our update `ServiceBinding` mutation."""
+type UpdateServiceBindingPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `ServiceBinding` that was updated by this mutation."""
+  serviceBinding: ServiceBinding
+
+  """An edge for our `ServiceBinding`. May be used by Relay 1."""
+  serviceBindingEdge(
+    """The method to use when ordering `ServiceBinding`."""
+    orderBy: [ServiceBindingOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ServiceBindingEdge
 }
 
 """All input for the `updateWebhookEndpoint` mutation."""

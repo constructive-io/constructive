@@ -169,6 +169,17 @@ const deleted = await db.machineSession.delete({ where: { id: '<UUID>' } }).exec
 
 ## Custom Operations
 
+### `db.query.currentDatabaseId`
+
+currentDatabaseId
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.currentDatabaseId().execute();
+```
+
 ### `db.mutation.machinesEnroll`
 
 machinesEnroll

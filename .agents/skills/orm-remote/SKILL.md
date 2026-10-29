@@ -1,13 +1,13 @@
 ---
 name: orm-remote
-description: ORM client for the remote API — provides typed CRUD operations for 3 tables and 2 custom operations
+description: ORM client for the remote API — provides typed CRUD operations for 3 tables and 3 custom operations
 ---
 
 # orm-remote
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the remote API — provides typed CRUD operations for 3 tables and 2 custom operations
+ORM client for the remote API — provides typed CRUD operations for 3 tables and 3 custom operations
 
 ## Usage
 
@@ -40,5 +40,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [machine](references/machine.md)
 - [machine-message](references/machine-message.md)
 - [machine-session](references/machine-session.md)
+- [current-database-id](references/current-database-id.md)
 - [machines-enroll](references/machines-enroll.md)
 - [provision-bucket](references/provision-bucket.md)
