@@ -38,3 +38,4 @@ export * from './useCurrentUserAgentQuery';
 export * from './useCurrentUserIdQuery';
 export * from './useGetMfaStatusQuery';
 export * from './useRequireStepUpQuery';
+export * from './useSignInOptionsQuery';
