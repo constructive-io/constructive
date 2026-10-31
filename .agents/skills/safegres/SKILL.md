@@ -235,6 +235,15 @@ Turns catalog inference into evidence: each probeable finding's query shape is p
 
 Presets compose: `{ "extends": ["safegres:supabase", "safegres:multi-tenant"] }`.
 
+**Your own preset** is a partial config other projects `extends`: a path inside one repo, or an npm package shared across repos (a bare non-built-in name resolves as an installed package's `main`, JSON or JS). It can itself extend built-ins:
+
+```jsonc
+// @acme/safegres-preset/safegres.json   (package.json: "main": "safegres.json")
+{ "extends": ["safegres:postgrest", "safegres:multi-tenant"], "exposure": { "anonRoles": ["web_anon"] }, "failOn": { "grade": "B" } }
+// a project's .safegresrc.json
+{ "extends": "@acme/safegres-preset", "public": { "read": ["api.plans"] } }
+```
+
 On Constructive, a project config is usually just:
 
 ```json
@@ -442,3 +451,4 @@ The job owns only what the database needs to exist (Postgres, roles); the deploy
 - `constructive-starter-kits` — `pgpm init workspace` scaffolds the config, scripts and CI job above.
 - `pgpm` — the workspace/modules a `source.pgpm` audit deploys; `references/ci-cd.md` for the rest of a pgpm CI pipeline.
 - `constructive-testing` — `pgsql-test`, the ephemeral database the audit deploys into.
+- `pgsql-lint` (in `constructive-io/pgsql-parser`: `npx skills add constructive-io/pgsql-parser --skill pgsql-lint`) — the C1–C4 convention rules on migration files, before they reach a database.
