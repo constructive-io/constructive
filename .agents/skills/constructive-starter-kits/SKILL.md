@@ -53,3 +53,4 @@ Related skills:
 - `pgpm` — Database migrations and module management (what you do after scaffolding); owns the references above
 - `constructive-cli` — Generated CLI commands and scaffolding
 - `constructive-setup` — Monorepo setup and local development environment
+- `safegres` — the database audit every scaffolded PGPM workspace ships (`safegres.config.js`, `pnpm run audit:db`, the `Database audit (safegres)` CI job)
