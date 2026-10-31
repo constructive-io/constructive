@@ -698,6 +698,30 @@ differ by their gates and their baseline, not by their 19-entry `public.read` li
   "failOn":  { "grade": "D" } }
 ```
 
+### Your own preset
+
+A preset is a partial config file, so a team's own preset is just a file it `extends`. That is
+a path inside one repo, or an npm package when several repos share it. A bare name that is not
+a built-in is resolved as an installed package (its `main`, JSON or JS):
+
+```jsonc
+// @acme/safegres-preset/safegres.json   (package.json: "main": "safegres.json")
+{
+  "extends": ["safegres:postgrest", "safegres:multi-tenant"],
+  "exposure": { "anonRoles": ["web_anon"] },
+  "rules": { "A5": "high" },
+  "failOn": { "grade": "B" }
+}
+```
+
+```jsonc
+// each project's .safegresrc.json
+{ "extends": "@acme/safegres-preset", "public": { "read": ["api.plans"] } }
+```
+
+The project file wins over the preset, key by key; `overrides` unions across the chain.
+`safegres print-config --explain` prints the merged result and where each value came from.
+
 A path in an inherited file resolves against **the file that wrote it**, so a base file's
 `"baseline": "ci/perf.json"` keeps meaning the base file's `ci/`, whichever job inherits it —
 the same rule as a discovered config, applied per key. Objects merge per key and arrays replace,
