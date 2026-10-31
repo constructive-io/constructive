@@ -87,7 +87,7 @@ Three analyses over three different representations. None of them run your queri
 grants, RLS flags, policies with their expressions, indexes, ownership.
 
 **2. Policy predicates, as ASTs.** Every `USING` / `WITH CHECK` expression is parsed with
-[`pgsql-parser`](https://github.com/launchql/pgsql-parser) (libpg_query — the *actual* PostgreSQL
+[`pgsql-parser`](https://github.com/constructive-io/pgsql-parser) (libpg_query — the *actual* PostgreSQL
 grammar, not a regex) and traversed. That is what makes the interesting rules possible: a literal
 `true` in a write policy (A7), a cast wrapping the policy's own column so no plain index can serve
 it (X3), a non-`IMMUTABLE` call whose arguments reference no column of the row and which sits
@@ -118,10 +118,11 @@ trust boundaries on the way.
 
 ## What it checks
 
-34 rules across two dimensions, plus a source-level convention linter. The prefix letter is a
-family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
+45 rules across two dimensions — 34 security, 11 performance — plus four opt-in runtime-statistics
+rules and a four-rule source-level convention linter. The prefix letter is a family, **not** the
+dimension: `P1`/`P1b` are performance, `P5` is security.
 
-### Security (19 rules)
+### Security (34 rules)
 
 | Code | Severity | Direction | Check |
 | --- | --- | --- | --- |
@@ -143,6 +144,7 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L4 | info | neutral | **Dead schema `USAGE`** — reaches no relation and no function |
 | L5 | info | fail-open | An untrusted role reaches an **RLS-off table** via PUBLIC/inheritance † |
 | L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name ‡ |
+| L7 | info | fail-open | **Role escalation** — an untrusted role can `SET ROLE` to a role with more reach † |
 | L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation, and named columns of it, as the view's owner † |
 | L9 | info | fail-open | **DEFINER view write** — an auto-updatable definer view writes a base relation as its owner † |
 | L10 | info | fail-open | **Rewrite-rule bypass** — a rule on a view writes a relation as the view's owner, `security_invoker` notwithstanding † |
@@ -156,11 +158,13 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L18 | info | fail-open | **Writable filtering view without `WITH CHECK OPTION`** — an untrusted role writes rows the view's own filter excludes † |
 | L19 | info | fail-open | **Definer-function reach** — an untrusted role touches a relation by executing a `SECURITY DEFINER` function, which runs as its owner † |
 | L20 | info | fail-open | **`INSTEAD OF` trigger write** — a write against a view becomes a trigger function's body, and a definer one lands it as the function's owner † |
+| L21 | info | fail-closed | **Revocable grant** — a role holds `EXECUTE` that no reachable path exercises † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
-† R1/R2/L5 are no-ops until you name the untrusted roles:
-`"R1": ["critical", { "roles": ["anonymous"] }]`. They cost nothing on databases without an
-untrusted-role model; the `safegres:constructive` preset configures them for `anonymous`.
+† The untrusted-role rules are no-ops until there is an untrusted role: named outright
+(`"R1": ["critical", { "roles": ["anonymous"] }]`) or resolved from the exposure surface
+(`rolesFrom: "anon"`, which `safegres:recommended` and the stack presets set — see
+[Configuration](#configuration)). They cost nothing on databases without an untrusted-role model.
 
 ‡ L6 needs an adapter that can compute [API reach](#api-reach--the-relations-the-api-can-actually-name);
 without one nothing is unaddressable and it never fires.
@@ -180,9 +184,9 @@ availability and hygiene concern, not a leak. They contribute **zero** to the sc
 ### Convention (source-level lint, 4 rules — `safegres:constructive`)
 
 House-style rules that read function **definitions** (`pg_get_functiondef`), not the catalog. They
-are pure `source → findings` — no `pg` dependency in the lint module — and are **off outside the
-`safegres:constructive` preset**, which enables them. A function on a non-exposed schema costs
-nothing, like every other rule.
+are pure `source → findings` — they come from [`@pgsql/lint`](https://www.npmjs.com/package/@pgsql/lint),
+which has no `pg` dependency — and are **off outside the `safegres:constructive` preset**, which
+enables them. A function on a non-exposed schema costs nothing, like every other rule.
 
 | Code | Severity | Direction | Check |
 | --- | --- | --- | --- |
@@ -210,8 +214,9 @@ EXECUTE 'REFRESH MATERIALIZED VIEW app.mv';  -- safegres-disable-line no-dynamic
 -- safegres-disable-file no-set-search-path -- vendored extension shim
 ```
 
-A directive with no rule id applies to every convention rule. Waived findings are **not dropped** —
-they surface as `acknowledged` (accepted-risk) findings carrying their reason, off the score.
+The `pgsql-lint-` prefix (as written for the standalone `pgsql-lint` CLI) is read the same way, so
+one waiver covers both tools. A directive with no rule id applies to every convention rule. Waived
+findings are **not dropped** — they surface as `acknowledged` (accepted-risk) findings carrying their reason, off the score.
 
 ### Performance (11 rules, `--perf`)
 
@@ -227,7 +232,7 @@ they surface as `acknowledged` (accepted-risk) findings carrying their reason, o
 | X8 | info | **Sort-shaped column leads no index** (`timestamptz`/`date`) — heuristic, scores 0 |
 | X9 | medium | **Policy calls a STABLE function per row** — not wrapped in a scalar sub-select, so no InitPlan |
 | P1 | high | Policy body calls a **VOLATILE function** — re-evaluated per row |
-| P1b | medium | Policy body calls a **STABLE function** in a per-row position |
+| P1b | medium | Policy body calls a **`SECURITY DEFINER` function** — the planner cannot inline it |
 
 X2/X3/X4/X9 are the checks a generic index linter structurally cannot make, because they require
 the policy predicate's AST. RLS quals are evaluated **before** user quals, on every candidate row,
