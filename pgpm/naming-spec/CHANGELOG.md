@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/naming-spec@0.6.0...@pgpmjs/naming-spec@0.6.1) (2026-11-01)
+
+### Bug Fixes
+
+- **naming-spec:** keep change path segments whitespace-free ([95cdf75](https://github.com/constructive-io/constructive/commit/95cdf75d4a52d8effbeee7228b063d0081f54809))
+
 # [0.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/naming-spec@0.5.0...@pgpmjs/naming-spec@0.6.0) (2026-10-14)
 
 **Note:** Version bump only for package @pgpmjs/naming-spec
