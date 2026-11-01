@@ -29,6 +29,7 @@ csdk auth set-token <your-token>
 | `machine` | machine CRUD operations |
 | `machine-message` | machineMessage CRUD operations |
 | `machine-session` | machineSession CRUD operations |
+| `current-database-id` | currentDatabaseId |
 | `machines-enroll` | machinesEnroll |
 | `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
 Records the request on the bucket row via RLS; the bucket's job
@@ -198,6 +199,13 @@ CRUD operations for MachineSession records.
 **Optional create fields (backend defaults):** `agentMode`, `agentSessionRef`, `args`, `cols`, `command`, `createdBy`, `createdByPrincipal`, `cwd`, `endedAt`, `env`, `exitCode`, `interactive`, `lastActivityAt`, `lastSeq`, `metadata`, `pid`, `runId`, `startedAt`, `state`, `termRows`, `updatedBy`, `updatedByPrincipal`
 
 ## Custom Operations
+
+### `current-database-id`
+
+currentDatabaseId
+
+- **Type:** query
+- **Arguments:** none
 
 ### `machines-enroll`
 

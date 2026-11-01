@@ -662,6 +662,17 @@ requireStepUp
 const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
 ```
 
+### `db.query.signInOptions`
+
+signInOptions
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.signInOptions().execute();
+```
+
 ### `db.mutation.approveDevice`
 
 approveDevice
@@ -739,7 +750,7 @@ const result = await db.mutation.confirmTotpSetup({ input: { totpValue: '<String
 
 ### `db.mutation.createApiKey`
 
-createApiKey
+Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
 
 - **Type:** mutation
 - **Arguments:**
@@ -947,6 +958,21 @@ enableTotp
 const result = await db.mutation.enableTotp({ input: '<EnableTotpInput>' }).execute();
 ```
 
+### `db.mutation.exchangeNativeHandoff`
+
+exchangeNativeHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ExchangeNativeHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.exchangeNativeHandoff({ input: { code: '<String>', codeVerifier: '<String>', credentialKind: '<String>' } }).execute();
+```
+
 ### `db.mutation.extendTokenExpires`
 
 extendTokenExpires
@@ -1084,7 +1110,7 @@ requestMagicLink
   | `input` | RequestMagicLinkInput (required) |
 
 ```typescript
-const result = await db.mutation.requestMagicLink({ input: { email: '<String>', next: '<String>' } }).execute();
+const result = await db.mutation.requestMagicLink({ input: { codeChallenge: '<String>', email: '<String>', nativeRedirectUri: '<String>', next: '<String>' } }).execute();
 ```
 
 ### `db.mutation.resetPassword`
@@ -1249,7 +1275,7 @@ setPassword
   | `input` | SetPasswordInput (required) |
 
 ```typescript
-const result = await db.mutation.setPassword({ input: { currentPassword: '<String>', newPassword: '<String>' } }).execute();
+const result = await db.mutation.setPassword({ input: { currentPassword: '<String>', newPassword: '<String>', signOutOtherSessions: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.setPrincipalEntities`

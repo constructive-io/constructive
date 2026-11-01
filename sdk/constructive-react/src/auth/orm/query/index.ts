@@ -9,8 +9,10 @@ import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   User,
   GetMfaStatusRecord,
+  SignInOptionsRecord,
   UserSelect,
   GetMfaStatusRecordSelect,
+  SignInOptionsRecordSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface RequireStepUpVariables {
@@ -148,6 +150,29 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           undefined
+        ),
+      }),
+    signInOptions: <S extends SignInOptionsRecordSelect>(
+      options: {
+        select: S;
+      } & StrictSelect<S, SignInOptionsRecordSelect>
+    ) =>
+      new QueryBuilder<{
+        signInOptions: InferSelectResult<SignInOptionsRecord, S> | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'SignInOptions',
+        fieldName: 'signInOptions',
+        ...buildCustomDocument(
+          'query',
+          'SignInOptions',
+          'signInOptions',
+          options.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          'SignInOptionsRecord'
         ),
       }),
   };

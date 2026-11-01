@@ -8,12 +8,14 @@ import type { OrmClientConfig } from './client';
 import { MachineModel } from './models/machine';
 import { MachineMessageModel } from './models/machineMessage';
 import { MachineSessionModel } from './models/machineSession';
+import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
 export { GraphQLRequestError, FetchAdapter } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
+export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
  * Create an ORM client instance
@@ -44,6 +46,7 @@ export function createClient(config: OrmClientConfig) {
     machine: new MachineModel(client),
     machineMessage: new MachineMessageModel(client),
     machineSession: new MachineSessionModel(client),
+    query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };
 }
