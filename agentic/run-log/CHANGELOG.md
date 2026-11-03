@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log@0.8.0...@agentic-kit/run-log@0.8.1) (2026-11-03)
+
+### Bug Fixes
+
+- **run-log:** keep pending and deferred model spans open ([005d019](https://github.com/constructive-io/constructive/commit/005d0198fa99c75358a6f5949eae39c20ab2ab74))
+- **run-log:** read pi 1.4.0 system messages and stop reasons ([90c5a0f](https://github.com/constructive-io/constructive/commit/90c5a0f9c520d6e6e68e1958ad06a97cf498bc62))
+
 # [0.8.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log@0.7.0...@agentic-kit/run-log@0.8.0) (2026-10-14)
 
 **Note:** Version bump only for package @agentic-kit/run-log
