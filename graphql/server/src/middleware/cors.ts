@@ -15,7 +15,9 @@ import type { ApiStructure } from '../types';
  *  - Always allows localhost to ease development.
  *
  * Usage:
+ *  app.use(createApiMiddleware(opts));
  *  app.use(cors(fallbackOrigin));
+ *  app.use(authenticate);
  */
 export const cors = (fallbackOrigin?: string): RequestHandler => {
   // Use the cors library's dynamic origin function to decide per request
@@ -64,12 +66,25 @@ export const cors = (fallbackOrigin?: string): RequestHandler => {
   };
 
   // Wrap in the cors plugin with our dynamic origin resolver
-  const handler: RequestHandler = (req, res, next) =>
+  const handler: RequestHandler = (req, res, next) => {
+    // Denied responses also vary by Origin: a cache must not reuse an allowed
+    // response (or a denial) for another origin.
+    res.vary('Origin');
     corsPlugin({
       origin: (reqOrigin, cb) => dynamicOrigin(reqOrigin, cb as any, req),
       credentials: true,
       optionsSuccessStatus: 200,
-    })(req, res, next);
+    })(req, res, (err) => {
+      if (err) return next(err);
+      // cors ends allowed preflights itself, but calls next() for a denied
+      // origin. End those too, without CORS grants or downstream execution.
+      if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+      }
+      next();
+    });
+  };
 
   return handler;
 };

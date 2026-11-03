@@ -153,6 +153,13 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
+    app.use(parseDomains() as RequestHandler);
+    app.use(clientIpMiddleware);
+    app.use(requestIdMiddleware());
+    app.use(requestLogger);
+    // Resolve scoped CORS metadata first. Unknown APIs and metadata failures
+    // must not receive a fallback grant. Preflights stop before auth or uploads.
+    app.use(api);
     app.use(cors(fallbackOrigin));
     app.use('/graphql', graphqlUpload.graphqlUploadExpress({
       maxFileSize: 10 * 1024 * 1024, // 10 MB
@@ -161,11 +168,6 @@ class Server {
 
     // Rewrite Content-Type after graphql-upload so grafserv accepts the request
     app.use('/graphql', multipartBridge);
-    app.use(parseDomains() as RequestHandler);
-    app.use(clientIpMiddleware);
-    app.use(requestIdMiddleware());
-    app.use(requestLogger);
-    app.use(api);
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
