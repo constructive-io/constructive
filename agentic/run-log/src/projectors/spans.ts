@@ -106,6 +106,12 @@ const close = (span: Span, seq: number, at: string): void => {
   if (duration !== undefined) span.durationMs = duration;
 };
 
+/** A pending or deferred response has not arrived yet, so its turn has not ended. */
+const modelStatus = (stopReason: string | undefined): SpanStatus => {
+  if (stopReason === 'pending' || stopReason === 'deferred') return 'open';
+  return stopReason === 'error' ? 'error' : 'ok';
+};
+
 const detailsOf = (value: unknown): Record<string, unknown> =>
   typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
 
@@ -150,10 +156,8 @@ export function projectSpans(
           // no previous entry the interval is unknown and the span is a point.
           startedAt: previous ?? at,
           startSeq: seq,
-          endSeq: seq,
-          endedAt: at,
           timing: 'bounded',
-          status: event.stopReason === 'error' ? 'error' : 'ok',
+          status: modelStatus(event.stopReason),
           ...(event.model ? { model: event.model } : {}),
           ...(event.provider ? { provider: event.provider } : {}),
           ...(event.responseId ? { responseId: event.responseId } : {}),
@@ -161,8 +165,7 @@ export function projectSpans(
           ...(event.usage ? { usage: event.usage } : {}),
           ...(event.errorMessage ? { errorMessage: event.errorMessage } : {})
         };
-        const duration = ms(span.startedAt, at);
-        if (duration !== undefined) span.durationMs = duration;
+        if (span.status !== 'open') close(span, seq, at);
         modelSpan = span;
         spans.push(span);
         continue;

@@ -22,7 +22,7 @@ import {
   transcriptReaders,
   wrapEntry
 } from '../src';
-import { assistantToolCall, header, resetIds, toolResult, usage } from './fixtures';
+import { assistantText, assistantToolCall, header, resetIds, systemMessage, toolResult, usage } from './fixtures';
 
 beforeEach(resetIds);
 
@@ -242,6 +242,16 @@ describe('the pi reader', () => {
     expect(events.map((event) => event.kind)).toEqual(['model-response', 'tool-call']);
     expect(events[0]).toMatchObject({ kind: 'model-response', provider: 'anthropic', stopReason: 'toolUse' });
     expect(events[1]).toMatchObject({ kind: 'tool-call', toolCallId: 'c1', name: 'run_codegen' });
+  });
+
+  it('reads a system message as no event, so the prompt never reaches a projection', () => {
+    expect(piTranscriptReader.toEvents(systemMessage())).toEqual([]);
+    expect(piTranscriptReader.toEvents(systemMessage(2, { sections: { skills: null }, toolsRemoved: [{ name: 'read' }] }))).toEqual([]);
+  });
+
+  it.each(['pending', 'deferred'] as const)('carries the %s stop reason into the model response', (stopReason) => {
+    const [event] = piTranscriptReader.toEvents(assistantText('later', 2, { stopReason }));
+    expect(event).toMatchObject({ kind: 'model-response', stopReason });
   });
 
   it('carries tool result usage into the neutral event', () => {

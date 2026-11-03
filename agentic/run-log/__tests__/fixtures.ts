@@ -34,6 +34,22 @@ export const header = (over: Partial<PiSessionHeader> = {}): PiSessionEntry => (
 const entry = (type: string, rest: Record<string, unknown>, seq: number): PiSessionEntry =>
   ({ type, id: nextId(), parentId: null, timestamp: at(seq), ...rest }) as PiSessionEntry;
 
+export const systemMessage = (seq = 1, over: Record<string, unknown> = {}): PiSessionEntry =>
+  entry(
+    'message',
+    {
+      message: {
+        role: 'system',
+        content: '',
+        sections: { preamble: 'You are an expert coding assistant.' },
+        toolsAdded: [{ name: 'read', description: 'Read a file', parameters: {} }],
+        timestamp: seq,
+        ...over
+      }
+    },
+    seq
+  );
+
 export const userMessage = (text: string, seq = 1): PiSessionEntry =>
   entry('message', { message: { role: 'user', content: text, timestamp: seq } }, seq);
 
