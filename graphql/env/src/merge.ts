@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge';
 
 import { getGraphQLEnvVars } from './env';
 import { normalizeGrafastCacheLimits } from './grafast-cache-limits';
-import { validateGraphileCacheOptions } from './validation';
+import { validateGraphileOptions } from './validation';
 
 const FIVE_MINUTES_MS = 1000 * 60 * 5;
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;
@@ -104,7 +104,7 @@ export const getEnvOptions = (
     options.graphile = { ...options.graphile, grafastCache };
   }
   resolveGraphileCacheDefaults(options, env);
-  validateGraphileCacheOptions(options);
+  validateGraphileOptions(options);
   return options;
 };
 

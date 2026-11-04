@@ -26,6 +26,12 @@ export {
   // Cache instance and entry type
   graphileCache,
   GraphileCacheBudgetError,
+  graphileBuildFlights,
+  reopenGraphileBuilds,
+  configureGraphileBuilds,
+  beginGraphileBuildShutdown,
+  closeGraphileBuilds,
+  getGraphileBuildStats,
   GraphileCacheEntry,
   GraphileCacheConfiguration,
   MIN_ENTRY_HEAP_BYTES,
@@ -48,3 +54,7 @@ export type { GraphileAdmissionOptions } from './admission';
 
 // Generic module config cache for plugin lookups
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';
+
+export type { GraphileBuildFlightScope, GraphileBuildScopeMetadata } from './build-flights';
+
+export type { GraphileBuildOptions } from './build-coordinator';

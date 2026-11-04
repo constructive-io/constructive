@@ -92,6 +92,44 @@ process-heap admission check, not an exact per-instance memory measurement or an
 RSS limit; garbage collection may delay admission after eviction. Raw
 `graphileCache.set` is a low-level API and does not reserve capacity.
 
+### Exact-key build flights
+
+Server and Explorer use the shared `graphileBuildFlights.getOrCreate` owner.
+It registers a flight synchronously, shares its promise for an exact build key,
+and publishes through resident admission only after readiness. A failed flight
+is shared with its current callers; a later request may start a new attempt.
+There is no implicit retry by joined callers.
+
+Preparation scopes fence asynchronous metadata lookup before the exact key is
+known. Service/database/pool invalidation, key deletion, and cache clear fence
+old work before removing residents. Late results are disposed instead of
+published, and cannot erase a replacement flight. Closing caches rejects callers
+promptly while draining the underlying work and its cleanup before pool close.
+`reopenGraphileBuilds` only reopens a fully drained registry.
+
+### Global build coordination
+
+Every unique admitted build runs through one process-wide coordinator. It uses
+one active permit and a bounded FIFO queue (default 16); same-key callers join
+the existing flight without consuming another queue slot. The permit covers
+capacity admission and eviction waits, preset allocation, readiness, publication,
+and failed-generation cleanup. Overflow refuses work before admission.
+
+`graphile.build` / `configureGraphileBuilds` configure `queueMax`, `watchdogMs`
+(default 300000), and `shutdownTimeoutMs` (default 30000). Corresponding environment
+variables are `GRAPHILE_BUILD_QUEUE_MAX`, `GRAPHILE_BUILD_WATCHDOG_MS`, and
+`GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS`. Multiple owners retain the strictest limits;
+active work cannot have its watchdog policy changed.
+
+The watchdog fences publication before rejecting active and queued callers. It
+cannot cancel JavaScript work: the permit and any reservation remain owned until
+the actual task and cleanup settle. Watchdog, drain timeout, or failed cleanup
+permanently makes the coordinator unavailable; process restart is required.
+`closeGraphileBuilds` returns false if its single deadline expires, and
+`closeAllCaches` throws without closing pools in that case. Server cache shutdown
+fences builds before waiting for HTTP requests that may be awaiting those builds.
+This is build drain; full request and WebSocket retirement is a separate concern.
+
 ### Basic Usage
 
 ```typescript

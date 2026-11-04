@@ -7,7 +7,13 @@
  */
 
 import type { GraphileOptions } from '@constructive-io/graphql-types';
-import { clearGraphileCache, graphileCache } from 'graphile-cache';
+import {
+  beginGraphileBuildShutdown,
+  clearGraphileCache,
+  configureGraphileBuilds,
+  graphileCache,
+  reopenGraphileBuilds
+} from 'graphile-cache';
 import path from 'path';
 import type supertest from 'supertest';
 
@@ -381,6 +387,26 @@ describe('Graphile build and cache over the real scoped HTTP server', () => {
     );
     expect(response.status).toBe(200);
     expect(control.buildCount()).toBe(0);
+
+    beginGraphileBuildShutdown();
+    const closedResponse = await postGraphQL();
+    expect(closedResponse.status).toBe(503);
+    expect(closedResponse.body).toEqual({
+      errors: [{
+        message: 'Schema builds are closed.',
+        extensions: {
+          code: 'SCHEMA_BUILDS_CLOSED',
+          class: 'internal',
+          http: 503
+        }
+      }]
+    });
+    expect(control.buildCount()).toBe(0);
+
+    // Restore the process-wide coordinator before this server is torn down;
+    // the next server owner also configures the coordinator during startup.
+    reopenGraphileBuilds();
+    configureGraphileBuilds();
   });
 
   it('keeps flush closed when no token is configured', async () => {

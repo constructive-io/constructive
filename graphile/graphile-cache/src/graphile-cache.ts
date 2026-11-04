@@ -13,6 +13,10 @@ import type { PostGraphileInstance } from 'postgraphile';
 
 import { GraphileAdmission, type GraphileAdmissionOptions, type GraphileAdmissionReservation } from './admission';
 
+import { buildAdmittedGraphileInstance } from './admitted-build';
+import { GraphileBuildFlights } from './build-flights';
+import { graphileBuildCoordinator, type GraphileBuildOptions } from './build-coordinator';
+
 const log = new Logger('graphile-cache');
 
 // --- Time Constants ---
@@ -172,7 +176,7 @@ const scheduleDisposal = (
   disposalRecords.set(sequence, pending);
   void pending
     .then(() => { disposalRecords.delete(sequence); }, (error) => {
-      admission.fail(error);
+      markGraphileCapacityUnavailable(error);
       log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
@@ -222,9 +226,20 @@ const getEvictionReason = (key: string, reason: LRUCache.DisposeReason): Evictio
 // Get initial cache configuration
 const initialConfig = getCacheConfig();
 
-// LRU's constructor max is immutable. Keep one dynamically sized LRU store
-// and enforce the owner's finite count on every insertion instead.
+// Fence pending work even when callers use the existing low-level delete/clear API.
+let activeBuildFlights: GraphileBuildFlights | undefined;
 class GraphileResidentCache extends LRUCache<string, GraphileCacheEntry> {
+  override delete(key: string): boolean {
+    activeBuildFlights?.invalidate((metadata) => metadata.cacheKey === key);
+    return super.delete(key);
+  }
+
+  override clear(): void {
+    activeBuildFlights?.invalidateAll();
+    super.clear();
+  }
+
+  // LRU's constructor max is immutable; enforce the owner's finite count here.
   override set(
     key: string,
     value: GraphileCacheEntry,
@@ -328,7 +343,51 @@ export const configureGraphileAdmission = (options: GraphileCacheConfiguration =
   cacheConfigured = true;
 };
 export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
-export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
+// Rejected cleanup can finish bookkeeping without releasing resources. Keep
+// both owners fenced until process restart, even after pending work reaches zero.
+export const markGraphileCapacityUnavailable = (error: unknown): void => {
+  admission.fail(error);
+  graphileBuildCoordinator.fail();
+};
+
+/** Shared by all cached Server and Explorer producers in this process. */
+export const graphileBuildFlights = new GraphileBuildFlights({
+  assertCanBuild: () => graphileBuildCoordinator.assertAccepting(),
+  get: (key) => graphileCache.get(key),
+  // Delay binding to avoid a circular initialization dependency with the owner.
+  build: (metadata, create, assertCurrent) =>
+    buildAdmittedGraphileInstance(metadata, create, assertCurrent)
+});
+activeBuildFlights = graphileBuildFlights;
+
+/** Reopening cannot abandon a prior generation's work or preparation. */
+export const reopenGraphileBuilds = (): void => {
+  if (graphileBuildCoordinator.stats.state === 'stuck') throw errors.SCHEMA_BUILD_STUCK();
+  if (graphileBuildCoordinator.stats.state === 'closed' &&
+      (graphileBuildCoordinator.stats.active > 0 || graphileBuildFlights.activeTaskCount > 0 || graphileBuildFlights.activeScopeCount > 0)) {
+    throw errors.SCHEMA_BUILDS_CLOSED();
+  }
+  if (!graphileBuildCoordinator.reopen() || !graphileBuildFlights.reopen()) throw errors.SCHEMA_BUILDS_CLOSED();
+};
+
+export const configureGraphileBuilds = (options?: GraphileBuildOptions): void => {
+  graphileBuildCoordinator.configure(options);
+  reopenGraphileBuilds();
+};
+
+/** Fence builds before waiting for HTTP requests that may be awaiting them. */
+export const beginGraphileBuildShutdown = (): void => {
+  graphileBuildFlights.close();
+  graphileBuildCoordinator.close();
+};
+
+/** One deadline covers flights, actual builds, reservations, and build cleanup. */
+export const closeGraphileBuilds = async (timeoutMs?: number): Promise<boolean> => {
+  beginGraphileBuildShutdown();
+  return graphileBuildCoordinator.closeAndDrain(timeoutMs, graphileBuildFlights.drain());
+};
+
+export const getGraphileBuildStats = () => graphileBuildCoordinator.stats;
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -373,10 +432,15 @@ export function getCacheStats(): CacheStats {
  * @returns Number of entries cleared
  */
 export function clearMatchingEntries(pattern: RegExp): number {
+  const matches = (key: string): boolean => {
+    pattern.lastIndex = 0;
+    return pattern.test(key);
+  };
+  graphileBuildFlights.invalidate((metadata) => metadata.cacheKey !== undefined && matches(metadata.cacheKey));
   let cleared = 0;
 
   for (const key of graphileCache.keys()) {
-    if (pattern.test(key)) {
+    if (matches(key)) {
       // Mark as manual eviction before deleting
       manualEvictionKeys.add(key);
       graphileCache.delete(key);
@@ -401,16 +465,21 @@ const clearEntries = (matches: (key: string, entry: GraphileCacheEntry) => boole
 /** Clear all cached build variants owned by one logical service. */
 export const clearGraphileEntriesForService = (serviceKey: string): number => {
   if (typeof serviceKey !== 'string' || serviceKey.length === 0) return 0;
+  graphileBuildFlights.invalidate((metadata) => metadata.serviceKey === serviceKey);
   return clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
 };
 
 /** Clear all cached build variants for one resolved database identifier. */
-export const clearGraphileEntriesForDatabase = (databaseId: string): number =>
-  clearEntries((_key, entry) => entry.databaseId === databaseId);
+export const clearGraphileEntriesForDatabase = (databaseId: string): number => {
+  graphileBuildFlights.invalidate((metadata) => metadata.databaseId === databaseId);
+  return clearEntries((_key, entry) => entry.databaseId === databaseId);
+};
 
 /** Clear all cached build variants backed by one pg-cache pool key. */
-export const clearGraphileEntriesForPool = (poolKey: string): number =>
-  clearEntries((_key, entry) => entry.poolKey === poolKey);
+export const clearGraphileEntriesForPool = (poolKey: string): number => {
+  graphileBuildFlights.invalidate((metadata) => metadata.poolKey === poolKey);
+  return clearEntries((_key, entry) => entry.poolKey === poolKey);
+};
 
 
 // Register cleanup callback with pgCache
@@ -431,6 +500,8 @@ export const clearGraphileCache = async (): Promise<void> => {
   }
   graphileCache.clear();
   try {
+    await graphileBuildFlights.drain();
+    await graphileBuildCoordinator.drain();
     await waitForActiveDisposals();
   } finally {
     manualEvictionKeys.clear();
@@ -455,6 +526,7 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
+      if (!await closeGraphileBuilds()) throw errors.SCHEMA_BUILD_DRAIN_TIMEOUT();
       const failures: unknown[] = [];
       try {
         await clearGraphileCache();

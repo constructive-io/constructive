@@ -4,20 +4,24 @@ const mockCreateGraphileInstance = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
 const mockCreateGrafastCacheLimitsPreset = jest.fn();
 
-jest.mock('graphile-cache', () => ({
-  ...jest.requireActual('graphile-cache'),
-  configureGraphileAdmission: jest.fn(),
-  buildAdmittedGraphileInstance: async (metadata: { cacheKey: string }, create: () => Promise<unknown>) => {
-    const entry = await create();
-    await mockCacheGraphileInstance(metadata.cacheKey, entry);
-    return entry;
-  },
-  cacheGraphileInstance: mockCacheGraphileInstance,
-  createGraphileInstance: mockCreateGraphileInstance,
-  graphileCache: {
-    get: mockCacheGet
-  }
-}));
+jest.mock('graphile-cache', () => {
+  const actual = jest.requireActual('graphile-cache');
+  const Flights = actual.graphileBuildFlights.constructor;
+  return {
+    ...actual,
+    configureGraphileAdmission: jest.fn(),
+    configureGraphileBuilds: jest.fn(),
+    graphileBuildFlights: new Flights({
+      get: mockCacheGet,
+      build: async (metadata: { cacheKey: string }, create: () => Promise<unknown>) => {
+        const entry = await create();
+        await mockCacheGraphileInstance(metadata.cacheKey, entry);
+        return entry;
+      }
+    }),
+    createGraphileInstance: mockCreateGraphileInstance
+  };
+});
 
 jest.mock('graphile-settings', () => ({
   createConstructivePreset: jest.fn(() => ({})),

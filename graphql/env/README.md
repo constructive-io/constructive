@@ -60,6 +60,17 @@ configuration file, environment variables, then runtime options. Explicit
 cache environment values must be positive safe integers (except the
 nonnegative build reserve); malformed values fail option resolution.
 
+Graphile schema build coordination can also be configured through:
+
+- `GRAPHILE_BUILD_QUEUE_MAX` - Nonnegative safe integer maximum queue size
+- `GRAPHILE_BUILD_WATCHDOG_MS` - Positive timeout in milliseconds, at most `2147483647`
+- `GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS` - Positive shutdown wait in milliseconds, at most `2147483647`
+
+These map to `graphile.build.queueMax`, `graphile.build.watchdogMs`, and
+`graphile.build.shutdownTimeoutMs`. Unset variables preserve `pgpm.json` and
+runtime options. Defaults are applied by the Graphile runtime: queue size `16`,
+watchdog `300000` ms, and shutdown timeout `30000` ms.
+
 The server always uses schema-scoped introspection for its `main` PostgreSQL
 service: each handler introspects only its API's schemas and their dependency
 closure. There is no switch back to stock introspection (`main: false` is
