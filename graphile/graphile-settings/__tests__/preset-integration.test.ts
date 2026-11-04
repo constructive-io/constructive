@@ -967,7 +967,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
 
               # 6. pgvector similarity (PgVectorPlugin)
               #    WHERE vector_embedding <=> '[0,1,0]' < 2.0
-              vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
+              vectorEmbedding: { vector: [0, 1, 0], metric: COSINE, distance: 2.0 }
 
               # 7. PostGIS spatial (PostGISFilterPlugin)
               #    WHERE ST_Intersects(geom, $bbox::geometry)
