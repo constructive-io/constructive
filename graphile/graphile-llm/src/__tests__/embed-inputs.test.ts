@@ -8,9 +8,11 @@ import { createUnifiedSearchPlugin } from 'graphile-search/plugin';
 import type { GraphQLResponse } from 'graphile-test';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLSchema } from 'graphql';
+import * as graphql from 'graphql';
 import { parse, validate } from 'graphql';
 import type { PgTestClient } from 'pgsql-test';
 
+import { createEmbedIndex, embedField } from '../../src/embed-inputs';
 import { llmConfigStore } from '../../src/embedder';
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
@@ -418,5 +420,38 @@ describe('plan-time embedding without an embedder', () => {
     const result = await h.query(CREATE_FROM_TEXT, { name: 'unconfigured.txt', t: 'rent' });
 
     expect(result.errors?.[0]?.message).toMatch(/EMBED_NOT_CONFIGURED: Cannot embed embeddingText/);
+  });
+});
+
+describe('embeddable-input reachability', () => {
+  // Relation filters are cyclic: a filter type reaches another that reaches it
+  // back, and the tagged field may sit behind either one.
+  function cyclicFilters() {
+    const { GraphQLInputObjectType, GraphQLString } = graphql;
+    const tagged = new GraphQLInputObjectType({
+      name: 'TaggedFilter',
+      fields: { text: embedField({ kind: 'unified', onQuotaExceeded: 'degrade' }, { type: GraphQLString }) }
+    });
+    const parent: any = new GraphQLInputObjectType({
+      name: 'ParentFilter',
+      fields: () => ({ child: { type: child }, tagged: { type: tagged } })
+    });
+    const child: any = new GraphQLInputObjectType({
+      name: 'ChildFilter',
+      fields: () => ({ parent: { type: parent } })
+    });
+    return { parent, child };
+  }
+
+  it('finds the tagged field from every type in the cycle, whichever is asked first', () => {
+    const parentFirst = createEmbedIndex(graphql);
+    const a = cyclicFilters();
+    expect(parentFirst.reaches(a.parent)).toBe(true);
+    expect(parentFirst.reaches(a.child)).toBe(true);
+
+    const childFirst = createEmbedIndex(graphql);
+    const b = cyclicFilters();
+    expect(childFirst.reaches(b.child)).toBe(true);
+    expect(childFirst.reaches(b.parent)).toBe(true);
   });
 });

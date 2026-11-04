@@ -77,7 +77,9 @@ export function createLlmTextSearchPlugin(
           return build.extend(
             {
               ...fields,
-              vector: { ...fields.vector, type: getNullableType(fields.vector.type) as any }
+              ...(fields.vector && {
+                vector: { ...fields.vector, type: getNullableType(fields.vector.type) as any }
+              })
             },
             {
               text: embedField(

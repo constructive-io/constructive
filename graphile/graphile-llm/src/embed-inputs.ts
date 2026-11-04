@@ -96,17 +96,56 @@ export function createEmbedIndex(graphql: any) {
   const { getNamedType, isInputObjectType, isListType, isNonNullType } = graphql;
   const reachesMemo = new WeakMap<object, boolean>();
 
+  const inputObjectFields = (type: any): any[] => Object.values<any>(type.getFields());
+  const namedInputObject = (field: any): any => {
+    const named = getNamedType(field.type);
+    return isInputObjectType(named) ? named : null;
+  };
+
+  // Filter types are cyclic (AND/OR/NOT, forward and backward relations), so
+  // reachability is a fixed point over everything reachable from `type`; a
+  // depth-first walk that memoizes a provisional answer mid-cycle gets it wrong.
   function reaches(type: GraphQLInputType): boolean {
-    const named = getNamedType(type);
-    if (!isInputObjectType(named)) return false;
-    const memo = reachesMemo.get(named);
-    if (memo !== undefined) return memo;
-    // Provisional false breaks AND/OR/NOT self-references.
-    reachesMemo.set(named, false);
-    const fields = Object.values<any>(named.getFields());
-    const hit = fields.some((f) => f.extensions?.[EMBED_EXT]) || fields.some((f) => reaches(f.type));
-    reachesMemo.set(named, hit);
-    return hit;
+    const start = getNamedType(type);
+    if (!isInputObjectType(start)) return false;
+    const known = reachesMemo.get(start);
+    if (known !== undefined) return known;
+
+    const pending: any[] = [];
+    const stack: any[] = [start];
+    const seen = new Set<any>();
+    while (stack.length > 0) {
+      const node = stack.pop();
+      if (seen.has(node) || reachesMemo.has(node)) continue;
+      seen.add(node);
+      pending.push(node);
+      for (const field of inputObjectFields(node)) {
+        const child = namedInputObject(field);
+        if (child) stack.push(child);
+      }
+    }
+
+    const hit = new Set<any>(
+      pending.filter((node) => inputObjectFields(node).some((f) => f.extensions?.[EMBED_EXT]))
+    );
+    const isHit = (node: any) => hit.has(node) || reachesMemo.get(node) === true;
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const node of pending) {
+        if (hit.has(node)) continue;
+        if (inputObjectFields(node).some((f) => {
+          const child = namedInputObject(f);
+          return child !== null && isHit(child);
+        })) {
+          hit.add(node);
+          changed = true;
+        }
+      }
+    }
+
+    for (const node of pending) reachesMemo.set(node, hit.has(node));
+    return reachesMemo.get(start);
   }
 
   async function applyRule(
@@ -246,12 +285,13 @@ function withEmbeddedArgs(
     // `$arg` getters, getBaked), so shadowing it here reaches every consumer.
     fieldArgs.getRaw = function getRawEmbedded(path?: string | ReadonlyArray<string | number>) {
       if (path === undefined) {
-        return object(Object.fromEntries(argNames.map((n) => [n, rootStep(n)]))) as any;
+        const steps = Object.fromEntries(argNames.map((n) => [n, rootStep(n)]));
+        return steps[argNames[0]].withLayerPlan(() => object(steps)) as any;
       }
       const [argName, ...rest] = typeof path === 'string' ? [path] : path;
       if (!embeddable.has(argName as string)) return originalGetRaw.call(fieldArgs, path);
       const $root = rootStep(argName as string);
-      return (rest.length === 0 ? $root : access($root, rest)) as any;
+      return (rest.length === 0 ? $root : $root.withLayerPlan(() => access($root, rest))) as any;
     } as typeof fieldArgs.getRaw;
 
     return originalPlan(parent, fieldArgs, info);
