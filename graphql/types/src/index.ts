@@ -5,6 +5,7 @@ export {
   GrafastCacheLimits,
   graphileDefaults,
   graphileFeatureDefaults,
+  GraphileCacheOptions,
   GraphileFeatureOptions,
   GraphileOptions,
   PgScopedIntrospectionConfig,

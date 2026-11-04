@@ -583,6 +583,9 @@ importers:
       12factor-env:
         specifier: workspace:^
         version: link:../../packages/12factor-env/dist
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -1911,6 +1914,12 @@ importers:
 
   graphql/explorer:
     dependencies:
+      '@constructive-io/errors':
+        specifier: workspace:^
+        version: link:../../packages/errors/dist
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist

@@ -1,6 +1,7 @@
 import { getHeapStatistics } from 'node:v8';
 
 import { Logger } from '@pgpmjs/logger';
+import { errors } from '@constructive-io/errors';
 import { parseEnvNumber } from '12factor-env';
 import { EventEmitter } from 'events';
 import type { Express } from 'express';
@@ -9,6 +10,8 @@ import type { Server as HttpServer } from 'http';
 import { LRUCache } from 'lru-cache';
 import { pgCache } from 'pg-cache';
 import type { PostGraphileInstance } from 'postgraphile';
+
+import { GraphileAdmission, type GraphileAdmissionOptions, type GraphileAdmissionReservation } from './admission';
 
 const log = new Logger('graphile-cache');
 
@@ -48,39 +51,21 @@ export interface CacheConfig {
   maxHeapBytes: number;
 }
 
-/** Floor for an entry's measured heap so a GC during its build cannot make it free. */
+// Environment parsing and deployment defaults belong to graphql-env. Direct
+// consumers receive a finite fallback until the first owner configures it.
 export const MIN_ENTRY_HEAP_BYTES = 1024 * 1024;
 
-const defaultMaxHeapBytes = (): number =>
-  Math.floor(getHeapStatistics().heap_size_limit / 2);
-
-/**
- * Get cache configuration from environment variables
- *
- * Supports:
- * - GRAPHILE_CACHE_MAX: Maximum number of entries (default: 50)
- * - GRAPHILE_CACHE_MAX_HEAP_BYTES: Total measured heap the cached handlers may
- *   retain (default: half of V8's heap limit, so the cache cannot fill the heap)
- * - GRAPHILE_CACHE_TTL_MS: TTL in milliseconds
- *   - Production default: ONE_YEAR
- *   - Development default: FIVE_MINUTES_MS
- *
- * NOTE: This value should be <= PG_CACHE_MAX (also default: 50) so that
- * every cached PostGraphile instance has a live pool backing it.
- */
+// Preserve the measured resident-heap limit already supported by main.
+const maxHeapBytes = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX_HEAP_BYTES)
+  ?? Math.floor(getHeapStatistics().heap_size_limit / 2);
+let cacheConfig: CacheConfig = { max: 50, ttl: ONE_YEAR, maxHeapBytes };
+let cacheConfigured = false;
 export function getCacheConfig(): CacheConfig {
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  return { ...cacheConfig };
+}
 
-  const max = parseEnvNumber(process.env.GRAPHILE_CACHE_MAX) ?? 50;
-
-  const ttl =
-    parseEnvNumber(process.env.GRAPHILE_CACHE_TTL_MS) ??
-    (isDevelopment ? FIVE_MINUTES_MS : ONE_YEAR);
-
-  const maxHeapBytes =
-    parseEnvNumber(process.env.GRAPHILE_CACHE_MAX_HEAP_BYTES) ?? defaultMaxHeapBytes();
-
-  return { max, ttl, maxHeapBytes };
+export interface GraphileCacheConfiguration extends GraphileAdmissionOptions {
+  ttl?: number;
 }
 
 /**
@@ -103,6 +88,12 @@ export interface GraphileCacheEntry {
   cacheKey: string;
   createdAt: number;
   heapBytes: number;
+  /** Logical service that owns this build (for example an API key or explorer route). */
+  serviceKey?: string;
+  /** Resolved database identifier, when the serving surface has one. */
+  databaseId?: string | null;
+  /** pg-cache's physical pool key (currently the resolved database name). */
+  poolKey?: string;
   /** Idempotent release for pgServices owned by this exact preset generation. */
   releasePresetServices?: () => Promise<void>;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
@@ -180,8 +171,8 @@ const scheduleDisposal = (
   const sequence = ++disposalSequence;
   disposalRecords.set(sequence, pending);
   void pending
-    .then(() => { disposalRecords.delete(sequence); }, () => {
-      // The original rejection remains observable through the owner APIs.
+    .then(() => { disposalRecords.delete(sequence); }, (error) => {
+      admission.fail(error);
       log.error('Graphile resource cleanup failed', { generation: sequence });
     })
     .finally(() => activeDisposals.delete(pending));
@@ -219,42 +210,53 @@ export const waitForActiveDisposals = async (): Promise<void> => {
 /**
  * Determine the eviction reason for a cache entry
  */
-const getEvictionReason = (key: string, entry: GraphileCacheEntry): EvictionReason => {
+const getEvictionReason = (key: string, reason: LRUCache.DisposeReason): EvictionReason => {
   if (manualEvictionKeys.has(key)) {
     manualEvictionKeys.delete(key);
     return 'manual';
   }
 
-  // Check if TTL expired
-  const age = Date.now() - entry.createdAt;
-  const config = getCacheConfig();
-  if (age >= config.ttl) {
-    return 'ttl';
-  }
-
-  return 'lru';
+  return reason === 'expire' ? 'ttl' : 'lru';
 };
 
 // Get initial cache configuration
 const initialConfig = getCacheConfig();
 
+// LRU's constructor max is immutable. Keep one dynamically sized LRU store
+// and enforce the owner's finite count on every insertion instead.
+class GraphileResidentCache extends LRUCache<string, GraphileCacheEntry> {
+  override set(
+    key: string,
+    value: GraphileCacheEntry,
+    options?: LRUCache.SetOptions<string, GraphileCacheEntry, unknown>
+  ): this {
+    this.purgeStale();
+    if (!this.has(key)) {
+      while (this.size >= cacheConfig.max) this.pop();
+    }
+    return super.set(key, value, options);
+  }
+}
+
 // --- Graphile Cache ---
-export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
-  max: initialConfig.max,
-  ttl: initialConfig.ttl,
+export const graphileCache = new GraphileResidentCache({
+  max: 0,
   maxSize: initialConfig.maxHeapBytes,
   sizeCalculation: (entry) => entry.heapBytes,
+  ttlAutopurge: false,
+  ttl: initialConfig.ttl,
   updateAgeOnGet: true,
-  dispose: (entry, key) => {
+  dispose: (entry, key, disposalReason) => {
     // Determine eviction reason before disposal
-    const reason = getEvictionReason(key, entry);
+    const reason = getEvictionReason(key, disposalReason);
+
+    // Teardown must be scheduled even if an eviction listener throws.
+    scheduleDisposal(entry, key);
 
     // Emit eviction event
     cacheEvents.emitEviction({ key, reason, entry });
 
     log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
-
-    scheduleDisposal(entry, key);
   }
 });
 
@@ -286,6 +288,47 @@ export async function cacheGraphileInstance(
   }
   graphileCache.set(key, entry);
 }
+const admission = new GraphileAdmission({
+  occupied: () => {
+    graphileCache.purgeStale();
+    return graphileCache.size + activeDisposals.size;
+  },
+  evict: async () => {
+    const entry = graphileCache.pop();
+    if (entry) {
+      await waitForEntryDisposal(entry);
+      return true;
+    }
+    if (activeDisposals.size > 0) {
+      await waitForActiveDisposals();
+      return true;
+    }
+    return false;
+  }
+}, initialConfig.max);
+
+export const configureGraphileAdmission = (options: GraphileCacheConfiguration = {}): void => {
+  if (Object.values(options).every((value) => value === undefined)) return;
+  if (options.ttl !== undefined && (!Number.isSafeInteger(options.ttl) || options.ttl <= 0)) {
+    throw errors.INTERNAL_FAILURE({ details: 'Invalid schema cache TTL' });
+  }
+  const ttl = cacheConfigured
+    ? Math.min(cacheConfig.ttl, options.ttl ?? cacheConfig.ttl)
+    : options.ttl ?? cacheConfig.ttl;
+  if (ttl !== cacheConfig.ttl && graphileCache.size > 0) {
+    throw errors.INTERNAL_FAILURE({ details: 'Schema cache TTL cannot change while residents exist' });
+  }
+  admission.configure({
+    max: options.max,
+    heapMaxBytes: options.heapMaxBytes,
+    buildReserveBytes: options.buildReserveBytes
+  });
+  cacheConfig = { ...cacheConfig, max: admission.stats.max, ttl };
+  graphileCache.ttl = ttl;
+  cacheConfigured = true;
+};
+export const reserveGraphileCapacity = (): Promise<GraphileAdmissionReservation> => admission.reserve();
+export const markGraphileCapacityUnavailable = (error: unknown): void => admission.fail(error);
 
 // --- Cache Stats ---
 export interface CacheStats {
@@ -295,6 +338,11 @@ export interface CacheStats {
   heapBytes: number;
   maxHeapBytes: number;
   keys: string[];
+  reserved: number;
+  disposing: number;
+  heapMaxBytes: number;
+  buildReserveBytes: number;
+  admissionFailed: boolean;
 }
 
 /**
@@ -304,11 +352,16 @@ export function getCacheStats(): CacheStats {
   const config = getCacheConfig();
   return {
     size: graphileCache.size,
-    max: config.max,
+    max: admission.stats.max,
     ttl: config.ttl,
     heapBytes: graphileCache.calculatedSize,
     maxHeapBytes: graphileCache.maxSize,
-    keys: [...graphileCache.keys()]
+    keys: [...graphileCache.keys()],
+    reserved: admission.stats.reserved,
+    disposing: activeDisposals.size,
+    heapMaxBytes: admission.stats.heapMaxBytes,
+    buildReserveBytes: admission.stats.buildReserveBytes,
+    admissionFailed: admission.stats.failed
   };
 }
 
@@ -334,19 +387,38 @@ export function clearMatchingEntries(pattern: RegExp): number {
   return cleared;
 }
 
+const clearEntries = (matches: (key: string, entry: GraphileCacheEntry) => boolean): number => {
+  let cleared = 0;
+  for (const [key, entry] of graphileCache.entries()) {
+    if (!matches(key, entry)) continue;
+    manualEvictionKeys.add(key);
+    graphileCache.delete(key);
+    cleared++;
+  }
+  return cleared;
+};
+
+/** Clear all cached build variants owned by one logical service. */
+export const clearGraphileEntriesForService = (serviceKey: string): number => {
+  if (typeof serviceKey !== 'string' || serviceKey.length === 0) return 0;
+  return clearEntries((key, entry) => entry.serviceKey === serviceKey || (!entry.serviceKey && key === serviceKey));
+};
+
+/** Clear all cached build variants for one resolved database identifier. */
+export const clearGraphileEntriesForDatabase = (databaseId: string): number =>
+  clearEntries((_key, entry) => entry.databaseId === databaseId);
+
+/** Clear all cached build variants backed by one pg-cache pool key. */
+export const clearGraphileEntriesForPool = (poolKey: string): number =>
+  clearEntries((_key, entry) => entry.poolKey === poolKey);
+
+
 // Register cleanup callback with pgCache
 // When a pg pool is disposed, clean up any graphile instances using it
 const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
   log.debug(`pgPool[${pgPoolKey}] disposed - checking graphile entries`);
-
-  // Remove graphile entries that reference this pool key
-  graphileCache.forEach((entry, k) => {
-    if (entry.cacheKey.includes(pgPoolKey)) {
-      log.debug(`Removing graphileCache[${k}] due to pgPool[${pgPoolKey}] disposal`);
-      manualEvictionKeys.add(k);
-      graphileCache.delete(k);
-    }
-  });
+  const cleared = clearGraphileEntriesForPool(pgPoolKey);
+  if (cleared > 0) log.debug(`Removed ${cleared} graphile entries for pgPool[${pgPoolKey}]`);
 });
 
 // Enhanced close function that handles all caches

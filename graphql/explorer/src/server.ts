@@ -1,9 +1,21 @@
+import { normalizeError } from '@constructive-io/errors';
+import { Logger } from '@pgpmjs/logger';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { cacheGraphileInstance, createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
+import {
+  buildAdmittedGraphileInstance,
+  clearGraphileEntriesForService,
+  configureGraphileAdmission,
+  createGraphileBuildCacheKey,
+  createGraphileInstance,
+  graphileCache,
+  GraphileCacheEntry,
+  referenceGraphileBuildValue,
+  snapshotGraphileBuildValue
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
@@ -12,8 +24,21 @@ import { getPgEnvOptions } from 'pg-env';
 import { printDatabases, printSchemas } from './render';
 import { getGraphilePreset } from './settings';
 
+const log = new Logger('graphql-explorer');
+const respondError = (res: Response, error: unknown): void => {
+  if ((error as { code?: string })?.code === '3D000') {
+    res.status(404).send('Database not found');
+    return;
+  }
+  const failure = normalizeError(error);
+  log.error('Explorer request refused', { code: failure.code });
+  res.status(failure.http).json({ errors: [{ message: failure.message, extensions: failure.toExtensions() }] });
+};
+
 export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
   const opts = getEnvOptions(rawOpts);
+  configureGraphileAdmission(opts.graphile?.cache);
+  const ownerIdentity = {};
 
   const { pg, server } = opts;
 
@@ -21,13 +46,6 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     dbname: string,
     schemaname: string
   ): Promise<GraphileCacheEntry> => {
-    const key = `${dbname}.${schemaname}`;
-
-    const cached = graphileCache.get(key);
-    if (cached) {
-      return cached;
-    }
-
     const pgConfig = getPgEnvOptions({
       ...pg,
       database: dbname,
@@ -37,22 +55,42 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     // properly, preventing leaked connections during database teardown.
     const pool = getPgPool(pgConfig);
 
-    const basePreset = getGraphilePreset(opts);
-    const preset: GraphileConfig.Preset = {
-      ...basePreset,
-      pgServices: [
-        makePgService({ pool, schemas: [schemaname] }),
-      ],
-      grafserv: {
+    const serviceKey = `${dbname}.${schemaname}`;
+    const snapshot = snapshotGraphileBuildValue({
+      ownerIdentity: referenceGraphileBuildValue(ownerIdentity),
+      serviceKey,
+      poolIdentity: referenceGraphileBuildValue(pool),
+      poolKey: pgConfig.database,
+      pgConfig,
+      databaseName: dbname,
+      databaseId: null,
+      apiId: null,
+      schemas: [schemaname],
+      role: pg.user ?? 'postgres',
+      surface: {
         graphqlPath: '/graphql',
         graphiqlPath: '/graphiql',
         graphiql: true,
       },
-    };
+      explain: undefined,
+      enableRealtime: false,
+    });
+    const key = createGraphileBuildCacheKey('explorer', snapshot);
+    const cached = graphileCache.get(key);
+    if (cached) return cached;
 
-    const instance = await createGraphileInstance({ preset, cacheKey: key });
-    await cacheGraphileInstance(key, instance);
-    return instance;
+    return buildAdmittedGraphileInstance(
+      { cacheKey: key, serviceKey, databaseId: null, poolKey: snapshot.poolKey },
+      async () => {
+        const basePreset = getGraphilePreset(opts, snapshot.role);
+        const preset: GraphileConfig.Preset = {
+          ...basePreset,
+          pgServices: [makePgService({ pool, schemas: snapshot.schemas })],
+          grafserv: snapshot.surface,
+        };
+        return createGraphileInstance({ preset, cacheKey: key });
+      }
+    );
   };
 
   const app = express();
@@ -89,12 +127,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         );
         return;
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }
@@ -114,12 +147,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
 
         await pgPool.query('SELECT 1;');
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }
@@ -130,24 +158,18 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
     if (req.urlDomains?.subdomains.length === 2) {
       const [schemaName, dbName] = req.urlDomains.subdomains;
       try {
+        if (req.url === '/flush') {
+          clearGraphileEntriesForService(`${dbName}.${schemaName}`);
+          res.status(200).send('OK');
+          return;
+        }
         const instance = await getGraphileInstanceObj(dbName, schemaName);
         instance.handler(req, res, next);
         return;
       } catch (e: any) {
-        res.status(500).send(e.message);
+        respondError(res, e);
         return;
       }
-    }
-    return next();
-  });
-
-  app.use(async (req: Request, res: Response, next: NextFunction) => {
-    if (req.urlDomains?.subdomains.length === 2 && req.url === '/flush') {
-      const [schemaName, dbName] = req.urlDomains.subdomains;
-      const key = `${dbName}.${schemaName}`;
-      graphileCache.delete(key);
-      res.status(200).send('OK');
-      return;
     }
     return next();
   });
@@ -171,12 +193,7 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
         );
         return;
       } catch (e: any) {
-        if (e.message?.match(/does not exist/)) {
-          res.status(404).send('DB Not found');
-          return;
-        }
-        console.error(e);
-        res.status(500).send('Something happened...');
+        respondError(res, e);
         return;
       }
     }

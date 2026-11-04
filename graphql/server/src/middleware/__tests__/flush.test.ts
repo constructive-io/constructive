@@ -25,6 +25,7 @@ const DATABASE_ID = '00000000-0000-0000-0000-000000000001';
 const makeReq = (url: string, authorization?: string): Request => {
   const req: any = {
     url,
+    constructive: { serviceKey: 'tenant.example.com', databaseId: DATABASE_ID },
     svc_key: 'tenant.example.com',
     databaseId: DATABASE_ID,
     get: (name: string) =>
@@ -54,7 +55,10 @@ describe('createFlushMiddleware', () => {
   let next: NextFunction;
 
   beforeEach(() => {
-    graphileCache.set('tenant.example.com', { cached: true, heapBytes: 1 } as any);
+    graphileCache.set('tenant.example.com', {
+      cacheKey: 'tenant.example.com', serviceKey: 'tenant.example.com', databaseId: DATABASE_ID,
+      createdAt: Date.now(), heapBytes: 1, pgl: { release: async (): Promise<void> => undefined }
+    } as any);
     svcCache.set('tenant.example.com', { cached: true, heapBytes: 1 } as any);
     next = jest.fn();
     clearStorageModuleCache();
