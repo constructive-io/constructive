@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.8...graphile-llm@1.21.9) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of a vector column or its text companion on create/update ([e4d9350](https://github.com/constructive-io/constructive/commit/e4d93504f65ec8d3eaac6cff51149055192b226e))
+
 ## [1.21.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.7...graphile-llm@1.21.8) (2026-11-04)
 
 ### Bug Fixes

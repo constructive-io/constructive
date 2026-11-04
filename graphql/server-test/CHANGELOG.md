@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.36.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.5...graphql-server-test@3.36.6) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of a vector column or its text companion on create/update ([e4d9350](https://github.com/constructive-io/constructive/commit/e4d93504f65ec8d3eaac6cff51149055192b226e))
+
 ## [3.36.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.4...graphql-server-test@3.36.5) (2026-11-04)
 
 ### Bug Fixes

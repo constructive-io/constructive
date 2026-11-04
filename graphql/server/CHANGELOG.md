@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.34.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.34.6...@constructive-io/graphql-server@5.34.7) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [5.34.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.34.5...@constructive-io/graphql-server@5.34.6) (2026-11-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
