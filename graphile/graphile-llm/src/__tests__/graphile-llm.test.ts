@@ -24,7 +24,7 @@ import {
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmRagPlugin } from '../../src/plugins/rag-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
-import { createLlmTextSearchPlugin } from '../../src/plugins/text-search-plugin';
+import { createLlmTextSearchPlugin, embedTextInWhere } from '../../src/plugins/text-search-plugin';
 import type { EmbedderFunction, LlmModuleData } from '../../src/types';
 
 // ─── @agentic-kit/ollama client ─────────────────────────────────────────────
@@ -1078,6 +1078,28 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
 
   beforeEach(async () => { await db.beforeEach(); });
   afterEach(async () => { await db.afterEach(); });
+
+  // ─── embedTextInWhere with real Ollama ──────────────────────────────────
+
+  it('embedTextInWhere transforms unifiedSearch with real 768-dim Ollama vector', async () => {
+    const realEmbedder = async (text: string) => {
+      const result = await embedder(text);
+      return result.embedding;
+    };
+
+    const where: any = { unifiedSearch: 'machine learning algorithms' };
+    await embedTextInWhere(where, realEmbedder, true);
+
+    expect(where.unifiedSearch).toHaveProperty('__text', 'machine learning algorithms');
+    expect(where.unifiedSearch).toHaveProperty('__vector');
+    expect(Array.isArray(where.unifiedSearch.__vector)).toBe(true);
+    expect(where.unifiedSearch.__vector.length).toBe(768);
+
+    for (const v of where.unifiedSearch.__vector) {
+      expect(typeof v).toBe('number');
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  }, 30_000);
 
   // ─── unifiedSearch text embedded server-side ───────────────────────────
 

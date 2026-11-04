@@ -42,6 +42,107 @@ declare global {
 }
 
 /**
+ * Recursively walk a `where` argument object and embed any VectorNearbyInput
+ * values that have `text` instead of `vector`.
+ *
+ * If the embedder returns null (e.g. quota exceeded), the text field is
+ * removed so the pgvector filter is skipped — graceful text-only fallback.
+ *
+ * @deprecated The plugins no longer call this: under Grafast a resolver runs
+ * after the plan's SQL, so embedding there is too late. They embed at plan
+ * time through `embedField` and `planTimeEmbedding` instead.
+ */
+export async function embedTextInWhere(
+  obj: any,
+  embedder: (text: string) => Promise<number[] | null>,
+  hasTextAdapters: boolean,
+  onQuotaExceeded: 'degrade' | 'throw' = 'degrade'
+): Promise<void> {
+  if (!obj || typeof obj !== 'object') return;
+
+  const pending: Promise<void>[] = [];
+
+  for (const key of Object.keys(obj)) {
+    const value = obj[key];
+
+    // Handle unifiedSearch: embed text and transform to { __text, __vector }
+    if (key === 'unifiedSearch' && typeof value === 'string' && value.trim().length > 0) {
+      pending.push((async () => {
+        const startTime = Date.now();
+        const vector = await embedder(value);
+        const latencyMs = Date.now() - startTime;
+
+        if (vector === null) {
+          if (onQuotaExceeded === 'throw' || !hasTextAdapters) {
+            throw new Error(
+              'unifiedSearch: embedding failed (quota exceeded or provider unavailable). ' +
+              (!hasTextAdapters
+                ? 'No text search adapters available for fallback. '
+                : 'onQuotaExceeded is set to \'throw\'. ') +
+              'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for text-only fallback.'
+            );
+          }
+          return;
+        }
+
+        console.log(
+          `[graphile-llm] unifiedSearch embed: dims=${vector.length}, latency=${latencyMs}ms`
+        );
+
+        // Transform to object shape that graphile-search understands
+        obj[key] = { __text: value, __vector: vector };
+      })());
+      continue;
+    }
+
+    if (!value || typeof value !== 'object') continue;
+
+    // Detect VectorNearbyInput shape: has `text` and no `vector`
+    if ('text' in value && typeof value.text === 'string' && !value.vector) {
+      pending.push((async () => {
+        const startTime = Date.now();
+        const vector = await embedder(value.text);
+        const latencyMs = Date.now() - startTime;
+
+        if (vector === null) {
+          if (onQuotaExceeded === 'throw') {
+            throw new Error(
+              'VectorNearbyInput: embedding failed (quota exceeded or provider unavailable). ' +
+              'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for graceful fallback.'
+            );
+          }
+          delete value.text;
+          return;
+        }
+
+        console.log(
+          `[graphile-llm] Search embed: field=${key}, dims=${vector.length}, latency=${latencyMs}ms`
+        );
+
+        // Replace text with vector
+        value.vector = vector;
+        delete value.text;
+      })());
+      continue;
+    }
+
+    // Recurse into nested filter objects (AND, OR, etc.)
+    if (!Array.isArray(value)) {
+      pending.push(embedTextInWhere(value, embedder, hasTextAdapters, onQuotaExceeded));
+    } else {
+      // Handle arrays (e.g. AND: [...], OR: [...])
+      for (const item of value) {
+        pending.push(embedTextInWhere(item, embedder, hasTextAdapters, onQuotaExceeded));
+      }
+    }
+  }
+
+  if (pending.length > 0) {
+    await Promise.all(pending);
+  }
+}
+
+/**
  * Creates the LlmTextSearchPlugin.
  *
  * Hooks into VectorNearbyInput to add a `text` field alongside the
