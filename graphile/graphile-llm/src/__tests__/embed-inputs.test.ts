@@ -36,12 +36,13 @@ const VECTORS: Record<string, number[]> = {
 };
 const vectorFor = (text: string) => VECTORS[text] ?? [1, 1, 1];
 
-type EmbedderShape = 'result' | 'array' | 'null';
+type EmbedderShape = 'result' | 'array' | 'null' | 'empty';
 let shape: EmbedderShape = 'result';
 const calls: Array<{ text: string; overrides: unknown }> = [];
 
 // `result` is the provider shape ({ embedding }), `array` is the metering
-// wrapper's shape, `null` is the metering wrapper refusing (quota exceeded).
+// wrapper's shape, `null` is the metering wrapper refusing (quota exceeded),
+// `empty` is a provider answering with no vector.
 function fakeEmbedderPlugin(configured: boolean): GraphileConfig.Plugin {
   return {
     name: 'FakeEmbedderPlugin',
@@ -54,6 +55,7 @@ function fakeEmbedderPlugin(configured: boolean): GraphileConfig.Plugin {
             ? async (text: string) => {
               calls.push({ text, overrides: llmConfigStore.getStore() });
               if (shape === 'null') return null;
+              if (shape === 'empty') return [];
               const embedding = vectorFor(text);
               return shape === 'array' ? embedding : { embedding, promptTokens: 1 };
             }
@@ -378,6 +380,13 @@ describe('plan-time embedding (onQuotaExceeded: throw)', () => {
   });
 
   it('fails a text search when the embedder returns null', async () => {
+    const result = await h.query(BY_TEXT, { t: 'rent' });
+
+    expect(result.errors?.[0]?.message).toMatch(/VectorNearbyInput: embedding failed/);
+  });
+
+  it('fails a text search when the embedder returns an empty vector', async () => {
+    shape = 'empty';
     const result = await h.query(BY_TEXT, { t: 'rent' });
 
     expect(result.errors?.[0]?.message).toMatch(/VectorNearbyInput: embedding failed/);

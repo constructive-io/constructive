@@ -45,9 +45,8 @@ export function toVectorEmbedder(raw: unknown): VectorEmbedder | null {
   if (typeof raw !== 'function') return null;
   return async (text) => {
     const result = await raw(text);
-    if (result == null) return null;
-    if (Array.isArray(result)) return result;
-    return Array.isArray(result.embedding) ? result.embedding : null;
+    const vector = Array.isArray(result) ? result : result?.embedding;
+    return Array.isArray(vector) && vector.length > 0 ? vector : null;
   };
 }
 
