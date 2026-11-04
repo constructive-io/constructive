@@ -24,7 +24,7 @@ import {
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmRagPlugin } from '../../src/plugins/rag-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
-import { createLlmTextSearchPlugin, embedTextInWhere } from '../../src/plugins/text-search-plugin';
+import { createLlmTextSearchPlugin } from '../../src/plugins/text-search-plugin';
 import type { EmbedderFunction, LlmModuleData } from '../../src/types';
 
 // ─── @agentic-kit/ollama client ─────────────────────────────────────────────
@@ -937,7 +937,7 @@ describe('GraphileLlmPreset toggles', () => {
 //
 // End-to-end: embeds article text with real Ollama nomic-embed-text (768 dims),
 // seeds the DB, then runs hybrid text+vector queries verifying RRF fusion,
-// semantic relevance, and the embedTextInWhere pipeline.
+// semantic relevance, and server-side embedding of unifiedSearch text.
 //
 // Requires: PostgreSQL with pgvector + Ollama with nomic-embed-text.
 // =============================================================================
@@ -1079,31 +1079,9 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
   beforeEach(async () => { await db.beforeEach(); });
   afterEach(async () => { await db.afterEach(); });
 
-  // ─── embedTextInWhere with real Ollama ──────────────────────────────────
+  // ─── unifiedSearch text embedded server-side ───────────────────────────
 
-  it('embedTextInWhere transforms unifiedSearch with real 768-dim Ollama vector', async () => {
-    const realEmbedder = async (text: string) => {
-      const result = await embedder(text);
-      return result.embedding;
-    };
-
-    const where: any = { unifiedSearch: 'machine learning algorithms' };
-    await embedTextInWhere(where, realEmbedder, true);
-
-    expect(where.unifiedSearch).toHaveProperty('__text', 'machine learning algorithms');
-    expect(where.unifiedSearch).toHaveProperty('__vector');
-    expect(Array.isArray(where.unifiedSearch.__vector)).toBe(true);
-    expect(where.unifiedSearch.__vector.length).toBe(768);
-
-    for (const v of where.unifiedSearch.__vector) {
-      expect(typeof v).toBe('number');
-      expect(Number.isFinite(v)).toBe(true);
-    }
-  }, 30_000);
-
-  // ─── unifiedSearch text-only (no vector injection) ─────────────────────
-
-  it('unifiedSearch text-only uses tsvector without pgvector', async () => {
+  it('unifiedSearch text embeds server-side so tsvector and pgvector both participate', async () => {
     const result = await query<{
       allArticles: { nodes: Array<{ rowId: number; title: string; tsvRank: number | null; embeddingVectorDistance: number | null; searchScore: number }> };
     }>(`
@@ -1118,13 +1096,9 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
     const nodes = result.data?.allArticles?.nodes ?? [];
     expect(nodes.length).toBeGreaterThan(0);
 
-    // tsvector should be active
-    const hasTsv = nodes.some((n) => n.tsvRank !== null);
-    expect(hasTsv).toBe(true);
-
-    // pgvector should NOT participate (no vector injection in graphile-test)
+    expect(nodes.some((n) => n.tsvRank !== null)).toBe(true);
     for (const node of nodes) {
-      expect(node.embeddingVectorDistance).toBeNull();
+      expect(typeof node.embeddingVectorDistance).toBe('number');
     }
   });
 

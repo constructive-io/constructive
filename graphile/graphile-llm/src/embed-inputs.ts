@@ -1,0 +1,291 @@
+/**
+ * Plan-time text-to-vector embedding.
+ *
+ * Under Grafast a field's `resolve()` runs after its plan has executed, so the
+ * SQL has already been built by the time a resolver wrapper could embed text.
+ * Instead, input fields that carry text to embed are tagged with an
+ * `EmbedRule` where they are declared, and `planTimeEmbedding` (run from a
+ * `finalize` hook) wraps the plan of every object field whose arguments can
+ * reach a tagged input field. The wrapper shadows `fieldArgs.getRaw` so every
+ * consumer of those arguments (connection-filter's `where` applyPlan, the
+ * create/update `args.apply`) reads a step that embeds the text first.
+ */
+
+import type { ExecutableStep, FieldArgs } from 'grafast';
+import { access, ConstantStep, context, lambda, object } from 'grafast';
+import type { GraphQLInputType, GraphQLSchema } from 'graphql';
+
+import type { LlmConfigOverrides } from './embedder';
+import { llmConfigStore } from './embedder';
+
+export type QuotaPolicy = 'degrade' | 'throw';
+
+/** Stored on a GraphQL input field's `extensions[EMBED_EXT]`. */
+export type EmbedRule =
+  /** `VectorNearbyInput.text`: embedded into the sibling `into` field. */
+  | { kind: 'nearby'; into: string; onQuotaExceeded: QuotaPolicy }
+  /** `unifiedSearch: String`: becomes `{ __text, __vector }` for graphile-search. */
+  | { kind: 'unified'; onQuotaExceeded: QuotaPolicy }
+  /** `{col}Text` on a create input or patch. `required` means the column is NOT NULL. */
+  | { kind: 'companion'; into: string; required: boolean };
+
+export const EMBED_EXT = 'graphileLlmEmbed';
+
+export type VectorEmbedder = (text: string) => Promise<number[] | null>;
+
+export function embedField<T extends object>(rule: EmbedRule, spec: T): T {
+  return { ...spec, extensions: { ...(spec as { extensions?: object }).extensions, [EMBED_EXT]: rule } };
+}
+
+/**
+ * `build.llmEmbedder` resolves to `{ embedding }` from the providers and to
+ * `number[] | null` once the metering plugin has wrapped it.
+ */
+export function toVectorEmbedder(raw: unknown): VectorEmbedder | null {
+  if (typeof raw !== 'function') return null;
+  return async (text) => {
+    const result = await raw(text);
+    if (result == null) return null;
+    if (Array.isArray(result)) return result;
+    return Array.isArray(result.embedding) ? result.embedding : null;
+  };
+}
+
+function isNonEmptyVector(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
+}
+
+export async function resolveConfigOverrides(
+  graphqlContext: any
+): Promise<LlmConfigOverrides | null> {
+  const ctx = graphqlContext?.constructive;
+  if (!ctx?.useLlm) return null;
+
+  try {
+    const llm = await ctx.useLlm();
+    if (!llm?.embeddingModel) return null;
+
+    return {
+      embeddingModel: llm.embeddingModel,
+      embeddingBaseUrl: llm.embeddingBaseUrl,
+      chatModel: llm.chatModel ?? undefined,
+      chatBaseUrl: llm.chatBaseUrl ?? undefined
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Binds the embedder to one request's per-database model overrides, resolved on first use. */
+function forRequest(embedder: VectorEmbedder | null, graphqlContext: unknown): VectorEmbedder | null {
+  if (!embedder) return null;
+  let overrides: Promise<LlmConfigOverrides | null> | undefined;
+  return async (text) => {
+    overrides ??= resolveConfigOverrides(graphqlContext);
+    const resolved = await overrides;
+    const startTime = Date.now();
+    const vector = await llmConfigStore.run(resolved, () => embedder(text));
+    if (vector) {
+      console.log(`[graphile-llm] embed: dims=${vector.length}, latency=${Date.now() - startTime}ms`);
+    }
+    return vector;
+  };
+}
+
+export function createEmbedIndex(graphql: any) {
+  const { getNamedType, isInputObjectType, isListType, isNonNullType } = graphql;
+  const reachesMemo = new WeakMap<object, boolean>();
+
+  function reaches(type: GraphQLInputType): boolean {
+    const named = getNamedType(type);
+    if (!isInputObjectType(named)) return false;
+    const memo = reachesMemo.get(named);
+    if (memo !== undefined) return memo;
+    // Provisional false breaks AND/OR/NOT self-references.
+    reachesMemo.set(named, false);
+    const fields = Object.values<any>(named.getFields());
+    const hit = fields.some((f) => f.extensions?.[EMBED_EXT]) || fields.some((f) => reaches(f.type));
+    reachesMemo.set(named, hit);
+    return hit;
+  }
+
+  async function applyRule(
+    rule: EmbedRule,
+    fieldName: string,
+    typeName: string,
+    value: Record<string, any>,
+    next: Record<string, any>,
+    embed: VectorEmbedder | null
+  ): Promise<void> {
+    const text = value[fieldName];
+
+    switch (rule.kind) {
+    case 'nearby': {
+      delete next[fieldName];
+      if (isNonEmptyVector(value[rule.into])) return;
+      if (typeof text !== 'string') {
+        throw new Error(`${typeName}: provide either \`${rule.into}\` or \`${fieldName}\`.`);
+      }
+      if (!embed) return;
+      const vector = await embed(text);
+      if (vector) {
+        next[rule.into] = vector;
+      } else if (rule.onQuotaExceeded === 'throw') {
+        throw new Error(
+          `${typeName}: embedding failed (quota exceeded or provider unavailable). ` +
+          'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for graceful fallback.'
+        );
+      }
+      return;
+    }
+
+    case 'unified': {
+      if (typeof text !== 'string' || text.trim().length === 0 || !embed) return;
+      const vector = await embed(text);
+      if (vector) {
+        next[fieldName] = { __text: text, __vector: vector };
+      } else if (rule.onQuotaExceeded === 'throw') {
+        throw new Error(
+          `${fieldName}: embedding failed (quota exceeded or provider unavailable). ` +
+          'onQuotaExceeded is set to \'throw\'. ' +
+          'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for text-only fallback.'
+        );
+      }
+      return;
+    }
+
+    case 'companion': {
+      delete next[fieldName];
+      if (isNonEmptyVector(value[rule.into])) return;
+      if (typeof text !== 'string') {
+        if (rule.required) {
+          throw new Error(`${typeName}: provide either \`${rule.into}\` or \`${fieldName}\`.`);
+        }
+        return;
+      }
+      if (!embed) {
+        throw new Error(
+          `EMBED_NOT_CONFIGURED: Cannot embed ${fieldName} — no embedding provider configured. ` +
+          'Set defaultEmbedder in GraphileLlmPreset options or EMBEDDER_PROVIDER env var.'
+        );
+      }
+      const vector = await embed(text);
+      if (!vector) {
+        throw new Error(
+          `EMBED_QUOTA_EXCEEDED: Cannot embed ${fieldName} — embedding quota exceeded. ` +
+          'Upgrade your plan or wait for the next billing period.'
+        );
+      }
+      next[rule.into] = vector;
+      return;
+    }
+    }
+  }
+
+  /** Returns `value` itself when its type cannot reach a tagged field. */
+  async function embedValue(type: any, value: any, embed: VectorEmbedder | null): Promise<any> {
+    if (value == null) return value;
+    const inner = isNonNullType(type) ? type.ofType : type;
+    if (isListType(inner)) {
+      if (!Array.isArray(value) || !reaches(inner.ofType)) return value;
+      return Promise.all(value.map((item: any) => embedValue(inner.ofType, item, embed)));
+    }
+    if (!isInputObjectType(inner) || !reaches(inner)) return value;
+
+    const next: Record<string, any> = { ...value };
+    const jobs: Promise<void>[] = [];
+    for (const [name, field] of Object.entries<any>(inner.getFields())) {
+      const rule = field.extensions?.[EMBED_EXT] as EmbedRule | undefined;
+      if (rule) {
+        jobs.push(applyRule(rule, name, inner.name, value, next, embed));
+      } else if (value[name] != null && reaches(field.type)) {
+        jobs.push(embedValue(field.type, value[name], embed).then((embedded) => { next[name] = embedded; }));
+      }
+    }
+    await Promise.all(jobs);
+    return next;
+  }
+
+  return { reaches, embedValue };
+}
+
+type EmbedIndex = ReturnType<typeof createEmbedIndex>;
+type FieldPlan = (parent: ExecutableStep, fieldArgs: FieldArgs, info: unknown) => unknown;
+
+function withEmbeddedArgs(
+  originalPlan: FieldPlan,
+  argNames: string[],
+  embeddable: Set<string>,
+  index: EmbedIndex,
+  embedder: VectorEmbedder | null
+): FieldPlan {
+  return function planWithEmbeddedArgs(parent, fieldArgs, info) {
+    const originalGetRaw = fieldArgs.getRaw as (path?: string | ReadonlyArray<string | number>) => ExecutableStep;
+    const roots = new Map<string, ExecutableStep>();
+
+    const rootStep = (argName: string): ExecutableStep => {
+      let $root = roots.get(argName);
+      if ($root) return $root;
+      const $raw = originalGetRaw.call(fieldArgs, argName);
+      const absent = $raw instanceof ConstantStep && $raw.data === undefined;
+      if (absent || !embeddable.has(argName)) {
+        $root = $raw;
+      } else {
+        const type = fieldArgs.typeAt(argName);
+        $root = $raw.withLayerPlan(() =>
+          lambda({ raw: $raw, ctx: context() } as any, ({ raw, ctx }: any) =>
+            index.embedValue(type, raw, forRequest(embedder, ctx))
+          )
+        );
+      }
+      roots.set(argName, $root);
+      return $root;
+    };
+
+    // grafast reads `fieldArgs.getRaw` through the object (apply, processAfter,
+    // `$arg` getters, getBaked), so shadowing it here reaches every consumer.
+    fieldArgs.getRaw = function getRawEmbedded(path?: string | ReadonlyArray<string | number>) {
+      if (path === undefined) {
+        return object(Object.fromEntries(argNames.map((n) => [n, rootStep(n)]))) as any;
+      }
+      const [argName, ...rest] = typeof path === 'string' ? [path] : path;
+      if (!embeddable.has(argName as string)) return originalGetRaw.call(fieldArgs, path);
+      const $root = rootStep(argName as string);
+      return (rest.length === 0 ? $root : access($root, rest)) as any;
+    } as typeof fieldArgs.getRaw;
+
+    return originalPlan(parent, fieldArgs, info);
+  };
+}
+
+const processedSchemas = new WeakSet<GraphQLSchema>();
+
+/**
+ * Wraps the plan of every object field whose arguments reach a tagged input
+ * field. Runs in `finalize` because args are attached after the
+ * `GraphQLObjectType_fields_field` hook. Idempotent per schema, so every plugin
+ * that tags fields can call it without depending on the others being loaded.
+ */
+export function planTimeEmbedding(schema: GraphQLSchema, build: any): GraphQLSchema {
+  if (processedSchemas.has(schema)) return schema;
+  processedSchemas.add(schema);
+
+  const { graphql } = build;
+  const index = createEmbedIndex(graphql);
+  const embedder = toVectorEmbedder(build.llmEmbedder);
+
+  for (const type of Object.values<any>(schema.getTypeMap())) {
+    if (!graphql.isObjectType(type) || type.name.startsWith('__')) continue;
+    for (const field of Object.values<any>(type.getFields())) {
+      const grafastExt = field.extensions?.grafast;
+      if (typeof grafastExt?.plan !== 'function') continue;
+      const embeddable = new Set<string>(
+        field.args.filter((a: any) => index.reaches(a.type)).map((a: any) => a.name)
+      );
+      if (embeddable.size === 0) continue;
+      const argNames = field.args.map((a: any) => a.name);
+      grafastExt.plan = withEmbeddedArgs(grafastExt.plan, argNames, embeddable, index, embedder);
+    }
+  }
+  return schema;
+}
