@@ -9,9 +9,15 @@ export {
   cacheGraphileInstance,
   // Cache stats
   CacheStats,
+  clearGraphileCache,
+  clearGraphileEntriesForDatabase,
+  clearGraphileEntriesForPool,
+  clearGraphileEntriesForService,
   // Clear matching entries
   clearMatchingEntries,
   closeAllCaches,
+  configureGraphileAdmission,
+  disposeUncachedEntry,
   // Eviction tracking
   EvictionReason,
   FIVE_MINUTES_MS,
@@ -20,13 +26,35 @@ export {
   // Cache instance and entry type
   graphileCache,
   GraphileCacheBudgetError,
+  graphileBuildFlights,
+  reopenGraphileBuilds,
+  configureGraphileBuilds,
+  beginGraphileBuildShutdown,
+  closeGraphileBuilds,
+  getGraphileBuildStats,
   GraphileCacheEntry,
+  GraphileCacheConfiguration,
   MIN_ENTRY_HEAP_BYTES,
   // Time constants
-  ONE_HOUR_MS} from './graphile-cache';
+  ONE_HOUR_MS,
+  waitForActiveDisposals,
+  waitForEntryDisposal} from './graphile-cache';
+
+export {
+  createGraphileBuildCacheKey,
+  referenceGraphileBuildValue,
+  snapshotGraphileBuildValue
+} from './build-identity';
+export type { GraphileBuildReference } from './build-identity';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';
+export { buildAdmittedGraphileInstance, type GraphileBuildMetadata } from './admitted-build';
+export type { GraphileAdmissionOptions } from './admission';
 
 // Generic module config cache for plugin lookups
 export { ModuleConfigCache, ModuleConfigCacheOptions } from './module-config-cache';
+
+export type { GraphileBuildFlightScope, GraphileBuildScopeMetadata } from './build-flights';
+
+export type { GraphileBuildOptions } from './build-coordinator';

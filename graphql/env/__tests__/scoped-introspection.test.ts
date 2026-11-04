@@ -114,6 +114,11 @@ describe('scoped introspection configuration precedence', () => {
 
   it('adds no options when neither file nor environment configures them', () => {
     fs.writeFileSync(path.join(directory, 'pgpm.json'), '{}');
-    expect(getEnvOptions({}, directory, {}).graphile).toEqual({ schema: [], extends: [], preset: {} });
+    expect(getEnvOptions({}, directory, {}).graphile).toEqual({
+      schema: [],
+      extends: [],
+      preset: {},
+      cache: { max: 50, ttl: 31622400000 }
+    });
   });
 });

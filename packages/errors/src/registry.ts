@@ -14,6 +14,42 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  SCHEMA_BUILD_STUCK: defineError({
+    code: 'SCHEMA_BUILD_STUCK',
+    class: 'internal',
+    http: 503,
+    message: 'Schema build coordination is unavailable.'
+  }),
+  SCHEMA_BUILD_QUEUE_FULL: defineError({
+    code: 'SCHEMA_BUILD_QUEUE_FULL',
+    class: 'internal',
+    http: 503,
+    message: 'Schema build queue is full.'
+  }),
+  SCHEMA_BUILD_DRAIN_TIMEOUT: defineError({
+    code: 'SCHEMA_BUILD_DRAIN_TIMEOUT',
+    class: 'internal',
+    http: 503,
+    message: 'Schema builds did not finish shutdown cleanup.'
+  }),
+  SCHEMA_BUILD_INVALIDATED: defineError({
+    code: 'SCHEMA_BUILD_INVALIDATED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema build was invalidated.'
+  }),
+  SCHEMA_BUILDS_CLOSED: defineError({
+    code: 'SCHEMA_BUILDS_CLOSED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema builds are closed.'
+  }),
+  SCHEMA_CAPACITY_EXHAUSTED: defineError({
+    code: 'SCHEMA_CAPACITY_EXHAUSTED',
+    class: 'internal',
+    http: 503,
+    message: 'Schema capacity is unavailable.'
+  }),
   STORAGE_BUCKET_NOT_RECONCILED: defineError({
     code: 'STORAGE_BUCKET_NOT_RECONCILED',
     class: 'public',

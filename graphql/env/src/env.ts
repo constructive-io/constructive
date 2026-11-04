@@ -6,6 +6,7 @@ import {
   parseGrafastCacheLimitEnv
 } from './grafast-cache-limits';
 import { getScopedIntrospectionEnv } from './scoped-introspection';
+import { parseGraphileInteger } from './validation';
 
 /**
  * @param env - Environment object to read from (defaults to process.env for backwards compatibility)
@@ -18,6 +19,13 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     GRAPHILE_QUERY_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH,
+    GRAPHILE_CACHE_MAX,
+    GRAPHILE_CACHE_TTL_MS,
+    GRAPHILE_CACHE_HEAP_MAX_BYTES,
+    GRAPHILE_CACHE_BUILD_RESERVE_BYTES,
+    GRAPHILE_BUILD_QUEUE_MAX,
+    GRAPHILE_BUILD_WATCHDOG_MS,
+    GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS,
 
     FEATURES_SIMPLE_INFLECTION,
     FEATURES_OPPOSITE_BASE_NAMES,
@@ -55,6 +63,39 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH
   ].some(value => value !== undefined);
+  const graphileCacheMax = parseGraphileInteger('GRAPHILE_CACHE_MAX', GRAPHILE_CACHE_MAX, 1);
+  const graphileCacheTtlMs = parseGraphileInteger(
+    'GRAPHILE_CACHE_TTL_MS',
+    GRAPHILE_CACHE_TTL_MS,
+    1
+  );
+  const graphileCacheHeapMaxBytes = parseGraphileInteger(
+    'GRAPHILE_CACHE_HEAP_MAX_BYTES',
+    GRAPHILE_CACHE_HEAP_MAX_BYTES,
+    1
+  );
+  const graphileCacheBuildReserveBytes = parseGraphileInteger(
+    'GRAPHILE_CACHE_BUILD_RESERVE_BYTES',
+    GRAPHILE_CACHE_BUILD_RESERVE_BYTES,
+    0
+  );
+  const graphileBuildQueueMax = parseGraphileInteger(
+    'GRAPHILE_BUILD_QUEUE_MAX',
+    GRAPHILE_BUILD_QUEUE_MAX,
+    0
+  );
+  const graphileBuildWatchdogMs = parseGraphileInteger(
+    'GRAPHILE_BUILD_WATCHDOG_MS',
+    GRAPHILE_BUILD_WATCHDOG_MS,
+    1,
+    2_147_483_647
+  );
+  const graphileBuildShutdownTimeoutMs = parseGraphileInteger(
+    'GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS',
+    GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS,
+    1,
+    2_147_483_647
+  );
   const hasSmsEnvOverrides = Boolean(
     SMS_PROVIDER ||
     SMS_SENDER_ID ||
@@ -93,6 +134,32 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
         schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())
           : GRAPHILE_SCHEMA
+      }),
+      ...((graphileCacheMax !== undefined ||
+        graphileCacheTtlMs !== undefined ||
+        graphileCacheHeapMaxBytes !== undefined ||
+        graphileCacheBuildReserveBytes !== undefined) && {
+        cache: {
+          ...(graphileCacheMax !== undefined && { max: graphileCacheMax }),
+          ...(graphileCacheTtlMs !== undefined && { ttl: graphileCacheTtlMs }),
+          ...(graphileCacheHeapMaxBytes !== undefined && {
+            heapMaxBytes: graphileCacheHeapMaxBytes
+          }),
+          ...(graphileCacheBuildReserveBytes !== undefined && {
+            buildReserveBytes: graphileCacheBuildReserveBytes
+          })
+        }
+      }),
+      ...((graphileBuildQueueMax !== undefined ||
+        graphileBuildWatchdogMs !== undefined ||
+        graphileBuildShutdownTimeoutMs !== undefined) && {
+        build: {
+          ...(graphileBuildQueueMax !== undefined && { queueMax: graphileBuildQueueMax }),
+          ...(graphileBuildWatchdogMs !== undefined && { watchdogMs: graphileBuildWatchdogMs }),
+          ...(graphileBuildShutdownTimeoutMs !== undefined && {
+            shutdownTimeoutMs: graphileBuildShutdownTimeoutMs
+          })
+        }
       })
     },
     features: {

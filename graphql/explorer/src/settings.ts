@@ -8,14 +8,17 @@ import { ConstructivePreset } from 'graphile-settings';
  *
  * This returns a v5 preset that can be extended with pgServices.
  */
-export const getGraphilePreset = (rawOpts: ConstructiveOptions): GraphileConfig.Preset => {
-  const opts = getEnvOptions(rawOpts);
+export const getGraphilePreset = (
+  rawOpts: ConstructiveOptions,
+  effectiveRole?: string
+): GraphileConfig.Preset => {
+  const role = effectiveRole ?? getEnvOptions(rawOpts).pg?.user ?? 'postgres';
 
   return {
     extends: [ConstructivePreset],
     grafast: {
       context: () => ({
-        pgSettings: { role: opts.pg?.user ?? 'postgres' },
+        pgSettings: { role },
       }),
     },
   };

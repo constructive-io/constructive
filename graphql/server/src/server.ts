@@ -1,3 +1,4 @@
+import { errors } from '@constructive-io/errors';
 import { createCsrfMiddleware } from '@constructive-io/csrf';
 import type { RefusalRecorder } from '@constructive-io/express-context';
 import { createContextMiddleware, createDefaultRegistry, requestIdMiddleware } from '@constructive-io/express-context';
@@ -9,7 +10,7 @@ import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
-import { closeAllCaches,graphileCache } from 'graphile-cache';
+import { beginGraphileBuildShutdown, clearGraphileCache, closeAllCaches, closeGraphileBuilds } from 'graphile-cache';
 import graphqlUpload from 'graphql-upload';
 import type { Server as HttpServer } from 'http';
 import { Pool, PoolClient } from 'pg';
@@ -226,8 +227,8 @@ class Server {
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
 
-    app.use(graphile(effectiveOpts));
     app.use(createFlushMiddleware(effectiveOpts));
+    app.use(graphile(effectiveOpts));
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)
@@ -365,6 +366,7 @@ class Server {
     }
     this.closed = true;
     this.shuttingDown = true;
+    if (closeCaches) beginGraphileBuildShutdown();
     await this.removeEventListener();
     if (this.refusalRecorder) {
       installRefusalRecorder(null);
@@ -387,12 +389,12 @@ class Server {
   static async closeCaches(opts: { closePools?: boolean } = {}): Promise<void> {
     const { closePools = false } = opts;
     svcCache.clear();
-    // Use closeAllCaches to properly await async disposal of PostGraphile instances
-    // before closing pg pools - this ensures all connections are released
+    // Drain actual build work before disposing residents or closing shared pools.
     if (closePools) {
       await closeAllCaches();
     } else {
-      graphileCache.clear();
+      if (!await closeGraphileBuilds()) throw errors.SCHEMA_BUILD_DRAIN_TIMEOUT();
+      await clearGraphileCache();
     }
   }
 

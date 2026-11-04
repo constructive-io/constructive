@@ -4,13 +4,24 @@ const mockCreateGraphileInstance = jest.fn();
 const mockMakeIntrospectionWiring = jest.fn();
 const mockCreateGrafastCacheLimitsPreset = jest.fn();
 
-jest.mock('graphile-cache', () => ({
-  cacheGraphileInstance: mockCacheGraphileInstance,
-  createGraphileInstance: mockCreateGraphileInstance,
-  graphileCache: {
-    get: mockCacheGet
-  }
-}));
+jest.mock('graphile-cache', () => {
+  const actual = jest.requireActual('graphile-cache');
+  const Flights = actual.graphileBuildFlights.constructor;
+  return {
+    ...actual,
+    configureGraphileAdmission: jest.fn(),
+    configureGraphileBuilds: jest.fn(),
+    graphileBuildFlights: new Flights({
+      get: mockCacheGet,
+      build: async (metadata: { cacheKey: string }, create: () => Promise<unknown>) => {
+        const entry = await create();
+        await mockCacheGraphileInstance(metadata.cacheKey, entry);
+        return entry;
+      }
+    }),
+    createGraphileInstance: mockCreateGraphileInstance
+  };
+});
 
 jest.mock('graphile-settings', () => ({
   createConstructivePreset: jest.fn(() => ({})),
@@ -29,8 +40,18 @@ import {
   graphile
 } from '../graphile';
 
+const pool = {};
 const makeRequest = (): Request =>
   ({
+    constructive: {
+      requestId: 'request-id',
+      serviceKey: 'service-key',
+      databaseId: 'database-id',
+      pool,
+      pgSettings: {},
+      useModule: jest.fn().mockResolvedValue(undefined),
+      api: { dbname: 'test-db', anonRole: 'anonymous', roleName: 'authenticated', schema: ['app_public'], databaseId: 'database-id' }
+    },
     requestId: 'request-id',
     svc_key: 'service-key',
     api: {
@@ -92,7 +113,7 @@ describe('graphile single-flight handler creation', () => {
 
     // Let the first request enter the registered creation promise before the
     // second request checks the in-flight map.
-    await Promise.resolve();
+    await new Promise(resolve => setImmediate(resolve));
     expect(getInFlightCount()).toBe(1);
 
     const second = middleware(makeRequest(), response, next);
@@ -139,7 +160,7 @@ describe('graphile single-flight handler creation', () => {
     const response = { headersSent: true } as unknown as Response;
     const next = jest.fn();
     const first = middleware(makeRequest(), response, next);
-    await Promise.resolve();
+    await new Promise(resolve => setImmediate(resolve));
     const second = middleware(makeRequest(), response, next);
     expect(getInFlightCount()).toBe(1);
 
@@ -149,7 +170,8 @@ describe('graphile single-flight handler creation', () => {
     expect(handler).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(2);
     for (const [error] of next.mock.calls) {
-      expect(error.message).toContain(budgetError.message);
+      expect(error.code).toBe('INTERNAL_FAILURE');
+      expect(error.cause).toBe(budgetError);
     }
     expect(getInFlightCount()).toBe(0);
   });

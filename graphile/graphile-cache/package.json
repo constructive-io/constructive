@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "12factor-env": "workspace:^",
+    "@constructive-io/errors": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "express": "^5.2.1",
     "grafserv": "1.0.1",
@@ -42,6 +43,7 @@
     "@types/express": "^5.0.6",
     "makage": "^0.8.0",
     "nodemon": "^3.1.14",
+    "pgsql-test": "workspace:^",
     "ts-node": "^10.9.2"
   },
   "keywords": [

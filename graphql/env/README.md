@@ -43,6 +43,33 @@ In addition to all environment variables supported by `@pgpmjs/env`, this packag
 
 ### GraphQL Schema
 - `GRAPHILE_SCHEMA` - Comma-separated list of PostgreSQL schemas to expose
+- `GRAPHILE_CACHE_MAX` - Positive safe integer cap on the number of cached plans
+- `GRAPHILE_CACHE_TTL_MS` - Positive safe integer resident lifetime in milliseconds
+- `GRAPHILE_CACHE_HEAP_MAX_BYTES` - Positive safe integer heap limit in bytes used to size the cache
+- `GRAPHILE_CACHE_BUILD_RESERVE_BYTES` - Nonnegative safe integer heap reserve in bytes for schema builds
+
+These variables map to `graphile.cache.max`, `graphile.cache.ttl`,
+`graphile.cache.heapMaxBytes`, and `graphile.cache.buildReserveBytes`. The same values can be set in `pgpm.json` or
+runtime options. If both heap byte values are explicit, the build reserve must
+be smaller than the heap limit; when no heap limit is set, the cache runtime
+derives it from the V8 heap limit.
+
+When omitted, the cache owner defaults `max` to `50` and `ttl` to five minutes
+in development or 366 days in other environments. Precedence is defaults,
+configuration file, environment variables, then runtime options. Explicit
+cache environment values must be positive safe integers (except the
+nonnegative build reserve); malformed values fail option resolution.
+
+Graphile schema build coordination can also be configured through:
+
+- `GRAPHILE_BUILD_QUEUE_MAX` - Nonnegative safe integer maximum queue size
+- `GRAPHILE_BUILD_WATCHDOG_MS` - Positive timeout in milliseconds, at most `2147483647`
+- `GRAPHILE_BUILD_SHUTDOWN_TIMEOUT_MS` - Positive shutdown wait in milliseconds, at most `2147483647`
+
+These map to `graphile.build.queueMax`, `graphile.build.watchdogMs`, and
+`graphile.build.shutdownTimeoutMs`. Unset variables preserve `pgpm.json` and
+runtime options. Defaults are applied by the Graphile runtime: queue size `16`,
+watchdog `300000` ms, and shutdown timeout `30000` ms.
 
 The server always uses schema-scoped introspection for its `main` PostgreSQL
 service: each handler introspects only its API's schemas and their dependency
@@ -117,7 +144,11 @@ GraphQL defaults are provided by `@constructive-io/graphql-types`:
   graphile: {
     schema: [],
     extends: [],
-    preset: {}
+    preset: {},
+    cache: {
+      max: 50,
+      ttl: 300000 // development; 31622400000 (366 days) otherwise
+    }
   },
   features: {
     simpleInflection: true,
