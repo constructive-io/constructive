@@ -524,7 +524,7 @@ describe('finalizeStagedUpload', () => {
       SET_CONFIG,
       {
         match: /SELECT id, key, mime_type/,
-        rows: () => [{ id: FILE_ID, key: staged.contentHash, mime_type: 'image/png', size: 16, filename: 'original.png' }],
+        rows: () => [{ id: FILE_ID, key: staged.contentHash, mime_type: 'image/png', size: 16, filename: 'original.png', status: 'uploaded' }],
       },
     ]);
 
@@ -536,20 +536,15 @@ describe('finalizeStagedUpload', () => {
     expect(projection.id).toBe(FILE_ID);
     expect(projection.filename).toBe('original.png');
     expect(db.queries.some((q) => /INSERT/.test(q.text))).toBe(false);
-    // The existing row's object is confirmed, then only the staged object is
-    // deleted; nothing is copied.
+    // The row's status is the evidence the bytes exist, so only the staged
+    // object is deleted; nothing is copied or probed in S3.
     const sent = (s3.client.send as jest.Mock).mock.calls.map(([command]) => command.constructor.name);
-    expect(sent).toEqual(['HeadObjectCommand', 'DeleteObjectCommand']);
+    expect(sent).toEqual(['DeleteObjectCommand']);
   });
 
-  // With the confirm-upload lifecycle, a row is a claim on bytes rather than
-  // proof of them, so only a confirmed row may absorb an upload.
-  describe('with the confirm-upload lifecycle', () => {
-    const lifecycleTarget = {
-      ...target,
-      storageConfig: { ...storageConfig(), hasConfirmUpload: true } as StorageModuleConfig,
-    };
-
+  // A row is a claim on bytes rather than proof of them, so only a confirmed
+  // row may absorb an upload.
+  describe('row liveness', () => {
     const existingRow = (status: string) => ({
       id: FILE_ID,
       key: staged.contentHash,
@@ -567,7 +562,7 @@ describe('finalizeStagedUpload', () => {
       ]);
 
       const { projection, deduplicated } = await finalizeStagedUpload({
-        target: lifecycleTarget, withPgClient: db.withPgClient, pgSettings: null, staged,
+        target, withPgClient: db.withPgClient, pgSettings: null, staged,
       });
 
       expect(deduplicated).toBe(true);
@@ -588,7 +583,7 @@ describe('finalizeStagedUpload', () => {
         ]);
 
         const { projection, deduplicated } = await finalizeStagedUpload({
-          target: lifecycleTarget, withPgClient: db.withPgClient, pgSettings: null, staged,
+          target, withPgClient: db.withPgClient, pgSettings: null, staged,
         });
 
         expect(deduplicated).toBe(false);
@@ -601,28 +596,16 @@ describe('finalizeStagedUpload', () => {
       },
     );
 
-    it('asks for the status column only when the module has one', async () => {
+    it('reads the status column alongside the row', async () => {
       const { finalizeStagedUpload } = await import('../src/managed-upload');
-      const withLifecycle = fakeDb([
+      const db = fakeDb([
         SET_CONFIG,
         { match: /SELECT id, key, mime_type/, rows: () => [existingRow('uploaded')] },
       ]);
       await finalizeStagedUpload({
-        target: lifecycleTarget, withPgClient: withLifecycle.withPgClient, pgSettings: null, staged,
+        target, withPgClient: db.withPgClient, pgSettings: null, staged,
       });
-      expect(withLifecycle.queries.find((q) => /SELECT id, key/.test(q.text))!.text).toContain('status');
-
-      const without = fakeDb([
-        SET_CONFIG,
-        {
-          match: /SELECT id, key, mime_type/,
-          rows: () => [{ id: FILE_ID, key: staged.contentHash, mime_type: 'image/png', size: 16, filename: null }],
-        },
-      ]);
-      await finalizeStagedUpload({
-        target, withPgClient: without.withPgClient, pgSettings: null, staged,
-      });
-      expect(without.queries.find((q) => /SELECT id, key/.test(q.text))!.text).not.toContain('status');
+      expect(db.queries.find((q) => /SELECT id, key/.test(q.text))!.text).toContain('status');
     });
   });
 

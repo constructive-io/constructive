@@ -30,7 +30,7 @@ import { checkTypeAgreement } from 'mime-bytes';
 
 import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
-import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
+import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './managed-upload';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
@@ -685,12 +685,11 @@ export async function processSingleFile(
   // hash and a second row would collide on (bucket_id, key). The GC job the
   // delete enqueues re-takes the reference count when it runs (≥5s later), by
   // which point the replacement row exists, so it no-ops.
-  const statusColumn = statusSelectFragment(storageConfig);
   let staleFileId: string | null = null;
 
   if (isCustomKey) {
     const existingResult = await txClient.query({
-      text: `SELECT id, content_hash${statusColumn}
+      text: `SELECT id, content_hash, status
        FROM ${storageConfig.filesQualifiedName}
        WHERE key = $1
          AND bucket_id = $2
@@ -702,7 +701,7 @@ export async function processSingleFile(
     if (existingResult.rows.length > 0) {
       const existing = existingResult.rows[0];
       if (existing.content_hash === contentHash) {
-        if (await isLiveFileRow(storageConfig, s3ForDb, { key: s3Key, status: existing.status })) {
+        if (isLiveFileRow(existing)) {
           log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
           return {
             uploadUrl: null as string | null,
@@ -737,7 +736,7 @@ export async function processSingleFile(
     }
   } else {
     const dedupResult = await txClient.query({
-      text: `SELECT id, key${statusColumn}
+      text: `SELECT id, key, status
        FROM ${storageConfig.filesQualifiedName}
        WHERE content_hash = $1
          AND bucket_id = $2
@@ -749,7 +748,7 @@ export async function processSingleFile(
       const existingFile = dedupResult.rows[0];
       // A custom-key row can carry this hash, so the bytes are at the row's own key.
       const existingKey = existingFile.key as string;
-      if (await isLiveFileRow(storageConfig, s3ForDb, { key: existingKey, status: existingFile.status })) {
+      if (isLiveFileRow(existingFile)) {
         log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
         return {
