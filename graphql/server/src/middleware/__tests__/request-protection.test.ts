@@ -108,20 +108,6 @@ describe('createRequestProtectionMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('exempts multipart uploads, whose bodies are files bounded by the upload limits', async () => {
-    const req = fakeReq(
-      {
-        'content-length': '50000000',
-        'content-type': 'multipart/form-data; boundary=----x'
-      },
-      jest.fn().mockResolvedValue(protection({ maxRequestBytes: 2_000 }))
-    );
-
-    const { next } = await run(req);
-
-    expect(next).toHaveBeenCalled();
-  });
-
   it('does not reject a request that declared no length', async () => {
     const req = fakeReq({}, jest.fn().mockResolvedValue(protection({ maxRequestBytes: 2_000 })));
 

@@ -84,7 +84,7 @@ React Query Hooks or Prisma-like ORM Client
 
 **`graphql/server`** - Express + PostGraphile. Supports multi-endpoint routing via subdomain/host detection (schema builder with app-public/auth/admin sub-endpoints). Uses `LISTEN/NOTIFY` for schema cache invalidation.
 
-**`graphile/graphile-settings`** - Centralizes all PostGraphile plugin config: connection filters, full-text search, PostGIS, i18n, meta-schema, many-to-many, search, upload plugin. Single `getGraphileSettings(opts)` entry point.
+**`graphile/graphile-settings`** - Centralizes all PostGraphile plugin config: connection filters, full-text search, PostGIS, i18n, meta-schema, many-to-many, search, presigned uploads. Single `getGraphileSettings(opts)` entry point.
 
 **`packages/query-builder`** - Fluent SQL query builder for SELECT/INSERT/UPDATE/DELETE with JOINs, WHERE, GROUP BY. Schema-qualified tables.
 

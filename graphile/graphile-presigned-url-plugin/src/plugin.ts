@@ -32,7 +32,7 @@ import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable } from './file-not-replaceable';
-import { buildFileProjection, type FileProjection } from './managed-upload';
+import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';

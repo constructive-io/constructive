@@ -18,7 +18,6 @@ export interface DatabaseSettings {
   enableAggregates: boolean;
   enablePostgis: boolean;
   enableSearch: boolean;
-  enableDirectUploads: boolean;
   enablePresignedUploads: boolean;
   enableManyToMany: boolean;
   enableConnectionFilter: boolean;

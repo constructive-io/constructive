@@ -169,7 +169,7 @@ export interface RequestUploadUrlPayload {
 }
 
 /**
- * The document a managed `image`/`upload` column stores. See `./managed-upload`.
+ * The document a managed `image`/`upload` column stores. See `./file-projection`.
  */
 export interface FileProjection {
   id: string;

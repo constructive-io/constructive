@@ -17,13 +17,9 @@
  *
  * Per-database model/baseUrl overrides (from `llm_module` via `ctx.useLlm()`)
  * are applied at request time via `llmConfigStore` (AsyncLocalStorage) in
- * the plan-time embedding step (embed-inputs.ts). The same embedder function — and
- * its metering wrapper — handles every request; only the model name and
- * base URL parameters change per-tenant.
- *
- * This plugin is intentionally pure — no billing or metering logic.
- * The optional LlmMeteringPlugin wraps the embedder with billing integration
- * if loaded (it runs after this plugin and before the consumer plugins).
+ * the plan-time embedding step (embed-inputs.ts). The same embedder function
+ * handles every request; only the model name and base URL parameters change
+ * per-tenant.
  */
 
 import type { GraphileConfig } from 'graphile-config';
@@ -42,9 +38,9 @@ declare global {
       llmEmbedder: EmbedderFunction | null;
       /** The resolved chat completion function, or null if not configured */
       llmChatCompleter: ChatFunction | null;
-      /** The embedding model name (used as billing meter slug) */
+      /** The embedding model name */
       llmEmbeddingModel: string | null;
-      /** The chat model name (used as billing meter slug) */
+      /** The chat model name */
       llmChatModel: string | null;
     }
   }

@@ -20,8 +20,7 @@
  * If no embedder is configured, `text` on `VectorNearbyInput` is an error and
  * `unifiedSearch` runs on the text adapters only.
  *
- * If the embedder returns null (e.g. quota exceeded when the metering
- * plugin is loaded), behavior depends on `onQuotaExceeded`:
+ * If the embedder returns null, behavior depends on `onQuotaExceeded`:
  * - `'degrade'` (default): drops the text and continues without the vector
  *   filter (text-only search for `unifiedSearch`).
  * - `'throw'`: throws an error.

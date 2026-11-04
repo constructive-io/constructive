@@ -10,7 +10,6 @@ import { PgpmOptions } from '@pgpmjs/types';
 import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import { closeAllCaches,graphileCache } from 'graphile-cache';
-import graphqlUpload from 'graphql-upload';
 import type { Server as HttpServer } from 'http';
 import { Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
@@ -38,7 +37,6 @@ import { favicon } from './middleware/favicon';
 import { createFlushMiddleware, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
-import { multipartBridge } from './middleware/multipart-bridge';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
@@ -154,13 +152,6 @@ class Server {
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
     app.use(cors(fallbackOrigin));
-    app.use('/graphql', graphqlUpload.graphqlUploadExpress({
-      maxFileSize: 10 * 1024 * 1024, // 10 MB
-      maxFiles: 10
-    }));
-
-    // Rewrite Content-Type after graphql-upload so grafserv accepts the request
-    app.use('/graphql', multipartBridge);
     app.use(parseDomains() as RequestHandler);
     app.use(clientIpMiddleware);
     app.use(requestIdMiddleware());
