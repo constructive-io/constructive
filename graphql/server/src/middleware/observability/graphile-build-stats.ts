@@ -1,3 +1,5 @@
+import { normalizeError } from '@constructive-io/errors';
+
 export interface GraphileBuildEvent {
   type: 'start' | 'success' | 'failure';
   cacheKey: string;
@@ -137,7 +139,7 @@ const recordBuildFailure = (
   buildStats.maxMs = Math.max(buildStats.maxMs, durationMs);
   buildStats.lastMs = durationMs;
   buildStats.lastFinishedAt = new Date().toISOString();
-  buildStats.lastError = error instanceof Error ? error.message : String(error);
+  buildStats.lastError = normalizeError(error).code;
   buildStats.lastServiceKey = context.serviceKey;
   buildStats.lastDatabaseId = context.databaseId;
 
@@ -147,7 +149,7 @@ const recordBuildFailure = (
     serviceKey: context.serviceKey,
     databaseId: context.databaseId,
     durationMs,
-    error: error instanceof Error ? error.message : String(error),
+    error: normalizeError(error).code,
     timestamp: new Date().toISOString(),
   });
 };

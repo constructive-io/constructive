@@ -54,11 +54,27 @@ export interface GrafastCacheLimits {
 }
 
 /**
+ * Admission limits for the Graphile plan cache.
+ */
+export interface GraphileCacheOptions {
+  /** Maximum number of cache entries. Must be a positive safe integer. */
+  max?: number;
+  /** Maximum resident lifetime of a cache entry, in milliseconds. */
+  ttl?: number;
+  /** Optional heap limit, in bytes, used to size the cache. */
+  heapMaxBytes?: number;
+  /** Heap space, in bytes, reserved for building and publishing a schema. */
+  buildReserveBytes?: number;
+}
+
+/**
  * PostGraphile/Graphile v5 configuration
  */
 export interface GraphileOptions {
   /** Database schema(s) to expose through GraphQL */
   schema?: string | string[];
+  /** Admission policy for the Graphile plan cache */
+  cache?: GraphileCacheOptions;
   /** Additional presets to extend */
   extends?: GraphileConfig.Preset[];
   /** Preset overrides */

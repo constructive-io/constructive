@@ -5,6 +5,13 @@ const mockMakeIntrospectionWiring = jest.fn();
 const mockCreateGrafastCacheLimitsPreset = jest.fn();
 
 jest.mock('graphile-cache', () => ({
+  ...jest.requireActual('graphile-cache'),
+  configureGraphileAdmission: jest.fn(),
+  buildAdmittedGraphileInstance: async (metadata: { cacheKey: string }, create: () => Promise<unknown>) => {
+    const entry = await create();
+    await mockCacheGraphileInstance(metadata.cacheKey, entry);
+    return entry;
+  },
   cacheGraphileInstance: mockCacheGraphileInstance,
   createGraphileInstance: mockCreateGraphileInstance,
   graphileCache: {
@@ -29,8 +36,18 @@ import {
   graphile
 } from '../graphile';
 
+const pool = {};
 const makeRequest = (): Request =>
   ({
+    constructive: {
+      requestId: 'request-id',
+      serviceKey: 'service-key',
+      databaseId: 'database-id',
+      pool,
+      pgSettings: {},
+      useModule: jest.fn().mockResolvedValue(undefined),
+      api: { dbname: 'test-db', anonRole: 'anonymous', roleName: 'authenticated', schema: ['app_public'], databaseId: 'database-id' }
+    },
     requestId: 'request-id',
     svc_key: 'service-key',
     api: {
@@ -92,7 +109,7 @@ describe('graphile single-flight handler creation', () => {
 
     // Let the first request enter the registered creation promise before the
     // second request checks the in-flight map.
-    await Promise.resolve();
+    await new Promise(resolve => setImmediate(resolve));
     expect(getInFlightCount()).toBe(1);
 
     const second = middleware(makeRequest(), response, next);
@@ -139,7 +156,7 @@ describe('graphile single-flight handler creation', () => {
     const response = { headersSent: true } as unknown as Response;
     const next = jest.fn();
     const first = middleware(makeRequest(), response, next);
-    await Promise.resolve();
+    await new Promise(resolve => setImmediate(resolve));
     const second = middleware(makeRequest(), response, next);
     expect(getInFlightCount()).toBe(1);
 
@@ -149,7 +166,8 @@ describe('graphile single-flight handler creation', () => {
     expect(handler).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(2);
     for (const [error] of next.mock.calls) {
-      expect(error.message).toContain(budgetError.message);
+      expect(error.code).toBe('INTERNAL_FAILURE');
+      expect(error.cause).toBe(budgetError);
     }
     expect(getInFlightCount()).toBe(0);
   });
