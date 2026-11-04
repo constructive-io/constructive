@@ -149,8 +149,11 @@ describe('{column}Text companions over HTTP: vector or text', () => {
     }
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     embedCalls.length = 0;
+    await pg.query(`DELETE FROM ${schema}.articles WHERE title <> 'seed'`);
+    await pg.query(`DELETE FROM ${schema}.notes WHERE title <> 'seed'`);
+    await pg.query(`UPDATE ${schema}.articles SET embedding = '[0.5, 0.5, 0.5]' WHERE title = 'seed'`);
   });
 
   it('creates from `embeddingText`, storing the embedded vector', async () => {
@@ -245,7 +248,7 @@ describe('{column}Text companions over HTTP: vector or text', () => {
 
     expect(res.body.errors).toHaveLength(1);
     expect(res.body.errors[0].message).toMatch(EXACTLY_ONE);
-    expect(await storedVector('articles', 'seed')).toBe('[0.8,0.2,0.5]');
+    expect(await storedVector('articles', 'seed')).toBe('[0.5,0.5,0.5]');
     expect(embedCalls).toEqual([]);
   });
 
@@ -256,7 +259,7 @@ describe('{column}Text companions over HTTP: vector or text', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeUndefined();
-    expect(await storedVector('articles', 'seed')).toBe('[0.8,0.2,0.5]');
+    expect(await storedVector('articles', 'seed')).toBe('[0.5,0.5,0.5]');
     expect(embedCalls).toEqual([]);
   });
 });
