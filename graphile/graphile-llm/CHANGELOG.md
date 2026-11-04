@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.7...graphile-llm@1.21.8) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of vector or text on VectorNearbyInput ([a20df3d](https://github.com/constructive-io/constructive/commit/a20df3dc0bfdbfd55c0da0fd46e9e42a327fef63))
+
 ## [1.21.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.6...graphile-llm@1.21.7) (2026-11-04)
 
 ### Bug Fixes

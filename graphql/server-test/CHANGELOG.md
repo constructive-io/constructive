@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.36.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.4...graphql-server-test@3.36.5) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of vector or text on VectorNearbyInput ([a20df3d](https://github.com/constructive-io/constructive/commit/a20df3dc0bfdbfd55c0da0fd46e9e42a327fef63))
+
 ## [3.36.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.3...graphql-server-test@3.36.4) (2026-11-04)
 
 **Note:** Version bump only for package graphql-server-test
