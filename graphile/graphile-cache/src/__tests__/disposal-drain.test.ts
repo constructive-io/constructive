@@ -5,12 +5,12 @@ import {
   closeAllCaches,
   disposeUncachedEntry,
   graphileCache,
-  waitForActiveDisposals,
-  type GraphileCacheEntry
+  type GraphileCacheEntry,
+  waitForActiveDisposals
 } from '../graphile-cache';
 
 const entry = (key: string, release: () => Promise<void>): GraphileCacheEntry => ({
-  cacheKey: key, createdAt: Date.now(), pgl: { release },
+  cacheKey: key, createdAt: Date.now(), heapBytes: 1024 * 1024, pgl: { release },
   serv: {}, handler: {}, httpServer: { listening: false }
 } as unknown as GraphileCacheEntry);
 

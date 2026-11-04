@@ -41,6 +41,7 @@ const makeEntry = (
     httpServer: { listening: false },
     cacheKey,
     createdAt: Date.now(),
+    heapBytes: 1024 * 1024,
     releasePresetServices,
   }) as unknown as GraphileCacheEntry;
 

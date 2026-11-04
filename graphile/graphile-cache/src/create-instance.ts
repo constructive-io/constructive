@@ -82,7 +82,7 @@ export const createGraphileInstance = async (
     addTo: () => serv.addTo(handler, httpServer),
     ready: () => serv.ready(),
     release: releaseFailedBuild,
-    onReleaseError: (releaseError) => {
+    onReleaseError: () => {
       log.error(
         'Graphile build cleanup failed',
         { stage: 'failed-build-release' }
