@@ -194,10 +194,19 @@ export function createEmbedIndex(graphql: any) {
 
     case 'companion': {
       delete next[fieldName];
-      if (isNonEmptyVector(value[rule.into])) return;
-      if (typeof text !== 'string') {
+      const hasVector = isNonEmptyVector(value[rule.into]);
+      const hasText = typeof text === 'string';
+      if (hasVector && hasText) {
+        throw new Error(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`
+        );
+      }
+      if (hasVector) return;
+      if (!hasText) {
         if (rule.required) {
-          throw new Error(`${typeName}: provide either \`${rule.into}\` or \`${fieldName}\`.`);
+          throw new Error(
+            `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`
+          );
         }
         return;
       }
