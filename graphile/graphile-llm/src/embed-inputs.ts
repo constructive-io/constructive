@@ -37,16 +37,13 @@ export function embedField<T extends object>(rule: EmbedRule, spec: T): T {
   return { ...spec, extensions: { ...(spec as { extensions?: object }).extensions, [EMBED_EXT]: rule } };
 }
 
-/**
- * `build.llmEmbedder` resolves to `{ embedding }` from the providers and to
- * `number[] | null` once the metering plugin has wrapped it.
- */
+/** `build.llmEmbedder` resolves to `{ embedding }`; an empty or missing vector is a failed embed. */
 export function toVectorEmbedder(raw: unknown): VectorEmbedder | null {
   if (typeof raw !== 'function') return null;
   return async (text) => {
     const result = await raw(text);
-    const vector = Array.isArray(result) ? result : result?.embedding;
-    return Array.isArray(vector) && vector.length > 0 ? vector : null;
+    const vector = result?.embedding;
+    return isNonEmptyVector(vector) ? vector : null;
   };
 }
 
@@ -184,8 +181,8 @@ export function createEmbedIndex(graphql: any) {
         next[rule.into] = vector;
       } else if (rule.onQuotaExceeded === 'throw') {
         throw new Error(
-          `${typeName}: embedding failed (quota exceeded or provider unavailable). ` +
-          'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for graceful fallback.'
+          `${typeName}: embedding failed (provider unavailable). ` +
+          'Set onQuotaExceeded to \'degrade\' to fall back to the other filters.'
         );
       }
       return;
@@ -198,9 +195,8 @@ export function createEmbedIndex(graphql: any) {
         next[fieldName] = { __text: text, __vector: vector };
       } else if (rule.onQuotaExceeded === 'throw') {
         throw new Error(
-          `${fieldName}: embedding failed (quota exceeded or provider unavailable). ` +
-          'onQuotaExceeded is set to \'throw\'. ' +
-          'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for text-only fallback.'
+          `${fieldName}: embedding failed (provider unavailable). ` +
+          'onQuotaExceeded is set to \'throw\'; set it to \'degrade\' for text-only fallback.'
         );
       }
       return;
@@ -233,8 +229,7 @@ export function createEmbedIndex(graphql: any) {
       const vector = await embed(text);
       if (!vector) {
         throw new Error(
-          `EMBED_QUOTA_EXCEEDED: Cannot embed ${fieldName} — embedding quota exceeded. ` +
-          'Upgrade your plan or wait for the next billing period.'
+          `EMBED_FAILED: Cannot embed ${fieldName} — the embedding provider returned no vector.`
         );
       }
       next[rule.into] = vector;

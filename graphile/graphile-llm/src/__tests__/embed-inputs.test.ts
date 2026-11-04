@@ -36,13 +36,12 @@ const VECTORS: Record<string, number[]> = {
 };
 const vectorFor = (text: string) => VECTORS[text] ?? [1, 1, 1];
 
-type EmbedderShape = 'result' | 'array' | 'null' | 'empty';
+type EmbedderShape = 'result' | 'null' | 'empty';
 let shape: EmbedderShape = 'result';
 const calls: Array<{ text: string; overrides: unknown }> = [];
 
-// `result` is the provider shape ({ embedding }), `array` is the metering
-// wrapper's shape, `null` is the metering wrapper refusing (quota exceeded),
-// `empty` is a provider answering with no vector.
+// `result` is the provider shape ({ embedding }); `null` and `empty` are a
+// provider answering with no vector.
 function fakeEmbedderPlugin(configured: boolean): GraphileConfig.Plugin {
   return {
     name: 'FakeEmbedderPlugin',
@@ -55,9 +54,8 @@ function fakeEmbedderPlugin(configured: boolean): GraphileConfig.Plugin {
             ? async (text: string) => {
               calls.push({ text, overrides: llmConfigStore.getStore() });
               if (shape === 'null') return null;
-              if (shape === 'empty') return [];
-              const embedding = vectorFor(text);
-              return shape === 'array' ? embedding : { embedding, promptTokens: 1 };
+              if (shape === 'empty') return { embedding: [] };
+              return { embedding: vectorFor(text), promptTokens: 1 };
             }
             : null;
           return build;
@@ -194,8 +192,8 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     expect(errors).toEqual([[], [], []]);
   });
 
-  describe.each<EmbedderShape>(['result', 'array'])('embedder returning the %s shape', (embedderShape) => {
-    beforeEach(() => { shape = embedderShape; });
+  describe('embedder returning the provider shape', () => {
+    beforeEach(() => { shape = 'result'; });
 
     it('ranks a text search by the embedded vector and embeds once', async () => {
       const result = await h.query<DocsResult>(BY_TEXT, { t: 'revenue' });
@@ -331,7 +329,7 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     shape = 'null';
     const result = await h.query(CREATE_FROM_TEXT, { name: 'quota.txt', t: 'rent' });
 
-    expect(result.errors?.[0]?.message).toMatch(/EMBED_QUOTA_EXCEEDED: Cannot embed embeddingText/);
+    expect(result.errors?.[0]?.message).toMatch(/EMBED_FAILED: Cannot embed embeddingText/);
     const rows = await h.pg.query("SELECT 1 FROM llm_embed_inputs.docs WHERE name = 'quota.txt'");
     expect(rows.rows).toHaveLength(0);
   });
