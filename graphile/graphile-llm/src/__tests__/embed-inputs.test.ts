@@ -154,6 +154,12 @@ const UNIFIED = `
     allDocs(where: { unifiedSearch: $t }) { nodes { name embeddingVectorDistance } }
   }
 `;
+const CREATE_FROM_VECTOR_AND_TEXT = `
+  mutation($name: String!, $t: String) {
+    createDoc(input: { doc: { name: $name, embedding: [0, 0, 1], embeddingText: $t } }) { doc { rowId } }
+  }
+`;
+
 const CREATE_FROM_TEXT = `
   mutation($name: String!, $t: String) {
     createDoc(input: { doc: { name: $name, embeddingText: $t } }) { doc { rowId embedding } }
@@ -333,7 +339,20 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
   it('rejects a create that has neither the vector nor its text companion', async () => {
     const result = await h.query(CREATE_FROM_TEXT, { name: 'nothing.txt' });
 
-    expect(result.errors?.[0]?.message).toMatch(/DocInput: provide either `embedding` or `embeddingText`/);
+    expect(result.errors?.[0]?.message).toMatch(
+      /DocInput: provide exactly one of `embedding` or `embeddingText`; neither was given/
+    );
+    expect(calls).toEqual([]);
+  });
+
+  it('rejects a create that has both the vector and its text companion', async () => {
+    const result = await h.query(CREATE_FROM_VECTOR_AND_TEXT, { name: 'both.txt', t: 'rent' });
+
+    expect(result.errors?.[0]?.message).toMatch(
+      /DocInput: provide exactly one of `embedding` or `embeddingText`, not both/
+    );
+    const rows = await h.pg.query("SELECT 1 FROM llm_embed_inputs.docs WHERE name = 'both.txt'");
+    expect(rows.rows).toHaveLength(0);
     expect(calls).toEqual([]);
   });
 

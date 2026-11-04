@@ -19,8 +19,8 @@
  *
  * The text is embedded while the mutation is planned (see embed-inputs.ts),
  * before the INSERT/UPDATE is built. On a create input for a NOT NULL vector
- * column the vector field becomes optional, and one of `{col}` or `{col}Text`
- * is required at execution time. If both are given, the vector is used.
+ * column the vector field becomes optional, and exactly one of `{col}` or
+ * `{col}Text` is required at execution time. Sending both is an error.
  *
  * The companion fields are only added when the LLM plugin is loaded.
  * If no embedder is configured, the fields are still registered for schema
@@ -161,7 +161,7 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
                     type: GraphQLString,
                     description:
                       `Natural language text to embed server-side into the \`${fieldName}\` vector column. ` +
-                      `Provide \`${fieldName}\` or \`${textFieldName}\`; if both are given, \`${fieldName}\` is used. ` +
+                      `Provide exactly one of \`${fieldName}\` or \`${textFieldName}\`; sending both is an error. ` +
                       'Requires the LLM plugin to be configured with an embedding provider.'
                   }
                 )
