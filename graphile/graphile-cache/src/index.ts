@@ -9,9 +9,11 @@ export {
   cacheGraphileInstance,
   // Cache stats
   CacheStats,
+  clearGraphileCache,
   // Clear matching entries
   clearMatchingEntries,
   closeAllCaches,
+  disposeUncachedEntry,
   // Eviction tracking
   EvictionReason,
   FIVE_MINUTES_MS,
@@ -23,7 +25,9 @@ export {
   GraphileCacheEntry,
   MIN_ENTRY_HEAP_BYTES,
   // Time constants
-  ONE_HOUR_MS} from './graphile-cache';
+  ONE_HOUR_MS,
+  waitForActiveDisposals,
+  waitForEntryDisposal} from './graphile-cache';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';
