@@ -44,7 +44,7 @@ declare global {
  * Recursively walk a `where` argument object and embed any VectorNearbyInput
  * values that have `text` instead of `vector`.
  *
- * If the embedder returns null (e.g. quota exceeded), the text field is
+ * If the embedder returns null (provider unavailable), the text field is
  * removed so the pgvector filter is skipped — graceful text-only fallback.
  *
  * @deprecated The plugins no longer call this: under Grafast a resolver runs
@@ -74,11 +74,11 @@ export async function embedTextInWhere(
         if (vector === null) {
           if (onQuotaExceeded === 'throw' || !hasTextAdapters) {
             throw new Error(
-              'unifiedSearch: embedding failed (quota exceeded or provider unavailable). ' +
+              'unifiedSearch: embedding failed (provider unavailable). ' +
               (!hasTextAdapters
                 ? 'No text search adapters available for fallback. '
                 : 'onQuotaExceeded is set to \'throw\'. ') +
-              'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for text-only fallback.'
+              'Set onQuotaExceeded to \'degrade\' for text-only fallback.'
             );
           }
           return;
@@ -106,8 +106,8 @@ export async function embedTextInWhere(
         if (vector === null) {
           if (onQuotaExceeded === 'throw') {
             throw new Error(
-              'VectorNearbyInput: embedding failed (quota exceeded or provider unavailable). ' +
-              'Upgrade your plan or adjust onQuotaExceeded to \'degrade\' for graceful fallback.'
+              'VectorNearbyInput: embedding failed (provider unavailable). ' +
+              'Set onQuotaExceeded to \'degrade\' to fall back to the other filters.'
             );
           }
           delete value.text;

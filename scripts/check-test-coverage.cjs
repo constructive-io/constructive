@@ -6,7 +6,7 @@
  * lists of package paths. Adding a package to the workspace does not add it to
  * a batch, and nothing complained: 35 packages / 89 test files had accumulated
  * in no job at all, so genuinely broken code (a type error in
- * graphile-upload-plugin, stale mocks in graphile-realtime-subscriptions) sat
+ * a graphile plugin, stale mocks in graphile-realtime-subscriptions) sat
  * green for as long as nobody ran them locally.
  *
  * Omission is now countable. A package with tests must either be claimed by a

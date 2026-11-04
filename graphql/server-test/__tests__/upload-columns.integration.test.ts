@@ -11,6 +11,7 @@
  *   pnpm test -- --testPathPattern=upload-columns
  */
 
+import { hashContent } from '@constructive-io/upload-client';
 import path from 'path';
 import type supertest from 'supertest';
 
@@ -22,7 +23,9 @@ const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 's
 const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
 
+// Alice's database: `simple-seed-storage` gives it a storage module and buckets.
 const databaseId = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
+const storageSchema = 'simple-storage-public';
 const schema = 'upload_columns';
 const metaSchemas = [
   'catalog_private',
@@ -43,6 +46,15 @@ const INPUT_FIELDS = `
   }
 `;
 
+const UPLOAD_APP_FILE = `
+  mutation UploadAppFile($input: UploadAppFileInput!) {
+    uploadAppFile(input: $input) {
+      fileId
+      key
+    }
+  }
+`;
+
 const UPDATE_PRODUCT = `
   mutation UpdateProduct($input: UpdateProductInput!) {
     updateProduct(input: $input) {
@@ -56,22 +68,27 @@ const fieldNames = (res: supertest.Response): string[] =>
 
 describe('image / upload / attachment columns', () => {
   let request: supertest.Agent;
+  let pg: { query: (text: string, values?: unknown[]) => Promise<{ rows: any[] }> };
   let teardown: () => Promise<void>;
 
   const post = () =>
-    request.post('/graphql').set('X-Database-Id', databaseId).set('X-Schemata', schema);
+    request
+      .post('/graphql')
+      .set('X-Database-Id', databaseId)
+      .set('X-Schemata', [storageSchema, schema].join(','));
 
   beforeAll(async () => {
-    ({ request, teardown } = await getConnections(
+    ({ request, pg, teardown } = await getConnections(
       {
-        schemas: [schema],
+        schemas: [storageSchema, schema],
         authRole: 'anonymous',
         server: { useRouting: true, api: { isPublic: false, metaSchemas } }
       },
       [
         seed.pgpm(pgpmWorkspace),
         seed.sqlfile([
-          path.join(sharedSeedRoot, 'scoped', 'test-data.sql'),
+          path.join(localSeedRoot, 'simple-seed-storage', 'schema.sql'),
+          path.join(localSeedRoot, 'simple-seed-storage', 'test-data.sql'),
           path.join(localSeedRoot, 'upload-columns', 'schema.sql')
         ])
       ]
@@ -104,14 +121,30 @@ describe('image / upload / attachment columns', () => {
     expect(res.body.data.__type).toBeNull();
   });
 
-  it('writes the projection document through the ordinary update', async () => {
-    const photo = {
-      id: '0f0f0f0f-0000-4000-8000-000000000001',
-      key: 'a'.repeat(64),
-      bucket_id: '0f0f0f0f-0000-4000-8000-000000000002',
-      mime: 'image/png',
-      size: 16
-    };
+  it('writes the projection of a presigned files row through the ordinary update', async () => {
+    const content = 'kettle photo bytes';
+    const contentHash = await hashContent(content);
+    const uploaded = await post().send({
+      query: UPLOAD_APP_FILE,
+      variables: {
+        input: {
+          bucketKey: 'public',
+          contentHash,
+          contentType: 'image/png',
+          size: Buffer.byteLength(content),
+          filename: 'kettle.png'
+        }
+      }
+    });
+    expect(uploaded.body.errors).toBeUndefined();
+    const { fileId, key } = uploaded.body.data.uploadAppFile;
+    const { rows } = await pg.query(
+      `SELECT bucket_id, mime_type, size FROM "${storageSchema}".app_files WHERE id = $1`,
+      [fileId]
+    );
+    expect(rows).toHaveLength(1);
+
+    const photo = { id: fileId, key, bucket_id: rows[0].bucket_id, mime: rows[0].mime_type, size: Number(rows[0].size) };
     const res = await post().send({
       query: UPDATE_PRODUCT,
       variables: { input: { id: 1, productPatch: { photo } } }
@@ -129,7 +162,7 @@ describe('image / upload / attachment columns', () => {
     });
     const res = await post()
       .field('operations', operations)
-      .field('map', JSON.stringify({ '0': ['variables.input.productPatch.photo'] }))
+      .field('map', JSON.stringify({ 0: ['variables.input.productPatch.photo'] }))
       .attach('0', Buffer.from('not a png'), { filename: 'kettle.png', contentType: 'image/png' });
 
     expect(res.status).toBe(415);
