@@ -17,8 +17,8 @@
  * The text is embedded while the operation is planned (see embed-inputs.ts),
  * before SQL is built.
  *
- * If no embedder is configured, `text` is ignored and `unifiedSearch` runs
- * on the text adapters only.
+ * If no embedder is configured, `text` on `VectorNearbyInput` is an error and
+ * `unifiedSearch` runs on the text adapters only.
  *
  * If the embedder returns null (e.g. quota exceeded when the metering
  * plugin is loaded), behavior depends on `onQuotaExceeded`:
@@ -207,7 +207,7 @@ export function createLlmTextSearchPlugin(
         finalize(schema, build) {
           if (!(build as any).llmEmbedder) {
             console.log(
-              '[graphile-llm] No embedder available — text on VectorNearbyInput is ignored ' +
+              '[graphile-llm] No embedder available — text on VectorNearbyInput is rejected ' +
               'and unifiedSearch runs without pgvector. Configure an embedding provider to enable.'
             );
           }
