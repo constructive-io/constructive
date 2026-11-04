@@ -103,57 +103,117 @@ export interface GraphileCacheEntry {
   cacheKey: string;
   createdAt: number;
   heapBytes: number;
+  /** Idempotent release for pgServices owned by this exact preset generation. */
+  releasePresetServices?: () => Promise<void>;
   /** Optional RealtimeManager for cursor-tracked subscription delivery */
   realtimeManager?: { stop(): Promise<void> } | null;
 }
 
+const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
+const activeDisposals = new Set<Promise<void>>();
+// Retain failed generations until a bulk drain observes them. Successful work
+// is removed immediately; exact-entry outcomes remain in the WeakMap above.
+const disposalRecords = new Map<number, Promise<void>>();
+let disposalSequence = 0;
+
 // Track keys that are being manually evicted for accurate eviction reason
 const manualEvictionKeys = new Set<string>();
-
-// One disposal per entry: closeAllCaches() and the LRU dispose callback both
-// dispose the same entry, and PostGraphile throws if released twice.
-const disposals = new WeakMap<GraphileCacheEntry, Promise<void>>();
 
 /**
  * Dispose a PostGraphile v5 cache entry
  *
  * Properly releases resources by:
  * 1. Closing the HTTP server if listening
- * 2. Releasing the PostGraphile instance (which internally releases grafserv)
+ * 2. Stopping the realtime manager
+ * 3. Releasing PostGraphile/Grafserv and preset services
  */
-const releaseEntry = async (entry: GraphileCacheEntry, key: string): Promise<void> => {
+const releaseEntry = async (
+  entry: GraphileCacheEntry,
+  key: string
+): Promise<void> => {
   log.debug(`Disposing PostGraphile[${key}]`);
+  const failures: unknown[] = [];
   try {
-    // Close HTTP server if it's listening
     if (entry.httpServer?.listening) {
-      await new Promise<void>((resolve) => {
-        entry.httpServer.close(() => resolve());
+      await new Promise<void>((resolve, reject) => {
+        entry.httpServer.close((error) => error ? reject(error) : resolve());
       });
     }
-    // Stop RealtimeManager if present (before releasing PostGraphile)
-    if (entry.realtimeManager) {
-      try {
-        await entry.realtimeManager.stop();
-      } catch (err) {
-        log.error(`Error stopping RealtimeManager for PostGraphile[${key}]:`, err);
-      }
-    }
-    // Release PostGraphile instance (this also releases grafserv internally)
-    if (entry.pgl) {
-      await entry.pgl.release();
-    }
-  } catch (err) {
-    log.error(`Error disposing PostGraphile[${key}]:`, err);
+  } catch (error) {
+    failures.push(error);
   }
+  try {
+    if (entry.realtimeManager) {
+      await entry.realtimeManager.stop();
+    }
+  } catch (error) {
+    failures.push(error);
+  }
+  try {
+    await entry.pgl.release();
+  } catch (error) {
+    failures.push(error);
+  }
+  try {
+    await entry.releasePresetServices?.();
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile resource cleanup failed');
 };
 
-const disposeEntry = (entry: GraphileCacheEntry, key: string): Promise<void> => {
-  let disposal = disposals.get(entry);
-  if (!disposal) {
-    disposal = releaseEntry(entry, key);
-    disposals.set(entry, disposal);
-  }
-  return disposal;
+/**
+ * Coalesce teardown by exact entry identity, not by its reusable cache key.
+ */
+const scheduleDisposal = (
+  entry: GraphileCacheEntry,
+  key: string
+): Promise<void> => {
+  const existing = disposalPromises.get(entry);
+  if (existing) return existing;
+
+  const pending = releaseEntry(entry, key);
+
+  disposalPromises.set(entry, pending);
+  activeDisposals.add(pending);
+  const sequence = ++disposalSequence;
+  disposalRecords.set(sequence, pending);
+  void pending
+    .then(() => { disposalRecords.delete(sequence); }, () => {
+      // The original rejection remains observable through the owner APIs.
+      log.error('Graphile resource cleanup failed', { generation: sequence });
+    })
+    .finally(() => activeDisposals.delete(pending));
+  return pending;
+};
+
+/** Dispose a generation that was built but never published in the cache. */
+export const disposeUncachedEntry = (
+  entry: GraphileCacheEntry,
+  key = entry.cacheKey
+): Promise<void> => scheduleDisposal(entry, key);
+
+/** Await disposal calls, not background connection cleanup inside upstream. */
+export const waitForEntryDisposal = (
+  entry: GraphileCacheEntry
+): Promise<void> => disposalPromises.get(entry) ?? Promise.resolve();
+
+/**
+ * Await disposals scheduled before this call, including failures that already
+ * settled. Later generations belong to the next drain. Concurrent callers hold
+ * their own snapshot, so acknowledging a failure cannot hide it from a peer.
+ */
+export const waitForActiveDisposals = async (): Promise<void> => {
+  const records = [...disposalRecords];
+  const outcomes = await Promise.allSettled(records.map(([, pending]) => pending));
+  const failures: unknown[] = [];
+  outcomes.forEach((outcome, index) => {
+    disposalRecords.delete(records[index][0]);
+    if (outcome.status === 'rejected') failures.push(outcome.reason);
+  });
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Graphile disposal drain failed');
 };
 
 /**
@@ -194,11 +254,7 @@ export const graphileCache = new LRUCache<string, GraphileCacheEntry>({
 
     log.debug(`Evicting PostGraphile[${key}] (reason: ${reason})`);
 
-    // LRU dispose is synchronous, but v5 disposal is async
-    // Fire and forget the async cleanup
-    disposeEntry(entry, key).catch((err) => {
-      log.error(`Failed to dispose PostGraphile[${key}]:`, err);
-    });
+    scheduleDisposal(entry, key);
   }
 });
 
@@ -225,7 +281,7 @@ export async function cacheGraphileInstance(
   entry: GraphileCacheEntry
 ): Promise<void> {
   if (entry.heapBytes > graphileCache.maxEntrySize) {
-    await disposeEntry(entry, key);
+    await scheduleDisposal(entry, key);
     throw new GraphileCacheBudgetError(key, entry.heapBytes, graphileCache.maxEntrySize);
   }
   graphileCache.set(key, entry);
@@ -296,6 +352,19 @@ const unregister = pgCache.registerCleanupCallback((pgPoolKey: string) => {
 // Enhanced close function that handles all caches
 const closePromise: { promise: Promise<void> | null } = { promise: null };
 
+/** Clear all resident entries and await every exact-generation disposal. */
+export const clearGraphileCache = async (): Promise<void> => {
+  for (const key of graphileCache.keys()) {
+    manualEvictionKeys.add(key);
+  }
+  graphileCache.clear();
+  try {
+    await waitForActiveDisposals();
+  } finally {
+    manualEvictionKeys.clear();
+  }
+};
+
 /**
  * Close all caches and release resources
  *
@@ -314,22 +383,20 @@ export const closeAllCaches = async (verbose = false): Promise<void> => {
     try {
       if (verbose) log.info('Closing all server caches...');
 
-      const entries = [...graphileCache.entries()];
-
-      // Mark all as manual evictions
-      for (const [key] of entries) {
-        manualEvictionKeys.add(key);
+      const failures: unknown[] = [];
+      try {
+        await clearGraphileCache();
+      } catch (error) {
+        failures.push(error);
       }
-
-      // clear() starts each entry's disposal; wait for those same disposals.
-      graphileCache.clear();
-      await Promise.allSettled(
-        entries.map(([key, entry]) => disposeEntry(entry, key))
-      );
-      manualEvictionKeys.clear();
-
-      // Close pg pools
-      await pgCache.close();
+      // Attempt pool cleanup even when a generation's release rejected.
+      try {
+        await pgCache.close();
+      } catch (error) {
+        failures.push(error);
+      }
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) throw new AggregateError(failures, 'Server cache cleanup failed');
 
       if (verbose) log.success('All caches disposed.');
     } finally {
