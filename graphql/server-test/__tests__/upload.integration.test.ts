@@ -280,6 +280,18 @@ function expectSuccess(res: supertest.Response): Record<string, any> {
 describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   let request: supertest.Agent;
   let pg: PgTestClient;
+
+  /**
+   * Stand-in for the storage:confirm_upload worker, which this fixture does not
+   * run: a row is written as `requested` and only becomes a dedup hit once the
+   * confirm job has inspected the object and moved it to `uploaded`.
+   */
+  const confirmUploaded = async (contentHash: string): Promise<void> => {
+    await pg.query(
+      `UPDATE "${aliceSchemas[0]}".app_files SET status = 'uploaded' WHERE content_hash = $1`,
+      [contentHash]
+    );
+  };
   let teardown: () => Promise<void>;
   const s3Client = createS3Client({
     provider: 'minio',
@@ -415,6 +427,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       it('should accept a PUT to the presigned URL', async () => {
         const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
         expect(putRes.ok).toBe(true);
+        await confirmUploaded(contentHash);
       });
     });
 
@@ -487,9 +500,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(payload.fileId).toBeTruthy();
       });
 
-      // The row is written before the PUT, and this module has no confirm-upload
-      // job to settle its status, so only the object itself proves the bytes
-      // arrived. A retry after a PUT that never ran must get a URL again.
+      // The row is written before the PUT as `requested`; only the confirm job
+      // (stood in for here by confirmUploaded) moves it to `uploaded`, and only
+      // an uploaded row is a dedup hit. A retry after a PUT that never ran must
+      // get a URL again.
       it('issues a fresh upload URL when the earlier PUT never ran', async () => {
         const fileContent = `Never PUT: the client walked away (${crypto.randomUUID()}).`;
         const contentHash = await hashContent(fileContent);
@@ -512,6 +526,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
         const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain');
         expect(putRes.ok).toBe(true);
+        await confirmUploaded(contentHash);
 
         const afterPut = expectSuccess(await postGraphQL({ query: UPLOAD_APP_FILE, variables: { input } })).uploadAppFile;
         expect(afterPut.deduplicated).toBe(true);

@@ -35,7 +35,6 @@ function storageConfig(overrides: Partial<StorageModuleConfig> = {}): StorageMod
     hasPathShares: false,
     hasVersioning: false,
     hasContentHash: false,
-    hasConfirmUpload: false,
     ...overrides,
   } as unknown as StorageModuleConfig;
 }
@@ -60,7 +59,7 @@ function fakeTx(existingHash: string, deletable = true) {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
       if (/SELECT id, content_hash/.test(opts.text)) {
-        return { rows: [{ id: OLD_FILE_ID, content_hash: existingHash }] };
+        return { rows: [{ id: OLD_FILE_ID, content_hash: existingHash, status: 'uploaded' }] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
         return { rows: deletable ? [{ id: OLD_FILE_ID }] : [] };

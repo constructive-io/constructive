@@ -1,12 +1,11 @@
 /**
  * A dedup hit must name bytes that exist.
  *
- * The files row is written before the presigned PUT, so a module without the
- * confirm-upload lifecycle holds `requested` rows whose PUT may never have run.
- * Reporting such a row as `deduplicated: true` hands the caller a reference to an
- * object that is not in S3, and leaves no way to ever upload it. Without a
- * confirm job to settle `status`, the object itself is the evidence: the row is
- * live only if its key resolves in S3.
+ * The files row is written before the presigned PUT, so a `requested` row may
+ * have no object behind it. Reporting such a row as `deduplicated: true` hands
+ * the caller a reference to an object that is not in S3, and leaves no way to
+ * ever upload it. The confirm-upload job settles `status` once it has inspected
+ * the object, so the row's status — never an S3 HEAD — decides whether it is live.
  *
  * The database is faked at the query boundary and S3 at the client's `send`.
  */
@@ -48,7 +47,6 @@ function storageConfig(overrides: Partial<StorageModuleConfig> = {}): StorageMod
     hasPathShares: false,
     hasVersioning: false,
     hasContentHash: false,
-    hasConfirmUpload: false,
     ...overrides,
   } as unknown as StorageModuleConfig;
 }
@@ -64,30 +62,9 @@ const bucket = {
   allow_custom_keys: true,
 } as unknown as BucketConfig;
 
-const notFound = Object.assign(new Error('NotFound'), { name: 'NotFound', $metadata: { httpStatusCode: 404 } });
-
-function s3Answering(objectExists: boolean): S3Config {
+function fakeS3(): S3Config {
   return {
-    client: {
-      send: jest.fn(async (command: unknown) => {
-        if (command instanceof HeadObjectCommand && !objectExists) throw notFound;
-        return {};
-      }),
-    },
-    bucket: 'site-bucket',
-    region: 'us-east-1',
-  } as unknown as S3Config;
-}
-
-/** An S3 whose HEAD resolves only the keys given. */
-function s3Holding(keys: string[]): S3Config {
-  return {
-    client: {
-      send: jest.fn(async (command: unknown) => {
-        if (command instanceof HeadObjectCommand && !keys.includes(command.input.Key as string)) throw notFound;
-        return {};
-      }),
-    },
+    client: { send: jest.fn(async () => ({})) },
     bucket: 'site-bucket',
     region: 'us-east-1',
   } as unknown as S3Config;
@@ -96,20 +73,19 @@ function s3Holding(keys: string[]): S3Config {
 const heads = (s3: S3Config) =>
   (s3.client.send as jest.Mock).mock.calls
     .map(([command]) => command)
-    .filter((command) => command instanceof HeadObjectCommand)
-    .map((command: HeadObjectCommand) => command.input.Key);
+    .filter((command) => command instanceof HeadObjectCommand);
 
 const options: PresignedUrlPluginOptions = { credentials: { accessKeyId: 'test', secretAccessKey: 'test' } };
 
-/** A tx whose one existing row is a `requested` row at `rowKey` carrying HASH. */
-function fakeTx(rowKey: string) {
+/** A tx whose one existing row sits at `rowKey` carrying HASH in `status`. */
+function fakeTx(rowKey: string, status: string) {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       if (/^SELECT id/.test(opts.text)) {
-        return { rows: [{ id: OLD_FILE_ID, key: rowKey, content_hash: HASH, status: 'requested' }] };
+        return { rows: [{ id: OLD_FILE_ID, key: rowKey, content_hash: HASH, status }] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -130,62 +106,64 @@ const upload = (txClient: unknown, s3: S3Config, key?: string) =>
 describe.each([
   ['content-addressed key', undefined, HASH],
   ['custom key', SITE_KEY, SITE_KEY],
-])('presigned retry of a never-completed upload (%s, no confirm-upload)', (_label, customKey, rowKey) => {
-  it('issues a fresh upload URL when the row has no object behind it', async () => {
-    const s3 = s3Answering(false);
-    const { txClient, queries } = fakeTx(rowKey);
+])('presigned retry of a never-completed upload (%s)', (_label, customKey, rowKey) => {
+  it.each(['requested', 'rejected', 'expired'])(
+    'issues a fresh upload URL when the row is %s, without probing S3',
+    async (status) => {
+      const s3 = fakeS3();
+      const { txClient, queries } = fakeTx(rowKey, status);
 
-    const result = await upload(txClient, s3, customKey);
+      const result = await upload(txClient, s3, customKey);
 
-    expect(result).toMatchObject({
-      fileId: NEW_FILE_ID,
-      deduplicated: false,
-      uploadUrl: 'https://s3.example.com/put',
-    });
-    expect(heads(s3)).toEqual([rowKey]);
-    const del = queries.find((q) => /^DELETE/.test(q.text));
-    expect(del?.values).toEqual([OLD_FILE_ID]);
-  });
+      expect(result).toMatchObject({
+        fileId: NEW_FILE_ID,
+        deduplicated: false,
+        uploadUrl: 'https://s3.example.com/put',
+      });
+      expect(heads(s3)).toEqual([]);
+      const del = queries.find((q) => /^DELETE/.test(q.text));
+      expect(del?.values).toEqual([OLD_FILE_ID]);
+    },
+  );
 
-  it('deduplicates when the row\'s object is in S3', async () => {
-    const s3 = s3Answering(true);
-    const { txClient, queries } = fakeTx(rowKey);
+  it.each(['uploaded', 'processed'])('deduplicates when the row is %s', async (status) => {
+    const s3 = fakeS3();
+    const { txClient, queries } = fakeTx(rowKey, status);
 
     const result = await upload(txClient, s3, customKey);
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
-    expect(heads(s3)).toEqual([rowKey]);
+    expect(heads(s3)).toEqual([]);
     expect(queries).toHaveLength(1);
+    expect(queries[0].text).toContain('status');
   });
 });
 
-describe('content-addressed upload whose hash matches a custom-key row (no confirm-upload)', () => {
+describe('content-addressed upload whose hash matches a custom-key row', () => {
   // Custom-key rows carry content_hash too, so the hash probe can match a row
-  // whose bytes live at its own key, not at the hash. That row is live.
-  it('deduplicates against the row and leaves it in place', async () => {
-    const s3 = s3Holding([SITE_KEY]);
-    const { txClient, queries } = fakeTx(SITE_KEY);
+  // whose bytes live at its own key, not at the hash.
+  it('deduplicates against a live row and leaves it in place', async () => {
+    const s3 = fakeS3();
+    const { txClient, queries } = fakeTx(SITE_KEY, 'uploaded');
 
     const result = await upload(txClient, s3);
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null, key: SITE_KEY });
-    expect(heads(s3)).toEqual([SITE_KEY]);
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
   });
 
-  it('restarts the upload when that row has no object at its own key', async () => {
-    const s3 = s3Holding([]);
-    const { txClient, queries } = fakeTx(SITE_KEY);
+  it('restarts the upload when that row is still requested', async () => {
+    const s3 = fakeS3();
+    const { txClient, queries } = fakeTx(SITE_KEY, 'requested');
 
     const result = await upload(txClient, s3);
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
-    expect(heads(s3)).toEqual([SITE_KEY]);
     expect(queries.find((q) => /^DELETE/.test(q.text))?.values).toEqual([OLD_FILE_ID]);
   });
 });
 
-describe('streamed upload landing on a never-completed row (no confirm-upload)', () => {
+describe('streamed upload landing on a never-completed row', () => {
   const staged = {
     stagingKey: '.staging/tmp-1',
     contentHash: HASH,
@@ -194,14 +172,14 @@ describe('streamed upload landing on a never-completed row (no confirm-upload)',
     filename: SITE_KEY,
   };
 
-  function db({ deleteAffects = true } = {}) {
+  function db({ status = 'requested', deleteAffects = true } = {}) {
     const queries: Array<{ text: string; values?: unknown[] }> = [];
     const client = {
       async query(opts: { text: string; values?: unknown[] }) {
         queries.push(opts);
         if (/set_config/.test(opts.text)) return { rows: [] };
         if (/SELECT id, key, mime_type/.test(opts.text)) {
-          return { rows: [{ id: OLD_FILE_ID, key: HASH, mime_type: 'text/html', size: 16, filename: null as string | null, status: 'requested' }] };
+          return { rows: [{ id: OLD_FILE_ID, key: HASH, mime_type: 'text/html', size: 16, filename: null as string | null, status }] };
         }
         if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
           return { rows: deleteAffects ? [{ id: OLD_FILE_ID }] : [] };
@@ -223,8 +201,8 @@ describe('streamed upload landing on a never-completed row (no confirm-upload)',
     binding: null,
   });
 
-  it('promotes the staged bytes as a fresh file instead of absorbing them into the empty row', async () => {
-    const s3 = s3Answering(false);
+  it('promotes the staged bytes as a fresh file instead of absorbing them into the requested row', async () => {
+    const s3 = fakeS3();
     const fake = db();
 
     const { projection, deduplicated } = await finalizeStagedUpload({
@@ -233,12 +211,12 @@ describe('streamed upload landing on a never-completed row (no confirm-upload)',
 
     expect(deduplicated).toBe(false);
     expect(projection.id).toBe(NEW_FILE_ID);
-    expect(heads(s3)).toEqual([HASH]);
+    expect(heads(s3)).toEqual([]);
     expect(fake.queries.find((q) => /^DELETE/.test(q.text))?.values).toEqual([OLD_FILE_ID]);
   });
 
-  it('fails instead of promoting when the caller cannot delete the empty row', async () => {
-    const s3 = s3Answering(false);
+  it('fails instead of promoting when the caller cannot delete the requested row', async () => {
+    const s3 = fakeS3();
     const fake = db({ deleteAffects: false });
 
     await expect(
@@ -247,13 +225,13 @@ describe('streamed upload landing on a never-completed row (no confirm-upload)',
 
     expect(fake.queries.some((q) => /record_file/.test(q.text))).toBe(false);
     const sent = (s3.client.send as jest.Mock).mock.calls.map(([command]) => command);
-    expect(sent.map((command) => command.constructor.name)).toEqual(['HeadObjectCommand', 'DeleteObjectCommand']);
-    expect(sent[1].input.Key).toBe(staged.stagingKey);
+    expect(sent.map((command) => command.constructor.name)).toEqual(['DeleteObjectCommand']);
+    expect(sent[0].input.Key).toBe(staged.stagingKey);
   });
 
-  it('deduplicates against a row whose object is in S3', async () => {
-    const s3 = s3Answering(true);
-    const fake = db();
+  it('deduplicates against an uploaded row', async () => {
+    const s3 = fakeS3();
+    const fake = db({ status: 'uploaded' });
 
     const { projection, deduplicated } = await finalizeStagedUpload({
       target: target(s3), withPgClient: fake.withPgClient, pgSettings: null, staged,

@@ -46,7 +46,6 @@ function storageModuleRow(): Record<string, unknown> {
     max_bulk_total_size: null,
     has_path_shares: false,
     has_versioning: false,
-    has_confirm_upload: false,
     entity_schema: null,
     entity_table: null,
   };
@@ -88,7 +87,7 @@ function fakeContext(opts: { isPublic?: boolean; existingFile?: boolean; failIns
     {
       match: /SELECT id, key, mime_type/,
       rows: () => opts.existingFile
-        ? [{ id: FILE_ID, key: 'existing-key', mime_type: 'image/png', size: 16, filename: 'first.png' }]
+        ? [{ id: FILE_ID, key: 'existing-key', mime_type: 'image/png', size: 16, filename: 'first.png', status: 'uploaded' }]
         : [],
     },
     {

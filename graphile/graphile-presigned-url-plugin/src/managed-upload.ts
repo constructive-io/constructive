@@ -22,12 +22,12 @@ import { Logger } from '@pgpmjs/logger';
 import { type WithPgClient, withRequestPgClient } from 'graphile-plugin-utils';
 
 import { resolveDefaultBucket } from './default-bucket';
-import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
+import { isLiveFileRow } from './file-lifecycle';
+import { fileNotReplaceable } from './file-not-replaceable';
 import { type FileRefFieldBinding, getFileRefFieldBinding } from './file-ref-registry';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { copyS3Object, deleteS3Object } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
-import { fileNotReplaceable } from './file-not-replaceable';
 import { getBucketConfig, loadAllStorageModules } from './storage-module-cache';
 import type { BucketConfig, FileProjection, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
@@ -308,7 +308,7 @@ export async function finalizeStagedUpload(args: {
 
   const existing = await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
     const result = await pgClient.query({
-      text: `SELECT id, key, mime_type, size, filename${statusSelectFragment(storageConfig)}
+      text: `SELECT id, key, mime_type, size, filename, status
              FROM ${storageConfig.filesQualifiedName}
              WHERE content_hash = $1 AND bucket_id = $2
              LIMIT 1`,
@@ -321,7 +321,7 @@ export async function finalizeStagedUpload(args: {
           mime_type: string;
           size: number;
           filename: string | null;
-          status?: string;
+          status: string;
         }
       | undefined;
   });
@@ -332,7 +332,7 @@ export async function finalizeStagedUpload(args: {
   // final key is the content hash and (bucket_id, key) is unique. The GC job the
   // delete enqueues re-takes the reference count when it runs, by which point
   // the replacement row exists, so it no-ops.
-  if (existing && !(await isLiveFileRow(storageConfig, s3, existing))) {
+  if (existing && !isLiveFileRow(existing)) {
     log.info(
       `Restarting upload of hash ${staged.contentHash}: file ${existing.id} has no bytes behind it`
     );
