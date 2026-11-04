@@ -54,7 +54,7 @@ function fakeEmbedderPlugin(configured: boolean): GraphileConfig.Plugin {
             ? async (text: string) => {
               calls.push({ text, overrides: llmConfigStore.getStore() });
               if (shape === 'null') return null;
-              if (shape === 'empty') return { embedding: [] };
+              if (shape === 'empty') return { embedding: [] as number[] };
               return { embedding: vectorFor(text), promptTokens: 1 };
             }
             : null;
