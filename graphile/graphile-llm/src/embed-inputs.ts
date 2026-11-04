@@ -160,11 +160,25 @@ export function createEmbedIndex(graphql: any) {
     switch (rule.kind) {
     case 'nearby': {
       delete next[fieldName];
-      if (isNonEmptyVector(value[rule.into])) return;
-      if (typeof text !== 'string') {
-        throw new Error(`${typeName}: provide either \`${rule.into}\` or \`${fieldName}\`.`);
+      const hasVector = isNonEmptyVector(value[rule.into]);
+      const hasText = typeof text === 'string';
+      if (hasVector && hasText) {
+        throw new Error(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`
+        );
       }
-      if (!embed) return;
+      if (!hasVector && !hasText) {
+        throw new Error(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`
+        );
+      }
+      if (hasVector) return;
+      if (!embed) {
+        throw new Error(
+          `${typeName}: \`${fieldName}\` needs an embedding provider and none is configured; ` +
+          `send \`${rule.into}\` instead.`
+        );
+      }
       const vector = await embed(text);
       if (vector) {
         next[rule.into] = vector;

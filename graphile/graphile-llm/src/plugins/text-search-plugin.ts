@@ -10,8 +10,8 @@
  * accepts a compound input (point + distance) and the plugin handles
  * the conversion to SQL internally.
  *
- * Clients provide `text` or `vector`; `vector` becomes optional. When both
- * are given the vector wins. `unifiedSearch` text is embedded too, so pgvector
+ * Clients provide exactly one of `text` or `vector`; `vector` becomes optional.
+ * Sending both, or neither, is an error. `unifiedSearch` text is embedded too, so pgvector
  * participates alongside the text adapters.
  *
  * The text is embedded while the operation is planned (see embed-inputs.ts),
@@ -189,7 +189,7 @@ export function createLlmTextSearchPlugin(
                   type: GraphQLString,
                   description:
                     'Natural language text to embed server-side for similarity search. ' +
-                    'Provide `text` or `vector`; if both are given, `vector` is used. ' +
+                    'Provide exactly one of `text` or `vector`; sending both or neither is an error. ' +
                     'Requires the LLM plugin to be configured with an embedding provider.'
                 }
               )
