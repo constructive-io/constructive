@@ -10,15 +10,15 @@
  * accepts a compound input (point + distance) and the plugin handles
  * the conversion to SQL internally.
  *
- * Clients provide `text` or `vector`; `vector` becomes optional. When both
- * are given the vector wins. `unifiedSearch` text is embedded too, so pgvector
+ * Clients provide exactly one of `text` or `vector`; `vector` becomes optional.
+ * Sending both, or neither, is an error. `unifiedSearch` text is embedded too, so pgvector
  * participates alongside the text adapters.
  *
  * The text is embedded while the operation is planned (see embed-inputs.ts),
  * before SQL is built.
  *
- * If no embedder is configured, `text` is ignored and `unifiedSearch` runs
- * on the text adapters only.
+ * If no embedder is configured, `text` on `VectorNearbyInput` is an error and
+ * `unifiedSearch` runs on the text adapters only.
  *
  * If the embedder returns null (e.g. quota exceeded when the metering
  * plugin is loaded), behavior depends on `onQuotaExceeded`:
@@ -189,7 +189,7 @@ export function createLlmTextSearchPlugin(
                   type: GraphQLString,
                   description:
                     'Natural language text to embed server-side for similarity search. ' +
-                    'Provide `text` or `vector`; if both are given, `vector` is used. ' +
+                    'Provide exactly one of `text` or `vector`; sending both or neither is an error. ' +
                     'Requires the LLM plugin to be configured with an embedding provider.'
                 }
               )
@@ -207,7 +207,7 @@ export function createLlmTextSearchPlugin(
         finalize(schema, build) {
           if (!(build as any).llmEmbedder) {
             console.log(
-              '[graphile-llm] No embedder available — text on VectorNearbyInput is ignored ' +
+              '[graphile-llm] No embedder available — text on VectorNearbyInput is rejected ' +
               'and unifiedSearch runs without pgvector. Configure an embedding provider to enable.'
             );
           }

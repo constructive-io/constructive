@@ -228,11 +228,12 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     expect(calls).toEqual([]);
   });
 
-  it('uses the vector when both vector and text are sent', async () => {
+  it('rejects a VectorNearbyInput with both vector and text', async () => {
     const result = await h.query<DocsResult>(BY_VECTOR_AND_TEXT, { v: [0, 1, 0], t: 'rent' });
 
-    expect(result.errors).toBeUndefined();
-    expect(names(result)[0]).toBe('q3-results.txt');
+    expect(result.errors?.[0]?.message).toMatch(
+      /VectorNearbyInput: provide exactly one of `vector` or `text`, not both/
+    );
     expect(calls).toEqual([]);
   });
 
@@ -249,7 +250,9 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
       'query { allDocs(where: { vectorEmbedding: { metric: COSINE } }) { nodes { name } } }'
     );
 
-    expect(result.errors?.[0]?.message).toMatch(/VectorNearbyInput: provide either `vector` or `text`/);
+    expect(result.errors?.[0]?.message).toMatch(
+      /VectorNearbyInput: provide exactly one of `vector` or `text`; neither was given/
+    );
   });
 
   it('embeds text nested under and/not', async () => {
@@ -413,12 +416,13 @@ describe('plan-time embedding without an embedder', () => {
     await h.pg.afterEach();
   });
 
-  it('ignores search text and runs unifiedSearch on the text adapters', async () => {
+  it('fails a text search and runs unifiedSearch on the text adapters', async () => {
     const byText = await h.query<DocsResult>(BY_TEXT, { t: 'rent' });
     const unified = await h.query<DocsResult>(UNIFIED, { t: 'warehouse' });
 
-    expect(byText.errors).toBeUndefined();
-    expect(byText.data!.allDocs.nodes.every((n) => n.embeddingVectorDistance === null)).toBe(true);
+    expect(byText.errors?.[0]?.message).toMatch(
+      /VectorNearbyInput: `text` needs an embedding provider and none is configured/
+    );
     expect(unified.errors).toBeUndefined();
     expect(unified.data!.allDocs.nodes).toEqual([
       { name: 'warehouse-lease.txt', embeddingVectorDistance: null }
