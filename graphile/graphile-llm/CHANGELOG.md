@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.6...graphile-llm@1.21.7) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** compute embed reachability as a fixed point over cyclic filter types ([c1402b6](https://github.com/constructive-io/constructive/commit/c1402b65c9111ebca14bcdba7730662aa5d01a10))
+- **graphile-llm:** embed text inputs at plan time so Grafast sends vectors to SQL ([046aa88](https://github.com/constructive-io/constructive/commit/046aa88a66a56396ef919a43b98c8edb23da15c6))
+- **graphile-llm:** keep exporting embedTextInWhere ([047e503](https://github.com/constructive-io/constructive/commit/047e503742ab60c0ea0b4b5ca7f05b8fe4ab5e07))
+- **graphile-llm:** treat an empty embedding as a failed embed ([54f3648](https://github.com/constructive-io/constructive/commit/54f3648ee250ef3bd26e3ce17d070ee3e2fe56d9))
+
 ## [1.21.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.5...graphile-llm@1.21.6) (2026-11-01)
 
 **Note:** Version bump only for package graphile-llm
