@@ -10,30 +10,26 @@
  * accepts a compound input (point + distance) and the plugin handles
  * the conversion to SQL internally.
  *
- * The `text` field is mutually exclusive with `vector`: clients provide
- * one or the other. When `text` is provided, the plugin embeds it and
- * injects the resulting vector into the normal pgvector pipeline.
+ * Clients provide `text` or `vector`; `vector` becomes optional. When both
+ * are given the vector wins. `unifiedSearch` text is embedded too, so pgvector
+ * participates alongside the text adapters.
  *
- * Runtime embedding for query filters uses the v4-style resolver wrapping
- * approach (same as graphile-upload-plugin). When a connection query's
- * `where` argument includes a VectorNearbyInput with `text`, the resolver
- * wrapper embeds the text and replaces it with the resulting vector before
- * the plan executes.
+ * The text is embedded while the operation is planned (see embed-inputs.ts),
+ * before SQL is built.
  *
- * If the embedder is not configured, the `text` field is still registered
- * (so the schema is stable) but will return a clear error at execution time.
+ * If no embedder is configured, `text` is ignored and `unifiedSearch` runs
+ * on the text adapters only.
  *
  * If the embedder returns null (e.g. quota exceeded when the metering
  * plugin is loaded), behavior depends on `onQuotaExceeded`:
- * - `'degrade'` (default): silently removes the text field and continues
- *   with text-only search as a graceful fallback.
- * - `'throw'`: always throws an error, even if text adapters could handle it.
+ * - `'degrade'` (default): drops the text and continues without the vector
+ *   filter (text-only search for `unifiedSearch`).
+ * - `'throw'`: throws an error.
  */
 
 import type { GraphileConfig } from 'graphile-config';
 
-import type { LlmConfigOverrides } from '../embedder';
-import { llmConfigStore } from '../embedder';
+import { embedField, planTimeEmbedding } from '../embed-inputs';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 
@@ -46,22 +42,15 @@ declare global {
 }
 
 /**
- * Check if a codec has any pgvector `vector` columns.
- */
-function hasVectorColumns(pgCodec: any): boolean {
-  if (!pgCodec?.attributes) return false;
-  for (const attribute of Object.values(pgCodec.attributes as Record<string, any>)) {
-    if (attribute.codec?.name === 'vector') return true;
-  }
-  return false;
-}
-
-/**
  * Recursively walk a `where` argument object and embed any VectorNearbyInput
  * values that have `text` instead of `vector`.
  *
  * If the embedder returns null (e.g. quota exceeded), the text field is
  * removed so the pgvector filter is skipped — graceful text-only fallback.
+ *
+ * @deprecated The plugins no longer call this: under Grafast a resolver runs
+ * after the plan's SQL, so embedding there is too late. They embed at plan
+ * time through `embedField` and `planTimeEmbedding` instead.
  */
 export async function embedTextInWhere(
   obj: any,
@@ -153,43 +142,12 @@ export async function embedTextInWhere(
   }
 }
 
-/** Embedder signature expected by embedTextInWhere */
-type WhereEmbedder = (text: string) => Promise<number[] | null>;
-
-/**
- * Resolve per-DB LLM config overrides from express-context.
- * Returns an LlmConfigOverrides object if per-DB config is available,
- * or null to use defaults. These overrides are string parameters only
- * (model name, base URL) — the embedder function and its metering
- * wrapper stay the same.
- */
-async function resolveConfigOverrides(
-  graphqlContext: any
-): Promise<LlmConfigOverrides | null> {
-  const ctx = graphqlContext?.constructive;
-  if (!ctx?.useLlm) return null;
-
-  try {
-    const llm = await ctx.useLlm();
-    if (!llm?.embeddingModel) return null;
-
-    return {
-      embeddingModel: llm.embeddingModel,
-      embeddingBaseUrl: llm.embeddingBaseUrl,
-      chatModel: llm.chatModel ?? undefined,
-      chatBaseUrl: llm.chatBaseUrl ?? undefined,
-    };
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Creates the LlmTextSearchPlugin.
  *
  * Hooks into VectorNearbyInput to add a `text` field alongside the
- * existing `vector` field. When a user provides `text`, the plugin's
- * resolver wrapper embeds it before passing to pgvector.
+ * existing `vector` field, and tags `text` and `unifiedSearch` for
+ * plan-time embedding.
  */
 export function createLlmTextSearchPlugin(
   options: { onQuotaExceeded?: 'degrade' | 'throw' } = {}
@@ -197,7 +155,7 @@ export function createLlmTextSearchPlugin(
   const { onQuotaExceeded = 'degrade' } = options;
   return {
     name: 'LlmTextSearchPlugin',
-    version: '0.2.0',
+    version: '0.3.0',
     description:
       'Adds text-to-vector embedding support on VectorNearbyInput filter fields',
     after: [
@@ -208,117 +166,52 @@ export function createLlmTextSearchPlugin(
 
     schema: {
       hooks: {
-        /**
-         * Add the `text: String` field to VectorNearbyInput.
-         *
-         * We intercept VectorNearbyInput specifically and add a `text` field.
-         * The field is optional — clients provide either `text` or `vector`.
-         */
         GraphQLInputObjectType_fields(fields, build, context) {
-          const typeName = context.Self.name;
-
-          if (typeName !== 'VectorNearbyInput') {
+          if (context.Self.name !== 'VectorNearbyInput') {
             return fields;
           }
 
           const {
-            graphql: { GraphQLString }
+            graphql: { GraphQLString, getNullableType }
           } = build;
 
           return build.extend(
-            fields,
             {
-              text: {
-                type: GraphQLString,
-                description:
-                  'Natural language text to embed server-side for similarity search. ' +
-                  'Mutually exclusive with `vector` — provide one or the other. ' +
-                  'Requires the LLM plugin to be configured with an embedding provider.'
-              }
+              ...fields,
+              ...(fields.vector && {
+                vector: { ...fields.vector, type: getNullableType(fields.vector.type) as any }
+              })
+            },
+            {
+              text: embedField(
+                { kind: 'nearby', into: 'vector', onQuotaExceeded },
+                {
+                  type: GraphQLString,
+                  description:
+                    'Natural language text to embed server-side for similarity search. ' +
+                    'Provide `text` or `vector`; if both are given, `vector` is used. ' +
+                    'Requires the LLM plugin to be configured with an embedding provider.'
+                }
+              )
             },
             'LlmTextSearchPlugin adding text field to VectorNearbyInput'
           );
         },
 
-        /**
-         * Wrap connection query resolvers to intercept `where` arguments that
-         * contain VectorNearbyInput with `text` or `unifiedSearch` with text,
-         * embed the text, and inject the resulting vector before the plan executes.
-         *
-         * For tables with vector columns: embeds VectorNearbyInput.text → vector
-         * For ALL tables with unifiedSearch: embeds unifiedSearch text → { __text, __vector }
-         *
-         * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
-         * and graphile-bucket-provisioner-plugin.
-         */
-        GraphQLObjectType_fields_field(field, build, context) {
-          const {
-            scope: { isRootQuery, pgCodec }
-          } = context as any;
-
-          if (!isRootQuery || !pgCodec) return field;
-
-          // Wrap if the table has vector columns OR has any searchable columns
-          // (for unifiedSearch embedding support)
-          const hasVector = hasVectorColumns(pgCodec);
-          const hasSearchableColumns = pgCodec.attributes && Object.values(
-            pgCodec.attributes as Record<string, any>
-          ).some((attr: any) =>
-            attr.codec?.name === 'tsvector' || attr.codec?.name === 'vector'
-          );
-
-          if (!hasVector && !hasSearchableColumns) return field;
-
-          const embedder = (build as any).llmEmbedder as
-            | WhereEmbedder
-            | null;
-          if (!embedder) return field;
-
-          // Determine if this table has text-based search adapters for fallback logic
-          const hasTextAdapters = pgCodec.attributes && Object.values(
-            pgCodec.attributes as Record<string, any>
-          ).some((attr: any) => attr.codec?.name === 'tsvector');
-
-          const defaultResolver = (obj: any) => obj[context.scope.fieldName];
-          const { resolve: oldResolve = defaultResolver, ...rest } = field;
-
-          return {
-            ...rest,
-            async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Resolve per-DB model/baseUrl overrides from express-context.
-              // These are just string parameters — the embedder function
-              // (and its metering wrapper) stays the same.
-              const overrides = await resolveConfigOverrides(graphqlContext);
-
-              // Run within llmConfigStore so the embedder picks up per-DB
-              // model/baseUrl at call time. Metering wraps the same function
-              // and is unaffected.
-              return llmConfigStore.run(overrides, async () => {
-                if (args?.where) {
-                  await embedTextInWhere(args.where, embedder, !!hasTextAdapters, onQuotaExceeded);
-                }
-
-                if (args?.filter) {
-                  await embedTextInWhere(args.filter, embedder, !!hasTextAdapters, onQuotaExceeded);
-                }
-
-                return oldResolve(source, args, graphqlContext, info);
-              });
-            }
-          };
+        GraphQLInputObjectType_fields_field(field, _build, context) {
+          const { fieldName, isPgConnectionFilterField } = context.scope as any;
+          if (fieldName !== 'unifiedSearch' || !isPgConnectionFilterField) return field;
+          return embedField({ kind: 'unified', onQuotaExceeded }, field);
         },
 
         finalize(schema, build) {
-          const embedder = (build as any).llmEmbedder;
-
-          if (!embedder) {
+          if (!(build as any).llmEmbedder) {
             console.log(
-              '[graphile-llm] No embedder available — text field on VectorNearbyInput ' +
-              'will return errors if used. Configure an embedding provider to enable.'
+              '[graphile-llm] No embedder available — text on VectorNearbyInput is ignored ' +
+              'and unifiedSearch runs without pgvector. Configure an embedding provider to enable.'
             );
           }
-
-          return schema;
+          return planTimeEmbedding(schema, build);
         }
       }
     }

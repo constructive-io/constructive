@@ -937,7 +937,7 @@ describe('GraphileLlmPreset toggles', () => {
 //
 // End-to-end: embeds article text with real Ollama nomic-embed-text (768 dims),
 // seeds the DB, then runs hybrid text+vector queries verifying RRF fusion,
-// semantic relevance, and the embedTextInWhere pipeline.
+// semantic relevance, and server-side embedding of unifiedSearch text.
 //
 // Requires: PostgreSQL with pgvector + Ollama with nomic-embed-text.
 // =============================================================================
@@ -1101,9 +1101,9 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
     }
   }, 30_000);
 
-  // ─── unifiedSearch text-only (no vector injection) ─────────────────────
+  // ─── unifiedSearch text embedded server-side ───────────────────────────
 
-  it('unifiedSearch text-only uses tsvector without pgvector', async () => {
+  it('unifiedSearch text embeds server-side so tsvector and pgvector both participate', async () => {
     const result = await query<{
       allArticles: { nodes: Array<{ rowId: number; title: string; tsvRank: number | null; embeddingVectorDistance: number | null; searchScore: number }> };
     }>(`
@@ -1118,13 +1118,9 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
     const nodes = result.data?.allArticles?.nodes ?? [];
     expect(nodes.length).toBeGreaterThan(0);
 
-    // tsvector should be active
-    const hasTsv = nodes.some((n) => n.tsvRank !== null);
-    expect(hasTsv).toBe(true);
-
-    // pgvector should NOT participate (no vector injection in graphile-test)
+    expect(nodes.some((n) => n.tsvRank !== null)).toBe(true);
     for (const node of nodes) {
-      expect(node.embeddingVectorDistance).toBeNull();
+      expect(typeof node.embeddingVectorDistance).toBe('number');
     }
   });
 

@@ -17,7 +17,7 @@
  *
  * Per-database model/baseUrl overrides (from `llm_module` via `ctx.useLlm()`)
  * are applied at request time via `llmConfigStore` (AsyncLocalStorage) in
- * the text-search-plugin resolver wrapper. The same embedder function — and
+ * the plan-time embedding step (embed-inputs.ts). The same embedder function — and
  * its metering wrapper — handles every request; only the model name and
  * base URL parameters change per-tenant.
  *

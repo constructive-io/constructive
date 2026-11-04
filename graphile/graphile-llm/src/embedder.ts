@@ -5,7 +5,7 @@
  * embeddings. Currently supports Ollama via @agentic-kit/ollama.
  *
  * Per-request model/baseUrl overrides are read from AsyncLocalStorage
- * (`llmConfigStore`). The text-search-plugin sets these overrides from
+ * (`llmConfigStore`). embed-inputs.ts sets these overrides from
  * the database's `llm_module` config via `ctx.useLlm()`. This means
  * the same embedder function — and its metering wrapper — handle every
  * request, regardless of which tenant's model config applies.
@@ -34,7 +34,7 @@ export interface LlmConfigOverrides {
 /**
  * AsyncLocalStorage for per-request LLM config overrides.
  *
- * Set by the text-search-plugin resolver wrapper (from ctx.useLlm()),
+ * Set by the plan-time embedding step in embed-inputs.ts (from ctx.useLlm()),
  * read by the embedder at call time. The metering wrapper sits between
  * them and is completely unaware — it just wraps the same function.
  */
