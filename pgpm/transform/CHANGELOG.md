@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.0...@pgpmjs/transform@0.32.1) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** alter reloptions, persistence, inheritance, partition bounds, storage/compression and trigger enable/disable in place ([2bee2e3](https://github.com/constructive-io/constructive/commit/2bee2e361e70df58c90e3ebe40cdb1c63ef37b93))
+- **diff:** an explicit REVOKE .. FROM PUBLIC restores only PUBLIC's default privileges in both directions (EXECUTE, USAGE, CONNECT/TEMPORARY on databases; nothing on schemas/tables), never GRANT ALL ([3530612](https://github.com/constructive-io/constructive/commit/3530612f3f210cd31c837072d9edde073b93a20e))
+- **diff:** attach GRANT ON FUNCTION/TYPE/DOMAIN and ALL ... IN SCHEMA grants to their own objects instead of the preceding statement's unit ([c5f5098](https://github.com/constructive-io/constructive/commit/c5f50984fd28cb9f74942c5a943c2b69efa1bec3))
+- **diff:** bridge composite-typed columns only around ALTER ATTRIBUTE ... TYPE; ADD/DROP ATTRIBUTE work in place ([6f28752](https://github.com/constructive-io/constructive/commit/6f2875210bc5abe215db1c280528d764ad981ae3))
+- **diff:** enum ADD VALUE neighbors and same-migration use, composite mid-list insert, sequence START after MINVALUE/MAXVALUE drop, --using single expression, -token privilege state, column rename on a renamed table, rename references and implicit constraint names ([abb4284](https://github.com/constructive-io/constructive/commit/abb428434563d9b640315e06e6fe6e607cb6d487))
+- **diff:** fold ALTER SEQUENCE into the sequence definition and order OWNED BY around its column ([0200238](https://github.com/constructive-io/constructive/commit/0200238fee9069e4e4b979d236eab871adb09c6e))
+- **diff:** identify extensions, collations, aggregates, operators, casts, statistics, rules, opclasses, publications, event triggers and foreign objects; order extension and collation steps; snapshot aggregates ([e550a8c](https://github.com/constructive-io/constructive/commit/e550a8ce278660abc26ccee60eb6fee9797d72de))
+- **diff:** park dependent columns in jsonb/text around type changes Postgres refuses in place ([a494196](https://github.com/constructive-io/constructive/commit/a494196b23d493a9143431e8efd633d9249794c4))
+- **diff:** rebuild composite[] columns through a statement-local helper (USING allows no subquery) keeping NULLs; drop typmods from overload signatures; identify operators and aggregates by operand types; cache function signatures ([16a0427](https://github.com/constructive-io/constructive/commit/16a0427c1237e31443c2603b4bcae4a0336a92dc))
+- **diff:** revert a dependent rebuilt around a renamed table in order and from its text as written; rewrite old.col only where old names the table, not an alias; a consumer of a new enum value depends on its ADD VALUE ([23da4cb](https://github.com/constructive-io/constructive/commit/23da4cbe930134420ee82b6e532b323af48a3913))
+- **diff:** treat each function overload as its own object, identified and pathed as name(argtypes) ([ee8cf6b](https://github.com/constructive-io/constructive/commit/ee8cf6bd5960e51c23ee51eaed49d5d39c056bf5))
+- **diff:** unfold serial columns into int + owned sequence + nextval default; order NOT NULL around identity ([f871405](https://github.com/constructive-io/constructive/commit/f8714059e7850865494e4ca72cf7297024dff6b3))
+
 # [0.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.31.0...@pgpmjs/transform@0.32.0) (2026-11-05)
 
 ### Bug Fixes

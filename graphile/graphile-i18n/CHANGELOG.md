@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.6](https://github.com/constructive-io/constructive/compare/graphile-i18n@2.20.5...graphile-i18n@2.20.6) (2026-11-05)
+
+**Note:** Version bump only for package graphile-i18n
+
 ## [2.20.5](https://github.com/constructive-io/constructive/compare/graphile-i18n@2.20.4...graphile-i18n@2.20.5) (2026-11-05)
 
 **Note:** Version bump only for package graphile-i18n

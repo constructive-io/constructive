@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.41.1](https://github.com/constructive-io/constructive/compare/pgpm@5.41.0...pgpm@5.41.1) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** attach GRANT ON FUNCTION/TYPE/DOMAIN and ALL ... IN SCHEMA grants to their own objects instead of the preceding statement's unit ([c5f5098](https://github.com/constructive-io/constructive/commit/c5f50984fd28cb9f74942c5a943c2b69efa1bec3))
+- **diff:** enum ADD VALUE neighbors and same-migration use, composite mid-list insert, sequence START after MINVALUE/MAXVALUE drop, --using single expression, -token privilege state, column rename on a renamed table, rename references and implicit constraint names ([abb4284](https://github.com/constructive-io/constructive/commit/abb428434563d9b640315e06e6fe6e607cb6d487))
+- **diff:** identify extensions, collations, aggregates, operators, casts, statistics, rules, opclasses, publications, event triggers and foreign objects; order extension and collation steps; snapshot aggregates ([e550a8c](https://github.com/constructive-io/constructive/commit/e550a8ce278660abc26ccee60eb6fee9797d72de))
+- **diff:** park dependent columns in jsonb/text around type changes Postgres refuses in place ([a494196](https://github.com/constructive-io/constructive/commit/a494196b23d493a9143431e8efd633d9249794c4))
+
 # [5.41.0](https://github.com/constructive-io/constructive/compare/pgpm@5.40.0...pgpm@5.41.0) (2026-11-05)
 
 ### Bug Fixes
