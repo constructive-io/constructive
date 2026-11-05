@@ -11,7 +11,8 @@
  *   pnpm test -- --testPathPattern=upload-columns
  */
 
-import { hashContent } from '@constructive-io/upload-client';
+import { createS3Bucket, createS3Client } from '@constructive-io/s3-utils';
+import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
 import type supertest from 'supertest';
 
@@ -51,6 +52,7 @@ const UPLOAD_APP_FILE = `
     uploadAppFile(input: $input) {
       fileId
       key
+      uploadUrl
     }
   }
 `;
@@ -122,37 +124,54 @@ describe('image / upload / attachment columns', () => {
   });
 
   it('writes the projection of a presigned files row through the ordinary update', async () => {
-    const content = 'kettle photo bytes';
+    const content = 'kettle manual, plain text';
     const contentHash = await hashContent(content);
+    const { rows: buckets } = await pg.query(
+      `SELECT physical_name FROM "${storageSchema}".app_buckets WHERE key = 'public'`
+    );
+    const s3 = createS3Client({
+      provider: 'minio',
+      region: 'us-east-1',
+      endpoint: 'http://localhost:9000',
+      accessKeyId: 'constructive',
+      secretAccessKey: 'constructive-dev-secret'
+    });
+    expect((await createS3Bucket(s3, buckets[0].physical_name, { provider: 'minio' })).success).toBe(true);
+
     const uploaded = await post().send({
       query: UPLOAD_APP_FILE,
       variables: {
         input: {
           bucketKey: 'public',
           contentHash,
-          contentType: 'image/png',
+          contentType: 'text/plain',
           size: Buffer.byteLength(content),
-          filename: 'kettle.png'
+          filename: 'kettle.txt'
         }
       }
     });
     expect(uploaded.body.errors).toBeUndefined();
-    const { fileId, key } = uploaded.body.data.uploadAppFile;
+    const { fileId, key, uploadUrl } = uploaded.body.data.uploadAppFile;
+    expect((await putToPresignedUrl(uploadUrl, content, 'text/plain')).ok).toBe(true);
+    // The confirm worker is not part of this fixture; it is what moves a row
+    // from `requested` to `uploaded` once it has inspected the object.
+    await pg.query(`UPDATE "${storageSchema}".app_files SET status = 'uploaded' WHERE id = $1`, [fileId]);
+
     const { rows } = await pg.query(
-      `SELECT bucket_id, mime_type, size FROM "${storageSchema}".app_files WHERE id = $1`,
+      `SELECT bucket_id, mime_type, size, status FROM "${storageSchema}".app_files WHERE id = $1`,
       [fileId]
     );
-    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBe('uploaded');
+    const projection = { id: fileId, key, bucket_id: rows[0].bucket_id, mime: rows[0].mime_type, size: Number(rows[0].size) };
 
-    const photo = { id: fileId, key, bucket_id: rows[0].bucket_id, mime: rows[0].mime_type, size: Number(rows[0].size) };
     const res = await post().send({
       query: UPDATE_PRODUCT,
-      variables: { input: { id: 1, productPatch: { photo } } }
+      variables: { input: { id: 1, productPatch: { photo: { ...projection, caption: 'mine' } } } }
     });
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeUndefined();
-    expect(res.body.data.updateProduct.product.photo).toEqual(photo);
+    expect(res.body.data.updateProduct.product.photo).toMatchObject({ ...projection, caption: 'mine' });
   });
 
   it('refuses a multipart body on /graphql', async () => {
