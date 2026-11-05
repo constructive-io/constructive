@@ -228,11 +228,26 @@ describe('pgpm diff e2e: hardening', () => {
     ]);
   });
 
-  it('live-database sides diff equal to their module (type spellings, default casts)', async () => {
-    const result = await fixture.runTerminalCommands(`
-      cd ${WS}
-      pgpm diff hard-v2 db:${v2Db.name} --json
-    `, {});
-    expect(result.length).toBeGreaterThan(0);
+  it('live-database sides diff equal to their module (type spellings, default casts, identity)', async () => {
+    const runJson = async (commands: string): Promise<any> => {
+      const spy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      let jsonCall: any[] | undefined;
+      try {
+        await fixture.runTerminalCommands(commands, {});
+        jsonCall = spy.mock.calls.find(args => typeof args[0] === 'string' && args[0].startsWith('{'));
+      } finally {
+        spy.mockRestore();
+      }
+      expect(jsonCall).toBeDefined();
+      return JSON.parse(jsonCall![0]);
+    };
+    for (const [module, db] of [['hard-v1', v1Db], ['hard-v2', v2Db]] as const) {
+      const parsed = await runJson(`
+        cd ${WS}
+        pgpm diff ${module} db:${db.name} --json
+      `);
+      expect(parsed.objects).toEqual([]);
+      expect(parsed.identical).toBe(true);
+    }
   });
 });

@@ -48,15 +48,58 @@ export function typeKey(typeName: TypeNameNode | undefined): string {
   return `${names}${typeName.arrayBounds ? '[]' : ''}${mods}`;
 }
 
+/** Sequence options whose value equals the catalog default (pg_dump spells them out). */
+const SEQUENCE_OPTION_DEFAULTS: Record<string, string> = {
+  increment: '{"Integer":{"ival":1}}',
+  minvalue: 'undefined',
+  maxvalue: 'undefined',
+  start: '{"Integer":{"ival":1}}',
+  cache: '{"Integer":{"ival":1}}',
+  cycle: '{"Boolean":{"boolval":false}}',
+  as: '{"TypeName":{"names":[{"String":{"sval":"int8"}}],"typemod":-1}}'
+};
+
+/** Whether a CREATE/ALTER SEQUENCE DefElem only restates the default. */
+export function isDefaultSequenceOption(defElem: { defname?: string; arg?: unknown }): boolean {
+  const name = defElem.defname ?? '';
+  const expected = SEQUENCE_OPTION_DEFAULTS[name];
+  if (expected === undefined) return false;
+  const value = defElem.arg === undefined ? 'undefined' : JSON.stringify(canonicalizeTypes(stripLocations(defElem.arg)));
+  return value === expected;
+}
+
+const stripLocations = (node: unknown): unknown => {
+  if (Array.isArray(node)) return node.map(stripLocations);
+  if (!node || typeof node !== 'object') return node;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(node as Record<string, unknown>)) if (k !== 'location') out[k] = stripLocations(v);
+  return out;
+};
+
 /**
- * Deep-canonicalize every TypeName (and `pg_catalog.`-qualified function
- * name) in a parse tree. Returns a new tree; the input is not mutated.
+ * Deep-canonicalize a parse tree's representation: every TypeName (and
+ * `pg_catalog.`-qualified function name) to its catalog spelling, string
+ * constants without their implicit `::text`, sequence options without
+ * restated defaults, `CREATE MATERIALIZED VIEW` without WITH [NO] DATA.
+ * Returns a new tree; the input is not mutated.
  */
 export function canonicalizeTypes<T>(node: T): T {
   if (Array.isArray(node)) return node.map(canonicalizeTypes) as unknown as T;
   if (!node || typeof node !== 'object') return node;
+  const rec = node as Record<string, unknown>;
+  const cast = rec.TypeCast as { arg?: Record<string, unknown>; typeName?: TypeNameNode } | undefined;
+  if (cast?.arg?.A_Const && (cast.arg.A_Const as { sval?: unknown }).sval !== undefined && typeKey(cast.typeName) === 'text[]') {
+    return canonicalizeTypes(cast.arg) as T;
+  }
   const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+  for (const [key, value] of Object.entries(rec)) {
+    if (key === 'skipData') continue;
+    if ((key === 'CreateSeqStmt' || key === 'AlterSeqStmt') && value && typeof value === 'object') {
+      const seq = value as { options?: { DefElem?: { defname?: string; arg?: unknown } }[] };
+      const options = (seq.options ?? []).filter(o => !o.DefElem || !isDefaultSequenceOption(o.DefElem));
+      out[key] = canonicalizeTypes({ ...seq, options: options.length > 0 ? options : undefined });
+      continue;
+    }
     if (key === 'TypeName' && value && typeof value === 'object') {
       const t = value as TypeNameNode;
       out[key] = canonicalizeTypes({ ...t, names: canonicalTypeNames(t.names ?? []) });

@@ -100,11 +100,14 @@ export function absorbAnnotation(state: AnnotationState, stmt: Node): boolean {
     return true;
   }
   if (stmt.AlterDefaultPrivilegesStmt) {
-    const d = stmt.AlterDefaultPrivilegesStmt as { options?: unknown; action: Node };
-    const options = cleanTree(d.options ?? []);
+    const d = stmt.AlterDefaultPrivilegesStmt as { options?: { DefElem?: { defname?: string } }[]; action: Node };
+    const options = cleanTree(d.options ?? []) as { DefElem?: { defname?: string } }[];
+    // `FOR ROLE <current role>` is how pg_dump spells the implicit target role;
+    // the key ignores it so a module compares equal to its catalog rendering.
+    const keyOptions = options.filter(o => o.DefElem?.defname !== 'roles');
     for (const grantee of (d.action.grantees as unknown[]) ?? []) {
       const clean = cleanTree(grantee);
-      const key = `${stablePrint(options)}:${d.action.objtype}:${stablePrint(clean)}`;
+      const key = `${stablePrint(keyOptions)}:${d.action.objtype}:${stablePrint(clean)}`;
       const entry = state.defaultPrivileges.get(key)
         ?? { options, objtype: d.action.objtype as string, grantee: clean, privs: new Set<string>() };
       applyAction(entry.privs, d.action);

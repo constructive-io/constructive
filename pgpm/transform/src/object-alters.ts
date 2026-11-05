@@ -10,7 +10,7 @@ import { cleanTree } from '@pgsql/transform';
 import { Deparser } from 'plpgsql-parser';
 
 import { stablePrint } from './annotations';
-import { canonicalizeTypes, typeKey } from './type-canon';
+import { canonicalizeTypes, isDefaultSequenceOption, typeKey } from './type-canon';
 
 type Node = Record<string, unknown>;
 
@@ -24,6 +24,8 @@ export interface AlterStep {
 }
 
 const deparse = (node: Node): string => `${Deparser.deparse(node as any, { pretty: false })};`;
+/** Representation-proof key for an expression (casts, type spellings). */
+const exprKey = (expr: unknown): string => stablePrint(canonicalizeTypes(cleanTree(expr)));
 const svals = (list: { String?: { sval?: string } }[] | undefined): string[] =>
   (list ?? []).map(x => x.String?.sval ?? '');
 
@@ -85,7 +87,7 @@ export function alterDomain(from: Node, to: Node): AlterStep[] | null {
   const alter = (subtype: string, extra: Node = {}): string =>
     deparse({ AlterDomainStmt: { subtype, typeName: to.domainname, behavior: 'DROP_RESTRICT', ...extra } });
   const steps: AlterStep[] = [];
-  if (stablePrint(a.def) !== stablePrint(b.def)) {
+  if (exprKey(a.def) !== exprKey(b.def)) {
     steps.push({
       sql: alter('T', b.def === undefined ? {} : { def: b.def }),
       inverse: alter('T', a.def === undefined ? {} : { def: a.def })
@@ -96,12 +98,12 @@ export function alterDomain(from: Node, to: Node): AlterStep[] | null {
   }
   for (const [name, c] of a.check) {
     const next = b.check.get(name);
-    if (next && stablePrint(cleanTree(next.raw_expr)) === stablePrint(cleanTree(c.raw_expr))) continue;
+    if (next && exprKey(next.raw_expr) === exprKey(c.raw_expr)) continue;
     steps.push({ sql: alter('X', { name }), inverse: alter('C', { def: { Constraint: cleanTree(c) } }) });
   }
   for (const [name, c] of b.check) {
     const prior = a.check.get(name);
-    if (prior && stablePrint(cleanTree(prior.raw_expr)) === stablePrint(cleanTree(c.raw_expr))) continue;
+    if (prior && exprKey(prior.raw_expr) === exprKey(c.raw_expr)) continue;
     steps.push({ sql: alter('C', { def: { Constraint: cleanTree(c) } }), inverse: alter('X', { name }) });
   }
   return steps;
@@ -125,7 +127,7 @@ export function alterSequence(from: Node, to: Node): AlterStep[] | null {
     const out = new Map<string, Node>();
     for (const item of (node.options as { DefElem?: Node }[]) ?? []) {
       const d = item.DefElem;
-      if (!d) continue;
+      if (!d || isDefaultSequenceOption(d as { defname?: string; arg?: unknown })) continue;
       out.set(d.defname as string, canonicalizeTypes(cleanTree({ DefElem: d })) as Node);
     }
     return out;
