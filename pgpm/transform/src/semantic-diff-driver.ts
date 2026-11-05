@@ -1055,18 +1055,6 @@ function buildChanges(
   }
 
   const segments = [...new Set(segmentOf)].sort((x, y) => position.get(x)! - position.get(y)!);
-  const nameOf = new Map<number, string>();
-  const used = new Map<string, number>();
-  for (const s of segments) {
-    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
-    const first = atoms[list[0]];
-    const dropOnly = list.every(id => atoms[id].phase === 'drop');
-    let base = dropOnly ? `${first.name}/drop` : first.name;
-    if (!dropOnly && first.phase === 'drop') base = atoms[list.find(id => atoms[id].phase !== 'drop')!].name;
-    const n = (used.get(base) ?? 0) + 1;
-    used.set(base, n);
-    nameOf.set(s, n === 1 ? base : `${base}-${n}`);
-  }
 
   // Emit in topological order of segments (segment deps are acyclic by construction).
   const segIndegree = new Map<number, number>();
@@ -1091,6 +1079,20 @@ function buildChanges(
   }
   if (emitted.length !== segments.length) {
     throw new Error('pgpm diff: dependency cycle among emitted changes; cannot order');
+  }
+
+  // Name segments in emitted order: a unit split in two gets `<name>` then `<name>-2`.
+  const nameOf = new Map<number, string>();
+  const used = new Map<string, number>();
+  for (const s of emitted) {
+    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
+    const first = atoms[list[0]];
+    const dropOnly = list.every(id => atoms[id].phase === 'drop');
+    let base = dropOnly ? `${first.name}/drop` : first.name;
+    if (!dropOnly && first.phase === 'drop') base = atoms[list.find(id => atoms[id].phase !== 'drop')!].name;
+    const n = (used.get(base) ?? 0) + 1;
+    used.set(base, n);
+    nameOf.set(s, n === 1 ? base : `${base}-${n}`);
   }
 
   return emitted.map(s => {

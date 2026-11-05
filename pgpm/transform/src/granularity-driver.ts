@@ -250,8 +250,6 @@ export function restructureChanges(
     groupOf[i] = g;
   });
 
-  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f));
-
   // Schema producers, for schema-level change dependencies.
   const schemaGroup = new Map<string, number>();
   facts.forEach((f, i) => {
@@ -260,11 +258,86 @@ export function restructureChanges(
     }
   });
 
-  // Slice statement text per group, in the emitted (topological) order,
-  // and collect each group's facts for revert/verify generation.
+  // Change dependencies = statement edges projected onto groups, plus
+  // schema references (an object change depends on its schema's change).
+  // A reference bound to an ADD CONSTRAINT statement targets the table that
+  // constraint belongs to: a constraint change never makes anything else
+  // resolvable, and treating it as the producer would cycle a split-out FK
+  // with the table it references.
+  const producerGroup = (stmt: number): number => {
+    const g = groupOf[stmt];
+    if (g === -1 || groupOwnerKey[g] === null) return g;
+    if (groupKeys[g].split('\u0000')[1] !== 'constraint') return g;
+    return groupKeyToIndex.get(groupOwnerKey[g]!) ?? g;
+  };
+  const buildGroupDeps = (): Set<number>[] => {
+    const deps: Set<number>[] = groupKeys.map((): Set<number> => new Set<number>());
+    for (const edge of graph.edges) {
+      if (edge.kind === 'late') continue;
+      const from = groupOf[edge.from];
+      const to = producerGroup(edge.to);
+      if (from !== -1 && to !== -1 && from !== to) deps[from].add(to);
+    }
+    facts.forEach((f, i) => {
+      const from = groupOf[i];
+      if (from === -1) return;
+      const schemas = new Set<string>(f.referencedSchemas);
+      for (const created of f.creates) {
+        if (created.schema) schemas.add(created.schema);
+      }
+      for (const schema of schemas) {
+        const to = schemaGroup.get(schema);
+        if (to !== undefined && to !== from) deps[from].add(to);
+      }
+    });
+    return deps;
+  };
+
+  // Folding a constraint into its table's change can close a cycle (two new
+  // tables whose foreign keys point at each other, one of them added by
+  // ALTER TABLE). A constraint sitting on such a cycle gets its own change,
+  // which then follows both tables. A cycle no constraint split can break
+  // is an error, never an unordered plan.
+  let groupDeps = buildGroupDeps();
+  for (;;) {
+    const cyclic = groupsOnCycles(groupDeps);
+    if (cyclic.size === 0) break;
+    let moved = false;
+    facts.forEach((f, i) => {
+      const g = groupOf[i];
+      if (g === -1 || !cyclic.has(g) || groupFacts[g] === f) return;
+      const sub = subObjectIdentityOf(f);
+      if (!sub || sub.kind !== 'constraint') return;
+      const closesCycle = graph.edges.some(
+        e => e.from === i && e.kind !== 'late' && groupOf[e.to] !== -1 && groupOf[e.to] !== g && cyclic.has(groupOf[e.to])
+      );
+      if (!closesCycle) return;
+      const key = `sub\u0000${sub.kind}\u0000${sub.schema ?? ''}\u0000${sub.table}\u0000${sub.name}`;
+      let ng = groupKeyToIndex.get(key);
+      if (ng === undefined) {
+        ng = groupKeys.length;
+        groupKeys.push(key);
+        groupFacts.push(f);
+        groupSubName.push(subNameFor(sub));
+        groupOwnerKey.push(`${sub.schema ?? ''}.${sub.table}`);
+        groupKeyToIndex.set(key, ng);
+      }
+      groupOf[i] = ng;
+      moved = true;
+    });
+    if (!moved) {
+      const names = [...cyclic].map(g => groupSubName[g] ?? nameFor(groupFacts[g])).sort();
+      throw new Error(`restructure: dependency cycle among changes; cannot order: ${names.join(', ')}`);
+    }
+    groupDeps = buildGroupDeps();
+  }
+
+  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f));
+
+  // Slice statement text per group and collect each group's facts for
+  // revert/verify generation.
   const groupSql: string[][] = groupNames.map((): string[] => []);
   const groupStatements: StatementFacts[][] = groupNames.map((): StatementFacts[] => []);
-
   facts.forEach((f, i) => {
     const text = sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
     const g = groupOf[i];
@@ -274,32 +347,11 @@ export function restructureChanges(
     }
   });
 
-  // Change dependencies = statement edges projected onto groups, plus
-  // schema references (an object change depends on its schema's change).
-  const groupDeps: Set<number>[] = groupNames.map((): Set<number> => new Set<number>());
-  for (const edge of graph.edges) {
-    if (edge.kind === 'late') continue;
-    const from = groupOf[edge.from];
-    const to = groupOf[edge.to];
-    if (from !== -1 && to !== -1 && from !== to) groupDeps[from].add(to);
-  }
-  facts.forEach((f, i) => {
-    const from = groupOf[i];
-    if (from === -1) return;
-    const schemas = new Set<string>(f.referencedSchemas);
-    for (const created of f.creates) {
-      if (created.schema) schemas.add(created.schema);
-    }
-    for (const schema of schemas) {
-      const to = schemaGroup.get(schema);
-      if (to !== undefined && to !== from) groupDeps[from].add(to);
-    }
-  });
-
-  // Alteration groups depend on their table's own change, and constraint
-  // groups additionally on the column changes they key on — the statement
-  // graph keys everything by the table, so these finer edges are added here.
-  if (alteration) {
+  // Alteration (and split-out constraint) groups depend on their table's own
+  // change, and constraint groups additionally on the column changes they
+  // key on — the statement graph keys everything by the table, so these
+  // finer edges are added here.
+  {
     const columnGroup = new Map<string, number>();
     groupKeys.forEach((key, g) => {
       const parts = key.split('\u0000');
@@ -330,12 +382,9 @@ export function restructureChanges(
     });
   }
 
-  // Emit groups in first-statement order (already topological).
-  const order = [...groupNames.keys()].sort((a, b) => {
-    const firstA = groupOf.indexOf(a);
-    const firstB = groupOf.indexOf(b);
-    return firstA - firstB;
-  });
+  // Emit groups in topological order of their dependencies; first-statement
+  // order (already topological for unsplit groups) breaks ties.
+  const order = topologicalGroupOrder(groupDeps, groupNames.map((_, g) => groupOf.indexOf(g)));
 
   const result: RestructuredChange[] = order
     .filter(g => groupSql[g].length > 0)
@@ -358,4 +407,49 @@ export function restructureChanges(
     });
 
   return { changes: result, warnings };
+}
+
+/** Groups that lie on at least one dependency cycle. */
+function groupsOnCycles(deps: Set<number>[]): Set<number> {
+  const cyclic = new Set<number>();
+  deps.forEach((_, start) => {
+    const seen = new Set<number>();
+    const stack = [...deps[start]];
+    while (stack.length > 0) {
+      const g = stack.pop()!;
+      if (g === start) {
+        cyclic.add(start);
+        break;
+      }
+      if (seen.has(g)) continue;
+      seen.add(g);
+      stack.push(...deps[g]);
+    }
+  });
+  return cyclic;
+}
+
+/** Kahn's algorithm over groups; `rank` breaks ties (lower first). */
+function topologicalGroupOrder(deps: Set<number>[], rank: number[]): number[] {
+  const indegree = deps.map(d => d.size);
+  const dependents: number[][] = deps.map((): number[] => []);
+  deps.forEach((d, g) => { for (const to of d) dependents[to].push(g); });
+  const byRank = (a: number, b: number): number => rank[a] - rank[b] || a - b;
+  const ready = deps.map((_, g) => g).filter(g => indegree[g] === 0).sort(byRank);
+  const order: number[] = [];
+  while (ready.length > 0) {
+    const g = ready.shift()!;
+    order.push(g);
+    for (const d of dependents[g]) {
+      indegree[d] -= 1;
+      if (indegree[d] === 0) {
+        ready.push(d);
+        ready.sort(byRank);
+      }
+    }
+  }
+  if (order.length !== deps.length) {
+    throw new Error('restructure: dependency cycle among changes; cannot order');
+  }
+  return order;
 }
