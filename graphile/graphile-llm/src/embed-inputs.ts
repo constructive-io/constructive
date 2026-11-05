@@ -15,8 +15,8 @@ import type { ExecutableStep, FieldArgs } from 'grafast';
 import { access, ConstantStep, context, lambda, object } from 'grafast';
 import type { GraphQLInputType, GraphQLSchema } from 'graphql';
 
-import type { LlmConfigOverrides } from './embedder';
-import { llmConfigStore } from './embedder';
+import type { LlmRequestScope } from './embedder';
+import { llmConfigStore, resolveRequestScope } from './embedder';
 
 export type QuotaPolicy = 'degrade' | 'throw';
 
@@ -51,34 +51,16 @@ function isNonEmptyVector(value: unknown): boolean {
   return Array.isArray(value) && value.length > 0;
 }
 
-export async function resolveConfigOverrides(
-  graphqlContext: any
-): Promise<LlmConfigOverrides | null> {
-  const ctx = graphqlContext?.constructive;
-  if (!ctx?.useLlm) return null;
-
-  try {
-    const llm = await ctx.useLlm();
-    if (!llm?.embeddingModel) return null;
-
-    return {
-      embeddingModel: llm.embeddingModel,
-      embeddingBaseUrl: llm.embeddingBaseUrl,
-      chatModel: llm.chatModel ?? undefined,
-      chatBaseUrl: llm.chatBaseUrl ?? undefined
-    };
-  } catch {
-    return null;
-  }
-}
-
-/** Binds the embedder to one request's per-database model overrides, resolved on first use. */
+/**
+ * Binds the embedder to one request: the identity its claims carry and the
+ * per-database model overrides, resolved on first use.
+ */
 function forRequest(embedder: VectorEmbedder | null, graphqlContext: unknown): VectorEmbedder | null {
   if (!embedder) return null;
-  let overrides: Promise<LlmConfigOverrides | null> | undefined;
+  let scope: Promise<LlmRequestScope> | undefined;
   return async (text) => {
-    overrides ??= resolveConfigOverrides(graphqlContext);
-    const resolved = await overrides;
+    scope ??= resolveRequestScope(graphqlContext);
+    const resolved = await scope;
     const startTime = Date.now();
     const vector = await llmConfigStore.run(resolved, () => embedder(text));
     if (vector) {

@@ -51,7 +51,7 @@ beforeAll(async () => {
 
   llmApp.post('/api/embed', (req: any, res: any) => {
     llmRequests.push({ path: req.path, method: req.method, body: req.body });
-    res.json({ embeddings: [[0.1, 0.2, 0.3, 0.4, 0.5]] });
+    res.json({ embeddings: [[0.1, 0.2, 0.3, 0.4, 0.5]], prompt_eval_count: 7 });
   });
 
   await new Promise<void>((resolve) => {
@@ -100,7 +100,12 @@ describe('POST /v1/chat/completions', () => {
         'X-Entity-Id': 'entity-1',
         'X-Actor-Id': 'actor-1'
       },
-      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'Hello' }] })
+      body: JSON.stringify({
+        model: 'llama3',
+        messages: [{ role: 'user', content: 'Hello' }],
+        temperature: 0.2,
+        max_tokens: 64
+      })
     });
 
     expect(res.status).toBe(200);
@@ -114,6 +119,7 @@ describe('POST /v1/chat/completions', () => {
     expect(llmRequests[0].path).toBe('/api/chat');
     expect(llmRequests[0].body.model).toBe('llama3');
     expect(llmRequests[0].body.stream).toBe(false);
+    expect(llmRequests[0].body.options).toEqual({ temperature: 0.2, num_predict: 64 });
   });
 
   it('routes a successful chat completion to the injected sink', async () => {
@@ -265,6 +271,7 @@ describe('POST /v1/embeddings', () => {
     expect(data.object).toBe('list');
     expect(data.data).toHaveLength(1);
     expect(data.data[0].embedding).toEqual([0.1, 0.2, 0.3, 0.4, 0.5]);
+    expect(data.usage).toEqual({ prompt_tokens: 7, completion_tokens: 0, total_tokens: 7 });
 
     expect(llmRequests).toHaveLength(1);
     expect(llmRequests[0].path).toBe('/api/embed');
@@ -272,7 +279,9 @@ describe('POST /v1/embeddings', () => {
 
     await new Promise((r) => setTimeout(r, 100));
     expect(sinkEntries).toHaveLength(1);
-    expect(sinkEntries[0]).toMatchObject({ databaseId: 'db-test-2', service: 'embed', status: 'ok' });
+    expect(sinkEntries[0]).toMatchObject({
+      databaseId: 'db-test-2', service: 'embed', status: 'ok', inputTokens: 7, totalTokens: 7
+    });
   });
 });
 

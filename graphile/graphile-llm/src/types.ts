@@ -25,12 +25,10 @@ export type EmbedderFunction = (text: string) => Promise<EmbeddingResult>;
  * Configuration for an embedding provider.
  */
 export interface EmbedderConfig {
-  /** Provider name: 'ollama', 'openai', or 'custom' */
+  /** Upstream dialect the gateway should use: 'ollama', 'openai', ... */
   provider: string;
   /** Model identifier (e.g. 'nomic-embed-text', 'text-embedding-3-small') */
   model?: string;
-  /** Base URL for the provider (e.g. 'http://localhost:11434' for Ollama) */
-  baseUrl?: string;
 }
 
 // ─── Token Usage Types ──────────────────────────────────────────────────────
@@ -91,12 +89,10 @@ export type ChatFunction = (messages: ChatMessage[], options?: ChatOptions) => P
  * Configuration for a chat completion provider.
  */
 export interface ChatConfig {
-  /** Provider name: 'ollama', 'openai', or 'custom' */
+  /** Upstream dialect the gateway should use: 'ollama', 'openai', ... */
   provider: string;
   /** Model identifier (e.g. 'llama3', 'gpt-4o') */
   model?: string;
-  /** Base URL for the provider */
-  baseUrl?: string;
 }
 
 // ─── LLM Module Types ───────────────────────────────────────────────────────
@@ -192,15 +188,15 @@ export interface ChunkTableInfo {
  */
 export interface GraphileLlmOptions {
   /**
-   * Default embedding provider when no llm_module is configured.
-   * Useful for development/testing without requiring llm_module setup.
-   * @default undefined (requires llm_module to be configured)
+   * Embedding provider and model the gateway (`AGENTIC_SERVER_URL`) is asked
+   * for. Falls back to `EMBEDDER_PROVIDER` / `EMBEDDER_MODEL`.
+   * @default undefined
    */
   defaultEmbedder?: EmbedderConfig;
 
   /**
-   * Default chat completion provider when no llm_module is configured.
-   * Required for RAG queries.
+   * Chat provider and model the gateway is asked for. Required for RAG
+   * queries. Falls back to `CHAT_PROVIDER` / `CHAT_MODEL`.
    * @default undefined
    */
   defaultChatCompleter?: ChatConfig;

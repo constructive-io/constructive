@@ -12,10 +12,10 @@
  *
  * Resolution order for the embedder:
  *   1. `defaultEmbedder` from preset options (build-time)
- *   2. Environment variables (EMBEDDER_PROVIDER, EMBEDDER_MODEL, EMBEDDER_BASE_URL)
+ *   2. Environment variables (EMBEDDER_PROVIDER, EMBEDDER_MODEL)
  *   3. null — LLM features are disabled
  *
- * Per-database model/baseUrl overrides (from `llm_module` via `ctx.useLlm()`)
+ * Per-database model overrides (from `llm_module` via `ctx.useLlm()`)
  * are applied at request time via `llmConfigStore` (AsyncLocalStorage) in
  * the plan-time embedding step (embed-inputs.ts). The same embedder function
  * handles every request; only the model name and base URL parameters change
@@ -92,8 +92,8 @@ export function createLlmModulePlugin(
             console.log('[graphile-llm] Embedder configured — LLM text fields will be enabled');
           } else {
             console.log(
-              '[graphile-llm] No embedder configured. Set defaultEmbedder in preset options ' +
-              'or EMBEDDER_PROVIDER env var to enable text-to-vector fields.'
+              '[graphile-llm] No embedder configured. Set AGENTIC_SERVER_URL (and defaultEmbedder ' +
+              'in preset options or EMBEDDER_PROVIDER / EMBEDDER_MODEL) to enable text-to-vector fields.'
             );
           }
 
@@ -115,8 +115,8 @@ export function createLlmModulePlugin(
             console.log('[graphile-llm] Chat completer configured — RAG queries will be enabled');
           } else {
             console.log(
-              '[graphile-llm] No chat completer configured. Set defaultChatCompleter in preset ' +
-              'options or CHAT_PROVIDER env var to enable RAG queries.'
+              '[graphile-llm] No chat completer configured. Set AGENTIC_SERVER_URL (and defaultChatCompleter ' +
+              'in preset options or CHAT_PROVIDER / CHAT_MODEL) to enable RAG queries.'
             );
           }
 

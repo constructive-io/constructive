@@ -1,4 +1,3 @@
-import OllamaClient from '@agentic-kit/ollama';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { createPgvectorAdapter } from 'graphile-search/adapters/pgvector';
@@ -11,34 +10,35 @@ import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test';
 
-import {
-  buildChatCompleter,
-  buildChatCompleterFromEnv,
-  buildChatCompleterFromModule
-} from '../../src/chat';
-import {
-  buildEmbedder,
-  buildEmbedderFromEnv,
-  buildEmbedderFromModule
-} from '../../src/embedder';
+import { buildChatCompleter, buildChatCompleterFromEnv } from '../../src/chat';
+import { buildEmbedder, buildEmbedderFromEnv } from '../../src/embedder';
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmRagPlugin } from '../../src/plugins/rag-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
 import { createLlmTextSearchPlugin, embedTextInWhere } from '../../src/plugins/text-search-plugin';
-import type { EmbedderFunction, LlmModuleData } from '../../src/types';
+import type { EmbedderFunction } from '../../src/types';
+import {
+  asTestRequest,
+  ensureModel,
+  startGateway,
+  TEST_CLAIMS,
+  TEST_DATABASE_ID,
+  type TestGateway
+} from '../../test-utils/gateway';
 
-// ─── @agentic-kit/ollama client ─────────────────────────────────────────────
+// ─── Gateway ────────────────────────────────────────────────────────────────
 
-const ollamaClient = new OllamaClient('http://localhost:11434');
+let gateway: TestGateway;
 
-async function ensureNomicModel(): Promise<void> {
-  const models = await ollamaClient.listModels();
-  const hasModel = models.some((m: string) => m.includes('nomic-embed-text'));
-  if (!hasModel) {
-    console.log('Pulling nomic-embed-text model...');
-    await ollamaClient.pullModel('nomic-embed-text');
-  }
-}
+beforeAll(async () => {
+  gateway = await startGateway();
+});
+
+afterAll(async () => {
+  if (gateway) await gateway.close();
+});
+
+const ensureNomicModel = () => ensureModel();
 
 // ─── Result types ────────────────────────────────────────────────────────────
 
@@ -53,48 +53,25 @@ type QueryFn = <TResult = unknown>(
 
 describe('Embedder abstraction', () => {
   describe('buildEmbedder()', () => {
-    it('returns an EmbedderFunction for ollama provider', () => {
-      const embedder = buildEmbedder({
-        provider: 'ollama',
-        model: 'nomic-embed-text',
-        baseUrl: 'http://localhost:11434'
-      });
-      expect(embedder).not.toBeNull();
+    it('returns a gateway embedder for the configured provider and model', () => {
+      const embedder = buildEmbedder({ provider: 'ollama', model: 'nomic-embed-text' });
       expect(typeof embedder).toBe('function');
     });
 
-    it('returns null for unknown provider', () => {
-      const embedder = buildEmbedder({
-        provider: 'unknown-provider'
-      });
-      expect(embedder).toBeNull();
-    });
-
-    it('uses default model and baseUrl for ollama when not specified', () => {
+    it('uses the default model when none is given', () => {
       const embedder = buildEmbedder({ provider: 'ollama' });
-      expect(embedder).not.toBeNull();
-      expect(typeof embedder).toBe('function');
-    });
-  });
-
-  describe('buildEmbedderFromModule()', () => {
-    it('builds embedder from LlmModuleData', () => {
-      const moduleData: LlmModuleData = {
-        embedding_provider: 'ollama',
-        embedding_model: 'nomic-embed-text',
-        embedding_base_url: 'http://localhost:11434'
-      };
-      const embedder = buildEmbedderFromModule(moduleData);
-      expect(embedder).not.toBeNull();
       expect(typeof embedder).toBe('function');
     });
 
-    it('returns null for unsupported provider in module data', () => {
-      const moduleData: LlmModuleData = {
-        embedding_provider: 'unsupported'
-      };
-      const embedder = buildEmbedderFromModule(moduleData);
-      expect(embedder).toBeNull();
+    it('refuses to build without a gateway', () => {
+      const originalEnv = process.env;
+      process.env = { ...originalEnv };
+      delete process.env.AGENTIC_SERVER_URL;
+      try {
+        expect(() => buildEmbedder({ provider: 'ollama' })).toThrow(/AGENTIC_SERVER_URL/);
+      } finally {
+        process.env = originalEnv;
+      }
     });
   });
 
@@ -105,24 +82,37 @@ describe('Embedder abstraction', () => {
       process.env = originalEnv;
     });
 
-    it('returns default ollama embedder when EMBEDDER_PROVIDER is not set', () => {
+    it('returns a gateway embedder when only AGENTIC_SERVER_URL is set', () => {
       process.env = { ...originalEnv };
       delete process.env.EMBEDDER_PROVIDER;
+      delete process.env.EMBEDDER_MODEL;
       const embedder = buildEmbedderFromEnv();
-      expect(embedder).not.toBeNull();
       expect(typeof embedder).toBe('function');
     });
 
-    it('builds embedder from environment variables', () => {
+    it('builds from EMBEDDER_PROVIDER / EMBEDDER_MODEL through the gateway', () => {
       process.env = {
         ...originalEnv,
         EMBEDDER_PROVIDER: 'ollama',
-        EMBEDDER_MODEL: 'nomic-embed-text',
-        EMBEDDER_BASE_URL: 'http://localhost:11434'
+        EMBEDDER_MODEL: 'nomic-embed-text'
       };
       const embedder = buildEmbedderFromEnv();
-      expect(embedder).not.toBeNull();
       expect(typeof embedder).toBe('function');
+    });
+
+    it('returns null when neither a gateway nor a provider is configured', () => {
+      process.env = { ...originalEnv };
+      delete process.env.AGENTIC_SERVER_URL;
+      delete process.env.EMBEDDER_PROVIDER;
+      delete process.env.EMBEDDER_MODEL;
+      delete process.env.EMBEDDER_BASE_URL;
+      expect(buildEmbedderFromEnv()).toBeNull();
+    });
+
+    it('throws when a provider is configured without a gateway', () => {
+      process.env = { ...originalEnv, EMBEDDER_PROVIDER: 'ollama' };
+      delete process.env.AGENTIC_SERVER_URL;
+      expect(() => buildEmbedderFromEnv()).toThrow(/AGENTIC_SERVER_URL/);
     });
   });
 });
@@ -153,7 +143,6 @@ describe('graphile-llm schema enrichment', () => {
           defaultEmbedder: {
             provider: 'ollama',
             model: 'nomic-embed-text',
-            baseUrl: 'http://localhost:11434'
           }
         }),
         createLlmTextSearchPlugin(),
@@ -374,124 +363,76 @@ describe('graphile-llm schema enrichment', () => {
 // =============================================================================
 
 describe('graphile-llm with real Ollama embedding', () => {
+  let embedder: EmbedderFunction;
+
   beforeAll(async () => {
     await ensureNomicModel();
+    embedder = buildEmbedder({ provider: 'ollama', model: 'nomic-embed-text' });
   });
 
-  it('should embed text to a real vector via Ollama nomic-embed-text', async () => {
-    const embedder = buildEmbedder({
-      provider: 'ollama',
-      model: 'nomic-embed-text',
-      baseUrl: 'http://localhost:11434'
-    });
+  beforeEach(() => {
+    gateway.recorded.length = 0;
+  });
 
-    expect(embedder).not.toBeNull();
-
-    const result = await embedder!('Machine learning is transforming AI');
+  it('embeds text to a real vector through the gateway, recording the call', async () => {
+    const result = await asTestRequest(() => embedder('Machine learning is transforming AI'));
 
     // nomic-embed-text produces 768-dimensional vectors
-    expect(Array.isArray(result.embedding)).toBe(true);
-    expect(result.embedding.length).toBe(768);
+    expect(result.embedding).toHaveLength(768);
     expect(result.promptTokens).toBeGreaterThan(0);
-
-    // All elements should be numbers
     for (const v of result.embedding) {
-      expect(typeof v).toBe('number');
       expect(Number.isFinite(v)).toBe(true);
     }
 
-    // Vector should not be all zeros
-    const magnitude = Math.sqrt(result.embedding.reduce((sum, v) => sum + v * v, 0));
-    expect(magnitude).toBeGreaterThan(0);
-
-  });
-
-  it('should produce different vectors for semantically different text', async () => {
-    const embedder = buildEmbedder({
-      provider: 'ollama',
+    expect(gateway.recorded).toHaveLength(1);
+    expect(gateway.recorded[0]).toMatchObject({
+      service: 'embed',
+      databaseId: TEST_DATABASE_ID,
       model: 'nomic-embed-text',
-      baseUrl: 'http://localhost:11434'
+      status: 'ok',
+      inputTokens: result.promptTokens
     });
-
-    expect(embedder).not.toBeNull();
-
-    const [resultA, resultB] = await Promise.all([
-      embedder!('Artificial intelligence and machine learning'),
-      embedder!('Cooking recipes for Italian pasta dishes')
-    ]);
-    const vecA = resultA.embedding;
-    const vecB = resultB.embedding;
-
-    expect(vecA.length).toBe(768);
-    expect(vecB.length).toBe(768);
-
-    // Compute cosine similarity
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-    for (let i = 0; i < vecA.length; i++) {
-      dotProduct += vecA[i] * vecB[i];
-      normA += vecA[i] * vecA[i];
-      normB += vecB[i] * vecB[i];
-    }
-    const cosineSimilarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-
-    // Semantically different texts should have lower similarity
-    expect(cosineSimilarity).toBeLessThan(0.95);
   });
 
-  it('should produce similar vectors for semantically similar text', async () => {
-    const embedder = buildEmbedder({
-      provider: 'ollama',
-      model: 'nomic-embed-text',
-      baseUrl: 'http://localhost:11434'
-    });
-
-    expect(embedder).not.toBeNull();
-
-    const [resultA, resultB] = await Promise.all([
-      embedder!('Machine learning and artificial intelligence'),
-      embedder!('AI and ML are subfields of computer science')
-    ]);
-    const vecA = resultA.embedding;
-    const vecB = resultB.embedding;
-
-    expect(vecA.length).toBe(768);
-    expect(vecB.length).toBe(768);
-
-    // Compute cosine similarity
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-    for (let i = 0; i < vecA.length; i++) {
-      dotProduct += vecA[i] * vecB[i];
-      normA += vecA[i] * vecA[i];
-      normB += vecB[i] * vecB[i];
-    }
-    const cosineSimilarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-
-    // Semantically similar texts should have high similarity
-    expect(cosineSimilarity).toBeGreaterThan(0.5);
+  it('refuses a call that carries no identity', async () => {
+    await expect(embedder('unattributed')).rejects.toThrow(/database_id/);
+    expect(gateway.recorded).toHaveLength(0);
   });
 
-  it('should produce embeddings with token count via @agentic-kit/ollama OllamaClient directly', async () => {
-    const result = await ollamaClient.generateEmbedding(
-      'Testing the agentic-kit Ollama client directly',
-      'nomic-embed-text'
+  it('produces different vectors for semantically different text', async () => {
+    const [a, b] = await asTestRequest(() =>
+      Promise.all([
+        embedder('Artificial intelligence and machine learning'),
+        embedder('Cooking recipes for Italian pasta dishes')
+      ])
     );
+    expect(a.embedding).not.toEqual(b.embedding);
+    expect(cosine(a.embedding, b.embedding)).toBeLessThan(0.9);
+    expect(gateway.recorded).toHaveLength(2);
+  });
 
-    expect(result).toHaveProperty('embedding');
-    expect(result).toHaveProperty('promptTokens');
-    expect(Array.isArray(result.embedding)).toBe(true);
-    expect(result.embedding.length).toBe(768);
-    expect(result.promptTokens).toBeGreaterThan(0);
-
-    for (const v of result.embedding) {
-      expect(typeof v).toBe('number');
-      expect(Number.isFinite(v)).toBe(true);
-    }
+  it('produces similar vectors for semantically similar text', async () => {
+    const [a, b] = await asTestRequest(() =>
+      Promise.all([
+        embedder('Machine learning and artificial intelligence'),
+        embedder('AI and ML are subfields of computer science')
+      ])
+    );
+    expect(cosine(a.embedding, b.embedding)).toBeGreaterThan(0.5);
   });
 });
+
+function cosine(a: number[], b: number[]): number {
+  let dot = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
 
 // =============================================================================
 // Suite 4: Chat completion abstraction unit tests
@@ -499,49 +440,20 @@ describe('graphile-llm with real Ollama embedding', () => {
 
 describe('Chat completion abstraction', () => {
   describe('buildChatCompleter()', () => {
-    it('returns a ChatFunction for ollama provider', () => {
-      const chat = buildChatCompleter({
-        provider: 'ollama',
-        model: 'llama3',
-        baseUrl: 'http://localhost:11434'
-      });
-      expect(chat).not.toBeNull();
+    it('returns a gateway chat completer for the configured provider and model', () => {
+      const chat = buildChatCompleter({ provider: 'ollama', model: 'llama3' });
       expect(typeof chat).toBe('function');
     });
 
-    it('returns null for unknown provider', () => {
-      const chat = buildChatCompleter({
-        provider: 'unknown-provider'
-      });
-      expect(chat).toBeNull();
-    });
-
-    it('uses default model and baseUrl for ollama when not specified', () => {
-      const chat = buildChatCompleter({ provider: 'ollama' });
-      expect(chat).not.toBeNull();
-      expect(typeof chat).toBe('function');
-    });
-  });
-
-  describe('buildChatCompleterFromModule()', () => {
-    it('builds chat completer from LlmModuleData with chat_provider', () => {
-      const moduleData: LlmModuleData = {
-        embedding_provider: 'ollama',
-        chat_provider: 'ollama',
-        chat_model: 'llama3',
-        chat_base_url: 'http://localhost:11434'
-      };
-      const chat = buildChatCompleterFromModule(moduleData);
-      expect(chat).not.toBeNull();
-      expect(typeof chat).toBe('function');
-    });
-
-    it('returns null when chat_provider is not set', () => {
-      const moduleData: LlmModuleData = {
-        embedding_provider: 'ollama'
-      };
-      const chat = buildChatCompleterFromModule(moduleData);
-      expect(chat).toBeNull();
+    it('refuses to build without a gateway', () => {
+      const originalEnv = process.env;
+      process.env = { ...originalEnv };
+      delete process.env.AGENTIC_SERVER_URL;
+      try {
+        expect(() => buildChatCompleter({ provider: 'ollama' })).toThrow(/AGENTIC_SERVER_URL/);
+      } finally {
+        process.env = originalEnv;
+      }
     });
   });
 
@@ -552,24 +464,31 @@ describe('Chat completion abstraction', () => {
       process.env = originalEnv;
     });
 
-    it('returns default ollama chat completer when CHAT_PROVIDER is not set', () => {
+    it('returns a gateway chat completer when only AGENTIC_SERVER_URL is set', () => {
       process.env = { ...originalEnv };
       delete process.env.CHAT_PROVIDER;
-      const chat = buildChatCompleterFromEnv();
-      expect(chat).not.toBeNull();
-      expect(typeof chat).toBe('function');
+      delete process.env.CHAT_MODEL;
+      expect(typeof buildChatCompleterFromEnv()).toBe('function');
     });
 
-    it('builds chat completer from environment variables', () => {
-      process.env = {
-        ...originalEnv,
-        CHAT_PROVIDER: 'ollama',
-        CHAT_MODEL: 'llama3',
-        CHAT_BASE_URL: 'http://localhost:11434'
-      };
-      const chat = buildChatCompleterFromEnv();
-      expect(chat).not.toBeNull();
-      expect(typeof chat).toBe('function');
+    it('builds from CHAT_PROVIDER / CHAT_MODEL through the gateway', () => {
+      process.env = { ...originalEnv, CHAT_PROVIDER: 'ollama', CHAT_MODEL: 'llama3' };
+      expect(typeof buildChatCompleterFromEnv()).toBe('function');
+    });
+
+    it('returns null when neither a gateway nor a provider is configured', () => {
+      process.env = { ...originalEnv };
+      delete process.env.AGENTIC_SERVER_URL;
+      delete process.env.CHAT_PROVIDER;
+      delete process.env.CHAT_MODEL;
+      delete process.env.CHAT_BASE_URL;
+      expect(buildChatCompleterFromEnv()).toBeNull();
+    });
+
+    it('throws when a provider is configured without a gateway', () => {
+      process.env = { ...originalEnv, CHAT_PROVIDER: 'ollama' };
+      delete process.env.AGENTIC_SERVER_URL;
+      expect(() => buildChatCompleterFromEnv()).toThrow(/AGENTIC_SERVER_URL/);
     });
   });
 });
@@ -981,19 +900,13 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
 
   beforeAll(async () => {
     // Build a real Ollama embedder
-    const built = buildEmbedder({
-      provider: 'ollama',
-      model: 'nomic-embed-text',
-      baseUrl: 'http://localhost:11434',
-    });
-    if (!built) throw new Error('Failed to build Ollama embedder');
-    embedder = built;
+    embedder = buildEmbedder({ provider: 'ollama', model: 'nomic-embed-text' });
 
     await ensureNomicModel();
 
     // Embed all article bodies in parallel
-    const embeddings = await Promise.all(
-      INTEGRATION_ARTICLES.map((a) => embedder(`${a.title}. ${a.body}`))
+    const embeddings = await asTestRequest(() =>
+      Promise.all(INTEGRATION_ARTICLES.map((a) => embedder(`${a.title}. ${a.body}`)))
     );
 
     // Build seed SQL with real 768-dim embeddings
@@ -1011,10 +924,12 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
     `;
 
     // Pre-compute search query vectors
-    const [mlResult, cookResult] = await Promise.all([
-      embedder('machine learning artificial intelligence algorithms'),
-      embedder('Italian cooking pasta recipes tomatoes'),
-    ]);
+    const [mlResult, cookResult] = await asTestRequest(() =>
+      Promise.all([
+        embedder('machine learning artificial intelligence algorithms'),
+        embedder('Italian cooking pasta recipes tomatoes')
+      ])
+    );
     mlQueryVector = mlResult.embedding;
     cookingQueryVector = cookResult.embedding;
 
@@ -1039,7 +954,6 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
           defaultEmbedder: {
             provider: 'ollama',
             model: 'nomic-embed-text',
-            baseUrl: 'http://localhost:11434',
           },
         }),
         createLlmTextSearchPlugin(),
@@ -1061,6 +975,8 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
     db = connections.db;
     teardown = connections.teardown;
     query = connections.query;
+    // Requests run on the root client (`useRoot`); its context is their pgSettings.
+    connections.pg.setContext({ role: 'postgres', ...TEST_CLAIMS });
 
     await db.client.query('BEGIN');
   }, 120_000);
@@ -1083,7 +999,7 @@ describe('Real Ollama + unifiedSearch + pgvector RRF integration', () => {
 
   it('embedTextInWhere transforms unifiedSearch with real 768-dim Ollama vector', async () => {
     const realEmbedder = async (text: string) => {
-      const result = await embedder(text);
+      const result = await asTestRequest(() => embedder(text));
       return result.embedding;
     };
 

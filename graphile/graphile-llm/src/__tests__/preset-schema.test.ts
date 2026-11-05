@@ -7,6 +7,7 @@ import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
 import type { PgTestClient } from 'pgsql-test';
 
+import { OLLAMA_URL, startGateway, TEST_CLAIMS, type TestGateway } from '../../test-utils/gateway';
 import { GraphileLlmPreset } from '../preset';
 
 // The preset as production loads it (graphile-settings calls `GraphileLlmPreset()`
@@ -18,7 +19,6 @@ type QueryFn = <TResult = unknown>(
   variables?: Record<string, unknown>
 ) => Promise<GraphQLResponse<TResult>>;
 
-const OLLAMA_URL = 'http://localhost:11434';
 
 async function ollamaReachable(): Promise<boolean> {
   try {
@@ -33,8 +33,10 @@ describe('GraphileLlmPreset builds a real schema', () => {
   let db: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;
+  let gateway: TestGateway;
 
   beforeAll(async () => {
+    gateway = await startGateway();
     const connections = await getConnections(
       {
         schemas: ['llm_test'],
@@ -42,7 +44,7 @@ describe('GraphileLlmPreset builds a real schema', () => {
           extends: [
             ConnectionFilterPreset(),
             GraphileLlmPreset({
-              defaultEmbedder: { provider: 'ollama', model: 'nomic-embed-text', baseUrl: OLLAMA_URL },
+              defaultEmbedder: { provider: 'ollama', model: 'nomic-embed-text' },
               enableRag: true
             })
           ],
@@ -59,10 +61,13 @@ describe('GraphileLlmPreset builds a real schema', () => {
     db = connections.db;
     teardown = connections.teardown;
     query = connections.query;
+    // Requests run on the root client (`useRoot`); its context is their pgSettings.
+    connections.pg.setContext({ role: 'postgres', ...TEST_CLAIMS });
   });
 
   afterAll(async () => {
     if (teardown) await teardown();
+    if (gateway) await gateway.close();
   });
 
   beforeEach(async () => {

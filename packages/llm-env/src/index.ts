@@ -17,6 +17,10 @@
  *   CHAT_PROVIDER      - Chat provider name (default: 'ollama')
  *   CHAT_MODEL         - Chat model (default: 'llama3')
  *   CHAT_BASE_URL      - Chat provider URL (default: 'http://localhost:11434')
+ *   AGENTIC_SERVER_URL - Metered LLM gateway root (no default). When set, the
+ *                        server embeds and chats through the gateway, which
+ *                        resolves the upstream provider and records every call;
+ *                        EMBEDDER_BASE_URL / CHAT_BASE_URL are not consulted.
  */
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -27,15 +31,22 @@ export interface LlmProviderConfig {
   baseUrl?: string;
 }
 
+/** The metered gateway model calls leave through, when one is configured. */
+export interface LlmGatewayConfig {
+  url?: string;
+}
+
 export interface LlmEnvOptions {
   embedding?: LlmProviderConfig;
   chat?: LlmProviderConfig;
+  gateway?: LlmGatewayConfig;
 }
 
-/** Fully resolved LLM config — every field guaranteed present after merge. */
+/** Fully resolved LLM config — every provider field present after merge; the gateway stays optional. */
 export interface ResolvedLlmEnvOptions {
   embedding: Required<LlmProviderConfig>;
   chat: Required<LlmProviderConfig>;
+  gateway: LlmGatewayConfig;
 }
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
@@ -50,7 +61,8 @@ export const llmDefaults: ResolvedLlmEnvOptions = {
     provider: 'ollama',
     model: 'llama3',
     baseUrl: 'http://localhost:11434'
-  }
+  },
+  gateway: {}
 };
 
 // ─── Env Parsing ────────────────────────────────────────────────────────────
@@ -71,6 +83,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): LlmEnvOptions 
     CHAT_PROVIDER,
     CHAT_MODEL,
     CHAT_BASE_URL,
+    AGENTIC_SERVER_URL,
   } = env;
 
   return {
@@ -87,6 +100,9 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): LlmEnvOptions 
         ...(CHAT_MODEL && { model: CHAT_MODEL }),
         ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL }),
       },
+    }),
+    ...(AGENTIC_SERVER_URL && {
+      gateway: { url: AGENTIC_SERVER_URL },
     }),
   };
 };
@@ -118,6 +134,11 @@ export const getEnvOptions = (
       ...llmDefaults.chat,
       ...envOptions.chat,
       ...overrides.chat,
+    },
+    gateway: {
+      ...llmDefaults.gateway,
+      ...envOptions.gateway,
+      ...overrides.gateway,
     },
   };
 };

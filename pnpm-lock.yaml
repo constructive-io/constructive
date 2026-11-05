@@ -856,9 +856,9 @@ importers:
 
   graphile/graphile-llm:
     dependencies:
-      '@agentic-kit/ollama':
-        specifier: workspace:*
-        version: link:../../agentic/ollama/dist
+      '@agentic-kit/metering':
+        specifier: workspace:^
+        version: link:../../agentic/metering/dist
       '@constructive-io/llm-env':
         specifier: workspace:^
         version: link:../../packages/llm-env/dist
@@ -896,6 +896,9 @@ importers:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.15
+      agentic-server:
+        specifier: workspace:*
+        version: link:../../agentic/agentic-server/dist
       graphile-connection-filter:
         specifier: workspace:^
         version: link:../graphile-connection-filter/dist
@@ -2378,6 +2381,9 @@ importers:
       '@types/supertest':
         specifier: ^7.2.1
         version: 7.2.1
+      agentic-server:
+        specifier: workspace:^
+        version: link:../../agentic/agentic-server/dist
       appstash:
         specifier: ^0.8.0
         version: 0.8.0
@@ -2387,6 +2393,9 @@ importers:
       graphile-cache:
         specifier: workspace:^
         version: link:../../graphile/graphile-cache/dist
+      graphile-llm:
+        specifier: workspace:^
+        version: link:../../graphile/graphile-llm/dist
       inquirerer:
         specifier: ^4.9.4
         version: 4.9.4

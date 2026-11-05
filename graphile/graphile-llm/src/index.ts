@@ -6,7 +6,8 @@
  *
  * Moves the embedding logic from the client (CLI --auto-embed) into the
  * Graphile server layer so clients work with text/prompts instead of raw
- * float vectors.
+ * float vectors. Every model call goes through the metered gateway at
+ * `AGENTIC_SERVER_URL`, under the identity the request's claims carry.
  *
  * @example
  * ```typescript
@@ -52,19 +53,21 @@ export type { AgentDiscovery,AgentTableInfo } from './plugins/agent-discovery-pl
 export { clearAgentDiscoveryCache,getAgentDiscovery } from './plugins/agent-discovery-plugin';
 
 // Embedder utilities
-export type { LlmConfigOverrides } from './embedder';
+export type { LlmRequestScope } from './embedder';
 export {
   buildEmbedder,
   buildEmbedderFromEnv,
-  buildEmbedderFromModule,
-  llmConfigStore
+  createGatewayEmbedder,
+  identityFromClaims,
+  llmConfigStore,
+  resolveRequestScope
 } from './embedder';
 
 // Chat completion utilities
 export {
   buildChatCompleter,
   buildChatCompleterFromEnv,
-  buildChatCompleterFromModule
+  createGatewayChatCompleter
 } from './chat';
 
 // Types

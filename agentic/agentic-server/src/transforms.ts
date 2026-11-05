@@ -70,13 +70,16 @@ export function transformChatRequest(
   }
 
   if (provider.type === 'ollama') {
+    // Ollama takes sampling settings under `options`; `max_tokens` is `num_predict`.
+    const options = {
+      ...(body.temperature !== undefined && { temperature: body.temperature }),
+      ...(body.max_tokens !== undefined && { num_predict: body.max_tokens })
+    };
     return {
       model: model || 'llama3',
       messages: flattenContentParts(body.messages),
       stream: false,
-      ...(body.temperature !== undefined && {
-        options: { temperature: body.temperature }
-      })
+      ...(Object.keys(options).length > 0 && { options })
     };
   }
 
@@ -176,7 +179,9 @@ export function transformEmbedResponse(
   if (provider.type === 'ollama') {
     const raw = (data.embeddings || data.embedding || []) as number[][];
     const embeddings: number[][] = Array.isArray(raw[0]) ? raw : [raw as unknown as number[]];
-    const usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+    // Ollama reports the prompt tokens of an embed as `prompt_eval_count`.
+    const promptTokens = (data.prompt_eval_count as number) || 0;
+    const usage = { prompt_tokens: promptTokens, completion_tokens: 0, total_tokens: promptTokens };
     return {
       body: {
         object: 'list',

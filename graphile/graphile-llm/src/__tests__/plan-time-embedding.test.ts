@@ -1,4 +1,3 @@
-import OllamaClient from '@agentic-kit/ollama';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { createPgvectorAdapter } from 'graphile-search/adapters/pgvector';
 import { createTsvectorAdapter } from 'graphile-search/adapters/tsvector';
@@ -13,6 +12,7 @@ import { buildEmbedder } from '../../src/embedder';
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
 import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
 import { createLlmTextSearchPlugin } from '../../src/plugins/text-search-plugin';
+import { asTestRequest, ensureModel, startGateway, TEST_CLAIMS, type TestGateway } from '../../test-utils/gateway';
 
 // Text-to-vector must happen while the operation is planned, before SQL is
 // built: a v4-style resolve() wrapper runs after Grafast has already executed
@@ -25,8 +25,6 @@ type QueryFn = <TResult = unknown>(
 
 type DocNode = { name: string; embeddingVectorDistance: number | null };
 type DocsResult = { allDocs: { nodes: DocNode[] } };
-
-const OLLAMA_URL = 'http://localhost:11434';
 
 const DOCS: Array<[string, string]> = [
   ['warehouse-lease.txt', 'Warehouse lease agreement: monthly rent of 12,000 USD for the Oakland storage facility, five year term.'],
@@ -59,17 +57,15 @@ describe('server-side embedding runs before SQL', () => {
   let teardown: () => Promise<void>;
   let query: QueryFn;
   let askVector: number[];
+  let gateway: TestGateway;
 
   beforeAll(async () => {
-    const ollama = new OllamaClient(OLLAMA_URL);
-    const models = await ollama.listModels();
-    if (!models.some((m: string) => m.includes('nomic-embed-text'))) {
-      await ollama.pullModel('nomic-embed-text');
-    }
+    gateway = await startGateway();
+    await ensureModel();
 
-    const embed = buildEmbedder({ provider: 'ollama', model: 'nomic-embed-text', baseUrl: OLLAMA_URL })!;
-    const docVectors = await Promise.all(DOCS.map(([, body]) => embed(body)));
-    askVector = (await embed(ASK)).embedding;
+    const embed = buildEmbedder({ provider: 'ollama', model: 'nomic-embed-text' });
+    const docVectors = await asTestRequest(() => Promise.all(DOCS.map(([, body]) => embed(body))));
+    askVector = (await asTestRequest(() => embed(ASK))).embedding;
 
     const values = DOCS.map(([name, body], i) =>
       `('${name}', '${body.replace(/'/g, "''")}', '[${docVectors[i].embedding.join(',')}]')`
@@ -88,7 +84,7 @@ describe('server-side embedding runs before SQL', () => {
             enableUnifiedSearch: true
           }),
           createLlmModulePlugin({
-            defaultEmbedder: { provider: 'ollama', model: 'nomic-embed-text', baseUrl: OLLAMA_URL }
+            defaultEmbedder: { provider: 'ollama', model: 'nomic-embed-text' }
           }),
           createLlmTextSearchPlugin(),
           createLlmTextMutationPlugin()
@@ -117,10 +113,13 @@ describe('server-side embedding runs before SQL', () => {
     pg = connections.pg;
     teardown = connections.teardown;
     query = connections.query;
+    // Requests run on the root client (`useRoot`); its context is their pgSettings.
+    pg.setContext({ role: 'postgres', ...TEST_CLAIMS });
   }, 120_000);
 
   afterAll(async () => {
     if (teardown) await teardown();
+    if (gateway) await gateway.close();
   });
 
   beforeEach(async () => { await db.beforeEach(); });

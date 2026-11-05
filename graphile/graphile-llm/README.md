@@ -41,7 +41,6 @@ const preset = {
       defaultEmbedder: {
         provider: 'ollama',
         model: 'nomic-embed-text',
-        baseUrl: 'http://localhost:11434',
       },
     }),
   ],
@@ -55,7 +54,7 @@ The preset bundles all plugins listed below. You can also import each plugin ind
 - **Text-based vector search** — adds `text: String` field to `VectorNearbyInput`; clients pass natural language instead of raw float vectors
 - **Text mutation fields** — adds `{column}Text: String` companion fields on create/update inputs for vector columns
 - **RAG queries** — adds `ragQuery` and `embedText` root query fields; detects `@hasChunks` smart tags for chunk-aware retrieval
-- **Pluggable providers** — provider-based architecture for both embedding and chat completion (Ollama via `@agentic-kit/ollama`, extensible to OpenAI, etc.)
+- **One metered route** — every embedding and completion is a call on the agentic-server gateway at `AGENTIC_SERVER_URL`, under the request's identity, so each model call is recorded; the gateway owns the upstream provider (Ollama, OpenAI, ...)
 - **Per-database configuration** — reads `llm_module` from `constructive_routing_public.api_modules` for per-API provider config
 - **Toggleable** — each capability (`enableTextSearch`, `enableTextMutations`, `enableRag`) can be independently enabled or disabled
 - **Plugin-conditional** — fields only appear in the schema when the plugin is loaded
@@ -77,14 +76,12 @@ GraphileLlmPreset({
   defaultEmbedder: {
     provider: 'ollama',
     model: 'nomic-embed-text',
-    baseUrl: 'http://localhost:11434',
   },
 
   // Chat completion provider (required for RAG)
   defaultChatCompleter: {
     provider: 'ollama',
     model: 'llama3',
-    baseUrl: 'http://localhost:11434',
   },
 
   // Toggle individual capabilities
@@ -101,7 +98,7 @@ GraphileLlmPreset({
 })
 ```
 
-Providers can also be configured via environment variables (`EMBEDDER_PROVIDER`, `EMBEDDER_MODEL`, `EMBEDDER_BASE_URL`, `CHAT_PROVIDER`, `CHAT_MODEL`, `CHAT_BASE_URL`).
+`AGENTIC_SERVER_URL` names the gateway and is required whenever an embedder or chat completer is configured; the schema build fails without it. Providers and models can also come from environment variables (`EMBEDDER_PROVIDER`, `EMBEDDER_MODEL`, `CHAT_PROVIDER`, `CHAT_MODEL`).
 
 ## RAG queries
 
