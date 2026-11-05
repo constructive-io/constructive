@@ -92,6 +92,18 @@ export const flushService = async (
     });
   }
 
+  // Every entry this database resolved to goes, by the id the entry carries:
+  // a hostname whose row was removed is no longer listed below, and its key
+  // must not outlive the row.
+  const resolved: string[] = [];
+  svcCache.forEach((entry: { databaseId?: string } | undefined, key: string) => {
+    if (entry?.databaseId === databaseId) resolved.push(key);
+  });
+  for (const key of resolved) {
+    graphileCache.delete(key);
+    svcCache.delete(key);
+  }
+
   // The domains plane sits behind member RLS; the login reads it through the
   // login-only SECURITY DEFINER reader, which resolves the plane itself.
   const svc = await pgPool.query<{ hostname: string }>(
