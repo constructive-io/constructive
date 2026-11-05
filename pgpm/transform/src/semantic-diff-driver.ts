@@ -1830,6 +1830,35 @@ export function diffSchemas(
     for (const drop of unitPhase(triggerKey, 'drop')) drop.deps.add(atom.id);
   }
 
+  // Extensions are cluster-level providers of types, functions and operators
+  // that references do not resolve to (`uuid_generate_v4()` names no schema):
+  // creating one precedes every other step and dropping one follows them.
+  const isExtension = (atom: Atom): boolean => atom.name.startsWith('extensions/');
+  for (const ext of atoms) {
+    if (!isExtension(ext)) continue;
+    for (const other of atoms) {
+      if (other === ext || isExtension(other)) continue;
+      if (ext.phase === 'drop') ext.deps.add(other.id);
+      else other.deps.add(ext.id);
+    }
+  }
+
+  // Collations are referenced by `COLLATE` clauses that resolve to no tracked
+  // object: a column that starts using one follows its creation, and a
+  // collation is dropped only after every step whose inverse still uses it.
+  const collationRef = /^(CREATE|DROP) COLLATION (?:IF EXISTS )?(?:("?)([^".\s]+)\2\.)?("?)([^"\s(;]+)\4/;
+  for (const atom of atoms) {
+    const m = collationRef.exec(atom.sql);
+    if (!m) continue;
+    const bare = m[5].replace(/^"|"$/g, '');
+    const uses = new RegExp(`\\bCOLLATE\\s+(?:"?${m[3] ?? '[^".\\s]+'}"?\\.)?"?${bare.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"?(?![\\w"])`, 'i');
+    for (const other of atoms) {
+      if (other === atom) continue;
+      if (m[1] === 'CREATE' && uses.test(other.sql)) other.deps.add(atom.id);
+      if (m[1] === 'DROP' && uses.test(other.inverse)) atom.deps.add(other.id);
+    }
+  }
+
   // ---- enum values added and used in the same migration: Postgres refuses to
   // use a new value before the transaction that added it commits (55P04).
   for (const atom of atoms) {

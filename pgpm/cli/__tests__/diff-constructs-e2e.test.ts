@@ -272,7 +272,7 @@ export const CASES: Case[] = [
   {
     name: 'operator-and-opclass',
     v1: `${S} CREATE FUNCTION fx.add3(int, int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT $1 + $2 + 3 $$;`,
-    v2: `${S} CREATE FUNCTION fx.add3(int, int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT $1 + $2 + 3 $$; CREATE OPERATOR fx.+++ (LEFTARG = int, RIGHTARG = int, FUNCTION = fx.add3, COMMUTATOR = OPERATOR(fx.+++));`
+    v2: `${S} CREATE FUNCTION fx.add3(int, int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT $1 + $2 + 3 $$; CREATE OPERATOR fx.### (LEFTARG = int, RIGHTARG = int, FUNCTION = fx.add3);`
   },
   {
     name: 'cast-add',

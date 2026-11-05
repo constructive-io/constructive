@@ -86,7 +86,13 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
   const functions = await db.query(`
     SELECT n.nspname AS schema, p.proname,
            pg_get_function_identity_arguments(p.oid) AS args,
-           pg_get_functiondef(p.oid) AS def
+           CASE WHEN p.prokind = 'a' THEN (
+             SELECT format('AGGREGATE kind=%s sfunc=%s stype=%s sspace=%s finalfunc=%s finalextra=%s finalmodify=%s combinefunc=%s serialfunc=%s deserialfunc=%s msfunc=%s minvfunc=%s mstype=%s mfinalfunc=%s sortop=%s initcond=%s minitcond=%s parallel=%s',
+               a.aggkind, a.aggtransfn::regproc, a.aggtranstype::regtype, a.aggtransspace, a.aggfinalfn::regproc, a.aggfinalextra, a.aggfinalmodify,
+               a.aggcombinefn::regproc, a.aggserialfn::regproc, a.aggdeserialfn::regproc, a.aggmtransfn::regproc, a.aggminvtransfn::regproc,
+               a.aggmtranstype::regtype, a.aggmfinalfn::regproc, a.aggsortop::regoperator, a.agginitval, a.aggminitval, p.proparallel)
+             FROM pg_aggregate a WHERE a.aggfnoid = p.oid
+           ) ELSE pg_get_functiondef(p.oid) END AS def
     FROM pg_proc p
     JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
