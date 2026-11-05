@@ -76,7 +76,8 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     pgpm(work, [
       'diff', path.join(work, 'blog'), path.join(work, 'blog-v2'),
       '--emit-migration', work, '--pkg', 'blog-migration',
-      '--emit-sql', path.join(work, 'migration.sql')
+      '--emit-sql', path.join(work, 'migration.sql'),
+      '--allow-data-loss'
     ]);
   });
 
@@ -142,7 +143,8 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
   it('derives the v1 -> v2 migration: exactly the real changes, nothing guessed', () => {
     const result = diffChangeSets(
       changesOf(path.join(work, 'blog')),
-      changesOf(path.join(work, 'blog-v2'))
+      changesOf(path.join(work, 'blog-v2')),
+      { allowDataLoss: true }
     );
     expect(result.identical).toBe(false);
     const byDelta = (delta: string): string[] =>
