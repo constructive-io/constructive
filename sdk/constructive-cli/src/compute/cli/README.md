@@ -28,7 +28,6 @@ csdk auth set-token <your-token>
 | `config` | Manage config key-value store (per-context) |
 | `build` | build CRUD operations |
 | `build-step` | buildStep CRUD operations |
-| `builder-binding` | builderBinding CRUD operations |
 | `content-preset` | contentPreset CRUD operations |
 | `database-function-graph` | databaseFunctionGraph CRUD operations |
 | `database-function-graph-execution-cancel-request` | databaseFunctionGraphExecutionCancelRequest CRUD operations |
@@ -72,7 +71,6 @@ csdk auth set-token <your-token>
 | `namespace-event` | namespaceEvent CRUD operations |
 | `platform-build` | platformBuild CRUD operations |
 | `platform-build-step` | platformBuildStep CRUD operations |
-| `platform-builder-binding` | platformBuilderBinding CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
@@ -119,6 +117,7 @@ csdk auth set-token <your-token>
 | `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `platform-service-binding` | platformServiceBinding CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `proposal-comment` | proposalComment CRUD operations |
@@ -147,6 +146,7 @@ csdk auth set-token <your-token>
 | `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `service-binding` | serviceBinding CRUD operations |
 | `webhook-endpoint` | webhookEndpoint CRUD operations |
 | `webhook-event` | webhookEvent CRUD operations |
 | `database-read-function-graph` | databaseReadFunctionGraph |
@@ -340,42 +340,6 @@ CRUD operations for BuildStep records.
 
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `builder-binding`
-
-CRUD operations for BuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all builderBinding records |
-| `find-first` | Find first matching builderBinding record |
-| `get` | Get a builderBinding by id |
-| `create` | Create a new builderBinding |
-| `update` | Update an existing builderBinding |
-| `delete` | Delete a builderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `databaseId`, `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `content-preset`
 
@@ -1785,41 +1749,6 @@ CRUD operations for PlatformBuildStep records.
 
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `platform-builder-binding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformBuilderBinding records |
-| `find-first` | Find first matching platformBuilderBinding record |
-| `get` | Get a platformBuilderBinding by id |
-| `create` | Create a new platformBuilderBinding |
-| `update` | Update an existing platformBuilderBinding |
-| `delete` | Delete a platformBuilderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-function-api-binding`
 
@@ -3768,6 +3697,43 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
 
+### `platform-service-binding`
+
+CRUD operations for PlatformServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformServiceBinding records |
+| `find-first` | Find first matching platformServiceBinding record |
+| `get` | Get a platformServiceBinding by id |
+| `create` | Create a new platformServiceBinding |
+| `update` | Update an existing platformServiceBinding |
+| `delete` | Delete a platformServiceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
+
 ### `platform-webhook-endpoint`
 
 CRUD operations for PlatformWebhookEndpoint records.
@@ -5134,6 +5100,44 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `service-binding`
+
+CRUD operations for ServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all serviceBinding records |
+| `find-first` | Find first matching serviceBinding record |
+| `get` | Get a serviceBinding by id |
+| `create` | Create a new serviceBinding |
+| `update` | Update an existing serviceBinding |
+| `delete` | Delete a serviceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `webhook-endpoint`
 
