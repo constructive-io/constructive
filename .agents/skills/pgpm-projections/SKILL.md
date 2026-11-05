@@ -95,8 +95,19 @@ pgpm diff <A> <B> --verify
 - Any dial combination normalizes back to the identical identity-keyed model
   (`diffChangeSets(a, b).identical === true`).
 - Any dial combination deploys to the identical Postgres catalog.
-- Generated migrations never use `CREATE OR REPLACE`; changed functions emit
-  `DROP` + `CREATE`.
+- A diff orders everything undeployed — drops, table alterations, replacements
+  and creates — by one dependency graph; phase and `to`-side source order only
+  break ties, and each change's `requires` are its real graph edges. An
+  unorderable cycle throws; nothing falls back to plan or file order.
+- A changed function keeps `CREATE OR REPLACE` only when its name, parameters
+  and return type are unchanged (Postgres then preserves dependents: views,
+  triggers, defaults). Any signature change, and every other replaced object,
+  emits `DROP` + `CREATE`; unchanged views/policies/triggers that a dropped or
+  retyped column or a replaced object would invalidate are dropped before it
+  and recreated after. Hand-written changes still never use `CREATE OR
+  REPLACE` (see `sql-create-or-replace-syntax`); this is the one place it is
+  emitted, and only because a same-signature replacement is the deterministic
+  way to keep dependents intact.
 - Every emitted change has deploy, revert, and verify; non-derivable reverts
   get a `-- revert not derivable` comment plus a warning, never silence.
 

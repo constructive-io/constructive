@@ -97,8 +97,10 @@ export interface AppendModuleResult {
  * file are left untouched; only the new changes are written (deploy/revert/
  * verify) and appended to `pgpm.plan` after the current changes.
  *
- * Rows whose change name already exists are skipped (never overwritten).
- * A new change's dependency bracket is filtered to names that resolve within
+ * A row whose change name already exists in the plan reworks a deployed
+ * change (a replaced function, an altered table), so it is appended under the
+ * next free `<name>-N` and never overwrites the existing change; incoming
+ * dependencies on it follow the rename. A new change's dependency bracket is filtered to names that resolve within
  * the plan (existing changes, other appended changes, or `pkg:`-external
  * references); a dangling internal dependency is dropped with a warning
  * (plan order still sequences it after the current changes).
@@ -126,6 +128,20 @@ export const appendModule = (
   const plan = parsed.data;
 
   const existingNames = new Set(plan.changes.map(c => c.name));
+  const taken = new Set([...existingNames, ...rows.map(r => r.deploy)]);
+  const renamed = new Map<string, string>();
+  for (const row of rows) {
+    if (!existingNames.has(row.deploy)) continue;
+    let n = 2;
+    while (taken.has(`${row.deploy}-${n}`)) n += 1;
+    renamed.set(row.deploy, `${row.deploy}-${n}`);
+    taken.add(`${row.deploy}-${n}`);
+  }
+  rows = rows.map(row => ({
+    ...row,
+    deploy: renamed.get(row.deploy) ?? row.deploy,
+    deps: (row.deps ?? []).map(dep => renamed.get(dep) ?? dep)
+  }));
   const incomingNames = new Set(rows.map(r => r.deploy));
   const appended = new Set<string>();
   const added: string[] = [];

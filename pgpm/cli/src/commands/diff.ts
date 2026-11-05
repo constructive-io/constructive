@@ -66,9 +66,10 @@ Options:
                            requires) into <dir>/<pkg>
   --emit-module <dir>      Alias of --emit-migration
   --append-module <dir>    Append the delta into an EXISTING pgpm module at
-                           <dir> (new changes only; existing changes, scripts,
-                           and .control are left untouched). Standalone: not
-                           combinable with --emit-*/--verify.
+                           <dir>: existing changes, scripts and .control are
+                           left untouched; a change reworking an existing name
+                           is appended as <name>-N. Standalone: not combinable
+                           with --emit-*/--verify.
   --emit-sql <file|->      Also project the delta to a single consolidated SQL
                            file (deparsed in plan order); - writes to stdout
   --emit-bundle <file>     Also project the delta to a content-addressed

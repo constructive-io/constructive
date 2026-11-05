@@ -55,7 +55,7 @@ describe('diffSchemas', () => {
 
     const modified = diffSchemas(BASE, BASE.replace('count(*)', 'count(1)'))
       .changes.find(c => c.name === 'schemas/app/procedures/user_count/procedure')!;
-    expect(modified.revert).toContain('DROP FUNCTION app.user_count');
+    expect(modified.revert).toContain('CREATE OR REPLACE FUNCTION app.user_count');
     expect(modified.revert).toContain('count(*)');
     expect(modified.verify).toContain('to_regprocedure');
 
@@ -293,7 +293,8 @@ describe('diffSchemas dependency order', () => {
     const result = diffSchemas(from, to);
     const script = deployScript(result);
     expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'DROP COLUMN y'));
-    expect(at(script, 'DROP COLUMN y')).toBeLessThan(at(script, 'CREATE VIEW app.av'));
+    expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'CREATE VIEW app.av'));
+    expect(changeWith(result, 'DROP COLUMN y').dependencies).toContain(changeWith(result, 'DROP VIEW app.av').name);
   });
 
   it('drops a removed view before dropping the column it used', () => {

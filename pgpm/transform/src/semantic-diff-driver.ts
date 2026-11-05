@@ -11,11 +11,13 @@
  * constraint-by-constraint so an added column emits `ALTER TABLE ADD COLUMN`,
  * not a table rebuild.
  *
- * The emitted delta is a set of pgpm changes: DROPs for removed objects
- * (reverse topological order), then CREATE/ALTER changes for added and
- * modified objects routed through the granularity pipeline
- * (`restructureChanges`), so names come from the naming spec and `requires`
- * from the statement graph — the same derivation every other projection uses.
+ * The emitted delta is a set of pgpm changes ordered by one dependency graph
+ * over everything undeployed: DROPs of removed objects, ALTER TABLE steps of
+ * modified tables, replacements (and the drop/recreate of unchanged dependents
+ * a breaking step would invalidate) and CREATEs of added objects. Added
+ * objects are shaped and named by the granularity pipeline
+ * (`restructureChanges`); every other change gets its name from the naming
+ * spec and its `requires` from the graph — never a positional chain.
  * Every emitted change carries a full deploy/revert/verify triple: inverses
  * and existence checks are composed at the AST level via `@pgsql/scripts`'
  * node-level API (`invertStatement`/`existenceCheck`) — never hand-templated
@@ -26,7 +28,7 @@
  *
  * Requires `loadModule()` from `plpgsql-parser` before use.
  */
-import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
+import { ObjectIdentity as NamingIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
 import { existenceCheck, invertStatement, revertFor, verifyFor } from '@pgsql/scripts';
 import type { StatementFacts } from '@pgsql/semantics';
 import { classifyStatements } from '@pgsql/semantics';
@@ -78,9 +80,10 @@ export interface SemanticDiffResult {
   /** Per-object dispositions, in `to`-then-removed order. */
   objects: SemanticObjectDiff[];
   /**
-   * The migration delta: DROP changes for removed objects first (reverse
-   * topological order), then CREATE/ALTER changes named and ordered by the
-   * granularity pipeline.
+   * The migration delta: drops, table alterations, replacements and creates
+   * in one stable topological order over their real dependencies (phase and
+   * `to`-side source order break ties); each change's `dependencies` are its
+   * graph edges.
    */
   changes: SemanticDeltaChange[];
   warnings: string[];
@@ -338,15 +341,32 @@ function tableShape(unit: ObjectUnit): TableShape {
 const deparseStmt = (node: Record<string, unknown>): string =>
   `${Deparser.deparse(node, { pretty: false })};`;
 
-/** Column-level ALTERs between two table shapes. */
+/** Where in the migration an alteration belongs (tie-break only; edges rule). */
+type Phase = 'drop' | 'remove' | 'alter' | 'add' | 'create';
+const PHASE_RANK: Record<Phase, number> = { drop: 0, remove: 1, alter: 2, add: 3, create: 4 };
+
+/** One ALTER TABLE step of a modified table, with its mechanical inverse. */
+interface TableAlteration {
+  sql: string;
+  inverse: string;
+  phase: Phase;
+  /** Column/constraint identity the step targets (null for RLS toggles). */
+  sub: NamingIdentity | null;
+  /** Columns this step keys on (constraint keys / fk columns). */
+  keyColumns: string[];
+}
+
+/** Column-level ALTERs between two table shapes, each paired with its inverse. */
 function diffTable(
   from: TableShape,
   to: TableShape,
   diff: SemanticObjectDiff,
   warnings: string[]
-): string[] {
-  const stmts: string[] = [];
+): TableAlteration[] {
+  const steps: TableAlteration[] = [];
   const relation = to.relation ?? from.relation;
+  const schema = (relation as { schemaname?: string } | null)?.schemaname ?? null;
+  const table = (relation as { relname?: string } | null)?.relname ?? diff.identity.name;
   const alter = (cmd: Record<string, unknown>): string =>
     deparseStmt({
       AlterTableStmt: {
@@ -355,6 +375,18 @@ function diffTable(
         objtype: 'OBJECT_TABLE'
       }
     });
+  const column = (name: string): NamingIdentity => ({ kind: 'column', schema, name, table });
+  const constraintName = (extra: unknown): string | undefined =>
+    (extra as { Constraint?: { conname?: string } }).Constraint?.conname
+    ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
+      .AlterTableCmd?.def?.Constraint?.conname;
+  const constraintKeys = (extra: unknown): string[] => {
+    const c = (extra as { Constraint?: ConstraintNode }).Constraint
+      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: ConstraintNode } } }).AlterTableCmd?.def?.Constraint;
+    return [...(c?.keys ?? []), ...(c?.fk_attrs ?? [])]
+      .map(k => (k as { String?: { sval?: string } }).String?.sval)
+      .filter((s): s is string => typeof s === 'string');
+  };
 
   diff.columnsAdded = [];
   diff.columnsRemoved = [];
@@ -364,7 +396,13 @@ function diffTable(
     const prior = from.columns.get(name);
     if (!prior) {
       diff.columnsAdded.push(name);
-      stmts.push(alter({ subtype: 'AT_AddColumn', def: { ColumnDef: col.def } }));
+      steps.push({
+        sql: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: col.def } }),
+        inverse: alter({ subtype: 'AT_DropColumn', name }),
+        phase: 'add',
+        sub: column(name),
+        keyColumns: []
+      });
     } else if (prior.print !== col.print) {
       diff.columnsModified.push(name);
       const fromDef = prior.def as { typeName?: unknown; constraints?: unknown };
@@ -374,11 +412,13 @@ function diffTable(
         JSON.stringify({ ...(fromDef as object), typeName: null }) !==
         JSON.stringify({ ...(toDef as object), typeName: null });
       if (typeChanged) {
-        stmts.push(alter({
-          subtype: 'AT_AlterColumnType',
-          name,
-          def: { ColumnDef: { typeName: toDef.typeName } }
-        }));
+        steps.push({
+          sql: alter({ subtype: 'AT_AlterColumnType', name, def: { ColumnDef: { typeName: toDef.typeName } } }),
+          inverse: alter({ subtype: 'AT_AlterColumnType', name, def: { ColumnDef: { typeName: fromDef.typeName } } }),
+          phase: 'alter',
+          sub: column(name),
+          keyColumns: []
+        });
       }
       if (restChanged) {
         warnings.push(
@@ -387,10 +427,16 @@ function diffTable(
       }
     }
   }
-  for (const name of from.columns.keys()) {
+  for (const [name, prior] of from.columns) {
     if (!to.columns.has(name)) {
       diff.columnsRemoved.push(name);
-      stmts.push(alter({ subtype: 'AT_DropColumn', name }));
+      steps.push({
+        sql: alter({ subtype: 'AT_DropColumn', name }),
+        inverse: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: prior.def } }),
+        phase: 'remove',
+        sub: column(name),
+        keyColumns: []
+      });
     }
   }
 
@@ -407,39 +453,191 @@ function diffTable(
   // its name must DROP CONSTRAINT before the replacement ADD CONSTRAINT.
   for (const [print, extra] of from.extras) {
     if (to.extras.has(print)) continue;
-    const conname = (extra as { Constraint?: { conname?: string } }).Constraint?.conname
-      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
-        .AlterTableCmd?.def?.Constraint?.conname;
+    const conname = constraintName(extra);
     const subtype = (extra as { AlterTableCmd?: { subtype?: string } }).AlterTableCmd?.subtype;
     if (conname) {
-      stmts.push(alter({ subtype: 'AT_DropConstraint', name: conname }));
+      const def = (extra as { Constraint?: unknown }).Constraint ? extra : undefined;
+      steps.push({
+        sql: alter({ subtype: 'AT_DropConstraint', name: conname }),
+        inverse: def
+          ? alter({ subtype: 'AT_AddConstraint', def })
+          : alter((extra as { AlterTableCmd: Record<string, unknown> }).AlterTableCmd),
+        phase: 'remove',
+        sub: { kind: 'constraint', schema, name: conname, table },
+        keyColumns: constraintKeys(extra)
+      });
     } else if (subtype && INVERSE_SUBTYPE[subtype]) {
-      stmts.push(alter({ subtype: INVERSE_SUBTYPE[subtype] }));
+      steps.push({
+        sql: alter({ subtype: INVERSE_SUBTYPE[subtype] }),
+        inverse: alter({ subtype }),
+        phase: 'remove',
+        sub: null,
+        keyColumns: []
+      });
     } else {
       warnings.push(`${diff.path}: removed table element has no name to drop; emit a manual ALTER`);
     }
   }
   for (const [print, extra] of to.extras) {
-    if (!from.extras.has(print)) {
-      const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
-      if (at) stmts.push(alter(at));
-      else if ((extra as Record<string, unknown>).Constraint) {
-        stmts.push(alter({ subtype: 'AT_AddConstraint', def: extra }));
-      } else {
-        warnings.push(`${diff.path}: unrecognized added table element; emit a manual ALTER`);
+    if (from.extras.has(print)) continue;
+    const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
+    const conname = constraintName(extra);
+    if (at) {
+      const subtype = at.subtype as string;
+      const inverse = INVERSE_SUBTYPE[subtype]
+        ? alter({ subtype: INVERSE_SUBTYPE[subtype] })
+        : conname ? alter({ subtype: 'AT_DropConstraint', name: conname }) : '';
+      if (!inverse) warnings.push(`${diff.path}: added table element has no derivable inverse`);
+      steps.push({
+        sql: alter(at),
+        inverse,
+        phase: 'add',
+        sub: conname ? { kind: 'constraint', schema, name: conname, table } : null,
+        keyColumns: constraintKeys(extra)
+      });
+    } else if ((extra as Record<string, unknown>).Constraint && conname) {
+      steps.push({
+        sql: alter({ subtype: 'AT_AddConstraint', def: extra }),
+        inverse: alter({ subtype: 'AT_DropConstraint', name: conname }),
+        phase: 'add',
+        sub: { kind: 'constraint', schema, name: conname, table },
+        keyColumns: constraintKeys(extra)
+      });
+    } else {
+      warnings.push(`${diff.path}: unrecognized added table element; emit a manual ALTER`);
+    }
+  }
+  return steps;
+}
+
+/** Column names a parse tree mentions (unqualified; `star` for `*`). */
+interface ColumnMentions {
+  names: Set<string>;
+  star: boolean;
+}
+
+function collectColumnMentions(node: unknown, out: ColumnMentions): void {
+  if (Array.isArray(node)) {
+    for (const item of node) collectColumnMentions(item, out);
+    return;
+  }
+  if (!node || typeof node !== 'object') return;
+  const rec = node as Record<string, unknown>;
+  if (rec.ColumnRef) {
+    const fields = ((rec.ColumnRef as { fields?: unknown[] }).fields ?? []);
+    const last = fields[fields.length - 1] as { String?: { sval?: string }; A_Star?: unknown } | undefined;
+    if (last?.A_Star) out.star = true;
+    else if (last?.String?.sval) out.names.add(last.String.sval);
+    return;
+  }
+  if (rec.IndexElem) {
+    const name = (rec.IndexElem as { name?: string }).name;
+    if (name) out.names.add(name);
+  }
+  if (rec.CreateTrigStmt) {
+    for (const c of ((rec.CreateTrigStmt as { columns?: { String?: { sval?: string } }[] }).columns ?? [])) {
+      if (c.String?.sval) out.names.add(c.String.sval);
+    }
+  }
+  if (rec.Constraint) {
+    const c = rec.Constraint as { keys?: unknown[]; fk_attrs?: unknown[]; pk_attrs?: unknown[] };
+    for (const k of [...(c.keys ?? []), ...(c.fk_attrs ?? []), ...(c.pk_attrs ?? [])]) {
+      const sval = (k as { String?: { sval?: string } }).String?.sval;
+      if (sval) out.names.add(sval);
+    }
+  }
+  if (rec.CreateFunctionStmt) {
+    // `LANGUAGE sql AS $$ ... $$` bodies are opaque strings: parse them too.
+    const options = ((rec.CreateFunctionStmt as { options?: { DefElem?: { defname?: string; arg?: unknown } }[] }).options ?? []);
+    const language = options.find(o => o.DefElem?.defname === 'language')?.DefElem?.arg as { String?: { sval?: string } } | undefined;
+    const as = options.find(o => o.DefElem?.defname === 'as')?.DefElem?.arg as { List?: { items?: { String?: { sval?: string } }[] } } | undefined;
+    const body = as?.List?.items?.[0]?.String?.sval;
+    if (language?.String?.sval?.toLowerCase() === 'sql' && body) {
+      try {
+        collectColumnMentions(parseSync(body).sql.stmts.map(s => s.stmt), out);
+      } catch {
+        out.star = true;
       }
     }
   }
-  return stmts;
+  for (const value of Object.values(rec)) collectColumnMentions(value, out);
 }
+
+/** Column names mentioned anywhere in `texts` (conservative: unqualified). */
+function columnMentions(texts: string[]): ColumnMentions {
+  const out: ColumnMentions = { names: new Set(), star: false };
+  for (const text of texts) collectColumnMentions(parseSync(text).sql.stmts.map(s => s.stmt), out);
+  return out;
+}
+
+const mentions = (m: ColumnMentions, column: string): boolean => m.star || m.names.has(column);
+
+/**
+ * The part of a `CREATE FUNCTION` that `CREATE OR REPLACE` cannot change:
+ * name, parameters (names, types, defaults) and return type. Null for
+ * anything that is not a single function/procedure definition.
+ */
+function functionSignature(texts: string[]): string | null {
+  if (texts.length === 0) return null;
+  const nodes = parseSync(texts[0]).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
+  const fn = nodes.length === 1 ? nodes[0].CreateFunctionStmt : undefined;
+  if (!fn) return null;
+  return stablePrint(cleanTree({
+    funcname: fn.funcname,
+    parameters: fn.parameters,
+    returnType: fn.returnType,
+    is_procedure: fn.is_procedure
+  }));
+}
+
+/** Rewrite the unit's `CREATE FUNCTION` as `CREATE OR REPLACE FUNCTION`. */
+function asReplace(texts: string[]): string {
+  return texts.map(text => {
+    const nodes = parseSync(text).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
+    if (nodes.length === 1 && nodes[0].CreateFunctionStmt) {
+      return deparseStmt({ CreateFunctionStmt: { ...nodes[0].CreateFunctionStmt, replace: true } });
+    }
+    return text;
+  }).join('\n');
+}
+
+/** Kinds whose catalog entries pin the columns/objects they reference. */
+const REBUILDABLE = new Set(['view', 'policy', 'trigger']);
+
+/**
+ * One undeployed statement group of the delta: a DROP, an ALTER TABLE step,
+ * or a CREATE. Atoms are the nodes of the delta's dependency graph; changes
+ * are built from them afterwards.
+ */
+interface Atom {
+  id: number;
+  /** Grouping key: atoms of one unit become one change unless an outside atom must sit between them. */
+  unit: string;
+  /** Change name for this atom's segment (segments with a different mix get `/drop`). */
+  name: string;
+  phase: Phase;
+  sql: string;
+  inverse: string;
+  facts: StatementFacts[];
+  /** Column/constraint identity for table alterations. */
+  sub: NamingIdentity | null;
+  /** Columns a constraint alteration keys on. */
+  keyColumns: string[];
+  /** Tie-break within a phase (lower first). */
+  rank: number;
+  deps: Set<number>;
+}
+
+const objectKey = (ref: { schema: string | null; name: string }): string => `${ref.schema ?? ''}.${ref.name}`;
 
 /**
  * Diff two deploy surfaces by object identity and emit the migration delta.
  *
  * `from`/`to` are whole deploy scripts (flatten changes in plan order to
  * diff bundles/modules). The result's `changes` deploy `to`'s shape on top
- * of `from`: reverse-topological DROPs, then CREATE/ALTERs named and
- * ordered by `restructureChanges`.
+ * of `from`, ordered by one dependency graph over everything undeployed —
+ * drops, table alterations, replacements and creates alike — with phase and
+ * source order breaking ties only.
  */
 export function diffSchemas(
   from: string,
@@ -447,21 +645,15 @@ export function diffSchemas(
   options: SemanticDiffOptions = {}
 ): SemanticDiffResult {
   const style = options.style ?? 'directory';
+  const alteration = options.changeGranularity === 'alteration';
   const warnings: string[] = [];
   const a = readSide(from, warnings, 'from');
   const b = readSide(to, warnings, 'to');
 
   const objects: SemanticObjectDiff[] = [];
   const forwardSql: string[] = [];
-  const modifiedChanges: SemanticDeltaChange[] = [];
-  const dropUnits: ObjectUnit[] = [];
+  const atoms: Atom[] = [];
 
-  /**
-   * `@pgsql/scripts` inverse of a deploy script (drops in reverse topo
-   * order), composed at the AST level via `invertStatement` and deparsed
-   * once. Underivable statements fall back to `revertFor` on the single
-   * statement to surface its not-derivable comment and warning.
-   */
   const inverseOf = (deploy: string, context: string): string => {
     const facts = classifyStatements(deploy);
     const graph = buildStatementGraph(facts);
@@ -478,11 +670,6 @@ export function diffSchemas(
     }
     return pieces.join('\n');
   };
-  /**
-   * `@pgsql/scripts` existence checks for a deploy script, composed from
-   * `existenceCheck`'s SelectStmt nodes and deparsed once. Underivable
-   * statements fall back to `verifyFor` to surface the warning.
-   */
   const verifyOf = (deploy: string, context: string): string => {
     const pieces: string[] = [];
     for (const fact of classifyStatements(deploy)) {
@@ -497,106 +684,427 @@ export function diffSchemas(
     return pieces.join('\n\n');
   };
 
-  for (const key of b.order) {
+  const addAtom = (atom: Omit<Atom, 'id' | 'deps' | 'facts'>): Atom => {
+    const full: Atom = { ...atom, id: atoms.length, deps: new Set(), facts: classifyStatements(atom.sql) };
+    atoms.push(full);
+    return full;
+  };
+
+  /** Atoms per unit key, and the unit's object key for reference binding. */
+  const unitAtoms = new Map<string, Atom[]>();
+  const track = (unitKey: string, atom: Atom): void => {
+    if (!unitAtoms.has(unitKey)) unitAtoms.set(unitKey, []);
+    unitAtoms.get(unitKey)!.push(atom);
+  };
+  const unitPhase = (unitKey: string, ...phases: Phase[]): Atom[] =>
+    (unitAtoms.get(unitKey) ?? []).filter(x => phases.includes(x.phase));
+  /** Object key (`schema.name`) → unit key, for both sides. */
+  const unitByObject = new Map<string, string>();
+  for (const side of [a, b]) {
+    for (const [key, unit] of side.units) {
+      if (!unit.identity.table || unit.identity.kind === 'table') {
+        unitByObject.set(objectKey({ schema: unit.identity.schema, name: unit.identity.table ?? unit.identity.name }), key);
+      }
+    }
+  }
+  /** `from`-side column mentions per unit (lazy). */
+  const fromMentions = new Map<string, ColumnMentions>();
+  const mentionsOf = (unit: ObjectUnit): ColumnMentions => {
+    const key = identityKey(unit.identity);
+    if (!fromMentions.has(key)) fromMentions.set(key, columnMentions(unit.texts));
+    return fromMentions.get(key)!;
+  };
+
+  // Drop + create pair for a unit's statements (replacements, rebuilds, removals).
+  const dropOf = (unit: ObjectUnit, path: string, rank: number): Atom | null => {
+    const recreate = unit.texts.join('\n');
+    const drop = inverseOf(recreate, path);
+    if (!drop.trim() || drop.trim().startsWith('--')) {
+      warnings.push(`${path}: no DROP derivable for kind "${unit.identity.kind}"; drop manually`);
+      return null;
+    }
+    return addAtom({ unit: identityKey(unit.identity), name: path, phase: 'drop', sql: drop, inverse: recreate, sub: null, keyColumns: [], rank });
+  };
+  const createOf = (unit: ObjectUnit, path: string, rank: number): Atom => {
+    const deploy = unit.texts.join('\n');
+    return addAtom({ unit: identityKey(unit.identity), name: path, phase: 'create', sql: deploy, inverse: inverseOf(deploy, path), sub: null, keyColumns: [], rank });
+  };
+
+  const fromRank = (unit: ObjectUnit): number =>
+    -Math.min(...unit.statements.map(s => a.graph.order.indexOf(s)));
+
+  // ---- to-side: added, modified, replaced ---------------------------------
+  b.order.forEach((key, toRank) => {
     const unit = b.units.get(key)!;
     const prior = a.units.get(key);
     const path = pathFor(unit.identity, { style });
     if (!prior) {
       objects.push({ identity: unit.identity, path, delta: 'added' });
       forwardSql.push(...unit.texts);
-      continue;
+      return;
     }
     if (unit.identity.kind === 'table') {
       const shapeFrom = tableShape(prior);
       const shapeTo = tableShape(unit);
       const diff: SemanticObjectDiff = { identity: unit.identity, path, delta: 'modified' };
-      const stmts = diffTable(shapeFrom, shapeTo, diff, warnings);
+      const steps = diffTable(shapeFrom, shapeTo, diff, warnings);
       const columnsTouched =
         diff.columnsAdded!.length + diff.columnsRemoved!.length + diff.columnsModified!.length > 0;
-      if (stmts.length > 0 || columnsTouched) {
-        objects.push(diff);
-        if (stmts.length > 0) {
-          // The inverse alteration is the same diff with the sides swapped.
-          const scratch: SemanticObjectDiff = { identity: unit.identity, path, delta: 'modified' };
-          const deploy = stmts.join('\n');
-          modifiedChanges.push({
-            name: `${path}/alter`,
-            dependencies: [],
-            deploy,
-            revert: diffTable(shapeTo, shapeFrom, scratch, []).join('\n'),
-            verify: verifyOf(deploy, path)
-          });
+      if (steps.length > 0 || columnsTouched) objects.push(diff);
+      steps.forEach((step, i) => {
+        let name = `${path}/alter`;
+        if (alteration && step.sub) {
+          const subPath = pathFor(step.sub, { style });
+          name = step.phase === 'add' ? subPath : step.phase === 'remove' ? `${subPath}/drop` : `${subPath}/alter`;
         }
-      }
-      continue;
-    }
-    if (unitFingerprint(prior) !== unitFingerprint(unit)) {
-      objects.push({ identity: unit.identity, path, delta: 'modified' });
-      const priorDeploy = prior.texts.join('\n');
-      const newDeploy = unit.texts.join('\n');
-      modifiedChanges.push({
-        name: path,
-        dependencies: [],
-        deploy: [inverseOf(priorDeploy, path), newDeploy].filter(Boolean).join('\n'),
-        revert: [inverseOf(newDeploy, path), priorDeploy].filter(Boolean).join('\n'),
-        verify: verifyOf(newDeploy, path)
+        const atom = addAtom({
+          unit: alteration ? `${key}\u0000${name}` : key,
+          name,
+          phase: step.phase,
+          sql: step.sql,
+          inverse: step.inverse,
+          sub: step.sub,
+          keyColumns: step.keyColumns,
+          rank: toRank * 1000 + i
+        });
+        track(key, atom);
       });
+      return;
     }
-  }
+    if (unitFingerprint(prior) === unitFingerprint(unit)) return;
+    objects.push({ identity: unit.identity, path, delta: 'modified' });
+    const signature = functionSignature(unit.texts);
+    if (signature !== null && signature === functionSignature(prior.texts)) {
+      // Same name, parameters and return type: replace in place. Dependents
+      // (views, triggers, defaults) keep pointing at the same function.
+      const atom = addAtom({
+        unit: key, name: path, phase: 'create', sql: asReplace(unit.texts), inverse: asReplace(prior.texts),
+        sub: null, keyColumns: [], rank: toRank * 1000
+      });
+      track(key, atom);
+      return;
+    }
+    const drop = dropOf(prior, path, fromRank(prior));
+    const create = createOf(unit, path, toRank * 1000);
+    if (drop) {
+      create.deps.add(drop.id);
+      track(key, drop);
+    }
+    track(key, create);
+  });
 
+  // ---- from-side: removed ------------------------------------------------
   for (const key of a.order) {
     if (b.units.has(key)) continue;
     const unit = a.units.get(key)!;
-    objects.push({ identity: unit.identity, path: pathFor(unit.identity, { style }), delta: 'removed' });
-    dropUnits.push(unit);
-  }
-
-  // Removed objects drop in reverse topological order of the `from` graph
-  // (dependents before dependencies), one change per object.
-  const position = new Map(dropUnits.map(u => [u, Math.min(...u.statements.map(s => a.graph.order.indexOf(s)))]));
-  dropUnits.sort((x, y) => position.get(y)! - position.get(x)!);
-  const dropChanges: SemanticDeltaChange[] = [];
-  for (const unit of dropUnits) {
     const path = pathFor(unit.identity, { style });
-    const recreate = unit.texts.join('\n');
-    const drop = inverseOf(recreate, path);
-    if (!drop.trim() || drop.trim().startsWith('--')) {
-      warnings.push(`${path}: no DROP derivable for kind "${unit.identity.kind}"; drop manually`);
-      continue;
-    }
-    dropChanges.push({
-      name: `${path}/drop`,
-      dependencies: dropChanges.length > 0 ? [dropChanges[dropChanges.length - 1].name] : [],
-      deploy: drop,
-      revert: recreate,
-      verify: ''
-    });
+    objects.push({ identity: unit.identity, path, delta: 'removed' });
+    const drop = dropOf(unit, path, fromRank(unit));
+    if (drop) track(key, drop);
   }
 
-  let forwardChanges: SemanticDeltaChange[] = [];
+  // ---- from-side: unchanged dependents that a breaking step would invalidate
+  // (view/policy/trigger on a dropped or retyped column, or on a replaced
+  // object): drop them before the breaking step and recreate them after.
+  // `from`'s topological order processes dependencies before dependents, so
+  // rebuilds cascade in one pass.
+  const fromUnitOf = new Map<number, string>();
+  for (const [key, unit] of a.units) for (const s of unit.statements) fromUnitOf.set(s, key);
+  const fromDependencies = (unitKey: string): Set<string> => {
+    const out = new Set<string>();
+    for (const edge of a.graph.edges) {
+      if (edge.kind === 'late') continue;
+      const fromUnit = fromUnitOf.get(edge.from);
+      const toUnit = fromUnitOf.get(edge.to);
+      if (fromUnit === unitKey && toUnit && toUnit !== unitKey) out.add(toUnit);
+    }
+    return out;
+  };
+  const fromUnitsTopo = [...a.units.keys()].sort((x, y) => fromRank(a.units.get(y)!) - fromRank(a.units.get(x)!));
+  for (const key of fromUnitsTopo) {
+    const unit = a.units.get(key)!;
+    const other = b.units.get(key);
+    if (!other || !REBUILDABLE.has(unit.identity.kind)) continue;
+    if (unitFingerprint(unit) !== unitFingerprint(other)) continue;
+    const used = mentionsOf(unit);
+    const breaking: Atom[] = [];
+    for (const dep of fromDependencies(key)) {
+      if (!b.units.has(dep)) continue;
+      breaking.push(...unitPhase(dep, 'drop'));
+      breaking.push(...unitPhase(dep, 'remove', 'alter').filter(x => x.sub?.kind === 'column' && mentions(used, x.sub.name)));
+    }
+    if (breaking.length === 0) continue;
+    const path = pathFor(unit.identity, { style });
+    const drop = dropOf(unit, path, fromRank(unit));
+    if (!drop) continue;
+    const create = createOf(unit, path, b.order.indexOf(key) * 1000);
+    create.deps.add(drop.id);
+    for (const x of breaking) {
+      x.deps.add(drop.id);
+      create.deps.add(x.id);
+    }
+    track(key, drop);
+    track(key, create);
+  }
+
+  // ---- drops order by the `from` graph: a dependent's DROP precedes the DROP
+  // (or the dropped/retyped column) of what it referenced.
+  for (const [key, list] of unitAtoms) {
+    const drops = list.filter(x => x.phase === 'drop');
+    if (drops.length === 0) continue;
+    const unit = a.units.get(key);
+    if (!unit) continue;
+    const used = mentionsOf(unit);
+    for (const dep of fromDependencies(key)) {
+      for (const x of unitPhase(dep, 'drop')) for (const d of drops) x.deps.add(d.id);
+      for (const x of unitPhase(dep, 'remove', 'alter')) {
+        if (x.sub?.kind === 'column' && !mentions(used, x.sub.name)) continue;
+        for (const d of drops) x.deps.add(d.id);
+      }
+    }
+  }
+
+  // ---- added objects: shaped and named by the granularity pipeline; each
+  // emitted change is one atom carrying the pipeline's requires.
+  const createAtomByName = new Map<string, Atom>();
   if (forwardSql.length > 0) {
     const { changes, warnings: w } = restructureChanges(
       [{ name: 'delta', dependencies: [], deploy: forwardSql.join('\n\n') }],
       {
         granularity: options.granularity ?? 'object',
-        changeGranularity: options.changeGranularity,
+        changeGranularity: alteration ? 'alteration' : undefined,
         subObjectName: identity => pathFor(identity, { style })
       }
     );
-    forwardChanges = changes.map(c => ({
-      ...c,
-      revert: inverseOf(c.deploy, c.name),
-      verify: verifyOf(c.deploy, c.name)
-    }));
     warnings.push(...w);
+    const pending: [Atom, string[]][] = [];
+    changes.forEach((c, i) => {
+      const atom = addAtom({
+        unit: `added\u0000${c.name}`, name: c.name, phase: 'create', sql: c.deploy,
+        inverse: inverseOf(c.deploy, c.name), sub: null, keyColumns: [], rank: 100000 + i
+      });
+      createAtomByName.set(c.name, atom);
+      track(atom.unit, atom);
+      pending.push([atom, c.dependencies]);
+    });
+    for (const [atom, deps] of pending) {
+      for (const d of deps) {
+        const target = createAtomByName.get(d);
+        if (target) atom.deps.add(target.id);
+      }
+    }
   }
+
+  // ---- forward edges: a create/add step depends on what it references —
+  // the create of a replaced/rebuilt/added object, and on a modified table
+  // the ADD COLUMN / ADD CONSTRAINT / type-change steps of the columns it uses.
+  const createAtomsByObject = new Map<string, Atom[]>();
+  for (const atom of atoms) {
+    if (atom.phase !== 'create') continue;
+    for (const f of atom.facts) {
+      for (const c of f.creates) {
+        const k = objectKey(c);
+        if (!createAtomsByObject.has(k)) createAtomsByObject.set(k, []);
+        createAtomsByObject.get(k)!.push(atom);
+      }
+    }
+  }
+  for (const atom of atoms) {
+    if (atom.phase !== 'create' && atom.phase !== 'add') continue;
+    const used = columnMentions(atom.facts.map(f => sliceStatementBytes(sqlSourceBytes(atom.sql), f.span.start, f.span.len)));
+    const seen = new Set<string>();
+    for (const f of atom.facts) {
+      for (const ref of f.references) {
+        const k = objectKey(ref);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        for (const target of createAtomsByObject.get(k) ?? []) {
+          if (target.unit !== atom.unit && !atom.unit.startsWith('added\u0000') || target.unit !== atom.unit && !target.unit.startsWith('added\u0000')) {
+            atom.deps.add(target.id);
+          }
+        }
+        const unitKey = unitByObject.get(k);
+        if (!unitKey || unitKey === atom.unit.split('\u0000')[0]) continue;
+        for (const step of unitPhase(unitKey, 'add', 'alter')) {
+          if (step.sub?.kind === 'column' && mentions(used, step.sub.name)) atom.deps.add(step.id);
+          if (step.sub?.kind === 'constraint' && step.phase === 'add' && step.keyColumns.length > 0
+            && step.keyColumns.every(c => mentions(used, c))) {
+            atom.deps.add(step.id);
+          }
+        }
+      }
+    }
+    // Within a table: constraints follow the columns they key on and the
+    // same-name constraint they replace.
+    if (atom.sub) {
+      const tableKey = atom.unit.split('\u0000')[0];
+      for (const step of unitPhase(tableKey, 'add')) {
+        if (step !== atom && step.sub?.kind === 'column' && atom.keyColumns.includes(step.sub.name)) atom.deps.add(step.id);
+      }
+      for (const step of unitPhase(tableKey, 'remove')) {
+        if (step.sub?.kind === atom.sub.kind && step.sub.name === atom.sub.name) atom.deps.add(step.id);
+      }
+    }
+  }
+
+  // ---- order: stable topological sort over atoms (phase, then rank, break ties).
+  const order = topoOrder(atoms, atom => `${atom.name} (${atom.phase})`);
+
+  // ---- segments: a unit's atoms form one change unless an outside atom
+  // depends on an earlier atom and a later atom depends on it.
+  const changes = buildChanges(atoms, order, options.changeGranularity === 'single', inverseOf, verifyOf);
 
   return {
     identical: objects.length === 0,
     objects,
-    changes: [...dropChanges, ...forwardChanges, ...modifiedChanges],
+    changes,
     warnings
   };
+}
+
+/** Kahn's algorithm with a (phase, rank) priority; throws on a cycle. */
+function topoOrder(atoms: Atom[], label: (atom: Atom) => string): number[] {
+  const indegree = atoms.map(x => x.deps.size);
+  const dependents: number[][] = atoms.map((): number[] => []);
+  for (const atom of atoms) for (const d of atom.deps) dependents[d].push(atom.id);
+  const priority = (x: number, y: number): number =>
+    PHASE_RANK[atoms[x].phase] - PHASE_RANK[atoms[y].phase] || atoms[x].rank - atoms[y].rank || x - y;
+  const ready = atoms.filter(x => x.deps.size === 0).map(x => x.id).sort(priority);
+  const order: number[] = [];
+  while (ready.length > 0) {
+    const next = ready.shift()!;
+    order.push(next);
+    for (const d of dependents[next]) {
+      indegree[d] -= 1;
+      if (indegree[d] === 0) {
+        ready.push(d);
+        ready.sort(priority);
+      }
+    }
+  }
+  if (order.length !== atoms.length) {
+    const stuck = atoms.filter(x => !order.includes(x.id)).map(label);
+    throw new Error(`pgpm diff: dependency cycle among undeployed changes; cannot order: ${stuck.join(', ')}`);
+  }
+  return order;
+}
+
+function buildChanges(
+  atoms: Atom[],
+  order: number[],
+  single: boolean,
+  inverseOf: (deploy: string, context: string) => string,
+  verifyOf: (deploy: string, context: string) => string
+): SemanticDeltaChange[] {
+  const position = new Map(order.map((id, i) => [id, i]));
+  const ordered = order.map(id => atoms[id]);
+
+  if (single) {
+    if (ordered.length === 0) return [];
+    const deploy = ordered.map(x => x.sql).join('\n\n');
+    const forward = ordered.filter(x => x.phase !== 'drop' && x.phase !== 'remove').map(x => x.sql).join('\n\n');
+    return [{
+      name: 'module/init',
+      dependencies: [],
+      deploy,
+      revert: [...ordered].reverse().map(x => x.inverse).filter(Boolean).join('\n\n'),
+      verify: forward ? verifyOf(forward, 'module/init') : ''
+    }];
+  }
+
+  // Segment nodes: start one per atom, then merge same-unit atoms when no
+  // outside node lies on a dependency path between them.
+  const segmentOf = atoms.map(x => x.id);
+  const members: number[][] = atoms.map(x => [x.id]);
+  const segDeps = (s: number): Set<number> => {
+    const out = new Set<number>();
+    for (const m of members[s]) for (const d of atoms[m].deps) if (segmentOf[d] !== s) out.add(segmentOf[d]);
+    return out;
+  };
+  const reaches = (from: number, target: number, skip: number): boolean => {
+    const seen = new Set<number>([skip]);
+    const stack = [...segDeps(from)].filter(s => s !== skip);
+    while (stack.length > 0) {
+      const s = stack.pop()!;
+      if (s === target) return true;
+      if (seen.has(s)) continue;
+      seen.add(s);
+      for (const d of segDeps(s)) if (!seen.has(d)) stack.push(d);
+    }
+    return false;
+  };
+  const byUnit = new Map<string, Atom[]>();
+  for (const atom of ordered) {
+    if (!byUnit.has(atom.unit)) byUnit.set(atom.unit, []);
+    byUnit.get(atom.unit)!.push(atom);
+  }
+  for (const list of byUnit.values()) {
+    let current = segmentOf[list[0].id];
+    for (const atom of list.slice(1)) {
+      // Merging is safe iff no path from `atom` back to `current` passes
+      // through another segment.
+      const external = [...new Set([...atom.deps].map(d => segmentOf[d]))].filter(s => s !== current);
+      if (external.some(s => reaches(s, current, -1)) || reaches(current, segmentOf[atom.id], -1)) {
+        current = segmentOf[atom.id];
+        continue;
+      }
+      members[current].push(atom.id);
+      members[atom.id] = [];
+      segmentOf[atom.id] = current;
+    }
+  }
+
+  const segments = [...new Set(segmentOf)].sort((x, y) => position.get(x)! - position.get(y)!);
+  const nameOf = new Map<number, string>();
+  const used = new Map<string, number>();
+  for (const s of segments) {
+    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
+    const first = atoms[list[0]];
+    const dropOnly = list.every(id => atoms[id].phase === 'drop');
+    let base = dropOnly ? `${first.name}/drop` : first.name;
+    if (!dropOnly && first.phase === 'drop') base = atoms[list.find(id => atoms[id].phase !== 'drop')!].name;
+    const n = (used.get(base) ?? 0) + 1;
+    used.set(base, n);
+    nameOf.set(s, n === 1 ? base : `${base}-${n}`);
+  }
+
+  // Emit in topological order of segments (segment deps are acyclic by construction).
+  const segIndegree = new Map<number, number>();
+  const segDependents = new Map<number, number[]>();
+  for (const s of segments) {
+    segIndegree.set(s, segDeps(s).size);
+    for (const d of segDeps(s)) {
+      if (!segDependents.has(d)) segDependents.set(d, []);
+      segDependents.get(d)!.push(s);
+    }
+  }
+  const ready = segments.filter(s => segIndegree.get(s) === 0);
+  const emitted: number[] = [];
+  while (ready.length > 0) {
+    ready.sort((x, y) => position.get(x)! - position.get(y)!);
+    const s = ready.shift()!;
+    emitted.push(s);
+    for (const d of segDependents.get(s) ?? []) {
+      segIndegree.set(d, segIndegree.get(d)! - 1);
+      if (segIndegree.get(d) === 0) ready.push(d);
+    }
+  }
+  if (emitted.length !== segments.length) {
+    throw new Error('pgpm diff: dependency cycle among emitted changes; cannot order');
+  }
+
+  return emitted.map(s => {
+    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
+    const name = nameOf.get(s)!;
+    const forward = list.map(id => atoms[id]).filter(x => x.phase !== 'drop' && x.phase !== 'remove');
+    return {
+      name,
+      dependencies: [...segDeps(s)].map(d => nameOf.get(d)!).sort(),
+      deploy: list.map(id => atoms[id].sql).join('\n'),
+      revert: [...list].reverse().map(id => atoms[id].inverse).filter(Boolean).join('\n'),
+      verify: forward.length > 0 ? verifyOf(forward.map(x => x.sql).join('\n'), name) : ''
+    };
+  });
 }
 
 /** A change's deploy surface (same seam as the other drivers). */
