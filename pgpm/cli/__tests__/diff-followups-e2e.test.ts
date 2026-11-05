@@ -214,9 +214,15 @@ describe('pgpm diff e2e: review follow-ups', () => {
       cd ${WS}/${v1}
       pgpm deploy --database ${testDb.name} --package ${v1} --yes
     `, { database: testDb.name });
-    const acls = async (): Promise<unknown[]> => (await testDb.query(
-      "SELECT n.nspacl::text AS schema_acl, p.proacl::text AS function_acl FROM pg_namespace n JOIN pg_proc p ON p.pronamespace = n.oid WHERE n.nspname = 'fu' AND p.proname = 'f'"
-    )).rows;
+    // Effective privileges: a NULL acl is the owner's default, spelled out.
+    const acls = async (): Promise<unknown[]> => (await testDb.query(`
+      SELECT 'schema' AS obj, a.grantee::regrole::text AS grantee, a.privilege_type
+        FROM pg_namespace n, aclexplode(coalesce(n.nspacl, acldefault('n', n.nspowner))) a WHERE n.nspname = 'fu'
+      UNION ALL
+      SELECT 'function', a.grantee::regrole::text, a.privilege_type
+        FROM pg_proc p, aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+        WHERE p.proname = 'f' AND p.pronamespace = 'fu'::regnamespace
+      ORDER BY 1, 2, 3`)).rows;
     const before = await acls();
     await fixture.runTerminalCommands(`
       cd ${WS}
