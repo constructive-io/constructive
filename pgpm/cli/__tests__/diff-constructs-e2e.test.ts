@@ -246,6 +246,7 @@ export const CASES: Case[] = [
     name: 'composite-attribute-type-change',
     v1: `${S} CREATE TYPE fx.pt AS (x int, y int); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt);`,
     v2: `${S} CREATE TYPE fx.pt AS (x bigint, y int, label text COLLATE "C"); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt);`,
+    flags: '--allow-data-loss',
     rows: 'INSERT INTO fx.t VALUES (1, ROW(1, 2))',
     check: { sql: 'SELECT (p).x AS x, (p).label AS label FROM fx.t', rows: [{ x: '1', label: null }] }
   },

@@ -377,6 +377,79 @@ function foldSequenceAlter(nodes: Record<string, unknown>[], definition: string[
   return true;
 }
 
+/** A table column whose type is (an array of) the given user type. */
+interface DependentColumn {
+  relation: unknown;
+  table: string;
+  schema: string | null;
+  name: string;
+  def: Record<string, unknown>;
+  toDef: Record<string, unknown> | undefined;
+  array: boolean;
+}
+
+/** Columns of the side's tables declared with the type (or arrays of it). */
+function typeDependentColumns(side: SideProgram, other: SideProgram, type: ObjectIdentity): DependentColumn[] {
+  const key = typeKey({ names: [type.schema, type.name].filter((x): x is string => x !== null).map(sval => ({ String: { sval } })) } as any);
+  const out: DependentColumn[] = [];
+  for (const unitKey of side.order) {
+    const unit = side.units.get(unitKey)!;
+    if (unit.identity.kind !== 'table') continue;
+    const shape = tableShape(unit);
+    const toShape = other.units.has(unitKey) ? tableShape(other.units.get(unitKey)!) : null;
+    for (const [name, col] of shape.columns) {
+      const colKey = typeKey((col.def as Record<string, unknown>).typeName as any);
+      if (colKey !== key && colKey !== `${key}[]`) continue;
+      out.push({
+        relation: shape.relation,
+        table: unit.identity.name,
+        schema: unit.identity.schema,
+        name,
+        def: col.def as Record<string, unknown>,
+        toDef: toShape?.columns.get(name)?.def as Record<string, unknown> | undefined,
+        array: colKey !== key
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Postgres refuses to alter or drop a type a table column uses, so the
+ * column is parked in a bridge type (jsonb for composites, text otherwise)
+ * around the type's change and cast back afterwards. Values the new type
+ * rejects are lost, which the caller reports as destructive.
+ */
+function columnRebridge(col: DependentColumn, composite: boolean): { pre: { sql: string; inverse: string }[]; post: { sql: string; inverse: string }[] } {
+  const ident = (name: string): string => /^[a-z_][a-z0-9_]*$/.test(name) ? name : `"${name.replace(/"/g, '""')}"`;
+  const c = ident(col.name);
+  const typeName = col.def.typeName as Record<string, unknown>;
+  const element: Record<string, unknown> = { ...typeName, arrayBounds: undefined };
+  const elementType = Deparser.deparse({ TypeName: element } as any, { pretty: false });
+  const bridge = { names: [{ String: { sval: composite ? 'jsonb' : 'text' } }] };
+  const out = composite ? `to_jsonb(${c})` : `${c}::text`;
+  const back = !composite
+    ? `${c}::${Deparser.deparse({ TypeName: typeName } as any, { pretty: false })}`
+    : col.array
+      ? `ARRAY(SELECT jsonb_populate_record(NULL::${elementType}, e) FROM jsonb_array_elements(${c}) AS e)`
+      : `jsonb_populate_record(NULL::${elementType}, ${c})`;
+  const alter = (cmd: Record<string, unknown>): string =>
+    deparseStmt({ AlterTableStmt: { relation: col.relation, objtype: 'OBJECT_TABLE', cmds: [{ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } }] } });
+  const retype = (target: unknown, using: string, collClause?: unknown): string =>
+    alter({ subtype: 'AT_AlterColumnType', name: col.name, def: { ColumnDef: { typeName: target, collClause, raw_default: parseExpression(using) } } });
+  const setDefault = (expr: unknown): string => alter({ subtype: 'AT_ColumnDefault', name: col.name, def: expr });
+  const dropDefault = alter({ subtype: 'AT_ColumnDefault', name: col.name });
+  const fromDefault = columnAttributes(col.def).def;
+  const toDefault = columnAttributes(col.toDef ?? col.def).def;
+  const pre: { sql: string; inverse: string }[] = [];
+  const post: { sql: string; inverse: string }[] = [];
+  if (fromDefault) pre.push({ sql: dropDefault, inverse: setDefault(fromDefault) });
+  pre.push({ sql: retype(bridge, out), inverse: retype(typeName, back, col.def.collClause) });
+  post.push({ sql: retype(typeName, back, col.def.collClause), inverse: retype(bridge, out) });
+  if (toDefault) post.push({ sql: setDefault(toDefault), inverse: dropDefault });
+  return { pre, post };
+}
+
 /** Normalized-AST fingerprint of one statement (formatting/position-proof). */
 function fingerprint(text: string): string {
   const parsed = parseSync(text);
@@ -1680,8 +1753,8 @@ export function diffSchemas(
     const pa = splitUnit(prior);
     const pb = splitUnit(unit);
     const annotationSteps = diffAnnotations(pa.annotations, pb.annotations, path);
-    const emitSteps = (list: { sql: string; inverse: string; incomplete?: string; destructive?: string }[], after?: Atom, breaking = false): void => {
-      list.forEach((step, i) => {
+    const emitSteps = (list: { sql: string; inverse: string; incomplete?: string; destructive?: string }[], after?: Atom, breaking = false): Atom[] => {
+      return list.map((step, i) => {
         if (step.incomplete) incomplete.push(`${path}: ${step.incomplete}`);
         if (step.destructive) destructive.push(step.destructive);
         const atom = addAtom({
@@ -1690,7 +1763,35 @@ export function diffSchemas(
         });
         if (after) atom.deps.add(after.id);
         track(key, atom);
+        return atom;
       });
+    };
+    // Columns typed with this type: parked in a bridge type around steps
+    // Postgres refuses while the type is in use (see `columnRebridge`).
+    const dependentColumns = unit.identity.kind === 'type' || unit.identity.kind === 'other'
+      ? typeDependentColumns(a, b, unit.identity)
+      : [];
+    const bridgeColumns = (middle: Atom[], composite: boolean): void => {
+      for (const col of dependentColumns) {
+        const { pre, post } = columnRebridge(col, composite);
+        const sub: NamingIdentity = { kind: 'column', schema: col.schema, table: col.table, name: col.name };
+        destructive.push(`${[col.schema, col.table, col.name].filter(Boolean).join('.')}: cast through ${composite ? 'jsonb' : 'text'} around ${objectLabel(unit.identity)} (values the new type rejects are lost)`);
+        let last: Atom | null = null;
+        pre.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: true, rank: toRank * 1000 - 100 + i });
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+        for (const m of middle) if (last) m.deps.add(last.id);
+        post.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: false, rank: toRank * 1000 + 900 + i });
+          for (const m of middle) atom.deps.add(m.id);
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+      }
     };
     const definitionChanged = definitionFingerprint(pa.definition) !== definitionFingerprint(pb.definition);
     if (!definitionChanged) {
@@ -1705,7 +1806,8 @@ export function diffSchemas(
         if (steps.length + annotationSteps.length > 0) modified();
         // Shape changes (enum values, domain rules, attributes) invalidate
         // dependents the way a drop does; annotations do not.
-        emitSteps(steps, undefined, true);
+        const atoms = emitSteps(steps, undefined, true);
+        if (pa.nodes[0].CompositeTypeStmt && atoms.length > 0) bridgeColumns(atoms, true);
         emitSteps(annotationSteps);
         continue;
       }
@@ -1740,6 +1842,7 @@ export function diffSchemas(
       track(key, drop);
     }
     track(key, create);
+    bridgeColumns(drop ? [drop, create] : [create], Boolean(pa.nodes[0]?.CompositeTypeStmt));
   }
 
   // ---- from-side: unchanged dependents that a breaking step would invalidate
