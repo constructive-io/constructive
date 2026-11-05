@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.4](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.3...@constructive-io/query-builder@3.18.4) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
 ## [3.18.3](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.2...@constructive-io/query-builder@3.18.3) (2026-11-05)
 
 **Note:** Version bump only for package @constructive-io/query-builder

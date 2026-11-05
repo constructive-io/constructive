@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.2...@pgpmjs/transform@0.31.0) (2026-11-05)
+
+### Bug Fixes
+
+- **pgpm:** drop a column's constraints before the column; --append-module rejects --emit-ledger ([204d7c1](https://github.com/constructive-io/constructive/commit/204d7c1849171d2abff94449e6c6fa3d8873739a))
+- **pgpm:** split a foreign key out of its table when folding it closes a cycle ([c0008ce](https://github.com/constructive-io/constructive/commit/c0008ce06c0fbf6089e9c7d524b7343907aff990))
+
+### Features
+
+- **pgpm:** order every undeployed diff change by one dependency graph ([fff381b](https://github.com/constructive-io/constructive/commit/fff381b6613b1b7a93c76d319878a669ecedd788))
+
 ## [0.30.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.1...@pgpmjs/transform@0.30.2) (2026-11-05)
 
 **Note:** Version bump only for package @pgpmjs/transform

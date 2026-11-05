@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.40.0](https://github.com/constructive-io/constructive/compare/pgpm@5.39.15...pgpm@5.40.0) (2026-11-05)
+
+### Bug Fixes
+
+- **pgpm:** drop a column's constraints before the column; --append-module rejects --emit-ledger ([204d7c1](https://github.com/constructive-io/constructive/commit/204d7c1849171d2abff94449e6c6fa3d8873739a))
+
+### Features
+
+- **pgpm:** order every undeployed diff change by one dependency graph ([fff381b](https://github.com/constructive-io/constructive/commit/fff381b6613b1b7a93c76d319878a669ecedd788))
+
 ## [5.39.15](https://github.com/constructive-io/constructive/compare/pgpm@5.39.14...pgpm@5.39.15) (2026-11-05)
 
 **Note:** Version bump only for package pgpm
