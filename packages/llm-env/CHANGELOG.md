@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/llm-env@0.16.0...@constructive-io/llm-env@0.17.0) (2026-11-05)
+
+### Features
+
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
 # [0.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/llm-env@0.15.0...@constructive-io/llm-env@0.16.0) (2026-10-14)
 
 **Note:** Version bump only for package @constructive-io/llm-env

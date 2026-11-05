@@ -1,7 +1,7 @@
 {
   "name": "graphile-llm",
-  "version": "1.22.1",
-  "description": "LLM integration plugin for PostGraphile v5 \u2014 server-side text-to-vector embedding and text companion fields for pgvector columns",
+  "version": "1.23.0",
+  "description": "LLM integration plugin for PostGraphile v5 — server-side text-to-vector embedding and text companion fields for pgvector columns",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",

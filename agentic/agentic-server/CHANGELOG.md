@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.29.0...agentic-server@0.30.0) (2026-11-05)
+
+### Bug Fixes
+
+- **graphile-llm:** RAG and embedText resolve the full request scope; gateway forwards max_tokens to Ollama ([3f2920c](https://github.com/constructive-io/constructive/commit/3f2920cfd7ead170e3c01c45aa62e8694dd006cd))
+
+### Features
+
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
 # [0.29.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.28.0...agentic-server@0.29.0) (2026-10-14)
 
 **Note:** Version bump only for package agentic-server

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.23.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.22.1...graphile-llm@1.23.0) (2026-11-05)
+
+### Bug Fixes
+
+- **graphile-llm:** RAG and embedText resolve the full request scope; gateway forwards max_tokens to Ollama ([3f2920c](https://github.com/constructive-io/constructive/commit/3f2920cfd7ead170e3c01c45aa62e8694dd006cd))
+
+### Features
+
+- **graphile-llm:** every model call goes through the gateway; no direct provider route ([81ec4f2](https://github.com/constructive-io/constructive/commit/81ec4f2e142e35cbe3ad1384ca4aacf8abc6d4a5))
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
 ## [1.22.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.22.0...graphile-llm@1.22.1) (2026-11-05)
 
 **Note:** Version bump only for package graphile-llm
