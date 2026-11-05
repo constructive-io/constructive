@@ -324,6 +324,21 @@ interface TableShape {
   annotations: AnnotationState;
   /** Constraints authored without a name; Postgres derives theirs from the table name. */
   implicitConstraints: { node: ConstraintNode; column?: string }[];
+  /** Table-level settings folded from CREATE TABLE and the ALTER TABLE commands that change them. */
+  props: TableProps;
+}
+
+interface TableProps {
+  /** relpersistence: 'p' (logged) or 'u' (unlogged). */
+  persistence: string;
+  /** reloption name → DefElem. */
+  options: Map<string, unknown>;
+  /** INHERITS parents, keyed by print. */
+  inherits: Map<string, unknown>;
+  /** PARTITION OF parent and bound, when the table is a partition. */
+  partition: { parent: unknown; bound: unknown } | null;
+  /** PARTITION BY clause of a partitioned table. */
+  partspec: unknown;
 }
 
 /** Constraint kinds that can move between column, table-elt, and ALTER form. */
@@ -383,7 +398,16 @@ function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, 
  * the catalog rendering of the same table.
  */
 function tableShape(unit: ObjectUnit): TableShape {
-  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [] };
+  const props: TableProps = { persistence: 'p', options: new Map(), inherits: new Map(), partition: null, partspec: null };
+  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [], props };
+  const setOptions = (items: unknown[] | undefined, keep: boolean): void => {
+    for (const o of items ?? []) {
+      const name = (o as { DefElem?: { defname?: string } }).DefElem?.defname;
+      if (!name) continue;
+      if (keep) props.options.set(name, cleanTree(o));
+      else props.options.delete(name);
+    }
+  };
   const table = unit.identity.name;
   const rawColumns: { colname: string; def: Record<string, unknown> }[] = [];
   const constraints: { node: ConstraintNode & Record<string, unknown>; column?: string }[] = [];
@@ -457,6 +481,18 @@ function tableShape(unit: ObjectUnit): TableShape {
       const stmt = raw.stmt as unknown as Record<string, Record<string, unknown>>;
       if (stmt.CreateStmt) {
         shape.relation = stmt.CreateStmt.relation;
+        props.persistence = (stmt.CreateStmt.relation as { relpersistence?: string }).relpersistence ?? 'p';
+        setOptions(stmt.CreateStmt.options as unknown[] | undefined, true);
+        const parents = (stmt.CreateStmt.inhRelations as unknown[] | undefined) ?? [];
+        if (stmt.CreateStmt.partbound) {
+          props.partition = { parent: cleanTree(parents[0]), bound: cleanTree(stmt.CreateStmt.partbound) };
+        } else {
+          for (const parent of parents) {
+            const clean = cleanTree(parent);
+            props.inherits.set(stablePrint(clean), clean);
+          }
+        }
+        if (stmt.CreateStmt.partspec) props.partspec = cleanTree(stmt.CreateStmt.partspec);
         const elts = (stmt.CreateStmt.tableElts as Record<string, unknown>[] | undefined) ?? [];
         for (const elt of elts) {
           if (elt.ColumnDef) addColumn(elt.ColumnDef as Record<string, unknown>);
@@ -483,6 +519,14 @@ function tableShape(unit: ObjectUnit): TableShape {
             absorbAnnotation(shape.annotations, {
               AlterTableStmt: { relation: stmt.AlterTableStmt.relation, objtype: stmt.AlterTableStmt.objtype, cmds: [cmd] }
             });
+          } else if (at.subtype === 'AT_SetRelOptions' || at.subtype === 'AT_ResetRelOptions') {
+            setOptions((def as { List?: { items?: unknown[] } } | undefined)?.List?.items, at.subtype === 'AT_SetRelOptions');
+          } else if (at.subtype === 'AT_SetUnLogged' || at.subtype === 'AT_SetLogged') {
+            props.persistence = at.subtype === 'AT_SetUnLogged' ? 'u' : 'p';
+          } else if (at.subtype === 'AT_AddInherit' || at.subtype === 'AT_DropInherit') {
+            const clean = cleanTree(def);
+            if (at.subtype === 'AT_AddInherit') props.inherits.set(stablePrint(clean), clean);
+            else props.inherits.delete(stablePrint(clean));
           } else if (!foldColumnCommand(at)) {
             addExtra({ AlterTableCmd: at });
           }
@@ -822,20 +866,100 @@ function diffTable(
     if (stablePrint(a.other) !== stablePrint(b.other)) {
       ctx.incomplete.push(`${diff.path}: column "${name}" changed in a way pgpm cannot express as ALTER COLUMN (${a.other.length + b.other.length} unsupported constraint(s)); alter it manually`);
     }
+    // Storage and compression are plain per-column settings; "default" puts
+    // either back to what the column type implies.
+    const setting = (def: unknown, field: 'storage_name' | 'compression'): string =>
+      ((def as Record<string, string | undefined>)[field] ?? 'default').toLowerCase();
+    for (const [field, subtype] of [['storage_name', 'AT_SetStorage'], ['compression', 'AT_SetCompression']] as const) {
+      const was = setting(prior.canon, field);
+      const now = setting(col.canon, field);
+      if (was === now) continue;
+      const set = (value: string): string => alter({ subtype, name, def: { String: { sval: value } } });
+      steps.push(attr(name, 'alter', set(now), set(was)));
+    }
     const rest = (def: unknown): string =>
-      stablePrint({ ...(def as Record<string, unknown>), colname: null, typeName: null, collClause: null, constraints: null, is_local: null, location: null });
+      stablePrint({
+        ...(def as Record<string, unknown>), colname: null, typeName: null, collClause: null, constraints: null,
+        is_local: null, location: null, storage_name: null, compression: null
+      });
     if (rest(prior.canon) !== rest(col.canon)) {
-      ctx.incomplete.push(`${diff.path}: column "${name}" changed storage/compression/options pgpm cannot express as ALTER COLUMN; alter it manually`);
+      ctx.incomplete.push(`${diff.path}: column "${name}" changed options pgpm cannot express as ALTER COLUMN; alter it manually`);
     }
   }
+  // ---- table-level properties: persistence, reloptions, inheritance and
+  // partition bound all change in place with exact inverses.
+  const alterCmds = (rel: unknown, cmds: Record<string, unknown>[]): string =>
+    deparseStmt({
+      AlterTableStmt: { relation: rel, cmds: cmds.map(cmd => ({ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } })), objtype: 'OBJECT_TABLE' }
+    });
+  const prop = (sql: string, inverse: string): TableAlteration => ({ sql, inverse, phase: 'alter', sub: null, keyColumns: [], breaking: false });
+  if (from.props.persistence !== to.props.persistence) {
+    const persistence = (p: string): string => alter({ subtype: p === 'u' ? 'AT_SetUnLogged' : 'AT_SetLogged' });
+    steps.push(prop(persistence(to.props.persistence), persistence(from.props.persistence)));
+  }
+  {
+    const set = (items: unknown[]): Record<string, unknown> => ({ subtype: 'AT_SetRelOptions', def: { List: { items } } });
+    const reset = (names: string[]): Record<string, unknown> =>
+      ({ subtype: 'AT_ResetRelOptions', def: { List: { items: names.map(defname => ({ DefElem: { defname, defaction: 'DEFELEM_UNSPEC' } })) } } });
+    const changed = [...to.props.options].filter(([k, v]) => stablePrint(from.props.options.get(k)) !== stablePrint(v));
+    const removed = [...from.props.options].filter(([k]) => !to.props.options.has(k));
+    const forward: Record<string, unknown>[] = [];
+    const backward: Record<string, unknown>[] = [];
+    if (changed.length > 0) {
+      forward.push(set(changed.map(([, v]) => v)));
+      const restore = changed.filter(([k]) => from.props.options.has(k)).map(([k]) => from.props.options.get(k));
+      const undo = changed.filter(([k]) => !from.props.options.has(k)).map(([k]) => k);
+      if (restore.length > 0) backward.push(set(restore));
+      if (undo.length > 0) backward.push(reset(undo));
+    }
+    if (removed.length > 0) {
+      forward.push(reset(removed.map(([k]) => k)));
+      backward.push(set(removed.map(([, v]) => v)));
+    }
+    if (forward.length > 0) steps.push(prop(alterCmds(relation, forward), alterCmds(relation, backward)));
+  }
+  for (const [print, parent] of from.props.inherits) {
+    if (to.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_DropInherit', def: parent }), alter({ subtype: 'AT_AddInherit', def: parent })));
+  }
+  for (const [print, parent] of to.props.inherits) {
+    if (from.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_AddInherit', def: parent }), alter({ subtype: 'AT_DropInherit', def: parent })));
+  }
+  if (stablePrint(from.props.partition) !== stablePrint(to.props.partition)) {
+    const parentOf = (p: { parent: unknown }): unknown => (p.parent as { RangeVar?: unknown }).RangeVar ?? p.parent;
+    const detach = (p: { parent: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_DetachPartition', def: { PartitionCmd: { name: relation } } }]);
+    const attach = (p: { parent: unknown; bound: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_AttachPartition', def: { PartitionCmd: { name: relation, bound: p.bound } } }]);
+    if (from.props.partition) steps.push(prop(detach(from.props.partition), attach(from.props.partition)));
+    if (to.props.partition) steps.push(prop(attach(to.props.partition), detach(to.props.partition)));
+  }
+  if (stablePrint(from.props.partspec) !== stablePrint(to.props.partspec)) {
+    ctx.incomplete.push(`${diff.path}: PARTITION BY changed; Postgres cannot re-partition a table in place, rebuild it manually`);
+  }
+
   // Self-inverse ALTER TABLE subtypes: a removed extra with one of these
   // undoes with the paired subtype rather than a DROP CONSTRAINT.
   const INVERSE_SUBTYPE: Record<string, string> = {
     AT_EnableRowSecurity: 'AT_DisableRowSecurity',
     AT_DisableRowSecurity: 'AT_EnableRowSecurity',
     AT_ForceRowSecurity: 'AT_NoForceRowSecurity',
-    AT_NoForceRowSecurity: 'AT_ForceRowSecurity'
+    AT_NoForceRowSecurity: 'AT_ForceRowSecurity',
+    AT_EnableTrig: 'AT_DisableTrig',
+    AT_DisableTrig: 'AT_EnableTrig',
+    AT_EnableAlwaysTrig: 'AT_EnableTrig',
+    AT_EnableReplicaTrig: 'AT_EnableTrig',
+    AT_EnableTrigAll: 'AT_DisableTrigAll',
+    AT_DisableTrigAll: 'AT_EnableTrigAll',
+    AT_EnableTrigUser: 'AT_DisableTrigUser',
+    AT_DisableTrigUser: 'AT_EnableTrigUser'
   };
+  /** The trigger an ENABLE/DISABLE TRIGGER command addresses (it must exist first). */
+  const triggerOf = (cmd: Record<string, unknown>): NamingIdentity | null =>
+    /Trig$/.test(cmd.subtype as string) && typeof cmd.name === 'string' ? { kind: 'trigger', schema, name: cmd.name, table } : null;
+  const invert = (cmd: Record<string, unknown>): Record<string, unknown> =>
+    cmd.name === undefined ? { subtype: INVERSE_SUBTYPE[cmd.subtype as string] } : { subtype: INVERSE_SUBTYPE[cmd.subtype as string], name: cmd.name };
 
   // Removed extras drop before added ones: a changed constraint that keeps
   // its name must DROP CONSTRAINT before the replacement ADD CONSTRAINT.
@@ -856,11 +980,12 @@ function diffTable(
         breaking: false
       });
     } else if (subtype && INVERSE_SUBTYPE[subtype]) {
+      const cmd = (extra as { AlterTableCmd: Record<string, unknown> }).AlterTableCmd;
       steps.push({
-        sql: alter({ subtype: INVERSE_SUBTYPE[subtype] }),
-        inverse: alter({ subtype }),
+        sql: alter(invert(cmd)),
+        inverse: alter(cmd),
         phase: 'remove',
-        sub: null,
+        sub: triggerOf(cmd),
         keyColumns: [],
         breaking: false
       });
@@ -895,14 +1020,14 @@ function diffTable(
     if (at) {
       const subtype = at.subtype as string;
       const inverse = INVERSE_SUBTYPE[subtype]
-        ? alter({ subtype: INVERSE_SUBTYPE[subtype] })
+        ? alter(invert(at))
         : conname ? alter({ subtype: 'AT_DropConstraint', name: conname }) : '';
       if (!inverse) ctx.incomplete.push(`${diff.path}: added table element has no derivable inverse (${describeExtra(extra)})`);
       steps.push({
         sql: alter(at),
         inverse: inverse || `-- pgpm: no inverse for ${describeExtra(extra)}`,
         phase: 'add',
-        sub: conname ? { kind: 'constraint', schema, name: conname, table } : null,
+        sub: conname ? { kind: 'constraint', schema, name: conname, table } : triggerOf(at),
         keyColumns: constraintKeys(extra),
         breaking: false
       });
@@ -1692,6 +1817,17 @@ export function diffSchemas(
     for (const step of unitPhase(tableKey, 'remove')) {
       if (step.sub?.kind === 'constraint' && step.keyColumns.includes(atom.sub.name)) atom.deps.add(step.id);
     }
+  }
+
+  // ENABLE/DISABLE TRIGGER addresses a trigger by name: it follows the
+  // trigger's creation and precedes its drop.
+  for (const atom of atoms) {
+    if (atom.sub?.kind !== 'trigger') continue;
+    const triggerKey = identityKey(atom.sub as ObjectIdentity);
+    const created = createAtomByName.get(pathFor(atom.sub, { style }));
+    if (created) atom.deps.add(created.id);
+    for (const create of unitPhase(triggerKey, 'create')) if (create.unit !== atom.unit) atom.deps.add(create.id);
+    for (const drop of unitPhase(triggerKey, 'drop')) drop.deps.add(atom.id);
   }
 
   // ---- enum values added and used in the same migration: Postgres refuses to
