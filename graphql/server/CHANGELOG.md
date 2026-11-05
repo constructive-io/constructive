@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.3...@constructive-io/graphql-server@5.35.4) (2026-11-05)
+
+### Bug Fixes
+
+- **server:** a handler built before an eviction is not cached after it ([92f7ff6](https://github.com/constructive-io/constructive/commit/92f7ff6f96ab4d1545bcae23e6cad46656b6d8d6))
+- **server:** flushService evicts every cache entry resolved to the flushed database ([8be2509](https://github.com/constructive-io/constructive/commit/8be250986fd97fd12115ddb21dc4be5011aaf4af))
+
 ## [5.35.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.2...@constructive-io/graphql-server@5.35.3) (2026-11-05)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

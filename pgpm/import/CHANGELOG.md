@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.3...@pgpmjs/import@0.11.0) (2026-11-05)
+
+### Bug Fixes
+
+- **import:** deploy misc/statements last, requiring every schema change ([f903187](https://github.com/constructive-io/constructive/commit/f9031870b86dad82008855896740e46ae90a2a2a))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
 ## [0.10.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.2...@pgpmjs/import@0.10.3) (2026-11-05)
 
 **Note:** Version bump only for package @pgpmjs/import

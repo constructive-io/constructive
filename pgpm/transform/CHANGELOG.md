@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.31.0...@pgpmjs/transform@0.32.0) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** module vs live-database normalization — implicit ::text on string constants, restated sequence defaults, WITH NO DATA, FOR ROLE on default privileges, column attributes emitted as separate ALTERs by pg_dump ([81e6659](https://github.com/constructive-io/constructive/commit/81e6659ce0c39fd22f94c3efcf2090237ea58e70))
+- **diff:** name inline constraints of added tables so every inverse is derivable; e2e direct diffChangeSets calls accept data loss ([ebc0303](https://github.com/constructive-io/constructive/commit/ebc0303fb680d9d451351d4e69eee87826c8ddf8))
+- **diff:** report an object as modified only when a step is emitted (representation-only differences are identical) ([ecb129c](https://github.com/constructive-io/constructive/commit/ecb129c311e300853d2fbdfdba3d6809fc647634))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
 # [0.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.2...@pgpmjs/transform@0.31.0) (2026-11-05)
 
 ### Bug Fixes

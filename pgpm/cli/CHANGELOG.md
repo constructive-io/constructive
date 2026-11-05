@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.41.0](https://github.com/constructive-io/constructive/compare/pgpm@5.40.0...pgpm@5.41.0) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** --verify replays a .sql/database side in dependency order with function bodies unchecked (pg_dump order lists functions before the tables they name) ([918a2eb](https://github.com/constructive-io/constructive/commit/918a2eb8f84c0fd057ab9257a12ee40624fffb01))
+- **diff:** module vs live-database normalization — implicit ::text on string constants, restated sequence defaults, WITH NO DATA, FOR ROLE on default privileges, column attributes emitted as separate ALTERs by pg_dump ([81e6659](https://github.com/constructive-io/constructive/commit/81e6659ce0c39fd22f94c3efcf2090237ea58e70))
+- **diff:** name inline constraints of added tables so every inverse is derivable; e2e direct diffChangeSets calls accept data loss ([ebc0303](https://github.com/constructive-io/constructive/commit/ebc0303fb680d9d451351d4e69eee87826c8ddf8))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
 # [5.40.0](https://github.com/constructive-io/constructive/compare/pgpm@5.39.15...pgpm@5.40.0) (2026-11-05)
 
 ### Bug Fixes
