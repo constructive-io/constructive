@@ -259,6 +259,24 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     );
   });
 
+  it.each(['', '   '])('rejects a VectorNearbyInput whose only input is blank text %j', async (t) => {
+    const result = await h.query<DocsResult>(BY_TEXT, { t });
+
+    expect(result.errors?.[0]?.message).toMatch(
+      /VectorNearbyInput: provide exactly one of `vector` or `text`; neither was given/
+    );
+    expect(calls).toEqual([]);
+  });
+
+  it('still rejects blank text sent with a vector as both', async () => {
+    const result = await h.query<DocsResult>(BY_VECTOR_AND_TEXT, { v: [0, 0, 1], t: '' });
+
+    expect(result.errors?.[0]?.message).toMatch(
+      /VectorNearbyInput: provide exactly one of `vector` or `text`, not both/
+    );
+    expect(calls).toEqual([]);
+  });
+
   it('embeds text nested under and/not', async () => {
     const result = await h.query<DocsResult>(`
       query {
