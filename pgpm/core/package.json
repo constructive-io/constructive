@@ -68,8 +68,8 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.4.2",
-    "pgsql-parser": "^18.3.2",
+    "pgsql-deparser": "^18.4.3",
+    "pgsql-parser": "^18.3.3",
     "semver": "^7.8.5",
     "yaml": "^2.9.0",
     "yanse": "^0.2.2"
