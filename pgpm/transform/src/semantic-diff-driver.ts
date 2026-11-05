@@ -205,7 +205,13 @@ function annotationHost(text: string): string | null {
     if (objects.length !== 1) return null;
     const first = objects[0] as Record<string, unknown>;
     if (first.RangeVar) return relation(first.RangeVar);
+    if (stmt.GrantStmt.targtype === 'ACL_TARGET_ALL_IN_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
     if (stmt.GrantStmt.objtype === 'OBJECT_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
+    const names = first.ObjectWithArgs
+      ? ((first.ObjectWithArgs as { objname?: { String?: { sval?: string } }[] }).objname ?? []).map(x => x.String?.sval ?? '')
+      : first.List ? items(first) : [];
+    if (names.length === 2) return `${names[0]}.${names[1]}`;
+    if (names.length === 1) return `.${names[0]}`;
     return null;
   }
   if (stmt.AlterDefaultPrivilegesStmt) {

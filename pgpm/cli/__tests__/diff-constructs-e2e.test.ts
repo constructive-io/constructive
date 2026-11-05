@@ -412,7 +412,20 @@ export const CASES: Case[] = [
     v2: `${S} CREATE TABLE fx.t (id int PRIMARY KEY); CREATE FUNCTION fx.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$; ALTER TABLE fx.t OWNER TO fx_owner; ALTER FUNCTION fx.f() OWNER TO fx_owner; ALTER SCHEMA fx OWNER TO fx_owner;`,
     roles: ['fx_owner'],
     flags: '--allow-incomplete',
-    notDeployed: [/DROP /]
+    notDeployed: [/DROP /],
+    // v1 declares no owner, so the inverse of OWNER TO is not derivable: the
+    // revert is reported incomplete and leaves fx_owner (and its implicit
+    // privileges) in place.
+    revertResidual: [
+      /^grants: fx\.f\(\):fx_owner:EXECUTE only in original$/,
+      ...['DELETE', 'INSERT', 'REFERENCES', 'SELECT', 'TRIGGER', 'TRUNCATE', 'UPDATE', 'USAGE'].map(p => new RegExp(`^grants: fx\\.t:fx_owner:${p} only in original$`)),
+      /^grants: fx:fx_owner:CREATE only in original$/,
+      /^grants: fx:fx_owner:USAGE only in original$/,
+      /^owners: function:fx\.f\(\) differs\n\s+original:\s+fx_owner\n\s+transformed:\s+postgres$/,
+      /^owners: relation:fx\.t differs\n\s+original:\s+fx_owner\n\s+transformed:\s+postgres$/,
+      /^owners: schema:fx differs\n\s+original:\s+fx_owner\n\s+transformed:\s+postgres$/,
+      /^owners: type:fx\.t differs\n\s+original:\s+fx_owner\n\s+transformed:\s+postgres$/
+    ]
   },
   // ---- misc statements
   {
