@@ -74,58 +74,58 @@ function completionFor(text: string): Completion | null {
   const [tag] = Object.keys(stmt);
   const node = stmt[tag];
   switch (tag) {
-    case 'CreateTableAsStmt': {
-      const rel = node.into?.rel as IntoRelation | undefined;
-      if (!rel?.relname) return null;
-      const kind = node.objtype === 'OBJECT_MATVIEW' ? 'view' : 'table';
-      return { schema: rel.schemaname ?? null, name: rel.relname, kind, identity: kind };
-    }
-    case 'CreateExtensionStmt':
-      return node.extname ? { schema: null, name: node.extname, kind: 'extension', identity: 'extension' } : null;
-    case 'DefineStmt': {
-      const spec = DEFINE_KINDS[node.kind];
-      const target = qualified(strings(node.defnames));
-      if (!spec || !target) return null;
-      if (node.kind === 'OBJECT_OPERATOR') target.name = operatorName(target.name);
-      return { ...target, ...spec };
-    }
-    case 'CreateCastStmt': {
-      const src = qualified(strings(node.sourcetype?.names));
-      const tgt = qualified(strings(node.targettype?.names));
-      return src && tgt ? other({ schema: null, name: `cast_${src.name}_as_${tgt.name}` }) : null;
-    }
-    case 'CreateStatsStmt':
-      return other(qualified(strings(node.defnames)));
-    case 'RuleStmt': {
-      const rel = node.relation as IntoRelation | undefined;
-      return rel?.relname && node.rulename
-        ? other({ schema: rel.schemaname ?? null, name: `${rel.relname}.rule.${node.rulename}` })
-        : null;
-    }
-    case 'CreateOpClassStmt': {
-      const target = qualified(strings(node.opclassname));
-      return target ? other({ schema: target.schema, name: `opclass_${node.amname}_${target.name}` }) : null;
-    }
-    case 'CreateOpFamilyStmt': {
-      const target = qualified(strings(node.opfamilyname));
-      return target ? other({ schema: target.schema, name: `opfamily_${node.amname}_${target.name}` }) : null;
-    }
-    case 'CreatePublicationStmt':
-      return node.pubname ? other({ schema: null, name: `publication_${node.pubname}` }) : null;
-    case 'CreateSubscriptionStmt':
-      return node.subname ? other({ schema: null, name: `subscription_${node.subname}` }) : null;
-    case 'CreateEventTrigStmt':
-      return node.trigname ? other({ schema: null, name: `event_trigger_${node.trigname}` }) : null;
-    case 'CreateForeignTableStmt': {
-      const rel = node.base?.relation as IntoRelation | undefined;
-      return rel?.relname ? other({ schema: rel.schemaname ?? null, name: rel.relname }) : null;
-    }
-    case 'CreateForeignServerStmt':
-      return node.servername ? other({ schema: null, name: `server_${node.servername}` }) : null;
-    case 'CreateFdwStmt':
-      return node.fdwname ? other({ schema: null, name: `fdw_${node.fdwname}` }) : null;
-    default:
-      return null;
+  case 'CreateTableAsStmt': {
+    const rel = node.into?.rel as IntoRelation | undefined;
+    if (!rel?.relname) return null;
+    const kind = node.objtype === 'OBJECT_MATVIEW' ? 'view' : 'table';
+    return { schema: rel.schemaname ?? null, name: rel.relname, kind, identity: kind };
+  }
+  case 'CreateExtensionStmt':
+    return node.extname ? { schema: null, name: node.extname, kind: 'extension', identity: 'extension' } : null;
+  case 'DefineStmt': {
+    const spec = DEFINE_KINDS[node.kind];
+    const target = qualified(strings(node.defnames));
+    if (!spec || !target) return null;
+    if (node.kind === 'OBJECT_OPERATOR') target.name = operatorName(target.name);
+    return { ...target, ...spec };
+  }
+  case 'CreateCastStmt': {
+    const src = qualified(strings(node.sourcetype?.names));
+    const tgt = qualified(strings(node.targettype?.names));
+    return src && tgt ? other({ schema: null, name: `cast_${src.name}_as_${tgt.name}` }) : null;
+  }
+  case 'CreateStatsStmt':
+    return other(qualified(strings(node.defnames)));
+  case 'RuleStmt': {
+    const rel = node.relation as IntoRelation | undefined;
+    return rel?.relname && node.rulename
+      ? other({ schema: rel.schemaname ?? null, name: `${rel.relname}.rule.${node.rulename}` })
+      : null;
+  }
+  case 'CreateOpClassStmt': {
+    const target = qualified(strings(node.opclassname));
+    return target ? other({ schema: target.schema, name: `opclass_${node.amname}_${target.name}` }) : null;
+  }
+  case 'CreateOpFamilyStmt': {
+    const target = qualified(strings(node.opfamilyname));
+    return target ? other({ schema: target.schema, name: `opfamily_${node.amname}_${target.name}` }) : null;
+  }
+  case 'CreatePublicationStmt':
+    return node.pubname ? other({ schema: null, name: `publication_${node.pubname}` }) : null;
+  case 'CreateSubscriptionStmt':
+    return node.subname ? other({ schema: null, name: `subscription_${node.subname}` }) : null;
+  case 'CreateEventTrigStmt':
+    return node.trigname ? other({ schema: null, name: `event_trigger_${node.trigname}` }) : null;
+  case 'CreateForeignTableStmt': {
+    const rel = node.base?.relation as IntoRelation | undefined;
+    return rel?.relname ? other({ schema: rel.schemaname ?? null, name: rel.relname }) : null;
+  }
+  case 'CreateForeignServerStmt':
+    return node.servername ? other({ schema: null, name: `server_${node.servername}` }) : null;
+  case 'CreateFdwStmt':
+    return node.fdwname ? other({ schema: null, name: `fdw_${node.fdwname}` }) : null;
+  default:
+    return null;
   }
 }
 
@@ -140,10 +140,10 @@ const COMPLETED_TAGS = new Set([
 function completedIdentityKind(f: StatementFacts): ObjectIdentityKind | null {
   if (!COMPLETED_TAGS.has(f.nodeTag) || f.creates.length === 0) return null;
   switch (f.nodeTag) {
-    case 'CreateTableAsStmt': return f.kind === 'view' ? 'view' : 'table';
-    case 'CreateExtensionStmt': return 'extension';
-    case 'DefineStmt': return f.kind === 'type' ? 'type' : 'other';
-    default: return 'other';
+  case 'CreateTableAsStmt': return f.kind === 'view' ? 'view' : 'table';
+  case 'CreateExtensionStmt': return 'extension';
+  case 'DefineStmt': return f.kind === 'type' ? 'type' : 'other';
+  default: return 'other';
   }
 }
 

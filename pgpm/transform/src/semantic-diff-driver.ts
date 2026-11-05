@@ -44,7 +44,7 @@ import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
 import { classifyStatements } from './facts';
 import { identityOf } from './facts';
-import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
+import { ChangeGranularity, defaultChangeName, GranularityChange, restructureChanges } from './granularity-driver';
 import { objectKeyOf, unitKeyOf } from './keys';
 import { alterInPlace } from './object-alters';
 import { topologicalOrder } from './order';
@@ -233,7 +233,56 @@ function annotationHost(text: string): string | null {
  * reference, falling back to the preceding statement's unit; truly homeless
  * statements are reported via `warnings`.
  */
-function readSide(sql: string, warnings: string[], label: string): SideProgram {
+/**
+ * Argument-type signature of a `CREATE FUNCTION`/`PROCEDURE` text — the IN,
+ * INOUT and VARIADIC parameter types that make an overload distinct. Null for
+ * anything else.
+ */
+function functionArgSignature(text: string): string | null {
+  let stmts;
+  try {
+    stmts = parseSync(text).sql.stmts;
+  } catch {
+    return null;
+  }
+  const fn = stmts.length === 1 ? (stmts[0].stmt as unknown as { CreateFunctionStmt?: { parameters?: { FunctionParameter?: { mode?: string; argType?: unknown } }[] } }).CreateFunctionStmt : undefined;
+  if (!fn) return null;
+  return (fn.parameters ?? [])
+    .map(p => p.FunctionParameter)
+    .filter(p => p && p.mode !== 'FUNC_PARAM_OUT' && p.mode !== 'FUNC_PARAM_TABLE')
+    .map(p => Deparser.deparse({ TypeName: canonicalizeTypes(cleanTree(p!.argType)) } as any, { pretty: false }))
+    .join(', ');
+}
+
+/**
+ * Functions declared with more than one argument signature across both
+ * sides, keyed `schema.name`. Each overload of such a function is its own
+ * object: identified (and pathed) as `name(argtypes)`.
+ */
+function overloadedFunctions(sides: string[]): Set<string> {
+  const signatures = new Map<string, Set<string>>();
+  for (const sql of sides) {
+    const bytes = sqlSourceBytes(sql);
+    for (const f of classifyStatements(sql)) {
+      if (f.nodeTag !== 'CreateFunctionStmt' || !f.creates[0]) continue;
+      const sig = functionArgSignature(sliceStatementBytes(bytes, f.span.start, f.span.len));
+      if (sig === null) continue;
+      const name = `${f.creates[0].schema ?? ''}.${f.creates[0].name}`;
+      if (!signatures.has(name)) signatures.set(name, new Set());
+      signatures.get(name)!.add(sig);
+    }
+  }
+  return new Set([...signatures].filter(([, sigs]) => sigs.size > 1).map(([name]) => name));
+}
+
+/** The identity an overloaded function's statement groups under: `name(argtypes)`. */
+function overloadIdentity(identity: ObjectIdentity, text: string, overloaded: Set<string>): ObjectIdentity {
+  if (identity.kind !== 'function' || !overloaded.has(`${identity.schema ?? ''}.${identity.name}`)) return identity;
+  const sig = functionArgSignature(text);
+  return sig === null ? identity : { ...identity, name: `${identity.name}(${sig})` };
+}
+
+function readSide(sql: string, warnings: string[], label: string, overloaded: Set<string>): SideProgram {
   const facts = classifyStatements(sql);
   const graph = buildStatementGraph(facts);
   const units = new Map<string, ObjectUnit>();
@@ -248,6 +297,7 @@ function readSide(sql: string, warnings: string[], label: string): SideProgram {
     if (!text) return;
 
     let identity = groupingIdentity(f);
+    if (identity && f.nodeTag === 'CreateFunctionStmt') identity = overloadIdentity(identity, text, overloaded);
     if (identity && identity.kind === 'other') {
       const asTable = identityKey({ kind: 'table', schema: identity.schema, name: identity.name });
       if (units.has(asTable)) identity = units.get(asTable)!.identity;
@@ -1318,8 +1368,9 @@ export function diffSchemas(
   const destructive: string[] = [];
   /** Steps with no derivable DROP/inverse; refused unless `allowIncomplete`. */
   const incomplete: string[] = [];
-  const a = readSide(from, warnings, 'from');
-  const b = readSide(to, warnings, 'to');
+  const overloaded = overloadedFunctions([from, to]);
+  const a = readSide(from, warnings, 'from', overloaded);
+  const b = readSide(to, warnings, 'to', overloaded);
   const renames = options.renames ?? [];
   const casts = options.casts ?? {};
 
@@ -1731,6 +1782,11 @@ export function diffSchemas(
       {
         granularity: options.granularity ?? 'object',
         changeGranularity: alteration ? 'alteration' : undefined,
+        changeName: (facts, text) => {
+          const identity = identityOf(facts);
+          if (!identity) return defaultChangeName(facts);
+          return pathFor(overloadIdentity(identity, text, overloaded), { style });
+        },
         subObjectName: identity => pathFor(identity, { style })
       }
     );
@@ -2105,9 +2161,14 @@ export function coverChanges(
   for (const obj of diff.objects) {
     deltaByKey.set(identityKey(obj.identity), obj.delta);
   }
+  const overloaded = new Set(
+    diff.objects
+      .filter(obj => obj.identity.kind === 'function' && /\)$/.test(obj.identity.name))
+      .map(obj => `${obj.identity.schema ?? ''}.${obj.identity.name.replace(/\(.*\)$/, '')}`)
+  );
   return changes.map(change => {
     const sideWarnings: string[] = [];
-    const side = readSide(change.deploy, sideWarnings, change.name);
+    const side = readSide(change.deploy, sideWarnings, change.name, overloaded);
     const objects: ChangeObjectCoverage[] = side.order.map(key => {
       const unit = side.units.get(key)!;
       return {
