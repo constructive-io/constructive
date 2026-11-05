@@ -1294,7 +1294,7 @@ export function diffSchemas(
   deferred.sort((x, y) => fromRank(y.prior) - fromRank(x.prior));
   for (const { key, unit, prior, toRank } of deferred) {
     const path = pathFor(unit.identity, { style });
-    objects.push({ identity: unit.identity, path, delta: 'modified' });
+    const modified = (): void => { objects.push({ identity: unit.identity, path, delta: 'modified' }); };
     const pa = splitUnit(prior);
     const pb = splitUnit(unit);
     const annotationSteps = diffAnnotations(pa.annotations, pb.annotations, path);
@@ -1312,12 +1312,15 @@ export function diffSchemas(
     };
     const definitionChanged = definitionFingerprint(pa.definition) !== definitionFingerprint(pb.definition);
     if (!definitionChanged) {
+      // Representation-only differences (e.g. pg_dump's FOR ROLE) yield no steps.
+      if (annotationSteps.length > 0) modified();
       emitSteps(annotationSteps);
       continue;
     }
     if (pa.nodes.length === 1 && pb.nodes.length === 1) {
       const steps = alterInPlace(pa.nodes[0], pb.nodes[0], objectLabel(unit.identity));
       if (steps) {
+        if (steps.length + annotationSteps.length > 0) modified();
         // Shape changes (enum values, domain rules, attributes) invalidate
         // dependents the way a drop does; annotations do not.
         emitSteps(steps, undefined, true);
@@ -1325,6 +1328,7 @@ export function diffSchemas(
         continue;
       }
     }
+    modified();
     const signature = functionSignature(pb.definition);
     // A function body is validated against the current shape of the types it
     // uses, so around a dropped or altered dependency it must be dropped and
