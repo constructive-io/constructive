@@ -68,6 +68,31 @@ export function identityFromClaims(
 }
 
 /**
+ * The scope one request's model calls run under: the database's `llm_module`
+ * model overrides (when the server exposes them on the GraphQL context) and
+ * the identity the request's claims carry.
+ */
+export async function resolveRequestScope(graphqlContext: any): Promise<LlmRequestScope> {
+  const scope: LlmRequestScope = { identity: identityFromClaims(graphqlContext?.pgSettings) };
+  const ctx = graphqlContext?.constructive;
+  if (!ctx?.useLlm) return scope;
+
+  try {
+    const llm = await ctx.useLlm();
+    if (!llm?.embeddingModel) return scope;
+    return {
+      ...scope,
+      embeddingModel: llm.embeddingModel,
+      embeddingBaseUrl: llm.embeddingBaseUrl,
+      chatModel: llm.chatModel ?? undefined,
+      chatBaseUrl: llm.chatBaseUrl ?? undefined
+    };
+  } catch {
+    return scope;
+  }
+}
+
+/**
  * Headers for one gateway call: content type, the upstream dialect the
  * deployment names, and the identity the gateway records the call under.
  * A request without an identity cannot be attributed, so it is refused here

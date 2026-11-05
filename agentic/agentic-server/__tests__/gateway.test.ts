@@ -100,7 +100,12 @@ describe('POST /v1/chat/completions', () => {
         'X-Entity-Id': 'entity-1',
         'X-Actor-Id': 'actor-1'
       },
-      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'Hello' }] })
+      body: JSON.stringify({
+        model: 'llama3',
+        messages: [{ role: 'user', content: 'Hello' }],
+        temperature: 0.2,
+        max_tokens: 64
+      })
     });
 
     expect(res.status).toBe(200);
@@ -114,6 +119,7 @@ describe('POST /v1/chat/completions', () => {
     expect(llmRequests[0].path).toBe('/api/chat');
     expect(llmRequests[0].body.model).toBe('llama3');
     expect(llmRequests[0].body.stream).toBe(false);
+    expect(llmRequests[0].body.options).toEqual({ temperature: 0.2, num_predict: 64 });
   });
 
   it('routes a successful chat completion to the injected sink', async () => {

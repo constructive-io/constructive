@@ -59,7 +59,8 @@ export {
   buildEmbedderFromModule,
   createGatewayEmbedder,
   identityFromClaims,
-  llmConfigStore
+  llmConfigStore,
+  resolveRequestScope
 } from './embedder';
 
 // Chat completion utilities

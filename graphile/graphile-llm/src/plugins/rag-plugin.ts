@@ -24,7 +24,7 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 
-import { identityFromClaims, llmConfigStore } from '../embedder';
+import { llmConfigStore, resolveRequestScope } from '../embedder';
 import type { ChatFunction, ChunkTableInfo, EmbedderFunction, RagDefaults } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
@@ -243,10 +243,12 @@ export function createLlmRagPlugin(
             const $contextLimit = fieldArgs.getRaw('contextLimit');
             const $minSimilarity = fieldArgs.getRaw('minSimilarity');
             const $systemPrompt = fieldArgs.getRaw('systemPrompt');
-            const $withPgClient = (grafastContext() as any).get('withPgClient');
-            const $pgSettings = (grafastContext() as any).get('pgSettings');
+            const $context = grafastContext() as any;
+            const $withPgClient = $context.get('withPgClient');
+            const $pgSettings = $context.get('pgSettings');
 
             const $combined = object({
+              context: $context,
               prompt: $prompt,
               contextLimit: $contextLimit,
               minSimilarity: $minSimilarity,
@@ -255,10 +257,11 @@ export function createLlmRagPlugin(
               pgSettings: $pgSettings
             });
 
-            // Both model calls run under the request's identity, read from the
-            // same claims the chunk search runs with.
-            return lambda($combined, (input: any) => llmConfigStore.run(
-              { identity: identityFromClaims(input.pgSettings) },
+            // Both model calls run under the request's scope: its identity, read
+            // from the same claims the chunk search runs with, and its model
+            // overrides.
+            return lambda($combined, async (input: any) => llmConfigStore.run(
+              await resolveRequestScope(input.context),
               async () => {
                 const {
                   prompt,
@@ -375,10 +378,10 @@ export function createLlmRagPlugin(
 
           embedText(_$root: any, fieldArgs: any) {
             const $text = fieldArgs.getRaw('text');
-            const $pgSettings = (grafastContext() as any).get('pgSettings');
+            const $context = grafastContext() as any;
 
-            return lambda(object({ text: $text, pgSettings: $pgSettings }), ({ text, pgSettings }: any) => llmConfigStore.run(
-              { identity: identityFromClaims(pgSettings) },
+            return lambda(object({ text: $text, context: $context }), async ({ text, context }: any) => llmConfigStore.run(
+              await resolveRequestScope(context),
               async () => {
                 if (!text || typeof text !== 'string') {
                   throw new Error('EMBED_INVALID_TEXT: text is required');

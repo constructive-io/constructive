@@ -214,12 +214,15 @@ describe('server-side embeddings are recorded by the gateway', () => {
   });
 
   afterAll(async () => {
-    if (teardown) await teardown();
-    if (gateway) await gateway.close();
-    if (modelServer) await modelServer.close();
-    for (const [key, value] of Object.entries(previousEnv)) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
+    try {
+      if (teardown) await teardown();
+    } finally {
+      if (gateway) await gateway.close();
+      if (modelServer) await modelServer.close();
+      for (const [key, value] of Object.entries(previousEnv)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
     }
   });
 

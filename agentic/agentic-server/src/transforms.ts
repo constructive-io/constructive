@@ -70,13 +70,16 @@ export function transformChatRequest(
   }
 
   if (provider.type === 'ollama') {
+    // Ollama takes sampling settings under `options`; `max_tokens` is `num_predict`.
+    const options = {
+      ...(body.temperature !== undefined && { temperature: body.temperature }),
+      ...(body.max_tokens !== undefined && { num_predict: body.max_tokens })
+    };
     return {
       model: model || 'llama3',
       messages: flattenContentParts(body.messages),
       stream: false,
-      ...(body.temperature !== undefined && {
-        options: { temperature: body.temperature }
-      })
+      ...(Object.keys(options).length > 0 && { options })
     };
   }
 
