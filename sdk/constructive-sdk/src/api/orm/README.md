@@ -70,6 +70,7 @@ const db = createClient({
 | `platformGetSitePreviewsRecord` | findMany, findOne, create, update, delete |
 | `platformManagedDomain` | findMany, findOne, create, update, delete |
 | `platformPage` | findMany, findOne, create, update, delete |
+| `platformReservedSubdomain` | findMany, findOne, create, update, delete |
 | `platformSiteAppLink` | findMany, findOne, create, update, delete |
 | `platformSite` | findMany, findOne, create, update, delete |
 | `platformSiteDeepLink` | findMany, findOne, create, update, delete |
@@ -2100,6 +2101,42 @@ const updated = await db.platformPage.update({ where: { id: '<UUID>' }, data: { 
 const deleted = await db.platformPage.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformReservedSubdomain`
+
+CRUD operations for PlatformReservedSubdomain records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `label` | String | Yes |
+| `match` | String | Yes |
+| `reason` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformReservedSubdomain records
+const items = await db.platformReservedSubdomain.findMany({ select: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformReservedSubdomain.findOne({ id: '<UUID>', select: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformReservedSubdomain.create({ data: { createdByPrincipal: '<UUID>', label: '<String>', match: '<String>', reason: '<String>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformReservedSubdomain.update({ where: { id: '<UUID>' }, data: { createdByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformReservedSubdomain.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformSiteAppLink`
 
 CRUD operations for PlatformSiteAppLink records.
@@ -3706,21 +3743,6 @@ const deleted = await db.webauthnSetting.delete({ where: { id: '<UUID>' } }).exe
 
 ## Custom Operations
 
-### `db.query.apiSchemaNames`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetApiId` | UUID |
-
-```typescript
-const result = await db.query.apiSchemaNames({ targetApiId: '<UUID>' }).execute();
-```
-
 ### `db.query.applyRegistryDefaults`
 
 applyRegistryDefaults
@@ -3889,54 +3911,6 @@ platformVerifySitePreviewToken
 
 ```typescript
 const result = await db.query.platformVerifySitePreviewToken({ siteId: '<UUID>', token: '<String>' }).execute();
-```
-
-### `db.query.resolveDeepLink`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `linkSlug` | String |
-  | `targetSiteId` | UUID |
-
-```typescript
-const result = await db.query.resolveDeepLink({ linkSlug: '<String>', targetSiteId: '<UUID>' }).execute();
-```
-
-### `db.query.resolveRoute`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
-
-```typescript
-const result = await db.query.resolveRoute({ requestHost: '<String>', requestMethod: '<String>', requestPath: '<String>' }).execute();
-```
-
-### `db.query.resolveSiteAppLinks`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetSiteId` | UUID |
-
-```typescript
-const result = await db.query.resolveSiteAppLinks({ targetSiteId: '<UUID>' }).execute();
 ```
 
 ### `db.query.sitesDeepLinkUrl`
