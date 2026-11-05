@@ -31,6 +31,8 @@ import { parseSync } from 'plpgsql-parser';
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { classifyStatements } from './facts';
 import { identityOf } from './facts';
+import { SubObjectKey, subObjectKeyOf } from './keys';
+import { nodesOnCycles, topologicalOrder } from './order';
 import { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 
 export type { Granularity } from '@pgsql/transform';
@@ -239,6 +241,18 @@ export function restructureChanges(
   const groupSubName: (string | null)[] = [];
   /** For alteration groups: the object-group key of the owning table. */
   const groupOwnerKey: (string | null)[] = [];
+  /** For alteration groups: the typed sub-object the group is keyed by. */
+  const groupSub: (SubObjectKey | null)[] = [];
+  const addGroup = (key: string, f: StatementFacts, sub: SubObjectKey | null): number => {
+    const g = groupKeys.length;
+    groupKeys.push(key);
+    groupFacts.push(f);
+    groupSubName.push(sub ? subNameFor(sub) : null);
+    groupOwnerKey.push(sub ? `${sub.schema ?? ''}.${sub.table}` : null);
+    groupSub.push(sub);
+    groupKeyToIndex.set(key, g);
+    return g;
+  };
 
   facts.forEach((f, i) => {
     const created = f.creates[0];
@@ -251,29 +265,15 @@ export function restructureChanges(
     if (alteration) {
       const sub = subObjectIdentityOf(f);
       if (sub) {
-        const key = `sub\u0000${sub.kind}\u0000${sub.schema ?? ''}\u0000${sub.table}\u0000${sub.name}`;
-        let g = groupKeyToIndex.get(key);
-        if (g === undefined) {
-          g = groupKeys.length;
-          groupKeys.push(key);
-          groupFacts.push(f);
-          groupSubName.push(subNameFor(sub));
-          groupOwnerKey.push(`${sub.schema ?? ''}.${sub.table}`);
-          groupKeyToIndex.set(key, g);
-        }
-        groupOf[i] = g;
+        const key = subObjectKeyOf(sub);
+        groupOf[i] = groupKeyToIndex.get(key) ?? addGroup(key, f, sub);
         return;
       }
     }
     const key = `${created.schema ?? ''}.${created.name}`;
     let g = groupKeyToIndex.get(key);
     if (g === undefined) {
-      g = groupKeys.length;
-      groupKeys.push(key);
-      groupFacts.push(f);
-      groupSubName.push(null);
-      groupOwnerKey.push(null);
-      groupKeyToIndex.set(key, g);
+      g = addGroup(key, f, null);
     } else if (!(groupFacts[g].kind in KIND_DIRS) && groupFacts[g].kind !== 'schema' && (f.kind in KIND_DIRS || f.kind === 'schema')) {
       // Prefer naming the group after its creating statement over an ALTER.
       groupFacts[g] = f;
@@ -298,7 +298,7 @@ export function restructureChanges(
   const producerGroup = (stmt: number): number => {
     const g = groupOf[stmt];
     if (g === -1 || groupOwnerKey[g] === null) return g;
-    if (groupKeys[g].split('\u0000')[1] !== 'constraint') return g;
+    if (groupSub[g]?.kind !== 'constraint') return g;
     return groupKeyToIndex.get(groupOwnerKey[g]!) ?? g;
   };
   const buildGroupDeps = (): Set<number>[] => {
@@ -331,7 +331,7 @@ export function restructureChanges(
   // is an error, never an unordered plan.
   let groupDeps = buildGroupDeps();
   for (;;) {
-    const cyclic = groupsOnCycles(groupDeps);
+    const cyclic = nodesOnCycles(groupDeps);
     if (cyclic.size === 0) break;
     let moved = false;
     facts.forEach((f, i) => {
@@ -343,17 +343,8 @@ export function restructureChanges(
         e => e.from === i && e.kind !== 'late' && groupOf[e.to] !== -1 && groupOf[e.to] !== g && cyclic.has(groupOf[e.to])
       );
       if (!closesCycle) return;
-      const key = `sub\u0000${sub.kind}\u0000${sub.schema ?? ''}\u0000${sub.table}\u0000${sub.name}`;
-      let ng = groupKeyToIndex.get(key);
-      if (ng === undefined) {
-        ng = groupKeys.length;
-        groupKeys.push(key);
-        groupFacts.push(f);
-        groupSubName.push(subNameFor(sub));
-        groupOwnerKey.push(`${sub.schema ?? ''}.${sub.table}`);
-        groupKeyToIndex.set(key, ng);
-      }
-      groupOf[i] = ng;
+      const key = subObjectKeyOf(sub);
+      groupOf[i] = groupKeyToIndex.get(key) ?? addGroup(key, f, sub);
       moved = true;
     });
     if (!moved) {
@@ -384,19 +375,15 @@ export function restructureChanges(
   // finer edges are added here.
   {
     const columnGroup = new Map<string, number>();
-    groupKeys.forEach((key, g) => {
-      const parts = key.split('\u0000');
-      if (parts[0] === 'sub' && parts[1] === 'column') {
-        columnGroup.set(`${parts[2]}.${parts[3]}.${parts[4]}`, g);
-      }
+    groupSub.forEach((sub, g) => {
+      if (sub?.kind === 'column') columnGroup.set(`${sub.schema ?? ''}.${sub.table}.${sub.name}`, g);
     });
-    groupKeys.forEach((key, g) => {
+    groupSub.forEach((sub, g) => {
       const owner = groupOwnerKey[g];
       if (owner === null) return;
       const tableGroup = groupKeyToIndex.get(owner);
       if (tableGroup !== undefined && tableGroup !== g) groupDeps[g].add(tableGroup);
-      const parts = key.split('\u0000');
-      if (parts[1] !== 'constraint') return;
+      if (sub?.kind !== 'constraint') return;
       const constraint = (groupFacts[g].stmt?.AlterTableStmt as {
         cmds?: { AlterTableCmd?: { def?: { Constraint?: {
           keys?: { String?: { sval?: string } }[];
@@ -415,7 +402,11 @@ export function restructureChanges(
 
   // Emit groups in topological order of their dependencies; first-statement
   // order (already topological for unsplit groups) breaks ties.
-  const order = topologicalGroupOrder(groupDeps, groupNames.map((_, g) => groupOf.indexOf(g)));
+  const rank = groupNames.map((_, g) => groupOf.indexOf(g));
+  const order = topologicalOrder(groupDeps, {
+    priority: (a, b) => rank[a] - rank[b] || a - b,
+    onCycle: () => new Error('restructure: dependency cycle among changes; cannot order')
+  });
 
   const result: RestructuredChange[] = order
     .filter(g => groupSql[g].length > 0)
@@ -440,47 +431,3 @@ export function restructureChanges(
   return { changes: result, warnings };
 }
 
-/** Groups that lie on at least one dependency cycle. */
-function groupsOnCycles(deps: Set<number>[]): Set<number> {
-  const cyclic = new Set<number>();
-  deps.forEach((_, start) => {
-    const seen = new Set<number>();
-    const stack = [...deps[start]];
-    while (stack.length > 0) {
-      const g = stack.pop()!;
-      if (g === start) {
-        cyclic.add(start);
-        break;
-      }
-      if (seen.has(g)) continue;
-      seen.add(g);
-      stack.push(...deps[g]);
-    }
-  });
-  return cyclic;
-}
-
-/** Kahn's algorithm over groups; `rank` breaks ties (lower first). */
-function topologicalGroupOrder(deps: Set<number>[], rank: number[]): number[] {
-  const indegree = deps.map(d => d.size);
-  const dependents: number[][] = deps.map((): number[] => []);
-  deps.forEach((d, g) => { for (const to of d) dependents[to].push(g); });
-  const byRank = (a: number, b: number): number => rank[a] - rank[b] || a - b;
-  const ready = deps.map((_, g) => g).filter(g => indegree[g] === 0).sort(byRank);
-  const order: number[] = [];
-  while (ready.length > 0) {
-    const g = ready.shift()!;
-    order.push(g);
-    for (const d of dependents[g]) {
-      indegree[d] -= 1;
-      if (indegree[d] === 0) {
-        ready.push(d);
-        ready.sort(byRank);
-      }
-    }
-  }
-  if (order.length !== deps.length) {
-    throw new Error('restructure: dependency cycle among changes; cannot order');
-  }
-  return order;
-}

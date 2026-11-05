@@ -45,7 +45,9 @@ import { ConstraintNode, defaultConstraintName } from './constraint-names';
 import { classifyStatements } from './facts';
 import { identityOf } from './facts';
 import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
+import { objectKeyOf, unitKeyOf } from './keys';
 import { alterInPlace } from './object-alters';
+import { topologicalOrder } from './order';
 import { canonicalizeTypes, stripDefaultCasts, typeKey } from './type-canon';
 
 /** How one object differs between the two sides. */
@@ -147,8 +149,7 @@ export interface SemanticDiffResult {
   warnings: string[];
 }
 
-const identityKey = (id: ObjectIdentity): string =>
-  `${id.kind}\u0000${id.schema ?? ''}\u0000${id.table ?? ''}\u0000${id.name}`;
+const identityKey = objectKeyOf;
 
 /** One side's statements for a single object. */
 interface ObjectUnit {
@@ -1002,6 +1003,8 @@ interface Atom {
   breaking: boolean;
   /** A RENAME step: everything addressing the object afterwards depends on it. */
   rename?: boolean;
+  /** An added object's create, shaped by the granularity pipeline. */
+  added?: boolean;
   /** From-side name of a renamed column (what from-side dependents mention). */
   fromName?: string;
   /** Tie-break within a phase (lower first). */
@@ -1266,7 +1269,7 @@ export function diffSchemas(
           name = step.rename ? `${subPath}/rename` : step.phase === 'add' ? subPath : step.phase === 'remove' ? `${subPath}/drop` : `${subPath}/alter`;
         }
         const atom = addAtom({
-          unit: alteration ? `${key}\u0000${name}` : key,
+          unit: alteration ? unitKeyOf({ kind: 'alteration', key, name }) : key,
           owner: key,
           name,
           phase: step.phase,
@@ -1441,8 +1444,8 @@ export function diffSchemas(
     const pending: [Atom, string[]][] = [];
     changes.forEach((c, i) => {
       const atom = addAtom({
-        unit: `added\u0000${c.name}`, name: c.name, phase: 'create', sql: c.deploy,
-        inverse: inverseOf(c.deploy, c.name), sub: null, keyColumns: [], rank: 100000 + i
+        unit: unitKeyOf({ kind: 'added', name: c.name }), name: c.name, phase: 'create', sql: c.deploy,
+        inverse: inverseOf(c.deploy, c.name), sub: null, keyColumns: [], rank: 100000 + i, added: true
       });
       createAtomByName.set(c.name, atom);
       track(atom.unit, atom);
@@ -1470,7 +1473,6 @@ export function diffSchemas(
       }
     }
   }
-  const isAdded = (unit: string): boolean => unit.startsWith('added\u0000');
   for (const atom of atoms) {
     if (atom.phase !== 'create' && atom.phase !== 'add') continue;
     const used = columnMentions(atom.facts.map(f => sliceStatementBytes(sqlSourceBytes(atom.sql), f.span.start, f.span.len)));
@@ -1481,7 +1483,7 @@ export function diffSchemas(
         if (seen.has(k)) continue;
         seen.add(k);
         for (const target of createAtomsByObject.get(k) ?? []) {
-          if (target.unit !== atom.unit && !(isAdded(atom.unit) && isAdded(target.unit))) {
+          if (target.unit !== atom.unit && !(atom.added && target.added)) {
             atom.deps.add(target.id);
           }
         }
@@ -1554,31 +1556,14 @@ export function diffSchemas(
   };
 }
 
-/** Kahn's algorithm with a (phase, rank) priority; throws on a cycle. */
+/** Topological order over atoms with a (phase, rank) priority; throws on a cycle. */
 function topoOrder(atoms: Atom[], label: (atom: Atom) => string): number[] {
-  const indegree = atoms.map(x => x.deps.size);
-  const dependents: number[][] = atoms.map((): number[] => []);
-  for (const atom of atoms) for (const d of atom.deps) dependents[d].push(atom.id);
-  const priority = (x: number, y: number): number =>
-    PHASE_RANK[atoms[x].phase] - PHASE_RANK[atoms[y].phase] || atoms[x].rank - atoms[y].rank || x - y;
-  const ready = atoms.filter(x => x.deps.size === 0).map(x => x.id).sort(priority);
-  const order: number[] = [];
-  while (ready.length > 0) {
-    const next = ready.shift()!;
-    order.push(next);
-    for (const d of dependents[next]) {
-      indegree[d] -= 1;
-      if (indegree[d] === 0) {
-        ready.push(d);
-        ready.sort(priority);
-      }
-    }
-  }
-  if (order.length !== atoms.length) {
-    const stuck = atoms.filter(x => !order.includes(x.id)).map(label);
-    throw new Error(`pgpm diff: dependency cycle among undeployed changes; cannot order: ${stuck.join(', ')}`);
-  }
-  return order;
+  return topologicalOrder(atoms.map(x => x.deps), {
+    priority: (x, y) =>
+      PHASE_RANK[atoms[x].phase] - PHASE_RANK[atoms[y].phase] || atoms[x].rank - atoms[y].rank || x - y,
+    onCycle: stuck =>
+      new Error(`pgpm diff: dependency cycle among undeployed changes; cannot order: ${stuck.map(id => label(atoms[id])).join(', ')}`)
+  });
 }
 
 function buildChanges(
@@ -1649,29 +1634,14 @@ function buildChanges(
   const segments = [...new Set(segmentOf)].sort((x, y) => position.get(x)! - position.get(y)!);
 
   // Emit in topological order of segments (segment deps are acyclic by construction).
-  const segIndegree = new Map<number, number>();
-  const segDependents = new Map<number, number[]>();
-  for (const s of segments) {
-    segIndegree.set(s, segDeps(s).size);
-    for (const d of segDeps(s)) {
-      if (!segDependents.has(d)) segDependents.set(d, []);
-      segDependents.get(d)!.push(s);
+  const segmentIndex = new Map(segments.map((s, i) => [s, i]));
+  const emitted = topologicalOrder(
+    segments.map(s => new Set([...segDeps(s)].map(d => segmentIndex.get(d)!))),
+    {
+      priority: (x, y) => position.get(segments[x])! - position.get(segments[y])!,
+      onCycle: () => new Error('pgpm diff: dependency cycle among emitted changes; cannot order')
     }
-  }
-  const ready = segments.filter(s => segIndegree.get(s) === 0);
-  const emitted: number[] = [];
-  while (ready.length > 0) {
-    ready.sort((x, y) => position.get(x)! - position.get(y)!);
-    const s = ready.shift()!;
-    emitted.push(s);
-    for (const d of segDependents.get(s) ?? []) {
-      segIndegree.set(d, segIndegree.get(d)! - 1);
-      if (segIndegree.get(d) === 0) ready.push(d);
-    }
-  }
-  if (emitted.length !== segments.length) {
-    throw new Error('pgpm diff: dependency cycle among emitted changes; cannot order');
-  }
+  ).map(i => segments[i]);
 
   // Name segments in emitted order: a unit split in two gets `<name>` then `<name>-2`.
   const nameOf = new Map<number, string>();
