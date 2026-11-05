@@ -28,6 +28,7 @@ import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
 import type { DatabaseSettings } from '../types';
+import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
@@ -371,6 +372,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Register the creation promise before any asynchronous preset work so
       // concurrent requests coalesce while optional plugin modules load.
+      const startedUnder = generationOf(key);
       const creationPromise = (async () => {
         const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
         const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
@@ -400,6 +402,14 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           }),
           { enabled: observabilityEnabled }
         );
+        // The service entry this build read was evicted while it ran: the
+        // handler describes a service that may no longer exist, so it is
+        // released rather than admitted, and the waiters re-resolve.
+        if (generationOf(key) !== startedUnder) {
+          await instance.realtimeManager?.stop();
+          await instance.pgl.release();
+          throw new Error(`service ${key} was invalidated while its handler was being built`);
+        }
         // Admission is part of the shared promise: a handler the cache rejects
         // has been released, so coalesced waiters must not be handed it.
         await cacheGraphileInstance(key, instance);
