@@ -148,9 +148,32 @@ const applySide = async (config: PgConfig, side: DiffSide, spec: string, cwd: st
     }
     return;
   }
+  // A .sql / database side is replayed as authored (pg_dump order: functions
+  // before the tables their bodies name), so function bodies are not checked
+  // at creation — exactly what pg_dump's own preamble does.
   const pool = getPgPool(config);
-  const sql = side.changes.map(c => c.deploy).filter(Boolean).join('\n\n');
-  if (sql.trim()) await pool.query(sql);
+  const sql = inDependencyOrder(side.changes).map(c => c.deploy).filter(Boolean).join('\n\n');
+  if (sql.trim()) await pool.query(`SET check_function_bodies = false;\n\n${sql}`);
+};
+
+/** Changes in an order that satisfies their `dependencies`; source order breaks ties. */
+const inDependencyOrder = <T extends { name: string; dependencies?: string[] }>(changes: T[]): T[] => {
+  const byName = new Map(changes.map(c => [c.name, c]));
+  const placed = new Set<string>();
+  const out: T[] = [];
+  const visit = (c: T, trail: Set<string>): void => {
+    if (placed.has(c.name)) return;
+    if (trail.has(c.name)) throw new Error(`pgpm diff: dependency cycle among changes at ${c.name}`);
+    trail.add(c.name);
+    for (const dep of c.dependencies ?? []) {
+      const target = byName.get(dep);
+      if (target) visit(target, trail);
+    }
+    placed.add(c.name);
+    out.push(c);
+  };
+  for (const c of changes) visit(c, new Set());
+  return out;
 };
 
 /**
