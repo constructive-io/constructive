@@ -2250,6 +2250,42 @@ type EnableTotpPayload {
   result: String
 }
 
+"""All input for the `exchangeNativeHandoff` mutation."""
+input ExchangeNativeHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: String
+  codeVerifier: String
+  credentialKind: String
+}
+
+"""The output of our `exchangeNativeHandoff` mutation."""
+type ExchangeNativeHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: ExchangeNativeHandoffRecord
+}
+
+type ExchangeNativeHandoffRecord {
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  id: UUID
+  isVerified: Boolean
+  totpEnabled: Boolean
+  userId: UUID
+}
+
 """All input for the `extendTokenExpires` mutation."""
 input ExtendTokenExpiresInput {
   amount: IntervalInput
@@ -2761,6 +2797,11 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """
+  Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only.
+  """
+  allowedValues: [String!]
+
   """PostgreSQL column name"""
   columnName: String!
   description: String
@@ -2771,6 +2812,19 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """
+  Whether a create must provide this field. Set on a table's own fields only.
+  """
+  isRequiredOnCreate: Boolean
+
+  """Whether a create may set this field. Set on a table's own fields only."""
+  isWritableOnCreate: Boolean
+
+  """
+  Whether an update may change this field. Set on a table's own fields only.
+  """
+  isWritableOnUpdate: Boolean
 
   """Final GraphQL field name"""
   name: String!
@@ -2796,7 +2850,7 @@ type MetaHasRelation {
   type: String
 }
 
-"""i18n metadata for a table with @i18n tag"""
+"""i18n metadata for a translatable table"""
 type MetaI18n {
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
@@ -2823,7 +2877,7 @@ type MetaIndex {
   name: String!
 }
 
-"""Table inflection names"""
+"""Type and field names generated for this table"""
 type MetaInflection {
   allRows: String!
   conditionType: String!
@@ -2868,7 +2922,7 @@ type MetaQuery {
   update: String
 }
 
-"""Realtime metadata for a table with @realtime tag"""
+"""Realtime metadata for a table with change subscriptions"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
@@ -2889,7 +2943,7 @@ type MetaRelations {
 }
 
 """
-How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.
 """
 type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
@@ -2920,11 +2974,11 @@ type MetaSchema {
 
 """Provisioning scope metadata for a table"""
 type MetaScope {
-  """SQL name of the entity table for entity scopes, else null"""
+  """Name of the entity table for entity scopes, else null"""
   entityTable: String
 
   """
-  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  Field name of the scope key (e.g. databaseId, orgId), null for global tiers
   """
   keyColumn: String
 
@@ -2933,7 +2987,7 @@ type MetaScope {
   """
   scope: String!
 
-  """Provenance of the scope metadata (always 'smartTag')"""
+  """Where this scope metadata comes from"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -2964,7 +3018,7 @@ type MetaSearchColumn {
   name: String!
 }
 
-"""Per-table search configuration from @searchConfig smart tag"""
+"""Per-table search configuration"""
 type MetaSearchConfig {
   """Exponential decay factor per day"""
   boostRecencyDecay: Float
@@ -2981,7 +3035,7 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
-  """GraphQL type name of the plane's buckets table"""
+  """GraphQL type name of the paired buckets table"""
   bucketsType: String!
 
   """
@@ -2989,7 +3043,7 @@ type MetaStorage {
   """
   downloadUrlField: String
 
-  """GraphQL type name of the plane's files table"""
+  """GraphQL type name of the paired files table"""
   filesType: String!
 
   """Whether this table is a storage buckets table"""
@@ -2998,13 +3052,11 @@ type MetaStorage {
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
 
-  """The plane's GraphQL upload surface"""
+  """Upload mutations and types for this storage"""
   upload: MetaStorageUpload!
 }
 
-"""
-The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
-"""
+"""The upload mutations and types for a storage table pair"""
 type MetaStorageUpload {
   """Per-file input type inside the bulk input"""
   bulkFileInputType: String!
@@ -3030,7 +3082,7 @@ type MetaStorageUpload {
   """Payload type of the single upload mutation"""
   payloadType: String!
 
-  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  """Whether the upload input requires ownerId"""
   requiresOwnerId: Boolean!
 }
 
@@ -3040,22 +3092,27 @@ type MetaTable {
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
-  """i18n metadata (null if no @i18n tag)"""
+  """i18n metadata (null if the table is not translatable)"""
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """
+  Whether this table only links rows of two other tables; the link appears in their manyToMany relations
+  """
+  isJunction: Boolean!
 
   """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
 
-  """Realtime metadata (null if no @realtime tag)"""
+  """Realtime metadata (null if the table has no change subscriptions)"""
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag)"""
+  """Provisioning scope metadata (null if the table has no scope)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
@@ -3158,6 +3215,10 @@ type Mutation {
     """
     input: ConfirmTotpSetupInput!
   ): ConfirmTotpSetupPayload
+
+  """
+  Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
+  """
   createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3392,6 +3453,12 @@ type Mutation {
     """
     input: EnableTotpInput!
   ): EnableTotpPayload
+  exchangeNativeHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ExchangeNativeHandoffInput!
+  ): ExchangeNativeHandoffPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4930,6 +4997,7 @@ type Query {
     """
     where: RoleTypeFilter
   ): RoleTypeConnection
+  signInOptions: SignInOptionsRecord
 
   """Reads and enables pagination through a set of `UserConnectedAccount`."""
   userConnectedAccounts(
@@ -5146,7 +5214,9 @@ input RequestMagicLinkInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  codeChallenge: String
   email: String
+  nativeRedirectUri: String
   next: String
 }
 
@@ -5503,6 +5573,7 @@ input SetPasswordInput {
   clientMutationId: String
   currentPassword: String
   newPassword: String
+  signOutOtherSessions: Boolean
 }
 
 """The output of our `setPassword` mutation."""
@@ -5658,11 +5729,34 @@ type SignInMagicLinkPayload {
 type SignInMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  codeChallenge: String
   deviceApprovalRequired: Boolean
   mfaChallengeToken: String
   mfaRequired: Boolean
+  nativeRedirectUri: String
   outDeviceToken: String
   userId: UUID
+}
+
+type SignInOptionsRecord {
+  allowAnonymousSessions: Boolean
+  allowEmailOtpSignIn: Boolean
+  allowIdentitySignIn: Boolean
+  allowIdentitySignUp: Boolean
+  allowMagicLinkSignIn: Boolean
+  allowMagicLinkSignUp: Boolean
+  allowPasswordSignIn: Boolean
+  allowPasswordSignUp: Boolean
+  allowSignUp: Boolean
+  allowSmsSignIn: Boolean
+  allowSmsSignUp: Boolean
+  allowWebauthnSignIn: Boolean
+  allowWebauthnSignUp: Boolean
+  allowWebauthnUsernameless: Boolean
+  enableCaptcha: Boolean
+  identityProviders: JSON
+  requireMfa: Boolean
+  signUpRequiresInvite: Boolean
 }
 
 """The output of our `signIn` mutation."""
@@ -5801,6 +5895,8 @@ type SignUpMagicLinkPayload {
 type SignUpMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  codeChallenge: String
+  nativeRedirectUri: String
   outDeviceToken: String
   userId: UUID
 }

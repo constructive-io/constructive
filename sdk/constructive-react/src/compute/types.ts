@@ -50,23 +50,6 @@ export interface BuildStep {
   status: string | null;
   summary: unknown | null;
 }
-export interface BuilderBinding {
-  createdAt: string | null;
-  createdBy: string | null;
-  createdByPrincipal: string | null;
-  databaseId: string | null;
-  id: string | null;
-  installationId: string | null;
-  lastError: string | null;
-  metadata: unknown | null;
-  namespaceId: string | null;
-  observedHost: string | null;
-  realm: string | null;
-  status: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  updatedByPrincipal: string | null;
-}
 export interface ContentPreset {
   active: boolean | null;
   commitId: string | null;
@@ -665,22 +648,6 @@ export interface PlatformBuildStep {
   startedAt: string | null;
   status: string | null;
   summary: unknown | null;
-}
-export interface PlatformBuilderBinding {
-  createdAt: string | null;
-  createdBy: string | null;
-  createdByPrincipal: string | null;
-  id: string | null;
-  installationId: string | null;
-  lastError: string | null;
-  metadata: unknown | null;
-  namespaceId: string | null;
-  observedHost: string | null;
-  realm: string | null;
-  status: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  updatedByPrincipal: string | null;
 }
 export interface PlatformFunctionApiBinding {
   alias: string | null;
@@ -1456,6 +1423,24 @@ export interface PlatformResourcesResolvedRequirement {
   secretsObjectName: string | null;
   slug: string | null;
 }
+export interface PlatformServiceBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  installationId: string | null;
+  installationScope: string | null;
+  kind: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformWebhookEndpoint {
   active: boolean | null;
   createdAt: string | null;
@@ -1990,6 +1975,25 @@ export interface ResourcesResolvedRequirement {
   resourceId: string | null;
   secretsObjectName: string | null;
   slug: string | null;
+}
+export interface ServiceBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  installationId: string | null;
+  installationScope: string | null;
+  kind: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface WebhookEndpoint {
   active: boolean | null;

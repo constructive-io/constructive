@@ -167,6 +167,7 @@ export const customQueryKeys = {
   /** Query key for getMfaStatus */ getMfaStatus: () => ['getMfaStatus'] as const,
   /** Query key for requireStepUp */ requireStepUp: (variables?: object) =>
     ['requireStepUp', variables] as const,
+  /** Query key for signInOptions */ signInOptions: () => ['signInOptions'] as const,
 } as const;
 /**
 
