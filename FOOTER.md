@@ -55,9 +55,10 @@ Install skills for AI coding agents:
 # All platform skills (security, blueprints, codegen, billing, etc.)
 npx skills add constructive-io/constructive-skills
 
-# Individual repo skills (pgpm, testing, CLI, search, etc.)
-npx skills add https://github.com/constructive-io/constructive --skill pgpm
-npx skills add https://github.com/constructive-io/constructive --skill constructive-testing
+# Individual repo skills (pgpm, safegres, testing, CLI, search, etc.)
+npx skills add constructive-io/constructive --skill pgpm
+npx skills add constructive-io/constructive --skill safegres
+npx skills add constructive-io/constructive --skill constructive-testing
 ```
 
 ## Credits
