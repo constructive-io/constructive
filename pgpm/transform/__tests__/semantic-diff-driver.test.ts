@@ -382,6 +382,47 @@ describe('diffSchemas dependency order', () => {
   });
 });
 
+describe('diffSchemas: column removed together with the constraints on it', () => {
+  const FROM = [
+    'CREATE SCHEMA app;',
+    'CREATE TABLE app.p (id int PRIMARY KEY);',
+    'CREATE TABLE app.t (',
+    '  id int PRIMARY KEY,',
+    '  a int,',
+    '  b int,',
+    '  CONSTRAINT t_a_check CHECK (a > 0),',
+    '  CONSTRAINT t_a_b_key UNIQUE (a, b),',
+    '  CONSTRAINT t_a_fkey FOREIGN KEY (a) REFERENCES app.p (id)',
+    ');'
+  ].join('\n');
+  const TO = [
+    'CREATE SCHEMA app;',
+    'CREATE TABLE app.p (id int PRIMARY KEY);',
+    'CREATE TABLE app.t (id int PRIMARY KEY, b int);'
+  ].join('\n');
+
+  it('drops the constraints before the column, and re-adds the column before the constraints', () => {
+    const result = diffSchemas(FROM, TO);
+    const deploy = deployScript(result);
+    for (const c of ['t_a_check', 't_a_b_key', 't_a_fkey']) {
+      expect(at(deploy, `DROP CONSTRAINT ${c}`)).toBeLessThan(at(deploy, 'DROP COLUMN a'));
+    }
+    const revert = [...result.changes].reverse().map(c => c.revert).join('\n');
+    for (const c of ['t_a_check', 't_a_b_key', 't_a_fkey']) {
+      expect(at(revert, 'ADD COLUMN a')).toBeLessThan(at(revert, `ADD CONSTRAINT ${c}`));
+    }
+  });
+
+  it('with changeGranularity alteration, the column drop requires each constraint drop', () => {
+    const result = diffSchemas(FROM, TO, { changeGranularity: 'alteration' });
+    const column = changeWith(result, 'DROP COLUMN a');
+    for (const c of ['t_a_check', 't_a_b_key', 't_a_fkey']) {
+      const constraint = changeWith(result, `DROP CONSTRAINT ${c}`);
+      expect(column.dependencies).toContain(constraint.name);
+    }
+  });
+});
+
 describe('diffChangeSets', () => {
   it('ignores change names entirely — only identity matters', () => {
     const from: DiffInputChange[] = [
