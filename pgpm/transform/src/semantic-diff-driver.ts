@@ -1874,7 +1874,9 @@ export function diffSchemas(
         // Shape changes (enum values, domain rules, attributes) invalidate
         // dependents the way a drop does; annotations do not.
         const atoms = emitSteps(steps, undefined, true);
-        if (pa.nodes[0].CompositeTypeStmt && atoms.length > 0) bridgeColumns(atoms, true);
+        // ADD/DROP ATTRIBUTE work with dependent columns; ALTER ATTRIBUTE ... TYPE does not.
+        const retypes = atoms.filter(a => /\bALTER ATTRIBUTE\b/.test(a.sql) || /\bALTER ATTRIBUTE\b/.test(a.inverse));
+        if (pa.nodes[0].CompositeTypeStmt && retypes.length > 0) bridgeColumns(retypes, true);
         emitSteps(annotationSteps);
         continue;
       }
