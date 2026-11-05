@@ -48,6 +48,7 @@ import { ChangeGranularity, GranularityChange, restructureChanges } from './gran
 import { objectKeyOf, unitKeyOf } from './keys';
 import { alterInPlace } from './object-alters';
 import { topologicalOrder } from './order';
+import { nameUnnamedConstraints } from './sub-object';
 import { canonicalizeTypes, stripDefaultCasts, typeKey } from './type-canon';
 
 /** How one object differs between the two sides. */
@@ -1432,8 +1433,10 @@ export function diffSchemas(
   // emitted change is one atom carrying the pipeline's requires.
   const createAtomByName = new Map<string, Atom>();
   if (forwardSql.length > 0) {
+    // Unnamed constraints get their Postgres default names up front so every
+    // added object's DROP CONSTRAINT inverse is derivable.
     const { changes, warnings: w } = restructureChanges(
-      [{ name: 'delta', dependencies: [], deploy: forwardSql.join('\n\n') }],
+      [{ name: 'delta', dependencies: [], deploy: nameUnnamedConstraints(forwardSql.join('\n\n')) }],
       {
         granularity: options.granularity ?? 'object',
         changeGranularity: alteration ? 'alteration' : undefined,

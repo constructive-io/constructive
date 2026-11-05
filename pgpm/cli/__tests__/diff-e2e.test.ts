@@ -165,7 +165,7 @@ describe('pgpm diff e2e', () => {
 
   it('diffs a module against itself as identical, dial-invariantly', async () => {
     const v1 = loadDiffSideFromDisk(path.join(wsDir, 'diff-v1'));
-    expect(diffChangeSets(v1.changes, v1.changes).identical).toBe(true);
+    expect(diffChangeSets(v1.changes, v1.changes, { allowDataLoss: true }).identical).toBe(true);
 
     await fixture.runTerminalCommands(
       `
@@ -175,7 +175,7 @@ describe('pgpm diff e2e', () => {
       {}
     );
     const consolidated = loadDiffSideFromDisk(path.join(wsDir, 'diff-v1-consolidated'));
-    expect(diffChangeSets(v1.changes, consolidated.changes).identical).toBe(true);
+    expect(diffChangeSets(v1.changes, consolidated.changes, { allowDataLoss: true }).identical).toBe(true);
   });
 
   it('emits a migration that deploys v1 to v2, verifies, and reverts back to v1', async () => {
@@ -369,11 +369,11 @@ describe('pgpm diff e2e', () => {
     const v2Module = loadDiffSideFromDisk(path.join(wsDir, 'diff-v2'));
 
     // module-vs-file and module-vs-module agree
-    expect(diffChangeSets(v2Module.changes, v2File.changes).identical).toBe(true);
-    const result = diffChangeSets(v1.changes, v2File.changes);
+    expect(diffChangeSets(v2Module.changes, v2File.changes, { allowDataLoss: true }).identical).toBe(true);
+    const result = diffChangeSets(v1.changes, v2File.changes, { allowDataLoss: true });
     expect(result.identical).toBe(false);
     expect(result.objects.map(o => `${o.delta} ${o.path}`).sort()).toEqual(
-      diffChangeSets(v1.changes, v2Module.changes).objects.map(o => `${o.delta} ${o.path}`).sort()
+      diffChangeSets(v1.changes, v2Module.changes, { allowDataLoss: true }).objects.map(o => `${o.delta} ${o.path}`).sort()
     );
   });
 });
@@ -581,7 +581,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
   it('every change requires what it really depends on (graph edges, not a chain)', async () => {
     const v1 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v1'));
     const v2 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v2'));
-    const result = diffChangeSets(v1.changes, v2.changes);
+    const result = diffChangeSets(v1.changes, v2.changes, { allowDataLoss: true });
     const names = result.changes.map(c => c.name);
     const withDeploy = (needle: string) => result.changes.find(c => c.deploy.includes(needle))!;
 
