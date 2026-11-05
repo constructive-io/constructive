@@ -16,8 +16,9 @@
  *   warning; `withData` emits them as seed fixture changes (COPY data is
  *   converted to INSERTs so it deploys through the pg driver);
  * - statements that classify to no object and attach to no host (roles,
- *   default privileges, ...) land in a `misc/statements` change, first in
- *   the plan, with a warning — never dropped silently.
+ *   default privileges, ...) land in a `misc/statements` change, last in
+ *   the plan and requiring every schema change, with a warning — never
+ *   dropped silently.
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { ObjectIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
@@ -502,6 +503,17 @@ export const importDumpRows = async (
 
   const rows: PgpmRow[] = [];
 
+  rows.push(
+    ...restructured.rows.map(row => ({
+      ...row,
+      content: reorderChangeStatements(row.content),
+      revert: reorderRevertStatements(row.revert)
+    }))
+  );
+
+  // Misc statements carry no identity of their own but may reference any
+  // object (CREATE MATERIALIZED VIEW, ALTER DEFAULT PRIVILEGES ..), so they
+  // deploy last and require every schema change.
   if (miscTexts.length > 0) {
     const miscSql = miscTexts.join('\n\n');
     const scripts = regenerateScripts(miscSql);
@@ -510,20 +522,13 @@ export const importDumpRows = async (
     rows.push({
       name: MISC_CHANGE_PATH,
       deploy: MISC_CHANGE_PATH,
-      deps: [],
+      deps: restructured.rows.map(row => row.deploy),
       content: miscSql,
       revert: scripts.revert.sql,
       verify: scripts.verify.sql
     });
   }
 
-  rows.push(
-    ...restructured.rows.map(row => ({
-      ...row,
-      content: reorderChangeStatements(row.content),
-      revert: reorderRevertStatements(row.revert)
-    }))
-  );
 
   // Seed fixture changes, one per table, after the schema changes.
   const seedsByTable = new Map<string, DataUnit[]>();
