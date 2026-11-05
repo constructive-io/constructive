@@ -250,11 +250,15 @@ export const CASES: Case[] = [
   },
   {
     name: 'composite-attribute-type-change',
-    v1: `${S} CREATE TYPE fx.pt AS (x int, y int); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt);`,
-    v2: `${S} CREATE TYPE fx.pt AS (x bigint, y int, label text COLLATE "C"); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt);`,
+    v1: `${S} CREATE TYPE fx.pt AS (x int, y int); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt, ps fx.pt[]);`,
+    v2: `${S} CREATE TYPE fx.pt AS (x bigint, y int, label text COLLATE "C"); CREATE TABLE fx.t (id int PRIMARY KEY, p fx.pt, ps fx.pt[]);`,
     flags: '--allow-data-loss',
-    rows: 'INSERT INTO fx.t VALUES (1, ROW(1, 2))',
-    check: { sql: 'SELECT (p).x AS x, (p).label AS label FROM fx.t', rows: [{ x: '1', label: null }] }
+    rows: 'INSERT INTO fx.t VALUES (1, ROW(1, 2), ARRAY[ROW(3, 4)::fx.pt]), (2, NULL, NULL)',
+    // NULLs survive the jsonb bridge as NULLs, not as empty records/arrays.
+    check: {
+      sql: 'SELECT id, (p).x AS x, (p).label AS label, (ps[1]).x AS px, ps IS NULL AS ps_null FROM fx.t ORDER BY id',
+      rows: [{ id: 1, x: '1', label: null, px: '3', ps_null: false }, { id: 2, x: null, label: null, px: null, ps_null: true }]
+    }
   },
   {
     name: 'shell-type-io-functions',
