@@ -156,8 +156,10 @@ pgpm diff <A> <B> --verify
   `REVOKE` / `ALTER DEFAULT PRIVILEGES` with the previous state as inverse,
   never a rebuild of the object. An explicit `REVOKE .. FROM PUBLIC` is state
   too: dropping it re-grants only what PUBLIC holds by default (EXECUTE on
-  functions, USAGE on types; nothing on tables, sequences or user schemas), so
-  a table's dropped revoke emits no GRANT at all. A table rename rewrites
+  functions, USAGE on types, CONNECT/TEMPORARY on databases; nothing on
+  tables, sequences or schemas), never `GRANT ALL`, so a table's or schema's
+  dropped revoke emits no GRANT at all; the inverse of an added revoke
+  likewise restores only that default (a comment when there is none). A table rename rewrites
   `old.col` references only where `old` names the table itself, never another
   relation's alias; a view/policy rebuilt around a renamed table is dropped
   under the old name and recreated on revert from its text as written.

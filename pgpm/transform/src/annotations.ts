@@ -181,8 +181,15 @@ const defaultPrivilegesNode = (isGrant: boolean, options: unknown, objtype: stri
   };
 };
 
-/** Privileges PUBLIC holds by default (what an explicit REVOKE .. FROM PUBLIC actually takes away). */
+/**
+ * Privileges PUBLIC holds by default (what an explicit REVOKE .. FROM PUBLIC
+ * actually takes away). Per the GRANT docs: none on tables, columns,
+ * sequences, schemas, foreign servers/wrappers, large objects, tablespaces or
+ * parameters; CONNECT and TEMPORARY on databases; EXECUTE on functions and
+ * procedures; USAGE on languages and types (including domains).
+ */
 const PUBLIC_DEFAULT_PRIVILEGES: Record<string, string[]> = {
+  OBJECT_DATABASE: ['connect', 'temporary'],
   OBJECT_FUNCTION: ['execute'],
   OBJECT_PROCEDURE: ['execute'],
   OBJECT_ROUTINE: ['execute'],
@@ -198,7 +205,9 @@ const isPublicRole = (grantee: unknown): boolean =>
  * Privilege-set delta as GRANT/REVOKE statements with exact inverses.
  * `-token` entries are explicit revocations: adding one is a REVOKE (once, even
  * when the same token was also held); dropping one only re-grants what the
- * grantee holds by default (PUBLIC on functions/types), since no grant existed.
+ * grantee holds by default (PUBLIC on functions/types/databases), since no
+ * grant existed. The inverse of an added revoke restores exactly that default,
+ * never ALL: a revoke of a privilege nobody held has nothing to put back.
  */
 function diffPrivileges(
   from: Set<string>,
@@ -218,7 +227,8 @@ function diffPrivileges(
   const toNeg = negative(to);
   const newlyRevoked = toNeg.filter(t => !fromNeg.includes(t) && !revoked.includes(t));
   const byDefault = isPublicRole(grantee) ? PUBLIC_DEFAULT_PRIVILEGES[objtype] ?? [] : [];
-  const unrevoked = fromNeg.filter(t => !toNeg.includes(t) && !granted.includes(t) && (t === 'all' ? byDefault.length > 0 : byDefault.includes(t)));
+  const heldByDefault = (tokens: string[]): string[] => tokens.includes('all') ? byDefault : tokens.filter(t => byDefault.includes(t));
+  const unrevoked = heldByDefault(fromNeg.filter(t => !toNeg.includes(t) && !granted.includes(t)));
   if (revoked.length > 0) {
     steps.push({ sql: deparse(build(false, revoked)), inverse: deparse(build(true, revoked)) });
   }
@@ -226,7 +236,11 @@ function diffPrivileges(
     steps.push({ sql: deparse(build(true, granted)), inverse: deparse(build(false, granted)) });
   }
   if (newlyRevoked.length > 0) {
-    steps.push({ sql: deparse(build(false, newlyRevoked)), inverse: deparse(build(true, newlyRevoked)) });
+    const restore = heldByDefault(newlyRevoked);
+    steps.push({
+      sql: deparse(build(false, newlyRevoked)),
+      inverse: restore.length > 0 ? deparse(build(true, restore)) : '-- pgpm: nothing to restore; the grantee held none of these privileges'
+    });
   }
   if (unrevoked.length > 0) {
     steps.push({ sql: deparse(build(true, unrevoked)), inverse: deparse(build(false, unrevoked)) });
