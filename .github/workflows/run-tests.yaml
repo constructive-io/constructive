@@ -67,6 +67,9 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
+      - name: Validate release notification gate
+        run: node --test .github/scripts/wait-for-npm-packages.test.cjs
+
       - name: Install dependencies
         run: pnpm install
 

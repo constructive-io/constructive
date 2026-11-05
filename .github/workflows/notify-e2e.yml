@@ -12,7 +12,21 @@ on:
 jobs:
   trigger-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      - name: Checkout release metadata
+        if: "${{ startsWith(github.event.head_commit.message, 'chore(release): publish') }}"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Wait for release packages to reach npm
+        if: "${{ startsWith(github.event.head_commit.message, 'chore(release): publish') }}"
+        run: |
+          node .github/scripts/wait-for-npm-packages.cjs \
+            --before "${{ github.event.before }}" \
+            --after "${{ github.sha }}"
+
       - name: Trigger submodule update in constructive-hub
         uses: actions/github-script@v7
         with:
