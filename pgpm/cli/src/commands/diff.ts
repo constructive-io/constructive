@@ -285,9 +285,9 @@ export default async (
     await cliExitWithError('--ledger requires side B to be a pgpm workspace or module directory (it needs a plan to classify).');
   }
 
-  if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || verify)) {
+  if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || emitLedgerTarget || verify)) {
     await cliExitWithError(
-      '--append-module is standalone; it cannot be combined with --emit-migration/--emit-module/--emit-sql/--emit-bundle/--verify.'
+      '--append-module is standalone; it cannot be combined with --emit-migration/--emit-module/--emit-sql/--emit-bundle/--emit-ledger/--verify.'
     );
   }
 

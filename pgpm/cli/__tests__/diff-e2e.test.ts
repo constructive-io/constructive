@@ -805,14 +805,26 @@ describe('pgpm diff e2e: a column removed together with the constraints on it', 
 
   it('--append-module rejects --emit-ledger like every other --emit-* flag', async () => {
     writeModule(path.join(wsDir, 'col-target'), 'col-target', COL_V1);
-    await expect(
-      fixture.runTerminalCommands(
-        `
-        cd ${CWS}
-        pgpm diff col-v1 col-v2 --append-module col-target --emit-ledger col-ledger.sql --ledger db:${v1Db.name}
-        `,
-        {}
-      )
-    ).rejects.toThrow();
+    const originalExit = process.exit;
+    let exitCode: number | undefined;
+    process.exit = jest.fn((code?: number) => {
+      exitCode = code;
+      throw new Error(`process.exit called with code ${code}`);
+    }) as any;
+    try {
+      await expect(
+        fixture.runTerminalCommands(
+          `
+          cd ${CWS}
+          pgpm diff col-v1 col-v2 --append-module col-target --emit-ledger col-ledger.sql --ledger db:${v1Db.name}
+          `,
+          {}
+        )
+      ).rejects.toThrow(/process.exit called with code 1/);
+    } finally {
+      process.exit = originalExit;
+    }
+    expect(exitCode).toBe(1);
+    expect(fs.existsSync(path.join(wsDir, 'col-ledger.sql'))).toBe(false);
   });
 });
