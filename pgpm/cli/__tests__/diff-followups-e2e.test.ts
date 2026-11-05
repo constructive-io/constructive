@@ -146,15 +146,15 @@ describe('pgpm diff e2e: review follow-ups', () => {
       const mig = `${c.name}-mig`;
       writeModule(path.join(wsDir, v1), v1, c.v1);
       writeModule(path.join(wsDir, v2), v2, c.v2);
-      const v1Db = await fixture.setupTestDatabase();
       const v2Db = await fixture.setupTestDatabase();
       const testDb = await fixture.setupTestDatabase();
-      for (const [db, pkg] of [[v1Db, v1], [v2Db, v2], [testDb, v1]] as const) {
+      for (const [db, pkg] of [[v2Db, v2], [testDb, v1]] as const) {
         await fixture.runTerminalCommands(`
           cd ${WS}/${pkg}
           pgpm deploy --database ${db.name} --package ${pkg} --yes
         `, { database: db.name });
       }
+      const v1Catalog = withoutColumnOrder(await snapshotCatalog(testDb));
       if (c.rows) await testDb.query(c.rows);
 
       await fixture.runTerminalCommands(`
@@ -183,7 +183,7 @@ describe('pgpm diff e2e: review follow-ups', () => {
         cd ${WS}/${mig}
         pgpm revert --database ${testDb.name} --package ${mig} --yes --no-recursive
       `, { database: testDb.name });
-      const back = diffCatalogSnapshots(withoutColumnOrder(await snapshotCatalog(testDb)), withoutColumnOrder(await snapshotCatalog(v1Db)));
+      const back = diffCatalogSnapshots(withoutColumnOrder(await snapshotCatalog(testDb)), v1Catalog);
       expect(back).toEqual((c.revertResidual ?? []).map(re => expect.stringMatching(re)));
     });
   }
