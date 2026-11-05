@@ -144,7 +144,7 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     SELECT target, g.grantee::regrole::text, g.privilege_type
     FROM (
       SELECT n.nspname AS target, coalesce(n.nspacl, acldefault('n', n.nspowner)) AS acl
-      FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
+      FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND n.nspname NOT LIKE 'pg\\_temp\\_%' AND n.nspname NOT LIKE 'pg\\_toast\\_temp\\_%'
       UNION ALL
       SELECT n.nspname || '.' || cl.relname, coalesce(cl.relacl, acldefault('s', cl.relowner))
       FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace
@@ -200,7 +200,7 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
   `);
   const owners = await db.query(`
     SELECT 'schema' AS kind, n.nspname AS target, pg_get_userbyid(n.nspowner) AS owner
-    FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
+    FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND n.nspname NOT LIKE 'pg\\_temp\\_%' AND n.nspname NOT LIKE 'pg\\_toast\\_temp\\_%'
     UNION ALL
     SELECT 'relation', n.nspname || '.' || cl.relname, pg_get_userbyid(cl.relowner)
     FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace

@@ -27,6 +27,7 @@ import { identityOf as upstreamIdentityOf } from '@pgsql/transform';
 import { parseSync } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { canonicalTypeNames } from './type-canon';
 
 interface IntoRelation { schemaname?: string; relname?: string }
 interface Completion { schema: string | null; name: string; kind: StatementFacts['kind']; identity: ObjectIdentityKind }
@@ -43,6 +44,15 @@ const OPERATOR_CHARS: Record<string, string> = {
 };
 const operatorName = (symbol: string): string =>
   `op_${[...symbol].map(c => OPERATOR_CHARS[c] ?? c).join('_')}`;
+
+interface TypeNameNode { names?: { String?: { sval?: string } }[]; arrayBounds?: unknown[] }
+
+/** `int4`, `text[]`, ...: a type as it names an overload, filesystem-safe. */
+const typeLabel = (type: TypeNameNode): string => {
+  const names = strings(canonicalTypeNames((type.names ?? []) as any) as any);
+  const base = names[names.length - 1] ?? 'unknown';
+  return `${base}${type.arrayBounds && type.arrayBounds.length > 0 ? '_array' : ''}`.replace(/[^a-zA-Z0-9_]/g, '_');
+};
 
 const qualified = (names: string[]): { schema: string | null; name: string } | null =>
   names.length === 0 ? null : { schema: names.length > 1 ? names[names.length - 2] : null, name: names[names.length - 1] };
@@ -86,7 +96,19 @@ function completionFor(text: string): Completion | null {
     const spec = DEFINE_KINDS[node.kind];
     const target = qualified(strings(node.defnames));
     if (!spec || !target) return null;
-    if (node.kind === 'OBJECT_OPERATOR') target.name = operatorName(target.name);
+    // Operators and aggregates overload on their argument types, so the
+    // types are part of the identity (and the path).
+    if (node.kind === 'OBJECT_OPERATOR') {
+      const operand = (which: string): string => {
+        const def = (node.definition ?? []).find((d: any) => d.DefElem?.defname?.toLowerCase() === which)?.DefElem;
+        return def?.arg?.TypeName ? typeLabel(def.arg.TypeName) : 'none';
+      };
+      target.name = `${operatorName(target.name)}__${operand('leftarg')}_${operand('rightarg')}`;
+    } else if (node.kind === 'OBJECT_AGGREGATE') {
+      const params = (node.args?.[0]?.List?.items ?? []) as { FunctionParameter?: { argType?: TypeNameNode } }[];
+      const labels = params.map(p => p.FunctionParameter?.argType).filter((t): t is TypeNameNode => !!t).map(typeLabel);
+      target.name = `${target.name}__${labels.length > 0 ? labels.join('_') : 'star'}`;
+    }
     return { ...target, ...spec };
   }
   case 'CreateCastStmt': {

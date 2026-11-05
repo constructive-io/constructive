@@ -244,20 +244,30 @@ function annotationHost(text: string): string | null {
  * INOUT and VARIADIC parameter types that make an overload distinct. Null for
  * anything else.
  */
+const signatureCache = new Map<string, string | null>();
+
+/**
+ * The input argument types of a `CREATE FUNCTION` statement as Postgres
+ * identifies the function: canonical type names, no typmods (`varchar(10)`
+ * and `varchar` are the same overload), OUT and TABLE parameters excluded.
+ */
 function functionArgSignature(text: string): string | null {
+  if (signatureCache.has(text)) return signatureCache.get(text)!;
   let stmts;
   try {
     stmts = parseSync(text).sql.stmts;
   } catch {
+    signatureCache.set(text, null);
     return null;
   }
   const fn = stmts.length === 1 ? (stmts[0].stmt as unknown as { CreateFunctionStmt?: { parameters?: { FunctionParameter?: { mode?: string; argType?: unknown } }[] } }).CreateFunctionStmt : undefined;
-  if (!fn) return null;
-  return (fn.parameters ?? [])
+  const sig = !fn ? null : (fn.parameters ?? [])
     .map(p => p.FunctionParameter)
     .filter(p => p && p.mode !== 'FUNC_PARAM_OUT' && p.mode !== 'FUNC_PARAM_TABLE')
-    .map(p => Deparser.deparse({ TypeName: canonicalizeTypes(cleanTree(p!.argType)) } as any, { pretty: false }))
+    .map(p => Deparser.deparse({ TypeName: { ...canonicalizeTypes(cleanTree(p!.argType)), typmods: undefined } } as any, { pretty: false }))
     .join(', ');
+  signatureCache.set(text, sig);
+  return sig;
 }
 
 /**
@@ -434,15 +444,25 @@ function columnRebridge(col: DependentColumn, composite: boolean): { pre: { sql:
   const elementType = Deparser.deparse({ TypeName: element } as any, { pretty: false });
   const bridge = { names: [{ String: { sval: composite ? 'jsonb' : 'text' } }] };
   const out = composite ? `to_jsonb(${c})` : `${c}::text`;
+  // A USING expression may not contain a subquery, so an array of records
+  // is rebuilt by a session-local helper that lives only for the statement.
+  const helper = composite && col.array ? 'pg_temp.pgpm_jsonb_array' : null;
   const back = !composite
     ? `${c}::${Deparser.deparse({ TypeName: typeName } as any, { pretty: false })}`
-    : col.array
-      ? `ARRAY(SELECT jsonb_populate_record(NULL::${elementType}, e) FROM jsonb_array_elements(${c}) AS e)`
+    : helper
+      ? `${helper}(NULL::${elementType}, ${c})`
       : `jsonb_populate_record(NULL::${elementType}, ${c})`;
   const alter = (cmd: Record<string, unknown>): string =>
     deparseStmt({ AlterTableStmt: { relation: col.relation, objtype: 'OBJECT_TABLE', cmds: [{ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } }] } });
-  const retype = (target: unknown, using: string, collClause?: unknown): string =>
-    alter({ subtype: 'AT_AlterColumnType', name: col.name, def: { ColumnDef: { typeName: target, collClause, raw_default: parseExpression(using) } } });
+  const retype = (target: unknown, using: string, collClause?: unknown): string => {
+    const stmt = alter({ subtype: 'AT_AlterColumnType', name: col.name, def: { ColumnDef: { typeName: target, collClause, raw_default: parseExpression(using) } } });
+    if (!helper || using !== back) return stmt;
+    return [
+      `CREATE FUNCTION ${helper}(base anyelement, j jsonb) RETURNS anyarray LANGUAGE sql IMMUTABLE AS $$ SELECT CASE WHEN j IS NULL THEN NULL ELSE ARRAY(SELECT jsonb_populate_record(base, e) FROM jsonb_array_elements(j) AS e) END $$;`,
+      stmt,
+      `DROP FUNCTION ${helper}(anyelement, jsonb);`
+    ].join('\n');
+  };
   const setDefault = (expr: unknown): string => alter({ subtype: 'AT_ColumnDefault', name: col.name, def: expr });
   const dropDefault = alter({ subtype: 'AT_ColumnDefault', name: col.name });
   const fromDefault = columnAttributes(col.def).def;
@@ -1355,9 +1375,14 @@ function functionSignature(texts: string[]): string | null {
   const nodes = parseSync(texts[0]).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
   const fn = nodes.length === 1 ? nodes[0].CreateFunctionStmt : undefined;
   if (!fn) return null;
+  // Postgres discards typmods from parameter types (f(varchar(10)) is f(varchar)).
+  const parameters = ((fn.parameters ?? []) as { FunctionParameter?: { argType?: Record<string, unknown> } }[])
+    .map(p => p.FunctionParameter
+      ? { FunctionParameter: { ...p.FunctionParameter, argType: p.FunctionParameter.argType ? { ...p.FunctionParameter.argType, typmods: undefined } : undefined } }
+      : p);
   return stablePrint(cleanTree({
     funcname: fn.funcname,
-    parameters: fn.parameters,
+    parameters: canonicalizeTypes(parameters),
     returnType: fn.returnType,
     is_procedure: fn.is_procedure
   }));
