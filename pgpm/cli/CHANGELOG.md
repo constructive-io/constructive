@@ -354,7 +354,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))
 - **pgpm:** pgpm diff --append-module — append the delta into an existing module ([4bfb5aa](https://github.com/constructive-io/constructive/commit/4bfb5aa1fbaaf1e9cf53f7f7d27584f503a0cd8a))
 - **pgpm:** uniform --emit-sql/--emit-bundle projections on transform and import ([a86a35d](https://github.com/constructive-io/constructive/commit/a86a35dced04f5df7d6ff1d87333590a5ee92c38))
@@ -389,7 +389,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff))
 - **pgpm:** add `pgpm package --check` to verify committed bundle artifacts are in sync with deploy/ ([c0b3b0a](https://github.com/constructive-io/constructive/commit/c0b3b0a040004d42f9e779fbdbb343068613089f))
 
 ## [5.17.4](https://github.com/constructive-io/constructive/compare/pgpm@5.17.3...pgpm@5.17.4) (2026-07-31)

@@ -162,10 +162,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))
 - **pgpm:** pgpm diff --append-module — append the delta into an existing module ([4bfb5aa](https://github.com/constructive-io/constructive/commit/4bfb5aa1fbaaf1e9cf53f7f7d27584f503a0cd8a))
-- **transform:** constraint-placement-invariant semantic diff (planning [#1341](https://github.com/constructive-io/constructive/issues/1341)) ([73d4888](https://github.com/constructive-io/constructive/commit/73d48882122fc883f8676a441b5bcb964c426ae9))
+- **transform:** constraint-placement-invariant semantic diff ([73d4888](https://github.com/constructive-io/constructive/commit/73d48882122fc883f8676a441b5bcb964c426ae9))
 
 # [0.19.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.18.0...@pgpmjs/transform@0.19.0) (2026-08-01)
 
@@ -191,7 +191,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07))
 - **transform:** derive change names from the naming spec — identityOf + pathFor ([7d0c9c6](https://github.com/constructive-io/constructive/commit/7d0c9c62eeb45897a316158b331426f097d7d642))
 - **transform:** partition dial — project one deploy surface into pgpm packages ([4dda559](https://github.com/constructive-io/constructive/commit/4dda559b94e3ccd3809007c279d69833c841582e))
 

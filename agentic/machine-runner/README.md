@@ -1,7 +1,7 @@
 # @constructive-db/machine-runner
 
 The machine runner: the Node daemon a user installs on their own machine for
-Remote Control (constructive-planning#1690). It is a **remote control and
+Remote Control. It is a **remote control and
 nothing else**: it dials **out** to a machine relay over WebSocket — it never
 listens on a port — runs the allow-listed commands the relay hands it (in a pty
 for a terminal, on pipes otherwise), streams their bytes back as
