@@ -9,7 +9,7 @@ import { createFolderOperatorFactory } from '../plugins/folder-filter-operators'
 import { LtreeCodecPlugin } from '../plugins/ltree-codec';
 
 interface FileNode {
-  id: number;
+  rowId: number;
   filename: string;
   path: string;
 }
@@ -101,7 +101,7 @@ describe('graphile-ltree', () => {
     it('returns path as slash-delimited file path', async () => {
       const result = await query<AllFilesResult>(`{
         allFiles {
-          nodes { id filename path }
+          nodes { rowId filename path }
         }
       }`);
       expect(result.errors).toBeUndefined();

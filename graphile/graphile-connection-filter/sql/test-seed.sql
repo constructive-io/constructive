@@ -27,16 +27,25 @@ CREATE TABLE filter_test.categories (
   description text
 );
 
+-- A product's supplier is optional: the nullable FK is what gets a forward
+-- `...Exists` filter (a NOT NULL FK such as category_id does not).
+CREATE TABLE filter_test.suppliers (
+  id serial PRIMARY KEY,
+  name text NOT NULL
+);
+
 CREATE TABLE filter_test.products (
   id serial PRIMARY KEY,
   name text NOT NULL,
   category_id int NOT NULL REFERENCES filter_test.categories(id),
+  supplier_id int REFERENCES filter_test.suppliers(id),
   price numeric(10,2) NOT NULL DEFAULT 0,
   is_available boolean NOT NULL DEFAULT true
 );
 
--- Index on the FK column so relation filters work with requireIndex
+-- Index on the FK columns so relation filters work with requireIndex
 CREATE INDEX idx_products_category_id ON filter_test.products(category_id);
+CREATE INDEX idx_products_supplier_id ON filter_test.products(supplier_id);
 
 CREATE TABLE filter_test.reviews (
   id serial PRIMARY KEY,
@@ -92,13 +101,18 @@ INSERT INTO filter_test.categories (name, description) VALUES
   ('Books', 'Physical and digital books');
 
 -- Products (linked to categories)
-INSERT INTO filter_test.products (name, category_id, price, is_available) VALUES
-  ('Laptop', 1, 999.99, true),
-  ('Phone', 1, 699.99, true),
-  ('T-Shirt', 2, 19.99, true),
-  ('Jeans', 2, 49.99, false),
-  ('Novel', 3, 14.99, true),
-  ('Textbook', 3, 79.99, true);
+INSERT INTO filter_test.suppliers (name) VALUES
+  ('Acme Electronics'),
+  ('Paperback Press');
+
+-- Products (linked to categories; half of them to a supplier)
+INSERT INTO filter_test.products (name, category_id, supplier_id, price, is_available) VALUES
+  ('Laptop', 1, 1, 999.99, true),
+  ('Phone', 1, 1, 699.99, true),
+  ('T-Shirt', 2, NULL, 19.99, true),
+  ('Jeans', 2, NULL, 49.99, false),
+  ('Novel', 3, 2, 14.99, true),
+  ('Textbook', 3, NULL, 79.99, true);
 
 -- Reviews (linked to products)
 INSERT INTO filter_test.reviews (product_id, reviewer_name, rating, comment) VALUES

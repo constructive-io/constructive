@@ -306,7 +306,7 @@ describe('Relational inserts', () => {
           }) {
             affectedCount
             returning {
-              id
+              rowId
               customerName
             }
           }

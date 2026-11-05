@@ -67,7 +67,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { equalTo: "Widget A" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -82,7 +82,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { notEqualTo: "Widget A" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -98,7 +98,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { description: { distinctFrom: "A basic widget" } }) {
-            nodes { id name description }
+            nodes { rowId name description }
           }
         }
       `,
@@ -113,7 +113,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { description: { notDistinctFrom: "A basic widget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -130,7 +130,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { description: { isNull: true } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -145,7 +145,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { description: { isNull: false } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -161,7 +161,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { in: ["Widget A", "Gadget X"] } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -177,7 +177,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { notIn: ["Widget A", "Widget B"] } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -193,7 +193,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { price: { lessThan: "20" } }) {
-            nodes { id name price }
+            nodes { rowId name price }
           }
         }
       `,
@@ -210,7 +210,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { price: { greaterThanOrEqualTo: "49.99" } }) {
-            nodes { id name price }
+            nodes { rowId name price }
           }
         }
       `,
@@ -227,7 +227,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { quantity: { lessThanOrEqualTo: 25 } }) {
-            nodes { id name quantity }
+            nodes { rowId name quantity }
           }
         }
       `,
@@ -243,7 +243,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { quantity: { greaterThan: 25 } }) {
-            nodes { id name quantity }
+            nodes { rowId name quantity }
           }
         }
       `,
@@ -262,7 +262,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { like: "Widget%" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -279,7 +279,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { likeInsensitive: "widget%" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -293,7 +293,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { notLike: "Widget%" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -307,7 +307,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { includes: "adget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -324,7 +324,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { includesInsensitive: "WIDGET" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -338,7 +338,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { startsWith: "Gadget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -352,7 +352,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { name: { endsWith: "B" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -369,7 +369,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems(where: { isActive: { equalTo: false } }) {
-            nodes { id name isActive }
+            nodes { rowId name isActive }
           }
         }
       `,
@@ -391,7 +391,7 @@ describe('Scalar operators', () => {
             isActive: { equalTo: true },
             price: { lessThan: "30" }
           }) {
-            nodes { id name price isActive }
+            nodes { rowId name price isActive }
           }
         }
       `,
@@ -412,7 +412,7 @@ describe('Scalar operators', () => {
       query: `
         query {
           allItems {
-            nodes { id }
+            nodes { rowId }
           }
         }
       `,
@@ -462,7 +462,7 @@ describe('Logical operators (and/or/not)', () => {
               { name: { equalTo: "Doohickey" } }
             ]
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -483,7 +483,7 @@ describe('Logical operators (and/or/not)', () => {
               { price: { greaterThan: "15" } }
             ]
           }) {
-            nodes { id name price isActive }
+            nodes { rowId name price isActive }
           }
         }
       `,
@@ -500,7 +500,7 @@ describe('Logical operators (and/or/not)', () => {
           allItems(where: {
             not: { isActive: { equalTo: true } }
           }) {
-            nodes { id name isActive }
+            nodes { rowId name isActive }
           }
         }
       `,
@@ -528,7 +528,7 @@ describe('Logical operators (and/or/not)', () => {
               { price: { lessThan: "15" } }
             ]
           }) {
-            nodes { id name price isActive }
+            nodes { rowId name price isActive }
           }
         }
       `,
@@ -553,7 +553,7 @@ describe('Logical operators (and/or/not)', () => {
               ]
             }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -608,7 +608,7 @@ describe('Relation filters', () => {
           allProducts(where: {
             categoryByCategoryId: { name: { equalTo: "Electronics" } }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -626,7 +626,7 @@ describe('Relation filters', () => {
           allProducts(where: {
             categoryByCategoryId: { name: { startsWith: "Cloth" } }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -648,7 +648,7 @@ describe('Relation filters', () => {
               some: { isAvailable: { equalTo: true } }
             }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -667,7 +667,7 @@ describe('Relation filters', () => {
               every: { isAvailable: { equalTo: true } }
             }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -688,7 +688,7 @@ describe('Relation filters', () => {
               none: { price: { greaterThan: "500" } }
             }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -710,7 +710,7 @@ describe('Relation filters', () => {
           allProducts(where: {
             productDetailByProductId: { sku: { equalTo: "LAP-001" } }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -722,21 +722,55 @@ describe('Relation filters', () => {
 
   // -- EXISTS filter --
 
-  it('forward relation exists: filter products that have a category', async () => {
+  it('forward relation exists: filter products that have a supplier', async () => {
+    const result = await query<{ allProducts: { nodes: any[] } }>({
+      query: `
+        query {
+          allProducts(where: {
+            supplierBySupplierIdExists: true
+          }) {
+            nodes { rowId name }
+          }
+        }
+      `,
+    });
+    expect(result.errors).toBeUndefined();
+    // Laptop, Phone, Novel have a supplier; supplier_id is nullable
+    expect(result.data?.allProducts.nodes.map((n) => n.name).sort()).toEqual(['Laptop', 'Novel', 'Phone']);
+  });
+
+  it('forward relation exists: false filters products without a supplier', async () => {
+    const result = await query<{ allProducts: { nodes: any[] } }>({
+      query: `
+        query {
+          allProducts(where: {
+            supplierBySupplierIdExists: false
+          }) {
+            nodes { rowId name }
+          }
+        }
+      `,
+    });
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.allProducts.nodes.map((n) => n.name).sort()).toEqual(['Jeans', 'T-Shirt', 'Textbook']);
+  });
+
+  it('forward relation exists: a NOT NULL FK gets no exists filter', async () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
           allProducts(where: {
             categoryByCategoryIdExists: true
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
     });
-    expect(result.errors).toBeUndefined();
-    // All products have a category (FK is NOT NULL)
-    expect(result.data?.allProducts.nodes).toHaveLength(6);
+    // category_id is NOT NULL, so every product has one and the field is not generated
+    expect(result.errors?.map((e) => e.message)).toEqual([
+      'Field "categoryByCategoryIdExists" is not defined by type "ProductFilter". Did you mean "categoryByCategoryId"?',
+    ]);
   });
 
   it('backward relation exists: filter products that have reviews', async () => {
@@ -746,7 +780,7 @@ describe('Relation filters', () => {
           allProducts(where: {
             reviewsByProductIdExist: true
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -763,7 +797,7 @@ describe('Relation filters', () => {
           allProducts(where: {
             reviewsByProductIdExist: false
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -785,7 +819,7 @@ describe('Relation filters', () => {
             isAvailable: { equalTo: true },
             categoryByCategoryId: { name: { equalTo: "Electronics" } }
           }) {
-            nodes { id name isAvailable }
+            nodes { rowId name isAvailable }
           }
         }
       `,
@@ -851,7 +885,7 @@ describe('Computed column filters', () => {
           allItems(where: {
             fullLabel: { includes: "basic" }
           }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1280,7 +1314,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { contains: ["popular"] } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1297,7 +1331,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { containedBy: ["popular", "sale", "new", "premium", "clearance"] } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1313,7 +1347,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { overlaps: ["sale", "clearance"] } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1330,7 +1364,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { anyEqualTo: "new" } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1346,7 +1380,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { anyNotEqualTo: "popular" } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1365,7 +1399,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { isNull: true } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1381,7 +1415,7 @@ describe('Array filters', () => {
       query: `
         query {
           allItems(where: { tags: { equalTo: ["new"] } }) {
-            nodes { id name tags }
+            nodes { rowId name tags }
           }
         }
       `,
@@ -1486,7 +1520,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notIncludes: "Widget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1503,7 +1537,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notIncludesInsensitive: "widget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1517,7 +1551,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notStartsWith: "Gadget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1534,7 +1568,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notStartsWithInsensitive: "gadget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1548,7 +1582,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notEndsWith: "B" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1565,7 +1599,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notEndsWithInsensitive: "b" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1579,7 +1613,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { notLikeInsensitive: "widget%" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1596,7 +1630,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { startsWithInsensitive: "widget" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1610,7 +1644,7 @@ describe('Negation string operators', () => {
       query: `
         query {
           allItems(where: { name: { endsWithInsensitive: "key" } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1716,7 +1750,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
       query: `
         query {
           allItems(where: { name: { isLongerThan: 8 } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1733,7 +1767,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
       query: `
         query {
           allItems(where: { quantity: { isPositive: true } }) {
-            nodes { id name quantity }
+            nodes { rowId name quantity }
           }
         }
       `,
@@ -1751,7 +1785,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
       query: `
         query {
           allItems(where: { quantity: { isPositive: false } }) {
-            nodes { id name quantity }
+            nodes { rowId name quantity }
           }
         }
       `,
@@ -1770,7 +1804,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
             name: { isLongerThan: 7 },
             quantity: { isPositive: true }
           }) {
-            nodes { id name quantity }
+            nodes { rowId name quantity }
           }
         }
       `,
@@ -1817,7 +1851,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: {}) {
-            nodes { id }
+            nodes { rowId }
           }
         }
       `,
@@ -1844,7 +1878,7 @@ describe('Edge cases', () => {
               ]
             }
           }) {
-            nodes { id name price isActive }
+            nodes { rowId name price isActive }
           }
         }
       `,
@@ -1866,7 +1900,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: { name: { in: ["Doohickey"] } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1881,7 +1915,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: { name: { notIn: [] } }) {
-            nodes { id }
+            nodes { rowId }
           }
         }
       `,
@@ -1895,7 +1929,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: { name: { in: [] } }) {
-            nodes { id }
+            nodes { rowId }
           }
         }
       `,
@@ -1910,7 +1944,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: { rating: { isNull: true } }) {
-            nodes { id name }
+            nodes { rowId name }
           }
         }
       `,
@@ -1931,7 +1965,7 @@ describe('Edge cases', () => {
               { rating: { greaterThan: 4.0 } }
             ]
           }) {
-            nodes { id name rating }
+            nodes { rowId name rating }
           }
         }
       `,
@@ -1948,7 +1982,7 @@ describe('Edge cases', () => {
           allItems(where: {
             price: { greaterThan: "10", lessThan: "50" }
           }) {
-            nodes { id name price }
+            nodes { rowId name price }
           }
         }
       `,
@@ -1970,7 +2004,7 @@ describe('Edge cases', () => {
       query: `
         query {
           allItems(where: { price: { equalTo: "99.99" } }) {
-            nodes { id name price }
+            nodes { rowId name price }
           }
         }
       `,
