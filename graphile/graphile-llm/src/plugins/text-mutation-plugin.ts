@@ -9,8 +9,8 @@
  * Example:
  *   mutation { createArticle(input: { embeddingText: "Machine learning concepts" }) }
  *
- * If the embedder returns null (e.g. quota exceeded when the metering plugin
- * is loaded), the mutation throws an error — unlike search, mutations cannot
+ * If the embedder returns null, the mutation throws an error — unlike
+ * search, mutations cannot
  * silently skip writing a vector the user asked for.
  *
  * This is the mutation counterpart to LlmTextSearchPlugin (which handles

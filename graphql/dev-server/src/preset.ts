@@ -16,10 +16,9 @@ export interface DevPresetInput {
  * configured schemas with a fixed role and no scoped-routing plane. Only
  * plugins that do NOT depend on a tenant database id are enabled. The presigned
  * upload / bucket-provisioner plugins resolve per-tenant storage config from a
- * `database_id`, and the LLM plugin resolves per-tenant billing / inference-log
- * config from a `database_id`, so all three are excluded here. Direct uploads
- * stream to a fixed env-configured bucket and need no database id, so they stay.
- * Nothing enabled here reads `jwt.claims.database_id`.
+ * `database_id`, and the LLM plugin resolves per-tenant model config from a
+ * `database_id`, so all three are excluded here. Nothing enabled here reads
+ * `jwt.claims.database_id`.
  */
 export const buildDevPreset = ({ pool, schemas, role }: DevPresetInput): GraphileConfig.Preset => ({
   extends: [

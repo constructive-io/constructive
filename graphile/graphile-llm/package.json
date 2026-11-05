@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@agentic-kit/ollama": "workspace:*",
-    "@constructive-io/express-context": "workspace:^",
     "@constructive-io/llm-env": "workspace:^",
     "graphile-cache": "workspace:^"
   },

@@ -7,8 +7,8 @@
  * Per-request model/baseUrl overrides are read from AsyncLocalStorage
  * (`llmConfigStore`). embed-inputs.ts sets these overrides from
  * the database's `llm_module` config via `ctx.useLlm()`. This means
- * the same embedder function — and its metering wrapper — handle every
- * request, regardless of which tenant's model config applies.
+ * the same embedder function handles every request, regardless of which
+ * tenant's model config applies.
  */
 
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -35,8 +35,7 @@ export interface LlmConfigOverrides {
  * AsyncLocalStorage for per-request LLM config overrides.
  *
  * Set by the plan-time embedding step in embed-inputs.ts (from ctx.useLlm()),
- * read by the embedder at call time. The metering wrapper sits between
- * them and is completely unaware — it just wraps the same function.
+ * read by the embedder at call time.
  */
 export const llmConfigStore = new AsyncLocalStorage<LlmConfigOverrides | null>();
 

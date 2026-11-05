@@ -22,7 +22,6 @@ jest.mock('../src/s3-signer', () => ({
 
 import { HeadObjectCommand } from '@aws-sdk/client-s3';
 
-import { finalizeStagedUpload } from '../src/managed-upload';
 import { processSingleFile } from '../src/plugin';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from '../src/types';
 
@@ -160,85 +159,5 @@ describe('content-addressed upload whose hash matches a custom-key row', () => {
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
     expect(queries.find((q) => /^DELETE/.test(q.text))?.values).toEqual([OLD_FILE_ID]);
-  });
-});
-
-describe('streamed upload landing on a never-completed row', () => {
-  const staged = {
-    stagingKey: '.staging/tmp-1',
-    contentHash: HASH,
-    contentType: 'text/html',
-    size: 16,
-    filename: SITE_KEY,
-  };
-
-  function db({ status = 'requested', deleteAffects = true } = {}) {
-    const queries: Array<{ text: string; values?: unknown[] }> = [];
-    const client = {
-      async query(opts: { text: string; values?: unknown[] }) {
-        queries.push(opts);
-        if (/set_config/.test(opts.text)) return { rows: [] };
-        if (/SELECT id, key, mime_type/.test(opts.text)) {
-          return { rows: [{ id: OLD_FILE_ID, key: HASH, mime_type: 'text/html', size: 16, filename: null as string | null, status }] };
-        }
-        if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
-          return { rows: deleteAffects ? [{ id: OLD_FILE_ID }] : [] };
-        }
-        if (/record_file/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
-        throw new Error(`unexpected query: ${opts.text}`);
-      },
-      withTransaction: (cb: any) => cb(client),
-    };
-    return { withPgClient: (_settings: any, cb: any) => cb(client), queries };
-  }
-
-  const target = (s3: S3Config): any => ({
-    databaseId: 'db',
-    storageConfig: storageConfig(),
-    bucket,
-    physicalName: 'site-bucket',
-    s3,
-    binding: null,
-  });
-
-  it('promotes the staged bytes as a fresh file instead of absorbing them into the requested row', async () => {
-    const s3 = fakeS3();
-    const fake = db();
-
-    const { projection, deduplicated } = await finalizeStagedUpload({
-      target: target(s3), withPgClient: fake.withPgClient, pgSettings: null, staged,
-    });
-
-    expect(deduplicated).toBe(false);
-    expect(projection.id).toBe(NEW_FILE_ID);
-    expect(heads(s3)).toEqual([]);
-    expect(fake.queries.find((q) => /^DELETE/.test(q.text))?.values).toEqual([OLD_FILE_ID]);
-  });
-
-  it('fails instead of promoting when the caller cannot delete the requested row', async () => {
-    const s3 = fakeS3();
-    const fake = db({ deleteAffects: false });
-
-    await expect(
-      finalizeStagedUpload({ target: target(s3), withPgClient: fake.withPgClient, pgSettings: null, staged }),
-    ).rejects.toThrow(/FILE_NOT_REPLACEABLE/);
-
-    expect(fake.queries.some((q) => /record_file/.test(q.text))).toBe(false);
-    const sent = (s3.client.send as jest.Mock).mock.calls.map(([command]) => command);
-    expect(sent.map((command) => command.constructor.name)).toEqual(['DeleteObjectCommand']);
-    expect(sent[0].input.Key).toBe(staged.stagingKey);
-  });
-
-  it('deduplicates against an uploaded row', async () => {
-    const s3 = fakeS3();
-    const fake = db({ status: 'uploaded' });
-
-    const { projection, deduplicated } = await finalizeStagedUpload({
-      target: target(s3), withPgClient: fake.withPgClient, pgSettings: null, staged,
-    });
-
-    expect(deduplicated).toBe(true);
-    expect(projection.id).toBe(OLD_FILE_ID);
-    expect(fake.queries.some((q) => /DELETE|record_file/.test(q.text))).toBe(false);
   });
 });

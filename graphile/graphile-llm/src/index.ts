@@ -47,9 +47,6 @@ export { createLlmTextSearchPlugin, embedTextInWhere } from './plugins/text-sear
 export type { EmbedRule } from './embed-inputs';
 export { embedField, planTimeEmbedding } from './embed-inputs';
 
-// Metering plugin (opt-in billing integration)
-export { createLlmMeteringPlugin } from './plugins/metering-plugin';
-
 // Agent discovery (queries agent_chat_module config table at runtime)
 export type { AgentDiscovery,AgentTableInfo } from './plugins/agent-discovery-plugin';
 export { clearAgentDiscoveryCache,getAgentDiscovery } from './plugins/agent-discovery-plugin';
@@ -70,18 +67,6 @@ export {
   buildChatCompleterFromModule
 } from './chat';
 
-// Metering utilities (for custom integration)
-export type { InferenceLogEntry,MeteringContext, MeteringOptions, MeterResult, WithPgClient } from './metering';
-export { logInferenceUsage, meteredChat, meteredEmbed, QuotaExceededError } from './metering';
-
-// Config cache (for custom integration)
-export type { BillingConfig, InferenceLogConfig, LlmBillingCacheEntry, PgClient } from './config-cache';
-export {
-  getLlmBillingCacheStats,
-  getLlmBillingConfig,
-  invalidateLlmBillingConfig
-} from './config-cache';
-
 // Types
 export type {
   ChatConfig,
@@ -96,6 +81,5 @@ export type {
   GraphileLlmOptions,
   LlmModuleData,
   LlmUsage,
-  MeteringConfig,
   RagDefaults
 } from './types';

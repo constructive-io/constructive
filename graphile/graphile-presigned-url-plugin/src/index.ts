@@ -27,16 +27,7 @@ export { validateCustomKey } from './custom-key';
 export type { ResolvedBucketCoordinate } from './default-bucket';
 export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
-export type { FileRefFieldBinding } from './file-ref-registry';
-export { clearFileRefFieldCache, FileRefFieldNotRegisteredError, getFileRefFieldBinding } from './file-ref-registry';
-export {
-  assertUploadAllowedByBucket,
-  buildFileProjection,
-  type FileProjection,
-  finalizeStagedUpload,
-  type ManagedUploadTarget,
-  resolveManagedUploadTarget,
-} from './managed-upload';
+export { buildFileProjection, type FileProjection } from './file-projection';
 export {
   assertBucketReconciled,
   resolveS3ForDatabase,

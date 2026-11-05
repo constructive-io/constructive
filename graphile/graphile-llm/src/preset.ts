@@ -8,7 +8,6 @@
  * - Resolves an embedder from configuration (llm_module, env vars, or preset options)
  * - Adds a `text: String` field to `VectorNearbyInput` for text-based vector search
  * - Adds `{column}Text: String` companion fields on mutation inputs for vector columns
- * - Optionally enables billing/metering via the LlmMeteringPlugin
  *
  * Included in ConstructivePreset when `enableLlm` is true (the default).
  * Can also be used standalone by adding it directly to your preset's `extends` array.
@@ -43,34 +42,13 @@
  * };
  * ```
  *
- * @example With billing metering (opt-in, meter slug = model name by default):
+ * @example Fail instead of degrading when the embedder is unavailable:
  * ```typescript
  * GraphileLlmPreset({
- *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
- *   metering: true,
- *   // → embedding calls metered under 'text-embedding-3-small' meter slug
- *   // → three-level waterfall: text-embedding-3-small → inference pool → universal
- * })
- * ```
- *
- * @example With strict quota enforcement (fail if embedding unavailable):
- * ```typescript
- * GraphileLlmPreset({
- *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
- *   metering: true,
+ *   defaultEmbedder: { provider: 'ollama', model: 'nomic-embed-text' },
  *   onQuotaExceeded: 'throw',
- *   // → if billing quota is exceeded, queries with unifiedSearch throw an error
- *   // → without this, queries silently fall back to text-only search
- * })
- * ```
- *
- * @example With custom entity_id resolution (bill per-database):
- * ```typescript
- * GraphileLlmPreset({
- *   defaultEmbedder: { provider: 'openai', model: 'text-embedding-3-small' },
- *   metering: {
- *     resolveEntityId: (pgSettings) => pgSettings['jwt.claims.database_id'],
- *   },
+ *   // → a unifiedSearch whose text cannot be embedded throws
+ *   // → without this, it falls back to text-only search
  * })
  * ```
  */
@@ -78,7 +56,6 @@
 import type { GraphileConfig } from 'graphile-config';
 
 import { createLlmModulePlugin } from './plugins/llm-module-plugin';
-import { createLlmMeteringPlugin } from './plugins/metering-plugin';
 import { createLlmRagPlugin } from './plugins/rag-plugin';
 import { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
 import { createLlmTextSearchPlugin } from './plugins/text-search-plugin';
@@ -98,20 +75,12 @@ export function GraphileLlmPreset(
     enableTextMutations = true,
     enableRag = false,
     onQuotaExceeded,
-    ragDefaults,
-    metering
+    ragDefaults
   } = options;
 
   const plugins: GraphileConfig.Plugin[] = [
     createLlmModulePlugin(options)
   ];
-
-  // Metering is opt-in: only loaded when metering is truthy
-  // (true, or a MeteringConfig object)
-  if (metering) {
-    const meteringConfig = metering === true ? {} : metering;
-    plugins.push(createLlmMeteringPlugin(meteringConfig));
-  }
 
   if (enableTextSearch) {
     plugins.push(createLlmTextSearchPlugin({ onQuotaExceeded }));
