@@ -44,7 +44,7 @@ import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
 import { classifyStatements } from './facts';
 import { identityOf } from './facts';
-import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
+import { ChangeGranularity, defaultChangeName, GranularityChange, restructureChanges } from './granularity-driver';
 import { objectKeyOf, unitKeyOf } from './keys';
 import { alterInPlace } from './object-alters';
 import { topologicalOrder } from './order';
@@ -205,7 +205,13 @@ function annotationHost(text: string): string | null {
     if (objects.length !== 1) return null;
     const first = objects[0] as Record<string, unknown>;
     if (first.RangeVar) return relation(first.RangeVar);
+    if (stmt.GrantStmt.targtype === 'ACL_TARGET_ALL_IN_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
     if (stmt.GrantStmt.objtype === 'OBJECT_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
+    const names = first.ObjectWithArgs
+      ? ((first.ObjectWithArgs as { objname?: { String?: { sval?: string } }[] }).objname ?? []).map(x => x.String?.sval ?? '')
+      : first.List ? items(first) : [];
+    if (names.length === 2) return `${names[0]}.${names[1]}`;
+    if (names.length === 1) return `.${names[0]}`;
     return null;
   }
   if (stmt.AlterDefaultPrivilegesStmt) {
@@ -233,7 +239,66 @@ function annotationHost(text: string): string | null {
  * reference, falling back to the preceding statement's unit; truly homeless
  * statements are reported via `warnings`.
  */
-function readSide(sql: string, warnings: string[], label: string): SideProgram {
+/**
+ * Argument-type signature of a `CREATE FUNCTION`/`PROCEDURE` text — the IN,
+ * INOUT and VARIADIC parameter types that make an overload distinct. Null for
+ * anything else.
+ */
+const signatureCache = new Map<string, string | null>();
+
+/**
+ * The input argument types of a `CREATE FUNCTION` statement as Postgres
+ * identifies the function: canonical type names, no typmods (`varchar(10)`
+ * and `varchar` are the same overload), OUT and TABLE parameters excluded.
+ */
+function functionArgSignature(text: string): string | null {
+  if (signatureCache.has(text)) return signatureCache.get(text)!;
+  let stmts;
+  try {
+    stmts = parseSync(text).sql.stmts;
+  } catch {
+    signatureCache.set(text, null);
+    return null;
+  }
+  const fn = stmts.length === 1 ? (stmts[0].stmt as unknown as { CreateFunctionStmt?: { parameters?: { FunctionParameter?: { mode?: string; argType?: unknown } }[] } }).CreateFunctionStmt : undefined;
+  const sig = !fn ? null : (fn.parameters ?? [])
+    .map(p => p.FunctionParameter)
+    .filter(p => p && p.mode !== 'FUNC_PARAM_OUT' && p.mode !== 'FUNC_PARAM_TABLE')
+    .map(p => Deparser.deparse({ TypeName: { ...canonicalizeTypes(cleanTree(p!.argType)), typmods: undefined } } as any, { pretty: false }))
+    .join(', ');
+  signatureCache.set(text, sig);
+  return sig;
+}
+
+/**
+ * Functions declared with more than one argument signature across both
+ * sides, keyed `schema.name`. Each overload of such a function is its own
+ * object: identified (and pathed) as `name(argtypes)`.
+ */
+function overloadedFunctions(sides: string[]): Set<string> {
+  const signatures = new Map<string, Set<string>>();
+  for (const sql of sides) {
+    const bytes = sqlSourceBytes(sql);
+    for (const f of classifyStatements(sql)) {
+      if (f.nodeTag !== 'CreateFunctionStmt' || !f.creates[0]) continue;
+      const sig = functionArgSignature(sliceStatementBytes(bytes, f.span.start, f.span.len));
+      if (sig === null) continue;
+      const name = `${f.creates[0].schema ?? ''}.${f.creates[0].name}`;
+      if (!signatures.has(name)) signatures.set(name, new Set());
+      signatures.get(name)!.add(sig);
+    }
+  }
+  return new Set([...signatures].filter(([, sigs]) => sigs.size > 1).map(([name]) => name));
+}
+
+/** The identity an overloaded function's statement groups under: `name(argtypes)`. */
+function overloadIdentity(identity: ObjectIdentity, text: string, overloaded: Set<string>): ObjectIdentity {
+  if (identity.kind !== 'function' || !overloaded.has(`${identity.schema ?? ''}.${identity.name}`)) return identity;
+  const sig = functionArgSignature(text);
+  return sig === null ? identity : { ...identity, name: `${identity.name}(${sig})` };
+}
+
+function readSide(sql: string, warnings: string[], label: string, overloaded: Set<string>): SideProgram {
   const facts = classifyStatements(sql);
   const graph = buildStatementGraph(facts);
   const units = new Map<string, ObjectUnit>();
@@ -248,6 +313,7 @@ function readSide(sql: string, warnings: string[], label: string): SideProgram {
     if (!text) return;
 
     let identity = groupingIdentity(f);
+    if (identity && f.nodeTag === 'CreateFunctionStmt') identity = overloadIdentity(identity, text, overloaded);
     if (identity && identity.kind === 'other') {
       const asTable = identityKey({ kind: 'table', schema: identity.schema, name: identity.name });
       if (units.has(asTable)) identity = units.get(asTable)!.identity;
@@ -304,6 +370,112 @@ function groupingIdentity(f: StatementFacts): ObjectIdentity | null {
   return identity;
 }
 
+/**
+ * Fold an `ALTER SEQUENCE` (OWNED BY, increment, ...) into the unit's
+ * `CREATE SEQUENCE` node so the sequence compares as one definition whether
+ * its options were authored inline or as a later ALTER. Later options win.
+ */
+function foldSequenceAlter(nodes: Record<string, unknown>[], definition: string[], stmt: Record<string, unknown>): boolean {
+  const alter = stmt.AlterSeqStmt as { options?: { DefElem?: { defname?: string } }[] } | undefined;
+  if (!alter) return false;
+  const at = nodes.findIndex(n => n.CreateSeqStmt);
+  if (at < 0) return false;
+  const create = nodes[at].CreateSeqStmt as { options?: { DefElem?: { defname?: string } }[] };
+  const overridden = new Set((alter.options ?? []).map(o => o.DefElem?.defname));
+  const merged = {
+    CreateSeqStmt: {
+      ...create,
+      options: [...(create.options ?? []).filter(o => !overridden.has(o.DefElem?.defname)), ...(alter.options ?? [])]
+    }
+  };
+  nodes[at] = merged;
+  definition[at] = deparseStmt(merged);
+  return true;
+}
+
+/** A table column whose type is (an array of) the given user type. */
+interface DependentColumn {
+  relation: unknown;
+  table: string;
+  schema: string | null;
+  name: string;
+  def: Record<string, unknown>;
+  toDef: Record<string, unknown> | undefined;
+  array: boolean;
+}
+
+/** Columns of the side's tables declared with the type (or arrays of it). */
+function typeDependentColumns(side: SideProgram, other: SideProgram, type: ObjectIdentity): DependentColumn[] {
+  const key = typeKey({ names: [type.schema, type.name].filter((x): x is string => x !== null).map(sval => ({ String: { sval } })) } as any);
+  const out: DependentColumn[] = [];
+  for (const unitKey of side.order) {
+    const unit = side.units.get(unitKey)!;
+    if (unit.identity.kind !== 'table') continue;
+    const shape = tableShape(unit);
+    const toShape = other.units.has(unitKey) ? tableShape(other.units.get(unitKey)!) : null;
+    for (const [name, col] of shape.columns) {
+      const colKey = typeKey((col.def as Record<string, unknown>).typeName as any);
+      if (colKey !== key && colKey !== `${key}[]`) continue;
+      out.push({
+        relation: shape.relation,
+        table: unit.identity.name,
+        schema: unit.identity.schema,
+        name,
+        def: col.def as Record<string, unknown>,
+        toDef: toShape?.columns.get(name)?.def as Record<string, unknown> | undefined,
+        array: colKey !== key
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Postgres refuses to alter or drop a type a table column uses, so the
+ * column is parked in a bridge type (jsonb for composites, text otherwise)
+ * around the type's change and cast back afterwards. Values the new type
+ * rejects are lost, which the caller reports as destructive.
+ */
+function columnRebridge(col: DependentColumn, composite: boolean): { pre: { sql: string; inverse: string }[]; post: { sql: string; inverse: string }[] } {
+  const ident = (name: string): string => /^[a-z_][a-z0-9_]*$/.test(name) ? name : `"${name.replace(/"/g, '""')}"`;
+  const c = ident(col.name);
+  const typeName = col.def.typeName as Record<string, unknown>;
+  const element: Record<string, unknown> = { ...typeName, arrayBounds: undefined };
+  const elementType = Deparser.deparse({ TypeName: element } as any, { pretty: false });
+  const bridge = { names: [{ String: { sval: composite ? 'jsonb' : 'text' } }] };
+  const out = composite ? `to_jsonb(${c})` : `${c}::text`;
+  // A USING expression may not contain a subquery, so an array of records
+  // is rebuilt by a session-local helper that lives only for the statement.
+  const helper = composite && col.array ? 'pg_temp.pgpm_jsonb_array' : null;
+  const back = !composite
+    ? `${c}::${Deparser.deparse({ TypeName: typeName } as any, { pretty: false })}`
+    : helper
+      ? `${helper}(NULL::${elementType}, ${c})`
+      : `jsonb_populate_record(NULL::${elementType}, ${c})`;
+  const alter = (cmd: Record<string, unknown>): string =>
+    deparseStmt({ AlterTableStmt: { relation: col.relation, objtype: 'OBJECT_TABLE', cmds: [{ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } }] } });
+  const retype = (target: unknown, using: string, collClause?: unknown): string => {
+    const stmt = alter({ subtype: 'AT_AlterColumnType', name: col.name, def: { ColumnDef: { typeName: target, collClause, raw_default: parseExpression(using) } } });
+    if (!helper || using !== back) return stmt;
+    return [
+      `CREATE FUNCTION ${helper}(base anyelement, j jsonb) RETURNS anyarray LANGUAGE sql IMMUTABLE AS $$ SELECT CASE WHEN j IS NULL THEN NULL ELSE ARRAY(SELECT jsonb_populate_record(base, e) FROM jsonb_array_elements(j) AS e) END $$;`,
+      stmt,
+      `DROP FUNCTION ${helper}(anyelement, jsonb);`
+    ].join('\n');
+  };
+  const setDefault = (expr: unknown): string => alter({ subtype: 'AT_ColumnDefault', name: col.name, def: expr });
+  const dropDefault = alter({ subtype: 'AT_ColumnDefault', name: col.name });
+  const fromDefault = columnAttributes(col.def).def;
+  const toDefault = columnAttributes(col.toDef ?? col.def).def;
+  const pre: { sql: string; inverse: string }[] = [];
+  const post: { sql: string; inverse: string }[] = [];
+  if (fromDefault) pre.push({ sql: dropDefault, inverse: setDefault(fromDefault) });
+  pre.push({ sql: retype(bridge, out), inverse: retype(typeName, back, col.def.collClause) });
+  post.push({ sql: retype(typeName, back, col.def.collClause), inverse: retype(bridge, out) });
+  if (toDefault) post.push({ sql: setDefault(toDefault), inverse: dropDefault });
+  return { pre, post };
+}
+
 /** Normalized-AST fingerprint of one statement (formatting/position-proof). */
 function fingerprint(text: string): string {
   const parsed = parseSync(text);
@@ -318,12 +490,29 @@ interface TableShape {
   relation: unknown;
   /** column name → ColumnDef as authored (emitted), its canonical form (compared) and print key. */
   columns: Map<string, { def: unknown; canon: unknown; print: string }>;
+  /** serial columns → the implied owned sequence (pg_dump's int + nextval + sequence). */
+  serials: Map<string, { schema: string | null; name: string; as: string }>;
   /** normalized table-level constraints/extras, keyed by their print. */
   extras: Map<string, unknown>;
   /** COMMENT / GRANT / OWNER state attached to the table. */
   annotations: AnnotationState;
   /** Constraints authored without a name; Postgres derives theirs from the table name. */
   implicitConstraints: { node: ConstraintNode; column?: string }[];
+  /** Table-level settings folded from CREATE TABLE and the ALTER TABLE commands that change them. */
+  props: TableProps;
+}
+
+interface TableProps {
+  /** relpersistence: 'p' (logged) or 'u' (unlogged). */
+  persistence: string;
+  /** reloption name → DefElem. */
+  options: Map<string, unknown>;
+  /** INHERITS parents, keyed by print. */
+  inherits: Map<string, unknown>;
+  /** PARTITION OF parent and bound, when the table is a partition. */
+  partition: { parent: unknown; bound: unknown } | null;
+  /** PARTITION BY clause of a partitioned table. */
+  partspec: unknown;
 }
 
 /** Constraint kinds that can move between column, table-elt, and ALTER form. */
@@ -382,8 +571,28 @@ function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, 
  * default-expression casts are canonicalized so a module compares equal to
  * the catalog rendering of the same table.
  */
+const SERIAL_TYPES: Record<string, string> = {
+  smallserial: 'int2', serial2: 'int2', serial: 'int4', serial4: 'int4', bigserial: 'int8', serial8: 'int8'
+};
+
+/** The serial pseudo-type a column is declared with, if any (`serial`, `bigserial`, ...). */
+function serialTypeName(typeName: unknown): string | null {
+  const names = ((typeName as { names?: { String?: { sval?: string } }[] } | undefined)?.names ?? []).map(n => n.String?.sval ?? '');
+  const bare = names.length === 1 ? names[0] : names.length === 2 && names[0] === 'pg_catalog' ? names[1] : null;
+  return bare !== null && bare in SERIAL_TYPES ? bare : null;
+}
+
 function tableShape(unit: ObjectUnit): TableShape {
-  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [] };
+  const props: TableProps = { persistence: 'p', options: new Map(), inherits: new Map(), partition: null, partspec: null };
+  const shape: TableShape = { relation: null, columns: new Map(), serials: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [], props };
+  const setOptions = (items: unknown[] | undefined, keep: boolean): void => {
+    for (const o of items ?? []) {
+      const name = (o as { DefElem?: { defname?: string } }).DefElem?.defname;
+      if (!name) continue;
+      if (keep) props.options.set(name, cleanTree(o));
+      else props.options.delete(name);
+    }
+  };
   const table = unit.identity.name;
   const rawColumns: { colname: string; def: Record<string, unknown> }[] = [];
   const constraints: { node: ConstraintNode & Record<string, unknown>; column?: string }[] = [];
@@ -457,6 +666,18 @@ function tableShape(unit: ObjectUnit): TableShape {
       const stmt = raw.stmt as unknown as Record<string, Record<string, unknown>>;
       if (stmt.CreateStmt) {
         shape.relation = stmt.CreateStmt.relation;
+        props.persistence = (stmt.CreateStmt.relation as { relpersistence?: string }).relpersistence ?? 'p';
+        setOptions(stmt.CreateStmt.options as unknown[] | undefined, true);
+        const parents = (stmt.CreateStmt.inhRelations as unknown[] | undefined) ?? [];
+        if (stmt.CreateStmt.partbound) {
+          props.partition = { parent: cleanTree(parents[0]), bound: cleanTree(stmt.CreateStmt.partbound) };
+        } else {
+          for (const parent of parents) {
+            const clean = cleanTree(parent);
+            props.inherits.set(stablePrint(clean), clean);
+          }
+        }
+        if (stmt.CreateStmt.partspec) props.partspec = cleanTree(stmt.CreateStmt.partspec);
         const elts = (stmt.CreateStmt.tableElts as Record<string, unknown>[] | undefined) ?? [];
         for (const elt of elts) {
           if (elt.ColumnDef) addColumn(elt.ColumnDef as Record<string, unknown>);
@@ -483,6 +704,14 @@ function tableShape(unit: ObjectUnit): TableShape {
             absorbAnnotation(shape.annotations, {
               AlterTableStmt: { relation: stmt.AlterTableStmt.relation, objtype: stmt.AlterTableStmt.objtype, cmds: [cmd] }
             });
+          } else if (at.subtype === 'AT_SetRelOptions' || at.subtype === 'AT_ResetRelOptions') {
+            setOptions((def as { List?: { items?: unknown[] } } | undefined)?.List?.items, at.subtype === 'AT_SetRelOptions');
+          } else if (at.subtype === 'AT_SetUnLogged' || at.subtype === 'AT_SetLogged') {
+            props.persistence = at.subtype === 'AT_SetUnLogged' ? 'u' : 'p';
+          } else if (at.subtype === 'AT_AddInherit' || at.subtype === 'AT_DropInherit') {
+            const clean = cleanTree(def);
+            if (at.subtype === 'AT_AddInherit') props.inherits.set(stablePrint(clean), clean);
+            else props.inherits.delete(stablePrint(clean));
           } else if (!foldColumnCommand(at)) {
             addExtra({ AlterTableCmd: at });
           }
@@ -510,7 +739,24 @@ function tableShape(unit: ObjectUnit): TableShape {
     addExtra({ Constraint: canonical });
   }
 
-  for (const { colname, def } of rawColumns) {
+  for (const { colname, def: declared } of rawColumns) {
+    // `serial` is shorthand for an int column with an owned sequence and a
+    // nextval default; it is unfolded so it compares with that spelling.
+    const serialAs = SERIAL_TYPES[serialTypeName(declared.typeName) ?? ''];
+    const sequence = serialAs
+      ? { schema: unit.identity.schema, name: `${unit.identity.name}_${colname}_seq`, as: serialAs }
+      : null;
+    const def = sequence
+      ? {
+        ...declared,
+        typeName: { names: [{ String: { sval: 'pg_catalog' } }, { String: { sval: sequence.as } }], typemod: -1 },
+        constraints: [
+          ...((declared.constraints as unknown[] | undefined) ?? []),
+          { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: parseExpression(`nextval('${[sequence.schema, sequence.name].filter(Boolean).join('.')}'::regclass)`) } }
+        ]
+      }
+      : declared;
+    if (sequence) shape.serials.set(colname, sequence);
     const typeName = canonicalizeTypes(cleanTree(def.typeName));
     const residual = ((def.constraints as unknown[] | undefined) ?? []).map(c =>
       normalizeColumnConstraint((c as { Constraint: ConstraintNode & Record<string, unknown> }).Constraint, typeName)
@@ -518,7 +764,7 @@ function tableShape(unit: ObjectUnit): TableShape {
     const hasNotNull = residual.some(
       c => (c as { Constraint?: ConstraintNode }).Constraint?.contype === 'CONSTR_NOTNULL'
     );
-    if (notNullImplied.has(colname) && !hasNotNull) {
+    if ((notNullImplied.has(colname) || sequence) && !hasNotNull) {
       residual.push({ Constraint: { contype: 'CONSTR_NOTNULL' } });
     }
     const sorted = residual
@@ -804,38 +1050,149 @@ function diffTable(
         typeChanged));
     }
 
+    const defaultSteps: TableAlteration[] = [];
     if (stablePrint(a.def) !== stablePrint(b.def)) {
       const setDefault = (expr: unknown): string => alter(expr === undefined ? { subtype: 'AT_ColumnDefault', name } : { subtype: 'AT_ColumnDefault', name, def: expr });
-      steps.push(attr(name, 'alter', setDefault(bRaw.def), setDefault(aRaw.def)));
+      defaultSteps.push(attr(name, 'alter', setDefault(bRaw.def), setDefault(aRaw.def)));
     }
-    if (a.notNull !== b.notNull) {
-      steps.push(attr(name, 'alter',
-        alter({ subtype: b.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }),
-        alter({ subtype: a.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name })));
-    }
+    const identitySteps: TableAlteration[] = [];
     if (stablePrint(a.identity) !== stablePrint(b.identity)) {
       const add = (c: Record<string, unknown>): string => alter({ subtype: 'AT_AddIdentity', name, def: { Constraint: c } });
       const drop = alter({ subtype: 'AT_DropIdentity', name });
-      if (a.identity) steps.push(attr(name, 'alter', drop, add(aRaw.identity!)));
-      if (b.identity) steps.push(attr(name, 'alter', add(bRaw.identity!), drop));
+      if (a.identity) identitySteps.push(attr(name, 'alter', drop, add(aRaw.identity!)));
+      if (b.identity) identitySteps.push(attr(name, 'alter', add(bRaw.identity!), drop));
     }
+    // A serial's owned sequence comes and goes with the spelling: dropped
+    // after its default is gone (and before an identity claims its name), or
+    // created after an identity is dropped and before the default needs it.
+    const serialFrom = from.serials.get(renamedFrom.get(name) ?? name) ?? null;
+    const serialTo = to.serials.get(name) ?? null;
+    const sequenceSql = (seq: { schema: string | null; name: string; as: string }): { create: string; drop: string } => {
+      const items = (parts: (string | null)[]): unknown[] => parts.filter((x): x is string => x !== null).map(sval => ({ String: { sval } }));
+      return {
+        create: deparseStmt({ CreateSeqStmt: { sequence: { schemaname: seq.schema ?? undefined, relname: seq.name }, options: [
+          { DefElem: { defname: 'as', arg: { TypeName: { names: items(['pg_catalog', seq.as]) } }, defaction: 'DEFELEM_UNSPEC' } },
+          { DefElem: { defname: 'owned_by', arg: { List: { items: items([schema, table, name]) } }, defaction: 'DEFELEM_UNSPEC' } }
+        ] } }),
+        drop: deparseStmt({ DropStmt: { objects: [{ List: { items: items([seq.schema, seq.name]) } }], removeType: 'OBJECT_SEQUENCE', behavior: 'DROP_RESTRICT' } })
+      };
+    };
+    // NOT NULL is required before an identity is added and may only be
+    // dropped after one is gone.
+    const notNullStep = a.notNull !== b.notNull
+      ? attr(name, 'alter',
+        alter({ subtype: b.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }),
+        alter({ subtype: a.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }))
+      : null;
+    if (notNullStep && b.notNull) steps.push(notNullStep);
+    if (serialFrom && !serialTo) {
+      const seq = sequenceSql(serialFrom);
+      ctx.destructive.push(`${qualified}: DROP SEQUENCE ${[serialFrom.schema, serialFrom.name].filter(Boolean).join('.')} (the serial's sequence and its current value are lost)`);
+      steps.push(...defaultSteps, attr(name, 'alter', seq.drop, seq.create), ...identitySteps);
+    } else if (serialTo && !serialFrom) {
+      const seq = sequenceSql(serialTo);
+      steps.push(...identitySteps, attr(name, 'alter', seq.create, seq.drop), ...defaultSteps);
+    } else {
+      steps.push(...defaultSteps, ...identitySteps);
+    }
+    if (notNullStep && !b.notNull) steps.push(notNullStep);
     if (stablePrint(a.other) !== stablePrint(b.other)) {
       ctx.incomplete.push(`${diff.path}: column "${name}" changed in a way pgpm cannot express as ALTER COLUMN (${a.other.length + b.other.length} unsupported constraint(s)); alter it manually`);
     }
+    // Storage and compression are plain per-column settings; "default" puts
+    // either back to what the column type implies.
+    const setting = (def: unknown, field: 'storage_name' | 'compression'): string =>
+      ((def as Record<string, string | undefined>)[field] ?? 'default').toLowerCase();
+    for (const [field, subtype] of [['storage_name', 'AT_SetStorage'], ['compression', 'AT_SetCompression']] as const) {
+      const was = setting(prior.canon, field);
+      const now = setting(col.canon, field);
+      if (was === now) continue;
+      const set = (value: string): string => alter({ subtype, name, def: { String: { sval: value } } });
+      steps.push(attr(name, 'alter', set(now), set(was)));
+    }
     const rest = (def: unknown): string =>
-      stablePrint({ ...(def as Record<string, unknown>), colname: null, typeName: null, collClause: null, constraints: null, is_local: null, location: null });
+      stablePrint({
+        ...(def as Record<string, unknown>), colname: null, typeName: null, collClause: null, constraints: null,
+        is_local: null, location: null, storage_name: null, compression: null
+      });
     if (rest(prior.canon) !== rest(col.canon)) {
-      ctx.incomplete.push(`${diff.path}: column "${name}" changed storage/compression/options pgpm cannot express as ALTER COLUMN; alter it manually`);
+      ctx.incomplete.push(`${diff.path}: column "${name}" changed options pgpm cannot express as ALTER COLUMN; alter it manually`);
     }
   }
+  // ---- table-level properties: persistence, reloptions, inheritance and
+  // partition bound all change in place with exact inverses.
+  const alterCmds = (rel: unknown, cmds: Record<string, unknown>[]): string =>
+    deparseStmt({
+      AlterTableStmt: { relation: rel, cmds: cmds.map(cmd => ({ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } })), objtype: 'OBJECT_TABLE' }
+    });
+  const prop = (sql: string, inverse: string): TableAlteration => ({ sql, inverse, phase: 'alter', sub: null, keyColumns: [], breaking: false });
+  if (from.props.persistence !== to.props.persistence) {
+    const persistence = (p: string): string => alter({ subtype: p === 'u' ? 'AT_SetUnLogged' : 'AT_SetLogged' });
+    steps.push(prop(persistence(to.props.persistence), persistence(from.props.persistence)));
+  }
+  {
+    const set = (items: unknown[]): Record<string, unknown> => ({ subtype: 'AT_SetRelOptions', def: { List: { items } } });
+    const reset = (names: string[]): Record<string, unknown> =>
+      ({ subtype: 'AT_ResetRelOptions', def: { List: { items: names.map(defname => ({ DefElem: { defname, defaction: 'DEFELEM_UNSPEC' } })) } } });
+    const changed = [...to.props.options].filter(([k, v]) => stablePrint(from.props.options.get(k)) !== stablePrint(v));
+    const removed = [...from.props.options].filter(([k]) => !to.props.options.has(k));
+    const forward: Record<string, unknown>[] = [];
+    const backward: Record<string, unknown>[] = [];
+    if (changed.length > 0) {
+      forward.push(set(changed.map(([, v]) => v)));
+      const restore = changed.filter(([k]) => from.props.options.has(k)).map(([k]) => from.props.options.get(k));
+      const undo = changed.filter(([k]) => !from.props.options.has(k)).map(([k]) => k);
+      if (restore.length > 0) backward.push(set(restore));
+      if (undo.length > 0) backward.push(reset(undo));
+    }
+    if (removed.length > 0) {
+      forward.push(reset(removed.map(([k]) => k)));
+      backward.push(set(removed.map(([, v]) => v)));
+    }
+    if (forward.length > 0) steps.push(prop(alterCmds(relation, forward), alterCmds(relation, backward)));
+  }
+  for (const [print, parent] of from.props.inherits) {
+    if (to.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_DropInherit', def: parent }), alter({ subtype: 'AT_AddInherit', def: parent })));
+  }
+  for (const [print, parent] of to.props.inherits) {
+    if (from.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_AddInherit', def: parent }), alter({ subtype: 'AT_DropInherit', def: parent })));
+  }
+  if (stablePrint(from.props.partition) !== stablePrint(to.props.partition)) {
+    const parentOf = (p: { parent: unknown }): unknown => (p.parent as { RangeVar?: unknown }).RangeVar ?? p.parent;
+    const detach = (p: { parent: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_DetachPartition', def: { PartitionCmd: { name: relation } } }]);
+    const attach = (p: { parent: unknown; bound: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_AttachPartition', def: { PartitionCmd: { name: relation, bound: p.bound } } }]);
+    if (from.props.partition) steps.push(prop(detach(from.props.partition), attach(from.props.partition)));
+    if (to.props.partition) steps.push(prop(attach(to.props.partition), detach(to.props.partition)));
+  }
+  if (stablePrint(from.props.partspec) !== stablePrint(to.props.partspec)) {
+    ctx.incomplete.push(`${diff.path}: PARTITION BY changed; Postgres cannot re-partition a table in place, rebuild it manually`);
+  }
+
   // Self-inverse ALTER TABLE subtypes: a removed extra with one of these
   // undoes with the paired subtype rather than a DROP CONSTRAINT.
   const INVERSE_SUBTYPE: Record<string, string> = {
     AT_EnableRowSecurity: 'AT_DisableRowSecurity',
     AT_DisableRowSecurity: 'AT_EnableRowSecurity',
     AT_ForceRowSecurity: 'AT_NoForceRowSecurity',
-    AT_NoForceRowSecurity: 'AT_ForceRowSecurity'
+    AT_NoForceRowSecurity: 'AT_ForceRowSecurity',
+    AT_EnableTrig: 'AT_DisableTrig',
+    AT_DisableTrig: 'AT_EnableTrig',
+    AT_EnableAlwaysTrig: 'AT_EnableTrig',
+    AT_EnableReplicaTrig: 'AT_EnableTrig',
+    AT_EnableTrigAll: 'AT_DisableTrigAll',
+    AT_DisableTrigAll: 'AT_EnableTrigAll',
+    AT_EnableTrigUser: 'AT_DisableTrigUser',
+    AT_DisableTrigUser: 'AT_EnableTrigUser'
   };
+  /** The trigger an ENABLE/DISABLE TRIGGER command addresses (it must exist first). */
+  const triggerOf = (cmd: Record<string, unknown>): NamingIdentity | null =>
+    /Trig$/.test(cmd.subtype as string) && typeof cmd.name === 'string' ? { kind: 'trigger', schema, name: cmd.name, table } : null;
+  const invert = (cmd: Record<string, unknown>): Record<string, unknown> =>
+    cmd.name === undefined ? { subtype: INVERSE_SUBTYPE[cmd.subtype as string] } : { subtype: INVERSE_SUBTYPE[cmd.subtype as string], name: cmd.name };
 
   // Removed extras drop before added ones: a changed constraint that keeps
   // its name must DROP CONSTRAINT before the replacement ADD CONSTRAINT.
@@ -856,11 +1213,12 @@ function diffTable(
         breaking: false
       });
     } else if (subtype && INVERSE_SUBTYPE[subtype]) {
+      const cmd = (extra as { AlterTableCmd: Record<string, unknown> }).AlterTableCmd;
       steps.push({
-        sql: alter({ subtype: INVERSE_SUBTYPE[subtype] }),
-        inverse: alter({ subtype }),
+        sql: alter(invert(cmd)),
+        inverse: alter(cmd),
         phase: 'remove',
-        sub: null,
+        sub: triggerOf(cmd),
         keyColumns: [],
         breaking: false
       });
@@ -895,14 +1253,14 @@ function diffTable(
     if (at) {
       const subtype = at.subtype as string;
       const inverse = INVERSE_SUBTYPE[subtype]
-        ? alter({ subtype: INVERSE_SUBTYPE[subtype] })
+        ? alter(invert(at))
         : conname ? alter({ subtype: 'AT_DropConstraint', name: conname }) : '';
       if (!inverse) ctx.incomplete.push(`${diff.path}: added table element has no derivable inverse (${describeExtra(extra)})`);
       steps.push({
         sql: alter(at),
         inverse: inverse || `-- pgpm: no inverse for ${describeExtra(extra)}`,
         phase: 'add',
-        sub: conname ? { kind: 'constraint', schema, name: conname, table } : null,
+        sub: conname ? { kind: 'constraint', schema, name: conname, table } : triggerOf(at),
         keyColumns: constraintKeys(extra),
         breaking: false
       });
@@ -1017,9 +1375,14 @@ function functionSignature(texts: string[]): string | null {
   const nodes = parseSync(texts[0]).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
   const fn = nodes.length === 1 ? nodes[0].CreateFunctionStmt : undefined;
   if (!fn) return null;
+  // Postgres discards typmods from parameter types (f(varchar(10)) is f(varchar)).
+  const parameters = ((fn.parameters ?? []) as { FunctionParameter?: { argType?: Record<string, unknown> } }[])
+    .map(p => p.FunctionParameter
+      ? { FunctionParameter: { ...p.FunctionParameter, argType: p.FunctionParameter.argType ? { ...p.FunctionParameter.argType, typmods: undefined } : undefined } }
+      : p);
   return stablePrint(cleanTree({
     funcname: fn.funcname,
-    parameters: fn.parameters,
+    parameters: canonicalizeTypes(parameters),
     returnType: fn.returnType,
     is_procedure: fn.is_procedure
   }));
@@ -1193,8 +1556,9 @@ export function diffSchemas(
   const destructive: string[] = [];
   /** Steps with no derivable DROP/inverse; refused unless `allowIncomplete`. */
   const incomplete: string[] = [];
-  const a = readSide(from, warnings, 'from');
-  const b = readSide(to, warnings, 'to');
+  const overloaded = overloadedFunctions([from, to]);
+  const a = readSide(from, warnings, 'from', overloaded);
+  const b = readSide(to, warnings, 'to', overloaded);
   const renames = options.renames ?? [];
   const casts = options.casts ?? {};
 
@@ -1375,6 +1739,7 @@ export function diffSchemas(
       for (const raw of parseSync(text).sql.stmts) {
         const stmt = raw.stmt as unknown as Record<string, unknown>;
         if (absorbAnnotation(annotations, stmt)) continue;
+        if (foldSequenceAlter(nodes, definition, stmt)) continue;
         definition.push(deparseStmt(stmt));
         nodes.push(stmt);
       }
@@ -1480,8 +1845,8 @@ export function diffSchemas(
     const pa = splitUnit(prior);
     const pb = splitUnit(unit);
     const annotationSteps = diffAnnotations(pa.annotations, pb.annotations, path);
-    const emitSteps = (list: { sql: string; inverse: string; incomplete?: string; destructive?: string }[], after?: Atom, breaking = false): void => {
-      list.forEach((step, i) => {
+    const emitSteps = (list: { sql: string; inverse: string; incomplete?: string; destructive?: string }[], after?: Atom, breaking = false): Atom[] => {
+      return list.map((step, i) => {
         if (step.incomplete) incomplete.push(`${path}: ${step.incomplete}`);
         if (step.destructive) destructive.push(step.destructive);
         const atom = addAtom({
@@ -1490,7 +1855,35 @@ export function diffSchemas(
         });
         if (after) atom.deps.add(after.id);
         track(key, atom);
+        return atom;
       });
+    };
+    // Columns typed with this type: parked in a bridge type around steps
+    // Postgres refuses while the type is in use (see `columnRebridge`).
+    const dependentColumns = unit.identity.kind === 'type' || unit.identity.kind === 'other'
+      ? typeDependentColumns(a, b, unit.identity)
+      : [];
+    const bridgeColumns = (middle: Atom[], composite: boolean): void => {
+      for (const col of dependentColumns) {
+        const { pre, post } = columnRebridge(col, composite);
+        const sub: NamingIdentity = { kind: 'column', schema: col.schema, table: col.table, name: col.name };
+        destructive.push(`${[col.schema, col.table, col.name].filter(Boolean).join('.')}: cast through ${composite ? 'jsonb' : 'text'} around ${objectLabel(unit.identity)} (values the new type rejects are lost)`);
+        let last: Atom | null = null;
+        pre.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: true, rank: toRank * 1000 - 100 + i });
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+        for (const m of middle) if (last) m.deps.add(last.id);
+        post.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: false, rank: toRank * 1000 + 900 + i });
+          for (const m of middle) atom.deps.add(m.id);
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+      }
     };
     const definitionChanged = definitionFingerprint(pa.definition) !== definitionFingerprint(pb.definition);
     if (!definitionChanged) {
@@ -1505,7 +1898,10 @@ export function diffSchemas(
         if (steps.length + annotationSteps.length > 0) modified();
         // Shape changes (enum values, domain rules, attributes) invalidate
         // dependents the way a drop does; annotations do not.
-        emitSteps(steps, undefined, true);
+        const atoms = emitSteps(steps, undefined, true);
+        // ADD/DROP ATTRIBUTE work with dependent columns; ALTER ATTRIBUTE ... TYPE does not.
+        const retypes = atoms.filter(a => /\bALTER ATTRIBUTE\b/.test(a.sql) || /\bALTER ATTRIBUTE\b/.test(a.inverse));
+        if (pa.nodes[0].CompositeTypeStmt && retypes.length > 0) bridgeColumns(retypes, true);
         emitSteps(annotationSteps);
         continue;
       }
@@ -1540,6 +1936,7 @@ export function diffSchemas(
       track(key, drop);
     }
     track(key, create);
+    bridgeColumns(drop ? [drop, create] : [create], Boolean(pa.nodes[0]?.CompositeTypeStmt));
   }
 
   // ---- from-side: unchanged dependents that a breaking step would invalidate
@@ -1606,6 +2003,11 @@ export function diffSchemas(
       {
         granularity: options.granularity ?? 'object',
         changeGranularity: alteration ? 'alteration' : undefined,
+        changeName: (facts, text) => {
+          const identity = identityOf(facts);
+          if (!identity) return defaultChangeName(facts);
+          return pathFor(overloadIdentity(identity, text, overloaded), { style });
+        },
         subObjectName: identity => pathFor(identity, { style })
       }
     );
@@ -1691,6 +2093,61 @@ export function diffSchemas(
     const tableKey = atom.owner;
     for (const step of unitPhase(tableKey, 'remove')) {
       if (step.sub?.kind === 'constraint' && step.keyColumns.includes(atom.sub.name)) atom.deps.add(step.id);
+    }
+  }
+
+  // ENABLE/DISABLE TRIGGER addresses a trigger by name: it follows the
+  // trigger's creation and precedes its drop.
+  for (const atom of atoms) {
+    if (atom.sub?.kind !== 'trigger') continue;
+    const triggerKey = identityKey(atom.sub as ObjectIdentity);
+    const created = createAtomByName.get(pathFor(atom.sub, { style }));
+    if (created) atom.deps.add(created.id);
+    for (const create of unitPhase(triggerKey, 'create')) if (create.unit !== atom.unit) atom.deps.add(create.id);
+    for (const drop of unitPhase(triggerKey, 'drop')) drop.deps.add(atom.id);
+  }
+
+  // Extensions are cluster-level providers of types, functions and operators
+  // that references do not resolve to (`uuid_generate_v4()` names no schema):
+  // creating one precedes every other step and dropping one follows them.
+  const isExtension = (atom: Atom): boolean => atom.name.startsWith('extensions/');
+  for (const ext of atoms) {
+    if (!isExtension(ext)) continue;
+    for (const other of atoms) {
+      if (other === ext || isExtension(other)) continue;
+      if (ext.phase === 'drop') ext.deps.add(other.id);
+      else other.deps.add(ext.id);
+    }
+  }
+
+  // Collations are referenced by `COLLATE` clauses that resolve to no tracked
+  // object: a column that starts using one follows its creation, and a
+  // collation is dropped only after every step whose inverse still uses it.
+  const collationRef = /^(CREATE|DROP) COLLATION (?:IF EXISTS )?(?:("?)([^".\s]+)\2\.)?("?)([^"\s(;]+)\4/;
+  for (const atom of atoms) {
+    const m = collationRef.exec(atom.sql);
+    if (!m) continue;
+    const bare = m[5].replace(/^"|"$/g, '');
+    const uses = new RegExp(`\\bCOLLATE\\s+(?:"?${m[3] ?? '[^".\\s]+'}"?\\.)?"?${bare.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"?(?![\\w"])`, 'i');
+    for (const other of atoms) {
+      if (other === atom) continue;
+      if (m[1] === 'CREATE' && uses.test(other.sql)) other.deps.add(atom.id);
+      if (m[1] === 'DROP' && uses.test(other.inverse)) atom.deps.add(other.id);
+    }
+  }
+
+  // `ALTER SEQUENCE .. OWNED BY table.column` names a column: it follows that
+  // column's addition and precedes its drop.
+  const ownedBy = /\bOWNED BY (?:"?([^".\s]+)"?\.)?"?([^".\s]+)"?\."?([^".\s;]+)"?/;
+  for (const atom of atoms) {
+    const m = /^ALTER SEQUENCE\b/.test(atom.sql) ? ownedBy.exec(atom.sql) : null;
+    if (!m) continue;
+    const owner = (x: Atom): boolean =>
+      x.sub?.kind === 'column' && x.sub.table === m[2] && x.sub.name === m[3] && (m[1] === undefined || (x.sub.schema ?? 'public') === m[1]);
+    for (const other of atoms) {
+      if (other === atom || !owner(other)) continue;
+      if (other.phase === 'add') atom.deps.add(other.id);
+      if (other.phase === 'remove' && other.breaking) other.deps.add(atom.id);
     }
   }
 
@@ -1940,9 +2397,14 @@ export function coverChanges(
   for (const obj of diff.objects) {
     deltaByKey.set(identityKey(obj.identity), obj.delta);
   }
+  const overloaded = new Set(
+    diff.objects
+      .filter(obj => obj.identity.kind === 'function' && /\)$/.test(obj.identity.name))
+      .map(obj => `${obj.identity.schema ?? ''}.${obj.identity.name.replace(/\(.*\)$/, '')}`)
+  );
   return changes.map(change => {
     const sideWarnings: string[] = [];
-    const side = readSide(change.deploy, sideWarnings, change.name);
+    const side = readSide(change.deploy, sideWarnings, change.name, overloaded);
     const objects: ChangeObjectCoverage[] = side.order.map(key => {
       const unit = side.units.get(key)!;
       return {

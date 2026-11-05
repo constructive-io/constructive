@@ -111,7 +111,7 @@ export interface RestructureModuleOptions {
    * (creating) statement. Defaults to {@link defaultChangeName}: naming spec
    * v1 paths (`identityOf` + `pathFor`).
    */
-  changeName?: (facts: StatementFacts) => string;
+  changeName?: (facts: StatementFacts, text: string) => string;
 }
 
 export interface RestructureModuleResult {
@@ -183,6 +183,7 @@ export function restructureChanges(
   options: RestructureModuleOptions
 ): RestructureModuleResult {
   const nameFor = options.changeName ?? defaultChangeName;
+  const textOf = (f: StatementFacts): string => sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
   const subNameFor = options.subObjectName ?? ((identity: NamingIdentity): string => pathFor(identity));
   const alteration = options.changeGranularity === 'alteration';
 
@@ -348,13 +349,13 @@ export function restructureChanges(
       moved = true;
     });
     if (!moved) {
-      const names = [...cyclic].map(g => groupSubName[g] ?? nameFor(groupFacts[g])).sort();
+      const names = [...cyclic].map(g => groupSubName[g] ?? nameFor(groupFacts[g], textOf(groupFacts[g]))).sort();
       throw new Error(`restructure: dependency cycle among changes; cannot order: ${names.join(', ')}`);
     }
     groupDeps = buildGroupDeps();
   }
 
-  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f));
+  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f, textOf(f)));
 
   // Slice statement text per group and collect each group's facts for
   // revert/verify generation.

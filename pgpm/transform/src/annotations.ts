@@ -34,7 +34,7 @@ export interface AnnotationState {
    * `insert*` for WITH GRANT OPTION, `all`) and `-token` for privileges
    * explicitly revoked (e.g. pg_dump's `REVOKE ALL ... FROM PUBLIC`).
    */
-  grants: Map<string, { objtype: string; objects: unknown; grantee: unknown; privs: Set<string> }>;
+  grants: Map<string, { targtype: string; objtype: string; objects: unknown; grantee: unknown; privs: Set<string> }>;
   /** `${objtype}:${object}` → OWNER TO statement template with its RoleSpec. */
   owners: Map<string, { template: Node; owner: unknown }>;
   /** `${options}:${objtype}:${grantee}` → default-privilege tokens (same scheme as grants). */
@@ -88,12 +88,13 @@ export function absorbAnnotation(state: AnnotationState, stmt: Node): boolean {
   }
   if (stmt.GrantStmt) {
     const g = stmt.GrantStmt as Node;
-    if (g.targtype !== 'ACL_TARGET_OBJECT') return false;
+    if (g.targtype !== 'ACL_TARGET_OBJECT' && g.targtype !== 'ACL_TARGET_ALL_IN_SCHEMA') return false;
     const objects = cleanTree(g.objects);
     for (const grantee of (g.grantees as unknown[]) ?? []) {
       const clean = cleanTree(grantee);
-      const key = `${g.objtype}:${stablePrint(objects)}:${stablePrint(clean)}`;
-      const entry = state.grants.get(key) ?? { objtype: g.objtype as string, objects, grantee: clean, privs: new Set<string>() };
+      const key = `${g.targtype}:${g.objtype}:${stablePrint(objects)}:${stablePrint(clean)}`;
+      const entry = state.grants.get(key)
+        ?? { targtype: g.targtype as string, objtype: g.objtype as string, objects, grantee: clean, privs: new Set<string>() };
       applyAction(entry.privs, g);
       state.grants.set(key, entry);
     }
@@ -146,7 +147,7 @@ export interface AnnotationStep {
   incomplete?: string;
 }
 
-const grantNode = (isGrant: boolean, objtype: string, objects: unknown, tokens: string[], grantee: unknown): Node => {
+const grantNode = (isGrant: boolean, objtype: string, objects: unknown, tokens: string[], grantee: unknown, targtype = 'ACL_TARGET_OBJECT'): Node => {
   const option = tokens.some(t => t.endsWith('*'));
   const names = tokens.map(t => t.replace(/\*$/, ''));
   const privileges = names.includes('all')
@@ -160,7 +161,7 @@ const grantNode = (isGrant: boolean, objtype: string, objects: unknown, tokens: 
   return {
     GrantStmt: {
       is_grant: isGrant || undefined,
-      targtype: 'ACL_TARGET_OBJECT',
+      targtype,
       objtype,
       objects,
       privileges,
@@ -266,7 +267,7 @@ export function diffAnnotations(from: AnnotationState, to: AnnotationState, path
     const prior = from.grants.get(key)?.privs ?? new Set<string>();
     const entry = to.grants.get(key) ?? from.grants.get(key)!;
     const next = to.grants.get(key)?.privs ?? new Set<string>();
-    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee), entry.objtype, entry.grantee));
+    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee, entry.targtype), entry.objtype, entry.grantee));
   }
 
   for (const key of new Set([...from.defaultPrivileges.keys(), ...to.defaultPrivileges.keys()])) {

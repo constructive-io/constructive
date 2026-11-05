@@ -430,3 +430,30 @@ describe('diffSchemas: review follow-ups', () => {
     expect(consumer.dependencies).toContain(added.name);
   });
 });
+
+describe('diffSchemas: overload identities', () => {
+  it('treats varchar(10) and varchar as the same function overload (typmods are not part of a signature)', () => {
+    const fn = (arg: string, body: string): string =>
+      `CREATE FUNCTION app.f(${arg}) RETURNS text LANGUAGE sql AS $$ SELECT ${body} $$;`;
+    const from = `${S}\n${fn('v varchar(10)', '$1::text')}\n${fn('i int', '$1::text')}`;
+    const to = `${S}\n${fn('v varchar', 'upper($1::text)')}\n${fn('i int', '$1::text')}`;
+    const result = diffSchemas(from, to);
+    const deploy = norm(sql(result, 'deploy'));
+    expect(deploy).not.toMatch(/DROP FUNCTION/);
+    expect(deploy).toMatch(/CREATE OR REPLACE FUNCTION app\.f\(v varchar\)/);
+    expect(deploy).not.toMatch(/app\.f\(i int\)/);
+  });
+
+  it('keeps operators with the same symbol but different operand types apart', () => {
+    const fns = `CREATE FUNCTION app.add_i(int, int) RETURNS int LANGUAGE sql AS $$ SELECT $1 + $2 $$;
+      CREATE FUNCTION app.add_t(text, text) RETURNS text LANGUAGE sql AS $$ SELECT $1 || $2 $$;`;
+    const opInt = 'CREATE OPERATOR app.### (LEFTARG = int, RIGHTARG = int, FUNCTION = app.add_i);';
+    const opText = 'CREATE OPERATOR app.### (LEFTARG = text, RIGHTARG = text, FUNCTION = app.add_t);';
+    const result = diffSchemas(`${S}\n${fns}\n${opInt}\n${opText}`, `${S}\n${fns}\n${opInt}`, lax);
+    const deploy = norm(sql(result, 'deploy'));
+    expect(deploy.match(/DROP OPERATOR/g)).toHaveLength(1);
+    expect(deploy).toMatch(/DROP OPERATOR app\.### ?\(text, text\)/);
+    expect(deploy).not.toMatch(/CREATE OPERATOR/);
+    expect(norm(sql(result, 'revert'))).toMatch(/CREATE OPERATOR app\.### \(LEFTARG = text/);
+  });
+});

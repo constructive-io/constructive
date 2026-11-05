@@ -24,14 +24,17 @@ export interface CatalogSnapshot {
   triggers: Record<string, string>;
   policies: Record<string, string>;
   rls: Record<string, string>;
+  /** Table/view grants plus schema, sequence, function and type ACLs (defaults made explicit). */
   grants: Record<string, string>;
   /** Enums (labels in order), domains, composite and range types. */
   types: Record<string, string>;
   sequences: Record<string, string>;
   /** Views and materialized views (definition). */
   views: Record<string, string>;
-  /** COMMENT ON for schemas, relations, columns, functions and types. */
+  /** Every COMMENT ON in user schemas (plus schema-less objects such as extensions and event triggers), keyed by catalog and object description. */
   comments: Record<string, string>;
+  /** Owners of schemas, relations, functions and types. */
+  owners: Record<string, string>;
   defaultPrivileges: Record<string, string>;
 }
 
@@ -56,16 +59,27 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
   `);
 
   const tables = await db.query(`
-    SELECT table_schema, table_name FROM information_schema.tables
-    WHERE table_schema NOT IN ${SYSTEM_SCHEMAS} AND table_type = 'BASE TABLE'
+    SELECT n.nspname AS table_schema, cl.relname AS table_name, cl.relpersistence,
+           array_to_string(cl.reloptions, ',') AS reloptions,
+           pg_get_expr(cl.relpartbound, cl.oid) AS partbound,
+           (SELECT string_agg(pn.nspname || '.' || pc.relname, ',' ORDER BY i.inhseqno)
+            FROM pg_inherits i JOIN pg_class pc ON pc.oid = i.inhparent JOIN pg_namespace pn ON pn.oid = pc.relnamespace
+            WHERE i.inhrelid = cl.oid) AS inherits
+    FROM pg_class cl
+    JOIN pg_namespace n ON n.oid = cl.relnamespace
+    WHERE cl.relkind IN ('r', 'p') AND n.nspname NOT IN ${SYSTEM_SCHEMAS}
   `);
 
   const columns = await db.query(`
-    SELECT table_schema, table_name, column_name, ordinal_position,
-           data_type, is_nullable, column_default, character_maximum_length,
-           is_identity, identity_generation, is_generated, generation_expression, collation_name
-    FROM information_schema.columns
-    WHERE table_schema NOT IN ${SYSTEM_SCHEMAS}
+    SELECT c.table_schema, c.table_name, c.column_name, c.ordinal_position,
+           c.data_type, c.is_nullable, c.column_default, c.character_maximum_length,
+           c.is_identity, c.identity_generation, c.is_generated, c.generation_expression, c.collation_name,
+           a.attstorage, a.attcompression
+    FROM information_schema.columns c
+    JOIN pg_namespace n ON n.nspname = c.table_schema
+    JOIN pg_class cl ON cl.relnamespace = n.oid AND cl.relname = c.table_name
+    JOIN pg_attribute a ON a.attrelid = cl.oid AND a.attname = c.column_name
+    WHERE c.table_schema NOT IN ${SYSTEM_SCHEMAS}
   `);
 
   const constraints = await db.query(`
@@ -86,7 +100,13 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
   const functions = await db.query(`
     SELECT n.nspname AS schema, p.proname,
            pg_get_function_identity_arguments(p.oid) AS args,
-           pg_get_functiondef(p.oid) AS def
+           CASE WHEN p.prokind = 'a' THEN (
+             SELECT format('AGGREGATE kind=%s sfunc=%s stype=%s sspace=%s finalfunc=%s finalextra=%s finalmodify=%s combinefunc=%s serialfunc=%s deserialfunc=%s msfunc=%s minvfunc=%s mstype=%s mfinalfunc=%s sortop=%s initcond=%s minitcond=%s parallel=%s',
+               a.aggkind, a.aggtransfn::regproc, a.aggtranstype::regtype, a.aggtransspace, a.aggfinalfn::regproc, a.aggfinalextra, a.aggfinalmodify,
+               a.aggcombinefn::regproc, a.aggserialfn::regproc, a.aggdeserialfn::regproc, a.aggmtransfn::regproc, a.aggminvtransfn::regproc,
+               a.aggmtranstype::regtype, a.aggmfinalfn::regproc, a.aggsortop::regoperator, a.agginitval, a.aggminitval, p.proparallel)
+             FROM pg_aggregate a WHERE a.aggfnoid = p.oid
+           ) ELSE pg_get_functiondef(p.oid) END AS def
     FROM pg_proc p
     JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
@@ -116,10 +136,29 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
   `);
 
   const grants = await db.query(`
-    SELECT table_schema, table_name, grantee, privilege_type
+    SELECT table_schema || '.' || table_name AS target, grantee, privilege_type
     FROM information_schema.role_table_grants
     WHERE table_schema NOT IN ${SYSTEM_SCHEMAS}
       AND grantee <> (SELECT current_user)
+    UNION ALL
+    SELECT target, g.grantee::regrole::text, g.privilege_type
+    FROM (
+      SELECT n.nspname AS target, coalesce(n.nspacl, acldefault('n', n.nspowner)) AS acl
+      FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND n.nspname NOT LIKE 'pg\\_temp\\_%' AND n.nspname NOT LIKE 'pg\\_toast\\_temp\\_%'
+      UNION ALL
+      SELECT n.nspname || '.' || cl.relname, coalesce(cl.relacl, acldefault('s', cl.relowner))
+      FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace
+      WHERE cl.relkind = 'S' AND n.nspname NOT IN ${SYSTEM_SCHEMAS}
+      UNION ALL
+      SELECT n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', coalesce(p.proacl, acldefault('f', p.proowner))
+      FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
+      UNION ALL
+      SELECT n.nspname || '.' || t.typname, coalesce(t.typacl, acldefault('T', t.typowner))
+      FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+      WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND t.typtype IN ('e', 'd', 'c', 'r')
+        AND NOT EXISTS (SELECT 1 FROM pg_type el WHERE el.typarray = t.oid)
+    ) o, aclexplode(o.acl) g
+    WHERE g.grantee <> (SELECT oid FROM pg_roles WHERE rolname = current_user)
   `);
   const types = await db.query(`
     SELECT n.nspname AS schema, t.typname, t.typtype,
@@ -152,24 +191,28 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     WHERE cl.relkind IN ('v', 'm') AND n.nspname NOT IN ${SYSTEM_SCHEMAS}
   `);
   const comments = await db.query(`
-    SELECT 'schema' AS kind, n.nspname AS target, obj_description(n.oid, 'pg_namespace') AS comment
-    FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(n.oid, 'pg_namespace') IS NOT NULL
+    SELECT d.classoid::regclass::text AS kind,
+           pg_describe_object(d.classoid, d.objoid, d.objsubid) AS target,
+           d.description AS comment
+    FROM pg_description d
+    WHERE coalesce((pg_identify_object(d.classoid, d.objoid, d.objsubid)).schema, '') NOT IN ${SYSTEM_SCHEMAS}
+      AND NOT EXISTS (SELECT 1 FROM pg_depend dep WHERE dep.classid = d.classoid AND dep.objid = d.objoid AND dep.deptype = 'e')
+  `);
+  const owners = await db.query(`
+    SELECT 'schema' AS kind, n.nspname AS target, pg_get_userbyid(n.nspowner) AS owner
+    FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND n.nspname NOT LIKE 'pg\\_temp\\_%' AND n.nspname NOT LIKE 'pg\\_toast\\_temp\\_%'
     UNION ALL
-    SELECT 'relation', n.nspname || '.' || cl.relname, obj_description(cl.oid, 'pg_class')
+    SELECT 'relation', n.nspname || '.' || cl.relname, pg_get_userbyid(cl.relowner)
     FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace
-    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(cl.oid, 'pg_class') IS NOT NULL
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND cl.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')
     UNION ALL
-    SELECT 'column', n.nspname || '.' || cl.relname || '.' || a.attname, col_description(cl.oid, a.attnum)
-    FROM pg_attribute a JOIN pg_class cl ON cl.oid = a.attrelid JOIN pg_namespace n ON n.oid = cl.relnamespace
-    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND a.attnum > 0 AND NOT a.attisdropped AND col_description(cl.oid, a.attnum) IS NOT NULL
+    SELECT 'function', n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', pg_get_userbyid(p.proowner)
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
     UNION ALL
-    SELECT 'function', n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', obj_description(p.oid, 'pg_proc')
-    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
-    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(p.oid, 'pg_proc') IS NOT NULL
-    UNION ALL
-    SELECT 'type', n.nspname || '.' || t.typname, obj_description(t.oid, 'pg_type')
+    SELECT 'type', n.nspname || '.' || t.typname, pg_get_userbyid(t.typowner)
     FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
-    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(t.oid, 'pg_type') IS NOT NULL
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND t.typtype IN ('e', 'd', 'c', 'r')
+      AND NOT EXISTS (SELECT 1 FROM pg_type el WHERE el.typarray = t.oid)
   `);
   const defaultPrivileges = await db.query(`
     SELECT pg_get_userbyid(d.defaclrole) AS role, n.nspname AS schema, d.defaclobjtype AS objtype,
@@ -181,7 +224,11 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
 
   return {
     schemas: record(schemas.rows, r => r.nspname, () => 'schema'),
-    tables: record(tables.rows, r => `${r.table_schema}.${r.table_name}`, () => 'table'),
+    tables: record(
+      tables.rows,
+      r => `${r.table_schema}.${r.table_name}`,
+      r => `persistence=${r.relpersistence} options=${r.reloptions ?? ''} bound=${r.partbound ?? ''} inherits=${r.inherits ?? ''}`
+    ),
     columns: record(
       columns.rows,
       r => `${r.table_schema}.${r.table_name}.${r.column_name}`,
@@ -189,7 +236,8 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
         `#${r.ordinal_position} ${r.data_type}${r.character_maximum_length ? `(${r.character_maximum_length})` : ''} nullable=${r.is_nullable} default=${r.column_default ?? 'none'}` +
         `${r.is_identity === 'YES' ? ` identity=${r.identity_generation}` : ''}` +
         `${r.is_generated && r.is_generated !== 'NEVER' ? ` generated=${r.generation_expression}` : ''}` +
-        `${r.collation_name ? ` collate=${r.collation_name}` : ''}`
+        `${r.collation_name ? ` collate=${r.collation_name}` : ''}` +
+        ` storage=${r.attstorage} compression=${r.attcompression || 'default'}`
     ),
     constraints: record(constraints.rows, r => `${r.schema}.${r.table}.${r.conname}`, r => r.def),
     indexes: record(indexes.rows, r => `${r.schemaname}.${r.tablename}.${r.indexname}`, r => r.indexdef),
@@ -208,7 +256,7 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     ),
     grants: record(
       grants.rows,
-      r => `${r.table_schema}.${r.table_name}:${r.grantee}:${r.privilege_type}`,
+      r => `${r.target}:${r.grantee}:${r.privilege_type}`,
       () => 'grant'
     ),
     types: record(types.rows, r => `${r.schema}.${r.typname}`, r => `${r.typtype} ${r.def ?? ''}`),
@@ -219,6 +267,7 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     ),
     views: record(views.rows, r => `${r.schema}.${r.relname}`, r => `${r.relkind} ${r.def}`),
     comments: record(comments.rows, r => `${r.kind}:${r.target}`, r => r.comment),
+    owners: record(owners.rows, r => `${r.kind}:${r.target}`, r => r.owner),
     defaultPrivileges: record(
       defaultPrivileges.rows,
       r => `${r.role}:${r.schema ?? ''}:${r.objtype}`,

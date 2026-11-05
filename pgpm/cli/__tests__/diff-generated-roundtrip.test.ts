@@ -26,6 +26,12 @@ afterAll(async () => {
   await teardownPgPools();
 });
 
+// Each seed opens three databases; releasing their pools per test keeps the
+// connection count flat when jest runs this suite next to the other diff suites.
+afterEach(async () => {
+  await teardownPgPools();
+});
+
 // ---------------------------------------------------------------- generator
 
 /** mulberry32: small, fast, deterministic. */
@@ -47,6 +53,8 @@ interface Column {
   type: ColumnType;
   notNull: boolean;
   def?: string;
+  storage?: 'external';
+  comment?: string;
 }
 
 interface Table {
@@ -55,17 +63,24 @@ interface Table {
   fk?: { column: string; ref: string };
   check?: { column: string };
   unique?: string;
-  index?: { column: string; unique: boolean; partial: boolean };
+  index?: { column: string; unique: boolean; partial: boolean; include: boolean };
   grants: string[];
   policy: boolean;
   trigger: boolean;
+  triggerDisabled: boolean;
   comment?: string;
+  unlogged: boolean;
+  fillfactor?: number;
+  identity: boolean;
+  viewSecurityInvoker: boolean;
 }
 
 interface Schema {
   enumValues: string[];
   seqIncrement: number;
   fnBody: string;
+  /** Whether `gen.total(scale int)` exists alongside `gen.total()`. */
+  overload: boolean;
   tables: Table[];
 }
 
@@ -99,7 +114,9 @@ const makeColumn = (rng: () => number, name: string): Column => {
   const type = pick(rng, COLUMN_TYPES);
   const notNull = rng() < 0.4;
   const def = rng() < 0.5 ? defaultFor(type) : undefined;
-  return { name, type, notNull, def };
+  const storage = type === 'text' && rng() < 0.3 ? 'external' as const : undefined;
+  const comment = rng() < 0.2 ? `column ${name}` : undefined;
+  return { name, type, notNull, def, storage, comment };
 };
 
 function generateV1(rng: () => number): Schema {
@@ -115,8 +132,14 @@ function generateV1(rng: () => number): Schema {
       grants: rng() < 0.7 ? ['SELECT'] : [],
       policy: rng() < 0.5,
       trigger: rng() < 0.5,
-      comment: rng() < 0.5 ? `table ${t}` : undefined
+      triggerDisabled: false,
+      comment: rng() < 0.5 ? `table ${t}` : undefined,
+      unlogged: false,
+      fillfactor: rng() < 0.3 ? 70 : undefined,
+      identity: rng() < 0.3,
+      viewSecurityInvoker: rng() < 0.3
     };
+    if (table.trigger && rng() < 0.3) table.triggerDisabled = true;
     if (t > 0 && rng() < 0.7) {
       columns.push({ name: 'ref_id', type: 'int', notNull: false });
       table.fk = { column: 'ref_id', ref: `t${Math.floor(rng() * t)}` };
@@ -128,11 +151,14 @@ function generateV1(rng: () => number): Schema {
     if (distinct.length > 0 && rng() < 0.5) table.unique = pick(rng, distinct).name;
     if (rng() < 0.7) {
       const unique = distinct.length > 0 && rng() < 0.3;
-      table.index = { column: pick(rng, unique ? distinct : plain).name, unique, partial: rng() < 0.3 };
+      table.index = { column: pick(rng, unique ? distinct : plain).name, unique, partial: rng() < 0.3, include: rng() < 0.3 };
     }
     tables.push(table);
   }
-  return { enumValues: ['a', 'b'], seqIncrement: 1, fnBody: 'count(*)', tables };
+  // A permanent table's FK may only reference a permanent table.
+  const referenced = new Set(tables.map(t => t.fk?.ref));
+  for (const table of tables) if (!referenced.has(table.name) && rng() < 0.25) table.unlogged = true;
+  return { enumValues: ['a', 'b'], seqIncrement: 1, fnBody: 'count(*)', overload: rng() < 0.4, tables };
 }
 
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -161,7 +187,9 @@ function mutate(rng: () => number, v1: Schema): { v2: Schema; mutation: Mutation
   const ops = [
     'addColumn', 'dropColumn', 'changeDefault', 'toggleNotNull', 'widenType', 'toggleIndex', 'changeFn',
     'togglePolicy', 'changeGrants', 'addEnumValue', 'addTable', 'dropTable', 'toggleCheck', 'changeSeq',
-    'toggleTrigger', 'changeComment', 'renameColumn'
+    'toggleTrigger', 'changeComment', 'renameColumn',
+    'toggleUnlogged', 'toggleReloptions', 'toggleIdentity', 'toggleTriggerState', 'toggleIndexInclude', 'toggleViewOption',
+    'toggleStorage', 'toggleOverload', 'changeColumnComment'
   ] as const;
   const applied: string[] = [];
   let guard = 0;
@@ -206,7 +234,7 @@ function mutate(rng: () => number, v1: Schema): { v2: Schema; mutation: Mutation
       if (table.index) {
         const flippable = UNIQUE_SAFE.includes(table.columns.find(c => c.name === table.index!.column)?.type ?? 'boolean');
         table.index = rng() < 0.5 || !flippable ? undefined : { ...table.index, unique: !table.index.unique };
-      } else if (free.length > 0) table.index = { column: pick(rng, free).name, unique: false, partial: true };
+      } else if (free.length > 0) table.index = { column: pick(rng, free).name, unique: false, partial: true, include: false };
       else continue;
       break;
     }
@@ -219,7 +247,8 @@ function mutate(rng: () => number, v1: Schema): { v2: Schema; mutation: Mutation
         name: `t${v2.tables.length}`,
         columns: [makeColumn(rng, 'c0'), { name: 'ref_id', type: 'int', notNull: false }],
         fk: { column: 'ref_id', ref: v2.tables[0].name },
-        grants: ['SELECT'], policy: false, trigger: false
+        grants: ['SELECT'], policy: false, trigger: false, triggerDisabled: false,
+        unlogged: v2.tables[0].unlogged, identity: false, viewSecurityInvoker: false
       };
       v2.tables.push(t);
       break;
@@ -252,6 +281,38 @@ function mutate(rng: () => number, v1: Schema): { v2: Schema; mutation: Mutation
       mutation.renames.push(`gen.${table.name}.${from}=gen.${table.name}.${col.name}`);
       break;
     }
+    case 'toggleUnlogged': {
+      if (v2.tables.some(t => t.fk?.ref === table.name)) continue;
+      table.unlogged = !table.unlogged;
+      break;
+    }
+    case 'toggleReloptions': table.fillfactor = table.fillfactor ? undefined : 70; break;
+    case 'toggleIdentity': table.identity = !table.identity; break;
+    case 'toggleTriggerState': {
+      if (!table.trigger) continue;
+      table.triggerDisabled = !table.triggerDisabled;
+      break;
+    }
+    case 'toggleIndexInclude': {
+      if (!table.index) continue;
+      table.index.include = !table.index.include;
+      break;
+    }
+    case 'toggleViewOption': table.viewSecurityInvoker = !table.viewSecurityInvoker; break;
+    case 'toggleStorage': {
+      const texts = free.filter(c => c.type === 'text' || c.type === 'varchar');
+      if (texts.length === 0) continue;
+      const col = pick(rng, texts);
+      col.storage = col.storage ? undefined : 'external';
+      break;
+    }
+    case 'toggleOverload': v2.overload = !v2.overload; break;
+    case 'changeColumnComment': {
+      if (free.length === 0) continue;
+      const col = pick(rng, free);
+      col.comment = col.comment ? undefined : 'changed';
+      break;
+    }
     }
     applied.push(op);
   }
@@ -264,7 +325,7 @@ function renderSql(schema: Schema): string {
   out.push(`CREATE TYPE gen.mood AS ENUM (${schema.enumValues.map(v => `'${v}'`).join(', ')});`);
   out.push(`CREATE SEQUENCE gen.seq INCREMENT ${schema.seqIncrement};`);
   schema.tables.forEach((table, i) => {
-    const cols = ['  id int PRIMARY KEY'];
+    const cols = [`  id int${table.identity ? ' GENERATED BY DEFAULT AS IDENTITY' : ''} PRIMARY KEY`];
     for (const c of table.columns) {
       cols.push(`  ${c.name} ${c.type}${c.notNull ? ' NOT NULL' : ''}${c.def ? ` DEFAULT ${c.def}` : ''}`);
     }
@@ -272,9 +333,15 @@ function renderSql(schema: Schema): string {
     if (table.fk) cols.push(`  CONSTRAINT ${table.name}_ref_fk FOREIGN KEY (${table.fk.column}) REFERENCES gen.${table.fk.ref} (id)`);
     if (table.check) cols.push(`  CONSTRAINT ${table.name}_${table.check.column}_pos CHECK (${table.check.column} > 0)`);
     if (table.unique) cols.push(`  CONSTRAINT ${table.name}_${table.unique}_key UNIQUE (${table.unique})`);
-    out.push(`CREATE TABLE gen.${table.name} (\n${cols.join(',\n')}\n);`);
+    const withClause = table.fillfactor ? ` WITH (fillfactor = ${table.fillfactor})` : '';
+    out.push(`CREATE ${table.unlogged ? 'UNLOGGED ' : ''}TABLE gen.${table.name} (\n${cols.join(',\n')}\n)${withClause};`);
+    for (const c of table.columns) {
+      if (c.storage) out.push(`ALTER TABLE gen.${table.name} ALTER COLUMN ${c.name} SET STORAGE ${c.storage};`);
+      if (c.comment) out.push(`COMMENT ON COLUMN gen.${table.name}.${c.name} IS '${c.comment}';`);
+    }
     if (table.index) {
-      out.push(`CREATE ${table.index.unique ? 'UNIQUE ' : ''}INDEX ${table.name}_${table.index.column}_idx ON gen.${table.name} (${table.index.column})${table.index.partial ? ' WHERE id > 0' : ''};`);
+      const include = table.index.include ? ' INCLUDE (id)' : '';
+      out.push(`CREATE ${table.index.unique ? 'UNIQUE ' : ''}INDEX ${table.name}_${table.index.column}_idx ON gen.${table.name} (${table.index.column})${include}${table.index.partial ? ' WHERE id > 0' : ''};`);
     }
     if (table.comment) out.push(`COMMENT ON TABLE gen.${table.name} IS '${table.comment}';`);
     if (table.grants.length > 0) out.push(`GRANT ${table.grants.join(', ')} ON gen.${table.name} TO PUBLIC;`);
@@ -282,13 +349,18 @@ function renderSql(schema: Schema): string {
       out.push(`ALTER TABLE gen.${table.name} ENABLE ROW LEVEL SECURITY;`);
       out.push(`CREATE POLICY ${table.name}_read ON gen.${table.name} FOR SELECT USING (true);`);
     }
-    out.push(`CREATE VIEW gen.${table.name}_v AS SELECT id${table.columns.map(c => `, ${c.name}`).join('')} FROM gen.${table.name};`);
+    const viewOptions = table.viewSecurityInvoker ? ' WITH (security_invoker = true)' : '';
+    out.push(`CREATE VIEW gen.${table.name}_v${viewOptions} AS SELECT id${table.columns.map(c => `, ${c.name}`).join('')} FROM gen.${table.name};`);
     if (table.trigger) {
       out.push(`CREATE FUNCTION gen.${table.name}_touch() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;`);
       out.push(`CREATE TRIGGER ${table.name}_touch BEFORE INSERT ON gen.${table.name} FOR EACH ROW EXECUTE FUNCTION gen.${table.name}_touch();`);
+      if (table.triggerDisabled) out.push(`ALTER TABLE gen.${table.name} DISABLE TRIGGER ${table.name}_touch;`);
     }
   });
   out.push(`CREATE FUNCTION gen.total() RETURNS bigint LANGUAGE sql AS $$ SELECT ${schema.fnBody} FROM gen.${schema.tables[0].name} $$;`);
+  if (schema.overload) {
+    out.push(`CREATE FUNCTION gen.total(scale int) RETURNS bigint LANGUAGE sql AS $$ SELECT ${schema.fnBody} * scale FROM gen.${schema.tables[0].name} $$;`);
+  }
   return out.join('\n');
 }
 
@@ -319,7 +391,7 @@ const writeModule = (moduleDir: string, name: string, sql: string) => {
 };
 
 const WS = 'gen-ws';
-const SEEDS = [11, 22, 33, 44, 55, 66, 77, 88];
+const SEEDS = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 122, 133, 144, 155, 166, 177];
 const DIALS: [string, string][] = [
   ['object', 'object'],
   ['atomic', 'alteration'],
