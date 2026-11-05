@@ -326,8 +326,28 @@ const CONSTRAINT_ATTRS: Record<string, Record<string, boolean>> = {
 };
 
 /** Normalize one column constraint to its semantic core (parser-version extras dropped). */
+const IDENTITY_OPTION_DEFAULTS: Record<string, string> = {
+  start: '{"Integer":{"ival":1}}',
+  increment: '{"Integer":{"ival":1}}',
+  minvalue: 'undefined',
+  maxvalue: 'undefined',
+  cache: '{"Integer":{"ival":1}}',
+  cycle: '{"Boolean":{"boolval":false}}'
+};
+
 function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, columnType: unknown): Record<string, unknown> {
   if (c.contype === 'CONSTR_NOTNULL') return { Constraint: { contype: 'CONSTR_NOTNULL' } };
+  if (c.contype === 'CONSTR_IDENTITY') {
+    // pg_dump spells out the backing sequence (SEQUENCE NAME, START 1, ...);
+    // only non-default options are semantic.
+    const options = ((c.options as { DefElem?: { defname?: string; arg?: unknown } }[] | undefined) ?? []).filter(o => {
+      const name = o.DefElem?.defname ?? '';
+      if (name === 'sequence_name') return false;
+      const value = o.DefElem?.arg === undefined ? 'undefined' : JSON.stringify(cleanTree(o.DefElem.arg));
+      return IDENTITY_OPTION_DEFAULTS[name] !== value;
+    });
+    return { Constraint: { contype: 'CONSTR_IDENTITY', generated_when: c.generated_when, options: options.length > 0 ? options : undefined } };
+  }
   if (c.contype === 'CONSTR_DEFAULT') {
     return { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: stripDefaultCasts(c.raw_expr, columnType as any) } };
   }
@@ -383,6 +403,38 @@ function tableShape(unit: ObjectUnit): TableShape {
   const addConstraint = (node: Record<string, unknown>, column?: string): void => {
     constraints.push({ node: node as ConstraintNode & Record<string, unknown>, column });
   };
+  // pg_dump emits column attributes as separate ALTER TABLE commands
+  // (SET DEFAULT nextval(..), SET NOT NULL, ADD GENERATED .. AS IDENTITY);
+  // they fold into the column they qualify.
+  const foldColumnCommand = (at: Record<string, unknown>): boolean => {
+    const target = rawColumns.find(c => c.colname === at.name);
+    if (!target) return false;
+    const list = target.def.constraints as Record<string, unknown>[];
+    const without = (contype: string): Record<string, unknown>[] =>
+      list.filter(item => (item.Constraint as { contype?: string } | undefined)?.contype !== contype);
+    switch (at.subtype) {
+    case 'AT_ColumnDefault':
+      target.def.constraints = at.def === undefined
+        ? without('CONSTR_DEFAULT')
+        : [...without('CONSTR_DEFAULT'), { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: at.def } }];
+      return true;
+    case 'AT_SetNotNull':
+      target.def.constraints = [...without('CONSTR_NOTNULL'), { Constraint: { contype: 'CONSTR_NOTNULL' } }];
+      return true;
+    case 'AT_DropNotNull':
+      target.def.constraints = without('CONSTR_NOTNULL');
+      return true;
+    case 'AT_AddIdentity':
+      target.def.constraints = [...without('CONSTR_IDENTITY'), at.def as Record<string, unknown>];
+      notNullImplied.add(target.colname);
+      return true;
+    case 'AT_DropIdentity':
+      target.def.constraints = without('CONSTR_IDENTITY');
+      return true;
+    default:
+      return false;
+    }
+  };
   const addExtra = (node: unknown): void => {
     const clean = canonicalizeTypes(cleanTree(node));
     shape.extras.set(stablePrint(clean), clean);
@@ -419,7 +471,7 @@ function tableShape(unit: ObjectUnit): TableShape {
             absorbAnnotation(shape.annotations, {
               AlterTableStmt: { relation: stmt.AlterTableStmt.relation, objtype: stmt.AlterTableStmt.objtype, cmds: [cmd] }
             });
-          } else {
+          } else if (!foldColumnCommand(at)) {
             addExtra({ AlterTableCmd: at });
           }
         }
@@ -671,9 +723,12 @@ function diffTable(
         const targetType = Deparser.deparse({ TypeName: toDef.typeName } as any, { pretty: false });
         ctx.destructive.push(`${qualified}: ALTER COLUMN ${name} TYPE ${targetType}${cast !== undefined ? ` USING ${cast}` : ''} (cast may lose data)`);
       }
+      // The inverse always casts back with `col::oldtype`: a user USING
+      // expression is written for the old representation, not the new one.
+      const castBack = { TypeCast: { arg: { ColumnRef: { fields: [{ String: { sval: name } }] } }, typeName: fromDef.typeName } };
       steps.push(attr(name, 'alter',
         retype(toDef, typeChanged ? using(toDef.typeName) : undefined),
-        retype(fromDef, typeChanged ? (cast !== undefined ? using(fromDef.typeName) : { TypeCast: { arg: { ColumnRef: { fields: [{ String: { sval: name } }] } }, typeName: fromDef.typeName } }) : undefined),
+        retype(fromDef, typeChanged ? castBack : undefined),
         typeChanged));
     }
 

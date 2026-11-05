@@ -25,6 +25,14 @@ export interface CatalogSnapshot {
   policies: Record<string, string>;
   rls: Record<string, string>;
   grants: Record<string, string>;
+  /** Enums (labels in order), domains, composite and range types. */
+  types: Record<string, string>;
+  sequences: Record<string, string>;
+  /** Views and materialized views (definition). */
+  views: Record<string, string>;
+  /** COMMENT ON for schemas, relations, columns, functions and types. */
+  comments: Record<string, string>;
+  defaultPrivileges: Record<string, string>;
 }
 
 const SYSTEM_SCHEMAS = `('pg_catalog', 'information_schema', 'pg_toast', 'pgpm_migrate', 'public')`;
@@ -54,7 +62,8 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
 
   const columns = await db.query(`
     SELECT table_schema, table_name, column_name, ordinal_position,
-           data_type, is_nullable, column_default, character_maximum_length
+           data_type, is_nullable, column_default, character_maximum_length,
+           is_identity, identity_generation, is_generated, generation_expression, collation_name
     FROM information_schema.columns
     WHERE table_schema NOT IN ${SYSTEM_SCHEMAS}
   `);
@@ -111,6 +120,63 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     WHERE table_schema NOT IN ${SYSTEM_SCHEMAS}
       AND grantee <> (SELECT current_user)
   `);
+  const types = await db.query(`
+    SELECT n.nspname AS schema, t.typname, t.typtype,
+           CASE t.typtype
+             WHEN 'e' THEN (SELECT string_agg(e.enumlabel, ',' ORDER BY e.enumsortorder) FROM pg_enum e WHERE e.enumtypid = t.oid)
+             WHEN 'd' THEN format_type(t.typbasetype, t.typtypmod) || ' notnull=' || t.typnotnull
+                        || ' default=' || coalesce(t.typdefault, 'none')
+                        || ' checks=' || coalesce((SELECT string_agg(c.conname || ':' || pg_get_constraintdef(c.oid), ';' ORDER BY c.conname) FROM pg_constraint c WHERE c.contypid = t.oid), '')
+             WHEN 'c' THEN (SELECT string_agg(a.attname || ' ' || format_type(a.atttypid, a.atttypmod), ',' ORDER BY a.attnum)
+                            FROM pg_attribute a WHERE a.attrelid = t.typrelid AND a.attnum > 0 AND NOT a.attisdropped)
+             WHEN 'r' THEN (SELECT format_type(r.rngsubtype, NULL) FROM pg_range r WHERE r.rngtypid = t.oid)
+             ELSE ''
+           END AS def
+    FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    LEFT JOIN pg_class cl ON cl.oid = t.typrelid
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
+      AND t.typtype IN ('e', 'd', 'c', 'r')
+      AND (t.typtype <> 'c' OR cl.relkind = 'c')
+      AND NOT EXISTS (SELECT 1 FROM pg_type el WHERE el.typarray = t.oid)
+  `);
+  const sequences = await db.query(`
+    SELECT schemaname, sequencename, data_type, start_value, min_value, max_value, increment_by, cycle, cache_size
+    FROM pg_sequences WHERE schemaname NOT IN ${SYSTEM_SCHEMAS}
+  `);
+  const views = await db.query(`
+    SELECT n.nspname AS schema, cl.relname, cl.relkind, pg_get_viewdef(cl.oid, true) AS def
+    FROM pg_class cl
+    JOIN pg_namespace n ON n.oid = cl.relnamespace
+    WHERE cl.relkind IN ('v', 'm') AND n.nspname NOT IN ${SYSTEM_SCHEMAS}
+  `);
+  const comments = await db.query(`
+    SELECT 'schema' AS kind, n.nspname AS target, obj_description(n.oid, 'pg_namespace') AS comment
+    FROM pg_namespace n WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(n.oid, 'pg_namespace') IS NOT NULL
+    UNION ALL
+    SELECT 'relation', n.nspname || '.' || cl.relname, obj_description(cl.oid, 'pg_class')
+    FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(cl.oid, 'pg_class') IS NOT NULL
+    UNION ALL
+    SELECT 'column', n.nspname || '.' || cl.relname || '.' || a.attname, col_description(cl.oid, a.attnum)
+    FROM pg_attribute a JOIN pg_class cl ON cl.oid = a.attrelid JOIN pg_namespace n ON n.oid = cl.relnamespace
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND a.attnum > 0 AND NOT a.attisdropped AND col_description(cl.oid, a.attnum) IS NOT NULL
+    UNION ALL
+    SELECT 'function', n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', obj_description(p.oid, 'pg_proc')
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(p.oid, 'pg_proc') IS NOT NULL
+    UNION ALL
+    SELECT 'type', n.nspname || '.' || t.typname, obj_description(t.oid, 'pg_type')
+    FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS} AND obj_description(t.oid, 'pg_type') IS NOT NULL
+  `);
+  const defaultPrivileges = await db.query(`
+    SELECT pg_get_userbyid(d.defaclrole) AS role, n.nspname AS schema, d.defaclobjtype AS objtype,
+           array_to_string(d.defaclacl, ',') AS acl
+    FROM pg_default_acl d
+    LEFT JOIN pg_namespace n ON n.oid = d.defaclnamespace
+    WHERE n.nspname IS NULL OR n.nspname NOT IN ${SYSTEM_SCHEMAS}
+  `);
 
   return {
     schemas: record(schemas.rows, r => r.nspname, () => 'schema'),
@@ -119,7 +185,10 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
       columns.rows,
       r => `${r.table_schema}.${r.table_name}.${r.column_name}`,
       r =>
-        `#${r.ordinal_position} ${r.data_type}${r.character_maximum_length ? `(${r.character_maximum_length})` : ''} nullable=${r.is_nullable} default=${r.column_default ?? 'none'}`
+        `#${r.ordinal_position} ${r.data_type}${r.character_maximum_length ? `(${r.character_maximum_length})` : ''} nullable=${r.is_nullable} default=${r.column_default ?? 'none'}` +
+        `${r.is_identity === 'YES' ? ` identity=${r.identity_generation}` : ''}` +
+        `${r.is_generated && r.is_generated !== 'NEVER' ? ` generated=${r.generation_expression}` : ''}` +
+        `${r.collation_name ? ` collate=${r.collation_name}` : ''}`
     ),
     constraints: record(constraints.rows, r => `${r.schema}.${r.table}.${r.conname}`, r => r.def),
     indexes: record(indexes.rows, r => `${r.schemaname}.${r.tablename}.${r.indexname}`, r => r.indexdef),
@@ -140,6 +209,19 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
       grants.rows,
       r => `${r.table_schema}.${r.table_name}:${r.grantee}:${r.privilege_type}`,
       () => 'grant'
+    ),
+    types: record(types.rows, r => `${r.schema}.${r.typname}`, r => `${r.typtype} ${r.def ?? ''}`),
+    sequences: record(
+      sequences.rows,
+      r => `${r.schemaname}.${r.sequencename}`,
+      r => `${r.data_type} start=${r.start_value} min=${r.min_value} max=${r.max_value} inc=${r.increment_by} cycle=${r.cycle} cache=${r.cache_size}`
+    ),
+    views: record(views.rows, r => `${r.schema}.${r.relname}`, r => `${r.relkind} ${r.def}`),
+    comments: record(comments.rows, r => `${r.kind}:${r.target}`, r => r.comment),
+    defaultPrivileges: record(
+      defaultPrivileges.rows,
+      r => `${r.role}:${r.schema ?? ''}:${r.objtype}`,
+      r => r.acl
     )
   };
 };
