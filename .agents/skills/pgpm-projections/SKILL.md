@@ -117,30 +117,52 @@ pgpm diff <A> <B> --verify
   way to keep dependents intact.
 - Every emitted change has deploy, revert, and verify. Steps pgpm cannot
   derive (a DROP it does not know, an inverse that does not exist such as
-  `ALTER TYPE .. ADD VALUE`) are a hard error naming the object; only
-  `--allow-incomplete` emits them, with a `-- pgpm:` marker and a warning.
+  `ALTER TYPE .. ADD VALUE`, an enum value added and used by another step of
+  the same migration — Postgres cannot use it before the adding transaction
+  commits, so deploy with `--no-tx` or split the migration — a composite
+  attribute inserted mid-list, which `ADD ATTRIBUTE` can only append) are a
+  hard error naming the object; only `--allow-incomplete` emits them, with a
+  `-- pgpm:` marker and a warning.
 - Steps that can lose data (DROP TABLE/COLUMN/SCHEMA/SEQUENCE, any column type
   change, a type/domain/sequence that must be dropped and recreated) are a
   hard error listing each step; only `--allow-data-loss` emits them. Renames
   are never inferred from a drop/add pair: `--rename schema.table[.column]=…`
   emits `ALTER .. RENAME` with its inverse (and rebuilds dependents that name
-  the column around it); an undeclared rename is a refused column drop.
+  the column around it); an undeclared rename is a refused column drop. A
+  table rename also renames the constraints (and their indexes) Postgres named
+  after the old table (`old_pkey` → `new_pkey`), rewrites qualified references
+  in views, policies, comments, grants and `regclass` literals, and keeps a
+  changed function body (text Postgres does not rewrite) restorable by folding
+  its inverse into the rename's. A column of a table renamed in the same diff
+  is declared with either name: `--rename app.old=app.new --rename
+  app.old.col=app.new.name`. `--rename` never moves a column to another table
+  or schema.
 - Column attribute changes emit exact ALTERs with exact inverses: `SET/DROP
   DEFAULT`, `SET/DROP NOT NULL`, `ADD/DROP IDENTITY`, `ALTER COLUMN TYPE ..
   USING col::type` (or the `--using` expression; the inverse always casts back
-  with `col::oldtype`), generated-expression changes as DROP + ADD COLUMN
+  with `col::oldtype`; a `--using` value must be one expression, no top-level
+  comma), generated-expression changes as DROP + ADD COLUMN
   (derived data). Column-level `DEFERRABLE` / `INITIALLY DEFERRED` fold into
   their constraint.
 - Objects with dependents alter in place instead of DROP + CREATE: enum values
-  append (`ALTER TYPE .. ADD VALUE`), domains (`ALTER DOMAIN` constraints /
-  default / NOT NULL), sequences (`ALTER SEQUENCE`), composite types (`ADD /
-  DROP / ALTER ATTRIBUTE`). A function whose signature uses a dropped or
+  append (`ALTER TYPE .. ADD VALUE`, `BEFORE`/`AFTER` only a value that already
+  exists), domains (`ALTER DOMAIN` constraints / default / NOT NULL), sequences
+  (`ALTER SEQUENCE`, including the `START` Postgres derives from a dropped
+  `MINVALUE`/`MAXVALUE`), composite types (`ADD / DROP / ALTER ATTRIBUTE`). A function whose signature uses a dropped or
   altered type is dropped and recreated around it (its body is validated
   against the type's current shape in both directions).
 - COMMENT ON, GRANT/REVOKE, OWNER TO and ALTER DEFAULT PRIVILEGES are keyed
   state on their object: the diff emits the exact `COMMENT` / `GRANT` /
   `REVOKE` / `ALTER DEFAULT PRIVILEGES` with the previous state as inverse,
-  never a rebuild of the object.
+  never a rebuild of the object. An explicit `REVOKE .. FROM PUBLIC` is state
+  too: dropping it re-grants only what PUBLIC holds by default (EXECUTE on
+  functions, USAGE on types, CONNECT/TEMPORARY on databases; nothing on
+  tables, sequences or schemas), never `GRANT ALL`, so a table's or schema's
+  dropped revoke emits no GRANT at all; the inverse of an added revoke
+  likewise restores only that default (a comment when there is none). A table rename rewrites
+  `old.col` references only where `old` names the table itself, never another
+  relation's alias; a view/policy rebuilt around a renamed table is dropped
+  under the old name and recreated on revert from its text as written.
 - A module compares equal to the live database it deployed: type spellings
   (`integer`/`int4`, `timestamp with time zone`/`timestamptz`, …), catalog
   default casts (`'a'::app.status`, `nextval('s'::regclass)`, `'x'::text`),

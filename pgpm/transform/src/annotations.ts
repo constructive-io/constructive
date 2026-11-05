@@ -181,11 +181,40 @@ const defaultPrivilegesNode = (isGrant: boolean, options: unknown, objtype: stri
   };
 };
 
-/** Privilege-set delta as GRANT/REVOKE statements with exact inverses. */
+/**
+ * Privileges PUBLIC holds by default (what an explicit REVOKE .. FROM PUBLIC
+ * actually takes away). Per the GRANT docs: none on tables, columns,
+ * sequences, schemas, foreign servers/wrappers, large objects, tablespaces or
+ * parameters; CONNECT and TEMPORARY on databases; EXECUTE on functions and
+ * procedures; USAGE on languages and types (including domains).
+ */
+const PUBLIC_DEFAULT_PRIVILEGES: Record<string, string[]> = {
+  OBJECT_DATABASE: ['connect', 'temporary'],
+  OBJECT_FUNCTION: ['execute'],
+  OBJECT_PROCEDURE: ['execute'],
+  OBJECT_ROUTINE: ['execute'],
+  OBJECT_TYPE: ['usage'],
+  OBJECT_DOMAIN: ['usage'],
+  OBJECT_LANGUAGE: ['usage']
+};
+
+const isPublicRole = (grantee: unknown): boolean =>
+  (grantee as { RoleSpec?: { roletype?: string } } | undefined)?.RoleSpec?.roletype === 'ROLESPEC_PUBLIC';
+
+/**
+ * Privilege-set delta as GRANT/REVOKE statements with exact inverses.
+ * `-token` entries are explicit revocations: adding one is a REVOKE (once, even
+ * when the same token was also held); dropping one only re-grants what the
+ * grantee holds by default (PUBLIC on functions/types/databases), since no
+ * grant existed. The inverse of an added revoke restores exactly that default,
+ * never ALL: a revoke of a privilege nobody held has nothing to put back.
+ */
 function diffPrivileges(
   from: Set<string>,
   to: Set<string>,
-  build: (isGrant: boolean, tokens: string[]) => Node
+  build: (isGrant: boolean, tokens: string[]) => Node,
+  objtype: string,
+  grantee: unknown
 ): AnnotationStep[] {
   const steps: AnnotationStep[] = [];
   const positive = (set: Set<string>): string[] => [...set].filter(t => !t.startsWith('-')).sort();
@@ -196,8 +225,10 @@ function diffPrivileges(
   const revoked = fromPos.filter(t => !toPos.includes(t));
   const fromNeg = negative(from);
   const toNeg = negative(to);
-  const newlyRevoked = toNeg.filter(t => !fromNeg.includes(t));
-  const unrevoked = fromNeg.filter(t => !toNeg.includes(t));
+  const newlyRevoked = toNeg.filter(t => !fromNeg.includes(t) && !revoked.includes(t));
+  const byDefault = isPublicRole(grantee) ? PUBLIC_DEFAULT_PRIVILEGES[objtype] ?? [] : [];
+  const heldByDefault = (tokens: string[]): string[] => tokens.includes('all') ? byDefault : tokens.filter(t => byDefault.includes(t));
+  const unrevoked = heldByDefault(fromNeg.filter(t => !toNeg.includes(t) && !granted.includes(t)));
   if (revoked.length > 0) {
     steps.push({ sql: deparse(build(false, revoked)), inverse: deparse(build(true, revoked)) });
   }
@@ -205,7 +236,11 @@ function diffPrivileges(
     steps.push({ sql: deparse(build(true, granted)), inverse: deparse(build(false, granted)) });
   }
   if (newlyRevoked.length > 0) {
-    steps.push({ sql: deparse(build(false, newlyRevoked)), inverse: deparse(build(true, newlyRevoked)) });
+    const restore = heldByDefault(newlyRevoked);
+    steps.push({
+      sql: deparse(build(false, newlyRevoked)),
+      inverse: restore.length > 0 ? deparse(build(true, restore)) : '-- pgpm: nothing to restore; the grantee held none of these privileges'
+    });
   }
   if (unrevoked.length > 0) {
     steps.push({ sql: deparse(build(true, unrevoked)), inverse: deparse(build(false, unrevoked)) });
@@ -231,7 +266,7 @@ export function diffAnnotations(from: AnnotationState, to: AnnotationState, path
     const prior = from.grants.get(key)?.privs ?? new Set<string>();
     const entry = to.grants.get(key) ?? from.grants.get(key)!;
     const next = to.grants.get(key)?.privs ?? new Set<string>();
-    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee)));
+    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee), entry.objtype, entry.grantee));
   }
 
   for (const key of new Set([...from.defaultPrivileges.keys(), ...to.defaultPrivileges.keys()])) {
@@ -239,7 +274,7 @@ export function diffAnnotations(from: AnnotationState, to: AnnotationState, path
     const entry = to.defaultPrivileges.get(key) ?? from.defaultPrivileges.get(key)!;
     const next = to.defaultPrivileges.get(key)?.privs ?? new Set<string>();
     steps.push(...diffPrivileges(prior, next, (isGrant, tokens) =>
-      defaultPrivilegesNode(isGrant, entry.options, entry.objtype, tokens, entry.grantee)));
+      defaultPrivilegesNode(isGrant, entry.options, entry.objtype, tokens, entry.grantee), entry.objtype, entry.grantee));
   }
 
   for (const key of new Set([...from.owners.keys(), ...to.owners.keys()])) {

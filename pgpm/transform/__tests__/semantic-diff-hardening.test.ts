@@ -7,7 +7,7 @@
  */
 import { loadModule } from 'plpgsql-parser';
 
-import { diffSchemas as diffSchemasTyped, SemanticDiffOptions } from '../src/semantic-diff-driver';
+import { diffSchemas as diffSchemasTyped, parseRenameDeclaration, SemanticDiffOptions } from '../src/semantic-diff-driver';
 
 // Options are typed loosely so this file compiles against the pre-fix driver too.
 const diffSchemas = (from: string, to: string, options?: Record<string, unknown>): ReturnType<typeof diffSchemasTyped> =>
@@ -251,5 +251,182 @@ describe('diffSchemas: module vs dump representations', () => {
     const from = `${S}\nCREATE TYPE app.status AS ENUM ('a');\nCREATE SEQUENCE app.s;\nCREATE TABLE app.t (id bigint PRIMARY KEY DEFAULT nextval('app.s'), s app.status DEFAULT 'a', n text DEFAULT 'x');`;
     const to = `${S}\nCREATE TYPE app.status AS ENUM ('a');\nCREATE SEQUENCE app.s;\nCREATE TABLE app.t (id bigint PRIMARY KEY DEFAULT nextval('app.s'::regclass), s app.status DEFAULT 'a'::app.status, n text DEFAULT 'x'::text);`;
     expect(diffSchemas(from, to).identical).toBe(true);
+  });
+});
+
+describe('diffSchemas: review follow-ups', () => {
+  it('inserts several enum values at the head referencing only labels that exist at that point', () => {
+    const from = `${S}\nCREATE TYPE app.status AS ENUM ('a');`;
+    const to = `${S}\nCREATE TYPE app.status AS ENUM ('x', 'y', 'a');`;
+    const deploy = norm(sql(diffSchemas(from, to, lax), 'deploy'));
+    expect(deploy).toMatch(/ADD VALUE 'x' BEFORE 'a'/);
+    expect(deploy).toMatch(/ADD VALUE 'y' AFTER 'x'/);
+    expect(deploy).not.toMatch(/BEFORE 'y'/);
+  });
+
+  it('names an enum value that is added and used in the same migration (Postgres rejects it in one transaction)', () => {
+    const from = `${S}\nCREATE TYPE app.status AS ENUM ('a');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'a');`;
+    const to = `${S}\nCREATE TYPE app.status AS ENUM ('a', 'c');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'c');`;
+    expect(() => diffSchemas(from, to)).toThrow(/enum value 'c'.*same migration/);
+    const result = diffSchemas(from, to, lax);
+    expect(result.warnings.join('\n')).toMatch(/enum value 'c'.*same migration.*--no-tx/);
+    expect(sql(result, 'deploy')).toMatch(/--no-tx/);
+  });
+
+  it('reports a composite attribute inserted mid-list as incomplete (ADD ATTRIBUTE appends)', () => {
+    const from = `${S}\nCREATE TYPE app.pt AS (a int, b int);`;
+    const to = `${S}\nCREATE TYPE app.pt AS (a int, c int, b int);`;
+    expect(() => diffSchemas(from, to)).toThrow(/app\.pt.*attribute "c".*append/);
+    const result = diffSchemas(from, to, lax);
+    expect(norm(sql(result, 'deploy'))).toMatch(/ALTER TYPE app\.pt ADD ATTRIBUTE c int(eger)?/);
+    expect(norm(sql(result, 'revert'))).toMatch(/ALTER TYPE app\.pt DROP ATTRIBUTE c/);
+    expect(result.warnings.join('\n')).toMatch(/attribute "c".*append/);
+  });
+
+  it('resets a removed MINVALUE/MAXVALUE together with the START it implied', () => {
+    const from = `${S}\nCREATE SEQUENCE app.s MINVALUE 5 MAXVALUE 1000 CACHE 10;`;
+    const to = `${S}\nCREATE SEQUENCE app.s;`;
+    const result = diffSchemas(from, to);
+    expect(result.warnings).toEqual([]);
+    const deploy = norm(sql(result, 'deploy'));
+    const revert = norm(sql(result, 'revert'));
+    expect(deploy).toMatch(/ALTER SEQUENCE app\.s .*NO MINVALUE/);
+    expect(deploy).toMatch(/NO MAXVALUE/);
+    expect(deploy).toMatch(/START (WITH )?1\b/);
+    expect(deploy).toMatch(/CACHE 1\b/);
+    expect(revert).toMatch(/MINVALUE 5/);
+    expect(revert).toMatch(/MAXVALUE 1000/);
+    expect(revert).toMatch(/START (WITH )?5\b/);
+    expect(revert).toMatch(/CACHE 10/);
+  });
+
+  it('rejects a --using expression with a top-level comma or a parse error, naming the flag', () => {
+    const from = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY, code text);`;
+    const to = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY, code int);`;
+    expect(() => diffSchemas(from, to, { ...lax, casts: { 'app.t.code': 'code::int, id' } })).toThrow(/--using.*single expression/);
+    expect(() => diffSchemas(from, to, { ...lax, casts: { 'app.t.code': 'nullif(code' } })).toThrow(/--using.*could not be parsed/);
+    const ok = diffSchemas(from, to, { ...lax, casts: { 'app.t.code': "nullif(code, '')::int" } });
+    expect(norm(sql(ok, 'deploy'))).toMatch(/USING .*nullif ?\(code, ''\).*int/i);
+  });
+
+  it('does not re-grant when an explicit REVOKE ALL FROM PUBLIC disappears on an object PUBLIC has no default rights to', () => {
+    const from = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY);\nREVOKE ALL ON TABLE app.t FROM PUBLIC;\nCREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;\nREVOKE ALL ON FUNCTION app.f() FROM PUBLIC;`;
+    const to = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY);\nCREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;`;
+    const result = diffSchemas(from, to);
+    const deploy = norm(sql(result, 'deploy'));
+    expect(deploy).not.toMatch(/GRANT ALL ON (TABLE )?app\.t/);
+    expect(deploy).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(deploy).not.toMatch(/GRANT ALL/);
+    expect(norm(sql(result, 'revert'))).toMatch(/REVOKE EXECUTE ON FUNCTION app\.f\(\) FROM PUBLIC/);
+    // The other direction (adding the explicit revoke) is one REVOKE per object, not two.
+    const back = diffSchemas(to, from);
+    const backDeploy = norm(sql(back, 'deploy'));
+    expect(backDeploy.match(/REVOKE ALL ON (TABLE )?app\.t FROM PUBLIC/g)).toHaveLength(1);
+    expect(backDeploy.match(/REVOKE ALL ON FUNCTION app\.f\(\) FROM PUBLIC/g)).toHaveLength(1);
+  });
+
+  it('restores only what PUBLIC holds by default around an explicit revoke: EXECUTE on functions, CONNECT/TEMPORARY on databases, nothing on schemas', () => {
+    const from = `${S}\nCREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;`;
+    const to = `${from}\nREVOKE ALL ON SCHEMA app FROM PUBLIC;\nREVOKE ALL ON FUNCTION app.f() FROM PUBLIC;\nREVOKE ALL ON DATABASE mydb FROM PUBLIC;`;
+    const added = diffSchemas(from, to);
+    const deploy = norm(sql(added, 'deploy'));
+    expect(deploy).toMatch(/REVOKE ALL ON SCHEMA app FROM PUBLIC/);
+    expect(deploy).toMatch(/REVOKE ALL ON FUNCTION app\.f\(\) FROM PUBLIC/);
+    expect(deploy).toMatch(/REVOKE ALL ON DATABASE mydb FROM PUBLIC/);
+    const revert = norm(sql(added, 'revert'));
+    expect(revert).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(revert).toMatch(/GRANT CONNECT, TEMPORARY ON DATABASE mydb TO PUBLIC/);
+    expect(revert).not.toMatch(/GRANT ALL/);
+    expect(revert).not.toMatch(/ON SCHEMA app TO PUBLIC/);
+    const dropped = norm(sql(diffSchemas(to, from), 'deploy'));
+    expect(dropped).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(dropped).toMatch(/GRANT CONNECT, TEMPORARY ON DATABASE mydb TO PUBLIC/);
+    expect(dropped).not.toMatch(/GRANT ALL/);
+    expect(dropped).not.toMatch(/SCHEMA app/);
+  });
+
+  it('emits a single REVOKE when a grant is replaced by an explicit revoke', () => {
+    const from = `${S}\nCREATE ROLE app_user;\nCREATE TABLE app.t (id int PRIMARY KEY);\nGRANT SELECT ON TABLE app.t TO app_user;`;
+    const to = `${S}\nCREATE ROLE app_user;\nCREATE TABLE app.t (id int PRIMARY KEY);\nREVOKE SELECT ON TABLE app.t FROM app_user;`;
+    const deploy = norm(sql(diffSchemas(from, to), 'deploy'));
+    expect(deploy.match(/REVOKE SELECT ON (TABLE )?app\.t FROM app_user/g)).toHaveLength(1);
+    expect(deploy).not.toMatch(/GRANT/);
+  });
+
+  it('renames a column on a table renamed in the same diff (declared with either table name)', () => {
+    const from = `${S}\nCREATE TABLE app.old (id int PRIMARY KEY, col text);`;
+    const to = `${S}\nCREATE TABLE app.new (id int PRIMARY KEY, name text);`;
+    for (const columnSpec of ['app.old.col=app.new.name', 'app.old.col=app.old.name']) {
+      const result = diffSchemas(from, to, { renames: ['app.old=app.new', columnSpec].map(parseRenameDeclaration) });
+      const deploy = norm(sql(result, 'deploy'));
+      expect(deploy).toMatch(/ALTER TABLE app\.old RENAME TO new/);
+      expect(deploy).toMatch(/ALTER TABLE app\.new RENAME (COLUMN )?col TO name/);
+      expect(deploy).not.toMatch(/DROP COLUMN/);
+      const revert = norm(sql(result, 'revert'));
+      expect(revert).toMatch(/ALTER TABLE app\.new RENAME (COLUMN )?name TO col/);
+      expect(revert).toMatch(/ALTER TABLE app\.new RENAME TO old/);
+    }
+    expect(() => diffSchemas(from, to, { renames: ['app.old=app.new', 'app.old.col=app.other.name'].map(parseRenameDeclaration) })).toThrow(/cannot move/);
+  });
+
+  it('follows a table rename through comments, grants, views, policies and function bodies', () => {
+    const body = (t: string) => [
+      S,
+      `CREATE TABLE app.${t} (id int PRIMARY KEY, col text);`,
+      `COMMENT ON TABLE app.${t} IS 'the table';`,
+      `COMMENT ON COLUMN app.${t}.col IS 'the col';`,
+      `GRANT SELECT ON TABLE app.${t} TO PUBLIC;`,
+      `ALTER TABLE app.${t} ENABLE ROW LEVEL SECURITY;`,
+      `CREATE POLICY p ON app.${t} FOR SELECT USING (true);`,
+      `CREATE VIEW app.v AS SELECT ${t}.id, ${t}.col FROM app.${t};`,
+      `CREATE FUNCTION app.f() RETURNS bigint LANGUAGE sql AS $$ SELECT count(*) FROM app.${t} $$;`
+    ].join('\n');
+    const result = diffSchemas(body('old'), body('new'), { renames: [parseRenameDeclaration('app.old=app.new')] });
+    expect(result.warnings).toEqual([]);
+    const deploy = norm(sql(result, 'deploy'));
+    expect(deploy).toMatch(/ALTER TABLE app\.old RENAME TO new/);
+    expect(deploy).toMatch(/CREATE OR REPLACE FUNCTION app\.f\(\)/);
+    expect(deploy).toMatch(/FROM app\.new/);
+    expect(deploy).not.toMatch(/COMMENT ON/);
+    expect(deploy).not.toMatch(/REVOKE|GRANT/);
+    expect(deploy).not.toMatch(/DROP VIEW|CREATE (OR REPLACE )?VIEW/);
+    expect(deploy).not.toMatch(/POLICY/);
+  });
+
+  it('rebuilds a view around a breaking change on a renamed table and reverts it in order with its original text', () => {
+    const from = `${S}\nCREATE TABLE app.old (id int PRIMARY KEY, col text);\nCREATE VIEW app.v AS SELECT old.id, old.col FROM app.old;`;
+    const to = `${S}\nCREATE TABLE app.new (id int PRIMARY KEY, col int);\nCREATE VIEW app.v AS SELECT new.id, new.col FROM app.new;`;
+    const result = diffSchemas(from, to, { allowDataLoss: true, renames: [parseRenameDeclaration('app.old=app.new')] });
+    const create = result.changes.find(c => /CREATE VIEW/.test(c.deploy))!;
+    expect(norm(create.revert)).toMatch(/DROP VIEW app\.v/);
+    const drop = result.changes.find(c => /DROP VIEW/.test(c.deploy))!;
+    expect(norm(drop.revert)).toMatch(/CREATE VIEW app\.v AS SELECT old\.id, old\.col FROM app\.old/);
+    const rename = result.changes.find(c => /RENAME TO new/.test(c.deploy))!;
+    expect(rename.revert).not.toMatch(/VIEW/);
+    const revert = norm([...result.changes].reverse().map(c => c.revert).join('\n'));
+    expect(revert.indexOf('DROP VIEW app.v')).toBeLessThan(revert.indexOf('TYPE text'));
+    expect(revert.indexOf('RENAME TO old')).toBeLessThan(revert.indexOf('CREATE VIEW app.v'));
+  });
+
+  it('leaves a table alias that happens to be named like the renamed table alone', () => {
+    const body = (t: string) => [
+      S,
+      `CREATE TABLE app.${t} (id int PRIMARY KEY);`,
+      'CREATE TABLE app.other (id int PRIMARY KEY, n int);',
+      'CREATE VIEW app.v AS SELECT old.id, old.n FROM app.other AS old;'
+    ].join('\n');
+    const result = diffSchemas(body('old'), body('new'), { renames: [parseRenameDeclaration('app.old=app.new')] });
+    expect(norm(sql(result, 'deploy'))).toMatch(/ALTER TABLE app\.old RENAME TO new/);
+    expect(sql(result, 'deploy')).not.toMatch(/VIEW/);
+    expect(sql(result, 'revert')).not.toMatch(/VIEW/);
+  });
+
+  it('orders a consumer of a new enum value after the ADD VALUE that introduces it', () => {
+    const from = `${S}\nCREATE TYPE app.status AS ENUM ('a', 'b');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'a');`;
+    const to = `${S}\nCREATE TYPE app.status AS ENUM ('a', 'b', 'c');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'c');`;
+    const result = diffSchemas(from, to, { allowIncomplete: true });
+    const added = result.changes.find(c => /ADD VALUE 'c'/.test(c.deploy))!;
+    const consumer = result.changes.find(c => /SET DEFAULT 'c'/.test(c.deploy))!;
+    expect(consumer.dependencies).toContain(added.name);
   });
 });
