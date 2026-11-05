@@ -63,7 +63,7 @@ pgpm import schema/schema.sql --pkg blog-part --partition schema/partition.json 
 pgpm import schema/schema-v2.sql --pkg blog-v2 --out ./out
 pgpm diff ./out/blog ./out/blog-v2 \
   --emit-migration ./out --pkg blog-migration \
-  --emit-sql ./out/migration.sql
+  --emit-sql ./out/migration.sql --allow-data-loss   # v2 drops posts.word_count
 
 # 5. Prove a projection is lossless against a real catalog (needs Postgres)
 cd out/blog

@@ -68,6 +68,13 @@ pgpm diff <A> <B> --emit-migration ./out --pkg my-migration \
   --granularity atomic --change-granularity alteration \
   --emit-sql ./out/migration.sql --emit-bundle ./out/migration.tar.gz
 
+# declared renames (never inferred), USING casts, and the explicit opt-ins the
+# diff needs before it will emit data loss or steps it cannot invert
+pgpm diff <A> <B> --emit-migration ./out \
+  --rename app.users.nm=app.users.name --rename app.old=app.new \
+  --using app.users.code="nullif(code,'')::int" \
+  --allow-data-loss --allow-incomplete
+
 # append the delta into an existing module's plan instead of a new package
 pgpm diff <A> <B> --append-module ./existing-module
 
@@ -108,9 +115,52 @@ pgpm diff <A> <B> --verify
   REPLACE` (see `sql-create-or-replace-syntax`); this is the one place it is
   emitted, and only because a same-signature replacement is the deterministic
   way to keep dependents intact.
-- Every emitted change has deploy, revert, and verify; non-derivable reverts
-  get a `-- revert not derivable` comment plus a warning, never silence.
+- Every emitted change has deploy, revert, and verify. Steps pgpm cannot
+  derive (a DROP it does not know, an inverse that does not exist such as
+  `ALTER TYPE .. ADD VALUE`) are a hard error naming the object; only
+  `--allow-incomplete` emits them, with a `-- pgpm:` marker and a warning.
+- Steps that can lose data (DROP TABLE/COLUMN/SCHEMA/SEQUENCE, any column type
+  change, a type/domain/sequence that must be dropped and recreated) are a
+  hard error listing each step; only `--allow-data-loss` emits them. Renames
+  are never inferred from a drop/add pair: `--rename schema.table[.column]=…`
+  emits `ALTER .. RENAME` with its inverse (and rebuilds dependents that name
+  the column around it); an undeclared rename is a refused column drop.
+- Column attribute changes emit exact ALTERs with exact inverses: `SET/DROP
+  DEFAULT`, `SET/DROP NOT NULL`, `ADD/DROP IDENTITY`, `ALTER COLUMN TYPE ..
+  USING col::type` (or the `--using` expression; the inverse always casts back
+  with `col::oldtype`), generated-expression changes as DROP + ADD COLUMN
+  (derived data). Column-level `DEFERRABLE` / `INITIALLY DEFERRED` fold into
+  their constraint.
+- Objects with dependents alter in place instead of DROP + CREATE: enum values
+  append (`ALTER TYPE .. ADD VALUE`), domains (`ALTER DOMAIN` constraints /
+  default / NOT NULL), sequences (`ALTER SEQUENCE`), composite types (`ADD /
+  DROP / ALTER ATTRIBUTE`). A function whose signature uses a dropped or
+  altered type is dropped and recreated around it (its body is validated
+  against the type's current shape in both directions).
+- COMMENT ON, GRANT/REVOKE, OWNER TO and ALTER DEFAULT PRIVILEGES are keyed
+  state on their object: the diff emits the exact `COMMENT` / `GRANT` /
+  `REVOKE` / `ALTER DEFAULT PRIVILEGES` with the previous state as inverse,
+  never a rebuild of the object.
+- A module compares equal to the live database it deployed: type spellings
+  (`integer`/`int4`, `timestamp with time zone`/`timestamptz`, …), catalog
+  default casts (`'a'::app.status`, `nextval('s'::regclass)`, `'x'::text`),
+  restated sequence defaults, `WITH NO DATA`, `FOR ROLE <current>` and
+  pg_dump's split `ALTER COLUMN SET DEFAULT / SET NOT NULL / ADD IDENTITY`
+  commands are all representation, not semantics. Known remaining
+  asymmetries: `serial` (the module has no sequence object), `SELECT *`
+  (the catalog stores the expanded list).
+- `CREATE MATERIALIZED VIEW` is identified (`schemas/<s>/views/<v>/view`);
+  `ALTER TABLE .. ADD CONSTRAINT .. NOT VALID` is never folded into `CREATE
+  TABLE` (the catalog would validate it); statements with no identity of their
+  own (`misc/statements` on import) deploy last and require every other change.
+- `pgpm/cli/__tests__/diff-generated-roundtrip.test.ts` is the seeded
+  generator: fixed seeds produce v1/v2 pairs over tables, columns, defaults,
+  constraints, FKs, indexes, views, functions, triggers, policies, grants,
+  enums, sequences and comments; each must migrate v1 (with rows) to the
+  catalog of a fresh v2, verify, and revert to v1 across the dials and emit
+  modes. Add a seed or a mutation kind there before fixing a new class of bug.
 
 Reference example with executable proofs: `examples/pgpm-projections`
 (README + database-free jest suite that runs the real CLI). Live-Postgres
-coverage: `pgpm/cli/__tests__/transform-e2e.test.ts` and `diff-e2e.test.ts`.
+coverage: `pgpm/cli/__tests__/transform-e2e.test.ts`, `diff-e2e.test.ts`,
+`diff-hardening-e2e.test.ts` and `diff-generated-roundtrip.test.ts`.

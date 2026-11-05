@@ -10,10 +10,10 @@
  * byte-identically, so content-addressed hashes are preserved.
  */
 import type { StatementFacts } from '@pgsql/semantics';
-import { classifyStatements } from '@pgsql/semantics';
 import { Deparser, parseSql } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { classifyStatements } from './facts';
 
 /** A statement's location in the source script (byte offsets). */
 export type SqlStatementSpan = StatementFacts['span'];

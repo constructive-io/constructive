@@ -165,7 +165,7 @@ describe('pgpm diff e2e', () => {
 
   it('diffs a module against itself as identical, dial-invariantly', async () => {
     const v1 = loadDiffSideFromDisk(path.join(wsDir, 'diff-v1'));
-    expect(diffChangeSets(v1.changes, v1.changes).identical).toBe(true);
+    expect(diffChangeSets(v1.changes, v1.changes, { allowDataLoss: true }).identical).toBe(true);
 
     await fixture.runTerminalCommands(
       `
@@ -175,14 +175,14 @@ describe('pgpm diff e2e', () => {
       {}
     );
     const consolidated = loadDiffSideFromDisk(path.join(wsDir, 'diff-v1-consolidated'));
-    expect(diffChangeSets(v1.changes, consolidated.changes).identical).toBe(true);
+    expect(diffChangeSets(v1.changes, consolidated.changes, { allowDataLoss: true }).identical).toBe(true);
   });
 
   it('emits a migration that deploys v1 to v2, verifies, and reverts back to v1', async () => {
     await fixture.runTerminalCommands(
       `
       cd ${WS}
-      pgpm diff diff-v1 diff-v2 --emit-migration . --pkg diff-migration
+      pgpm diff diff-v1 diff-v2 --emit-migration . --pkg diff-migration --allow-data-loss
       `,
       {}
     );
@@ -232,7 +232,7 @@ describe('pgpm diff e2e', () => {
     await fixture.runTerminalCommands(
       `
       cd ${WS}
-      pgpm diff diff-v1 diff-v2 --emit-module . --pkg diff-compose --emit-sql migration.sql --emit-bundle migration.bundle.tar.gz
+      pgpm diff diff-v1 diff-v2 --emit-module . --pkg diff-compose --emit-sql migration.sql --emit-bundle migration.bundle.tar.gz --allow-data-loss
       `,
       {}
     );
@@ -264,7 +264,7 @@ describe('pgpm diff e2e', () => {
     await fixture.runTerminalCommands(
       `
       cd ${WS}
-      pgpm diff diff-append diff-v2 --append-module diff-append
+      pgpm diff diff-append diff-v2 --append-module diff-append --allow-data-loss
       `,
       {}
     );
@@ -299,7 +299,7 @@ describe('pgpm diff e2e', () => {
       await fixture.runTerminalCommands(
         `
         cd ${WS}
-        pgpm diff diff-v1 diff-v2 --emit-migration . --pkg ${pkg} --granularity ${granularity}
+        pgpm diff diff-v1 diff-v2 --emit-migration . --pkg ${pkg} --granularity ${granularity} --allow-data-loss
         `,
         {}
       );
@@ -329,7 +329,7 @@ describe('pgpm diff e2e', () => {
     await fixture.runTerminalCommands(
       `
       cd ${WS}
-      pgpm diff diff-v1 diff-v2 --emit-migration . --pkg ${pkg} --granularity atomic --change-granularity alteration
+      pgpm diff diff-v1 diff-v2 --emit-migration . --pkg ${pkg} --granularity atomic --change-granularity alteration --allow-data-loss
       `,
       {}
     );
@@ -355,7 +355,7 @@ describe('pgpm diff e2e', () => {
     await fixture.runTerminalCommands(
       `
       cd ${WS}
-      pgpm diff diff-v1 diff-v2 --verify
+      pgpm diff diff-v1 diff-v2 --verify --allow-data-loss
       `,
       {}
     );
@@ -369,11 +369,11 @@ describe('pgpm diff e2e', () => {
     const v2Module = loadDiffSideFromDisk(path.join(wsDir, 'diff-v2'));
 
     // module-vs-file and module-vs-module agree
-    expect(diffChangeSets(v2Module.changes, v2File.changes).identical).toBe(true);
-    const result = diffChangeSets(v1.changes, v2File.changes);
+    expect(diffChangeSets(v2Module.changes, v2File.changes, { allowDataLoss: true }).identical).toBe(true);
+    const result = diffChangeSets(v1.changes, v2File.changes, { allowDataLoss: true });
     expect(result.identical).toBe(false);
     expect(result.objects.map(o => `${o.delta} ${o.path}`).sort()).toEqual(
-      diffChangeSets(v1.changes, v2Module.changes).objects.map(o => `${o.delta} ${o.path}`).sort()
+      diffChangeSets(v1.changes, v2Module.changes, { allowDataLoss: true }).objects.map(o => `${o.delta} ${o.path}`).sort()
     );
   });
 });
@@ -570,7 +570,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     await fixture.runTerminalCommands(
       `
       cd ${DWS}
-      pgpm diff dep-v1 dep-v2 --emit-migration . --pkg ${pkg} ${dials}
+      pgpm diff dep-v1 dep-v2 --emit-migration . --pkg ${pkg} ${dials} --allow-data-loss
       `,
       {}
     );
@@ -581,7 +581,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
   it('every change requires what it really depends on (graph edges, not a chain)', async () => {
     const v1 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v1'));
     const v2 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v2'));
-    const result = diffChangeSets(v1.changes, v2.changes);
+    const result = diffChangeSets(v1.changes, v2.changes, { allowDataLoss: true });
     const names = result.changes.map(c => c.name);
     const withDeploy = (needle: string) => result.changes.find(c => c.deploy.includes(needle))!;
 
@@ -605,7 +605,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     await fixture.runTerminalCommands(
       `
       cd ${DWS}
-      pgpm diff dep-v1 dep-v2 --emit-sql dep-migration.sql --emit-bundle dep-migration.bundle.tar.gz
+      pgpm diff dep-v1 dep-v2 --emit-sql dep-migration.sql --emit-bundle dep-migration.bundle.tar.gz --allow-data-loss
       `,
       {}
     );
@@ -629,7 +629,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     await fixture.runTerminalCommands(
       `
       cd ${DWS}
-      pgpm diff dep-append dep-v2 --append-module dep-append
+      pgpm diff dep-append dep-v2 --append-module dep-append --allow-data-loss
       `,
       {}
     );
@@ -648,7 +648,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     await fixture.runTerminalCommands(
       `
       cd ${DWS}
-      pgpm diff db:${v1Db.name} db:${v2Db.name} --emit-migration . --pkg dep-dbdiff
+      pgpm diff db:${v1Db.name} db:${v2Db.name} --emit-migration . --pkg dep-dbdiff --allow-data-loss
       `,
       {}
     );
@@ -659,7 +659,7 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     await fixture.runTerminalCommands(
       `
       cd ${DWS}
-      pgpm diff dep-v1 dep-v2 --verify
+      pgpm diff dep-v1 dep-v2 --verify --allow-data-loss
       `,
       {}
     );
@@ -756,7 +756,7 @@ describe('pgpm diff e2e: a column removed together with the constraints on it', 
     await fixture.runTerminalCommands(
       `
       cd ${CWS}
-      pgpm diff col-v1 col-v2 --emit-migration . --pkg ${pkg} ${dials}
+      pgpm diff col-v1 col-v2 --emit-migration . --pkg ${pkg} ${dials} --allow-data-loss
       `,
       {}
     );
@@ -786,7 +786,7 @@ describe('pgpm diff e2e: a column removed together with the constraints on it', 
     await fixture.runTerminalCommands(
       `
       cd ${CWS}
-      pgpm diff col-v1 col-v2 --emit-sql col-migration.sql
+      pgpm diff col-v1 col-v2 --emit-sql col-migration.sql --allow-data-loss
       `,
       {}
     );
@@ -816,7 +816,7 @@ describe('pgpm diff e2e: a column removed together with the constraints on it', 
         fixture.runTerminalCommands(
           `
           cd ${CWS}
-          pgpm diff col-v1 col-v2 --append-module col-target --emit-ledger col-ledger.sql --ledger db:${v1Db.name}
+          pgpm diff col-v1 col-v2 --append-module col-target --emit-ledger col-ledger.sql --ledger db:${v1Db.name} --allow-data-loss
           `,
           {}
         )

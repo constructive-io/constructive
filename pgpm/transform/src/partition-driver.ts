@@ -21,15 +21,17 @@
  * pgpm.plan + deploy trees, feed a bundle, ...).
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { classifyStatements, StatementFacts, StatementKind } from '@pgsql/semantics';
+import { StatementFacts, StatementKind } from '@pgsql/semantics';
 import {
   buildStatementGraph,
-  identityOf,
   ObjectIdentity,
   ObjectIdentityKind
 } from '@pgsql/transform';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { classifyStatements } from './facts';
+import { identityOf } from './facts';
+import { objectKeyOf } from './keys';
 
 /** One deployable unit: an object (by identity) and the statements that build it. */
 export interface PartitionUnit {
@@ -150,7 +152,7 @@ export class PartitionCycleError extends Error {
 }
 
 const identityKey = (id: ObjectIdentity): string =>
-  `${id.kind}\u0000${id.schema ?? ''}\u0000${id.table ?? ''}\u0000${id.name}`;
+  objectKeyOf(id);
 
 const matchField = <T>(value: T, wanted: T | T[] | undefined): boolean => {
   if (wanted === undefined) return true;
