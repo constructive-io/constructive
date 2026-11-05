@@ -164,6 +164,8 @@ interface ObjectUnit {
   /** Statement indexes in source order. */
   statements: number[];
   texts: string[];
+  /** The texts as written on the from side, before a declared rename rewrote them (what a revert recreates). */
+  inverseTexts?: string[];
 }
 
 interface SideProgram {
@@ -1094,6 +1096,19 @@ const objectLabelOf = (id: ObjectIdentity): string => `${id.schema ? `${id.schem
 function renameRelation(texts: string[], schema: string | null, from: string, to: string): string[] {
   const svalOf = (x: unknown): string | undefined => (x as { String?: { sval?: string } })?.String?.sval;
   const schemaMatches = (name: string | undefined | null): boolean => name === undefined || name === null || name === schema;
+  // `old.col` names the relation only where the statement reads `old` itself,
+  // not where `old` is another relation's alias (`FROM app.other AS old`).
+  let qualifiesRelation = false;
+  const scanRelations = (node: unknown, found: { named: boolean; aliased: boolean }): void => {
+    if (Array.isArray(node)) { node.forEach(x => scanRelations(x, found)); return; }
+    if (!node || typeof node !== 'object') return;
+    const rv = node as { relname?: unknown; schemaname?: string; alias?: { aliasname?: string } };
+    if (typeof rv.relname === 'string') {
+      if (rv.alias?.aliasname === from) found.aliased = true;
+      else if (rv.relname === from && schemaMatches(rv.schemaname)) found.named = true;
+    }
+    for (const value of Object.values(node)) scanRelations(value, found);
+  };
   // `[schema?, relation, ...depth trailing names]`
   const renameNames = (items: unknown[], depth: number): unknown[] => {
     const at = items.length - 1 - depth;
@@ -1112,7 +1127,7 @@ function renameRelation(texts: string[], schema: string | null, from: string, to
         out[key] = walk({ ...rv, relname: to });
         continue;
       }
-      if (key === 'ColumnRef') {
+      if (key === 'ColumnRef' && qualifiesRelation) {
         const cr = value as { fields?: unknown[] };
         if (cr.fields && cr.fields.length >= 2) {
           out[key] = { ...cr, fields: renameNames(cr.fields, 1) };
@@ -1148,7 +1163,12 @@ function renameRelation(texts: string[], schema: string | null, from: string, to
   const mentions = new RegExp(`\\b${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
   return texts.map(text => {
     if (!mentions.test(text)) return text;
-    return parseSync(text).sql.stmts.map(st => deparseStmt(walk(st.stmt) as Record<string, unknown>)).join('\n');
+    return parseSync(text).sql.stmts.map(st => {
+      const found = { named: false, aliased: false };
+      scanRelations(st.stmt, found);
+      qualifiesRelation = found.named && !found.aliased;
+      return deparseStmt(walk(st.stmt) as Record<string, unknown>);
+    }).join('\n');
   });
 }
 
@@ -1196,7 +1216,8 @@ export function diffSchemas(
     const renamed: ObjectUnit = {
       identity: { ...unit.identity, name: rename.to },
       statements: unit.statements,
-      texts: renameRelation(unit.texts, rename.schema, rename.from, rename.to)
+      texts: renameRelation(unit.texts, rename.schema, rename.from, rename.to),
+      inverseTexts: unit.inverseTexts ?? unit.texts
     };
     a.units.set(newKey, renamed);
     a.order[a.order.indexOf(oldKey)] = newKey;
@@ -1217,7 +1238,7 @@ export function diffSchemas(
         a.units.delete(key);
         a.order[a.order.indexOf(key)] = movedKey;
       }
-      a.units.set(movedKey, { ...other, identity, texts });
+      a.units.set(movedKey, { ...other, identity, texts, inverseTexts: other.inverseTexts ?? other.texts });
     }
   }
   const columnRenames = new Map<string, Map<string, string>>();
@@ -1326,8 +1347,10 @@ export function diffSchemas(
   const objectLabel = (id: ObjectIdentity): string => `${id.schema ? `${id.schema}.` : ''}${id.name}`;
 
   // Drop + create pair for a unit's statements (replacements, rebuilds, removals).
+  // A drop runs before the alter phase (so before a table rename) and its
+  // inverse after the rename is undone: both speak the from side as written.
   const dropOf = (unit: ObjectUnit, path: string, rank: number): Atom | null => {
-    const recreate = unit.texts.join('\n');
+    const recreate = (unit.inverseTexts ?? unit.texts).join('\n');
     const drop = inverseOf(recreate, path);
     if (!drop.trim() || drop.trim().startsWith('--')) {
       incomplete.push(`${path}: no DROP derivable for kind "${unit.identity.kind}" (${objectLabel(unit.identity)}); drop it manually`);
@@ -1496,8 +1519,9 @@ export function diffSchemas(
     if (signature !== null && signature === functionSignature(pa.definition) && !dependencyChanged) {
       // Same name, parameters and return type: replace in place. Dependents
       // (views, triggers, defaults) keep pointing at the same function.
+      const inverseDefinition = prior.inverseTexts ? splitUnit({ ...prior, texts: prior.inverseTexts }).definition : pa.definition;
       const atom = addAtom({
-        unit: key, name: path, phase: 'create', sql: asReplace(pb.definition), inverse: asReplace(pa.definition),
+        unit: key, name: path, phase: 'create', sql: asReplace(pb.definition), inverse: asReplace(inverseDefinition),
         sub: null, keyColumns: [], breaking: false, rank: toRank * 1000
       });
       track(key, atom);
@@ -1677,9 +1701,12 @@ export function diffSchemas(
     if (!added) continue;
     const users = atoms.filter(x => x !== atom && x.phase !== 'drop' && !/^ALTER TYPE \S+ ADD VALUE /.test(x.sql) && x.sql.includes(added[2]));
     if (users.length === 0) continue;
-    const note = `enum value ${added[2]} of ${added[1]} is added and used in the same migration; Postgres cannot use a new enum value before the transaction that added it commits (deploy with --no-tx, or split the migration)`;
+    const note = `enum value ${added[2].replace(/\s+/g, ' ')} of ${added[1]} is added and used in the same migration; Postgres cannot use a new enum value before the transaction that added it commits (deploy with --no-tx, or split the migration)`;
     incomplete.push(`${atom.name}: ${note}`);
-    for (const user of users) user.sql = `-- pgpm: ${note}\n${user.sql}`;
+    for (const user of users) {
+      user.sql = `-- pgpm: ${note}\n${user.sql}`;
+      user.deps.add(atom.id);
+    }
   }
 
   // ---- policy: refuse data loss / incompleteness unless accepted explicitly.
@@ -1698,14 +1725,17 @@ export function diffSchemas(
   warnings.push(...destructive.map(x => `data loss accepted: ${x}`));
   warnings.push(...incomplete.map(x => `incomplete: ${x}`));
 
-  // A replaced object whose new definition needs the table's new name (function
-  // bodies are text; Postgres does not rewrite them on RENAME) needs its old
-  // definition restored only once the table carries its old name again. The
-  // reverse order would recreate it first, so the rename's inverse restores it.
+  // An object replaced in place whose new definition needs the table's new
+  // name (function bodies are text; Postgres does not rewrite them on RENAME)
+  // needs its old definition restored only once the table carries its old
+  // name again. The reverse order would recreate it first, so the rename's
+  // inverse restores it. A drop/create pair is already ordered: its create's
+  // inverse drops, and the drop's inverse recreates after the rename is undone.
   for (const renameAtom of atoms) {
     if (!renameAtom.rename || renameAtom.sub?.kind !== 'table') continue;
     for (const atom of atoms) {
       if (atom.phase !== 'create' || atom.added || !atom.inverse || !atom.deps.has(renameAtom.id)) continue;
+      if (unitPhase(atom.unit, 'drop').length > 0) continue;
       renameAtom.inverse = `${renameAtom.inverse}\n${atom.inverse}`;
       atom.inverse = '';
     }
