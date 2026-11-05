@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.37.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.6...graphql-server-test@3.37.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
 ## [3.36.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.5...graphql-server-test@3.36.6) (2026-11-04)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.22.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.9...graphile-llm@1.22.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
 ## [1.21.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.8...graphile-llm@1.21.9) (2026-11-04)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.12...@constructive-io/graphql-dev-server@3.23.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
 ## [3.22.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.11...@constructive-io/graphql-dev-server@3.22.12) (2026-11-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-dev-server
