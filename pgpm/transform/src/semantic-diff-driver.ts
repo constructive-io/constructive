@@ -354,6 +354,29 @@ function groupingIdentity(f: StatementFacts): ObjectIdentity | null {
   return identity;
 }
 
+/**
+ * Fold an `ALTER SEQUENCE` (OWNED BY, increment, ...) into the unit's
+ * `CREATE SEQUENCE` node so the sequence compares as one definition whether
+ * its options were authored inline or as a later ALTER. Later options win.
+ */
+function foldSequenceAlter(nodes: Record<string, unknown>[], definition: string[], stmt: Record<string, unknown>): boolean {
+  const alter = stmt.AlterSeqStmt as { options?: { DefElem?: { defname?: string } }[] } | undefined;
+  if (!alter) return false;
+  const at = nodes.findIndex(n => n.CreateSeqStmt);
+  if (at < 0) return false;
+  const create = nodes[at].CreateSeqStmt as { options?: { DefElem?: { defname?: string } }[] };
+  const overridden = new Set((alter.options ?? []).map(o => o.DefElem?.defname));
+  const merged = {
+    CreateSeqStmt: {
+      ...create,
+      options: [...(create.options ?? []).filter(o => !overridden.has(o.DefElem?.defname)), ...(alter.options ?? [])]
+    }
+  };
+  nodes[at] = merged;
+  definition[at] = deparseStmt(merged);
+  return true;
+}
+
 /** Normalized-AST fingerprint of one statement (formatting/position-proof). */
 function fingerprint(text: string): string {
   const parsed = parseSync(text);
@@ -1551,6 +1574,7 @@ export function diffSchemas(
       for (const raw of parseSync(text).sql.stmts) {
         const stmt = raw.stmt as unknown as Record<string, unknown>;
         if (absorbAnnotation(annotations, stmt)) continue;
+        if (foldSequenceAlter(nodes, definition, stmt)) continue;
         definition.push(deparseStmt(stmt));
         nodes.push(stmt);
       }
@@ -1912,6 +1936,21 @@ export function diffSchemas(
       if (other === atom) continue;
       if (m[1] === 'CREATE' && uses.test(other.sql)) other.deps.add(atom.id);
       if (m[1] === 'DROP' && uses.test(other.inverse)) atom.deps.add(other.id);
+    }
+  }
+
+  // `ALTER SEQUENCE .. OWNED BY table.column` names a column: it follows that
+  // column's addition and precedes its drop.
+  const ownedBy = /\bOWNED BY (?:"?([^".\s]+)"?\.)?"?([^".\s]+)"?\."?([^".\s;]+)"?/;
+  for (const atom of atoms) {
+    const m = /^ALTER SEQUENCE\b/.test(atom.sql) ? ownedBy.exec(atom.sql) : null;
+    if (!m) continue;
+    const owner = (x: Atom): boolean =>
+      x.sub?.kind === 'column' && x.sub.table === m[2] && x.sub.name === m[3] && (m[1] === undefined || (x.sub.schema ?? 'public') === m[1]);
+    for (const other of atoms) {
+      if (other === atom || !owner(other)) continue;
+      if (other.phase === 'add') atom.deps.add(other.id);
+      if (other.phase === 'remove' && other.breaking) other.deps.add(atom.id);
     }
   }
 
