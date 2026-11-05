@@ -1004,7 +1004,7 @@ linkIdentity
   | `input` | LinkIdentityInput (required) |
 
 ```typescript
-const result = await db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } }).execute();
+const result = await db.mutation.linkIdentity({ input: { ticket: '<String>' } }).execute();
 ```
 
 ### `db.mutation.mintAccessToken`

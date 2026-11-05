@@ -955,9 +955,7 @@ linkIdentity
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.details` | JSON |
-  | `--input.identifier` | String (required) |
-  | `--input.service` | String (required) |
+  | `--input.ticket` | String (required) |
 
 ### `mint-access-token`
 

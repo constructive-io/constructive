@@ -2135,9 +2135,7 @@ export interface GenerateBackupCodesInput {
 }
 export interface LinkIdentityInput {
   clientMutationId?: string;
-  details?: Record<string, unknown>;
-  identifier: string;
-  service: string;
+  ticket: string;
 }
 export interface MintAccessTokenInput {
   accessTtl?: IntervalInput;
@@ -3828,7 +3826,7 @@ export type GenerateBackupCodesPayloadSelect = {
 };
 export interface LinkIdentityPayload {
   clientMutationId?: string | null;
-  result?: boolean | null;
+  result?: Record<string, unknown> | null;
 }
 export type LinkIdentityPayloadSelect = {
   clientMutationId?: boolean;
