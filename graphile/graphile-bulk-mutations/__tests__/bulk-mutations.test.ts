@@ -283,7 +283,7 @@ describe('Relational inserts', () => {
     }
 
     const result = await query<{
-      bulkCreateOrders: { affectedCount: number; returning: { id: number; customerName: string }[] };
+      bulkCreateOrders: { affectedCount: number; returning: { rowId: number; customerName: string }[] };
     }>({
       query: `
         mutation {
