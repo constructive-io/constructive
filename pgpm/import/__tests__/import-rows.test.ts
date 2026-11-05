@@ -160,4 +160,26 @@ describe('importDumpRows', () => {
     expect(paths).toContain('schemas/app/procedures/touch');
     expect(paths).not.toContain('schemas/app/procedures/touch/procedure');
   });
+
+  it('slices statements by UTF-8 byte offset after non-ASCII text', async () => {
+    const result = await importDumpRows(
+      sourceOf(
+        [
+          '-- owner — the database',
+          'CREATE SCHEMA app;',
+          "COMMENT ON SCHEMA app IS 'café';",
+          'CREATE TABLE app.users (id int PRIMARY KEY);',
+          "COMMENT ON TABLE app.users IS 'users — all of them';"
+        ].join('\n')
+      )
+    );
+    const table = result.rows.find(r => r.deploy === 'schemas/app/tables/users/table')!;
+    expect(table.content).toContain('CREATE TABLE app.users');
+    expect(table.content).toContain("COMMENT ON TABLE app.users IS 'users — all of them'");
+  });
+
+  it('imports a script whose statements all land in misc/', async () => {
+    const result = await importDumpRows(sourceOf('REVOKE CREATE ON SCHEMA public FROM PUBLIC;'));
+    expect(result.rows.map(r => r.deploy)).toEqual([MISC_CHANGE_PATH]);
+  });
 });

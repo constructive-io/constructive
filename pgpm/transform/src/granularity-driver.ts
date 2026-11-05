@@ -162,6 +162,7 @@ export function restructureChanges(
     .map(c => c.deploy.trim())
     .filter(Boolean)
     .join('\n\n');
+  if (!flattened) return { changes: [], warnings: [] };
 
   const restructured = restructureSql(flattened, {
     granularity: options.granularity

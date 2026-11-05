@@ -21,7 +21,17 @@
  */
 import { PgpmRow } from '@pgpmjs/ast';
 import { ObjectIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { ChangeGranularity, classifyStatements, ExportGranularity, loadModule, regenerateScripts, restructureExportRows, StatementFacts } from '@pgpmjs/transform';
+import {
+  ChangeGranularity,
+  classifyStatements,
+  ExportGranularity,
+  loadModule,
+  regenerateScripts,
+  restructureExportRows,
+  sliceStatementBytes,
+  sqlSourceBytes,
+  StatementFacts
+} from '@pgpmjs/transform';
 
 import { copyBlockToInsert, copyTargetOf, DumpSource } from './dump-source';
 
@@ -170,7 +180,8 @@ const reorderChangeStatements = (content: string): string => {
   const riders = facts.filter(f => !isCreate(f));
   const ordered = [...creates, ...riders];
   if (ordered.every((f, i) => f === facts[i])) return content;
-  return ordered.map(f => statementText(content, f)).join('\n\n') + '\n';
+  const contentBytes = sqlSourceBytes(content);
+  return ordered.map(f => statementText(contentBytes, f)).join('\n\n') + '\n';
 };
 
 /**
@@ -185,15 +196,16 @@ const reorderRevertStatements = (content: string): string => {
   const isDrop = (f: StatementFacts): boolean => f.nodeTag.startsWith('Drop');
   const ordered = [...facts.filter(f => !isDrop(f)), ...facts.filter(isDrop)];
   if (ordered.every((f, i) => f === facts[i])) return content;
+  const contentBytes = sqlSourceBytes(content);
   let leftover = content;
   for (const f of facts) {
-    leftover = leftover.replace(content.slice(f.span.start, f.span.start + f.span.len), '');
+    leftover = leftover.replace(sliceStatementBytes(contentBytes, f.span.start, f.span.len), '');
   }
   const notes = leftover
     .split('\n')
     .map(line => line.trim())
     .filter(line => line.startsWith('--'));
-  return [...ordered.map(f => statementText(content, f)), ...notes].join('\n\n') + '\n';
+  return [...ordered.map(f => statementText(contentBytes, f)), ...notes].join('\n\n') + '\n';
 };
 
 const SET_CONFIG = /^SELECT\s+(pg_catalog\.)?set_config\s*\(/i;
@@ -203,8 +215,8 @@ const isPreamble = (facts: StatementFacts, text: string): boolean =>
   facts.nodeTag === 'VariableSetStmt' ||
   (facts.nodeTag === 'SelectStmt' && SET_CONFIG.test(text));
 
-const statementText = (sql: string, facts: StatementFacts): string => {
-  const text = sql.slice(facts.span.start, facts.span.start + facts.span.len).trim();
+const statementText = (sqlBytes: Buffer, facts: StatementFacts): string => {
+  const text = sliceStatementBytes(sqlBytes, facts.span.start, facts.span.len).trim();
   return text.endsWith(';') ? text : `${text};`;
 };
 
@@ -343,6 +355,7 @@ export const importDumpRows = async (
   let skippedData = 0;
 
   const facts = classifyStatements(source.sql);
+  const sourceBytes = sqlSourceBytes(source.sql);
 
   // Main statements (those creating/targeting an object) in dump order, with
   // per-statement rider buckets so riders re-attach right after their host.
@@ -359,7 +372,7 @@ export const importDumpRows = async (
   const ownedSequences: { schema: string | null; name: string; tableKey: string; text: string }[] = [];
 
   for (const f of facts) {
-    const text = statementText(source.sql, f);
+    const text = statementText(sourceBytes, f);
 
     if (isPreamble(f, text)) {
       skippedPreamble++;
