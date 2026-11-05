@@ -315,13 +315,34 @@ describe('diffSchemas: review follow-ups', () => {
     const result = diffSchemas(from, to);
     const deploy = norm(sql(result, 'deploy'));
     expect(deploy).not.toMatch(/GRANT ALL ON (TABLE )?app\.t/);
-    expect(deploy).toMatch(/GRANT ALL ON FUNCTION app\.f\(\) TO PUBLIC/);
-    expect(norm(sql(result, 'revert'))).toMatch(/REVOKE ALL ON FUNCTION app\.f\(\) FROM PUBLIC/);
+    expect(deploy).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(deploy).not.toMatch(/GRANT ALL/);
+    expect(norm(sql(result, 'revert'))).toMatch(/REVOKE EXECUTE ON FUNCTION app\.f\(\) FROM PUBLIC/);
     // The other direction (adding the explicit revoke) is one REVOKE per object, not two.
     const back = diffSchemas(to, from);
     const backDeploy = norm(sql(back, 'deploy'));
     expect(backDeploy.match(/REVOKE ALL ON (TABLE )?app\.t FROM PUBLIC/g)).toHaveLength(1);
     expect(backDeploy.match(/REVOKE ALL ON FUNCTION app\.f\(\) FROM PUBLIC/g)).toHaveLength(1);
+  });
+
+  it('restores only what PUBLIC holds by default around an explicit revoke: EXECUTE on functions, CONNECT/TEMPORARY on databases, nothing on schemas', () => {
+    const from = `${S}\nCREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;`;
+    const to = `${from}\nREVOKE ALL ON SCHEMA app FROM PUBLIC;\nREVOKE ALL ON FUNCTION app.f() FROM PUBLIC;\nREVOKE ALL ON DATABASE mydb FROM PUBLIC;`;
+    const added = diffSchemas(from, to);
+    const deploy = norm(sql(added, 'deploy'));
+    expect(deploy).toMatch(/REVOKE ALL ON SCHEMA app FROM PUBLIC/);
+    expect(deploy).toMatch(/REVOKE ALL ON FUNCTION app\.f\(\) FROM PUBLIC/);
+    expect(deploy).toMatch(/REVOKE ALL ON DATABASE mydb FROM PUBLIC/);
+    const revert = norm(sql(added, 'revert'));
+    expect(revert).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(revert).toMatch(/GRANT CONNECT, TEMPORARY ON DATABASE mydb TO PUBLIC/);
+    expect(revert).not.toMatch(/GRANT ALL/);
+    expect(revert).not.toMatch(/ON SCHEMA app TO PUBLIC/);
+    const dropped = norm(sql(diffSchemas(to, from), 'deploy'));
+    expect(dropped).toMatch(/GRANT EXECUTE ON FUNCTION app\.f\(\) TO PUBLIC/);
+    expect(dropped).toMatch(/GRANT CONNECT, TEMPORARY ON DATABASE mydb TO PUBLIC/);
+    expect(dropped).not.toMatch(/GRANT ALL/);
+    expect(dropped).not.toMatch(/SCHEMA app/);
   });
 
   it('emits a single REVOKE when a grant is replaced by an explicit revoke', () => {

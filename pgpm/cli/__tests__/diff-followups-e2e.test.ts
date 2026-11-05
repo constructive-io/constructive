@@ -87,8 +87,8 @@ const CASES: Case[] = [
     ].join('\n'),
     v2: `CREATE SCHEMA fu; CREATE TABLE fu.t (id int PRIMARY KEY); CREATE FUNCTION fu.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;`,
     flags: '',
-    deployed: [/GRANT ALL ON FUNCTION fu\.f\(\) TO PUBLIC/],
-    notDeployed: [/GRANT ALL ON (TABLE )?fu\.t TO PUBLIC/]
+    deployed: [/GRANT EXECUTE ON FUNCTION fu\.f\(\) TO PUBLIC/],
+    notDeployed: [/GRANT ALL/]
   },
   {
     name: 'rename-table-and-column',
@@ -202,6 +202,37 @@ describe('pgpm diff e2e: review follow-ups', () => {
       expect(back).toEqual((c.revertResidual ?? []).map(re => expect.stringMatching(re)));
     });
   }
+
+  it('an added REVOKE .. FROM PUBLIC reverts to the privileges PUBLIC actually held (none on a schema, EXECUTE on a function)', async () => {
+    const v1 = 'revoke-added-v1';
+    const v2 = 'revoke-added-v2';
+    const base = 'CREATE SCHEMA fu; CREATE FUNCTION fu.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;';
+    writeModule(path.join(wsDir, v1), v1, base);
+    writeModule(path.join(wsDir, v2), v2, `${base} REVOKE ALL ON SCHEMA fu FROM PUBLIC; REVOKE ALL ON FUNCTION fu.f() FROM PUBLIC;`);
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(`
+      cd ${WS}/${v1}
+      pgpm deploy --database ${testDb.name} --package ${v1} --yes
+    `, { database: testDb.name });
+    const acls = async (): Promise<unknown[]> => (await testDb.query(
+      "SELECT n.nspacl::text AS schema_acl, p.proacl::text AS function_acl FROM pg_namespace n JOIN pg_proc p ON p.pronamespace = n.oid WHERE n.nspname = 'fu' AND p.proname = 'f'"
+    )).rows;
+    const before = await acls();
+    await fixture.runTerminalCommands(`
+      cd ${WS}
+      pgpm diff ${v1} ${v2} --emit-migration . --pkg revoke-added-mig
+    `, {});
+    await fixture.runTerminalCommands(`
+      cd ${WS}/revoke-added-mig
+      pgpm deploy --database ${testDb.name} --package revoke-added-mig --yes
+    `, { database: testDb.name });
+    expect(await acls()).not.toEqual(before);
+    await fixture.runTerminalCommands(`
+      cd ${WS}/revoke-added-mig
+      pgpm revert --database ${testDb.name} --package revoke-added-mig --yes --no-recursive
+    `, { database: testDb.name });
+    expect(await acls()).toEqual(before);
+  });
 
   it('an enum value added and used in the same migration is named: Postgres cannot use it before the transaction commits', async () => {
     const v1 = 'enum-used-v1';
