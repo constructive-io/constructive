@@ -371,4 +371,41 @@ describe('diffSchemas: review follow-ups', () => {
     expect(deploy).not.toMatch(/DROP VIEW|CREATE (OR REPLACE )?VIEW/);
     expect(deploy).not.toMatch(/POLICY/);
   });
+
+  it('rebuilds a view around a breaking change on a renamed table and reverts it in order with its original text', () => {
+    const from = `${S}\nCREATE TABLE app.old (id int PRIMARY KEY, col text);\nCREATE VIEW app.v AS SELECT old.id, old.col FROM app.old;`;
+    const to = `${S}\nCREATE TABLE app.new (id int PRIMARY KEY, col int);\nCREATE VIEW app.v AS SELECT new.id, new.col FROM app.new;`;
+    const result = diffSchemas(from, to, { allowDataLoss: true, renames: [parseRenameDeclaration('app.old=app.new')] });
+    const create = result.changes.find(c => /CREATE VIEW/.test(c.deploy))!;
+    expect(norm(create.revert)).toMatch(/DROP VIEW app\.v/);
+    const drop = result.changes.find(c => /DROP VIEW/.test(c.deploy))!;
+    expect(norm(drop.revert)).toMatch(/CREATE VIEW app\.v AS SELECT old\.id, old\.col FROM app\.old/);
+    const rename = result.changes.find(c => /RENAME TO new/.test(c.deploy))!;
+    expect(rename.revert).not.toMatch(/VIEW/);
+    const revert = norm([...result.changes].reverse().map(c => c.revert).join('\n'));
+    expect(revert.indexOf('DROP VIEW app.v')).toBeLessThan(revert.indexOf('TYPE text'));
+    expect(revert.indexOf('RENAME TO old')).toBeLessThan(revert.indexOf('CREATE VIEW app.v'));
+  });
+
+  it('leaves a table alias that happens to be named like the renamed table alone', () => {
+    const body = (t: string) => [
+      S,
+      `CREATE TABLE app.${t} (id int PRIMARY KEY);`,
+      'CREATE TABLE app.other (id int PRIMARY KEY, n int);',
+      'CREATE VIEW app.v AS SELECT old.id, old.n FROM app.other AS old;'
+    ].join('\n');
+    const result = diffSchemas(body('old'), body('new'), { renames: [parseRenameDeclaration('app.old=app.new')] });
+    expect(norm(sql(result, 'deploy'))).toMatch(/ALTER TABLE app\.old RENAME TO new/);
+    expect(sql(result, 'deploy')).not.toMatch(/VIEW/);
+    expect(sql(result, 'revert')).not.toMatch(/VIEW/);
+  });
+
+  it('orders a consumer of a new enum value after the ADD VALUE that introduces it', () => {
+    const from = `${S}\nCREATE TYPE app.status AS ENUM ('a', 'b');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'a');`;
+    const to = `${S}\nCREATE TYPE app.status AS ENUM ('a', 'b', 'c');\nCREATE TABLE app.t (id int PRIMARY KEY, s app.status NOT NULL DEFAULT 'c');`;
+    const result = diffSchemas(from, to, { allowIncomplete: true });
+    const added = result.changes.find(c => /ADD VALUE 'c'/.test(c.deploy))!;
+    const consumer = result.changes.find(c => /SET DEFAULT 'c'/.test(c.deploy))!;
+    expect(consumer.dependencies).toContain(added.name);
+  });
 });

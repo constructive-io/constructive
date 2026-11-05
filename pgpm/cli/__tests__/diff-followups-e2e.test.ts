@@ -120,6 +120,21 @@ const CASES: Case[] = [
     flags: '--rename fu.old=fu.new',
     deployed: [/ALTER TABLE fu\.old RENAME TO new/, /CREATE OR REPLACE FUNCTION fu\.f\(\)/],
     notDeployed: [/COMMENT ON/, /DROP VIEW/, /DROP POLICY/, /REVOKE/]
+  },
+  {
+    name: 'rename-rebuild',
+    v1: 'CREATE SCHEMA fu; CREATE TABLE fu.old (id int PRIMARY KEY, col text); CREATE VIEW fu.v AS SELECT old.id, old.col FROM fu.old;',
+    v2: 'CREATE SCHEMA fu; CREATE TABLE fu.new (id int PRIMARY KEY, col int); CREATE VIEW fu.v AS SELECT new.id, new.col FROM fu.new;',
+    flags: '--rename fu.old=fu.new --allow-data-loss',
+    deployed: [/ALTER TABLE fu\.old RENAME TO new/, /DROP VIEW fu\.v/, /ALTER COLUMN col TYPE int/, /CREATE VIEW fu\.v/]
+  },
+  {
+    name: 'rename-alias',
+    v1: 'CREATE SCHEMA fu; CREATE TABLE fu.old (id int PRIMARY KEY); CREATE TABLE fu.other (id int PRIMARY KEY, n int); CREATE VIEW fu.v AS SELECT old.id, old.n FROM fu.other AS old;',
+    v2: 'CREATE SCHEMA fu; CREATE TABLE fu.new (id int PRIMARY KEY); CREATE TABLE fu.other (id int PRIMARY KEY, n int); CREATE VIEW fu.v AS SELECT old.id, old.n FROM fu.other AS old;',
+    flags: '--rename fu.old=fu.new',
+    deployed: [/ALTER TABLE fu\.old RENAME TO new/],
+    notDeployed: [/VIEW/]
   }
 ];
 
