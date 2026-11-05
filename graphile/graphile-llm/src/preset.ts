@@ -35,7 +35,6 @@
  *       defaultEmbedder: {
  *         provider: 'ollama',
  *         model: 'nomic-embed-text',
- *         baseUrl: 'http://localhost:11434',
  *       },
  *     }),
  *   ],

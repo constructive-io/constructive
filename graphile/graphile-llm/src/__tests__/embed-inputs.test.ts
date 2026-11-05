@@ -357,7 +357,7 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
   it('embeds with the per-database model for both search and create', async () => {
     const reqOptions = {
       constructive: {
-        useLlm: async () => ({ embeddingModel: 'tenant-embed', embeddingBaseUrl: 'http://tenant-ollama:11434' })
+        useLlm: async () => ({ embeddingModel: 'tenant-embed' })
       }
     };
     const search = await h.query(BY_TEXT, { t: 'rent' }, false, reqOptions);
@@ -367,10 +367,7 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     expect(create.errors).toBeUndefined();
     expect(calls).toHaveLength(2);
     for (const call of calls) {
-      expect(call.overrides).toMatchObject({
-        embeddingModel: 'tenant-embed',
-        embeddingBaseUrl: 'http://tenant-ollama:11434'
-      });
+      expect(call.overrides).toMatchObject({ embeddingModel: 'tenant-embed' });
     }
   });
 

@@ -16,14 +16,13 @@
  */
 
 import type { InferenceEntry } from 'agentic-server';
-import { createAgenticServer } from 'agentic-server';
 import { createLlmRagPlugin } from 'graphile-llm';
 import http from 'http';
-import type { AddressInfo } from 'net';
 import path from 'path';
 import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
+import { listen, type Listening, startGateway } from './llm-gateway.shared';
 
 jest.setTimeout(120000);
 
@@ -57,19 +56,6 @@ const VECTORS: Record<string, number[]> = {
 };
 const vectorFor = (text: string) => VECTORS[text] ?? [0.5, 0.5, 0.5];
 const COSINE_METRIC = 'COSINE';
-
-type Listening = { url: string; close: () => Promise<void> };
-
-const listen = (server: http.Server): Promise<Listening> =>
-  new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', () => {
-      const { port } = server.address() as AddressInfo;
-      resolve({
-        url: `http://127.0.0.1:${port}`,
-        close: () => new Promise((done) => server.close(() => done()))
-      });
-    });
-  });
 
 const modelCalls: Array<{ path: string; body: any }> = [];
 /** Statuses the model server answers the next calls with instead of a result. */
@@ -109,15 +95,6 @@ function startModelServer(): Promise<Listening> {
 }
 
 const recorded: InferenceEntry[] = [];
-
-function startGateway(modelUrl: string): Promise<Listening> {
-  const app = createAgenticServer({
-    providerType: 'ollama',
-    providerBaseUrl: modelUrl,
-    inferenceSink: { logInference: (entry) => recorded.push(entry) }
-  });
-  return listen(http.createServer(app));
-}
 
 const NEARBY = `
   query Nearby($where: ArticleFilter!) {
@@ -164,10 +141,8 @@ describe('server-side embeddings are recorded by the gateway', () => {
     'AGENTIC_SERVER_URL',
     'EMBEDDER_PROVIDER',
     'EMBEDDER_MODEL',
-    'EMBEDDER_BASE_URL',
     'CHAT_PROVIDER',
-    'CHAT_MODEL',
-    'CHAT_BASE_URL'
+    'CHAT_MODEL'
   ];
 
   const post = (query: string, variables?: Record<string, unknown>, authenticated = true) => {
@@ -181,12 +156,8 @@ describe('server-side embeddings are recorded by the gateway', () => {
 
   beforeAll(async () => {
     modelServer = await startModelServer();
-    gateway = await startGateway(modelServer.url);
+    gateway = await startGateway(modelServer.url, recorded);
     for (const key of ENV_KEYS) previousEnv[key] = process.env[key];
-    // The gateway is the only model endpoint the server knows; no provider
-    // base URL is given, so a direct call would have nowhere to go.
-    delete process.env.EMBEDDER_BASE_URL;
-    delete process.env.CHAT_BASE_URL;
     process.env.AGENTIC_SERVER_URL = gateway.url;
     process.env.EMBEDDER_PROVIDER = 'ollama';
     process.env.EMBEDDER_MODEL = EMBED_MODEL;

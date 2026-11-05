@@ -859,9 +859,6 @@ importers:
       '@agentic-kit/metering':
         specifier: workspace:^
         version: link:../../agentic/metering/dist
-      '@agentic-kit/ollama':
-        specifier: workspace:*
-        version: link:../../agentic/ollama/dist
       '@constructive-io/llm-env':
         specifier: workspace:^
         version: link:../../packages/llm-env/dist
@@ -899,6 +896,9 @@ importers:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.15
+      agentic-server:
+        specifier: workspace:*
+        version: link:../../agentic/agentic-server/dist
       graphile-connection-filter:
         specifier: workspace:^
         version: link:../graphile-connection-filter/dist

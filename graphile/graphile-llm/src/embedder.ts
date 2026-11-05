@@ -1,41 +1,34 @@
 /**
- * Embedder — pluggable text-to-vector embedding for the Graphile LLM plugin
+ * Embedder — text-to-vector embedding for the Graphile LLM plugin
  *
- * Two routes:
- *
- *   - The metered gateway (`AGENTIC_SERVER_URL`): every embedding is a
- *     `POST /v1/embeddings` carrying the request's identity headers, so the
- *     gateway resolves the upstream provider and records the call. This is the
- *     route a Constructive server uses.
- *   - A provider called directly (Ollama via @agentic-kit/ollama), for a
- *     standalone PostGraphile deployment with no gateway.
+ * Every embedding is a `POST /v1/embeddings` on the metered gateway
+ * (`AGENTIC_SERVER_URL`) carrying the request's identity headers: the gateway
+ * owns the upstream provider and records the call. There is no other route;
+ * configuring an embedder without a gateway fails when the schema is built.
  *
  * Per-request state is read from AsyncLocalStorage (`llmConfigStore`): the
  * identity the gateway attributes the call to, taken from the request's
- * `jwt.claims.*` settings, and model/baseUrl overrides from the database's
+ * `jwt.claims.*` settings, and the model override from the database's
  * `llm_module`. The same embedder function handles every request.
  */
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import { buildIdentityHeaders, type MeteredIdentity, normalizeGatewayUrl } from '@agentic-kit/metering';
-import OllamaClient from '@agentic-kit/ollama';
 
-import { getLlmEnvOptions } from './env';
-import type { EmbedderConfig, EmbedderFunction, EmbeddingResult, LlmModuleData } from './types';
+import { getEnvVars, getLlmEnvOptions } from './env';
+import type { EmbedderConfig, EmbedderFunction, EmbeddingResult } from './types';
 
 // ─── Per-request scope ──────────────────────────────────────────────────────
 
 /**
  * What one request contributes to a model call: who it is for, and the
- * database's own model/baseUrl overrides. The embedder client itself stays
- * the same across requests.
+ * database's own model overrides. The gateway client itself stays the same
+ * across requests.
  */
 export interface LlmRequestScope {
   embeddingModel?: string;
-  embeddingBaseUrl?: string;
   chatModel?: string;
-  chatBaseUrl?: string;
   /** The identity the gateway meters on; absent when the request names no database. */
   identity?: MeteredIdentity;
 }
@@ -83,9 +76,7 @@ export async function resolveRequestScope(graphqlContext: any): Promise<LlmReque
     return {
       ...scope,
       embeddingModel: llm.embeddingModel,
-      embeddingBaseUrl: llm.embeddingBaseUrl,
-      chatModel: llm.chatModel ?? undefined,
-      chatBaseUrl: llm.chatBaseUrl ?? undefined
+      chatModel: llm.chatModel ?? undefined
     };
   } catch {
     return scope;
@@ -112,45 +103,7 @@ export function gatewayHeaders(provider: string): Record<string, string> {
   };
 }
 
-// ─── Client cache ───────────────────────────────────────────────────────────
-
-/** Cache OllamaClient instances by baseUrl to avoid re-creation per request */
-const ollamaClientCache = new Map<string, OllamaClient>();
-
-function getOllamaClient(baseUrl: string): OllamaClient {
-  let client = ollamaClientCache.get(baseUrl);
-  if (!client) {
-    client = new OllamaClient(baseUrl);
-    ollamaClientCache.set(baseUrl, client);
-  }
-  return client;
-}
-
-// ─── Built-in Providers ─────────────────────────────────────────────────────
-
-/**
- * Create an Ollama-based embedder function.
- *
- * At call time, checks `llmConfigStore` for per-request model/baseUrl
- * overrides. Falls back to the defaults passed at creation time.
- * Client instances are cached by baseUrl — no new objects per request.
- */
-function createOllamaEmbedder(
-  defaultBaseUrl: string = 'http://localhost:11434',
-  defaultModel: string = 'nomic-embed-text'
-): EmbedderFunction {
-  // Pre-cache the default client
-  const defaultClient = getOllamaClient(defaultBaseUrl);
-
-  return async (text: string): Promise<EmbeddingResult> => {
-    const overrides = llmConfigStore.getStore();
-    const model = overrides?.embeddingModel ?? defaultModel;
-    const baseUrl = overrides?.embeddingBaseUrl ?? defaultBaseUrl;
-    const client = baseUrl === defaultBaseUrl ? defaultClient : getOllamaClient(baseUrl);
-
-    return client.generateEmbedding(text, model);
-  };
-}
+// ─── Gateway client ─────────────────────────────────────────────────────────
 
 interface GatewayEmbeddingsResponse {
   data?: Array<{ embedding: number[] }>;
@@ -192,50 +145,49 @@ export function createGatewayEmbedder(
 // ─── Embedder Construction ──────────────────────────────────────────────────
 
 /**
- * Build an embedder function from a config object.
- *
- * @returns An EmbedderFunction, or null if the provider is not recognized
+ * The gateway every model call goes through. Configuring a model without one
+ * would mean unrecorded calls, so it is refused when the schema is built
+ * rather than discovered later as a missing record.
  */
-export function buildEmbedder(config: EmbedderConfig): EmbedderFunction | null {
-  switch (config.provider) {
-  case 'ollama':
-    return createOllamaEmbedder(config.baseUrl, config.model);
-    // Future: 'openai', 'anthropic', 'custom'
-  default:
-    return null;
+export function requireGatewayUrl(what: string): string {
+  const { gateway } = getLlmEnvOptions();
+  if (!gateway.url) {
+    throw new Error(
+      `graphile-llm: ${what} is configured but AGENTIC_SERVER_URL is not set. ` +
+        'Server-side model calls go through the agentic-server gateway, which records each one; ' +
+        'set AGENTIC_SERVER_URL to the gateway root.'
+    );
   }
+  return gateway.url;
 }
 
-// ─── Resolution from LLM Module ─────────────────────────────────────────────
-
 /**
- * Build an embedder from an `llm_module` row.
- *
- * @param data - The llm_module data from metaschema_modules_public.llm_module
- * @returns An EmbedderFunction, or null if the provider is not supported
+ * Build an embedder from a config object: the gateway client for the named
+ * provider and model. Throws when no gateway is configured.
  */
-export function buildEmbedderFromModule(data: LlmModuleData): EmbedderFunction | null {
-  return buildEmbedder({
-    provider: data.embedding_provider,
-    model: data.embedding_model,
-    baseUrl: data.embedding_base_url
-  });
+export function buildEmbedder(config: EmbedderConfig): EmbedderFunction {
+  const gatewayUrl = requireGatewayUrl(`an embedder (${config.provider})`);
+  return createGatewayEmbedder(gatewayUrl, config.model ?? getLlmEnvOptions().embedding.model, config.provider);
 }
 
 /**
  * Resolve an embedder from environment variables.
  *
- * With `AGENTIC_SERVER_URL` set, embeddings go through the metered gateway
- * and `EMBEDDER_PROVIDER` names the upstream dialect the gateway should use.
- * Otherwise the provider is called directly:
- *   EMBEDDER_PROVIDER  - Provider name (default: 'ollama')
+ *   AGENTIC_SERVER_URL - The gateway root; with it set, an embedder is always
+ *                        available (the gateway resolves the upstream).
+ *   EMBEDDER_PROVIDER  - Upstream dialect the gateway should use (default: 'ollama')
  *   EMBEDDER_MODEL     - Model identifier (default: 'nomic-embed-text')
- *   EMBEDDER_BASE_URL  - Provider base URL (default: 'http://localhost:11434')
+ *
+ * Naming a provider or model without a gateway throws; naming nothing at all
+ * leaves text fields disabled.
  */
 export function buildEmbedderFromEnv(): EmbedderFunction | null {
   const { embedding, gateway } = getLlmEnvOptions();
   if (gateway.url) {
     return createGatewayEmbedder(gateway.url, embedding.model, embedding.provider);
   }
-  return buildEmbedder(embedding);
+  if (getEnvVars().embedding) {
+    requireGatewayUrl('EMBEDDER_PROVIDER / EMBEDDER_MODEL');
+  }
+  return null;
 }

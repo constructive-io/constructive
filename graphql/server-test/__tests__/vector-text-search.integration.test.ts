@@ -13,11 +13,11 @@
  */
 
 import http from 'http';
-import type { AddressInfo } from 'net';
 import path from 'path';
 import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
+import { listen, type Listening, startGateway } from './llm-gateway.shared';
 
 jest.setTimeout(120000);
 
@@ -45,7 +45,7 @@ const COSINE_METRIC = 'COSINE';
 
 const embedCalls: string[] = [];
 
-function startEmbedder(): Promise<{ url: string; close: () => Promise<void> }> {
+function startEmbedder(): Promise<Listening> {
   const server = http.createServer((req, res) => {
     let body = '';
     req.on('data', (chunk) => (body += chunk));
@@ -60,15 +60,7 @@ function startEmbedder(): Promise<{ url: string; close: () => Promise<void> }> {
       res.end(JSON.stringify({ embeddings: [vectorFor(input)], prompt_eval_count: 1 }));
     });
   });
-  return new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', () => {
-      const { port } = server.address() as AddressInfo;
-      resolve({
-        url: `http://127.0.0.1:${port}`,
-        close: () => new Promise((done) => server.close(() => done()))
-      });
-    });
-  });
+  return listen(server);
 }
 
 const INPUT_FIELDS = `
@@ -95,7 +87,8 @@ type Node = { title: string; embeddingVectorDistance: number | null };
 describe('VectorNearbyInput over HTTP: vector or text', () => {
   let request: supertest.Agent;
   let teardown: () => Promise<void>;
-  let embedder: { url: string; close: () => Promise<void> };
+  let embedder: Listening;
+  let gateway: Listening;
   const previousEnv: Record<string, string | undefined> = {};
 
   const post = (query: string, variables?: Record<string, unknown>) =>
@@ -107,12 +100,13 @@ describe('VectorNearbyInput over HTTP: vector or text', () => {
 
   beforeAll(async () => {
     embedder = await startEmbedder();
-    for (const key of ['EMBEDDER_PROVIDER', 'EMBEDDER_MODEL', 'EMBEDDER_BASE_URL']) {
+    gateway = await startGateway(embedder.url);
+    for (const key of ['AGENTIC_SERVER_URL', 'EMBEDDER_PROVIDER', 'EMBEDDER_MODEL']) {
       previousEnv[key] = process.env[key];
     }
+    process.env.AGENTIC_SERVER_URL = gateway.url;
     process.env.EMBEDDER_PROVIDER = 'ollama';
     process.env.EMBEDDER_MODEL = 'test-embed';
-    process.env.EMBEDDER_BASE_URL = embedder.url;
 
     ({ request, teardown } = await getConnections(
       {
@@ -134,6 +128,7 @@ describe('VectorNearbyInput over HTTP: vector or text', () => {
 
   afterAll(async () => {
     if (teardown) await teardown();
+    if (gateway) await gateway.close();
     if (embedder) await embedder.close();
     for (const [key, value] of Object.entries(previousEnv)) {
       if (value === undefined) delete process.env[key];
