@@ -9,6 +9,8 @@ import { graphileCache } from 'graphile-cache';
 import { clearStorageModuleCache } from 'graphile-presigned-url-plugin';
 import { getPgPool } from 'pg-cache';
 
+import { evictServiceKey } from './cache-generation';
+
 
 const log = new Logger('flush');
 
@@ -63,8 +65,7 @@ export const createFlushMiddleware = (
 
     const databaseId = req.databaseId ?? req.api?.databaseId;
     if (databaseId) clearStorageModuleCache(databaseId);
-    graphileCache.delete((req as any).svc_key);
-    svcCache.delete((req as any).svc_key);
+    evictServiceKey((req as any).svc_key);
     res.status(200).send('OK');
   };
 };
@@ -86,10 +87,20 @@ export const flushService = async (
   if (!opts.api.isPublic) {
     graphileCache.forEach((_, k: string) => {
       if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
-        svcCache.delete(k);
+        evictServiceKey(k);
       }
     });
+  }
+
+  // Every entry this database resolved to goes, by the id the entry carries:
+  // a hostname whose row was removed is no longer listed below, and its key
+  // must not outlive the row.
+  const resolved: string[] = [];
+  svcCache.forEach((entry: { databaseId?: string } | undefined, key: string) => {
+    if (entry?.databaseId === databaseId) resolved.push(key);
+  });
+  for (const key of resolved) {
+    evictServiceKey(key);
   }
 
   // The domains plane sits behind member RLS; the login reads it through the
@@ -104,8 +115,7 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
-      svcCache.delete(key);
+      evictServiceKey(key);
     }
   }
 };

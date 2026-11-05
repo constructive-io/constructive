@@ -87,6 +87,28 @@ describe('createFlushMiddleware', () => {
     expect(svcCache.get('tenant.example.com')).toBeUndefined();
   });
 
+  it('drops every host the database resolved to, including one it no longer lists', async () => {
+    svcCache.set('gone.example.com', { databaseId: DATABASE_ID } as any);
+    graphileCache.set('gone.example.com', { cached: true, heapBytes: 1 } as any);
+    svcCache.set('other.example.com', { databaseId: 'other-database' } as any);
+    graphileCache.set('other.example.com', { cached: true, heapBytes: 1 } as any);
+    mockRoutingQuery.mockResolvedValue({ rows: [], rowCount: 0 });
+    const server = Object.create(Server.prototype) as Server;
+    Object.assign(server, { opts: { api: { isPublic: true } } });
+    try {
+      await server.flush(DATABASE_ID);
+      expect(svcCache.get('gone.example.com')).toBeUndefined();
+      expect(graphileCache.get('gone.example.com')).toBeUndefined();
+      expect(svcCache.get('other.example.com')).toBeDefined();
+      expect(graphileCache.get('other.example.com')).toBeDefined();
+    } finally {
+      for (const key of ['gone.example.com', 'other.example.com']) {
+        svcCache.delete(key);
+        graphileCache.delete(key);
+      }
+    }
+  });
+
   it.each([
     ['no authorization header', undefined],
     ['a wrong token', 'Bearer nope'],

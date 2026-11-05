@@ -8,8 +8,13 @@ jest.mock('graphile-cache', () => ({
   cacheGraphileInstance: mockCacheGraphileInstance,
   createGraphileInstance: mockCreateGraphileInstance,
   graphileCache: {
-    get: mockCacheGet
+    get: mockCacheGet,
+    delete: jest.fn()
   }
+}));
+
+jest.mock('@pgpmjs/server-utils', () => ({
+  svcCache: { delete: jest.fn() }
 }));
 
 jest.mock('graphile-settings', () => ({
@@ -23,6 +28,7 @@ jest.mock('../graphile-introspection', () => ({
 
 import type { Request, Response } from 'express';
 
+import { clearGenerations, evictServiceKey } from '../cache-generation';
 import {
   clearInFlightMap,
   getInFlightCount,
@@ -46,6 +52,7 @@ const makeRequest = (): Request =>
 describe('graphile single-flight handler creation', () => {
   beforeEach(() => {
     clearInFlightMap();
+    clearGenerations();
     mockCacheGet.mockReset().mockReturnValue(undefined);
     mockCacheGraphileInstance.mockReset().mockResolvedValue(undefined);
     mockCreateGraphileInstance.mockReset().mockResolvedValue({
@@ -151,6 +158,42 @@ describe('graphile single-flight handler creation', () => {
     for (const [error] of next.mock.calls) {
       expect(error.message).toContain(budgetError.message);
     }
+    expect(getInFlightCount()).toBe(0);
+  });
+
+  it('does not admit a handler whose service was evicted while it was being built', async () => {
+    let releaseBuild!: () => void;
+    const buildReady = new Promise<void>((resolve) => {
+      releaseBuild = resolve;
+    });
+    const handler = jest.fn();
+    const release = jest.fn().mockResolvedValue(undefined);
+    mockCreateGraphileInstance.mockImplementation(async () => {
+      await buildReady;
+      return { handler, pgl: { release } };
+    });
+    mockMakeIntrospectionWiring.mockReturnValue({
+      presets: [],
+      pgService: {},
+      pgScopedIntrospection: { main: true }
+    });
+
+    const middleware = graphile({ graphile: {} } as any);
+    const response = { headersSent: true } as unknown as Response;
+    const next = jest.fn();
+    const pending = middleware(makeRequest(), response, next);
+    await Promise.resolve();
+    expect(getInFlightCount()).toBe(1);
+
+    evictServiceKey('service-key');
+    releaseBuild();
+    await pending;
+
+    expect(mockCacheGraphileInstance).not.toHaveBeenCalled();
+    expect(handler).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next.mock.calls[0][0].message).toContain('invalidated');
     expect(getInFlightCount()).toBe(0);
   });
 });
