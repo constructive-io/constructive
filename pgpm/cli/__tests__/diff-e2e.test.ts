@@ -377,3 +377,291 @@ describe('pgpm diff e2e', () => {
     );
   });
 });
+
+/**
+ * Dependency order across the whole delta. v1 -> v2 covers: objects added on
+ * a NEW column of an existing table (view, index, policy, function), an FK
+ * cycle between a new table and an existing table's new column, a replaced
+ * view that stops using a dropped column, a same-signature function body
+ * change under an existing view, a column type change under an unchanged
+ * view, a dropped table, and a PL/pgSQL body reference to a table created
+ * later (late, must not constrain order).
+ */
+const DEP_V1: ChangeSpec[] = [
+  { name: 'schemas/dep/schema', deploy: 'CREATE SCHEMA dep;' },
+  {
+    name: 'schemas/dep/tables/a/table',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE TABLE dep.a (id int PRIMARY KEY, n int, y int);'
+  },
+  {
+    name: 'schemas/dep/tables/c/table',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE TABLE dep.c (id int PRIMARY KEY);'
+  },
+  {
+    name: 'schemas/dep/views/av/view',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE VIEW dep.av AS SELECT a.id, a.y FROM dep.a a;'
+  },
+  {
+    name: 'schemas/dep/views/nv/view',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE VIEW dep.nv AS SELECT a.n FROM dep.a a;'
+  },
+  {
+    name: 'schemas/dep/procedures/f/procedure',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE FUNCTION dep.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;'
+  },
+  {
+    name: 'schemas/dep/views/fv/view',
+    deps: ['schemas/dep/procedures/f/procedure'],
+    deploy: 'CREATE VIEW dep.fv AS SELECT dep.f() AS v;'
+  }
+];
+
+const DEP_V2: ChangeSpec[] = [
+  { name: 'schemas/dep/schema', deploy: 'CREATE SCHEMA dep;' },
+  {
+    // n: int -> bigint (under unchanged view nv); +x (unique); -y
+    name: 'schemas/dep/tables/a/table',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE TABLE dep.a (id int PRIMARY KEY, n bigint, x int UNIQUE);'
+  },
+  {
+    // new table, FK -> existing table's new column
+    name: 'schemas/dep/tables/b/table',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE TABLE dep.b (id int PRIMARY KEY, a_x int REFERENCES dep.a (x));'
+  },
+  {
+    // existing table gains an FK -> the new table (cycle with the one above)
+    name: 'schemas/dep/tables/a/constraints/a_b_id_fkey/constraint',
+    deps: ['schemas/dep/tables/a/table', 'schemas/dep/tables/b/table'],
+    deploy: 'ALTER TABLE dep.a ADD COLUMN b_id int;\nALTER TABLE dep.a ADD CONSTRAINT a_b_id_fkey FOREIGN KEY (b_id) REFERENCES dep.b (id);'
+  },
+  {
+    // replaced view: stops using y, starts using x
+    name: 'schemas/dep/views/av/view',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE VIEW dep.av AS SELECT a.id, a.x FROM dep.a a;'
+  },
+  {
+    name: 'schemas/dep/views/nv/view',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE VIEW dep.nv AS SELECT a.n FROM dep.a a;'
+  },
+  {
+    // same signature, new body, under existing view fv
+    name: 'schemas/dep/procedures/f/procedure',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE FUNCTION dep.f() RETURNS int LANGUAGE sql AS $$ SELECT 2 $$;'
+  },
+  {
+    name: 'schemas/dep/views/fv/view',
+    deps: ['schemas/dep/procedures/f/procedure'],
+    deploy: 'CREATE VIEW dep.fv AS SELECT dep.f() AS v;'
+  },
+  {
+    name: 'schemas/dep/tables/a/indexes/a_x_idx',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE INDEX a_x_idx ON dep.a (x);'
+  },
+  {
+    name: 'schemas/dep/tables/a/policies/a_read',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'ALTER TABLE dep.a ENABLE ROW LEVEL SECURITY;\nCREATE POLICY a_read ON dep.a FOR SELECT USING (x > 0);'
+  },
+  {
+    name: 'schemas/dep/procedures/sum_x/procedure',
+    deps: ['schemas/dep/tables/a/table'],
+    deploy: 'CREATE FUNCTION dep.sum_x() RETURNS bigint LANGUAGE sql AS $$ SELECT sum(x) FROM dep.a $$;'
+  },
+  {
+    // PL/pgSQL body references dep.late_t, which is created after it
+    name: 'schemas/dep/procedures/count_late/procedure',
+    deps: ['schemas/dep/schema'],
+    deploy:
+      'CREATE FUNCTION dep.count_late() RETURNS bigint LANGUAGE plpgsql AS $$ BEGIN RETURN (SELECT count(*) FROM dep.late_t); END $$;'
+  },
+  {
+    name: 'schemas/dep/tables/late_t/table',
+    deps: ['schemas/dep/schema'],
+    deploy: 'CREATE TABLE dep.late_t (id int PRIMARY KEY);'
+  }
+  // dropped table: dep.c exists only in v1
+];
+
+describe('pgpm diff e2e: dependency order across the whole delta', () => {
+  const DWS = 'dep-ws';
+  let fixture: CLIDeployTestFixture;
+  let wsDir: string;
+  let v1Db: any;
+  let v2Db: any;
+
+  beforeAll(async () => {
+    await loadModule();
+    fixture = new CLIDeployTestFixture();
+    wsDir = path.join(fixture.tempFixtureDir, DWS);
+    fs.mkdirSync(wsDir, { recursive: true });
+    fs.writeFileSync(path.join(wsDir, 'pgpm.json'), '{\n    "packages": [\n        "*"\n    ]\n}');
+    writeModule(path.join(wsDir, 'dep-v1'), 'dep-v1', DEP_V1);
+    writeModule(path.join(wsDir, 'dep-v2'), 'dep-v2', DEP_V2);
+
+    v1Db = await fixture.setupTestDatabase();
+    v2Db = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/dep-v1
+      pgpm deploy --database ${v1Db.name} --package dep-v1 --yes
+      `,
+      { database: v1Db.name }
+    );
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/dep-v2
+      pgpm deploy --database ${v2Db.name} --package dep-v2 --yes
+      `,
+      { database: v2Db.name }
+    );
+  });
+
+  afterAll(async () => {
+    await fixture.cleanup();
+  });
+
+  const expectCatalog = async (db: any, oracle: any) => {
+    const [actual, expected] = await Promise.all([snapshotCatalog(db), snapshotCatalog(oracle)]);
+    expect(diffCatalogSnapshots(withoutColumnOrder(actual), withoutColumnOrder(expected))).toEqual([]);
+  };
+
+  /** Deploy v1 fresh, deploy `pkg` on top (must reach v2), verify it, revert it (must reach v1). */
+  const migrateVerifyRevert = async (pkg: string) => {
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/dep-v1
+      pgpm deploy --database ${testDb.name} --package dep-v1 --yes
+      cd ../${pkg}
+      pgpm deploy --database ${testDb.name} --package ${pkg} --yes
+      `,
+      { database: testDb.name }
+    );
+    await expectCatalog(testDb, v2Db);
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/${pkg}
+      pgpm verify --database ${testDb.name} --package ${pkg} --yes
+      pgpm revert --database ${testDb.name} --package ${pkg} --yes
+      `,
+      { database: testDb.name }
+    );
+    await expectCatalog(testDb, v1Db);
+  };
+
+  it.each([
+    ['dep-mig', ''],
+    ['dep-mig-atomic', '--granularity atomic'],
+    ['dep-mig-consolidated', '--granularity consolidated'],
+    ['dep-mig-alteration', '--granularity atomic --change-granularity alteration'],
+    ['dep-mig-single', '--change-granularity single']
+  ])('%s: the emitted migration deploys v1 to v2, verifies, and reverts to v1 (%s)', async (pkg, dials) => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}
+      pgpm diff dep-v1 dep-v2 --emit-migration . --pkg ${pkg} ${dials}
+      `,
+      {}
+    );
+    expect(fs.existsSync(path.join(wsDir, pkg, 'pgpm.plan'))).toBe(true);
+    await migrateVerifyRevert(pkg);
+  });
+
+  it('every change requires what it really depends on (graph edges, not a chain)', async () => {
+    const v1 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v1'));
+    const v2 = loadDiffSideFromDisk(path.join(wsDir, 'dep-v2'));
+    const result = diffChangeSets(v1.changes, v2.changes);
+    const names = result.changes.map(c => c.name);
+    const withDeploy = (needle: string) => result.changes.find(c => c.deploy.includes(needle))!;
+
+    const addX = withDeploy('ADD COLUMN x');
+    for (const needle of ['CREATE VIEW dep.av', 'CREATE INDEX a_x_idx', 'CREATE POLICY a_read', 'CREATE FUNCTION dep.sum_x']) {
+      const dependent = withDeploy(needle);
+      expect(names.indexOf(dependent.name)).toBeGreaterThan(names.indexOf(addX.name));
+      expect(dependent.dependencies).toContain(addX.name);
+    }
+    const b = withDeploy('CREATE TABLE dep.b');
+    const aFk = withDeploy('REFERENCES dep.b');
+    expect(aFk.dependencies).toContain(b.name);
+    const countLate = withDeploy('CREATE FUNCTION dep.count_late');
+    expect(countLate.dependencies).not.toContain(withDeploy('CREATE TABLE dep.late_t').name);
+    // same-signature body change: replace in place, never drop under dep.fv
+    expect(withDeploy('CREATE OR REPLACE FUNCTION dep.f')).toBeDefined();
+    expect(result.changes.some(c => c.deploy.includes('DROP FUNCTION dep.f'))).toBe(false);
+  });
+
+  it('the linear SQL projection applies on v1 and reaches v2', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}
+      pgpm diff dep-v1 dep-v2 --emit-sql dep-migration.sql --emit-bundle dep-migration.bundle.tar.gz
+      `,
+      {}
+    );
+    const sql = fs.readFileSync(path.join(wsDir, 'dep-migration.sql'), 'utf-8');
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/dep-v1
+      pgpm deploy --database ${testDb.name} --package dep-v1 --yes
+      `,
+      { database: testDb.name }
+    );
+    await testDb.query(sql);
+    await expectCatalog(testDb, v2Db);
+    expect(readBundleArchiveFile(path.join(wsDir, 'dep-migration.bundle.tar.gz')).changes.length).toBeGreaterThan(0);
+  });
+
+  it('appends the delta into a v1 module that then fresh-deploys to v2', async () => {
+    const appendDir = path.join(wsDir, 'dep-append');
+    writeModule(appendDir, 'dep-append', DEP_V1);
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}
+      pgpm diff dep-append dep-v2 --append-module dep-append
+      `,
+      {}
+    );
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}/dep-append
+      pgpm deploy --database ${testDb.name} --package dep-append --yes
+      `,
+      { database: testDb.name }
+    );
+    await expectCatalog(testDb, v2Db);
+  });
+
+  it('db-vs-db sources emit the same deployable migration', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}
+      pgpm diff db:${v1Db.name} db:${v2Db.name} --emit-migration . --pkg dep-dbdiff
+      `,
+      {}
+    );
+    await migrateVerifyRevert('dep-dbdiff');
+  });
+
+  it('--verify proves the migration is a catalog-level oracle match', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${DWS}
+      pgpm diff dep-v1 dep-v2 --verify
+      `,
+      {}
+    );
+  });
+});

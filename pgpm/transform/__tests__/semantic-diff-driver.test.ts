@@ -97,12 +97,23 @@ describe('diffSchemas', () => {
     expect(users.columnsRemoved).toEqual(['name']);
   });
 
-  it('recreates modified non-table objects via DROP + CREATE', () => {
+  it('replaces a same-signature function body with CREATE OR REPLACE (dependents keep working)', () => {
     const to = BASE.replace('count(*)', 'count(1)');
     const result = diffSchemas(BASE, to);
 
     const fn = result.objects.find(o => o.path === 'schemas/app/procedures/user_count/procedure')!;
     expect(fn.delta).toBe('modified');
+    const change = result.changes.find(c => c.name === 'schemas/app/procedures/user_count/procedure')!;
+    expect(change.deploy).not.toContain('DROP FUNCTION');
+    expect(change.deploy).toContain('CREATE OR REPLACE FUNCTION app.user_count');
+    expect(change.deploy).toContain('count(1)');
+    expect(change.revert).toContain('CREATE OR REPLACE FUNCTION app.user_count');
+    expect(change.revert).toContain('count(*)');
+  });
+
+  it('recreates a function whose return type changed via DROP + CREATE', () => {
+    const to = BASE.replace('RETURNS bigint', 'RETURNS int').replace('count(*)', 'count(*)::int');
+    const result = diffSchemas(BASE, to);
     const change = result.changes.find(c => c.name === 'schemas/app/procedures/user_count/procedure')!;
     expect(change.deploy).toContain('DROP FUNCTION app.user_count');
     expect(change.deploy).toContain('CREATE FUNCTION app.user_count');
@@ -204,6 +215,169 @@ describe('diffSchemas', () => {
     ]);
     const view = result.changes.find(c => c.name === 'schemas/app/views/active_users/view/drop')!;
     expect(view.deploy).toContain('DROP VIEW app.active_users');
+  });
+});
+
+/** Deploy SQL of all changes in emitted order, for cross-change ordering assertions. */
+const deployScript = (result: ReturnType<typeof diffSchemas>): string =>
+  result.changes.map(c => c.deploy).join('\n');
+const at = (script: string, needle: string): number => {
+  const i = script.indexOf(needle);
+  expect(i).toBeGreaterThanOrEqual(0);
+  return i;
+};
+const changeWith = (result: ReturnType<typeof diffSchemas>, needle: string) => {
+  const c = result.changes.find(x => x.deploy.includes(needle));
+  expect(c).toBeDefined();
+  return c!;
+};
+
+describe('diffSchemas dependency order', () => {
+  const A1 = 'CREATE SCHEMA app;\nCREATE TABLE app.a (id int PRIMARY KEY);';
+
+  it('orders objects added on a NEW column of an existing table after that ALTER, with requires', () => {
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE VIEW app.av AS SELECT a.id, a.x FROM app.a a;',
+      'CREATE INDEX a_x_idx ON app.a (x);',
+      'CREATE POLICY a_read ON app.a FOR SELECT USING (x > 0);',
+      'CREATE FUNCTION app.sum_x() RETURNS bigint LANGUAGE sql AS $$ SELECT sum(x) FROM app.a $$;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, x int);'
+    ].join('\n');
+    const result = diffSchemas(A1, to);
+    const alter = changeWith(result, 'ADD COLUMN x');
+    for (const needle of ['CREATE VIEW app.av', 'CREATE INDEX a_x_idx', 'CREATE POLICY a_read', 'CREATE FUNCTION app.sum_x']) {
+      const dependent = changeWith(result, needle);
+      expect(result.changes.indexOf(dependent)).toBeGreaterThan(result.changes.indexOf(alter));
+      expect(dependent.dependencies).toContain(alter.name);
+    }
+  });
+
+  it('orders an ALTER adding an FK to a NEW table after that table, with requires', () => {
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, b_id int REFERENCES app.b (id));',
+      'CREATE TABLE app.b (id int PRIMARY KEY);'
+    ].join('\n');
+    const result = diffSchemas(A1, to);
+    const b = changeWith(result, 'CREATE TABLE app.b');
+    const fk = changeWith(result, 'REFERENCES app.b');
+    expect(result.changes.indexOf(fk)).toBeGreaterThan(result.changes.indexOf(b));
+    expect(fk.dependencies).toContain(b.name);
+  });
+
+  it('splits constraints to order a new<->modified FK cycle', () => {
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.b (id int PRIMARY KEY, a_x int REFERENCES app.a (x));',
+      'CREATE TABLE app.a (id int PRIMARY KEY, x int UNIQUE, b_id int REFERENCES app.b (id));'
+    ].join('\n');
+    const result = diffSchemas(A1, to);
+    const script = deployScript(result);
+    expect(at(script, 'ADD COLUMN x')).toBeLessThan(at(script, 'REFERENCES app.a'));
+    expect(at(script, 'UNIQUE')).toBeLessThan(at(script, 'REFERENCES app.a'));
+    expect(at(script, 'CREATE TABLE app.b')).toBeLessThan(at(script, 'REFERENCES app.b'));
+  });
+
+  it('drops a replaced view before dropping the column it used, and recreates it after', () => {
+    const from = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, y int);',
+      'CREATE VIEW app.av AS SELECT a.id, a.y FROM app.a a;'
+    ].join('\n');
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY);',
+      'CREATE VIEW app.av AS SELECT a.id FROM app.a a;'
+    ].join('\n');
+    const result = diffSchemas(from, to);
+    const script = deployScript(result);
+    expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'DROP COLUMN y'));
+    expect(at(script, 'DROP COLUMN y')).toBeLessThan(at(script, 'CREATE VIEW app.av'));
+  });
+
+  it('drops a removed view before dropping the column it used', () => {
+    const from = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, y int);',
+      'CREATE VIEW app.av AS SELECT a.id, a.y FROM app.a a;'
+    ].join('\n');
+    const result = diffSchemas(from, A1);
+    const script = deployScript(result);
+    expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'DROP COLUMN y'));
+    const drop = changeWith(result, 'DROP COLUMN y');
+    expect(drop.dependencies).toContain(changeWith(result, 'DROP VIEW app.av').name);
+  });
+
+  it('rebuilds an unchanged view around a column type change it depends on', () => {
+    const from = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, n int);',
+      'CREATE VIEW app.nv AS SELECT a.n FROM app.a a;'
+    ].join('\n');
+    const to = from.replace('n int', 'n bigint');
+    const result = diffSchemas(from, to);
+    const script = deployScript(result);
+    expect(at(script, 'DROP VIEW app.nv')).toBeLessThan(at(script, 'TYPE bigint'));
+    expect(at(script, 'TYPE bigint')).toBeLessThan(at(script, 'CREATE VIEW app.nv'));
+    // the revert undoes the whole sequence back to the `from` shape
+    const revert = [...result.changes].reverse().map(c => c.revert).join('\n');
+    expect(at(revert, 'DROP VIEW app.nv')).toBeLessThan(at(revert, 'TYPE int'));
+    expect(at(revert, 'TYPE int')).toBeLessThan(at(revert, 'CREATE VIEW app.nv'));
+  });
+
+  it('leaves an unchanged view alone when the type change does not touch its columns', () => {
+    const from = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, n int, m int);',
+      'CREATE VIEW app.nv AS SELECT a.n FROM app.a a;'
+    ].join('\n');
+    const result = diffSchemas(from, from.replace('m int', 'm bigint'));
+    expect(deployScript(result)).not.toContain('app.nv');
+  });
+
+  it('does not let PL/pgSQL body references constrain order', () => {
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY);',
+      'CREATE FUNCTION app.count_t() RETURNS bigint LANGUAGE plpgsql AS $$ BEGIN RETURN (SELECT count(*) FROM app.t); END $$;',
+      'CREATE TABLE app.t (id int PRIMARY KEY);'
+    ].join('\n');
+    const result = diffSchemas(A1, to);
+    const fn = changeWith(result, 'CREATE FUNCTION app.count_t');
+    const t = changeWith(result, 'CREATE TABLE app.t');
+    expect(fn.dependencies).not.toContain(t.name);
+    expect(result.changes.indexOf(fn)).toBeLessThan(result.changes.indexOf(t));
+  });
+
+  it('throws on a new<->modified cycle it cannot split', () => {
+    const from = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY);',
+      'CREATE VIEW app.v AS SELECT a.id FROM app.a a;'
+    ].join('\n');
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE TABLE app.a (id int PRIMARY KEY);',
+      'CREATE FUNCTION app.f() RETURNS bigint LANGUAGE sql AS $$ SELECT count(*) FROM app.v $$;',
+      'CREATE VIEW app.v AS SELECT a.id, app.f() AS f FROM app.a a;'
+    ].join('\n');
+    expect(() => diffSchemas(from, to)).toThrow(/cycle/i);
+  });
+
+  it('gives each alteration its own graph-ordered change under changeGranularity alteration', () => {
+    const to = [
+      'CREATE SCHEMA app;',
+      'CREATE VIEW app.av AS SELECT a.id, a.x FROM app.a a;',
+      'CREATE TABLE app.a (id int PRIMARY KEY, x int, y int);'
+    ].join('\n');
+    const result = diffSchemas(A1, to, { changeGranularity: 'alteration' });
+    const x = changeWith(result, 'ADD COLUMN x');
+    const y = changeWith(result, 'ADD COLUMN y');
+    expect(x).not.toBe(y);
+    const view = changeWith(result, 'CREATE VIEW app.av');
+    expect(view.dependencies).toContain(x.name);
+    expect(view.dependencies).not.toContain(y.name);
   });
 });
 
