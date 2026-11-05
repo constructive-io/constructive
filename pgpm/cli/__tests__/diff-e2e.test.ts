@@ -665,3 +665,166 @@ describe('pgpm diff e2e: dependency order across the whole delta', () => {
     );
   });
 });
+
+const COL_V1: ChangeSpec[] = [
+  { name: 'schemas/col/schema', deploy: 'CREATE SCHEMA col;' },
+  {
+    name: 'schemas/col/tables/p/table',
+    deps: ['schemas/col/schema'],
+    deploy: 'CREATE TABLE col.p (id int PRIMARY KEY);'
+  },
+  {
+    name: 'schemas/col/tables/t/table',
+    deps: ['schemas/col/tables/p/table'],
+    deploy: [
+      'CREATE TABLE col.t (',
+      '  id int PRIMARY KEY,',
+      '  a int,',
+      '  b int,',
+      '  CONSTRAINT t_a_check CHECK (a > 0),',
+      '  CONSTRAINT t_a_b_key UNIQUE (a, b),',
+      '  CONSTRAINT t_a_fkey FOREIGN KEY (a) REFERENCES col.p (id)',
+      ');'
+    ].join('\n')
+  }
+];
+
+const COL_V2: ChangeSpec[] = [
+  { name: 'schemas/col/schema', deploy: 'CREATE SCHEMA col;' },
+  {
+    name: 'schemas/col/tables/p/table',
+    deps: ['schemas/col/schema'],
+    deploy: 'CREATE TABLE col.p (id int PRIMARY KEY);'
+  },
+  {
+    name: 'schemas/col/tables/t/table',
+    deps: ['schemas/col/tables/p/table'],
+    deploy: 'CREATE TABLE col.t (id int PRIMARY KEY, b int);'
+  }
+];
+
+describe('pgpm diff e2e: a column removed together with the constraints on it', () => {
+  const CWS = 'col-ws';
+  let fixture: CLIDeployTestFixture;
+  let wsDir: string;
+  let v1Db: any;
+  let v2Db: any;
+
+  beforeAll(async () => {
+    await loadModule();
+    fixture = new CLIDeployTestFixture();
+    wsDir = path.join(fixture.tempFixtureDir, CWS);
+    fs.mkdirSync(wsDir, { recursive: true });
+    fs.writeFileSync(path.join(wsDir, 'pgpm.json'), '{\n    "packages": [\n        "*"\n    ]\n}');
+    writeModule(path.join(wsDir, 'col-v1'), 'col-v1', COL_V1);
+    writeModule(path.join(wsDir, 'col-v2'), 'col-v2', COL_V2);
+
+    v1Db = await fixture.setupTestDatabase();
+    v2Db = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}/col-v1
+      pgpm deploy --database ${v1Db.name} --package col-v1 --yes
+      `,
+      { database: v1Db.name }
+    );
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}/col-v2
+      pgpm deploy --database ${v2Db.name} --package col-v2 --yes
+      `,
+      { database: v2Db.name }
+    );
+  });
+
+  afterAll(async () => {
+    await fixture.cleanup();
+  });
+
+  const expectCatalog = async (db: any, oracle: any) => {
+    const [actual, expected] = await Promise.all([snapshotCatalog(db), snapshotCatalog(oracle)]);
+    expect(diffCatalogSnapshots(withoutColumnOrder(actual), withoutColumnOrder(expected))).toEqual([]);
+  };
+
+  it.each([
+    ['col-mig', ''],
+    ['col-mig-atomic', '--granularity atomic'],
+    ['col-mig-consolidated', '--granularity consolidated'],
+    ['col-mig-alteration', '--granularity atomic --change-granularity alteration'],
+    ['col-mig-single', '--change-granularity single']
+  ])('%s: the emitted migration deploys v1 to v2, verifies, and reverts to v1 (%s)', async (pkg, dials) => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}
+      pgpm diff col-v1 col-v2 --emit-migration . --pkg ${pkg} ${dials}
+      `,
+      {}
+    );
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}/col-v1
+      pgpm deploy --database ${testDb.name} --package col-v1 --yes
+      cd ../${pkg}
+      pgpm deploy --database ${testDb.name} --package ${pkg} --yes
+      `,
+      { database: testDb.name }
+    );
+    await expectCatalog(testDb, v2Db);
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}/${pkg}
+      pgpm verify --database ${testDb.name} --package ${pkg} --yes
+      pgpm revert --database ${testDb.name} --package ${pkg} --yes
+      `,
+      { database: testDb.name }
+    );
+    await expectCatalog(testDb, v1Db);
+  });
+
+  it('the linear SQL projection applies on v1 and reaches v2', async () => {
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}
+      pgpm diff col-v1 col-v2 --emit-sql col-migration.sql
+      `,
+      {}
+    );
+    const sql = fs.readFileSync(path.join(wsDir, 'col-migration.sql'), 'utf-8');
+    const testDb = await fixture.setupTestDatabase();
+    await fixture.runTerminalCommands(
+      `
+      cd ${CWS}/col-v1
+      pgpm deploy --database ${testDb.name} --package col-v1 --yes
+      `,
+      { database: testDb.name }
+    );
+    await testDb.query(sql);
+    await expectCatalog(testDb, v2Db);
+  });
+
+  it('--append-module rejects --emit-ledger like every other --emit-* flag', async () => {
+    writeModule(path.join(wsDir, 'col-target'), 'col-target', COL_V1);
+    const originalExit = process.exit;
+    let exitCode: number | undefined;
+    process.exit = jest.fn((code?: number) => {
+      exitCode = code;
+      throw new Error(`process.exit called with code ${code}`);
+    }) as any;
+    try {
+      await expect(
+        fixture.runTerminalCommands(
+          `
+          cd ${CWS}
+          pgpm diff col-v1 col-v2 --append-module col-target --emit-ledger col-ledger.sql --ledger db:${v1Db.name}
+          `,
+          {}
+        )
+      ).rejects.toThrow(/process.exit called with code 1/);
+    } finally {
+      process.exit = originalExit;
+    }
+    expect(exitCode).toBe(1);
+    expect(fs.existsSync(path.join(wsDir, 'col-ledger.sql'))).toBe(false);
+  });
+});

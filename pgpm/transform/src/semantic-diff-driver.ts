@@ -383,9 +383,12 @@ function diffTable(
   const constraintKeys = (extra: unknown): string[] => {
     const c = (extra as { Constraint?: ConstraintNode }).Constraint
       ?? (extra as { AlterTableCmd?: { def?: { Constraint?: ConstraintNode } } }).AlterTableCmd?.def?.Constraint;
-    return [...(c?.keys ?? []), ...(c?.fk_attrs ?? [])]
+    const keys = [...(c?.keys ?? []), ...(c?.fk_attrs ?? [])]
       .map(k => (k as { String?: { sval?: string } }).String?.sval)
       .filter((s): s is string => typeof s === 'string');
+    const expr: ColumnMentions = { names: new Set(), star: false };
+    collectColumnMentions((c as { raw_expr?: unknown } | undefined)?.raw_expr, expr);
+    return [...new Set([...keys, ...expr.names])];
   };
 
   diff.columnsAdded = [];
@@ -427,19 +430,6 @@ function diffTable(
       }
     }
   }
-  for (const [name, prior] of from.columns) {
-    if (!to.columns.has(name)) {
-      diff.columnsRemoved.push(name);
-      steps.push({
-        sql: alter({ subtype: 'AT_DropColumn', name }),
-        inverse: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: prior.def } }),
-        phase: 'remove',
-        sub: column(name),
-        keyColumns: []
-      });
-    }
-  }
-
   // Self-inverse ALTER TABLE subtypes: a removed extra with one of these
   // undoes with the paired subtype rather than a DROP CONSTRAINT.
   const INVERSE_SUBTYPE: Record<string, string> = {
@@ -478,6 +468,21 @@ function diffTable(
       warnings.push(`${diff.path}: removed table element has no name to drop; emit a manual ALTER`);
     }
   }
+  // A dropped column takes its constraints with it, so constraint drops come
+  // first (and, reverted, the column is re-added before its constraints).
+  for (const [name, prior] of from.columns) {
+    if (!to.columns.has(name)) {
+      diff.columnsRemoved.push(name);
+      steps.push({
+        sql: alter({ subtype: 'AT_DropColumn', name }),
+        inverse: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: prior.def } }),
+        phase: 'remove',
+        sub: column(name),
+        keyColumns: []
+      });
+    }
+  }
+
   for (const [print, extra] of to.extras) {
     if (from.extras.has(print)) continue;
     const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
@@ -613,6 +618,8 @@ interface Atom {
   id: number;
   /** Grouping key: atoms of one unit become one change unless an outside atom must sit between them. */
   unit: string;
+  /** Unit key of the object this atom belongs to (the table, for ALTER TABLE steps). */
+  owner: string;
   /** Change name for this atom's segment (segments with a different mix get `/drop`). */
   name: string;
   phase: Phase;
@@ -684,8 +691,10 @@ export function diffSchemas(
     return pieces.join('\n\n');
   };
 
-  const addAtom = (atom: Omit<Atom, 'id' | 'deps' | 'facts'>): Atom => {
-    const full: Atom = { ...atom, id: atoms.length, deps: new Set(), facts: classifyStatements(atom.sql) };
+  const addAtom = (atom: Omit<Atom, 'id' | 'deps' | 'facts' | 'owner'> & { owner?: string }): Atom => {
+    const full: Atom = {
+      ...atom, owner: atom.owner ?? atom.unit, id: atoms.length, deps: new Set(), facts: classifyStatements(atom.sql)
+    };
     atoms.push(full);
     return full;
   };
@@ -759,6 +768,7 @@ export function diffSchemas(
         }
         const atom = addAtom({
           unit: alteration ? `${key}\u0000${name}` : key,
+          owner: key,
           name,
           phase: step.phase,
           sql: step.sql,
@@ -924,7 +934,7 @@ export function diffSchemas(
           }
         }
         const unitKey = unitByObject.get(k);
-        if (!unitKey || unitKey === atom.unit.split('\u0000')[0]) continue;
+        if (!unitKey || unitKey === atom.owner) continue;
         for (const step of unitPhase(unitKey, 'add', 'alter')) {
           if (step.sub?.kind === 'column' && mentions(used, step.sub.name)) atom.deps.add(step.id);
           if (step.sub?.kind === 'constraint' && step.phase === 'add' && step.keyColumns.length > 0
@@ -937,13 +947,24 @@ export function diffSchemas(
     // Within a table: constraints follow the columns they key on and the
     // same-name constraint they replace.
     if (atom.sub) {
-      const tableKey = atom.unit.split('\u0000')[0];
+      const tableKey = atom.owner;
       for (const step of unitPhase(tableKey, 'add')) {
         if (step !== atom && step.sub?.kind === 'column' && atom.keyColumns.includes(step.sub.name)) atom.deps.add(step.id);
       }
       for (const step of unitPhase(tableKey, 'remove')) {
         if (step.sub?.kind === atom.sub.kind && step.sub.name === atom.sub.name) atom.deps.add(step.id);
       }
+    }
+  }
+
+  // Within a table: a column drop follows the drop of every constraint that
+  // keyed on or checked that column (the column drop would take them with it,
+  // and the revert must re-add the column before them).
+  for (const atom of atoms) {
+    if (atom.phase !== 'remove' || atom.sub?.kind !== 'column') continue;
+    const tableKey = atom.owner;
+    for (const step of unitPhase(tableKey, 'remove')) {
+      if (step.sub?.kind === 'constraint' && step.keyColumns.includes(atom.sub.name)) atom.deps.add(step.id);
     }
   }
 
