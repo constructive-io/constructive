@@ -88,11 +88,11 @@ describe('diffSchemas', () => {
 
   it('emits column drops and type changes', () => {
     const to = BASE.replace('name text', 'name varchar');
-    const result = diffSchemas(BASE, to);
+    const result = diffSchemas(BASE, to, { allowDataLoss: true });
     const change = result.changes.find(c => c.name.startsWith('schemas/app/tables/users/table'))!;
     expect(change.deploy).toContain('ALTER COLUMN name TYPE varchar');
 
-    const dropped = diffSchemas(BASE, BASE.replace(', name text', ''));
+    const dropped = diffSchemas(BASE, BASE.replace(', name text', ''), { allowDataLoss: true });
     const users = dropped.objects.find(o => o.path === 'schemas/app/tables/users/table')!;
     expect(users.columnsRemoved).toEqual(['name']);
   });
@@ -142,11 +142,14 @@ describe('diffSchemas', () => {
     expect(change.revert).toContain('DISABLE ROW LEVEL SECURITY');
   });
 
-  it('warns on non-derivable column alterations (constraints/defaults changed)', () => {
+  it('emits column constraint/default alterations with inverses (no manual ALTER)', () => {
     const from = 'CREATE TABLE app.products (id int, note text);';
     const to = 'CREATE TABLE app.products (id int, note text NOT NULL);';
     const result = diffSchemas(from, to);
-    expect(result.warnings.some(w => w.includes('column "note" changed beyond its type'))).toBe(true);
+    expect(result.warnings).toEqual([]);
+    const change = result.changes.find(c => c.name.startsWith('schemas/app/tables/products/table'))!;
+    expect(change.deploy).toContain('ALTER COLUMN note SET NOT NULL');
+    expect(change.revert).toContain('ALTER COLUMN note DROP NOT NULL');
   });
 
   it('is constraint-placement-invariant: inline, table-elt, and standalone ADD CONSTRAINT unify', () => {
@@ -290,7 +293,7 @@ describe('diffSchemas dependency order', () => {
       'CREATE TABLE app.a (id int PRIMARY KEY);',
       'CREATE VIEW app.av AS SELECT a.id FROM app.a a;'
     ].join('\n');
-    const result = diffSchemas(from, to);
+    const result = diffSchemas(from, to, { allowDataLoss: true });
     const script = deployScript(result);
     expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'DROP COLUMN y'));
     expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'CREATE VIEW app.av'));
@@ -303,7 +306,7 @@ describe('diffSchemas dependency order', () => {
       'CREATE TABLE app.a (id int PRIMARY KEY, y int);',
       'CREATE VIEW app.av AS SELECT a.id, a.y FROM app.a a;'
     ].join('\n');
-    const result = diffSchemas(from, A1);
+    const result = diffSchemas(from, A1, { allowDataLoss: true });
     const script = deployScript(result);
     expect(at(script, 'DROP VIEW app.av')).toBeLessThan(at(script, 'DROP COLUMN y'));
     const drop = changeWith(result, 'DROP COLUMN y');
@@ -317,7 +320,7 @@ describe('diffSchemas dependency order', () => {
       'CREATE VIEW app.nv AS SELECT a.n FROM app.a a;'
     ].join('\n');
     const to = from.replace('n int', 'n bigint');
-    const result = diffSchemas(from, to);
+    const result = diffSchemas(from, to, { allowDataLoss: true });
     const script = deployScript(result);
     expect(at(script, 'DROP VIEW app.nv')).toBeLessThan(at(script, 'TYPE bigint'));
     expect(at(script, 'TYPE bigint')).toBeLessThan(at(script, 'CREATE VIEW app.nv'));
@@ -333,7 +336,7 @@ describe('diffSchemas dependency order', () => {
       'CREATE TABLE app.a (id int PRIMARY KEY, n int, m int);',
       'CREATE VIEW app.nv AS SELECT a.n FROM app.a a;'
     ].join('\n');
-    const result = diffSchemas(from, from.replace('m int', 'm bigint'));
+    const result = diffSchemas(from, from.replace('m int', 'm bigint'), { allowDataLoss: true });
     expect(deployScript(result)).not.toContain('app.nv');
   });
 
@@ -402,7 +405,7 @@ describe('diffSchemas: column removed together with the constraints on it', () =
   ].join('\n');
 
   it('drops the constraints before the column, and re-adds the column before the constraints', () => {
-    const result = diffSchemas(FROM, TO);
+    const result = diffSchemas(FROM, TO, { allowDataLoss: true });
     const deploy = deployScript(result);
     for (const c of ['t_a_check', 't_a_b_key', 't_a_fkey']) {
       expect(at(deploy, `DROP CONSTRAINT ${c}`)).toBeLessThan(at(deploy, 'DROP COLUMN a'));
@@ -414,7 +417,7 @@ describe('diffSchemas: column removed together with the constraints on it', () =
   });
 
   it('with changeGranularity alteration, the column drop requires each constraint drop', () => {
-    const result = diffSchemas(FROM, TO, { changeGranularity: 'alteration' });
+    const result = diffSchemas(FROM, TO, { changeGranularity: 'alteration', allowDataLoss: true });
     const column = changeWith(result, 'DROP COLUMN a');
     for (const c of ['t_a_check', 't_a_b_key', 't_a_fkey']) {
       const constraint = changeWith(result, `DROP CONSTRAINT ${c}`);

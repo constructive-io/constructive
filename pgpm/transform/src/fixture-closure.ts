@@ -1,10 +1,11 @@
-import { classifyStatements, QualifiedName, StatementFacts } from '@pgsql/semantics';
+import { QualifiedName, StatementFacts } from '@pgsql/semantics';
 
 import {
   CategoryProfile,
   ChangeCategory,
   TIER_PROFILE
 } from './categorize';
+import { classifyStatements } from './facts';
 
 /**
  * A change plus its deploy SQL. Optional plan `dependencies` (from `pgpm.plan`)

@@ -73,7 +73,7 @@ describe('diffSchemas: column attribute changes', () => {
     expect(norm(sql(result, 'deploy'))).toMatch(/ALTER COLUMN code (SET DATA )?TYPE int(eger)? USING code::int(eger)?/);
     expect(norm(sql(result, 'revert'))).toMatch(/ALTER COLUMN code (SET DATA )?TYPE text USING code::text/);
     const custom = diffSchemas(from, to, { allowDataLoss: true, casts: { 'app.t.code': 'nullif(code, \'\')::int' } });
-    expect(norm(sql(custom, 'deploy'))).toMatch(/USING nullif\(code, ''\)::int/);
+    expect(norm(sql(custom, 'deploy'))).toMatch(/USING (nullif\(code, ''\)::int|CAST\(NULLIF ?\(code, ''\) AS int\))/i);
   });
 
   it('rebuilds a generated column whose expression changed (derived data, no opt-in)', () => {
@@ -167,9 +167,9 @@ describe('diffSchemas: non-table objects alter in place', () => {
     expect(result.warnings).toEqual([]);
     const deploy = norm(sql(result, 'deploy'));
     expect(deploy).toMatch(/ALTER DOMAIN app\.email DROP CONSTRAINT email_check/);
-    expect(deploy).toMatch(/ALTER DOMAIN app\.email ADD CONSTRAINT email_check CHECK \(VALUE ~ '@' AND length\(VALUE\) > 3\)/);
+    expect(deploy).toMatch(/ALTER DOMAIN app\.email ADD CONSTRAINT email_check CHECK \(VALUE ~ '@' AND length\(VALUE\) > 3\)/i);
     expect(deploy).not.toMatch(/DROP DOMAIN/);
-    expect(norm(sql(result, 'revert'))).toMatch(/ADD CONSTRAINT email_check CHECK \(VALUE ~ '@'\)/);
+    expect(norm(sql(result, 'revert'))).toMatch(/ADD CONSTRAINT email_check CHECK \(VALUE ~ '@'\)/i);
   });
 
   it('alters sequence options in place', () => {

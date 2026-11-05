@@ -57,8 +57,13 @@ describe('importDumpRows', () => {
     );
     const paths = result.rows.map(r => r.deploy);
     expect(paths[paths.length - 1]).toBe(MISC_CHANGE_PATH);
+    // The materialized view is identified (it creates app.mv), so it gets
+    // its own change that requires the table it selects from.
+    const mv = result.rows.find(r => r.deploy === 'schemas/app/views/mv/view')!;
+    expect(mv.content).toContain('CREATE MATERIALIZED VIEW app.mv');
+    expect(mv.deps).toContain('schemas/app/tables/t/table');
     const misc = result.rows.find(r => r.deploy === MISC_CHANGE_PATH)!;
-    expect(misc.content).toContain('CREATE MATERIALIZED VIEW app.mv');
+    expect(misc.content).toContain('ALTER DEFAULT PRIVILEGES');
     expect([...misc.deps].sort()).toEqual(paths.filter(p => p !== MISC_CHANGE_PATH).sort());
   });
 

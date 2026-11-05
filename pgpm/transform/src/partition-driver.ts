@@ -21,15 +21,16 @@
  * pgpm.plan + deploy trees, feed a bundle, ...).
  */
 import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
-import { classifyStatements, StatementFacts, StatementKind } from '@pgsql/semantics';
+import { StatementFacts, StatementKind } from '@pgsql/semantics';
 import {
   buildStatementGraph,
-  identityOf,
   ObjectIdentity,
   ObjectIdentityKind
 } from '@pgsql/transform';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { classifyStatements } from './facts';
+import { identityOf } from './facts';
 
 /** One deployable unit: an object (by identity) and the statements that build it. */
 export interface PartitionUnit {

@@ -21,15 +21,16 @@ import type { ObjectIdentity as NamingIdentity } from '@pgpmjs/naming-spec';
 import { pathFor } from '@pgpmjs/naming-spec';
 import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { StatementFacts } from '@pgsql/semantics';
-import { classifyStatements } from '@pgsql/semantics';
 import type { Granularity } from '@pgsql/transform';
 import {
   buildStatementGraph,
-  identityOf,
   restructureSql
 } from '@pgsql/transform';
+import { parseSync } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { classifyStatements } from './facts';
+import { identityOf } from './facts';
 import { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 
 export type { Granularity } from '@pgsql/transform';
@@ -135,6 +136,31 @@ const KIND_DIRS: Partial<Record<StatementFacts['kind'], string>> = {
  * `@pgsql/transform`) rendered through `pathFor` (`@pgpmjs/naming-spec`).
  * Paths are pure projections of identity, never authored.
  */
+/**
+ * Split `ALTER TABLE .. ADD CONSTRAINT .. NOT VALID` statements out of a
+ * program: they must stay standalone ALTERs (NOT VALID is not expressible in
+ * CREATE TABLE), so the restructurer never sees them.
+ */
+export function holdOutNotValid(sql: string): { program: string; heldOut: string[] } {
+  const facts = classifyStatements(sql);
+  const bytes = sqlSourceBytes(sql);
+  const kept: string[] = [];
+  const heldOut: string[] = [];
+  for (const f of facts) {
+    const text = sliceStatementBytes(bytes, f.span.start, f.span.len).trim();
+    if (!text) continue;
+    let notValid = false;
+    if (f.nodeTag === 'AlterTableStmt') {
+      const stmt = parseSync(text).sql.stmts[0]?.stmt as unknown as
+        { AlterTableStmt?: { cmds?: { AlterTableCmd?: { subtype?: string; def?: { Constraint?: { skip_validation?: boolean } } } }[] } } | undefined;
+      const cmds = stmt?.AlterTableStmt?.cmds ?? [];
+      notValid = cmds.length > 0 && cmds.every(c => c.AlterTableCmd?.subtype === 'AT_AddConstraint' && c.AlterTableCmd.def?.Constraint?.skip_validation === true);
+    }
+    (notValid ? heldOut : kept).push(text.endsWith(';') ? text : `${text};`);
+  }
+  return { program: kept.join('\n\n'), heldOut };
+}
+
 export function defaultChangeName(facts: StatementFacts): string {
   const identity = identityOf(facts);
   if (identity) return pathFor(identity);
@@ -163,11 +189,16 @@ export function restructureChanges(
     .filter(Boolean)
     .join('\n\n');
 
-  const restructured = restructureSql(flattened, {
+  // `ADD CONSTRAINT .. NOT VALID` cannot be folded into CREATE TABLE (the
+  // catalog would validate it), so those statements are held out of the
+  // restructuring and re-appended after it.
+  const { program, heldOut } = holdOutNotValid(flattened);
+  const restructured = restructureSql(program, {
     granularity: options.granularity
   });
   const warnings = restructured.warnings;
-  const sql = alteration ? nameUnnamedConstraints(restructured.sql) : restructured.sql;
+  const rejoined = heldOut.length > 0 ? `${restructured.sql}\n\n${heldOut.join('\n\n')}` : restructured.sql;
+  const sql = alteration ? nameUnnamedConstraints(rejoined) : rejoined;
 
   // Re-classify the emitted script; group statements by the object they
   // target (creates[0]), so a table's CREATE and its remaining ALTERs land

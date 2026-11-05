@@ -14,7 +14,8 @@
 import type { GeneratedScript } from '@pgsql/scripts';
 import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { StatementFacts } from '@pgsql/semantics';
-import { classifyStatements } from '@pgsql/semantics';
+
+import { classifyStatements } from './facts';
 
 export type { GeneratedScript } from '@pgsql/scripts';
 
