@@ -26,6 +26,12 @@ afterAll(async () => {
   await teardownPgPools();
 });
 
+// Each seed opens three databases; releasing their pools per test keeps the
+// connection count flat when jest runs this suite next to the other diff suites.
+afterEach(async () => {
+  await teardownPgPools();
+});
+
 // ---------------------------------------------------------------- generator
 
 /** mulberry32: small, fast, deterministic. */

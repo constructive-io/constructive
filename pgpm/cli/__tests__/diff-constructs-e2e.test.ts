@@ -24,6 +24,12 @@ afterAll(async () => {
   await teardownPgPools();
 });
 
+// Each case opens two databases; releasing their pools per case keeps the
+// connection count flat when jest runs this suite next to the other diff suites.
+afterEach(async () => {
+  await teardownPgPools();
+});
+
 const WS = 'cx-ws';
 
 const writeModule = (moduleDir: string, name: string, sql: string, revert: string) => {
@@ -221,7 +227,7 @@ export const CASES: Case[] = [
     name: 'policy-command-change-and-second-policy',
     v1: `${S} CREATE TABLE fx.t (id int PRIMARY KEY); ALTER TABLE fx.t ENABLE ROW LEVEL SECURITY; CREATE POLICY p ON fx.t FOR INSERT TO fx_role WITH CHECK (true);`,
     v2: `${S} CREATE TABLE fx.t (id int PRIMARY KEY); ALTER TABLE fx.t ENABLE ROW LEVEL SECURITY; CREATE POLICY p ON fx.t FOR UPDATE TO fx_role USING (id > 0); CREATE POLICY q ON fx.t FOR DELETE USING (false);`,
-    revert: 'DROP OWNED BY fx_role; DROP ROLE IF EXISTS fx_role;'
+    roles: ['fx_role']
   },
   // ---- types
   {
@@ -347,7 +353,7 @@ export const CASES: Case[] = [
     v2: `${S} CREATE TABLE fx."MyTable" ("Id" int PRIMARY KEY, "order" text NOT NULL DEFAULT 'x', "tëst" bigint, "select" boolean); CREATE TABLE fx."user" (id int PRIMARY KEY, "group" text); CREATE INDEX "MyTable_order_Idx" ON fx."MyTable" ("order"); CREATE VIEW fx."View One" AS SELECT "Id", "order" FROM fx."MyTable";`,
     flags: '--allow-data-loss',
     rows: `INSERT INTO fx."MyTable" VALUES (1, 'o', 2)`,
-    check: { sql: 'SELECT "Id", "order", "tëst" FROM fx."MyTable"', rows: [{ Id: 1, order: 'o', 'tëst': '2' }] }
+    check: { sql: 'SELECT "Id", "order", "tëst" FROM fx."MyTable"', rows: [{ Id: 1, order: 'o', tëst: '2' }] }
   },
   {
     name: 'quoted-schema-and-dollar-names',
@@ -445,7 +451,7 @@ export const CASES: Case[] = [
     name: 'array-and-composite-column-types',
     v1: `${S} CREATE TYPE fx.pt AS (x int, y int); CREATE TABLE fx.t (id int PRIMARY KEY, pts fx.pt[], m int[][], d numeric(5,2)[]);`,
     v2: `${S} CREATE TYPE fx.pt AS (x int, y int); CREATE TABLE fx.t (id int PRIMARY KEY, pts fx.pt[] NOT NULL DEFAULT '{}', m int[][], d numeric(5,2)[], ranges int4range[] DEFAULT ARRAY['[1,2)'::int4range]);`,
-    rows: "INSERT INTO fx.t VALUES (1, ARRAY[ROW(1,2)::fx.pt], NULL, NULL)"
+    rows: 'INSERT INTO fx.t VALUES (1, ARRAY[ROW(1,2)::fx.pt], NULL, NULL)'
   }
 ];
 
