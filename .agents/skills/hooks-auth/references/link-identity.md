@@ -7,7 +7,7 @@ React Query mutation hook for linkIdentity
 ## Usage
 
 ```typescript
-const { mutate } = useLinkIdentityMutation(); mutate({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } });
+const { mutate } = useLinkIdentityMutation(); mutate({ input: { ticket: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useLinkIdentityMutation(); mutate({ input: { details: '<JSON>
 
 ```typescript
 const { mutate, isLoading } = useLinkIdentityMutation();
-mutate({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } });
+mutate({ input: { ticket: '<String>' } });
 ```

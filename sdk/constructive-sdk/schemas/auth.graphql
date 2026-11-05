@@ -2714,9 +2714,7 @@ input LinkIdentityInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  details: JSON
-  identifier: String!
-  service: String!
+  ticket: String!
 }
 
 """The output of our `linkIdentity` mutation."""
@@ -2731,7 +2729,7 @@ type LinkIdentityPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: Boolean
+  result: JSON
 }
 
 """A belongs-to (forward FK) relation"""
