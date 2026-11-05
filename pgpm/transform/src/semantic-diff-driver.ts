@@ -464,6 +464,8 @@ interface TableShape {
   relation: unknown;
   /** column name → ColumnDef as authored (emitted), its canonical form (compared) and print key. */
   columns: Map<string, { def: unknown; canon: unknown; print: string }>;
+  /** serial columns → the implied owned sequence (pg_dump's int + nextval + sequence). */
+  serials: Map<string, { schema: string | null; name: string; as: string }>;
   /** normalized table-level constraints/extras, keyed by their print. */
   extras: Map<string, unknown>;
   /** COMMENT / GRANT / OWNER state attached to the table. */
@@ -543,9 +545,20 @@ function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, 
  * default-expression casts are canonicalized so a module compares equal to
  * the catalog rendering of the same table.
  */
+const SERIAL_TYPES: Record<string, string> = {
+  smallserial: 'int2', serial2: 'int2', serial: 'int4', serial4: 'int4', bigserial: 'int8', serial8: 'int8'
+};
+
+/** The serial pseudo-type a column is declared with, if any (`serial`, `bigserial`, ...). */
+function serialTypeName(typeName: unknown): string | null {
+  const names = ((typeName as { names?: { String?: { sval?: string } }[] } | undefined)?.names ?? []).map(n => n.String?.sval ?? '');
+  const bare = names.length === 1 ? names[0] : names.length === 2 && names[0] === 'pg_catalog' ? names[1] : null;
+  return bare !== null && bare in SERIAL_TYPES ? bare : null;
+}
+
 function tableShape(unit: ObjectUnit): TableShape {
   const props: TableProps = { persistence: 'p', options: new Map(), inherits: new Map(), partition: null, partspec: null };
-  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [], props };
+  const shape: TableShape = { relation: null, columns: new Map(), serials: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [], props };
   const setOptions = (items: unknown[] | undefined, keep: boolean): void => {
     for (const o of items ?? []) {
       const name = (o as { DefElem?: { defname?: string } }).DefElem?.defname;
@@ -700,7 +713,24 @@ function tableShape(unit: ObjectUnit): TableShape {
     addExtra({ Constraint: canonical });
   }
 
-  for (const { colname, def } of rawColumns) {
+  for (const { colname, def: declared } of rawColumns) {
+    // `serial` is shorthand for an int column with an owned sequence and a
+    // nextval default; it is unfolded so it compares with that spelling.
+    const serialAs = SERIAL_TYPES[serialTypeName(declared.typeName) ?? ''];
+    const sequence = serialAs
+      ? { schema: unit.identity.schema, name: `${unit.identity.name}_${colname}_seq`, as: serialAs }
+      : null;
+    const def = sequence
+      ? {
+        ...declared,
+        typeName: { names: [{ String: { sval: 'pg_catalog' } }, { String: { sval: sequence.as } }], typemod: -1 },
+        constraints: [
+          ...((declared.constraints as unknown[] | undefined) ?? []),
+          { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: parseExpression(`nextval('${[sequence.schema, sequence.name].filter(Boolean).join('.')}'::regclass)`) } }
+        ]
+      }
+      : declared;
+    if (sequence) shape.serials.set(colname, sequence);
     const typeName = canonicalizeTypes(cleanTree(def.typeName));
     const residual = ((def.constraints as unknown[] | undefined) ?? []).map(c =>
       normalizeColumnConstraint((c as { Constraint: ConstraintNode & Record<string, unknown> }).Constraint, typeName)
@@ -708,7 +738,7 @@ function tableShape(unit: ObjectUnit): TableShape {
     const hasNotNull = residual.some(
       c => (c as { Constraint?: ConstraintNode }).Constraint?.contype === 'CONSTR_NOTNULL'
     );
-    if (notNullImplied.has(colname) && !hasNotNull) {
+    if ((notNullImplied.has(colname) || sequence) && !hasNotNull) {
       residual.push({ Constraint: { contype: 'CONSTR_NOTNULL' } });
     }
     const sorted = residual
@@ -994,21 +1024,52 @@ function diffTable(
         typeChanged));
     }
 
+    const defaultSteps: TableAlteration[] = [];
     if (stablePrint(a.def) !== stablePrint(b.def)) {
       const setDefault = (expr: unknown): string => alter(expr === undefined ? { subtype: 'AT_ColumnDefault', name } : { subtype: 'AT_ColumnDefault', name, def: expr });
-      steps.push(attr(name, 'alter', setDefault(bRaw.def), setDefault(aRaw.def)));
+      defaultSteps.push(attr(name, 'alter', setDefault(bRaw.def), setDefault(aRaw.def)));
     }
-    if (a.notNull !== b.notNull) {
-      steps.push(attr(name, 'alter',
-        alter({ subtype: b.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }),
-        alter({ subtype: a.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name })));
-    }
+    const identitySteps: TableAlteration[] = [];
     if (stablePrint(a.identity) !== stablePrint(b.identity)) {
       const add = (c: Record<string, unknown>): string => alter({ subtype: 'AT_AddIdentity', name, def: { Constraint: c } });
       const drop = alter({ subtype: 'AT_DropIdentity', name });
-      if (a.identity) steps.push(attr(name, 'alter', drop, add(aRaw.identity!)));
-      if (b.identity) steps.push(attr(name, 'alter', add(bRaw.identity!), drop));
+      if (a.identity) identitySteps.push(attr(name, 'alter', drop, add(aRaw.identity!)));
+      if (b.identity) identitySteps.push(attr(name, 'alter', add(bRaw.identity!), drop));
     }
+    // A serial's owned sequence comes and goes with the spelling: dropped
+    // after its default is gone (and before an identity claims its name), or
+    // created after an identity is dropped and before the default needs it.
+    const serialFrom = from.serials.get(renamedFrom.get(name) ?? name) ?? null;
+    const serialTo = to.serials.get(name) ?? null;
+    const sequenceSql = (seq: { schema: string | null; name: string; as: string }): { create: string; drop: string } => {
+      const items = (parts: (string | null)[]): unknown[] => parts.filter((x): x is string => x !== null).map(sval => ({ String: { sval } }));
+      return {
+        create: deparseStmt({ CreateSeqStmt: { sequence: { schemaname: seq.schema ?? undefined, relname: seq.name }, options: [
+          { DefElem: { defname: 'as', arg: { TypeName: { names: items(['pg_catalog', seq.as]) } }, defaction: 'DEFELEM_UNSPEC' } },
+          { DefElem: { defname: 'owned_by', arg: { List: { items: items([schema, table, name]) } }, defaction: 'DEFELEM_UNSPEC' } }
+        ] } }),
+        drop: deparseStmt({ DropStmt: { objects: [{ List: { items: items([seq.schema, seq.name]) } }], removeType: 'OBJECT_SEQUENCE', behavior: 'DROP_RESTRICT' } })
+      };
+    };
+    // NOT NULL is required before an identity is added and may only be
+    // dropped after one is gone.
+    const notNullStep = a.notNull !== b.notNull
+      ? attr(name, 'alter',
+        alter({ subtype: b.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }),
+        alter({ subtype: a.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }))
+      : null;
+    if (notNullStep && b.notNull) steps.push(notNullStep);
+    if (serialFrom && !serialTo) {
+      const seq = sequenceSql(serialFrom);
+      ctx.destructive.push(`${qualified}: DROP SEQUENCE ${[serialFrom.schema, serialFrom.name].filter(Boolean).join('.')} (the serial's sequence and its current value are lost)`);
+      steps.push(...defaultSteps, attr(name, 'alter', seq.drop, seq.create), ...identitySteps);
+    } else if (serialTo && !serialFrom) {
+      const seq = sequenceSql(serialTo);
+      steps.push(...identitySteps, attr(name, 'alter', seq.create, seq.drop), ...defaultSteps);
+    } else {
+      steps.push(...defaultSteps, ...identitySteps);
+    }
+    if (notNullStep && !b.notNull) steps.push(notNullStep);
     if (stablePrint(a.other) !== stablePrint(b.other)) {
       ctx.incomplete.push(`${diff.path}: column "${name}" changed in a way pgpm cannot express as ALTER COLUMN (${a.other.length + b.other.length} unsupported constraint(s)); alter it manually`);
     }
