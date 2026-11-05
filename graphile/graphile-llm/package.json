@@ -29,6 +29,7 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
+    "@agentic-kit/metering": "workspace:^",
     "@agentic-kit/ollama": "workspace:*",
     "@constructive-io/llm-env": "workspace:^",
     "graphile-cache": "workspace:^"

@@ -10,10 +10,15 @@
  *   1. The `llm_module` configuration (per-database)
  *   2. The preset's `defaultChatCompleter` option (fallback for dev/testing)
  *   3. Environment variables (CHAT_PROVIDER, CHAT_MODEL, CHAT_BASE_URL)
+ *
+ * With `AGENTIC_SERVER_URL` set, completions go through the metered gateway
+ * under the request's identity (see embedder.ts), so each call is recorded.
  */
 
+import { normalizeGatewayUrl } from '@agentic-kit/metering';
 import { OllamaAdapter } from '@agentic-kit/ollama';
 
+import { gatewayHeaders, llmConfigStore } from './embedder';
 import { getLlmEnvOptions } from './env';
 import type { ChatConfig, ChatFunction, ChatMessage, ChatOptions, ChatResult, LlmModuleData } from './types';
 
@@ -74,6 +79,54 @@ function createOllamaChatCompleter(
   };
 }
 
+interface GatewayChatResponse {
+  choices?: Array<{ message?: { content?: string } }>;
+  usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+}
+
+/**
+ * Create a chat completer that calls the metered gateway's `/v1/chat/completions`.
+ */
+export function createGatewayChatCompleter(
+  gatewayUrl: string,
+  defaultModel: string,
+  provider: string
+): ChatFunction {
+  const root = normalizeGatewayUrl(gatewayUrl);
+
+  return async (messages: ChatMessage[], options?: ChatOptions): Promise<ChatResult> => {
+    const model = llmConfigStore.getStore()?.chatModel ?? defaultModel;
+    const response = await fetch(`${root}/v1/chat/completions`, {
+      method: 'POST',
+      headers: gatewayHeaders(provider),
+      body: JSON.stringify({
+        model,
+        messages,
+        ...(options?.temperature !== undefined && { temperature: options.temperature }),
+        ...(options?.maxTokens !== undefined && { max_tokens: options.maxTokens })
+      })
+    });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      throw new Error(`gateway chat completion failed: ${response.status}${detail ? ` ${detail}` : ''}`);
+    }
+    const payload = (await response.json()) as GatewayChatResponse;
+    const input = payload.usage?.prompt_tokens ?? 0;
+    const output = payload.usage?.completion_tokens ?? 0;
+    return {
+      content: payload.choices?.[0]?.message?.content ?? '',
+      usage: {
+        input,
+        output,
+        reasoning: 0,
+        cacheRead: 0,
+        cacheWrite: 0,
+        totalTokens: payload.usage?.total_tokens ?? input + output
+      }
+    };
+  };
+}
+
 // ─── Chat Completer Construction ────────────────────────────────────────────
 
 /**
@@ -110,14 +163,18 @@ export function buildChatCompleterFromModule(data: LlmModuleData): ChatFunction 
 
 /**
  * Resolve a chat completer from environment variables.
- * This is a fallback for development when no llm_module or defaultChatCompleter is configured.
  *
- * Environment variables (with defaults from env.ts):
+ * With `AGENTIC_SERVER_URL` set, completions go through the metered gateway
+ * and `CHAT_PROVIDER` names the upstream dialect the gateway should use.
+ * Otherwise the provider is called directly:
  *   CHAT_PROVIDER  - Provider name (default: 'ollama')
  *   CHAT_MODEL     - Model identifier (default: 'llama3')
  *   CHAT_BASE_URL  - Provider base URL (default: 'http://localhost:11434')
  */
 export function buildChatCompleterFromEnv(): ChatFunction | null {
-  const { chat } = getLlmEnvOptions();
+  const { chat, gateway } = getLlmEnvOptions();
+  if (gateway.url) {
+    return createGatewayChatCompleter(gateway.url, chat.model, chat.provider);
+  }
   return buildChatCompleter(chat);
 }

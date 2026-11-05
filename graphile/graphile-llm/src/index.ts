@@ -52,11 +52,13 @@ export type { AgentDiscovery,AgentTableInfo } from './plugins/agent-discovery-pl
 export { clearAgentDiscoveryCache,getAgentDiscovery } from './plugins/agent-discovery-plugin';
 
 // Embedder utilities
-export type { LlmConfigOverrides } from './embedder';
+export type { LlmRequestScope } from './embedder';
 export {
   buildEmbedder,
   buildEmbedderFromEnv,
   buildEmbedderFromModule,
+  createGatewayEmbedder,
+  identityFromClaims,
   llmConfigStore
 } from './embedder';
 
@@ -64,7 +66,8 @@ export {
 export {
   buildChatCompleter,
   buildChatCompleterFromEnv,
-  buildChatCompleterFromModule
+  buildChatCompleterFromModule,
+  createGatewayChatCompleter
 } from './chat';
 
 // Types

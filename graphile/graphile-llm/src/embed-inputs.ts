@@ -15,8 +15,8 @@ import type { ExecutableStep, FieldArgs } from 'grafast';
 import { access, ConstantStep, context, lambda, object } from 'grafast';
 import type { GraphQLInputType, GraphQLSchema } from 'graphql';
 
-import type { LlmConfigOverrides } from './embedder';
-import { llmConfigStore } from './embedder';
+import type { LlmRequestScope } from './embedder';
+import { identityFromClaims, llmConfigStore } from './embedder';
 
 export type QuotaPolicy = 'degrade' | 'throw';
 
@@ -53,7 +53,7 @@ function isNonEmptyVector(value: unknown): boolean {
 
 export async function resolveConfigOverrides(
   graphqlContext: any
-): Promise<LlmConfigOverrides | null> {
+): Promise<LlmRequestScope | null> {
   const ctx = graphqlContext?.constructive;
   if (!ctx?.useLlm) return null;
 
@@ -72,15 +72,21 @@ export async function resolveConfigOverrides(
   }
 }
 
-/** Binds the embedder to one request's per-database model overrides, resolved on first use. */
-function forRequest(embedder: VectorEmbedder | null, graphqlContext: unknown): VectorEmbedder | null {
+/**
+ * Binds the embedder to one request: the identity its claims carry and the
+ * per-database model overrides, resolved on first use.
+ */
+function forRequest(embedder: VectorEmbedder | null, graphqlContext: any): VectorEmbedder | null {
   if (!embedder) return null;
-  let overrides: Promise<LlmConfigOverrides | null> | undefined;
+  let overrides: Promise<LlmRequestScope | null> | undefined;
   return async (text) => {
     overrides ??= resolveConfigOverrides(graphqlContext);
-    const resolved = await overrides;
+    const scope: LlmRequestScope = {
+      ...(await overrides),
+      identity: identityFromClaims(graphqlContext?.pgSettings)
+    };
     const startTime = Date.now();
-    const vector = await llmConfigStore.run(resolved, () => embedder(text));
+    const vector = await llmConfigStore.run(scope, () => embedder(text));
     if (vector) {
       console.log(`[graphile-llm] embed: dims=${vector.length}, latency=${Date.now() - startTime}ms`);
     }
