@@ -77,7 +77,7 @@ const CASES: Case[] = [
     v1: `CREATE SCHEMA fu; CREATE SEQUENCE fu.s MINVALUE 5 MAXVALUE 1000 CACHE 10;`,
     v2: `CREATE SCHEMA fu; CREATE SEQUENCE fu.s;`,
     flags: '',
-    deployed: [/NO MINVALUE/, /START WITH 1/]
+    deployed: [/NO MINVALUE/, /START (WITH )?1\b/]
   },
   {
     name: 'revoke-public',

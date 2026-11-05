@@ -181,11 +181,31 @@ const defaultPrivilegesNode = (isGrant: boolean, options: unknown, objtype: stri
   };
 };
 
-/** Privilege-set delta as GRANT/REVOKE statements with exact inverses. */
+/** Privileges PUBLIC holds by default (what an explicit REVOKE .. FROM PUBLIC actually takes away). */
+const PUBLIC_DEFAULT_PRIVILEGES: Record<string, string[]> = {
+  OBJECT_FUNCTION: ['execute'],
+  OBJECT_PROCEDURE: ['execute'],
+  OBJECT_ROUTINE: ['execute'],
+  OBJECT_TYPE: ['usage'],
+  OBJECT_DOMAIN: ['usage'],
+  OBJECT_LANGUAGE: ['usage']
+};
+
+const isPublicRole = (grantee: unknown): boolean =>
+  (grantee as { RoleSpec?: { roletype?: string } } | undefined)?.RoleSpec?.roletype === 'ROLESPEC_PUBLIC';
+
+/**
+ * Privilege-set delta as GRANT/REVOKE statements with exact inverses.
+ * `-token` entries are explicit revocations: adding one is a REVOKE (once, even
+ * when the same token was also held); dropping one only re-grants what the
+ * grantee holds by default (PUBLIC on functions/types), since no grant existed.
+ */
 function diffPrivileges(
   from: Set<string>,
   to: Set<string>,
-  build: (isGrant: boolean, tokens: string[]) => Node
+  build: (isGrant: boolean, tokens: string[]) => Node,
+  objtype: string,
+  grantee: unknown
 ): AnnotationStep[] {
   const steps: AnnotationStep[] = [];
   const positive = (set: Set<string>): string[] => [...set].filter(t => !t.startsWith('-')).sort();
@@ -196,8 +216,9 @@ function diffPrivileges(
   const revoked = fromPos.filter(t => !toPos.includes(t));
   const fromNeg = negative(from);
   const toNeg = negative(to);
-  const newlyRevoked = toNeg.filter(t => !fromNeg.includes(t));
-  const unrevoked = fromNeg.filter(t => !toNeg.includes(t));
+  const newlyRevoked = toNeg.filter(t => !fromNeg.includes(t) && !revoked.includes(t));
+  const byDefault = isPublicRole(grantee) ? PUBLIC_DEFAULT_PRIVILEGES[objtype] ?? [] : [];
+  const unrevoked = fromNeg.filter(t => !toNeg.includes(t) && !granted.includes(t) && (t === 'all' ? byDefault.length > 0 : byDefault.includes(t)));
   if (revoked.length > 0) {
     steps.push({ sql: deparse(build(false, revoked)), inverse: deparse(build(true, revoked)) });
   }
@@ -231,7 +252,7 @@ export function diffAnnotations(from: AnnotationState, to: AnnotationState, path
     const prior = from.grants.get(key)?.privs ?? new Set<string>();
     const entry = to.grants.get(key) ?? from.grants.get(key)!;
     const next = to.grants.get(key)?.privs ?? new Set<string>();
-    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee)));
+    steps.push(...diffPrivileges(prior, next, (isGrant, tokens) => grantNode(isGrant, entry.objtype, entry.objects, tokens, entry.grantee), entry.objtype, entry.grantee));
   }
 
   for (const key of new Set([...from.defaultPrivileges.keys(), ...to.defaultPrivileges.keys()])) {
@@ -239,7 +260,7 @@ export function diffAnnotations(from: AnnotationState, to: AnnotationState, path
     const entry = to.defaultPrivileges.get(key) ?? from.defaultPrivileges.get(key)!;
     const next = to.defaultPrivileges.get(key)?.privs ?? new Set<string>();
     steps.push(...diffPrivileges(prior, next, (isGrant, tokens) =>
-      defaultPrivilegesNode(isGrant, entry.options, entry.objtype, tokens, entry.grantee)));
+      defaultPrivilegesNode(isGrant, entry.options, entry.objtype, tokens, entry.grantee), entry.objtype, entry.grantee));
   }
 
   for (const key of new Set([...from.owners.keys(), ...to.owners.keys()])) {

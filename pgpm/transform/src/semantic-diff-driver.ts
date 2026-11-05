@@ -75,6 +75,8 @@ export interface RenameDeclaration {
   schema: string | null;
   /** The table, for column renames. */
   table?: string;
+  /** For column renames declared with the table's new name (renamed in the same diff). */
+  toTable?: string;
   from: string;
   to: string;
 }
@@ -90,10 +92,14 @@ export function parseRenameDeclaration(spec: string): RenameDeclaration {
   if (a.length !== b.length || a.length < 2 || a.length > 3 || a.some(x => !x) || b.some(x => !x)) {
     throw new DiffPolicyError('rename', `pgpm diff: --rename expects schema.table=schema.table or schema.table.column=schema.table.column, got "${spec}"`);
   }
-  if (a.slice(0, -1).join('.') !== b.slice(0, -1).join('.')) {
-    throw new DiffPolicyError('rename', `pgpm diff: --rename cannot move "${lhs}" to another ${a.length === 3 ? 'table' : 'schema'} ("${rhs}")`);
+  if (a[0] !== b[0]) {
+    throw new DiffPolicyError('rename', `pgpm diff: --rename cannot move "${lhs}" to another schema ("${rhs}")`);
   }
-  if (a.length === 3) return { kind: 'column', schema: a[0], table: a[1], from: a[2], to: b[2] };
+  if (a.length === 3) {
+    const decl: RenameDeclaration = { kind: 'column', schema: a[0], table: a[1], from: a[2], to: b[2] };
+    if (a[1] !== b[1]) decl.toTable = b[1];
+    return decl;
+  }
   return { kind: 'table', schema: a[0], from: a[1], to: b[1] };
 }
 
@@ -314,6 +320,8 @@ interface TableShape {
   extras: Map<string, unknown>;
   /** COMMENT / GRANT / OWNER state attached to the table. */
   annotations: AnnotationState;
+  /** Constraints authored without a name; Postgres derives theirs from the table name. */
+  implicitConstraints: { node: ConstraintNode; column?: string }[];
 }
 
 /** Constraint kinds that can move between column, table-elt, and ALTER form. */
@@ -373,7 +381,7 @@ function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, 
  * the catalog rendering of the same table.
  */
 function tableShape(unit: ObjectUnit): TableShape {
-  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations() };
+  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [] };
   const table = unit.identity.name;
   const rawColumns: { colname: string; def: Record<string, unknown> }[] = [];
   const constraints: { node: ConstraintNode & Record<string, unknown>; column?: string }[] = [];
@@ -484,6 +492,7 @@ function tableShape(unit: ObjectUnit): TableShape {
   }
 
   for (const { node, column } of constraints) {
+    if (!node.conname) shape.implicitConstraints.push({ node, column });
     const canonical: Record<string, unknown> = { ...node };
     canonical.conname = node.conname ?? defaultConstraintName(table, node, column) ?? undefined;
     if (column && (node.keys ?? []).length === 0 && node.contype !== 'CONSTR_FOREIGN' && node.contype !== 'CONSTR_CHECK') {
@@ -522,6 +531,50 @@ function tableShape(unit: ObjectUnit): TableShape {
 
 const deparseStmt = (node: Record<string, unknown>): string =>
   `${Deparser.deparse(node, { pretty: false })};`;
+
+/** Postgres' NAMEDATALEN - 1: longer derived names are truncated by the server and cannot be predicted here. */
+const MAX_IDENTIFIER = 63;
+
+/**
+ * Renaming a table does not rename the constraints (and their indexes) whose
+ * names Postgres derived from the old table name; a fresh deploy of the target
+ * would derive them from the new one. Rename each to keep the catalogs equal.
+ */
+function implicitConstraintRenames(
+  shape: TableShape,
+  relation: Record<string, unknown>,
+  fromTable: string,
+  toTable: string,
+  incomplete: string[]
+): TableAlteration[] {
+  const steps: TableAlteration[] = [];
+  const seen = new Map<string, number>();
+  const pairs = shape.implicitConstraints.map(({ node, column }) => ({
+    from: defaultConstraintName(fromTable, node, column),
+    to: defaultConstraintName(toTable, node, column)
+  }));
+  for (const { from } of pairs) if (from) seen.set(from, (seen.get(from) ?? 0) + 1);
+  const label = relation.schemaname ? `${relation.schemaname}.${toTable}` : toTable;
+  for (const { from, to } of pairs) {
+    if (!from || !to || from === to) continue;
+    if (seen.get(from)! > 1 || from.length > MAX_IDENTIFIER || to.length > MAX_IDENTIFIER) {
+      incomplete.push(`${label}: constraint "${from}" was named by Postgres from the old table name and cannot be renamed predictably (duplicate or truncated derivation); name it explicitly`);
+      continue;
+    }
+    const renameConstraint = (subname: string, newname: string): string =>
+      deparseStmt({ RenameStmt: { renameType: 'OBJECT_TABCONSTRAINT', relationType: 'OBJECT_TABLE', relation: { ...relation, relname: toTable }, subname, newname, behavior: 'DROP_RESTRICT' } });
+    steps.push({
+      sql: renameConstraint(from, to),
+      inverse: renameConstraint(to, from),
+      phase: 'alter',
+      sub: { kind: 'constraint', schema: (relation.schemaname as string | undefined) ?? null, table: toTable, name: to },
+      keyColumns: [],
+      breaking: false,
+      rename: true
+    });
+  }
+  return steps;
+}
 
 /** Where in the migration an alteration belongs (tie-break only; edges rule). */
 type Phase = 'drop' | 'remove' | 'alter' | 'add' | 'create';
@@ -579,10 +632,18 @@ function columnAttributes(def: Record<string, unknown>): ColumnAttributes {
 
 /** The expression node of `SELECT <expr>`. */
 function parseExpression(expr: string): unknown {
-  const stmts = parseSync(`SELECT ${expr}`).sql.stmts;
-  const select = stmts[0]?.stmt as unknown as { SelectStmt?: { targetList?: { ResTarget?: { val?: unknown } }[] } };
-  const val = select?.SelectStmt?.targetList?.[0]?.ResTarget?.val;
-  if (stmts.length !== 1 || !val) throw new DiffPolicyError('incomplete', `pgpm diff: --using expression is not a single expression: ${expr}`);
+  let stmts: { stmt?: unknown }[];
+  try {
+    stmts = parseSync(`SELECT ${expr}`).sql.stmts;
+  } catch (e) {
+    throw new DiffPolicyError('incomplete', `pgpm diff: --using expression could not be parsed: ${expr} (${(e as Error).message})`);
+  }
+  const select = stmts[0]?.stmt as { SelectStmt?: { targetList?: { ResTarget?: { val?: unknown } }[] } } | undefined;
+  const targets = select?.SelectStmt?.targetList ?? [];
+  const val = targets[0]?.ResTarget?.val;
+  if (stmts.length !== 1 || targets.length !== 1 || !val) {
+    throw new DiffPolicyError('incomplete', `pgpm diff: --using expression is not a single expression (one value, no top-level comma): ${expr}`);
+  }
   return cleanTree(val);
 }
 
@@ -1016,7 +1077,30 @@ interface Atom {
 const objectKey = (ref: { schema: string | null; name: string }): string => `${ref.schema ?? ''}.${ref.name}`;
 
 /** Rewrite every reference to relation `schema.from` in `texts` to `schema.to` (AST-level). */
+/** COMMENT/SECURITY LABEL object kinds whose name list ends with one element below the relation. */
+const RELATION_SUBOBJECT_KINDS = new Set(['OBJECT_COLUMN', 'OBJECT_TABCONSTRAINT', 'OBJECT_TRIGGER', 'OBJECT_POLICY', 'OBJECT_RULE']);
+const RELATION_KINDS = new Set(['OBJECT_TABLE', 'OBJECT_VIEW', 'OBJECT_MATVIEW', 'OBJECT_SEQUENCE', 'OBJECT_INDEX', 'OBJECT_FOREIGN_TABLE']);
+
+/**
+ * Rewrite every reference to relation `schema.from` as `to`: RangeVars
+ * (tables, FK targets, policies, grants, composite typevars), qualified
+ * column references, COMMENT ON name lists and `::regclass` literals.
+ * Function bodies are strings and stay as written: Postgres does not rewrite
+ * them on rename either, so a body naming the old relation diffs as a
+ * replacement against the target.
+ */
+const objectLabelOf = (id: ObjectIdentity): string => `${id.schema ? `${id.schema}.` : ''}${id.table ? `${id.table}.` : ''}${id.name}`;
+
 function renameRelation(texts: string[], schema: string | null, from: string, to: string): string[] {
+  const svalOf = (x: unknown): string | undefined => (x as { String?: { sval?: string } })?.String?.sval;
+  const schemaMatches = (name: string | undefined | null): boolean => name === undefined || name === null || name === schema;
+  // `[schema?, relation, ...depth trailing names]`
+  const renameNames = (items: unknown[], depth: number): unknown[] => {
+    const at = items.length - 1 - depth;
+    if (at < 0 || svalOf(items[at]) !== from) return items;
+    if (at > 1 || (at === 1 && !schemaMatches(svalOf(items[0])))) return items;
+    return items.map((x, i) => (i === at ? { String: { sval: to } } : x));
+  };
   const walk = (node: unknown): unknown => {
     if (Array.isArray(node)) return node.map(walk);
     if (!node || typeof node !== 'object') return node;
@@ -1024,20 +1108,48 @@ function renameRelation(texts: string[], schema: string | null, from: string, to
     const out: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(rec)) {
       const rv = value as { relname?: string; schemaname?: string } | undefined;
-      if (
-        (key === 'RangeVar' || key === 'relation' || key === 'pktable' || key === 'typevar') &&
-        rv && typeof rv === 'object' && rv.relname === from && ((rv.schemaname ?? null) === schema || !rv.schemaname)
-      ) {
+      if (rv && typeof rv === 'object' && typeof rv.relname === 'string' && rv.relname === from && schemaMatches(rv.schemaname)) {
         out[key] = walk({ ...rv, relname: to });
         continue;
+      }
+      if (key === 'ColumnRef') {
+        const cr = value as { fields?: unknown[] };
+        if (cr.fields && cr.fields.length >= 2) {
+          out[key] = { ...cr, fields: renameNames(cr.fields, 1) };
+          continue;
+        }
+      }
+      if (key === 'CommentStmt' || key === 'SecLabelStmt') {
+        const c = value as { objtype?: string; object?: { List?: { items?: unknown[] } } };
+        const items = c.object?.List?.items;
+        const depth = RELATION_SUBOBJECT_KINDS.has(c.objtype ?? '') ? 1 : RELATION_KINDS.has(c.objtype ?? '') ? 0 : -1;
+        if (items && depth >= 0) {
+          out[key] = { ...c, object: { List: { items: renameNames(items, depth) } } };
+          continue;
+        }
+      }
+      if (key === 'TypeCast') {
+        const tc = value as { arg?: { A_Const?: { sval?: { sval?: string } } }; typeName?: { names?: unknown[] } };
+        const names = tc.typeName?.names ?? [];
+        const literal = tc.arg?.A_Const?.sval?.sval;
+        if (svalOf(names[names.length - 1]) === 'regclass' && literal !== undefined) {
+          const parts = literal.split('.');
+          const renamed = renameNames(parts.map(x => ({ String: { sval: x } })), 0).map(svalOf).join('.');
+          if (renamed !== literal) {
+            out[key] = { ...tc, arg: { A_Const: { sval: { sval: renamed } } } };
+            continue;
+          }
+        }
       }
       out[key] = walk(value);
     }
     return out;
   };
-  return texts.map(text =>
-    parseSync(text).sql.stmts.map(st => deparseStmt(walk(st.stmt) as Record<string, unknown>)).join('\n')
-  );
+  const mentions = new RegExp(`\\b${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+  return texts.map(text => {
+    if (!mentions.test(text)) return text;
+    return parseSync(text).sql.stmts.map(st => deparseStmt(walk(st.stmt) as Record<string, unknown>)).join('\n');
+  });
 }
 
 /**
@@ -1068,6 +1180,7 @@ export function diffSchemas(
 
   // ---- declared table renames: re-key the from-side unit under its new name.
   const renamedTables = new Map<string, { from: string; schema: string | null }>();
+  const renamedTo = new Map<string, { key: string; name: string }>();
   for (const rename of renames.filter(r => r.kind === 'table')) {
     const oldKey = identityKey({ kind: 'table', schema: rename.schema, name: rename.from });
     const newKey = identityKey({ kind: 'table', schema: rename.schema, name: rename.to });
@@ -1088,10 +1201,37 @@ export function diffSchemas(
     a.units.set(newKey, renamed);
     a.order[a.order.indexOf(oldKey)] = newKey;
     renamedTables.set(newKey, { from: rename.from, schema: rename.schema });
+    renamedTo.set(oldKey, { key: newKey, name: rename.to });
+    // Postgres follows the rename in views, policies, grants and comments; so does the from side.
+    for (const [key, other] of [...a.units]) {
+      if (key === newKey) continue;
+      const texts = renameRelation(other.texts, rename.schema, rename.from, rename.to);
+      const scoped = other.identity.table === rename.from && other.identity.schema === rename.schema;
+      if (!scoped && texts.every((t, i) => t === other.texts[i])) continue;
+      const identity = scoped ? { ...other.identity, table: rename.to } : other.identity;
+      const movedKey = identityKey(identity);
+      if (movedKey !== key) {
+        if (a.units.has(movedKey)) {
+          throw new DiffPolicyError('rename', `pgpm diff: cannot apply rename ${rename.schema ?? ''}.${rename.from} -> ${rename.to}: "${objectLabelOf(identity)}" already exists on the source`);
+        }
+        a.units.delete(key);
+        a.order[a.order.indexOf(key)] = movedKey;
+      }
+      a.units.set(movedKey, { ...other, identity, texts });
+    }
   }
   const columnRenames = new Map<string, Map<string, string>>();
   for (const rename of renames.filter(r => r.kind === 'column')) {
-    const key = identityKey({ kind: 'table', schema: rename.schema, name: rename.table! });
+    const declared = identityKey({ kind: 'table', schema: rename.schema, name: rename.table! });
+    const target = renamedTo.get(declared);
+    const key = target?.key ?? declared;
+    const tableName = target?.name ?? rename.table!;
+    if (rename.toTable !== undefined && rename.toTable !== tableName && rename.toTable !== rename.table) {
+      throw new DiffPolicyError(
+        'rename',
+        `pgpm diff: --rename cannot move "${rename.schema}.${rename.table}.${rename.from}" to another table ("${rename.schema}.${rename.toTable}.${rename.to}")`
+      );
+    }
     if (!columnRenames.has(key)) columnRenames.set(key, new Map());
     columnRenames.get(key)!.set(rename.from, rename.to);
   }
@@ -1256,7 +1396,7 @@ export function diffSchemas(
           keyColumns: [],
           breaking: false,
           rename: true
-        });
+        }, ...implicitConstraintRenames(shapeFrom, relation, renamed.from, unit.identity.name, incomplete));
       }
       const columnsTouched =
         diff.columnsAdded!.length + diff.columnsRemoved!.length + diff.columnsModified!.length > 0;
@@ -1288,6 +1428,8 @@ export function diffSchemas(
       });
       // Every other step of the table addresses it (or its columns) by the new name.
       for (const r of renameAtoms) for (const x of stepAtoms) x.deps.add(r.id);
+      const tableRename = renameAtoms.find(r => r.sub?.kind === 'table');
+      if (tableRename) for (const r of renameAtoms) if (r !== tableRename) r.deps.add(tableRename.id);
       return;
     }
     if (unitFingerprint(prior) === unitFingerprint(unit)) return;
@@ -1528,6 +1670,18 @@ export function diffSchemas(
     }
   }
 
+  // ---- enum values added and used in the same migration: Postgres refuses to
+  // use a new value before the transaction that added it commits (55P04).
+  for (const atom of atoms) {
+    const added = /^ALTER TYPE (\S+) ADD VALUE ('(?:[^']|'')*')/.exec(atom.sql);
+    if (!added) continue;
+    const users = atoms.filter(x => x !== atom && x.phase !== 'drop' && !/^ALTER TYPE \S+ ADD VALUE /.test(x.sql) && x.sql.includes(added[2]));
+    if (users.length === 0) continue;
+    const note = `enum value ${added[2]} of ${added[1]} is added and used in the same migration; Postgres cannot use a new enum value before the transaction that added it commits (deploy with --no-tx, or split the migration)`;
+    incomplete.push(`${atom.name}: ${note}`);
+    for (const user of users) user.sql = `-- pgpm: ${note}\n${user.sql}`;
+  }
+
   // ---- policy: refuse data loss / incompleteness unless accepted explicitly.
   if (destructive.length > 0 && !options.allowDataLoss) {
     throw new DiffPolicyError(
@@ -1543,6 +1697,19 @@ export function diffSchemas(
   }
   warnings.push(...destructive.map(x => `data loss accepted: ${x}`));
   warnings.push(...incomplete.map(x => `incomplete: ${x}`));
+
+  // A replaced object whose new definition needs the table's new name (function
+  // bodies are text; Postgres does not rewrite them on RENAME) needs its old
+  // definition restored only once the table carries its old name again. The
+  // reverse order would recreate it first, so the rename's inverse restores it.
+  for (const renameAtom of atoms) {
+    if (!renameAtom.rename || renameAtom.sub?.kind !== 'table') continue;
+    for (const atom of atoms) {
+      if (atom.phase !== 'create' || atom.added || !atom.inverse || !atom.deps.has(renameAtom.id)) continue;
+      renameAtom.inverse = `${renameAtom.inverse}\n${atom.inverse}`;
+      atom.inverse = '';
+    }
+  }
 
   // ---- order: stable topological sort over atoms (phase, then rank, break ties).
   const order = topoOrder(atoms, atom => `${atom.name} (${atom.phase})`);

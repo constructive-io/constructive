@@ -42,8 +42,10 @@ export function alterEnum(from: Node, to: Node, label: string): AlterStep[] | nu
   const steps: AlterStep[] = [];
   toVals.forEach((v, i) => {
     if (fromVals.includes(v)) return;
+    // Values are added in target order, so the previous target value always
+    // exists by now; a value at the head goes BEFORE the first pre-existing one.
     const after = i > 0 ? toVals[i - 1] : undefined;
-    const before = after === undefined && toVals.length > 1 ? toVals[1] : undefined;
+    const before = after === undefined ? toVals.slice(1).find(x => fromVals.includes(x)) : undefined;
     const node: Node = { AlterEnumStmt: { typeName: to.typeName, newVal: v } };
     if (after !== undefined) Object.assign(node.AlterEnumStmt as Node, { newValNeighbor: after, newValIsAfter: true });
     else if (before !== undefined) Object.assign(node.AlterEnumStmt as Node, { newValNeighbor: before, newValIsAfter: false });
@@ -121,7 +123,31 @@ const SEQUENCE_DEFAULTS: Record<string, Node> = {
   owned_by: { DefElem: { defname: 'owned_by', arg: { List: { items: [{ String: { sval: 'none' } }] } }, defaction: 'DEFELEM_UNSPEC' } }
 };
 
-/** One ALTER SEQUENCE carrying every changed option (removed options reset to their defaults). */
+const sequenceOptionValue = (node: Node, name: string): number | undefined => {
+  for (const item of (node.options as { DefElem?: Node }[]) ?? []) {
+    const d = item.DefElem;
+    if (!d || d.defname !== name) continue;
+    const arg = d.arg as { Integer?: { ival?: number }; Float?: { fval?: string } } | undefined;
+    if (arg?.Integer) return arg.Integer.ival ?? 0;
+    if (arg?.Float) return Number(arg.Float.fval);
+    return undefined;
+  }
+  return undefined;
+};
+
+/** START WITH as the catalog records it: explicit, else MINVALUE (ascending) / MAXVALUE (descending), else 1 / -1. */
+const effectiveSequenceStart = (node: Node): number => {
+  const explicit = sequenceOptionValue(node, 'start');
+  if (explicit !== undefined) return explicit;
+  const increment = sequenceOptionValue(node, 'increment') ?? 1;
+  return increment >= 0 ? sequenceOptionValue(node, 'minvalue') ?? 1 : sequenceOptionValue(node, 'maxvalue') ?? -1;
+};
+
+/**
+ * One ALTER SEQUENCE carrying every changed option (removed options reset to
+ * their defaults). START is compared as its effective value, since a removed
+ * MINVALUE/MAXVALUE also moves the start the catalog derived from it.
+ */
 export function alterSequence(from: Node, to: Node): AlterStep[] | null {
   const read = (node: Node): Map<string, Node> => {
     const out = new Map<string, Node>();
@@ -139,11 +165,18 @@ export function alterSequence(from: Node, to: Node): AlterStep[] | null {
   for (const name of new Set([...a.keys(), ...b.keys()])) {
     const prior = a.get(name);
     const next = b.get(name);
-    if (stablePrint(prior) === stablePrint(next)) continue;
+    if (name === 'start' || stablePrint(prior) === stablePrint(next)) continue;
     const reset = SEQUENCE_DEFAULTS[name];
     if (!reset && (!prior || !next)) return null;
     forward.push(next ?? reset);
     backward.push(prior ?? reset);
+  }
+  const startFrom = effectiveSequenceStart(from);
+  const startTo = effectiveSequenceStart(to);
+  if (startFrom !== startTo) {
+    const start = (value: number): Node => ({ DefElem: { defname: 'start', arg: { Integer: { ival: value } }, defaction: 'DEFELEM_UNSPEC' } });
+    forward.push(start(startTo));
+    backward.push(start(startFrom));
   }
   if (forward.length === 0) return [];
   const alter = (options: Node[]): string =>
@@ -177,10 +210,17 @@ export function alterComposite(from: Node, to: Node, label: string): AlterStep[]
       destructive: `${label}: DROP ATTRIBUTE ${name}`
     });
   }
+  const targetOrder = [...b.keys()];
   for (const [name, def] of b) {
     const prior = a.get(name);
     if (!prior) {
-      steps.push({ sql: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: def } }), inverse: alter({ subtype: 'AT_DropColumn', name }) });
+      const displaced = targetOrder.slice(targetOrder.indexOf(name) + 1).find(k => a.has(k));
+      steps.push({
+        sql: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: def } }),
+        inverse: alter({ subtype: 'AT_DropColumn', name }),
+        incomplete: displaced === undefined ? undefined :
+          `${label}: attribute "${name}" is inserted before "${displaced}" but ALTER TYPE .. ADD ATTRIBUTE appends; the attribute order differs from the target (recreate the type to match it)`
+      });
     } else if (stablePrint(prior) !== stablePrint(def)) {
       const retype = (d: Node): string =>
         alter({ subtype: 'AT_AlterColumnType', name, def: { ColumnDef: { typeName: d.typeName, collClause: d.collClause } } });

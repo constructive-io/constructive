@@ -7,7 +7,7 @@
  */
 import { loadModule } from 'plpgsql-parser';
 
-import { diffSchemas as diffSchemasTyped, SemanticDiffOptions } from '../src/semantic-diff-driver';
+import { diffSchemas as diffSchemasTyped, parseRenameDeclaration, SemanticDiffOptions } from '../src/semantic-diff-driver';
 
 // Options are typed loosely so this file compiles against the pre-fix driver too.
 const diffSchemas = (from: string, to: string, options?: Record<string, unknown>): ReturnType<typeof diffSchemasTyped> =>
@@ -292,21 +292,21 @@ describe('diffSchemas: review follow-ups', () => {
     const revert = norm(sql(result, 'revert'));
     expect(deploy).toMatch(/ALTER SEQUENCE app\.s .*NO MINVALUE/);
     expect(deploy).toMatch(/NO MAXVALUE/);
-    expect(deploy).toMatch(/START WITH 1/);
+    expect(deploy).toMatch(/START (WITH )?1\b/);
     expect(deploy).toMatch(/CACHE 1\b/);
     expect(revert).toMatch(/MINVALUE 5/);
     expect(revert).toMatch(/MAXVALUE 1000/);
-    expect(revert).toMatch(/START WITH 5/);
+    expect(revert).toMatch(/START (WITH )?5\b/);
     expect(revert).toMatch(/CACHE 10/);
   });
 
   it('rejects a --using expression with a top-level comma or a parse error, naming the flag', () => {
     const from = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY, code text);`;
     const to = `${S}\nCREATE TABLE app.t (id int PRIMARY KEY, code int);`;
-    expect(() => diffSchemas(from, to, { casts: { 'app.t.code': 'code::int, id' } })).toThrow(/--using.*single expression/);
-    expect(() => diffSchemas(from, to, { casts: { 'app.t.code': 'nullif(code' } })).toThrow(/--using.*could not be parsed/);
-    const ok = diffSchemas(from, to, { casts: { 'app.t.code': "nullif(code, '')::int" } });
-    expect(norm(sql(ok, 'deploy'))).toMatch(/USING nullif\(code, ''\)::int(eger)?/);
+    expect(() => diffSchemas(from, to, { ...lax, casts: { 'app.t.code': 'code::int, id' } })).toThrow(/--using.*single expression/);
+    expect(() => diffSchemas(from, to, { ...lax, casts: { 'app.t.code': 'nullif(code' } })).toThrow(/--using.*could not be parsed/);
+    const ok = diffSchemas(from, to, { ...lax, casts: { 'app.t.code': "nullif(code, '')::int" } });
+    expect(norm(sql(ok, 'deploy'))).toMatch(/USING .*nullif ?\(code, ''\).*int/i);
   });
 
   it('does not re-grant when an explicit REVOKE ALL FROM PUBLIC disappears on an object PUBLIC has no default rights to', () => {
@@ -336,7 +336,7 @@ describe('diffSchemas: review follow-ups', () => {
     const from = `${S}\nCREATE TABLE app.old (id int PRIMARY KEY, col text);`;
     const to = `${S}\nCREATE TABLE app.new (id int PRIMARY KEY, name text);`;
     for (const columnSpec of ['app.old.col=app.new.name', 'app.old.col=app.old.name']) {
-      const result = diffSchemas(from, to, { renames: ['app.old=app.new', columnSpec] });
+      const result = diffSchemas(from, to, { renames: ['app.old=app.new', columnSpec].map(parseRenameDeclaration) });
       const deploy = norm(sql(result, 'deploy'));
       expect(deploy).toMatch(/ALTER TABLE app\.old RENAME TO new/);
       expect(deploy).toMatch(/ALTER TABLE app\.new RENAME (COLUMN )?col TO name/);
@@ -345,7 +345,7 @@ describe('diffSchemas: review follow-ups', () => {
       expect(revert).toMatch(/ALTER TABLE app\.new RENAME (COLUMN )?name TO col/);
       expect(revert).toMatch(/ALTER TABLE app\.new RENAME TO old/);
     }
-    expect(() => diffSchemas(from, to, { renames: ['app.old=app.new', 'app.old.col=app.other.name'] })).toThrow(/cannot move/);
+    expect(() => diffSchemas(from, to, { renames: ['app.old=app.new', 'app.old.col=app.other.name'].map(parseRenameDeclaration) })).toThrow(/cannot move/);
   });
 
   it('follows a table rename through comments, grants, views, policies and function bodies', () => {
@@ -360,7 +360,7 @@ describe('diffSchemas: review follow-ups', () => {
       `CREATE VIEW app.v AS SELECT ${t}.id, ${t}.col FROM app.${t};`,
       `CREATE FUNCTION app.f() RETURNS bigint LANGUAGE sql AS $$ SELECT count(*) FROM app.${t} $$;`
     ].join('\n');
-    const result = diffSchemas(body('old'), body('new'), { renames: ['app.old=app.new'] });
+    const result = diffSchemas(body('old'), body('new'), { renames: [parseRenameDeclaration('app.old=app.new')] });
     expect(result.warnings).toEqual([]);
     const deploy = norm(sql(result, 'deploy'));
     expect(deploy).toMatch(/ALTER TABLE app\.old RENAME TO new/);

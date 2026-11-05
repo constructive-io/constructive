@@ -223,7 +223,9 @@ export class CLIDeployTestFixture extends TestFixture {
           argv[baseKey] = false;
           i += 1;
         } else if (i + 1 < tokens.length && !tokens[i + 1].startsWith('--')) {
-          argv[key] = tokens[i + 1];
+          // Repeated flags accumulate, as minimist does (`--rename a=b --rename c=d`).
+          const prior = argv[key];
+          argv[key] = prior === undefined ? tokens[i + 1] : [...(Array.isArray(prior) ? prior : [prior]), tokens[i + 1]];
           i += 2;
         } else {
           argv[key] = true;
