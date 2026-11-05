@@ -327,5 +327,5 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))

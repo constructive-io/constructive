@@ -358,8 +358,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
-- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff))
+- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07))
 
 ## [1.13.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.13.3...@pgpmjs/export@1.13.4) (2026-07-31)
 
@@ -902,7 +902,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **export:** add 6 new services_public settings tables to export ([e5017e3](https://github.com/constructive-io/constructive/commit/e5017e3449c5e17045498dd116047421b50bf398)), closes [constructive-db#1060](https://github.com/constructive-db/issues/1060) [constructive-planning#812](https://github.com/constructive-planning/issues/812)
+- **export:** add 6 new services_public settings tables to export ([e5017e3](https://github.com/constructive-io/constructive/commit/e5017e3449c5e17045498dd116047421b50bf398))
 - **export:** update settings table configs to use UUID FK fields ([7d7b759](https://github.com/constructive-io/constructive/commit/7d7b75926d89088640bc98989b76544a0b7c1495)), closes [#1060](https://github.com/constructive-io/constructive/issues/1060) [#816](https://github.com/constructive-io/constructive/issues/816) [#817](https://github.com/constructive-io/constructive/issues/817)
 
 ## [0.10.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@0.10.1...@pgpmjs/export@0.10.2) (2026-05-09)
