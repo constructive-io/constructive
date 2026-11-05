@@ -75,6 +75,7 @@ export const snapshotCatalog = async (db: CatalogQueryable): Promise<CatalogSnap
     JOIN pg_class cl ON cl.oid = c.conrelid
     JOIN pg_namespace n ON n.oid = cl.relnamespace
     WHERE n.nspname NOT IN ${SYSTEM_SCHEMAS}
+      AND c.contype <> 'n'
   `);
 
   const indexes = await db.query(`

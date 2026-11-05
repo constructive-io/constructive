@@ -538,6 +538,8 @@ interface TableAlteration {
   breaking: boolean;
   /** The RENAME step every other step of the table must follow. */
   rename?: boolean;
+  /** The column's name on the from side when it was renamed (dependents mention that name). */
+  fromName?: string;
 }
 
 /** Policy and declaration inputs threaded into the table diff. */
@@ -624,8 +626,9 @@ function diffTable(
     collectColumnMentions((c as { raw_expr?: unknown } | undefined)?.raw_expr, expr);
     return [...new Set([...keys, ...expr.names])];
   };
+  const renamedFrom = new Map<string, string>();
   const attr = (name: string, phase: Phase, sql: string, inverse: string, breaking = false): TableAlteration =>
-    ({ sql, inverse, phase, sub: column(name), keyColumns: [], breaking });
+    ({ sql, inverse, phase, sub: column(name), keyColumns: [], breaking, fromName: renamedFrom.get(name) });
 
   diff.columnsAdded = [];
   diff.columnsRemoved = [];
@@ -644,6 +647,7 @@ function diffTable(
       );
     }
     fromColumns.delete(oldName);
+    renamedFrom.set(newName, oldName);
     const def = { ...(prior.def as Record<string, unknown>), colname: newName };
     const canon = { ...(prior.canon as Record<string, unknown>), colname: newName };
     fromColumns.set(newName, { def, canon, print: stablePrint(canon) });
@@ -660,8 +664,11 @@ function diffTable(
       inverse: deparseStmt({ RenameStmt: { renameType: 'OBJECT_COLUMN', relationType: 'OBJECT_TABLE', relation, subname: newName, newname: oldName, behavior: 'DROP_RESTRICT' } }),
       phase: 'alter',
       sub: column(newName),
+      fromName: oldName,
       keyColumns: [],
-      breaking: false,
+      // Dependents that name the column must be rebuilt around the rename
+      // (their from-side text uses the old name, their to-side text the new).
+      breaking: true,
       rename: true
     });
   }
@@ -993,6 +1000,10 @@ interface Atom {
   keyColumns: string[];
   /** Whether the step invalidates dependents (drops, column drop/retype). */
   breaking: boolean;
+  /** A RENAME step: everything addressing the object afterwards depends on it. */
+  rename?: boolean;
+  /** From-side name of a renamed column (what from-side dependents mention). */
+  fromName?: string;
   /** Tie-break within a phase (lower first). */
   rank: number;
   deps: Set<number>;
@@ -1264,6 +1275,8 @@ export function diffSchemas(
           sub: step.sub,
           keyColumns: step.keyColumns,
           breaking: step.breaking,
+          rename: step.rename,
+          fromName: step.fromName,
           rank: toRank * 1000 + i - (step.rename ? 1000 : 0)
         });
         (step.rename ? renameAtoms : stepAtoms).push(atom);
@@ -1378,7 +1391,7 @@ export function diffSchemas(
       breaking.push(...unitPhase(dep, 'drop'));
       // Functions bind late to columns; only replaced objects invalidate them.
       if (unit.identity.kind === 'function') continue;
-      breaking.push(...unitPhase(dep, 'remove', 'alter').filter(x => x.breaking && x.sub?.kind === 'column' && mentions(used, x.sub.name)));
+      breaking.push(...unitPhase(dep, 'remove', 'alter').filter(x => x.breaking && x.sub?.kind === 'column' && mentions(used, x.fromName ?? x.sub.name)));
     }
     if (breaking.length === 0) continue;
     const path = pathFor(unit.identity, { style });
@@ -1406,7 +1419,7 @@ export function diffSchemas(
       for (const x of unitPhase(dep, 'drop')) for (const d of drops) x.deps.add(d.id);
       for (const x of unitPhase(dep, 'remove', 'alter')) {
         if (!x.breaking) continue;
-        if (x.sub?.kind === 'column' && !mentions(used, x.sub.name)) continue;
+        if (x.sub?.kind === 'column' && !mentions(used, x.fromName ?? x.sub.name)) continue;
         for (const d of drops) x.deps.add(d.id);
       }
     }
@@ -1475,7 +1488,7 @@ export function diffSchemas(
         const unitKey = unitByObject.get(k);
         if (!unitKey || unitKey === atom.owner) continue;
         for (const step of unitPhase(unitKey, 'add', 'alter')) {
-          if (step.sub?.kind === 'table') atom.deps.add(step.id);
+          if (step.sub?.kind === 'table' || step.rename) atom.deps.add(step.id);
           if (step.sub === null && step.breaking && step.phase === 'alter') atom.deps.add(step.id);
           if (step.sub?.kind === 'column' && mentions(used, step.sub.name)) atom.deps.add(step.id);
           if (step.sub?.kind === 'constraint' && step.phase === 'add' && step.keyColumns.length > 0
