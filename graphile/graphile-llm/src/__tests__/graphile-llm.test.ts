@@ -333,12 +333,12 @@ describe('graphile-llm schema enrichment', () => {
 
     it('stores raw text in the physical embedding_text column (not consumed as companion)', async () => {
       const result = await query<{
-        createNote: { note: { id: number; title: string; embeddingText: string; embedding: number[] | null } };
+        createNote: { note: { rowId: number; title: string; embeddingText: string; embedding: number[] | null } };
       }>(`
         mutation {
           createNote(input: { note: { title: "Physical column", embeddingText: "keep me as text" } }) {
             note {
-              id
+              rowId
               title
               embeddingText
               embedding
