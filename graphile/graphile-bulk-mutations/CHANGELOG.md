@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.7](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.6...graphile-bulk-mutations@1.19.7) (2026-11-06)
+
+### Bug Fixes
+
+- **graphile-test:** validate the document before executing it ([9ea5e41](https://github.com/constructive-io/constructive/commit/9ea5e411d5c451adeafa36b23cbb7dc827c27cee))
+
 ## [1.19.6](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.5...graphile-bulk-mutations@1.19.6) (2026-11-05)
 
 **Note:** Version bump only for package graphile-bulk-mutations

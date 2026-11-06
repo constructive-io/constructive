@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.24.20](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.19...@constructive-io/playwright-test@3.24.20) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
 ## [3.24.19](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.18...@constructive-io/playwright-test@3.24.19) (2026-11-05)
 
 **Note:** Version bump only for package @constructive-io/playwright-test
