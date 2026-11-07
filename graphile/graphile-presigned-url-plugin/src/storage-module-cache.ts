@@ -317,6 +317,7 @@ export function storedPhysicalName(row: { physical_name?: string | null }): stri
  * @param databaseId - The metaschema database UUID (used as cache key prefix)
  * @param bucketKey - The bucket key (e.g., "public", "private")
  * @param ownerId - Optional owner entity ID for entity-scoped bucket lookup
+ * @param byDatabase - The plane is database-keyed: read the bucket of `databaseId` only
  * @returns BucketConfig or null if the bucket doesn't exist / isn't accessible
  */
 export async function getBucketConfig(
@@ -325,6 +326,7 @@ export async function getBucketConfig(
   databaseId: string,
   bucketKey: string,
   ownerId?: string,
+  byDatabase = false,
 ): Promise<BucketConfig | null> {
   const cacheKey = `bucket:${databaseId}:${storageConfig.id}:${bucketKey}${ownerId ? `:${ownerId}` : ''}`;
   const cached = bucketCache.get(cacheKey);
@@ -337,19 +339,21 @@ export async function getBucketConfig(
   return readAndCache(databaseId, 'bucket', async () => {
     // Entity-keyed planes (the module records an entity table) use the
     // (owner_id, key) composite lookup; app- and database-scope planes just use key.
+    // Database-keyed planes hold every database's buckets under the same keys.
     const isEntityScoped = storageConfig.entityTableId !== null;
     const hasOwner = ownerId && isEntityScoped;
+    const scopeFilter = byDatabase ? ` AND database_id = $${hasOwner ? 3 : 2}` : '';
     const result = await pgClient.query({
       text: hasOwner
         ? `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size, allow_custom_keys, physical_name
            FROM ${storageConfig.bucketsQualifiedName}
-           WHERE key = $1 AND owner_id = $2
+           WHERE key = $1 AND owner_id = $2${scopeFilter}
            LIMIT 1`
         : `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys, physical_name
            FROM ${storageConfig.bucketsQualifiedName}
-           WHERE key = $1
+           WHERE key = $1${scopeFilter}
            LIMIT 1`,
-      values: hasOwner ? [bucketKey, ownerId] : [bucketKey],
+      values: [bucketKey, ...(hasOwner ? [ownerId] : []), ...(byDatabase ? [databaseId] : [])],
     });
 
     if (result.rows.length === 0) {

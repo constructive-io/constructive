@@ -86,9 +86,25 @@ async function resolveUploadBucket(
   bucketKey: string | null,
   ownerId: string | null,
   isPublic: boolean,
+  byDatabase: boolean,
+  explicitDatabase: boolean,
 ): Promise<BucketConfig | null> {
   if (bucketKey) {
-    return getBucketConfig(pgClient, storageConfig, databaseId, bucketKey, ownerId || undefined);
+    return getBucketConfig(pgClient, storageConfig, databaseId, bucketKey, ownerId || undefined, byDatabase);
+  }
+
+  // A database named on the input is the row's scope, not the session's: its
+  // default bucket is read by tag under the request role, so RLS decides
+  // whether the caller may see (and so write into) that database's buckets.
+  if (explicitDatabase) {
+    const result = await pgClient.query({
+      text: `SELECT key FROM ${storageConfig.bucketsQualifiedName}
+             WHERE database_id = $1 AND $2 = ANY(tags)
+             LIMIT 1`,
+      values: [databaseId, isPublic ? 'default-public' : 'default'],
+    });
+    const key = result.rows[0]?.key as string | undefined;
+    return key ? getBucketConfig(pgClient, storageConfig, databaseId, key, undefined, true) : null;
   }
 
   const coordinate = await resolveDefaultBucket(
@@ -98,7 +114,7 @@ async function resolveUploadBucket(
     isPublic,
     null,
   );
-  return getBucketConfig(pgClient, storageConfig, databaseId, coordinate.resolvedKey, ownerId || undefined);
+  return getBucketConfig(pgClient, storageConfig, databaseId, coordinate.resolvedKey, ownerId || undefined, byDatabase);
 }
 
 // --- Plugin factory ---
@@ -166,6 +182,8 @@ export function createPresignedUrlPlugin(
             const { filesTypeName, uploadMutation: mutationName } = names;
 
             const hasOwnerId = plane.hasOwnerId;
+            const hasDatabaseId = plane.hasDatabaseId;
+            const uuidGqlType = (build as any).getTypeByName('UUID') || GraphQLString;
 
             const ownerIdGqlType = hasOwnerId
               ? (build as any).getGraphQLTypeByPgCodec(matchingBucketCodec.attributes.owner_id.codec, 'input')
@@ -178,6 +196,9 @@ export function createPresignedUrlPlugin(
                 isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given.' },
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
+                  : {}),
+                ...(hasDatabaseId
+                  ? { databaseId: { type: uuidGqlType, description: 'Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused.' } }
                   : {}),
                 contentHash: { type: new GraphQLNonNull(GraphQLString), description: 'SHA-256 content hash (hex-encoded, 64 chars)' },
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
@@ -232,6 +253,7 @@ export function createPresignedUrlPlugin(
                     const $filename = access($input, 'filename');
                     const $customKey = access($input, 'key');
                     const $ownerId = hasOwnerId ? access($input, 'ownerId') : lambda(null, (): null => null);
+                    const $databaseId = hasDatabaseId ? access($input, 'databaseId') : lambda(null, (): null => null);
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
 
@@ -239,6 +261,7 @@ export function createPresignedUrlPlugin(
                       bucketKey: $bucketKey,
                       isPublic: $isPublic,
                       ownerId: $ownerId,
+                      databaseId: $databaseId,
                       contentHash: $contentHash,
                       contentType: $contentType,
                       size: $size,
@@ -252,16 +275,18 @@ export function createPresignedUrlPlugin(
                       // Request-lane reads/writes run under the request role's pgSettings
                       // inside an explicit transaction so the jwt claims stay applied
                       // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
+                      const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      // The input's databaseId selects the row's scope; identity stays on the claims.
+                      const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
                       // Storage config is read on the request lane through the claim-scoped
 
                       // function_resolution.storage_modules(): no role switch, no RLS bypass.
                       const allConfigs = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                        loadAllStorageModules(pgClient, claimDatabaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
@@ -271,8 +296,10 @@ export function createPresignedUrlPlugin(
                         resolveUploadBucket(
                           pgClient, storageConfig, databaseId,
                           vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                          hasDatabaseId, vals.databaseId != null,
                         ),
                       );
+                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // The reconciler records the coordinate; consumers never
@@ -328,6 +355,9 @@ export function createPresignedUrlPlugin(
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
                   : {}),
+                ...(hasDatabaseId
+                  ? { databaseId: { type: uuidGqlType, description: 'Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused.' } }
+                  : {}),
                 files: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(BulkFileInputType))), description: 'Array of files to upload' },
               },
             });
@@ -355,6 +385,7 @@ export function createPresignedUrlPlugin(
                     const $bucketKey = access($input, 'bucketKey');
                     const $isPublic = access($input, 'isPublic');
                     const $ownerId = hasOwnerId ? access($input, 'ownerId') : lambda(null, (): null => null);
+                    const $databaseId = hasDatabaseId ? access($input, 'databaseId') : lambda(null, (): null => null);
                     const $files = access($input, 'files');
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
@@ -363,6 +394,7 @@ export function createPresignedUrlPlugin(
                       bucketKey: $bucketKey,
                       isPublic: $isPublic,
                       ownerId: $ownerId,
+                      databaseId: $databaseId,
                       files: $files,
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
@@ -372,16 +404,18 @@ export function createPresignedUrlPlugin(
                       // Request-lane reads/writes run under the request role's pgSettings
                       // inside an explicit transaction so the jwt claims stay applied
                       // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
+                      const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      // The input's databaseId selects the row's scope; identity stays on the claims.
+                      const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
                       // Storage config is read on the request lane through the claim-scoped
 
                       // function_resolution.storage_modules(): no role switch, no RLS bypass.
                       const allConfigs = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                        loadAllStorageModules(pgClient, claimDatabaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
@@ -391,8 +425,10 @@ export function createPresignedUrlPlugin(
                         resolveUploadBucket(
                           pgClient, storageConfig, databaseId,
                           vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                          hasDatabaseId, vals.databaseId != null,
                         ),
                       );
+                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // Enforce bulk upload limits
