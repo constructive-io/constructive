@@ -140,8 +140,9 @@ export function createEmbedIndex(graphql: any) {
     case 'nearby': {
       delete next[fieldName];
       const hasVector = isNonEmptyVector(value[rule.into]);
-      const hasText = typeof text === 'string';
-      if (hasVector && hasText) {
+      const sentText = typeof text === 'string';
+      const hasText = sentText && text.trim().length > 0;
+      if (hasVector && sentText) {
         throw new Error(
           `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`
         );
