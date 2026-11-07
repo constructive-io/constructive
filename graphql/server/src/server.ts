@@ -151,12 +151,13 @@ class Server {
 
     app.use(poweredBy('constructive'));
     app.use(cookieParser());
-    app.use(cors(fallbackOrigin));
     app.use(parseDomains() as RequestHandler);
     app.use(clientIpMiddleware);
     app.use(requestIdMiddleware());
     app.use(requestLogger);
     app.use(api);
+    // CORS is decided against the API the host resolved to (req.api).
+    app.use(cors(fallbackOrigin));
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
