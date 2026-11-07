@@ -327,6 +327,12 @@ export const registry = {
     http: 401,
     message: 'You must be signed in to do that.'
   }),
+  STRICT_AUTH_UNAVAILABLE: defineError({
+    code: 'STRICT_AUTH_UNAVAILABLE',
+    class: 'internal',
+    http: 503,
+    message: 'Strict authentication is enabled but this API has no strict authentication function, so the request was refused.'
+  }),
   CAPTCHA_REQUIRED: defineError({
     code: 'CAPTCHA_REQUIRED',
     class: 'public',
