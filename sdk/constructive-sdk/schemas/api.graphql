@@ -3517,6 +3517,41 @@ type CreatePlatformPagePayload {
   query: Query
 }
 
+"""All input for the create `PlatformReservedSubdomain` mutation."""
+input CreatePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` to be created by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomainInput!
+}
+
+"""The output of our create `PlatformReservedSubdomain` mutation."""
+type CreatePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was created by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `PlatformSiteAppLink` mutation."""
 input CreatePlatformSiteAppLinkInput {
   """
@@ -9264,6 +9299,39 @@ type DeletePlatformPagePayload {
     """The method to use when ordering `PlatformPage`."""
     orderBy: [PlatformPageOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformPageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformReservedSubdomain` mutation."""
+input DeletePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformReservedSubdomain` mutation."""
+type DeletePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was deleted by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -16567,6 +16635,14 @@ type Mutation {
     input: CreatePlatformPageInput!
   ): CreatePlatformPagePayload
 
+  """Creates a single `PlatformReservedSubdomain`."""
+  createPlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformReservedSubdomainInput!
+  ): CreatePlatformReservedSubdomainPayload
+
   """Creates a single `PlatformSite`."""
   createPlatformSite(
     """
@@ -17246,6 +17322,14 @@ type Mutation {
     """
     input: DeletePlatformPageInput!
   ): DeletePlatformPagePayload
+
+  """Deletes a single `PlatformReservedSubdomain` using a unique key."""
+  deletePlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformReservedSubdomainInput!
+  ): DeletePlatformReservedSubdomainPayload
 
   """Deletes a single `PlatformSite` using a unique key."""
   deletePlatformSite(
@@ -18130,6 +18214,16 @@ type Mutation {
     """
     input: UpdatePlatformPageInput!
   ): UpdatePlatformPagePayload
+
+  """
+  Updates a single `PlatformReservedSubdomain` using a unique key and a patch.
+  """
+  updatePlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformReservedSubdomainInput!
+  ): UpdatePlatformReservedSubdomainPayload
 
   """Updates a single `PlatformSite` using a unique key and a patch."""
   updatePlatformSite(
@@ -22591,6 +22685,151 @@ type PlatformProvisionSitePreviewPayload {
   result: PlatformRoute
 }
 
+"""Subdomain labels no tenant may claim under a platform apex"""
+type PlatformReservedSubdomain {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID!
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String!
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String!
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `PlatformReservedSubdomain` values."""
+type PlatformReservedSubdomainConnection {
+  """
+  A list of edges which contains the `PlatformReservedSubdomain` and cursor to aid in pagination.
+  """
+  edges: [PlatformReservedSubdomainEdge]!
+
+  """A list of `PlatformReservedSubdomain` objects."""
+  nodes: [PlatformReservedSubdomain]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformReservedSubdomain` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformReservedSubdomain` edge in the connection."""
+type PlatformReservedSubdomainEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformReservedSubdomain` at the end of the edge."""
+  node: PlatformReservedSubdomain
+}
+
+"""
+A filter to be used against `PlatformReservedSubdomain` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformReservedSubdomainFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformReservedSubdomainFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `label` field."""
+  label: StringFilter
+
+  """Filter by the object’s `match` field."""
+  match: StringFilter
+
+  """Negates the expression."""
+  not: PlatformReservedSubdomainFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformReservedSubdomainFilter!]
+
+  """Filter by the object’s `reason` field."""
+  reason: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformReservedSubdomain`"""
+input PlatformReservedSubdomainInput {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String!
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformReservedSubdomain`."""
+enum PlatformReservedSubdomainOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  MATCH_ASC
+  MATCH_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REASON_ASC
+  REASON_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformReservedSubdomain`. Fields that are set will be updated.
+"""
+input PlatformReservedSubdomainPatch {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
 """Routes binding a domain hostname and path to a typed catalog target"""
 type PlatformRoute {
   """
@@ -25711,7 +25950,6 @@ type Query {
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
   _meta: MetaSchema
-  apiSchemaNames(targetApiId: UUID): JSON
 
   """Reads and enables pagination through a set of `ApiSchema`."""
   apiSchemas(
@@ -27118,6 +27356,37 @@ type Query {
     where: PlatformPageFilter
   ): PlatformPageConnection
 
+  """
+  Reads and enables pagination through a set of `PlatformReservedSubdomain`.
+  """
+  platformReservedSubdomains(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformReservedSubdomainFilter
+  ): PlatformReservedSubdomainConnection
+
   """Reads and enables pagination through a set of `PlatformSiteAppLink`."""
   platformSiteAppLinks(
     """Read all values in the set after (below) this cursor."""
@@ -27497,9 +27766,6 @@ type Query {
     """
     where: RedirectFilter
   ): RedirectConnection
-  resolveDeepLink(linkSlug: String, targetSiteId: UUID): JSON
-  resolveRoute(requestHost: String, requestMethod: String, requestPath: String): ResolveRouteRecord
-  resolveSiteAppLinks(targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `RlsSetting`."""
   rlsSettings(
@@ -28607,26 +28873,6 @@ type RequestDatabasePayload {
   """
   query: Query
   result: DatabaseProvisionModule
-}
-
-type ResolveRouteRecord {
-  domainId: UUID
-  hostname: String
-  matchedPath: String
-  matchedWildcard: Boolean
-  method: String
-  priority: Int
-  resolvedConfig: JSON
-  routeBindingId: UUID
-  servingLane: String
-  targetCatalogId: UUID
-  targetModule: String
-  targetOwnerKey: UUID
-  targetOwnerScope: String
-  targetSourceId: UUID
-  tlsSecretName: String
-  tlsStatus: String
-  verificationStatus: String
 }
 
 """
@@ -37287,6 +37533,44 @@ type UpdatePlatformPagePayload {
     """The method to use when ordering `PlatformPage`."""
     orderBy: [PlatformPageOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformPageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updatePlatformReservedSubdomain` mutation."""
+input UpdatePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformReservedSubdomain` being updated.
+  """
+  platformReservedSubdomainPatch: PlatformReservedSubdomainPatch!
+}
+
+"""The output of our update `PlatformReservedSubdomain` mutation."""
+type UpdatePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was updated by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
