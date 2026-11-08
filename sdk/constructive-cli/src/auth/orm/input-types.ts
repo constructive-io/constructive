@@ -2122,6 +2122,12 @@ export interface EnableSmsMfaInput {
 export interface EnableTotpInput {
   clientMutationId?: string;
 }
+export interface ExchangeNativeHandoffInput {
+  clientMutationId?: string;
+  code?: string;
+  codeVerifier?: string;
+  credentialKind?: string;
+}
 export interface ExtendTokenExpiresInput {
   amount?: IntervalInput;
   clientMutationId?: string;
@@ -2165,7 +2171,9 @@ export interface RequestCrossOriginTokenInput {
 }
 export interface RequestMagicLinkInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   email?: string;
+  nativeRedirectUri?: string;
   next?: string;
 }
 export interface ResetPasswordInput {
@@ -2216,6 +2224,7 @@ export interface SetPasswordInput {
   clientMutationId?: string;
   currentPassword?: string;
   newPassword?: string;
+  signOutOtherSessions?: boolean;
 }
 export interface SetPrincipalEntitiesInput {
   clientMutationId?: string;
@@ -3800,6 +3809,16 @@ export type EnableTotpPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface ExchangeNativeHandoffPayload {
+  clientMutationId?: string | null;
+  result?: ExchangeNativeHandoffRecord | null;
+}
+export type ExchangeNativeHandoffPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: ExchangeNativeHandoffRecordSelect;
+  };
+};
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
@@ -4556,6 +4575,22 @@ export type CreateOrgApiKeyRecordSelect = {
   expiresAt?: boolean;
   keyId?: boolean;
 };
+export interface ExchangeNativeHandoffRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  id?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  userId?: string | null;
+}
+export type ExchangeNativeHandoffRecordSelect = {
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+  id?: boolean;
+  isVerified?: boolean;
+  totpEnabled?: boolean;
+  userId?: boolean;
+};
 export interface ExtendTokenExpiresRecord {
   expiresAt?: string | null;
   id?: string | null;
@@ -4643,18 +4678,22 @@ export type SignInCrossOriginRecordSelect = {
 export interface SignInMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
   deviceApprovalRequired?: boolean | null;
   mfaChallengeToken?: string | null;
   mfaRequired?: boolean | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
 export type SignInMagicLinkRecordSelect = {
   accessToken?: boolean;
   accessTokenExpiresAt?: boolean;
+  codeChallenge?: boolean;
   deviceApprovalRequired?: boolean;
   mfaChallengeToken?: boolean;
   mfaRequired?: boolean;
+  nativeRedirectUri?: boolean;
   outDeviceToken?: boolean;
   userId?: boolean;
 };
@@ -4679,12 +4718,16 @@ export type SignInSmsOtpRecordSelect = {
 export interface SignUpMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
 export type SignUpMagicLinkRecordSelect = {
   accessToken?: boolean;
   accessTokenExpiresAt?: boolean;
+  codeChallenge?: boolean;
+  nativeRedirectUri?: boolean;
   outDeviceToken?: boolean;
   userId?: boolean;
 };

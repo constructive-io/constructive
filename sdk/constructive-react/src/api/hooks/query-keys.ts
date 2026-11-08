@@ -465,6 +465,15 @@ export const platformPageKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformPageKeys.details(), id] as const,
 } as const;
+export const platformReservedSubdomainKeys = {
+  /** All platformReservedSubdomain queries */ all: ['platformreservedsubdomain'] as const,
+  /** List query keys */ lists: () => [...platformReservedSubdomainKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformReservedSubdomainKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformReservedSubdomainKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformReservedSubdomainKeys.details(), id] as const,
+} as const;
 export const platformSiteAppLinkKeys = {
   /** All platformSiteAppLink queries */ all: ['platformsiteapplink'] as const,
   /** List query keys */ lists: () => [...platformSiteAppLinkKeys.all, 'list'] as const,
@@ -840,8 +849,6 @@ export const webauthnSettingKeys = {
 // ============================================================================
 
 export const customQueryKeys = {
-  /** Query key for apiSchemaNames */ apiSchemaNames: (variables?: object) =>
-    ['apiSchemaNames', variables] as const,
   /** Query key for applyRegistryDefaults */ applyRegistryDefaults: (variables?: object) =>
     ['applyRegistryDefaults', variables] as const,
   /** Query key for emailSharedAccount */ emailSharedAccount: () => ['emailSharedAccount'] as const,
@@ -866,12 +873,6 @@ export const customQueryKeys = {
   /** Query key for platformVerifySitePreviewToken */ platformVerifySitePreviewToken: (
     variables?: object
   ) => ['platformVerifySitePreviewToken', variables] as const,
-  /** Query key for resolveDeepLink */ resolveDeepLink: (variables?: object) =>
-    ['resolveDeepLink', variables] as const,
-  /** Query key for resolveRoute */ resolveRoute: (variables?: object) =>
-    ['resolveRoute', variables] as const,
-  /** Query key for resolveSiteAppLinks */ resolveSiteAppLinks: (variables?: object) =>
-    ['resolveSiteAppLinks', variables] as const,
   /** Query key for sitesDeepLinkUrl */ sitesDeepLinkUrl: (variables?: object) =>
     ['sitesDeepLinkUrl', variables] as const,
   /** Query key for sitesSiteOrigin */ sitesSiteOrigin: (variables?: object) =>
@@ -951,6 +952,7 @@ export const queryKeys = {
   platformGetSitePreviewsRecord: platformGetSitePreviewsRecordKeys,
   platformManagedDomain: platformManagedDomainKeys,
   platformPage: platformPageKeys,
+  platformReservedSubdomain: platformReservedSubdomainKeys,
   platformSiteAppLink: platformSiteAppLinkKeys,
   platformSite: platformSiteKeys,
   platformSiteDeepLink: platformSiteDeepLinkKeys,

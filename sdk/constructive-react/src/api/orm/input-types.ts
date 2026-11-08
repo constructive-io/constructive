@@ -1229,6 +1229,20 @@ export interface PlatformPage {
   /** Timestamp of last modification */
   updatedAt?: string | null;
 }
+/** Subdomain labels no tenant may claim under a platform apex */
+export interface PlatformReservedSubdomain {
+  createdAt?: string | null;
+  createdByPrincipal?: string | null;
+  id: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label?: string | null;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string | null;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string | null;
+  updatedAt?: string | null;
+  updatedByPrincipal?: string | null;
+}
 /** Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) */
 export interface PlatformSiteAppLink {
   /** App-owned store identity this association serves (app_store_identities row in this scope's app plane; the association carries no store facts of its own) */
@@ -2203,6 +2217,7 @@ export interface PlatformManagedDomainRelations {
 export interface PlatformPageRelations {
   site?: PlatformSite | null;
 }
+export interface PlatformReservedSubdomainRelations {}
 export interface PlatformSiteAppLinkRelations {
   site?: PlatformSite | null;
 }
@@ -2490,6 +2505,8 @@ export type PlatformGetSitePreviewsRecordWithRelations = PlatformGetSitePreviews
 export type PlatformManagedDomainWithRelations = PlatformManagedDomain &
   PlatformManagedDomainRelations;
 export type PlatformPageWithRelations = PlatformPage & PlatformPageRelations;
+export type PlatformReservedSubdomainWithRelations = PlatformReservedSubdomain &
+  PlatformReservedSubdomainRelations;
 export type PlatformSiteAppLinkWithRelations = PlatformSiteAppLink & PlatformSiteAppLinkRelations;
 export type PlatformSiteWithRelations = PlatformSite & PlatformSiteRelations;
 export type PlatformSiteDeepLinkWithRelations = PlatformSiteDeepLink &
@@ -3801,6 +3818,16 @@ export type PlatformPageSelect = {
   site?: {
     select: PlatformSiteSelect;
   };
+};
+export type PlatformReservedSubdomainSelect = {
+  createdAt?: boolean;
+  createdByPrincipal?: boolean;
+  id?: boolean;
+  label?: boolean;
+  match?: boolean;
+  reason?: boolean;
+  updatedAt?: boolean;
+  updatedByPrincipal?: boolean;
 };
 export type PlatformSiteAppLinkSelect = {
   appStoreIdentityId?: boolean;
@@ -6936,6 +6963,30 @@ export interface PlatformPageFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
+export interface PlatformReservedSubdomainFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `match` field. */
+  match?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformReservedSubdomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 export interface PlatformSiteAppLinkFilter {
   /** Checks for all expressions in this list. */
   and?: PlatformSiteAppLinkFilter[];
@@ -10063,6 +10114,26 @@ export type PlatformPageOrderBy =
   | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type PlatformReservedSubdomainOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MATCH_ASC'
+  | 'MATCH_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type PlatformSiteAppLinkOrderBy =
   | 'APP_STORE_IDENTITY_ID_ASC'
   | 'APP_STORE_IDENTITY_ID_DESC'
@@ -12899,6 +12970,32 @@ export interface UpdatePlatformPageInput {
   platformPagePatch: PlatformPagePatch;
 }
 export interface DeletePlatformPageInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  platformReservedSubdomain: {
+    createdByPrincipal?: string;
+    label: string;
+    match?: string;
+    reason?: string;
+    updatedByPrincipal?: string;
+  };
+}
+export interface PlatformReservedSubdomainPatch {
+  createdByPrincipal?: string | null;
+  label?: string | null;
+  match?: string | null;
+  reason?: string | null;
+  updatedByPrincipal?: string | null;
+}
+export interface UpdatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  id: string;
+  platformReservedSubdomainPatch: PlatformReservedSubdomainPatch;
+}
+export interface DeletePlatformReservedSubdomainInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16598,6 +16695,20 @@ export interface PlatformPageInput {
   storeId?: string;
   /** Timestamp of last modification */
   updatedAt?: string;
+}
+/** An input for mutations affecting `PlatformReservedSubdomain` */
+export interface PlatformReservedSubdomainInput {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label: string;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `PlatformSiteAppLink` */
 export interface PlatformSiteAppLinkInput {
@@ -21069,44 +21180,6 @@ export interface BigIntFilter {
   notIn?: string[];
 }
 // ============ Payload/Return Types (for custom operations) ============
-export interface ResolveRouteRecord {
-  domainId?: string | null;
-  hostname?: string | null;
-  matchedPath?: string | null;
-  matchedWildcard?: boolean | null;
-  method?: string | null;
-  priority?: number | null;
-  resolvedConfig?: Record<string, unknown> | null;
-  routeBindingId?: string | null;
-  servingLane?: string | null;
-  targetCatalogId?: string | null;
-  targetModule?: string | null;
-  targetOwnerKey?: string | null;
-  targetOwnerScope?: string | null;
-  targetSourceId?: string | null;
-  tlsSecretName?: string | null;
-  tlsStatus?: string | null;
-  verificationStatus?: string | null;
-}
-export type ResolveRouteRecordSelect = {
-  domainId?: boolean;
-  hostname?: boolean;
-  matchedPath?: boolean;
-  matchedWildcard?: boolean;
-  method?: boolean;
-  priority?: boolean;
-  resolvedConfig?: boolean;
-  routeBindingId?: boolean;
-  servingLane?: boolean;
-  targetCatalogId?: boolean;
-  targetModule?: boolean;
-  targetOwnerKey?: boolean;
-  targetOwnerScope?: boolean;
-  targetSourceId?: boolean;
-  tlsSecretName?: boolean;
-  tlsStatus?: boolean;
-  verificationStatus?: boolean;
-};
 export interface AcceptDatabaseTransferPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -23419,6 +23492,51 @@ export type DeletePlatformPagePayloadSelect = {
   };
   platformPageEdge?: {
     select: PlatformPageEdgeSelect;
+  };
+};
+export interface CreatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was created by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
+}
+export type CreatePlatformReservedSubdomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformReservedSubdomain?: {
+    select: PlatformReservedSubdomainSelect;
+  };
+  platformReservedSubdomainEdge?: {
+    select: PlatformReservedSubdomainEdgeSelect;
+  };
+};
+export interface UpdatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was updated by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
+}
+export type UpdatePlatformReservedSubdomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformReservedSubdomain?: {
+    select: PlatformReservedSubdomainSelect;
+  };
+  platformReservedSubdomainEdge?: {
+    select: PlatformReservedSubdomainEdgeSelect;
+  };
+};
+export interface DeletePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was deleted by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
+}
+export type DeletePlatformReservedSubdomainPayloadSelect = {
+  clientMutationId?: boolean;
+  platformReservedSubdomain?: {
+    select: PlatformReservedSubdomainSelect;
+  };
+  platformReservedSubdomainEdge?: {
+    select: PlatformReservedSubdomainEdgeSelect;
   };
 };
 export interface CreatePlatformSiteAppLinkPayload {
@@ -25927,6 +26045,18 @@ export type PlatformPageEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformPageSelect;
+  };
+};
+/** A `PlatformReservedSubdomain` edge in the connection. */
+export interface PlatformReservedSubdomainEdge {
+  cursor?: string | null;
+  /** The `PlatformReservedSubdomain` at the end of the edge. */
+  node?: PlatformReservedSubdomain | null;
+}
+export type PlatformReservedSubdomainEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformReservedSubdomainSelect;
   };
 };
 /** A `PlatformSiteAppLink` edge in the connection. */
