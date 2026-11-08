@@ -44,7 +44,7 @@
   ],
   "dependencies": {
     "@pgsql/types": "^18.0.0",
-    "@pgsql/utils": "^18.3.3",
+    "@pgsql/utils": "^18.3.4",
     "csv-parser": "^3.2.1",
     "inquirerer": "^4.9.4",
     "js-yaml": "^4.1.0",

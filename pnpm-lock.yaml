@@ -734,8 +734,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       plpgsql-parser:
-        specifier: ^18.6.3
-        version: 18.6.3
+        specifier: ^18.6.4
+        version: 18.6.4
       postgraphile:
         specifier: 5.1.4
         version: 5.1.4(abb1e7d37c806d345dec450464477780)
@@ -2707,8 +2707,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.3.3
-        version: 18.3.3
+        specifier: ^18.3.4
+        version: 18.3.4
       csv-parser:
         specifier: ^3.2.1
         version: 3.2.1
@@ -2809,8 +2809,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.3.3
-        version: 18.3.3
+        specifier: ^18.3.4
+        version: 18.3.4
       pgsql-deparser:
         specifier: ^18.4.3
         version: 18.4.3
@@ -2936,11 +2936,11 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
       '@pgsql/lint':
-        specifier: ^18.3.5
-        version: 18.3.5
+        specifier: ^18.3.6
+        version: 18.3.6
       '@pgsql/traverse':
-        specifier: ^18.8.3
-        version: 18.8.3
+        specifier: ^18.8.4
+        version: 18.8.4
       '@pgsql/types':
         specifier: ^18.0.0
         version: 18.0.0
@@ -3476,8 +3476,8 @@ importers:
         specifier: ^10.2.6
         version: 10.2.6
       plpgsql-parser:
-        specifier: ^18.6.3
-        version: 18.6.3
+        specifier: ^18.6.4
+        version: 18.6.4
     devDependencies:
       makage:
         specifier: ^0.8.0
@@ -3493,17 +3493,17 @@ importers:
         specifier: workspace:^
         version: link:../naming-spec/dist
       '@pgsql/scripts':
-        specifier: ^18.5.3
-        version: 18.5.3
+        specifier: ^18.5.4
+        version: 18.5.4
       '@pgsql/semantics':
-        specifier: ^18.2.3
-        version: 18.2.3
+        specifier: ^18.2.4
+        version: 18.2.4
       '@pgsql/transform':
-        specifier: ^18.18.3
-        version: 18.18.3
+        specifier: ^18.18.4
+        version: 18.18.4
       plpgsql-parser:
-        specifier: ^18.6.3
-        version: 18.6.3
+        specifier: ^18.6.4
+        version: 18.6.4
     devDependencies:
       '@pgpmjs/bundle':
         specifier: workspace:^
@@ -3631,8 +3631,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       pg-proto-parser:
-        specifier: ^1.32.5
-        version: 1.32.5
+        specifier: ^1.32.6
+        version: 1.32.6
       pgsql-deparser:
         specifier: ^18.4.3
         version: 18.4.3
@@ -6918,10 +6918,10 @@ packages:
       }
     engines: { node: '>=20.0.0' }
 
-  '@pgsql/lint@18.3.5':
+  '@pgsql/lint@18.3.6':
     resolution:
       {
-        integrity: sha512-K1d60bQ8DCSu1KSPImL4Dfly+Ss83eTuI5GL2PED/dlP9BSjp9OZoD81qzmFmskCFgwyzdJBBLO+g53phM2bww==,
+        integrity: sha512-XvKVF/oBCFRS/PwqiFVTodvLVAvmJsHyv+xt4WAnarD/dXhiKVOL9gJYPBL2k7Q9YwWHq6E66LnjktTI1Q98fg==,
       }
     hasBin: true
 
@@ -6931,28 +6931,28 @@ packages:
         integrity: sha512-muCDdPu/bM/f9d7IquBNfkMgiRPehv6vvjdhSMxXeVKwJKPX9xIscDu11ju15s7UeEXoWntE8zrSaR9wQ9wgCg==,
       }
 
-  '@pgsql/scripts@18.5.3':
+  '@pgsql/scripts@18.5.4':
     resolution:
       {
-        integrity: sha512-w09pfpezYR8LH9GXZzX6KjDAKH1/CsnKRDcvHLG7OcU+p/dcH7pUoxLRRKAgSjMCc1DPbRq9D1IX5US2/Ol32Q==,
+        integrity: sha512-ogb43+bBpxgVfmjcdm4dj2w0asEcDOcSnnubmps1L+Ius+otv95BJzJDaG7XZb4QpXgQqnigeRNKj1ppJPwTrw==,
       }
 
-  '@pgsql/semantics@18.2.3':
+  '@pgsql/semantics@18.2.4':
     resolution:
       {
-        integrity: sha512-jXmyUbRDxpVFXV6WRdIsIwtjM1BwasKaupXkn73xYFTn71QzATkcL2X7SMfnyCykvZhWRdV/DFLCW9gc9sbF0g==,
+        integrity: sha512-7k3AgIGHAz7r6yNeME7bM1smRLRedhC9JwQwvcfSn9qnVW0Pc+TVOnUu/oEs/dXirup3paDAhPQy+CK4PultnQ==,
       }
 
-  '@pgsql/transform@18.18.3':
+  '@pgsql/transform@18.18.4':
     resolution:
       {
-        integrity: sha512-Vk7DxfHN8OqGmD0098WkdI7zIna7GF+pANeqgd3i4cd7I4UvFVhOcsB1r11w6SVmlUlLMt+fMLILQds6BpihAA==,
+        integrity: sha512-mqPmuBldDl6k9pwH0Zcf5OhKrEPWMTYj8Ko4Z6F2iyBkkY5ZdZ5CAe39NHgIlRPnsFySYnjyCukoNDg/T/K9iQ==,
       }
 
-  '@pgsql/traverse@18.8.3':
+  '@pgsql/traverse@18.8.4':
     resolution:
       {
-        integrity: sha512-ai/plrUraOuy9aWaZy+xJ+hi70dPa6QDh73K+2u2EIcR+Dgx5MGvJtanpfH/b/hoj5XzsbMOWXJhXm/Q34OmHw==,
+        integrity: sha512-yZGd/Fx6cAHwBtHcONr9uOekR/uzWUpfUTZ+94dl0IJz7YCx2nFx5X51xku8gFFSUVj3Eom3mvYyiezbW8o8fA==,
       }
 
   '@pgsql/types@18.0.0':
@@ -6961,10 +6961,10 @@ packages:
         integrity: sha512-jtAY4JU7jdVYZ/Vv3zlZqVP+FRWZokyCLKPPCnAApiaJAElpyyiMC3HRiquBu29kSrVs+rkqZD50SUIb/zyEGw==,
       }
 
-  '@pgsql/utils@18.3.3':
+  '@pgsql/utils@18.3.4':
     resolution:
       {
-        integrity: sha512-V5/Y6i9c5mPUglcJqOYixT8DvUO8maXsJNlF5o5CLSFZAv5iP3a0UR9JRPTv3vObBbhzldnX8pmOuVIGzUh3wg==,
+        integrity: sha512-gul1jn230cislWSjFFSK95kESgVVUiPzKxXDLNCbMsYukW0PyEjyROhVyK4t+bel6k+snVdsTbC9R0Urr5Lj2w==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -13565,10 +13565,10 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-proto-parser@1.32.5:
+  pg-proto-parser@1.32.6:
     resolution:
       {
-        integrity: sha512-rYfjXTwzZDpTpA6h2Yl9oYu1GPHgmZWOkFxjrg3cMcRASu+F+FaYp1+8JvOBl05rA+OCOlqsq3sViaR5xOlMIQ==,
+        integrity: sha512-cqTnfi9uUk6DkC7Nb1AkWTCO6v2RFvzsVEUxJVIPXrzk6oP2FDBefpbjyGPFgaeHwKg9S/EV0ET4hK6N/wJaEw==,
       }
 
   pg-protocol@1.13.0:
@@ -13737,10 +13737,10 @@ packages:
         integrity: sha512-TgPX5pYEhe6fG3gNfvZdsIG13hglP85XPVgDxrvaLrCNXsBHHLP8iHvkPotAxcjQTNkzBs6Lzlq4yAkzhMsudw==,
       }
 
-  plpgsql-parser@18.6.3:
+  plpgsql-parser@18.6.4:
     resolution:
       {
-        integrity: sha512-q4+Ct2ZwH9qbjslT8tbhm9QewT2gkGkeIwNB/wAGCuW/TKw0GPX1ADAueBaf0j7S0sDO/69q7fjbpmcGsNvcrg==,
+        integrity: sha512-/a9fmGaydMZNRrTKA0dV0t7QjxrVBJQMSS6ilA3nxkUEVgNg+lOEekLU+D0KySW6ZBcgaztERH5KWg0Q6yzHFA==,
       }
 
   pluralize@7.0.0:
@@ -18372,54 +18372,43 @@ snapshots:
       tslib: 2.8.1
       tsyringe: 4.10.0
 
-  '@pgsql/lint@18.3.5':
+  '@pgsql/lint@18.3.6':
     dependencies:
-      '@pgsql/traverse': 18.8.3
+      '@pgsql/traverse': 18.8.4
       chalk: 4.1.2
       git-changed: 0.3.0
       libpg-query: 18.2.1
       minimist: 1.2.8
       pgsql-parser: 18.3.3
-    transitivePeerDependencies:
-      - supports-color
 
   '@pgsql/quotes@18.2.4': {}
 
-  '@pgsql/scripts@18.5.3':
+  '@pgsql/scripts@18.5.4':
     dependencies:
       '@pgsql/quotes': 18.2.4
-      '@pgsql/transform': 18.18.3
-      plpgsql-parser: 18.6.3
-    transitivePeerDependencies:
-      - supports-color
+      '@pgsql/transform': 18.18.4
+      plpgsql-parser: 18.6.4
 
-  '@pgsql/semantics@18.2.3':
+  '@pgsql/semantics@18.2.4':
     dependencies:
-      '@pgsql/traverse': 18.8.3
-      plpgsql-parser: 18.6.3
-    transitivePeerDependencies:
-      - supports-color
+      '@pgsql/traverse': 18.8.4
+      plpgsql-parser: 18.6.4
 
-  '@pgsql/transform@18.18.3':
+  '@pgsql/transform@18.18.4':
     dependencies:
       '@pgsql/quotes': 18.2.4
-      '@pgsql/semantics': 18.2.3
-      '@pgsql/traverse': 18.8.3
-      plpgsql-parser: 18.6.3
-    transitivePeerDependencies:
-      - supports-color
+      '@pgsql/semantics': 18.2.4
+      '@pgsql/traverse': 18.8.4
+      plpgsql-parser: 18.6.4
 
-  '@pgsql/traverse@18.8.3':
+  '@pgsql/traverse@18.8.4':
     dependencies:
       '@pgsql/types': 18.0.0
-      pg-proto-parser: 1.32.5
       plpgsql-deparser: 18.3.3
-    transitivePeerDependencies:
-      - supports-color
 
   '@pgsql/types@18.0.0': {}
 
-  '@pgsql/utils@18.3.3':
+  '@pgsql/utils@18.3.4':
     dependencies:
       '@pgsql/types': 18.0.0
       nested-obj: 0.2.3
@@ -22967,7 +22956,7 @@ snapshots:
     dependencies:
       pg: 8.21.0
 
-  pg-proto-parser@1.32.5:
+  pg-proto-parser@1.32.6:
     dependencies:
       '@babel/generator': 7.29.1
       '@babel/parser': 7.29.3
@@ -23071,15 +23060,13 @@ snapshots:
       libpg-query: 18.2.1
       pgsql-deparser: 18.4.3
 
-  plpgsql-parser@18.6.3:
+  plpgsql-parser@18.6.4:
     dependencies:
-      '@pgsql/traverse': 18.8.3
+      '@pgsql/traverse': 18.8.4
       '@pgsql/types': 18.0.0
       libpg-query: 18.2.1
       pgsql-deparser: 18.4.3
       plpgsql-deparser: 18.3.3
-    transitivePeerDependencies:
-      - supports-color
 
   pluralize@7.0.0: {}
 
