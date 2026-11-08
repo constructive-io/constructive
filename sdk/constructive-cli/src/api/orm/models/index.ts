@@ -52,6 +52,7 @@ export { PlatformEmailSiteIdentityModel } from './platformEmailSiteIdentity';
 export { PlatformGetSitePreviewsRecordModel } from './platformGetSitePreviewsRecord';
 export { PlatformManagedDomainModel } from './platformManagedDomain';
 export { PlatformPageModel } from './platformPage';
+export { PlatformReservedSubdomainModel } from './platformReservedSubdomain';
 export { PlatformSiteAppLinkModel } from './platformSiteAppLink';
 export { PlatformSiteModel } from './platformSite';
 export { PlatformSiteDeepLinkModel } from './platformSiteDeepLink';

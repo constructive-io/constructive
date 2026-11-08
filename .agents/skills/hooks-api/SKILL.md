@@ -1,13 +1,13 @@
 ---
 name: hooks-api
-description: React Query hooks for the api API — provides typed query and mutation hooks for 90 tables and 49 custom operations
+description: React Query hooks for the api API — provides typed query and mutation hooks for 91 tables and 45 custom operations
 ---
 
 # hooks-api
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the api API — provides typed query and mutation hooks for 90 tables and 49 custom operations
+React Query hooks for the api API — provides typed query and mutation hooks for 91 tables and 45 custom operations
 
 ## Usage
 
@@ -87,6 +87,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-get-site-previews-record](references/platform-get-site-previews-record.md)
 - [platform-managed-domain](references/platform-managed-domain.md)
 - [platform-page](references/platform-page.md)
+- [platform-reserved-subdomain](references/platform-reserved-subdomain.md)
 - [platform-site-app-link](references/platform-site-app-link.md)
 - [platform-site](references/platform-site.md)
 - [platform-site-deep-link](references/platform-site-deep-link.md)
@@ -128,7 +129,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-rule](references/view-rule.md)
 - [view-table](references/view-table.md)
 - [webauthn-setting](references/webauthn-setting.md)
-- [api-schema-names](references/api-schema-names.md)
 - [apply-registry-defaults](references/apply-registry-defaults.md)
 - [email-shared-account](references/email-shared-account.md)
 - [get-site-preview-commit](references/get-site-preview-commit.md)
@@ -140,9 +140,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-sites-deep-link-url](references/platform-sites-deep-link-url.md)
 - [platform-sites-site-origin](references/platform-sites-site-origin.md)
 - [platform-verify-site-preview-token](references/platform-verify-site-preview-token.md)
-- [resolve-deep-link](references/resolve-deep-link.md)
-- [resolve-route](references/resolve-route.md)
-- [resolve-site-app-links](references/resolve-site-app-links.md)
 - [sites-deep-link-url](references/sites-deep-link-url.md)
 - [sites-site-origin](references/sites-site-origin.md)
 - [verify-site-preview-token](references/verify-site-preview-token.md)

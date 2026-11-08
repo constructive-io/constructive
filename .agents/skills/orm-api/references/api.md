@@ -9,7 +9,7 @@ API surfaces exposed by this scope; publication makes a surface bindable from ot
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
 db.api.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute()
+db.api.create({ data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' }, select: { id: true } }).execute()
 db.api.update({ where: { id: '<UUID>' }, data: { anonRole: '<String>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.api.findMany({
 
 ```typescript
 const item = await db.api.create({
-  data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' },
+  data: { anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' },
   select: { id: true }
 }).execute();
 ```
