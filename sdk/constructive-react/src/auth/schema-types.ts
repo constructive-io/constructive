@@ -950,6 +950,12 @@ export interface EnableSmsMfaInput {
 export interface EnableTotpInput {
   clientMutationId?: string;
 }
+export interface ExchangeNativeHandoffInput {
+  clientMutationId?: string;
+  code?: string;
+  codeVerifier?: string;
+  credentialKind?: string;
+}
 export interface ExtendTokenExpiresInput {
   amount?: IntervalInput;
   clientMutationId?: string;
@@ -1290,7 +1296,9 @@ export interface RequestCrossOriginTokenInput {
 }
 export interface RequestMagicLinkInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   email?: string;
+  nativeRedirectUri?: string;
   next?: string;
 }
 export interface ResetPasswordInput {
@@ -1364,6 +1372,7 @@ export interface SetPasswordInput {
   clientMutationId?: string;
   currentPassword?: string;
   newPassword?: string;
+  signOutOtherSessions?: boolean;
 }
 export interface SetPrincipalEntitiesInput {
   clientMutationId?: string;
@@ -2292,6 +2301,10 @@ export interface EnableTotpPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
+export interface ExchangeNativeHandoffPayload {
+  clientMutationId?: string | null;
+  result?: ExchangeNativeHandoffRecord | null;
+}
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
@@ -2638,6 +2651,14 @@ export interface CreateOrgApiKeyRecord {
   expiresAt?: string | null;
   keyId?: string | null;
 }
+export interface ExchangeNativeHandoffRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  id?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  userId?: string | null;
+}
 export interface ExtendTokenExpiresRecord {
   expiresAt?: string | null;
   id?: string | null;
@@ -2683,9 +2704,11 @@ export interface SignInCrossOriginRecord {
 export interface SignInMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
   deviceApprovalRequired?: boolean | null;
   mfaChallengeToken?: string | null;
   mfaRequired?: boolean | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
@@ -2701,6 +2724,8 @@ export interface SignInSmsOtpRecord {
 export interface SignUpMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
