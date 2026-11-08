@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.6...@constructive-io/graphql-server@5.35.7) (2026-11-08)
+
+### Bug Fixes
+
+- **graphql-server:** preserve request body parser errors ([#1972](https://github.com/constructive-io/constructive/issues/1972)) ([55616d8](https://github.com/constructive-io/constructive/commit/55616d84525261186f33e70043473c3c72f23ad2))
+
 ## [5.35.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.5...@constructive-io/graphql-server@5.35.6) (2026-11-06)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
