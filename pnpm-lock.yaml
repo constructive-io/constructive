@@ -2707,8 +2707,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.3.3
-        version: 18.3.3
+        specifier: ^18.3.4
+        version: 18.3.4
       csv-parser:
         specifier: ^3.2.1
         version: 3.2.1
@@ -2809,8 +2809,8 @@ importers:
         specifier: ^18.0.0
         version: 18.0.0
       '@pgsql/utils':
-        specifier: ^18.3.3
-        version: 18.3.3
+        specifier: ^18.3.4
+        version: 18.3.4
       pgsql-deparser:
         specifier: ^18.4.3
         version: 18.4.3
@@ -3631,8 +3631,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       pg-proto-parser:
-        specifier: ^1.32.5
-        version: 1.32.5
+        specifier: ^1.32.6
+        version: 1.32.6
       pgsql-deparser:
         specifier: ^18.4.3
         version: 18.4.3
@@ -6961,10 +6961,10 @@ packages:
         integrity: sha512-jtAY4JU7jdVYZ/Vv3zlZqVP+FRWZokyCLKPPCnAApiaJAElpyyiMC3HRiquBu29kSrVs+rkqZD50SUIb/zyEGw==,
       }
 
-  '@pgsql/utils@18.3.3':
+  '@pgsql/utils@18.3.4':
     resolution:
       {
-        integrity: sha512-V5/Y6i9c5mPUglcJqOYixT8DvUO8maXsJNlF5o5CLSFZAv5iP3a0UR9JRPTv3vObBbhzldnX8pmOuVIGzUh3wg==,
+        integrity: sha512-gul1jn230cislWSjFFSK95kESgVVUiPzKxXDLNCbMsYukW0PyEjyROhVyK4t+bel6k+snVdsTbC9R0Urr5Lj2w==,
       }
 
   '@pkgjs/parseargs@0.11.0':
@@ -13565,10 +13565,10 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-proto-parser@1.32.5:
+  pg-proto-parser@1.32.6:
     resolution:
       {
-        integrity: sha512-rYfjXTwzZDpTpA6h2Yl9oYu1GPHgmZWOkFxjrg3cMcRASu+F+FaYp1+8JvOBl05rA+OCOlqsq3sViaR5xOlMIQ==,
+        integrity: sha512-cqTnfi9uUk6DkC7Nb1AkWTCO6v2RFvzsVEUxJVIPXrzk6oP2FDBefpbjyGPFgaeHwKg9S/EV0ET4hK6N/wJaEw==,
       }
 
   pg-protocol@1.13.0:
@@ -18408,7 +18408,7 @@ snapshots:
 
   '@pgsql/types@18.0.0': {}
 
-  '@pgsql/utils@18.3.3':
+  '@pgsql/utils@18.3.4':
     dependencies:
       '@pgsql/types': 18.0.0
       nested-obj: 0.2.3
@@ -22956,7 +22956,7 @@ snapshots:
     dependencies:
       pg: 8.21.0
 
-  pg-proto-parser@1.32.5:
+  pg-proto-parser@1.32.6:
     dependencies:
       '@babel/generator': 7.29.1
       '@babel/parser': 7.29.3
