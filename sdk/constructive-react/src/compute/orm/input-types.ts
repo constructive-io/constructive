@@ -315,32 +315,6 @@ export interface BuildStep {
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown> | null;
 }
-/** Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST */
-export interface BuilderBinding {
-  createdAt?: string | null;
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string | null;
-  id: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId?: string | null;
-  /** Most recent projection failure */
-  lastError?: string | null;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown> | null;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId?: string | null;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string | null;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string | null;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string | null;
-  updatedAt?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
-}
 /** Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store */
 export interface ContentPreset {
   /** Whether this preset is selectable at provision time */
@@ -1446,30 +1420,6 @@ export interface PlatformBuildStep {
   status?: string | null;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown> | null;
-}
-/** Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST */
-export interface PlatformBuilderBinding {
-  createdAt?: string | null;
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  id: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId?: string | null;
-  /** Most recent projection failure */
-  lastError?: string | null;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown> | null;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId?: string | null;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string | null;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string | null;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string | null;
-  updatedAt?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
 }
 /** Join table binding function definitions to API endpoints with per-binding alias and config */
 export interface PlatformFunctionApiBinding {
@@ -2720,6 +2670,34 @@ export interface PlatformResourcesResolvedRequirement {
   secretsObjectName?: string | null;
   slug?: string | null;
 }
+/** Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config */
+export interface PlatformServiceBinding {
+  createdAt?: string | null;
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  id: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId?: string | null;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope?: string | null;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind?: string | null;
+  /** Most recent projection failure */
+  lastError?: string | null;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown> | null;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string | null;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string | null;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string | null;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
 /** Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window */
 export interface PlatformWebhookEndpoint {
   /** Whether this endpoint currently accepts deliveries */
@@ -3533,6 +3511,36 @@ export interface ResourcesResolvedRequirement {
   secretsObjectName?: string | null;
   slug?: string | null;
 }
+/** Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config */
+export interface ServiceBinding {
+  createdAt?: string | null;
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId?: string | null;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope?: string | null;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind?: string | null;
+  /** Most recent projection failure */
+  lastError?: string | null;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown> | null;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string | null;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string | null;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string | null;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
 /** Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window */
 export interface WebhookEndpoint {
   /** Whether this endpoint currently accepts deliveries */
@@ -3607,9 +3615,6 @@ export interface BuildRelations {
   workflow?: RepositoryWorkflow | null;
 }
 export interface BuildStepRelations {}
-export interface BuilderBindingRelations {
-  namespace?: Namespace | null;
-}
 export interface ContentPresetRelations {}
 export interface DatabaseFunctionGraphRelations {
   databaseFunctionGraphExecutionsByGraphId?: ConnectionResult<DatabaseFunctionGraphExecution>;
@@ -3683,12 +3688,12 @@ export interface InfraRefRelations {}
 export interface InfraStoreRelations {}
 export interface IntegrationProviderRelations {}
 export interface NamespaceRelations {
-  builderBindings?: ConnectionResult<BuilderBinding>;
   functionDeployments?: ConnectionResult<FunctionDeployment>;
   registryBindings?: ConnectionResult<RegistryBinding>;
   resourceDefinitions?: ConnectionResult<ResourceDefinition>;
   resourceInstallations?: ConnectionResult<ResourceInstallation>;
   resources?: ConnectionResult<Resource>;
+  serviceBindings?: ConnectionResult<ServiceBinding>;
   webhookEndpoints?: ConnectionResult<WebhookEndpoint>;
 }
 export interface NamespaceEventRelations {}
@@ -3699,9 +3704,6 @@ export interface PlatformBuildRelations {
   workflow?: PlatformRepositoryWorkflow | null;
 }
 export interface PlatformBuildStepRelations {}
-export interface PlatformBuilderBindingRelations {
-  namespace?: PlatformNamespace | null;
-}
 export interface PlatformFunctionApiBindingRelations {
   functionDefinition?: PlatformFunctionDefinition | null;
   platformFunctionInvocationsByApiBindingId?: ConnectionResult<PlatformFunctionInvocation>;
@@ -3742,12 +3744,12 @@ export interface PlatformInfraStoreRelations {}
 export interface PlatformK8sResourceKindRelations {}
 export interface PlatformK8sSpecRuleRelations {}
 export interface PlatformNamespaceRelations {
-  platformBuilderBindingsByNamespaceId?: ConnectionResult<PlatformBuilderBinding>;
   platformFunctionDeploymentsByNamespaceId?: ConnectionResult<PlatformFunctionDeployment>;
   platformRegistryBindingsByNamespaceId?: ConnectionResult<PlatformRegistryBinding>;
   platformResourceDefinitionsByNamespaceId?: ConnectionResult<PlatformResourceDefinition>;
   platformResourceInstallationsByNamespaceId?: ConnectionResult<PlatformResourceInstallation>;
   platformResourcesByNamespaceId?: ConnectionResult<PlatformResource>;
+  platformServiceBindingsByNamespaceId?: ConnectionResult<PlatformServiceBinding>;
   platformWebhookEndpointsByNamespaceId?: ConnectionResult<PlatformWebhookEndpoint>;
 }
 export interface PlatformNamespaceEventRelations {}
@@ -3839,6 +3841,9 @@ export interface PlatformResourceUtilizationRelations {}
 export interface PlatformResourcesHealthRelations {}
 export interface PlatformResourcesRequirementsStateRelations {}
 export interface PlatformResourcesResolvedRequirementRelations {}
+export interface PlatformServiceBindingRelations {
+  namespace?: PlatformNamespace | null;
+}
 export interface PlatformWebhookEndpointRelations {
   functionDefinition?: PlatformFunctionDefinition | null;
   namespace?: PlatformNamespace | null;
@@ -3935,6 +3940,9 @@ export interface ResourceUtilizationRelations {}
 export interface ResourcesHealthRelations {}
 export interface ResourcesRequirementsStateRelations {}
 export interface ResourcesResolvedRequirementRelations {}
+export interface ServiceBindingRelations {
+  namespace?: Namespace | null;
+}
 export interface WebhookEndpointRelations {
   functionDefinition?: FunctionDefinition | null;
   namespace?: Namespace | null;
@@ -3946,7 +3954,6 @@ export interface WebhookEventRelations {
 // ============ Entity Types With Relations ============
 export type BuildWithRelations = Build & BuildRelations;
 export type BuildStepWithRelations = BuildStep & BuildStepRelations;
-export type BuilderBindingWithRelations = BuilderBinding & BuilderBindingRelations;
 export type ContentPresetWithRelations = ContentPreset & ContentPresetRelations;
 export type DatabaseFunctionGraphWithRelations = DatabaseFunctionGraph &
   DatabaseFunctionGraphRelations;
@@ -4007,8 +4014,6 @@ export type NamespaceWithRelations = Namespace & NamespaceRelations;
 export type NamespaceEventWithRelations = NamespaceEvent & NamespaceEventRelations;
 export type PlatformBuildWithRelations = PlatformBuild & PlatformBuildRelations;
 export type PlatformBuildStepWithRelations = PlatformBuildStep & PlatformBuildStepRelations;
-export type PlatformBuilderBindingWithRelations = PlatformBuilderBinding &
-  PlatformBuilderBindingRelations;
 export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding &
   PlatformFunctionApiBindingRelations;
 export type PlatformFunctionCapabilityBindingWithRelations = PlatformFunctionCapabilityBinding &
@@ -4089,6 +4094,8 @@ export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesR
   PlatformResourcesRequirementsStateRelations;
 export type PlatformResourcesResolvedRequirementWithRelations =
   PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
+export type PlatformServiceBindingWithRelations = PlatformServiceBinding &
+  PlatformServiceBindingRelations;
 export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint &
   PlatformWebhookEndpointRelations;
 export type PlatformWebhookEventWithRelations = PlatformWebhookEvent &
@@ -4126,6 +4133,7 @@ export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState
   ResourcesRequirementsStateRelations;
 export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement &
   ResourcesResolvedRequirementRelations;
+export type ServiceBindingWithRelations = ServiceBinding & ServiceBindingRelations;
 export type WebhookEndpointWithRelations = WebhookEndpoint & WebhookEndpointRelations;
 export type WebhookEventWithRelations = WebhookEvent & WebhookEventRelations;
 // ============ Entity Select Types ============
@@ -4183,26 +4191,6 @@ export type BuildStepSelect = {
   startedAt?: boolean;
   status?: boolean;
   summary?: boolean;
-};
-export type BuilderBindingSelect = {
-  createdAt?: boolean;
-  createdBy?: boolean;
-  createdByPrincipal?: boolean;
-  databaseId?: boolean;
-  id?: boolean;
-  installationId?: boolean;
-  lastError?: boolean;
-  metadata?: boolean;
-  namespaceId?: boolean;
-  observedHost?: boolean;
-  realm?: boolean;
-  status?: boolean;
-  updatedAt?: boolean;
-  updatedBy?: boolean;
-  updatedByPrincipal?: boolean;
-  namespace?: {
-    select: NamespaceSelect;
-  };
 };
 export type ContentPresetSelect = {
   active?: boolean;
@@ -4850,12 +4838,6 @@ export type NamespaceSelect = {
   namespaceName?: boolean;
   status?: boolean;
   updatedAt?: boolean;
-  builderBindings?: {
-    select: BuilderBindingSelect;
-    first?: number;
-    filter?: BuilderBindingFilter;
-    orderBy?: BuilderBindingOrderBy[];
-  };
   functionDeployments?: {
     select: FunctionDeploymentSelect;
     first?: number;
@@ -4885,6 +4867,12 @@ export type NamespaceSelect = {
     first?: number;
     filter?: ResourceFilter;
     orderBy?: ResourceOrderBy[];
+  };
+  serviceBindings?: {
+    select: ServiceBindingSelect;
+    first?: number;
+    filter?: ServiceBindingFilter;
+    orderBy?: ServiceBindingOrderBy[];
   };
   webhookEndpoints?: {
     select: WebhookEndpointSelect;
@@ -4955,25 +4943,6 @@ export type PlatformBuildStepSelect = {
   startedAt?: boolean;
   status?: boolean;
   summary?: boolean;
-};
-export type PlatformBuilderBindingSelect = {
-  createdAt?: boolean;
-  createdBy?: boolean;
-  createdByPrincipal?: boolean;
-  id?: boolean;
-  installationId?: boolean;
-  lastError?: boolean;
-  metadata?: boolean;
-  namespaceId?: boolean;
-  observedHost?: boolean;
-  realm?: boolean;
-  status?: boolean;
-  updatedAt?: boolean;
-  updatedBy?: boolean;
-  updatedByPrincipal?: boolean;
-  namespace?: {
-    select: PlatformNamespaceSelect;
-  };
 };
 export type PlatformFunctionApiBindingSelect = {
   alias?: boolean;
@@ -5313,12 +5282,6 @@ export type PlatformNamespaceSelect = {
   namespaceName?: boolean;
   status?: boolean;
   updatedAt?: boolean;
-  platformBuilderBindingsByNamespaceId?: {
-    select: PlatformBuilderBindingSelect;
-    first?: number;
-    filter?: PlatformBuilderBindingFilter;
-    orderBy?: PlatformBuilderBindingOrderBy[];
-  };
   platformFunctionDeploymentsByNamespaceId?: {
     select: PlatformFunctionDeploymentSelect;
     first?: number;
@@ -5348,6 +5311,12 @@ export type PlatformNamespaceSelect = {
     first?: number;
     filter?: PlatformResourceFilter;
     orderBy?: PlatformResourceOrderBy[];
+  };
+  platformServiceBindingsByNamespaceId?: {
+    select: PlatformServiceBindingSelect;
+    first?: number;
+    filter?: PlatformServiceBindingFilter;
+    orderBy?: PlatformServiceBindingOrderBy[];
   };
   platformWebhookEndpointsByNamespaceId?: {
     select: PlatformWebhookEndpointSelect;
@@ -6048,6 +6017,27 @@ export type PlatformResourcesResolvedRequirementSelect = {
   resourceId?: boolean;
   secretsObjectName?: boolean;
   slug?: boolean;
+};
+export type PlatformServiceBindingSelect = {
+  createdAt?: boolean;
+  createdBy?: boolean;
+  createdByPrincipal?: boolean;
+  id?: boolean;
+  installationId?: boolean;
+  installationScope?: boolean;
+  kind?: boolean;
+  lastError?: boolean;
+  metadata?: boolean;
+  namespaceId?: boolean;
+  observedHost?: boolean;
+  realm?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  updatedByPrincipal?: boolean;
+  namespace?: {
+    select: PlatformNamespaceSelect;
+  };
 };
 export type PlatformWebhookEndpointSelect = {
   active?: boolean;
@@ -6800,6 +6790,28 @@ export type ResourcesResolvedRequirementSelect = {
   secretsObjectName?: boolean;
   slug?: boolean;
 };
+export type ServiceBindingSelect = {
+  createdAt?: boolean;
+  createdBy?: boolean;
+  createdByPrincipal?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  installationId?: boolean;
+  installationScope?: boolean;
+  kind?: boolean;
+  lastError?: boolean;
+  metadata?: boolean;
+  namespaceId?: boolean;
+  observedHost?: boolean;
+  realm?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  updatedByPrincipal?: boolean;
+  namespace?: {
+    select: NamespaceSelect;
+  };
+};
 export type WebhookEndpointSelect = {
   active?: boolean;
   createdAt?: boolean;
@@ -6956,46 +6968,6 @@ export interface BuildStepFilter {
   status?: StringFilter;
   /** Filter by the object’s `summary` field. */
   summary?: JSONFilter;
-}
-export interface BuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: BuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: BuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: BuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
 }
 export interface ContentPresetFilter {
   /** Filter by the object’s `active` field. */
@@ -8271,10 +8243,6 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `builderBindings` relation. */
-  builderBindings?: NamespaceToManyBuilderBindingFilter;
-  /** `builderBindings` exist. */
-  builderBindingsExist?: boolean;
   /** Filter by the object’s `clusterId` field. */
   clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -8321,6 +8289,10 @@ export interface NamespaceFilter {
   resources?: NamespaceToManyResourceFilter;
   /** `resources` exist. */
   resourcesExist?: boolean;
+  /** Filter by the object’s `serviceBindings` relation. */
+  serviceBindings?: NamespaceToManyServiceBindingFilter;
+  /** `serviceBindings` exist. */
+  serviceBindingsExist?: boolean;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -8457,44 +8429,6 @@ export interface PlatformBuildStepFilter {
   status?: StringFilter;
   /** Filter by the object’s `summary` field. */
   summary?: JSONFilter;
-}
-export interface PlatformBuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PlatformBuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
 }
 export interface PlatformFunctionApiBindingFilter {
   /** Filter by the object’s `alias` field. */
@@ -9166,10 +9100,6 @@ export interface PlatformNamespaceFilter {
   not?: PlatformNamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceFilter[];
-  /** Filter by the object’s `platformBuilderBindingsByNamespaceId` relation. */
-  platformBuilderBindingsByNamespaceId?: PlatformNamespaceToManyPlatformBuilderBindingFilter;
-  /** `platformBuilderBindingsByNamespaceId` exist. */
-  platformBuilderBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
   platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
   /** `platformFunctionDeploymentsByNamespaceId` exist. */
@@ -9190,6 +9120,10 @@ export interface PlatformNamespaceFilter {
   platformResourcesByNamespaceId?: PlatformNamespaceToManyPlatformResourceFilter;
   /** `platformResourcesByNamespaceId` exist. */
   platformResourcesByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformServiceBindingsByNamespaceId` relation. */
+  platformServiceBindingsByNamespaceId?: PlatformNamespaceToManyPlatformServiceBindingFilter;
+  /** `platformServiceBindingsByNamespaceId` exist. */
+  platformServiceBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation. */
   platformWebhookEndpointsByNamespaceId?: PlatformNamespaceToManyPlatformWebhookEndpointFilter;
   /** `platformWebhookEndpointsByNamespaceId` exist. */
@@ -10446,6 +10380,48 @@ export interface PlatformResourcesResolvedRequirementFilter {
   secretsObjectName?: StringFilter;
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
+}
+export interface PlatformServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
 }
 export interface PlatformWebhookEndpointFilter {
   /** Filter by the object’s `active` field. */
@@ -11795,6 +11771,50 @@ export interface ResourcesResolvedRequirementFilter {
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
 }
+export interface ServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: ServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: ServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 export interface WebhookEndpointFilter {
   /** Filter by the object’s `active` field. */
   active?: BooleanFilter;
@@ -11966,40 +11986,6 @@ export type BuildStepOrderBy =
   | 'STATUS_DESC'
   | 'SUMMARY_ASC'
   | 'SUMMARY_DESC';
-export type BuilderBindingOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_BY_PRINCIPAL_ASC'
-  | 'CREATED_BY_PRINCIPAL_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'OBSERVED_HOST_ASC'
-  | 'OBSERVED_HOST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REALM_ASC'
-  | 'REALM_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'UPDATED_BY_PRINCIPAL_ASC'
-  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type ContentPresetOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -13198,38 +13184,6 @@ export type PlatformBuildStepOrderBy =
   | 'STATUS_DESC'
   | 'SUMMARY_ASC'
   | 'SUMMARY_DESC';
-export type PlatformBuilderBindingOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_BY_PRINCIPAL_ASC'
-  | 'CREATED_BY_PRINCIPAL_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'OBSERVED_HOST_ASC'
-  | 'OBSERVED_HOST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REALM_ASC'
-  | 'REALM_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'UPDATED_BY_PRINCIPAL_ASC'
-  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type PlatformFunctionApiBindingOrderBy =
   | 'ALIAS_ASC'
   | 'ALIAS_DESC'
@@ -14766,6 +14720,42 @@ export type PlatformResourcesResolvedRequirementOrderBy =
   | 'SECRETS_OBJECT_NAME_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC';
+export type PlatformServiceBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INSTALLATION_SCOPE_ASC'
+  | 'INSTALLATION_SCOPE_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type PlatformWebhookEndpointOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -15824,6 +15814,44 @@ export type ResourcesResolvedRequirementOrderBy =
   | 'SECRETS_OBJECT_NAME_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC';
+export type ServiceBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INSTALLATION_SCOPE_ASC'
+  | 'INSTALLATION_SCOPE_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type WebhookEndpointOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -15989,46 +16017,6 @@ export interface UpdateBuildStepInput {
   buildStepPatch: BuildStepPatch;
 }
 export interface DeleteBuildStepInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateBuilderBindingInput {
-  clientMutationId?: string;
-  builderBinding: {
-    createdBy?: string;
-    createdByPrincipal?: string;
-    databaseId: string;
-    installationId: string;
-    lastError?: string;
-    metadata?: Record<string, unknown>;
-    namespaceId: string;
-    observedHost?: string;
-    realm?: string;
-    status?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
-}
-export interface BuilderBindingPatch {
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  databaseId?: string | null;
-  installationId?: string | null;
-  lastError?: string | null;
-  metadata?: Record<string, unknown> | null;
-  namespaceId?: string | null;
-  observedHost?: string | null;
-  realm?: string | null;
-  status?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
-}
-export interface UpdateBuilderBindingInput {
-  clientMutationId?: string;
-  id: string;
-  builderBindingPatch: BuilderBindingPatch;
-}
-export interface DeleteBuilderBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -17565,44 +17553,6 @@ export interface UpdatePlatformBuildStepInput {
   platformBuildStepPatch: PlatformBuildStepPatch;
 }
 export interface DeletePlatformBuildStepInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePlatformBuilderBindingInput {
-  clientMutationId?: string;
-  platformBuilderBinding: {
-    createdBy?: string;
-    createdByPrincipal?: string;
-    installationId: string;
-    lastError?: string;
-    metadata?: Record<string, unknown>;
-    namespaceId: string;
-    observedHost?: string;
-    realm?: string;
-    status?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
-}
-export interface PlatformBuilderBindingPatch {
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  installationId?: string | null;
-  lastError?: string | null;
-  metadata?: Record<string, unknown> | null;
-  namespaceId?: string | null;
-  observedHost?: string | null;
-  realm?: string | null;
-  status?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
-}
-export interface UpdatePlatformBuilderBindingInput {
-  clientMutationId?: string;
-  id: string;
-  platformBuilderBindingPatch: PlatformBuilderBindingPatch;
-}
-export interface DeletePlatformBuilderBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -19398,6 +19348,48 @@ export interface DeletePlatformResourcesResolvedRequirementInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePlatformServiceBindingInput {
+  clientMutationId?: string;
+  platformServiceBinding: {
+    createdBy?: string;
+    createdByPrincipal?: string;
+    installationId: string;
+    installationScope: string;
+    kind: string;
+    lastError?: string;
+    metadata?: Record<string, unknown>;
+    namespaceId: string;
+    observedHost?: string;
+    realm?: string;
+    status?: string;
+    updatedBy?: string;
+    updatedByPrincipal?: string;
+  };
+}
+export interface PlatformServiceBindingPatch {
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  installationId?: string | null;
+  installationScope?: string | null;
+  kind?: string | null;
+  lastError?: string | null;
+  metadata?: Record<string, unknown> | null;
+  namespaceId?: string | null;
+  observedHost?: string | null;
+  realm?: string | null;
+  status?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
+export interface UpdatePlatformServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+  platformServiceBindingPatch: PlatformServiceBindingPatch;
+}
+export interface DeletePlatformServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreatePlatformWebhookEndpointInput {
   clientMutationId?: string;
   platformWebhookEndpoint: {
@@ -20579,6 +20571,50 @@ export interface DeleteResourcesResolvedRequirementInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateServiceBindingInput {
+  clientMutationId?: string;
+  serviceBinding: {
+    createdBy?: string;
+    createdByPrincipal?: string;
+    databaseId: string;
+    installationId: string;
+    installationScope: string;
+    kind: string;
+    lastError?: string;
+    metadata?: Record<string, unknown>;
+    namespaceId: string;
+    observedHost?: string;
+    realm?: string;
+    status?: string;
+    updatedBy?: string;
+    updatedByPrincipal?: string;
+  };
+}
+export interface ServiceBindingPatch {
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  databaseId?: string | null;
+  installationId?: string | null;
+  installationScope?: string | null;
+  kind?: string | null;
+  lastError?: string | null;
+  metadata?: Record<string, unknown> | null;
+  namespaceId?: string | null;
+  observedHost?: string | null;
+  realm?: string | null;
+  status?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
+export interface UpdateServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+  serviceBindingPatch: ServiceBindingPatch;
+}
+export interface DeleteServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateWebhookEndpointInput {
   clientMutationId?: string;
   webhookEndpoint: {
@@ -20682,12 +20718,12 @@ export const connectionFieldsMap = {
     imageGrants: 'ImageGrant',
   },
   Namespace: {
-    builderBindings: 'BuilderBinding',
     functionDeployments: 'FunctionDeployment',
     registryBindings: 'RegistryBinding',
     resourceDefinitions: 'ResourceDefinition',
     resourceInstallations: 'ResourceInstallation',
     resources: 'Resource',
+    serviceBindings: 'ServiceBinding',
     webhookEndpoints: 'WebhookEndpoint',
   },
   PlatformFunctionApiBinding: {
@@ -20703,12 +20739,12 @@ export const connectionFieldsMap = {
     platformImageGrantsByImageId: 'PlatformImageGrant',
   },
   PlatformNamespace: {
-    platformBuilderBindingsByNamespaceId: 'PlatformBuilderBinding',
     platformFunctionDeploymentsByNamespaceId: 'PlatformFunctionDeployment',
     platformRegistryBindingsByNamespaceId: 'PlatformRegistryBinding',
     platformResourceDefinitionsByNamespaceId: 'PlatformResourceDefinition',
     platformResourceInstallationsByNamespaceId: 'PlatformResourceInstallation',
     platformResourcesByNamespaceId: 'PlatformResource',
+    platformServiceBindingsByNamespaceId: 'PlatformServiceBinding',
     platformWebhookEndpointsByNamespaceId: 'PlatformWebhookEndpoint',
   },
   PlatformProposalComment: {
@@ -21488,15 +21524,6 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Not included in the specified list. */
   notIn?: ConstructiveInternalTypeImage[];
 }
-/** A filter to be used against many `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface NamespaceToManyBuilderBindingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: BuilderBindingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: BuilderBindingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: BuilderBindingFilter;
-}
 /** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -21541,6 +21568,15 @@ export interface NamespaceToManyResourceFilter {
   none?: ResourceFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ResourceFilter;
+}
+/** A filter to be used against many `ServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyServiceBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ServiceBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ServiceBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ServiceBindingFilter;
 }
 /** A filter to be used against many `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyWebhookEndpointFilter {
@@ -21605,15 +21641,6 @@ export interface PlatformImageToManyPlatformImageGrantFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformImageGrantFilter;
 }
-/** A filter to be used against many `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceToManyPlatformBuilderBindingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: PlatformBuilderBindingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: PlatformBuilderBindingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: PlatformBuilderBindingFilter;
-}
 /** A filter to be used against many `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -21658,6 +21685,15 @@ export interface PlatformNamespaceToManyPlatformResourceFilter {
   none?: PlatformResourceFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformResourceFilter;
+}
+/** A filter to be used against many `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformServiceBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformServiceBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformServiceBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformServiceBindingFilter;
 }
 /** A filter to be used against many `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformWebhookEndpointFilter {
@@ -22321,32 +22357,6 @@ export interface BuildStepInput {
   status?: string;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown>;
-}
-/** An input for mutations affecting `BuilderBinding` */
-export interface BuilderBindingInput {
-  createdAt?: string;
-  createdBy?: string;
-  createdByPrincipal?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  id?: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId: string;
-  /** Most recent projection failure */
-  lastError?: string;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown>;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId: string;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string;
-  updatedAt?: string;
-  updatedBy?: string;
-  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `ContentPreset` */
 export interface ContentPresetInput {
@@ -23383,30 +23393,6 @@ export interface PlatformBuildStepInput {
   status?: string;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown>;
-}
-/** An input for mutations affecting `PlatformBuilderBinding` */
-export interface PlatformBuilderBindingInput {
-  createdAt?: string;
-  createdBy?: string;
-  createdByPrincipal?: string;
-  id?: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId: string;
-  /** Most recent projection failure */
-  lastError?: string;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown>;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId: string;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string;
-  updatedAt?: string;
-  updatedBy?: string;
-  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `PlatformFunctionApiBinding` */
 export interface PlatformFunctionApiBindingInput {
@@ -24460,6 +24446,34 @@ export interface PlatformResourceUsageSummaryInput {
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number;
 }
+/** An input for mutations affecting `PlatformServiceBinding` */
+export interface PlatformServiceBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId: string;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope: string;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown>;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
 /** An input for mutations affecting `PlatformWebhookEndpoint` */
 export interface PlatformWebhookEndpointInput {
   /** Whether this endpoint currently accepts deliveries */
@@ -25055,6 +25069,36 @@ export interface ResourceUsageSummaryInput {
   runtimeSeconds?: string;
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number;
+}
+/** An input for mutations affecting `ServiceBinding` */
+export interface ServiceBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId: string;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope: string;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown>;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `WebhookEndpoint` */
 export interface WebhookEndpointInput {
@@ -25874,47 +25918,6 @@ export interface ImageGrantFilter {
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
-/** A filter to be used against `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface BuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: BuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: BuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: BuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
-}
 /** A filter to be used against `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDeploymentFilter {
   /** Checks for all expressions in this list. */
@@ -26214,6 +26217,51 @@ export interface ResourceFilter {
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
+/** A filter to be used against `ServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface ServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: ServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: ServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 /** A filter to be used against `PlatformFunctionInvocation` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformFunctionInvocationFilter {
   /** Filter by the object’s `actorId` field. */
@@ -26453,45 +26501,6 @@ export interface PlatformImageGrantFilter {
   or?: PlatformImageGrantFilter[];
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
-}
-/** A filter to be used against `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformBuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PlatformBuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
@@ -26777,6 +26786,49 @@ export interface PlatformResourceFilter {
   storageSizeBytes?: BigIntFilter;
   /** Filter by the object’s `storageTotalBytes` field. */
   storageTotalBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
@@ -28502,10 +28554,6 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `builderBindings` relation. */
-  builderBindings?: NamespaceToManyBuilderBindingFilter;
-  /** `builderBindings` exist. */
-  builderBindingsExist?: boolean;
   /** Filter by the object’s `clusterId` field. */
   clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -28552,6 +28600,10 @@ export interface NamespaceFilter {
   resources?: NamespaceToManyResourceFilter;
   /** `resources` exist. */
   resourcesExist?: boolean;
+  /** Filter by the object’s `serviceBindings` relation. */
+  serviceBindings?: NamespaceToManyServiceBindingFilter;
+  /** `serviceBindings` exist. */
+  serviceBindingsExist?: boolean;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -28786,10 +28838,6 @@ export interface PlatformNamespaceFilter {
   not?: PlatformNamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceFilter[];
-  /** Filter by the object’s `platformBuilderBindingsByNamespaceId` relation. */
-  platformBuilderBindingsByNamespaceId?: PlatformNamespaceToManyPlatformBuilderBindingFilter;
-  /** `platformBuilderBindingsByNamespaceId` exist. */
-  platformBuilderBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
   platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
   /** `platformFunctionDeploymentsByNamespaceId` exist. */
@@ -28810,6 +28858,10 @@ export interface PlatformNamespaceFilter {
   platformResourcesByNamespaceId?: PlatformNamespaceToManyPlatformResourceFilter;
   /** `platformResourcesByNamespaceId` exist. */
   platformResourcesByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformServiceBindingsByNamespaceId` relation. */
+  platformServiceBindingsByNamespaceId?: PlatformNamespaceToManyPlatformServiceBindingFilter;
+  /** `platformServiceBindingsByNamespaceId` exist. */
+  platformServiceBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation. */
   platformWebhookEndpointsByNamespaceId?: PlatformNamespaceToManyPlatformWebhookEndpointFilter;
   /** `platformWebhookEndpointsByNamespaceId` exist. */
@@ -29560,51 +29612,6 @@ export type DeleteBuildStepPayloadSelect = {
   };
   buildStepEdge?: {
     select: BuildStepEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface CreateBuilderBindingPayload {
-  /** The `BuilderBinding` that was created by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type CreateBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface UpdateBuilderBindingPayload {
-  /** The `BuilderBinding` that was updated by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type UpdateBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface DeleteBuilderBindingPayload {
-  /** The `BuilderBinding` that was deleted by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type DeleteBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -31386,51 +31393,6 @@ export type DeletePlatformBuildStepPayloadSelect = {
     select: PlatformBuildStepEdgeSelect;
   };
 };
-export interface CreatePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was created by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type CreatePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
-  };
-};
-export interface UpdatePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was updated by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type UpdatePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
-  };
-};
-export interface DeletePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was deleted by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type DeletePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
-  };
-};
 export interface CreatePlatformFunctionApiBindingPayload {
   clientMutationId?: string | null;
   /** The `PlatformFunctionApiBinding` that was created by this mutation. */
@@ -33186,6 +33148,51 @@ export type DeletePlatformResourceUsageSummaryPayloadSelect = {
     select: PlatformResourceUsageSummaryEdgeSelect;
   };
 };
+export interface CreatePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was created by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type CreatePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
+export interface UpdatePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was updated by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type UpdatePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
+export interface DeletePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was deleted by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type DeletePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
 export interface CreatePlatformWebhookEndpointPayload {
   clientMutationId?: string | null;
   /** The `PlatformWebhookEndpoint` that was created by this mutation. */
@@ -34176,6 +34183,51 @@ export type DeleteResourceUsageSummaryPayloadSelect = {
     select: ResourceUsageSummaryEdgeSelect;
   };
 };
+export interface CreateServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was created by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type CreateServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
+export interface UpdateServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was updated by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type UpdateServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
+export interface DeleteServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was deleted by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type DeleteServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
 export interface CreateWebhookEndpointPayload {
   clientMutationId?: string | null;
   /** The `WebhookEndpoint` that was created by this mutation. */
@@ -34360,18 +34412,6 @@ export type BuildStepEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: BuildStepSelect;
-  };
-};
-/** A `BuilderBinding` edge in the connection. */
-export interface BuilderBindingEdge {
-  cursor?: string | null;
-  /** The `BuilderBinding` at the end of the edge. */
-  node?: BuilderBinding | null;
-}
-export type BuilderBindingEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: BuilderBindingSelect;
   };
 };
 /** A `ContentPreset` edge in the connection. */
@@ -34804,18 +34844,6 @@ export type PlatformBuildStepEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformBuildStepSelect;
-  };
-};
-/** A `PlatformBuilderBinding` edge in the connection. */
-export interface PlatformBuilderBindingEdge {
-  cursor?: string | null;
-  /** The `PlatformBuilderBinding` at the end of the edge. */
-  node?: PlatformBuilderBinding | null;
-}
-export type PlatformBuilderBindingEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformBuilderBindingSelect;
   };
 };
 /** A `PlatformFunctionApiBinding` edge in the connection. */
@@ -35262,6 +35290,18 @@ export type PlatformResourceUsageSummaryEdgeSelect = {
     select: PlatformResourceUsageSummarySelect;
   };
 };
+/** A `PlatformServiceBinding` edge in the connection. */
+export interface PlatformServiceBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformServiceBinding` at the end of the edge. */
+  node?: PlatformServiceBinding | null;
+}
+export type PlatformServiceBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformServiceBindingSelect;
+  };
+};
 /** A `PlatformWebhookEndpoint` edge in the connection. */
 export interface PlatformWebhookEndpointEdge {
   cursor?: string | null;
@@ -35524,6 +35564,18 @@ export type ResourceUsageSummaryEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ResourceUsageSummarySelect;
+  };
+};
+/** A `ServiceBinding` edge in the connection. */
+export interface ServiceBindingEdge {
+  cursor?: string | null;
+  /** The `ServiceBinding` at the end of the edge. */
+  node?: ServiceBinding | null;
+}
+export type ServiceBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ServiceBindingSelect;
   };
 };
 /** A `WebhookEndpoint` edge in the connection. */
