@@ -68,7 +68,7 @@ export const createAuthenticateMiddleware = (
       !(rlsModule?.authenticateStrict && rlsModule.privateSchema?.schemaName)
     ) {
       log.error(`[auth] strictAuth is on but API ${api.apiId ?? 'unknown'} has no authenticateStrict; refusing`);
-      respondWithGraphQLError(res, errors.STRICT_AUTH_UNAVAILABLE());
+      respondWithGraphQLError(res, errors.STRICT_AUTH_UNAVAILABLE(), { status: 503 });
       return;
     }
 

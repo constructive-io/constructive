@@ -155,9 +155,13 @@ class Server {
     app.use(clientIpMiddleware);
     app.use(requestIdMiddleware());
     app.use(requestLogger);
+    // CORS runs twice. Before routing it can only allow the platform fallback,
+    // so a 404/500 from `api` still reaches that origin readably. After routing
+    // it decides against the API the host resolved to (req.api).
+    const corsForRoutedApi = cors(fallbackOrigin);
+    app.use(corsForRoutedApi);
     app.use(api);
-    // CORS is decided against the API the host resolved to (req.api).
-    app.use(cors(fallbackOrigin));
+    app.use(corsForRoutedApi);
     app.use(authenticate);
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,

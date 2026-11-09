@@ -75,6 +75,7 @@ describe('strictAuth without an authenticate_strict function', () => {
       .set('Host', HOST)
       .set(headers)
       .send({ query: '{ __typename }' });
+    expect(res.status).toBe(503);
     expect(res.body.data).toBeUndefined();
     expect(res.body.errors).toEqual([
       expect.objectContaining({

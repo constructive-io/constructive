@@ -131,6 +131,43 @@ describe('per-API CORS', () => {
     expectRefused(await post('http://localhost:5173'));
   });
 
+  describe('on a host that resolves to no API', () => {
+    const UNKNOWN_HOST = 'nothing-here.test.constructive.io';
+
+    it('answers a preflight from the platform fallback origin', async () => {
+      const res = await request
+        .options('/graphql')
+        .set('Host', UNKNOWN_HOST)
+        .set('Origin', PLATFORM_ORIGIN)
+        .set('Access-Control-Request-Method', 'POST')
+        .set('Access-Control-Request-Headers', 'content-type');
+      expect(res.status).toBe(200);
+      expectAllowed(res, PLATFORM_ORIGIN);
+    });
+
+    it('sends the 404 with CORS headers for the platform fallback origin', async () => {
+      const res = await request
+        .post('/graphql')
+        .set('Host', UNKNOWN_HOST)
+        .set('Origin', PLATFORM_ORIGIN)
+        .send({ query: '{ __typename }' });
+      expect(res.status).toBe(404);
+      expectAllowed(res, PLATFORM_ORIGIN);
+    });
+
+    it('sends the 404 without CORS headers for any other origin', async () => {
+      for (const origin of [APP_ORIGIN, 'https://evil.example']) {
+        const res = await request
+          .post('/graphql')
+          .set('Host', UNKNOWN_HOST)
+          .set('Origin', origin)
+          .send({ query: '{ __typename }' });
+        expect(res.status).toBe(404);
+        expectRefused(res);
+      }
+    });
+  });
+
   it('refuses an unrelated origin', async () => {
     expectRefused(await preflight('https://evil.example'));
     expectRefused(await post('https://evil.example'));

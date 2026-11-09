@@ -4,8 +4,10 @@ import corsPlugin from 'cors';
 import type { Request, RequestHandler } from 'express';
 
 /**
- * CORS for the routed API. Mount after the `api` middleware: the decision is
- * made against `req.api`, the API the request's host resolved to.
+ * CORS for the routed API, decided against `req.api`, the API the request's
+ * host resolved to. Mount it both before and after the `api` middleware:
+ * before routing `req.api` is unset, so only the fallback origin is allowed,
+ * which keeps routing 404/500 responses readable for the platform origin.
  *
  * An origin is allowed, with credentials, when it is exactly:
  *  - one of the routed API's typed `cors_settings` origins (`req.api.corsOrigins`,
