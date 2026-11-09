@@ -150,8 +150,9 @@ chunks, and NULL only when neither has an embedding. The filter also adds
 
 ```sql
 parent.embedding IS NOT NULL
-OR EXISTS (SELECT 1 FROM documents_chunks AS c
-           WHERE c.parent_id = parent.id AND c.embedding IS NOT NULL)
+OR (SELECT MIN(c.embedding <=> $query)
+    FROM documents_chunks AS c
+    WHERE c.parent_id = parent.id) IS NOT NULL
 ```
 
 to `WHERE`, so rows with no embedding anywhere are not returned, counted or

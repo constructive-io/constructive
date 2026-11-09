@@ -233,12 +233,8 @@ export function createPgvectorAdapter(
         const combinedDistanceExpr = sql`LEAST(${parentDistanceExpr}, ${chunkDistanceSubquery})`;
 
         // Rows with no embedding anywhere have no distance to rank: leave them out.
-        const scorableClause = sql`(${parentColumnExpr} IS NOT NULL OR EXISTS (
-          SELECT 1
-          FROM ${chunksTableRef} AS ${chunksAlias}
-          WHERE ${chunksAlias}.${parentFk} = ${parentId}
-            AND ${chunksAlias}.${chunkEmbedding} IS NOT NULL
-        ))`;
+        // MIN(distance) is NULL exactly when no chunk has an embedding.
+        const scorableClause = sql`(${parentColumnExpr} IS NOT NULL OR ${chunkDistanceSubquery} IS NOT NULL)`;
 
         let whereClause: SQL | null = null;
         if (distance !== undefined && distance !== null) {
