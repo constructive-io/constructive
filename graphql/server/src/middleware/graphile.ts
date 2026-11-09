@@ -27,7 +27,8 @@ import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
-import type { DatabaseSettings } from '../types';
+import type { ApiOptions, DatabaseSettings } from '../types';
+import { getApiConfig, isApiError } from './api';
 import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
@@ -294,13 +295,161 @@ const buildPreset = (
   };
 };
 
+/**
+ * The service entry a handler build read was evicted while the build ran (a
+ * schema change flushes the service as it lands). The handler is released, and
+ * the request resolves its service again rather than failing.
+ */
+class ServiceInvalidatedError extends Error {
+  constructor(key: string) {
+    super(`service ${key} was invalidated while its handler was being built`);
+    this.name = 'ServiceInvalidatedError';
+  }
+}
+
+/**
+ * How many times one request resolves its service. A request that starts a
+ * handler build just before a schema change's flush resolves once more; a
+ * service that keeps changing past that fails the request with the reason.
+ */
+const MAX_SERVICE_RESOLUTIONS = 3;
+
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+
+  /** A cached, coalesced or newly built handler for one resolution of the service. */
+  const handlerFor = async (
+    req: Request,
+    api: NonNullable<Request['api']>,
+    key: string,
+    label: string
+  ): Promise<GraphileCacheEntry> => {
+    const { anonRole, roleName, schema } = api;
+    const databaseLabel = api.databaseId ?? 'none';
+    const schemaLabel = schema?.join(',') || 'unknown';
+
+    // =========================================================================
+    // Phase A: Cache Check (fast path)
+    // =========================================================================
+    const cached = graphileCache.get(key);
+    if (cached) {
+      log.debug(`${label} PostGraphile cache hit key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
+      return cached;
+    }
+
+    log.debug(`${label} PostGraphile cache miss key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
+
+    // =========================================================================
+    // Phase B: In-Flight Check (single-flight coalescing)
+    // =========================================================================
+    const inFlight = creating.get(key);
+    if (inFlight) {
+      log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
+      try {
+        return await inFlight;
+      } catch (error) {
+        // The service this waiter resolved is gone too: resolve it again.
+        if (error instanceof ServiceInvalidatedError) throw error;
+        log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`, error);
+        // Fall through to Phase C to retry creation
+      }
+    }
+
+    // =========================================================================
+    // Phase C: Create New Handler (first request for this key)
+    // =========================================================================
+
+    // Re-check cache after coalesced request failure (another retry may have succeeded)
+    const recheckedCache = graphileCache.get(key);
+    if (recheckedCache) {
+      log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
+      return recheckedCache;
+    }
+
+    // Re-check in-flight map (another retry may have started creation)
+    const retryInFlight = creating.get(key);
+    if (retryInFlight) {
+      log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
+      return await retryInFlight;
+    }
+
+    log.info(
+      `${label} Building PostGraphile v5 handler key=${key} databaseId=${databaseLabel} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
+    );
+
+    const pool = api.tenantPool;
+
+    // Register the creation promise before any asynchronous preset work so
+    // concurrent requests coalesce while optional plugin modules load.
+    const startedUnder = generationOf(key);
+    const creationPromise = (async () => {
+      const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
+      const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
+      const preset = buildPreset(
+        pool,
+        schema || [],
+        anonRole,
+        roleName,
+        opts.api?.introspectionRole,
+        opts.graphile,
+        api.databaseSettings,
+        api.apiId,
+        compute,
+        Boolean(api.webauthnSettings),
+        platform?.platform
+      );
+      const instance = await observeGraphileBuild(
+        {
+          cacheKey: key,
+          serviceKey: key,
+          databaseId: api.databaseId ?? null
+        },
+        () => createGraphileInstance({
+          preset,
+          cacheKey: key,
+          enableRealtime: api.databaseSettings?.enableRealtime
+        }),
+        { enabled: observabilityEnabled }
+      );
+      // The service entry this build read was evicted while it ran: the
+      // handler describes a service that may no longer exist, so it is
+      // released rather than admitted, and the requests resolve it again.
+      if (generationOf(key) !== startedUnder) {
+        await instance.realtimeManager?.stop();
+        await instance.pgl.release();
+        throw new ServiceInvalidatedError(key);
+      }
+      // Admission is part of the shared promise: a handler the cache rejects
+      // has been released, so coalesced waiters must not be handed it.
+      await cacheGraphileInstance(key, instance);
+      return instance;
+    })();
+    creating.set(key, creationPromise);
+
+    try {
+      const instance = await creationPromise;
+      log.info(`${label} Cached PostGraphile v5 handler key=${key} databaseId=${databaseLabel}`);
+      return instance;
+    } catch (error) {
+      if (error instanceof ServiceInvalidatedError) throw error;
+      log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
+      throw new HandlerCreationError(
+        `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
+        {
+          cacheKey: key,
+          cause: error instanceof Error ? error.message : String(error)
+        }
+      );
+    } finally {
+      // Clean up this build's in-flight entry, never a newer build's.
+      if (creating.get(key) === creationPromise) creating.delete(key);
+    }
+  };
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
     try {
-      const api = req.api;
+      let api = req.api;
       if (!api) {
         log.error(`${label} Missing API info`);
         respondWithGraphQLError(res, errors.INTERNAL_FAILURE({ details: 'Missing API info' }));
@@ -315,124 +464,32 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         );
         return;
       }
-      const { anonRole, roleName, schema } = api;
-      const databaseLabel = api.databaseId ?? 'none';
-      const schemaLabel = schema?.join(',') || 'unknown';
 
-      // =========================================================================
-      // Phase A: Cache Check (fast path)
-      // =========================================================================
-      const cached = graphileCache.get(key);
-      if (cached) {
-        log.debug(`${label} PostGraphile cache hit key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
-        return cached.handler(req, res, next);
-      }
-
-      log.debug(`${label} PostGraphile cache miss key=${key} databaseId=${databaseLabel} schemas=${schemaLabel}`);
-
-      // =========================================================================
-      // Phase B: In-Flight Check (single-flight coalescing)
-      // =========================================================================
-      const inFlight = creating.get(key);
-      if (inFlight) {
-        log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
+      for (let resolution = 1; ; resolution++) {
+        let instance: GraphileCacheEntry;
         try {
-          const instance = await inFlight;
-          return instance.handler(req, res, next);
+          instance = await handlerFor(req, api, key, label);
         } catch (error) {
-          log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`, error);
-          // Fall through to Phase C to retry creation
-        }
-      }
-
-      // =========================================================================
-      // Phase C: Create New Handler (first request for this key)
-      // =========================================================================
-
-      // Re-check cache after coalesced request failure (another retry may have succeeded)
-      const recheckedCache = graphileCache.get(key);
-      if (recheckedCache) {
-        log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
-        return recheckedCache.handler(req, res, next);
-      }
-
-      // Re-check in-flight map (another retry may have started creation)
-      const retryInFlight = creating.get(key);
-      if (retryInFlight) {
-        log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
-        const retryInstance = await retryInFlight;
-        return retryInstance.handler(req, res, next);
-      }
-
-      log.info(
-        `${label} Building PostGraphile v5 handler key=${key} databaseId=${databaseLabel} schemas=${schemaLabel} role=${roleName} anon=${anonRole}`
-      );
-
-      const pool = api.tenantPool;
-
-      // Register the creation promise before any asynchronous preset work so
-      // concurrent requests coalesce while optional plugin modules load.
-      const startedUnder = generationOf(key);
-      const creationPromise = (async () => {
-        const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
-        const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
-        const preset = buildPreset(
-          pool,
-          schema || [],
-          anonRole,
-          roleName,
-          opts.api?.introspectionRole,
-          opts.graphile,
-          api.databaseSettings,
-          api.apiId,
-          compute,
-          Boolean(api.webauthnSettings),
-          platform?.platform
-        );
-        const instance = await observeGraphileBuild(
-          {
-            cacheKey: key,
-            serviceKey: key,
-            databaseId: api.databaseId ?? null
-          },
-          () => createGraphileInstance({
-            preset,
-            cacheKey: key,
-            enableRealtime: api.databaseSettings?.enableRealtime
-          }),
-          { enabled: observabilityEnabled }
-        );
-        // The service entry this build read was evicted while it ran: the
-        // handler describes a service that may no longer exist, so it is
-        // released rather than admitted, and the waiters re-resolve.
-        if (generationOf(key) !== startedUnder) {
-          await instance.realtimeManager?.stop();
-          await instance.pgl.release();
-          throw new Error(`service ${key} was invalidated while its handler was being built`);
-        }
-        // Admission is part of the shared promise: a handler the cache rejects
-        // has been released, so coalesced waiters must not be handed it.
-        await cacheGraphileInstance(key, instance);
-        return instance;
-      })();
-      creating.set(key, creationPromise);
-
-      try {
-        const instance = await creationPromise;
-        log.info(`${label} Cached PostGraphile v5 handler key=${key} databaseId=${databaseLabel}`);
-        return instance.handler(req, res, next);
-      } catch (error) {
-        log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
-        throw new HandlerCreationError(
-          `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
-          {
-            cacheKey: key,
-            cause: error instanceof Error ? error.message : String(error)
+          if (!(error instanceof ServiceInvalidatedError)) throw error;
+          if (resolution >= MAX_SERVICE_RESOLUTIONS) {
+            throw new HandlerCreationError(`Failed to create handler for ${key}: ${error.message}`, {
+              cacheKey: key,
+              cause: error.message
+            });
           }
-        );
-      } finally {
-        // Always clean up in-flight tracker
-        creating.delete(key);
+          log.info(`${label} Service ${key} changed while its handler was being built; resolving it again`);
+          const resolved = await getApiConfig(opts as ApiOptions, req);
+          if (!resolved || isApiError(resolved)) {
+            throw new HandlerCreationError(`Failed to create handler for ${key}: the service no longer resolves`, {
+              cacheKey: key
+            });
+          }
+          req.api = resolved;
+          req.databaseId = resolved.databaseId;
+          api = resolved;
+          continue;
+        }
+        return instance.handler(req, res, next);
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);

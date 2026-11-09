@@ -26,6 +26,13 @@ jest.mock('../graphile-introspection', () => ({
   makeIntrospectionWiring: mockMakeIntrospectionWiring
 }));
 
+const mockGetApiConfig = jest.fn();
+jest.mock('../api', () => ({
+  getApiConfig: mockGetApiConfig,
+  isApiError: (result: { errorHtml?: unknown } | null | undefined) =>
+    !!result && typeof result.errorHtml === 'string'
+}));
+
 import type { Request, Response } from 'express';
 
 import { clearGenerations, evictServiceKey } from '../cache-generation';
@@ -59,6 +66,7 @@ describe('graphile single-flight handler creation', () => {
       handler: jest.fn()
     });
     mockMakeIntrospectionWiring.mockReset();
+    mockGetApiConfig.mockReset();
     mockCreateGrafastCacheLimitsPreset.mockReset().mockReturnValue({
       plugins: [{ name: 'GrafastCacheLimitsPlugin', version: '1.0.0' }]
     });
@@ -161,15 +169,59 @@ describe('graphile single-flight handler creation', () => {
     expect(getInFlightCount()).toBe(0);
   });
 
-  it('does not admit a handler whose service was evicted while it was being built', async () => {
-    let releaseBuild!: () => void;
-    const buildReady = new Promise<void>((resolve) => {
-      releaseBuild = resolve;
+  it('does not admit a handler whose service was evicted while it was being built, and serves the request from a rebuild', async () => {
+    let releaseFirstBuild!: () => void;
+    const firstBuildReady = new Promise<void>((resolve) => {
+      releaseFirstBuild = resolve;
     });
+    const staleHandler = jest.fn();
+    const freshHandler = jest.fn();
+    const release = jest.fn().mockResolvedValue(undefined);
+    mockCreateGraphileInstance
+      .mockImplementationOnce(async () => {
+        await firstBuildReady;
+        return { handler: staleHandler, pgl: { release } };
+      })
+      .mockImplementationOnce(async () => ({ handler: freshHandler, pgl: { release } }));
+    mockMakeIntrospectionWiring.mockReturnValue({
+      presets: [],
+      pgService: {},
+      pgScopedIntrospection: { main: true }
+    });
+    const resolved = { ...makeRequest().api, schema: ['app_public', 'app_new'] };
+    mockGetApiConfig.mockResolvedValue(resolved);
+
+    const middleware = graphile({ graphile: {} } as any);
+    const response = { headersSent: false } as unknown as Response;
+    const next = jest.fn();
+    const req = makeRequest();
+    const pending = middleware(req, response, next);
+    await Promise.resolve();
+    expect(getInFlightCount()).toBe(1);
+
+    evictServiceKey('service-key');
+    releaseFirstBuild();
+    await pending;
+
+    // The stale build is released, never admitted or served.
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(staleHandler).not.toHaveBeenCalled();
+    // The request resolved its service again and was served by the new build.
+    expect(mockGetApiConfig).toHaveBeenCalledTimes(1);
+    expect(req.api).toBe(resolved);
+    expect(mockCreateGraphileInstance).toHaveBeenCalledTimes(2);
+    expect(mockCacheGraphileInstance).toHaveBeenCalledTimes(1);
+    expect(freshHandler).toHaveBeenCalledTimes(1);
+    expect(next).not.toHaveBeenCalled();
+    expect(getInFlightCount()).toBe(0);
+  });
+
+  it('fails the request with the reason when the service keeps changing during every build', async () => {
     const handler = jest.fn();
     const release = jest.fn().mockResolvedValue(undefined);
     mockCreateGraphileInstance.mockImplementation(async () => {
-      await buildReady;
+      // Every build sees an eviction land before it is admitted.
+      evictServiceKey('service-key');
       return { handler, pgl: { release } };
     });
     mockMakeIntrospectionWiring.mockReturnValue({
@@ -177,23 +229,19 @@ describe('graphile single-flight handler creation', () => {
       pgService: {},
       pgScopedIntrospection: { main: true }
     });
+    mockGetApiConfig.mockImplementation(async () => makeRequest().api);
 
     const middleware = graphile({ graphile: {} } as any);
     const response = { headersSent: true } as unknown as Response;
     const next = jest.fn();
-    const pending = middleware(makeRequest(), response, next);
-    await Promise.resolve();
-    expect(getInFlightCount()).toBe(1);
+    await middleware(makeRequest(), response, next);
 
-    evictServiceKey('service-key');
-    releaseBuild();
-    await pending;
-
-    expect(mockCacheGraphileInstance).not.toHaveBeenCalled();
+    expect(mockCreateGraphileInstance).toHaveBeenCalledTimes(3);
+    expect(mockGetApiConfig).toHaveBeenCalledTimes(2);
+    expect(release).toHaveBeenCalledTimes(3);
     expect(handler).not.toHaveBeenCalled();
-    expect(release).toHaveBeenCalledTimes(1);
     expect(next).toHaveBeenCalledTimes(1);
-    expect(next.mock.calls[0][0].message).toContain('invalidated');
+    expect(next.mock.calls[0][0].message).toContain('invalidated while its handler was being built');
     expect(getInFlightCount()).toBe(0);
   });
 });
