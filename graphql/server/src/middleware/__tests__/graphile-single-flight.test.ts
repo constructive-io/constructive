@@ -242,6 +242,78 @@ describe('graphile single-flight handler creation', () => {
     expect(handler).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(1);
     expect(next.mock.calls[0][0].message).toContain('invalidated while its handler was being built');
+    // The service cache key stays in the log, never in what the client is sent.
+    expect(next.mock.calls[0][0].message).not.toContain('service-key');
     expect(getInFlightCount()).toBe(0);
+  });
+
+  it('releases a discarded build whose realtime teardown fails, and still rebuilds for the request', async () => {
+    let releaseFirstBuild!: () => void;
+    const firstBuildReady = new Promise<void>((resolve) => {
+      releaseFirstBuild = resolve;
+    });
+    const release = jest.fn().mockResolvedValue(undefined);
+    const stop = jest.fn().mockRejectedValue(new Error('realtime already closed'));
+    const freshHandler = jest.fn();
+    mockCreateGraphileInstance
+      .mockImplementationOnce(async () => {
+        await firstBuildReady;
+        return { handler: jest.fn(), pgl: { release }, realtimeManager: { stop } };
+      })
+      .mockImplementationOnce(async () => ({ handler: freshHandler, pgl: { release } }));
+    mockMakeIntrospectionWiring.mockReturnValue({ presets: [], pgService: {}, pgScopedIntrospection: { main: true } });
+    mockGetApiConfig.mockResolvedValue(makeRequest().api);
+
+    const middleware = graphile({ graphile: {} } as any);
+    const next = jest.fn();
+    const pending = middleware(makeRequest(), { headersSent: false } as unknown as Response, next);
+    await Promise.resolve();
+    evictServiceKey('service-key');
+    releaseFirstBuild();
+    await pending;
+
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(freshHandler).toHaveBeenCalledTimes(1);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('answers 404 when the service no longer resolves after its build was invalidated', async () => {
+    const handler = jest.fn();
+    mockCreateGraphileInstance.mockImplementation(async () => {
+      evictServiceKey('service-key');
+      return { handler, pgl: { release: jest.fn().mockResolvedValue(undefined) } };
+    });
+    mockMakeIntrospectionWiring.mockReturnValue({ presets: [], pgService: {}, pgScopedIntrospection: { main: true } });
+    mockGetApiConfig.mockResolvedValue(null);
+
+    const send = jest.fn();
+    const status = jest.fn(() => ({ send }));
+    const middleware = graphile({ graphile: {} } as any);
+    const next = jest.fn();
+    await middleware(makeRequest(), { headersSent: false, status } as unknown as Response, next);
+
+    expect(status).toHaveBeenCalledWith(404);
+    expect(send.mock.calls[0][0]).toContain('API not found');
+    expect(handler).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('keeps a failed re-resolution out of what the client is sent', async () => {
+    mockCreateGraphileInstance.mockImplementation(async () => {
+      evictServiceKey('service-key');
+      return { handler: jest.fn(), pgl: { release: jest.fn().mockResolvedValue(undefined) } };
+    });
+    mockMakeIntrospectionWiring.mockReturnValue({ presets: [], pgService: {}, pgScopedIntrospection: { main: true } });
+    mockGetApiConfig.mockRejectedValue(new Error('no schemas in [tenant_private] for database 0f2c…'));
+
+    const middleware = graphile({ graphile: {} } as any);
+    const next = jest.fn();
+    await middleware(makeRequest(), { headersSent: true } as unknown as Response, next);
+
+    const message: string = next.mock.calls[0][0].message;
+    expect(message).toBe('Failed to create handler for this API: the service could not be resolved again');
+    expect(message).not.toContain('service-key');
+    expect(message).not.toContain('tenant_private');
   });
 });

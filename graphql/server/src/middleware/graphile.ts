@@ -21,6 +21,7 @@ import {
 } from 'graphile-settings';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
+import errorPage404Message from '../errors/404-message';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
@@ -301,11 +302,22 @@ const buildPreset = (
  * the request resolves its service again rather than failing.
  */
 class ServiceInvalidatedError extends Error {
+  readonly cacheKey: string;
   constructor(key: string) {
-    super(`service ${key} was invalidated while its handler was being built`);
+    // The key stays out of the message, which can reach the client.
+    super('the service was invalidated while its handler was being built');
     this.name = 'ServiceInvalidatedError';
+    this.cacheKey = key;
   }
 }
+
+/**
+ * A client sees the failure, not the service cache key (a hostname, or the
+ * database id and schemas of a header-routed request): the key and any cause
+ * stay in the log and in the error's context.
+ */
+const handlerFailure = (reason: string, context: Record<string, unknown>) =>
+  new HandlerCreationError(`Failed to create handler for this API: ${reason}`, context);
 
 /**
  * How many times one request resolves its service. A request that starts a
@@ -415,8 +427,18 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // handler describes a service that may no longer exist, so it is
       // released rather than admitted, and the requests resolve it again.
       if (generationOf(key) !== startedUnder) {
-        await instance.realtimeManager?.stop();
-        await instance.pgl.release();
+        // Release even when the realtime teardown fails, and keep the
+        // invalidation signal either way: the waiters resolve again on it.
+        try {
+          await instance.realtimeManager?.stop();
+        } catch (error) {
+          log.warn(`Stopping realtime for the discarded PostGraphile[${key}] failed`, error);
+        }
+        try {
+          await instance.pgl.release();
+        } catch (error) {
+          log.warn(`Releasing the discarded PostGraphile[${key}] failed`, error);
+        }
         throw new ServiceInvalidatedError(key);
       }
       // Admission is part of the shared promise: a handler the cache rejects
@@ -433,13 +455,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
     } catch (error) {
       if (error instanceof ServiceInvalidatedError) throw error;
       log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
-      throw new HandlerCreationError(
-        `Failed to create handler for ${key}: ${error instanceof Error ? error.message : String(error)}`,
-        {
-          cacheKey: key,
-          cause: error instanceof Error ? error.message : String(error)
-        }
-      );
+      const cause = error instanceof Error ? error.message : String(error);
+      throw handlerFailure(cause, { cacheKey: key, cause });
     } finally {
       // Clean up this build's in-flight entry, never a newer build's.
       if (creating.get(key) === creationPromise) creating.delete(key);
@@ -472,17 +489,24 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         } catch (error) {
           if (!(error instanceof ServiceInvalidatedError)) throw error;
           if (resolution >= MAX_SERVICE_RESOLUTIONS) {
-            throw new HandlerCreationError(`Failed to create handler for ${key}: ${error.message}`, {
-              cacheKey: key,
-              cause: error.message
-            });
+            log.warn(`${label} Service ${key} changed during ${resolution} handler builds; giving up`);
+            throw handlerFailure(error.message, { cacheKey: key, cause: error.message });
           }
           log.info(`${label} Service ${key} changed while its handler was being built; resolving it again`);
-          const resolved = await getApiConfig(opts as ApiOptions, req);
+          let resolved: Awaited<ReturnType<typeof getApiConfig>>;
+          try {
+            resolved = await getApiConfig(opts as ApiOptions, req);
+          } catch (resolveError) {
+            log.error(`${label} Resolving service ${key} again failed`, resolveError);
+            throw handlerFailure('the service could not be resolved again', { cacheKey: key });
+          }
+          // Gone meanwhile: answer as the api middleware answers a fresh request for it.
           if (!resolved || isApiError(resolved)) {
-            throw new HandlerCreationError(`Failed to create handler for ${key}: the service no longer resolves`, {
-              cacheKey: key
-            });
+            log.info(`${label} Service ${key} no longer resolves`);
+            res
+              .status(404)
+              .send(errorPage404Message('API not found', isApiError(resolved) ? resolved.errorHtml : undefined));
+            return;
           }
           req.api = resolved;
           req.databaseId = resolved.databaseId;
