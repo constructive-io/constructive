@@ -11,7 +11,7 @@
  * the conversion to SQL internally.
  *
  * Clients provide exactly one of `text` or `vector`; `vector` becomes optional.
- * Sending both, or neither, is an error. `unifiedSearch` text is embedded too, so pgvector
+ * Sending both, or neither, is an error; blank `text` on its own counts as not given. `unifiedSearch` text is embedded too, so pgvector
  * participates alongside the text adapters.
  *
  * The text is embedded while the operation is planned (see embed-inputs.ts),
@@ -189,6 +189,7 @@ export function createLlmTextSearchPlugin(
                   description:
                     'Natural language text to embed server-side for similarity search. ' +
                     'Provide exactly one of `text` or `vector`; sending both or neither is an error. ' +
+                    'Blank text on its own counts as not given. ' +
                     'Requires the LLM plugin to be configured with an embedding provider.'
                 }
               )
