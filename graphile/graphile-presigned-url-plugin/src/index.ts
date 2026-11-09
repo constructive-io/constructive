@@ -3,7 +3,6 @@
  *
  * Provides per-table S3 storage middleware for PostGraphile v5:
  * - Upload fields on @storageBuckets types (requestUploadUrl, requestBulkUploadUrls)
- * - Delete middleware on @storageFiles tables (S3 cleanup on delete)
  * - downloadUrl computed field on @storageFiles types
  *
  * @example

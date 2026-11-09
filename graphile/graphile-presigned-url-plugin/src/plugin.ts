@@ -10,10 +10,7 @@
  *    Pairs are discovered from the registry's FK relations (see
  *    graphile-storage-registry) — table naming carries no meaning here.
  *
- * 2. Delete middleware — wraps `delete*` mutations on `@storageFiles`-tagged tables
- *    with S3 object cleanup (sync + async GC fallback via AFTER DELETE trigger).
- *
- * 3. downloadUrl — handled by download-url-field.ts (separate plugin).
+ * 2. downloadUrl — handled by download-url-field.ts (separate plugin).
  *
  * Scope resolution uses the codec's schema/table name matched against
  * cached storage module configs.
@@ -34,9 +31,9 @@ import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
-import { deleteS3Object,generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
+import { generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
-import { getBucketConfig, loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
+import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -126,7 +123,7 @@ export function createPresignedUrlPlugin(
   return {
     name: 'PresignedUrlPlugin',
     version: '1.0.0',
-    description: 'Per-table S3 storage middleware: upload fields on @storageBuckets, delete middleware on @storageFiles',
+    description: 'Per-table S3 storage middleware: upload fields on @storageBuckets',
 
     after: ['PgAttributesPlugin', 'PgMutationCreatePlugin', 'PgMutationUpdateDeletePlugin'],
 
@@ -489,141 +486,6 @@ export function createPresignedUrlPlugin(
             newFields,
             'PresignedUrlPlugin adding file upload mutations',
           );
-        },
-
-        /**
-         * Wrap delete* mutations on @storageFiles-tagged tables with S3 cleanup.
-         *
-         * Pattern: identical to graphile-bucket-provisioner-plugin's create/update hooks.
-         * 1. Read the file row BEFORE delete (need key + bucket_id for S3 cleanup)
-         * 2. Call PostGraphile's generated delete (RLS enforced)
-         * 3. If delete succeeded, check refcount and attempt sync S3 delete
-         * 4. AFTER DELETE trigger (constructive-db) enqueues async GC job as fallback
-         */
-        GraphQLObjectType_fields_field(field: any, build: any, context: any) {
-          const {
-            scope: { isRootMutation, fieldName, pgCodec },
-          } = context;
-
-          if (!isRootMutation || !pgCodec || !pgCodec.attributes) {
-            return field;
-          }
-
-          const tags = pgCodec.extensions?.tags;
-          if (!tags?.storageFiles) {
-            return field;
-          }
-
-          if (!fieldName.startsWith('delete')) {
-            return field;
-          }
-
-          log.debug(`Wrapping delete mutation "${fieldName}" with S3 cleanup (codec: ${pgCodec.name})`);
-
-          const defaultResolver = (obj: any) => obj[fieldName];
-          const { resolve: oldResolve = defaultResolver, ...rest } = field;
-          const capturedCodec = pgCodec;
-
-          return {
-            ...rest,
-            async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Extract the file ID from the mutation input
-              const inputKey = Object.keys(args.input || {}).find(
-                (k) => k !== 'clientMutationId',
-              );
-              const fileInput = inputKey ? args.input[inputKey] : null;
-
-              let fileRow: { key: string; bucket_id: string } | null = null;
-
-              if (fileInput) {
-                // Read the file row BEFORE delete to get the S3 key + bucket_id
-                const withPgClient = graphqlContext.withPgClient;
-                const pgSettings = graphqlContext.pgSettings;
-
-                if (withPgClient) {
-                  try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Storage config is read on the request lane through the claim-scoped
-                    // function_resolution.storage_modules(): no role switch, no RLS bypass.
-                    const allConfigs = databaseId
-                      ? await withRequestPgClient(withPgClient, pgSettings, (pgClient) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
-                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-
-                    if (storageConfig) {
-                      await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
-                        // Read the file row (RLS enforced)
-                        const result = await pgClient.query({
-                          text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
-                          values: [fileInput],
-                        });
-                        if (result.rows.length > 0) {
-                          fileRow = result.rows[0] as { key: string; bucket_id: string };
-                        }
-                      });
-                    }
-                  } catch (err: any) {
-                    log.warn(`Pre-delete file lookup failed: ${err.message}`);
-                  }
-                }
-              }
-
-              // Call PostGraphile's generated delete (RLS enforced)
-              const result = await oldResolve(source, args, graphqlContext, info);
-
-              // Attempt sync S3 cleanup if we have the file row
-              if (fileRow) {
-                const withPgClient = graphqlContext.withPgClient;
-                const pgSettings = graphqlContext.pgSettings;
-
-                if (withPgClient) {
-                  try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Storage config is read on the request lane through the claim-scoped
-                    // function_resolution.storage_modules(): no role switch, no RLS bypass.
-                    const allConfigs = databaseId
-                      ? await withRequestPgClient(withPgClient, pgSettings, (pgClient) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
-                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-
-                    if (storageConfig) await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
-                      // Check refcount: any other file with the same key in this bucket?
-                      const refResult = await pgClient.query({
-                        text: `SELECT COUNT(*)::int AS ref_count FROM ${storageConfig.filesQualifiedName} WHERE key = $1 AND bucket_id = $2`,
-                        values: [fileRow!.key, fileRow!.bucket_id],
-                      });
-                      const refCount = (refResult.rows[0]?.ref_count as number | undefined) ?? 0;
-
-                      if (refCount > 0) {
-                        log.info(`File deleted from DB; S3 key ${fileRow!.key} still referenced by ${refCount} file(s)`);
-                        return;
-                      }
-
-                      // No other references — attempt sync S3 delete.
-                      // Read the stored physical coordinate; the object lives in the
-                      // recorded bucket, never a recomputed prefix name. A deleter may
-                      // not see the bucket row (path share with can_delete), so it is
-                      // read through the module's narrow bucket physical-name reader.
-                      const physicalName = await readBucketPhysicalName(pgClient, storageConfig, fileRow!.bucket_id);
-                      if (physicalName === null) {
-                        // No physical bucket was ever provisioned — there is no object to delete.
-                        log.warn(`Bucket ${fileRow!.bucket_id} has no physical_name; skipping S3 delete`);
-                        return;
-                      }
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
-                      await deleteS3Object(s3ForDb, fileRow!.key);
-                      log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
-                    });
-                  } catch (err: any) {
-                    // Sync S3 delete failed — the AFTER DELETE trigger has enqueued an async GC job
-                    log.warn(`Sync S3 delete failed for key=${fileRow.key}; async GC job will retry: ${err.message}`);
-                  }
-                }
-              }
-
-              return result;
-            },
-          };
         },
       },
     },
