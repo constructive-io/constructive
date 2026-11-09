@@ -1,8 +1,27 @@
-import type { AgenticServerOptions, ResolvedProvider } from './types';
+import { providerName } from './transforms';
+import type { AgenticServerOptions, ProviderConfig, ResolvedProvider } from './types';
+
+/**
+ * Open-weights families Ollama serves. `gpt-oss` is listed because the
+ * `gpt` prefix would otherwise read as OpenAI's hosted models.
+ */
+const OLLAMA_MODEL_PREFIXES = ['gpt-oss', 'llama', 'mistral', 'gemma', 'nomic', 'qwen', 'glm'];
+
+const startsWithAny = (model: string, prefixes: readonly string[]): boolean =>
+  prefixes.some((prefix) => model.startsWith(prefix));
+
+/**
+ * The entry a request addresses: by registry name first, so two providers of
+ * one dialect are both reachable, then by dialect for an entry with no name of
+ * its own.
+ */
+const findNamed = (providers: ProviderConfig[], name: string): ProviderConfig | undefined =>
+  providers.find((p) => providerName(p) === name) ?? providers.find((p) => p.type === name);
 
 /**
  * Resolve which provider to use for a given request.
- * Priority: model-based routing → explicit provider header → default.
+ * Priority: explicit provider header → `name/model` prefix → known model
+ * families → the first configured provider.
  */
 export function resolveProvider(
   options: AgenticServerOptions,
@@ -13,36 +32,31 @@ export function resolveProvider(
 
   if (providers.length > 0) {
     if (requestProvider) {
-      const match = providers.find((p) => p.type === requestProvider);
+      const match = findNamed(providers, requestProvider);
       if (match) return match;
     }
 
-    // Route by model prefix: "anthropic/claude-3" → anthropic provider
+    // Route by model prefix: "anthropic/claude-3" → the provider named anthropic
     if (requestModel && requestModel.includes('/')) {
-      const prefix = requestModel.split('/')[0];
-      const match = providers.find((p) => p.type === prefix);
+      const [prefix, ...rest] = requestModel.split('/');
+      const match = findNamed(providers, prefix);
       if (match) {
-        return { ...match, defaultModel: requestModel.split('/').slice(1).join('/') };
+        return { ...match, defaultModel: rest.join('/') };
       }
     }
 
-    // Route by known model patterns
+    // Route by known model families
     if (requestModel) {
       if (requestModel.startsWith('claude')) {
         const match = providers.find((p) => p.type === 'anthropic');
         if (match) return match;
       }
-      if (requestModel.startsWith('gpt') || requestModel.startsWith('o1') || requestModel.startsWith('o3')) {
-        const match = providers.find((p) => p.type === 'openai');
+      if (startsWithAny(requestModel, OLLAMA_MODEL_PREFIXES)) {
+        const match = providers.find((p) => p.type === 'ollama');
         if (match) return match;
       }
-      if (
-        requestModel.startsWith('llama') ||
-        requestModel.startsWith('mistral') ||
-        requestModel.startsWith('gemma') ||
-        requestModel.startsWith('nomic')
-      ) {
-        const match = providers.find((p) => p.type === 'ollama');
+      if (requestModel.startsWith('gpt') || requestModel.startsWith('o1') || requestModel.startsWith('o3')) {
+        const match = providers.find((p) => p.type === 'openai');
         if (match) return match;
       }
     }

@@ -50,6 +50,26 @@ app.listen(3001, () => {
 
 `POST /v1/chat/completions` with `stream: true` is relayed as a `text/event-stream`: the gateway forwards the provider's frames verbatim, so a client receives tokens as they are produced. It adds `stream_options: { include_usage: true }` unless the caller set `stream_options` itself, and meters the usage the final frame carries. Streaming is available for OpenAI-compatible providers; a provider whose stream would need translation (`ollama`, `anthropic`) is rejected `501` rather than answered with a non-streaming body.
 
+## Providers and routing
+
+`providers` is a registry; each entry has a `type` (the dialect: `openai`, `anthropic`, `ollama`) and an optional `name` it is addressed by, which defaults to the type. Two entries of one dialect — an in-cluster Ollama and one on a GPU host — are both reachable by name:
+
+```typescript
+createAgenticServer({
+  providers: [
+    { name: 'ollama', type: 'ollama', baseUrl: 'http://ollama:11434' },
+    { name: 'host-ollama', type: 'ollama', baseUrl: 'http://host.docker.internal:11434' },
+    { type: 'openai', baseUrl: 'https://api.openai.com', apiKey: process.env.OPENAI_API_KEY }
+  ]
+});
+```
+
+A request picks its provider, in this order: the `X-LLM-Provider` header (a name, or a type for an entry with no name); a `name/model` prefix such as `host-ollama/qwen3:8b` (stripped before the call goes upstream); a known model family (`claude*` → anthropic; `gpt-oss*`, `llama*`, `mistral*`, `gemma*`, `nomic*`, `qwen*`, `glm*` → ollama; `gpt*`, `o1*`, `o3*` → openai); otherwise the first entry.
+
+### The Ollama dialect
+
+A request to an `ollama` provider is rewritten for `/api/chat`: content parts are flattened to the string Ollama takes; `max_tokens` becomes `options.num_predict` and `num_ctx` becomes `options.num_ctx` (a client `options` object is merged under them); `tools`, `think` and `keep_alive` are forwarded as-is; `response_format` becomes `format` (`json_object` → `'json'`, `json_schema` → the schema; a native `format` is passed through). The reply comes back in the OpenAI shape, including `tool_calls` (arguments as a JSON string, `finish_reason: 'tool_calls'`) and `reasoning_content` for a `thinking` message, so a tool-calling harness can run on an Ollama-served model.
+
 ## Identity & tenancy
 
 Requests carry tenant identity via headers: `X-Database-Id` (**required** — requests without it are rejected `400`), `X-Entity-Id`, and `X-Actor-Id`. Routing to a specific provider can be forced with `X-LLM-Provider`.

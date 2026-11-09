@@ -26,6 +26,7 @@ export { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './pro
 export { createRouter } from './router';
 export type { AgenticServerStartOptions } from './server';
 export { createAgenticServer } from './server';
+export { providerName, transformChatRequest, transformChatResponse, upstreamModel } from './transforms';
 export type {
   AgenticServerOptions,
   InferenceAttribution,

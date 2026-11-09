@@ -16,6 +16,7 @@ import { Router } from 'express';
 import { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
 import { relayEventStream, withUsageStreamOptions } from './streaming';
 import {
+  providerName,
   transformChatRequest,
   transformChatResponse,
   transformEmbedRequest,
@@ -417,6 +418,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
     }];
     res.json({
       providers: providers.map((p) => ({
+        name: providerName(p),
         type: p.type,
         defaultModel: p.defaultModel
       }))
