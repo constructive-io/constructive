@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.22](https://github.com/constructive-io/constructive/compare/pglite-test@1.19.21...pglite-test@1.19.22) (2026-11-09)
+
+**Note:** Version bump only for package pglite-test
+
 ## [1.19.21](https://github.com/constructive-io/constructive/compare/pglite-test@1.19.20...pglite-test@1.19.21) (2026-11-09)
 
 **Note:** Version bump only for package pglite-test

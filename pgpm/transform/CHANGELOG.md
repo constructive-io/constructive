@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.2...@pgpmjs/transform@0.32.3) (2026-11-09)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
 ## [0.32.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.1...@pgpmjs/transform@0.32.2) (2026-11-08)
 
 **Note:** Version bump only for package @pgpmjs/transform

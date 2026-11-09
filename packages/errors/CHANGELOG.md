@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.0...@constructive-io/errors@0.25.1) (2026-11-09)
+
+### Bug Fixes
+
+- **graphql-server:** decide CORS per routed API and fail strictAuth closed ([04af3fd](https://github.com/constructive-io/constructive/commit/04af3fdde53d23ec1fe2bbc0b07b721dea6ca226))
+
 # [0.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.24.0...@constructive-io/errors@0.25.0) (2026-10-14)
 
 **Note:** Version bump only for package @constructive-io/errors

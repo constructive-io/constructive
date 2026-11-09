@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.39.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.39.0...graphql-server-test@3.39.1) (2026-11-09)
+
+### Bug Fixes
+
+- **graphql-server:** decide CORS per routed API and fail strictAuth closed ([04af3fd](https://github.com/constructive-io/constructive/commit/04af3fdde53d23ec1fe2bbc0b07b721dea6ca226))
+- **graphql-server:** keep CORS on routing errors and send strictAuth refusal as 503 ([baf7eb3](https://github.com/constructive-io/constructive/commit/baf7eb31edcf36d882fb905b50b240a38775cb35))
+
 # [3.39.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.6...graphql-server-test@3.39.0) (2026-11-09)
 
 ### Features

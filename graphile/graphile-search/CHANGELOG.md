@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.9](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.8...graphile-search@2.19.9) (2026-11-09)
+
+### Bug Fixes
+
+- **graphile-search:** exclude rows with no embedding from vector search ([76782b3](https://github.com/constructive-io/constructive/commit/76782b3600c629970b1d1db2c0452b799be36c4c))
+- **graphile-search:** reuse the chunk MIN(distance) subquery for the scorable predicate ([6fbe208](https://github.com/constructive-io/constructive/commit/6fbe2088ead73689899c083399ef905479bbbe5b))
+
 ## [2.19.8](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.7...graphile-search@2.19.8) (2026-11-08)
 
 **Note:** Version bump only for package graphile-search

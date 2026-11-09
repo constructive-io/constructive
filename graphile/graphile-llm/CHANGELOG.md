@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.5...graphile-llm@1.23.6) (2026-11-09)
+
+### Bug Fixes
+
+- **graphile-llm:** treat blank VectorNearbyInput text as not given ([e7239cf](https://github.com/constructive-io/constructive/commit/e7239cf436eb5aa274753c9c21579d10ba6882f1))
+
 ## [1.23.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.4...graphile-llm@1.23.5) (2026-11-08)
 
 **Note:** Version bump only for package graphile-llm

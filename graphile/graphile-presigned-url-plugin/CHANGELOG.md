@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.25.0...graphile-presigned-url-plugin@1.25.1) (2026-11-09)
+
+### Bug Fixes
+
+- **presigned-url:** accept the characters Next.js writes into static-export file names ([152cd9c](https://github.com/constructive-io/constructive/commit/152cd9c0c713036bc468ff4426cfccd1be95dddf))
+- **presigned-url:** no downloadUrl for a file that is not uploaded ([221bc04](https://github.com/constructive-io/constructive/commit/221bc040beb9e31b29bbafd5f1682aa835e388dc))
+
 # [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.24.0...graphile-presigned-url-plugin@1.25.0) (2026-11-09)
 
 ### Features

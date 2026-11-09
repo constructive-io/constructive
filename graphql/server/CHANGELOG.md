@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.9...@constructive-io/graphql-server@5.35.10) (2026-11-09)
+
+### Bug Fixes
+
+- **graphql-server:** decide CORS per routed API and fail strictAuth closed ([04af3fd](https://github.com/constructive-io/constructive/commit/04af3fdde53d23ec1fe2bbc0b07b721dea6ca226))
+- **graphql-server:** keep CORS on routing errors and send strictAuth refusal as 503 ([baf7eb3](https://github.com/constructive-io/constructive/commit/baf7eb31edcf36d882fb905b50b240a38775cb35))
+- **graphql-server:** keep the service key out of handler errors, and release a discarded build ([83a9dcd](https://github.com/constructive-io/constructive/commit/83a9dcd7686bf75f649eff2d73a9d1e330f92497))
+- **graphql-server:** serve a request whose service changed during its handler build ([3fc316a](https://github.com/constructive-io/constructive/commit/3fc316a3ea47d774745b8537ea53503cbc2ec44c))
+
 ## [5.35.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.8...@constructive-io/graphql-server@5.35.9) (2026-11-09)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

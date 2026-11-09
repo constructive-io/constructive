@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.0...agentic-server@0.30.1) (2026-11-09)
+
+### Bug Fixes
+
+- **agentic-server:** forward tools, format, think, keep_alive and num_ctx on the ollama route; select providers by name; route gpt-oss to ollama ([a753a87](https://github.com/constructive-io/constructive/commit/a753a87a90f33325ec61f83850767095fa826de7))
+- **agentic-server:** reject an unknown X-LLM-Provider and malformed request bodies with 400; report a truncated tool call as length ([3101a41](https://github.com/constructive-io/constructive/commit/3101a41a4fcb1a071ad9784bebeb158e71871e8a))
+
 # [0.30.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.29.0...agentic-server@0.30.0) (2026-11-05)
 
 ### Bug Fixes
