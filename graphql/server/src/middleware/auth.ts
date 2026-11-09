@@ -63,6 +63,15 @@ export const createAuthenticateMiddleware = (
         `privateSchema=${rlsModule?.privateSchema?.schemaName ?? 'none'}`
     );
 
+    if (
+      opts.server?.strictAuth &&
+      !(rlsModule?.authenticateStrict && rlsModule.privateSchema?.schemaName)
+    ) {
+      log.error(`[auth] strictAuth is on but API ${api.apiId ?? 'unknown'} has no authenticateStrict; refusing`);
+      respondWithGraphQLError(res, errors.STRICT_AUTH_UNAVAILABLE(), { status: 503 });
+      return;
+    }
+
     if (!rlsModule) {
       log.info('[auth] No RLS module configured, skipping auth');
       return next();
