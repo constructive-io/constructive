@@ -130,6 +130,24 @@ describe('transformChatResponse for ollama', () => {
     expect(choice.message.tool_calls[0].id).not.toBe('');
   });
 
+  it('reports a tool call cut off by the token budget as length, not as a completed tool_calls turn', () => {
+    const { body } = transformChatResponse(
+      {
+        message: {
+          role: 'assistant',
+          content: '',
+          tool_calls: [{ function: { name: 'get_weather', arguments: { city: 'Par' } } }]
+        },
+        done: true,
+        done_reason: 'length'
+      },
+      ollama
+    );
+    const choice = (body.choices as any[])[0];
+    expect(choice.finish_reason).toBe('length');
+    expect(choice.message.tool_calls).toHaveLength(1);
+  });
+
   it('reports a truncated answer as finish_reason length', () => {
     const { body } = transformChatResponse(
       { message: { role: 'assistant', content: 'partial' }, done: true, done_reason: 'length' },

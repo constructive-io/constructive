@@ -1,3 +1,4 @@
+import { BadRequestError } from './errors';
 import { providerName } from './transforms';
 import type { AgenticServerOptions, ProviderConfig, ResolvedProvider } from './types';
 
@@ -34,6 +35,11 @@ export function resolveProvider(
     if (requestProvider) {
       const match = findNamed(providers, requestProvider);
       if (match) return match;
+      // A request pinned to a provider that is not registered must not drift
+      // to whichever entry a heuristic picks.
+      throw new BadRequestError(
+        `unknown provider '${requestProvider}'; registered: ${providers.map(providerName).join(', ')}`
+      );
     }
 
     // Route by model prefix: "anthropic/claude-3" → the provider named anthropic
@@ -65,8 +71,12 @@ export function resolveProvider(
   }
 
   // Single-provider mode (default: ollama for local dev)
+  const type = options.providerType || 'ollama';
+  if (requestProvider && requestProvider !== type) {
+    throw new BadRequestError(`unknown provider '${requestProvider}'; registered: ${type}`);
+  }
   return {
-    type: options.providerType || 'ollama',
+    type,
     baseUrl: options.providerBaseUrl || 'http://localhost:11434',
     apiKey: options.providerApiKey,
     defaultModel: options.defaultModel

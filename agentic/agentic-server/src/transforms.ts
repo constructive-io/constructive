@@ -1,3 +1,4 @@
+import { BadRequestError } from './errors';
 import type { ResolvedProvider, UsageResult } from './types';
 
 interface ContentPart {
@@ -60,16 +61,16 @@ function flattenContentParts(messages: unknown): unknown {
       }
       if (part.type === 'image_url') {
         const url = part.image_url?.url;
-        if (!url) throw new Error('ollama: an image_url content part carries no url');
+        if (!url) throw new BadRequestError('ollama: an image_url content part carries no url');
         // Ollama takes base64 bytes, never a fetchable url.
         const base64 = /^data:[^;]*;base64,(.*)$/.exec(url)?.[1];
         if (!base64) {
-          throw new Error('ollama: an image content part must be a base64 data url');
+          throw new BadRequestError('ollama: an image content part must be a base64 data url');
         }
         images.push(base64);
         continue;
       }
-      throw new Error(`ollama: unsupported content part type '${part.type}'`);
+      throw new BadRequestError(`ollama: unsupported content part type '${part.type}'`);
     }
 
     return {
@@ -96,7 +97,7 @@ function ollamaToolCalls(message: ChatMessage): ChatMessage {
       try {
         parsed = JSON.parse(args);
       } catch (err) {
-        throw new Error(
+        throw new BadRequestError(
           `ollama: tool call '${call.function?.name ?? ''}' carries arguments that are not JSON: ${(err as Error).message}`
         );
       }
@@ -117,7 +118,7 @@ function ollamaFormat(body: Record<string, unknown>): unknown {
   if (responseFormat.type === 'json_object') return 'json';
   if (responseFormat.type === 'json_schema') {
     if (responseFormat.json_schema?.schema === undefined) {
-      throw new Error('ollama: response_format json_schema carries no schema');
+      throw new BadRequestError('ollama: response_format json_schema carries no schema');
     }
     return responseFormat.json_schema.schema;
   }
@@ -202,6 +203,9 @@ export function transformChatResponse(
       total_tokens: promptTokens + completionTokens
     };
     const toolCalls = openAiToolCalls(msg?.tool_calls);
+    // A generation cut off by the token budget may hold half a tool call;
+    // only a completed turn is reported as `tool_calls`.
+    const reason = finishReason(data.done_reason);
     const message: Record<string, unknown> = {
       role: msg?.role || 'assistant',
       content: msg?.content ?? '',
@@ -214,7 +218,7 @@ export function transformChatResponse(
         object: 'chat.completion',
         choices: [{
           message,
-          finish_reason: toolCalls ? 'tool_calls' : finishReason(data.done_reason),
+          finish_reason: toolCalls && reason === 'stop' ? 'tool_calls' : reason,
           index: 0
         }],
         usage

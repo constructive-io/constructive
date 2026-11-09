@@ -272,6 +272,46 @@ describe('POST /v1/chat/completions', () => {
     });
   });
 
+  it('rejects (400) an X-LLM-Provider that is not registered rather than routing elsewhere', async () => {
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-pin-1', 'X-LLM-Provider': 'gpu-ollama' },
+      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'hi' }] })
+    });
+
+    expect(res.status).toBe(400);
+    const data = (await res.json()) as any;
+    expect(data.error.message).toBe("unknown provider 'gpu-ollama'; registered: ollama");
+    await new Promise((r) => setTimeout(r, 50));
+    expect(llmRequests).toHaveLength(0);
+    expect(sinkEntries).toHaveLength(0);
+  });
+
+  it('rejects (400) a request the ollama dialect cannot express, without calling upstream', async () => {
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-bad-1' },
+      body: JSON.stringify({
+        model: 'llama3',
+        messages: [
+          { role: 'user', content: 'weather?' },
+          {
+            role: 'assistant',
+            content: '',
+            tool_calls: [{ id: 'call_1', type: 'function', function: { name: 'get_weather', arguments: '{not json' } }]
+          }
+        ]
+      })
+    });
+
+    expect(res.status).toBe(400);
+    const data = (await res.json()) as any;
+    expect(data.error.message).toMatch(/^ollama: tool call 'get_weather' carries arguments that are not JSON/);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(llmRequests).toHaveLength(0);
+    expect(sinkEntries).toHaveLength(0);
+  });
+
   it('names the upstream reason in the error message the harness reads', async () => {
     const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
       method: 'POST',

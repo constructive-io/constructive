@@ -13,6 +13,7 @@
 import { Logger } from '@pgpmjs/logger';
 import { Router } from 'express';
 
+import { BadRequestError } from './errors';
 import { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
 import { relayEventStream, withUsageStreamOptions } from './streaming';
 import {
@@ -25,6 +26,26 @@ import {
 import type { AgenticServerOptions, InferenceAttribution, ResolvedProvider } from './types';
 
 const log = new Logger('agentic-server');
+
+/**
+ * Answer a request the gateway rejects itself — before any upstream call —
+ * with `400`, or report that `err` was something else. A client mistake must
+ * not be metered or reported as a provider failure.
+ */
+function rejectBadRequest(res: any, err: unknown): boolean {
+  if (!(err instanceof BadRequestError)) return false;
+  res.status(err.status).json({ error: { message: err.message } });
+  return true;
+}
+
+function selectProvider(options: AgenticServerOptions, req: any, res: any): ResolvedProvider | undefined {
+  try {
+    return resolveProvider(options, req.body?.model, req.get('X-LLM-Provider'));
+  } catch (err) {
+    if (rejectBadRequest(res, err)) return undefined;
+    throw err;
+  }
+}
 
 /** How long an upstream reason may be before it stops being a message. */
 const UPSTREAM_REASON_LIMIT = 300;
@@ -98,10 +119,10 @@ export const createRouter = (options: AgenticServerOptions): Router => {
     }
     const attribution = readAttribution(req);
     const { entityId } = attribution;
-    const requestProvider = req.get('X-LLM-Provider');
     const startTime = process.hrtime.bigint();
 
-    const provider = resolveProvider(options, req.body?.model, requestProvider);
+    const provider = selectProvider(options, req, res);
+    if (!provider) return;
 
     log.info('chat/completions', {
       databaseId,
@@ -233,6 +254,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       res.json(responseBody);
     } catch (err: any) {
+      if (!res.headersSent && rejectBadRequest(res, err)) return;
       const latencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
       log.error('chat/completions error', err);
 
@@ -272,10 +294,10 @@ export const createRouter = (options: AgenticServerOptions): Router => {
     }
     const attribution = readAttribution(req);
     const { entityId } = attribution;
-    const requestProvider = req.get('X-LLM-Provider');
     const startTime = process.hrtime.bigint();
 
-    const provider = resolveProvider(options, req.body?.model, requestProvider);
+    const provider = selectProvider(options, req, res);
+    if (!provider) return;
 
     log.info('embeddings', { databaseId, entityId, provider: provider.type, model: req.body?.model });
 
@@ -339,6 +361,7 @@ export const createRouter = (options: AgenticServerOptions): Router => {
 
       res.json(responseBody);
     } catch (err: any) {
+      if (rejectBadRequest(res, err)) return;
       const latencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
       log.error('embeddings error', err);
 

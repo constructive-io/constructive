@@ -7,6 +7,7 @@
  * open-weights model for a vendor's hosted one.
  */
 
+import { BadRequestError } from '../src/errors';
 import { resolveProvider } from '../src/providers';
 import type { AgenticServerOptions } from '../src/types';
 
@@ -39,6 +40,13 @@ describe('resolveProvider by registry name', () => {
     };
     expect(resolveProvider(options, 'anything', 'ollama').baseUrl).toBe('http://ollama.svc:11434');
     expect(resolveProvider(options, 'ollama/qwen3').baseUrl).toBe('http://ollama.svc:11434');
+  });
+
+  it('rejects an X-LLM-Provider that names no registered provider instead of routing elsewhere', () => {
+    expect(() => resolveProvider(twoOllamas, 'qwen3:8b', 'host-olama')).toThrow(BadRequestError);
+    expect(() => resolveProvider(twoOllamas, 'qwen3:8b', 'host-olama')).toThrow(
+      "unknown provider 'host-olama'; registered: openai, ollama, host-ollama"
+    );
   });
 });
 
