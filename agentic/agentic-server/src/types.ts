@@ -1,4 +1,9 @@
 export interface ProviderConfig {
+  /** Registry name a request addresses this entry by (`X-LLM-Provider`, a
+   *  `name/model` prefix). Defaults to `type`, so a deployment with one entry
+   *  per dialect needs no names. */
+  name?: string;
+  /** Dialect: 'openai' | 'anthropic' | 'ollama'. Chooses URL, auth and body shape. */
   type: string;
   baseUrl: string;
   apiKey?: string;
@@ -32,6 +37,7 @@ export interface AgenticServerOptions {
 }
 
 export interface ResolvedProvider {
+  name?: string;
   type: string;
   baseUrl: string;
   apiKey?: string;
