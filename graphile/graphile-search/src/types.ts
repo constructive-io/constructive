@@ -56,6 +56,14 @@ export interface FilterApplyResult {
   whereClause: SQL | null;
   /** SQL expression that computes the score/distance/rank for this row */
   scoreExpression: SQL;
+  /**
+   * Predicate that holds only for rows this adapter can score, e.g.
+   * `embedding IS NOT NULL` for pgvector. The adapter's own filter field ANDs
+   * it into WHERE so unscored rows are neither returned nor paged over. The
+   * composite `unifiedSearch` filter does not apply it: a row may still match
+   * through another adapter.
+   */
+  scorableClause?: SQL | null;
 }
 
 /**

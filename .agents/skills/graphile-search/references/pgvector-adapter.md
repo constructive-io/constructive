@@ -138,17 +138,27 @@ When `includeChunks` is active, the adapter generates:
 
 ```sql
 LEAST(
-  COALESCE(parent.embedding <=> $query, 'Infinity'::float),
-  COALESCE(
-    (SELECT MIN(c.embedding <=> $query)
-     FROM documents_chunks AS c
-     WHERE c.parent_id = parent.id),
-    'Infinity'::float
-  )
+  parent.embedding <=> $query,
+  (SELECT MIN(c.embedding <=> $query)
+   FROM documents_chunks AS c
+   WHERE c.parent_id = parent.id)
 )
 ```
 
-`COALESCE` handles cases where the parent or chunks may not have embeddings.
+`LEAST` ignores NULL operands, so this is the closest of the parent and its
+chunks, and NULL only when neither has an embedding. The filter also adds
+
+```sql
+parent.embedding IS NOT NULL
+OR EXISTS (SELECT 1 FROM documents_chunks AS c
+           WHERE c.parent_id = parent.id AND c.embedding IS NOT NULL)
+```
+
+to `WHERE`, so rows with no embedding anywhere are not returned, counted or
+paged over. With `includeChunks: false` (and on tables without `@hasChunks`)
+the predicate is just `parent.embedding IS NOT NULL`. The composite
+`unifiedSearch` filter does not add this predicate: a row with no embedding can
+still match through another adapter and simply has no vector score.
 
 ### GraphQL Query Examples
 
