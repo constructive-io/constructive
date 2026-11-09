@@ -62,6 +62,11 @@ export interface StoragePlanePair {
    * attribute (a registry fact — never inferred from the plane's scope name).
    */
   hasOwnerId: boolean;
+  /**
+   * Whether the plane is database-keyed: the buckets table carries a
+   * `database_id` scope column, so several databases' buckets share it.
+   */
+  hasDatabaseId: boolean;
 }
 
 function hasTag(codec: StorageCodec, tag: 'storageFiles' | 'storageBuckets'): boolean {
@@ -125,6 +130,7 @@ export function pairStoragePlane(
     relationName,
     fkAttributes: [...relation.localAttributes],
     hasOwnerId: !!bucketsCodec.attributes?.owner_id,
+    hasDatabaseId: !!bucketsCodec.attributes?.database_id,
   };
 }
 
