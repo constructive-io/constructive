@@ -27,6 +27,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
+import { isLiveFileRow } from './file-lifecycle';
 import { resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
@@ -86,13 +87,15 @@ export function createDownloadUrlPlugin(
                 {
                   description:
                     'URL to download this file. For public files, returns the public URL. ' +
-                    'For private files, returns a time-limited presigned URL.',
+                    'For private files, returns a time-limited presigned URL. ' +
+                    'Null until the upload is confirmed (status uploaded or processed), and for a rejected file.',
                   type: GraphQLString,
                   plan($parent: any) {
                     const $key = $parent.get('key');
                     const $isPublic = $parent.get('is_public');
                     const $filename = $parent.get('filename');
                     const $bucketId = $parent.get('bucket_id');
+                    const $status = $parent.get('status');
 
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
@@ -102,12 +105,14 @@ export function createDownloadUrlPlugin(
                       isPublic: $isPublic,
                       filename: $filename,
                       bucketId: $bucketId,
+                      status: $status,
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
                     });
 
-                    return lambda($combined, async ({ key, isPublic, filename, bucketId, withPgClient, pgSettings }: any) => {
+                    return lambda($combined, async ({ key, isPublic, filename, bucketId, status, withPgClient, pgSettings }: any) => {
                       if (!key) return null;
+                      if (!isLiveFileRow({ status })) return null;
 
                       if (!withPgClient || !pgSettings) return null;
 

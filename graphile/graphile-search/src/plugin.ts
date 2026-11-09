@@ -816,7 +816,9 @@ export function createUnifiedSearchPlugin(
 
             const rankMetaKey = `${scoreMetaKey}__rank`;
             const orderDirection = adapter.scoreSemantics.lowerIsBetter ? 'ASC' : 'DESC';
-            const rankSql = sql`(ROW_NUMBER() OVER (ORDER BY ${sql.parens(result.scoreExpression)} ${orderDirection === 'ASC' ? sql.fragment`ASC` : sql.fragment`DESC`} NULLS LAST))::text`;
+            // A row without a score has no rank: otherwise ROW_NUMBER() would
+            // hand unscored rows the positions right after the scored ones.
+            const rankSql = sql`(CASE WHEN ${sql.parens(result.scoreExpression)} IS NULL THEN NULL ELSE ROW_NUMBER() OVER (ORDER BY ${sql.parens(result.scoreExpression)} ${orderDirection === 'ASC' ? sql.fragment`ASC` : sql.fragment`DESC`} NULLS LAST) END)::text`;
             const rankIndex = qb.selectAndReturnIndex(rankSql);
             qb.setMeta(rankMetaKey, { selectIndex: rankIndex } as SearchScoreDetails);
 
@@ -910,6 +912,10 @@ export function createUnifiedSearchPlugin(
                         // Apply WHERE clause
                         if (result.whereClause) {
                           $condition.where(result.whereClause);
+                        }
+                        // Only rows this adapter can score are returned
+                        if (result.scorableClause) {
+                          $condition.where(result.scorableClause);
                         }
 
                         const qb = getQueryBuilder(build, $condition);

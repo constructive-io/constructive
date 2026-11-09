@@ -224,16 +224,17 @@ export function createPgvectorAdapter(
           WHERE ${chunksAlias}.${parentFk} = ${parentId}
         )`;
 
-        // Also compute direct parent distance if the parent has an embedding
+        // Direct parent distance (NULL when the parent has no embedding)
         const parentColumnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
         const parentDistanceExpr = buildDistanceExpr(sql, parentColumnExpr, vectorExpr, resolvedMetric);
 
-        // Use LEAST of parent distance and closest chunk distance
-        // COALESCE handles cases where parent or chunks may not have embeddings
-        const combinedDistanceExpr = sql`LEAST(
-          COALESCE(${parentDistanceExpr}, 'Infinity'::float),
-          COALESCE(${chunkDistanceSubquery}, 'Infinity'::float)
-        )`;
+        // LEAST skips NULL operands, so this is the closest of parent + chunks
+        // and NULL only when neither the parent nor any chunk is embedded.
+        const combinedDistanceExpr = sql`LEAST(${parentDistanceExpr}, ${chunkDistanceSubquery})`;
+
+        // Rows with no embedding anywhere have no distance to rank: leave them out.
+        // MIN(distance) is NULL exactly when no chunk has an embedding.
+        const scorableClause = sql`(${parentColumnExpr} IS NOT NULL OR ${chunkDistanceSubquery} IS NOT NULL)`;
 
         let whereClause: SQL | null = null;
         if (distance !== undefined && distance !== null) {
@@ -243,6 +244,7 @@ export function createPgvectorAdapter(
         return {
           whereClause,
           scoreExpression: combinedDistanceExpr,
+          scorableClause,
         };
       }
 
@@ -258,6 +260,8 @@ export function createPgvectorAdapter(
       return {
         whereClause,
         scoreExpression: distanceExpr,
+        // A NULL embedding has no distance to rank: leave the row out.
+        scorableClause: sql`${columnExpr} IS NOT NULL`,
       };
     },
   };

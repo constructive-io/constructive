@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-storage-registry@0.3.0...graphile-storage-registry@0.4.0) (2026-11-09)
+
+### Features
+
+- **storage:** optional databaseId on uploadFile selects the file row's database ([bd01587](https://github.com/constructive-io/constructive/commit/bd01587bb1e60c480212a879320c054933742343))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/graphile-storage-registry@0.2.0...graphile-storage-registry@0.3.0) (2026-10-14)
 
 **Note:** Version bump only for package graphile-storage-registry

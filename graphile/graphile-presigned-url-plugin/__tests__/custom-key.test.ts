@@ -20,6 +20,12 @@ describe('validateCustomKey', () => {
     'docs/v1.2.3/guide.pdf',
     'a',
     'my-file_name.v2.tar.gz',
+    // Next.js segment-prefetch files of a static export.
+    '__next.!KGFwcCk.__PAGE__.txt',
+    'tools/__next.!KGFwcCk.tools.__PAGE__.txt',
+    'sign-in/__next.!KGF1dGgp.sign-in.__PAGE__.txt',
+    'tools/__next.!KGFwcCk.tools.$d$id.__PAGE__.txt',
+    'inbox/__next.@modal.__PAGE__.txt',
   ])('accepts %s', (key) => {
     expect(validateCustomKey(key)).toBeNull();
   });
@@ -55,6 +61,11 @@ describe('validateCustomKey', () => {
     'has:colon.js',
     'has?query=1',
     'emoji-🚀.png',
+    '!leading-bang.txt',
+    '$leading-dollar.txt',
+    '@leading-at.txt',
+    'has#hash.txt',
+    'has%25percent.txt',
   ])('rejects %s', (key) => {
     expect(validateCustomKey(key)).toMatch(/^INVALID_KEY:/);
   });
