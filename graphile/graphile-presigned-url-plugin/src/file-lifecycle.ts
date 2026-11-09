@@ -6,9 +6,8 @@
 export const LIVE_FILE_STATUSES = ['uploaded', 'processed'];
 
 /**
- * Whether a row is live (constructive-db file lifecycle invariant S2): a dedup
- * hit, and a row `downloadUrl` signs a URL for, only once the bytes it names
- * are in S3.
+ * Whether a row is live: a dedup hit, and a row `downloadUrl` signs a URL for,
+ * only once the bytes it names are in S3.
  *
  * The row is written before the PUT; the confirm-upload job moves it out of
  * `requested` only after inspecting the object, so its status is the answer.
