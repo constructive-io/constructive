@@ -146,7 +146,7 @@ const resolveModuleSettings = async (
 // Helpers
 // =============================================================================
 
-const isApiError = (result: ApiConfigResult): result is ApiError =>
+export const isApiError = (result: ApiConfigResult): result is ApiError =>
   !!result && typeof (result as ApiError).errorHtml === 'string';
 
 /**
