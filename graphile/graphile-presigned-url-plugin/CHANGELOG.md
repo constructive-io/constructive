@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.24.0...graphile-presigned-url-plugin@1.25.0) (2026-11-09)
+
+### Features
+
+- **storage:** optional databaseId on uploadFile selects the file row's database ([bd01587](https://github.com/constructive-io/constructive/commit/bd01587bb1e60c480212a879320c054933742343))
+
 # [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.23.5...graphile-presigned-url-plugin@1.24.0) (2026-11-05)
 
 ### Features

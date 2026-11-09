@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.39.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.6...graphql-server-test@3.39.0) (2026-11-09)
+
+### Features
+
+- **storage:** optional databaseId on uploadFile selects the file row's database ([bd01587](https://github.com/constructive-io/constructive/commit/bd01587bb1e60c480212a879320c054933742343))
+
 ## [3.38.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.5...graphql-server-test@3.38.6) (2026-11-08)
 
 **Note:** Version bump only for package graphql-server-test
