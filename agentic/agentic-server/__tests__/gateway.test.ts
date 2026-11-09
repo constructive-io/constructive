@@ -42,6 +42,20 @@ beforeAll(async () => {
       });
       return;
     }
+    if (req.body?.model === 'tool-user') {
+      res.json({
+        message: {
+          role: 'assistant',
+          content: '',
+          tool_calls: [{ function: { name: 'get_weather', arguments: { city: 'Paris' } } }]
+        },
+        done: true,
+        done_reason: 'stop',
+        prompt_eval_count: 12,
+        eval_count: 8
+      });
+      return;
+    }
     res.json({
       message: { role: 'assistant', content: 'Mock Ollama response' },
       prompt_eval_count: 12,
@@ -221,6 +235,81 @@ describe('POST /v1/chat/completions', () => {
       { role: 'system', content: 'Be brief.' },
       { role: 'user', content: 'Hello\nworld' }
     ]);
+  });
+
+  it('carries a tool-calling turn to ollama and back in the OpenAI shape', async () => {
+    const tool = {
+      type: 'function',
+      function: { name: 'get_weather', parameters: { type: 'object', properties: { city: { type: 'string' } } } }
+    };
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-tools-1' },
+      body: JSON.stringify({
+        model: 'tool-user',
+        messages: [{ role: 'user', content: [{ type: 'text', text: 'weather in Paris?' }] }],
+        tools: [tool],
+        response_format: { type: 'json_object' },
+        think: false,
+        keep_alive: '10m',
+        num_ctx: 16384
+      })
+    });
+
+    expect(res.status).toBe(200);
+    expect(llmRequests[0].body).toMatchObject({
+      tools: [tool],
+      format: 'json',
+      think: false,
+      keep_alive: '10m',
+      options: { num_ctx: 16384 }
+    });
+    const data = (await res.json()) as any;
+    expect(data.choices[0].finish_reason).toBe('tool_calls');
+    expect(data.choices[0].message.tool_calls[0]).toMatchObject({
+      type: 'function',
+      function: { name: 'get_weather', arguments: '{"city":"Paris"}' }
+    });
+  });
+
+  it('rejects (400) an X-LLM-Provider that is not registered rather than routing elsewhere', async () => {
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-pin-1', 'X-LLM-Provider': 'gpu-ollama' },
+      body: JSON.stringify({ model: 'llama3', messages: [{ role: 'user', content: 'hi' }] })
+    });
+
+    expect(res.status).toBe(400);
+    const data = (await res.json()) as any;
+    expect(data.error.message).toBe("unknown provider 'gpu-ollama'; registered: ollama");
+    await new Promise((r) => setTimeout(r, 50));
+    expect(llmRequests).toHaveLength(0);
+    expect(sinkEntries).toHaveLength(0);
+  });
+
+  it('rejects (400) a request the ollama dialect cannot express, without calling upstream', async () => {
+    const res = await fetch(`http://localhost:${agenticPort}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-bad-1' },
+      body: JSON.stringify({
+        model: 'llama3',
+        messages: [
+          { role: 'user', content: 'weather?' },
+          {
+            role: 'assistant',
+            content: '',
+            tool_calls: [{ id: 'call_1', type: 'function', function: { name: 'get_weather', arguments: '{not json' } }]
+          }
+        ]
+      })
+    });
+
+    expect(res.status).toBe(400);
+    const data = (await res.json()) as any;
+    expect(data.error.message).toMatch(/^ollama: tool call 'get_weather' carries arguments that are not JSON/);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(llmRequests).toHaveLength(0);
+    expect(sinkEntries).toHaveLength(0);
   });
 
   it('names the upstream reason in the error message the harness reads', async () => {
@@ -419,5 +508,6 @@ describe('GET /v1/providers', () => {
     const data = (await res.json()) as any;
     expect(data.providers).toHaveLength(1);
     expect(data.providers[0].type).toBe('ollama');
+    expect(data.providers[0].name).toBe('ollama');
   });
 });

@@ -22,10 +22,19 @@
  * ```
  */
 
+export { BadRequestError } from './errors';
 export { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
 export { createRouter } from './router';
 export type { AgenticServerStartOptions } from './server';
 export { createAgenticServer } from './server';
+export {
+  providerName,
+  transformChatRequest,
+  transformChatResponse,
+  transformEmbedRequest,
+  transformEmbedResponse,
+  upstreamModel
+} from './transforms';
 export type {
   AgenticServerOptions,
   InferenceAttribution,
