@@ -174,13 +174,19 @@ export function createUnifiedSearchPlugin(
   // Per-codec cache of discovered columns, keyed by codec name
   const codecCache = new Map<string, AdapterColumnCache[]>();
 
-  // Bridge between orderBy enum apply and filter apply.
-  // The orderBy enum runs on the PgSelectStep while the filter runs on
-  // a separate query-builder object.  They share the same SQL `alias`
-  // reference, so we use a WeakMap keyed by that alias to pass the
-  // requested sort direction from the orderBy (which fires first) to
-  // the filter (which fires second and has the score expression).
-  const _pendingOrderDirections = new WeakMap<object, Record<string, string>>();
+  // A search orderBy needs the direction (from the orderBy enum) and the
+  // score expression (from the filter). The filter always applies at
+  // runtime; a literal orderBy applies at plan time, before it, and a
+  // variable orderBy applies at runtime, after it. Each side stores its
+  // half in the query builder's meta, which is copied per execution, and
+  // whichever side runs second adds the ORDER BY.
+  function orderBySearchScore(qb: any, orderKey: string): void {
+    const direction = qb.getMetaRaw(`${orderKey}__direction`);
+    const fragment = qb.getMetaRaw(`${orderKey}__score`);
+    if (direction && fragment) {
+      qb.orderBy({ fragment, codec: TYPES.float, direction });
+    }
+  }
 
   /**
    * Get (or compute) the adapter columns for a given codec.
@@ -690,18 +696,9 @@ export function createUnifiedSearchPlugin(
               });
               const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
               const makePlan =
-                (direction: 'ASC' | 'DESC') => (step: any) => {
-                  // Store the requested direction keyed by the SQL alias so
-                  // the filter's apply (which runs second) can read it.
-                  const aliasKey = step?.alias;
-                  if (aliasKey) {
-                    let dirs = _pendingOrderDirections.get(aliasKey);
-                    if (!dirs) {
-                      dirs = {};
-                      _pendingOrderDirections.set(aliasKey, dirs);
-                    }
-                    dirs[orderKey] = direction;
-                  }
+                (direction: 'ASC' | 'DESC') => (qb: any) => {
+                  qb.setMeta(`${orderKey}__direction`, direction);
+                  orderBySearchScore(qb, orderKey);
                 };
 
               const ascName = inflection.pgSearchOrderByEnum(
@@ -740,16 +737,8 @@ export function createUnifiedSearchPlugin(
             const searchScoreDescName = inflection.constantCase('search_score_desc');
 
             const makeSearchScorePlan =
-              (direction: 'ASC' | 'DESC') => (step: any) => {
-                const aliasKey = step?.alias;
-                if (aliasKey) {
-                  let dirs = _pendingOrderDirections.get(aliasKey);
-                  if (!dirs) {
-                    dirs = {};
-                    _pendingOrderDirections.set(aliasKey, dirs);
-                  }
-                  dirs['unified_order_search_score'] = direction;
-                }
+              (direction: 'ASC' | 'DESC') => (qb: any) => {
+                qb.setMeta('unified_order_search_score', direction);
               };
 
             newValues = build.extend(
@@ -790,7 +779,7 @@ export function createUnifiedSearchPlugin(
 
           /**
            * Inject a single adapter's score expression + rank window function
-           * into the query builder, and apply any pending ORDER BY direction.
+           * into the query builder, and add its ORDER BY if one was requested.
            *
            * Shared by per-adapter filter fields AND the unifiedSearch
            * composite filter (both text and vector adapter branches).
@@ -801,7 +790,6 @@ export function createUnifiedSearchPlugin(
             column: SearchableColumn,
             result: { scoreExpression: any },
             codec_: PgCodecWithAttributes,
-            $condition: any,
           ): void {
             if (!qb || qb.mode !== 'normal') return;
 
@@ -823,15 +811,8 @@ export function createUnifiedSearchPlugin(
             qb.setMeta(rankMetaKey, { selectIndex: rankIndex } as SearchScoreDetails);
 
             const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
-            const dirs = _pendingOrderDirections.get($condition.alias);
-            const explicitDir = dirs?.[orderKey];
-            if (explicitDir) {
-              qb.orderBy({
-                fragment: result.scoreExpression,
-                codec: TYPES.float,
-                direction: explicitDir,
-              });
-            }
+            qb.setMeta(`${orderKey}__score`, result.scoreExpression);
+            orderBySearchScore(qb, orderKey);
           }
 
           if (
@@ -919,7 +900,7 @@ export function createUnifiedSearchPlugin(
                         }
 
                         const qb = getQueryBuilder(build, $condition);
-                        injectScoreAndRank(qb, adapter, column, result, codec, $condition);
+                        injectScoreAndRank(qb, adapter, column, result, codec);
                       },
                     }
                   ),
@@ -1003,7 +984,7 @@ export function createUnifiedSearchPlugin(
                             if (result.whereClause) {
                               whereClauses.push(result.whereClause);
                             }
-                            injectScoreAndRank(qb, adapter, column, result, codec, $condition);
+                            injectScoreAndRank(qb, adapter, column, result, codec);
                           }
                         }
 
@@ -1023,7 +1004,7 @@ export function createUnifiedSearchPlugin(
                               if (result.whereClause) {
                                 whereClauses.push(result.whereClause);
                               }
-                              injectScoreAndRank(qb, adapter, column, result, codec, $condition);
+                              injectScoreAndRank(qb, adapter, column, result, codec);
                             }
                           }
                         }
