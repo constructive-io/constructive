@@ -114,7 +114,7 @@ export async function uploadToSurface(
   }
 
   checkAborted(signal);
-  await transport.putObject(payload.uploadUrl, await file.arrayBuffer(), contentType, signal);
+  await transport.putObject(payload.uploadUrl, await file.arrayBuffer(), contentType, signal, contentHash);
 
   return toResult(payload);
 }

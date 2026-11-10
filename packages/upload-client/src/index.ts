@@ -37,6 +37,8 @@ export { hashFile, hashFileChunked } from './hash';
 export { hashContent } from './hash-content';
 
 // Presigned URL helpers
+export { CHECKSUM_SHA256_HEADER, presignedPutHeaders, sha256HexOfBody, sha256HexToBase64 } from './checksum';
+export type { PutToPresignedUrlOptions } from './put';
 export { fetchFromUrl,putToPresignedUrl } from './put';
 
 // Orchestrator

@@ -143,7 +143,7 @@ export async function uploadMissing(
       if (index >= diff.missing.length) return;
       const { file, uploadUrl } = diff.missing[index];
       await withRetries(
-        () => put(uploadUrl, file.bytes, file.contentType, options.signal),
+        () => put(uploadUrl, file.bytes, file.contentType, options.signal, file.hash),
         options.retries,
         file.path,
         options.signal,
@@ -163,11 +163,11 @@ export async function uploadMissing(
   };
 }
 
-const defaultPut: PutObject = async (url, body, contentType, signal) => {
+const defaultPut: PutObject = async (url, body, contentType, signal, contentHash) => {
   // A fresh copy: putToPresignedUrl takes a BodyInit, and a Uint8Array view
   // over a pooled Buffer would send the whole pool.
   const buffer = body.slice().buffer as ArrayBuffer;
-  await putToPresignedUrl(url, buffer, contentType, signal);
+  await putToPresignedUrl(url, buffer, contentType, { signal, contentHash });
 };
 
 async function withRetries(

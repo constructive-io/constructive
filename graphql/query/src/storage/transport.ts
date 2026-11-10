@@ -23,12 +23,17 @@ export interface StorageFile {
 export interface StorageTransport {
   /** SHA-256 the file contents, hex-encoded */
   hashFile(file: StorageFile): Promise<string>;
-  /** PUT the bytes to a presigned URL */
+  /**
+   * PUT the bytes to a presigned URL. `contentHash` is the hex SHA-256 the
+   * upload was requested with; the URL is signed over it as
+   * `x-amz-checksum-sha256`, so the transport must send it.
+   */
   putObject(
     url: string,
     body: ArrayBuffer,
     contentType: string,
     signal?: AbortSignal,
+    contentHash?: string,
   ): Promise<void>;
 }
 

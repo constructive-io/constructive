@@ -13,6 +13,20 @@ import type { S3Config } from './types';
 
 const log = new Logger('graphile-presigned-url:s3');
 
+/** The header a checksum-bound presigned PUT must carry (RFC 4648 base64 of the raw digest). */
+export const CHECKSUM_SHA256_HEADER = 'x-amz-checksum-sha256';
+
+/**
+ * Convert a hex-encoded SHA-256 (the `content_hash` clients send) to the
+ * base64-of-raw-digest form S3 expects in `x-amz-checksum-sha256`.
+ */
+export function checksumSha256Base64(contentHashHex: string): string {
+  if (!/^[0-9a-f]{64}$/i.test(contentHashHex)) {
+    throw new Error('INVALID_CONTENT_HASH_FORMAT: must be a 64-char hex SHA-256');
+  }
+  return Buffer.from(contentHashHex, 'hex').toString('base64');
+}
+
 /**
  * Generate a presigned PUT URL for uploading a file to S3.
  *
@@ -20,11 +34,18 @@ const log = new Logger('graphile-presigned-url:s3');
  * content-length via the signature. The client MUST use these exact values
  * when performing the PUT request.
  *
+ * When `contentHash` is given, the SHA-256 is signed into the request as the
+ * `x-amz-checksum-sha256` header (kept out of the query string, where stores
+ * ignore it). The store then rejects any body that does not hash to it
+ * (`BadDigest`), and a PUT without the header fails the signature. This is
+ * what makes a content-addressed key actually hold the content it names.
+ *
  * @param s3Config - S3 client and bucket configuration
  * @param key - S3 object key (content hash or UUID)
  * @param contentType - MIME type (locked into the signature)
  * @param contentLength - File size in bytes (locked into the signature)
  * @param expiresIn - URL expiry in seconds (default: 900 = 15 minutes)
+ * @param contentHash - Hex SHA-256 the uploaded bytes must hash to
  * @returns Presigned PUT URL
  */
 export async function generatePresignedPutUrl(
@@ -33,17 +54,22 @@ export async function generatePresignedPutUrl(
   contentType: string,
   contentLength: number,
   expiresIn: number = 900,
+  contentHash?: string,
 ): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: s3Config.bucket,
     Key: key,
     ContentType: contentType,
     ContentLength: contentLength,
+    ...(contentHash ? { ChecksumSHA256: checksumSha256Base64(contentHash) } : {}),
   });
 
   let url: string;
   try {
-    url = await getSignedUrl(s3Config.client as any, command, { expiresIn });
+    url = await getSignedUrl(s3Config.client as any, command, {
+      expiresIn,
+      ...(contentHash ? { unhoistableHeaders: new Set([CHECKSUM_SHA256_HEADER]) } : {}),
+    });
   } catch (err) {
     throw s3FailureError(
       'PRESIGN_PUT_FAILED',
@@ -51,7 +77,9 @@ export async function generatePresignedPutUrl(
       err,
     );
   }
-  log.debug(`Generated presigned PUT URL for key=${key}, contentType=${contentType}, expires=${expiresIn}s`);
+  log.debug(
+    `Generated presigned PUT URL for key=${key}, contentType=${contentType}, checksum=${contentHash ? 'sha256' : 'none'}, expires=${expiresIn}s`,
+  );
   return url;
 }
 
@@ -148,6 +176,11 @@ export async function copyS3Object(
 /**
  * Check if an object exists in S3 and optionally verify its content-type.
  *
+ * Asks the store for the object's checksum (`ChecksumMode: ENABLED`); it is
+ * returned as `checksumSha256` (base64 of the raw digest) when the object was
+ * written through a checksum-bound PUT, so callers can verify the bytes
+ * behind a key still hash to the content hash it names.
+ *
  * @param s3Config - S3 client and bucket configuration
  * @param key - S3 object key
  * @param expectedContentType - Expected MIME type (optional)
@@ -157,12 +190,13 @@ export async function headObject(
   s3Config: S3Config,
   key: string,
   expectedContentType?: string,
-): Promise<{ contentType?: string; contentLength?: number } | null> {
+): Promise<{ contentType?: string; contentLength?: number; checksumSha256?: string } | null> {
   try {
     const response = await s3Config.client.send(
       new HeadObjectCommand({
         Bucket: s3Config.bucket,
         Key: key,
+        ChecksumMode: 'ENABLED',
       }),
     );
 
@@ -175,6 +209,7 @@ export async function headObject(
     return {
       contentType: response.ContentType,
       contentLength: response.ContentLength,
+      ...(response.ChecksumSHA256 ? { checksumSha256: response.ChecksumSHA256 } : {}),
     };
   } catch (e: any) {
     if (e.name === 'NotFound' || e.$metadata?.httpStatusCode === 404) {

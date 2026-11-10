@@ -204,7 +204,7 @@ describe('database-scope upload surface', () => {
     });
 
     it('accepts the PUT, into a physical bucket recorded on the tenant row', async () => {
-      const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
+      const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
       expect(putRes.ok).toBe(true);
 
       const stored = await pg.query(

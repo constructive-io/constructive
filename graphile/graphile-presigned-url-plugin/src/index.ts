@@ -38,7 +38,15 @@ export {
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { describeS3Failure, s3FailureError } from './s3-failure';
-export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject } from './s3-signer';
+export {
+  CHECKSUM_SHA256_HEADER,
+  checksumSha256Base64,
+  copyS3Object,
+  deleteS3Object,
+  generatePresignedGetUrl,
+  generatePresignedPutUrl,
+  headObject,
+} from './s3-signer';
 export { clearBucketCache, clearStorageModuleCache, getBucketConfig, loadAllStorageModules,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,
