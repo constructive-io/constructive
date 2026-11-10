@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/site-deploy@0.3.0...@constructive-io/site-deploy@0.4.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/site-deploy@0.2.0...@constructive-io/site-deploy@0.3.0) (2026-10-14)
 
 **Note:** Version bump only for package @constructive-io/site-deploy

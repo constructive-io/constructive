@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.40.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.39.1...graphql-server-test@3.40.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
 ## [3.39.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.39.0...graphql-server-test@3.39.1) (2026-11-09)
 
 ### Bug Fixes
