@@ -105,7 +105,11 @@ describe('uploadFile', () => {
         'https://s3.example.com/presigned-put-url',
         expect.objectContaining({
           method: 'PUT',
-          headers: { 'Content-Type': 'text/plain' },
+          headers: {
+            'Content-Type': 'text/plain',
+            // base64(sha256("hello world")): the presigned PUT is signed over it
+            'x-amz-checksum-sha256': 'uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek=',
+          },
         }),
       );
     });

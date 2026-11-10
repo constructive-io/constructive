@@ -11,8 +11,11 @@
 
 import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
+import { createHash } from 'crypto';
 
 import {
+  CHECKSUM_SHA256_HEADER,
+  checksumSha256Base64,
   deleteS3Object,
   generatePresignedGetUrl,
   generatePresignedPutUrl,
@@ -71,15 +74,21 @@ async function uploadToPresignedUrl(
   url: string,
   body: string,
   contentType: string,
+  extraHeaders: Record<string, string> = {},
 ): Promise<Response> {
   return fetch(url, {
     method: 'PUT',
     headers: {
       'Content-Type': contentType,
       'Content-Length': String(Buffer.byteLength(body)),
+      ...extraHeaders,
     },
     body,
   });
+}
+
+function sha256Hex(content: string): string {
+  return createHash('sha256').update(content).digest('hex');
 }
 
 /**
@@ -142,6 +151,68 @@ describe('s3-signer integration (RustFS)', () => {
       const url = await generatePresignedPutUrl(s3Config, 'expiry-test.txt', 'text/plain', 5, 60);
       // The URL should contain expiry-related query params
       expect(url).toContain('X-Amz-Expires=60');
+    });
+  });
+
+  describe('checksum-bound presigned PUT (content_hash binds the bytes)', () => {
+    const contentType = 'text/plain';
+    const real = 'the bytes this hash names';
+    const forged = 'FORGED bytes, same length'; // same Content-Length as `real`
+    const hash = sha256Hex(real);
+
+    beforeAll(() => {
+      expect(Buffer.byteLength(forged)).toBe(Buffer.byteLength(real));
+    });
+
+    it('signs x-amz-checksum-sha256 as a header, not a query parameter', async () => {
+      const url = await generatePresignedPutUrl(s3Config, 'checksum-shape.txt', contentType, Buffer.byteLength(real), 900, hash);
+      const params = new URL(url).searchParams;
+      expect(params.get('X-Amz-SignedHeaders')).toContain(CHECKSUM_SHA256_HEADER);
+      expect(params.has(CHECKSUM_SHA256_HEADER)).toBe(false);
+    });
+
+    it('accepts the bytes that hash to the content hash', async () => {
+      const key = 'checksum-ok.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, real, contentType, {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(200);
+
+      const head = await headObject(s3Config, key);
+      expect(head?.checksumSha256).toBe(checksumSha256Base64(hash));
+    });
+
+    it('rejects same-length bytes that do not hash to it (BadDigest)', async () => {
+      const key = 'checksum-forged.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, forged, contentType, {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(400);
+      expect(await res.text()).toContain('BadDigest');
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it('rejects a PUT that omits the checksum header (signature covers it)', async () => {
+      const key = 'checksum-missing.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, forged, contentType);
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it('cannot replace a confirmed object through the same URL with different bytes', async () => {
+      const key = 'checksum-replay.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const headers = { [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash) };
+      expect((await uploadToPresignedUrl(url, real, contentType, headers)).status).toBe(200);
+
+      expect((await uploadToPresignedUrl(url, forged, contentType, headers)).status).toBe(400);
+      expect((await uploadToPresignedUrl(url, forged, contentType)).status).toBe(403);
+
+      const getUrl = await generatePresignedGetUrl(s3Config, key);
+      expect((await downloadFromPresignedUrl(getUrl)).body).toBe(real);
     });
   });
 

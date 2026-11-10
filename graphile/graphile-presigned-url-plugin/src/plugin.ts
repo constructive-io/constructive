@@ -829,13 +829,16 @@ export async function processSingleFile(
     path: derivedPath,
   });
 
-  // Generate presigned PUT URL
+  // Generate presigned PUT URL, signed over the client's SHA-256 so the store
+  // only accepts bytes that hash to the content hash the row (and, for
+  // content-addressed buckets, the key and any later dedup hit) is named by.
   const uploadUrl = await generatePresignedPutUrl(
     s3ForDb,
     s3Key,
     contentType,
     size,
     storageConfig.uploadUrlExpirySeconds,
+    contentHash,
   );
 
   const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();

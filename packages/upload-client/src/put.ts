@@ -20,9 +20,32 @@
 
 import { createFetch } from '@constructive-io/fetch';
 
+import { presignedPutHeaders, sha256HexOfBody } from './checksum';
 import { UploadError } from './types';
 
 const fetch = createFetch();
+
+export interface PutToPresignedUrlOptions {
+  signal?: AbortSignal;
+  /**
+   * Hex SHA-256 of `body`. Sent as `x-amz-checksum-sha256`, which the
+   * server-issued presigned URL is signed over: the store rejects bytes that
+   * do not hash to it, and a PUT without it fails the signature. When omitted
+   * it is computed from `body` if the body is in memory (string, ArrayBuffer,
+   * typed array, Blob); a streamed body must pass it explicitly.
+   */
+  contentHash?: string;
+}
+
+function normalizePutOptions(
+  signalOrOptions?: AbortSignal | PutToPresignedUrlOptions,
+): PutToPresignedUrlOptions {
+  if (!signalOrOptions) return {};
+  if (typeof (signalOrOptions as AbortSignal).aborted === 'boolean') {
+    return { signal: signalOrOptions as AbortSignal };
+  }
+  return signalOrOptions as PutToPresignedUrlOptions;
+}
 
 /**
  * PUT content to a presigned S3 URL.
@@ -41,12 +64,14 @@ export async function putToPresignedUrl(
   url: string,
   body: BodyInit | string,
   contentType: string,
-  signal?: AbortSignal,
+  signalOrOptions?: AbortSignal | PutToPresignedUrlOptions,
 ): Promise<Response> {
+  const { signal, contentHash } = normalizePutOptions(signalOrOptions);
   try {
+    const checksumSource = contentHash ?? (await sha256HexOfBody(body));
     const response = await fetch(url, {
       method: 'PUT',
-      headers: { 'Content-Type': contentType },
+      headers: presignedPutHeaders(contentType, checksumSource),
       body: body as BodyInit,
       signal,
     });

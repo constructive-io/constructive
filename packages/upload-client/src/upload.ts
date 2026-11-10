@@ -7,6 +7,7 @@
  * Each step is a pure function — this module just wires them together.
  */
 
+import { presignedPutHeaders } from './checksum';
 import { hashFile } from './hash';
 import { putToPresignedUrl } from './put';
 import { buildRequestUploadUrlQuery, DEFAULT_BUCKET_QUERY_FIELD } from './queries';
@@ -89,7 +90,14 @@ export async function uploadFile(options: UploadFileOptions): Promise<UploadResu
     );
   }
 
-  await putToS3(requestPayload.uploadUrl, file, file.type || 'application/octet-stream', onProgress, signal);
+  await putToS3(
+    requestPayload.uploadUrl,
+    file,
+    file.type || 'application/octet-stream',
+    contentHash,
+    onProgress,
+    signal,
+  );
 
   return {
     fileId: requestPayload.fileId,
@@ -155,16 +163,17 @@ async function putToS3(
   url: string,
   file: UploadFileOptions['file'],
   contentType: string,
+  contentHash: string,
   onProgress?: (percent: number) => void,
   signal?: AbortSignal,
 ): Promise<void> {
   // Use XMLHttpRequest for progress support if available
   if (typeof XMLHttpRequest !== 'undefined' && onProgress) {
-    return putWithXHR(url, file, contentType, onProgress, signal);
+    return putWithXHR(url, file, contentType, contentHash, onProgress, signal);
   }
 
   const body = await file.arrayBuffer();
-  await putToPresignedUrl(url, body, contentType, signal);
+  await putToPresignedUrl(url, body, contentType, { signal, contentHash });
 }
 
 /**
@@ -174,13 +183,16 @@ function putWithXHR(
   url: string,
   file: UploadFileOptions['file'],
   contentType: string,
+  contentHash: string,
   onProgress: (percent: number) => void,
   signal?: AbortSignal,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', url);
-    xhr.setRequestHeader('Content-Type', contentType);
+    for (const [name, value] of Object.entries(presignedPutHeaders(contentType, contentHash))) {
+      xhr.setRequestHeader(name, value);
+    }
 
     xhr.upload.addEventListener('progress', (event) => {
       if (event.lengthComputable) {

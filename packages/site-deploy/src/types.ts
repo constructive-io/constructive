@@ -104,6 +104,8 @@ export type PutObject = (
   body: Uint8Array,
   contentType: string,
   signal?: AbortSignal,
+  /** Hex SHA-256 of `body`; the presigned URL is signed over it as `x-amz-checksum-sha256`. */
+  contentHash?: string,
 ) => Promise<void>;
 
 export interface DeploySiteOptions {

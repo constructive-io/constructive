@@ -425,7 +425,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       });
 
       it('should accept a PUT to the presigned URL', async () => {
-        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
+        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
         expect(putRes.ok).toBe(true);
         await confirmUploaded(contentHash);
       });
@@ -468,7 +468,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       });
 
       it('should accept a PUT to the presigned URL', async () => {
-        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType);
+        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
         expect(putRes.ok).toBe(true);
       });
     });
@@ -524,7 +524,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(retry.uploadUrl).toBeTruthy();
         expect(retry.fileId).not.toBe(first.fileId);
 
-        const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain');
+        const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain', { contentHash });
         expect(putRes.ok).toBe(true);
         await confirmUploaded(contentHash);
 
@@ -869,7 +869,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(payload.fileId).toBeTruthy();
       expect(payload.uploadUrl).toBeTruthy();
 
-      const putRes = await putToPresignedUrl(payload.uploadUrl, fileContent, 'text/plain');
+      const putRes = await putToPresignedUrl(payload.uploadUrl, fileContent, 'text/plain', { contentHash });
       expect(putRes.ok).toBe(true);
     });
 
