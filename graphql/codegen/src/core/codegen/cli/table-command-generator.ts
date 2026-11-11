@@ -1683,7 +1683,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const orderByTypeName = getOrderByTypeName(table);
   statements.push(
     createImportDeclaration(inputTypesPath, [
-      createInputTypeName,
+      ...(table.query?.create !== null ? [createInputTypeName] : []),
       patchTypeName,
       selectTypeName,
       whereTypeName,

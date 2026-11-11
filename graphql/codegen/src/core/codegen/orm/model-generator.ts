@@ -265,7 +265,7 @@ export function generateModelFile(
     selectTypeName,
     whereTypeName,
     orderByTypeName,
-    createInputTypeName,
+    ...(createMutationName ? [createInputTypeName] : []),
     updateInputTypeName,
     patchTypeName,
   ];

@@ -120,6 +120,7 @@ describe('model-generator', () => {
 
     expect(result.content).not.toContain('create<');
     expect(result.content).not.toContain('"createFile"');
+    expect(result.content).not.toContain('CreateFileInput');
     expect(result.content).toContain('update<');
     expect(result.content).toContain('delete<');
   });
