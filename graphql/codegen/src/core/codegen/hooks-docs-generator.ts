@@ -14,8 +14,10 @@ import {
 import {
   getBulkCreateMutationHookName,
   getBulkDeleteMutationHookName,
+  getBulkInsertMutationName,
   getBulkUpdateMutationHookName,
   getBulkUpsertMutationHookName,
+  getBulkUpsertMutationName,
   getCreateMutationHookName,
   getDeleteMutationHookName,
   getListQueryHookName,
@@ -93,12 +95,12 @@ export function generateHooksReadme(
         `| \`${getDeleteMutationHookName(table)}\` | Mutation | ${table.description || `Delete a ${singularName}`} |`,
       );
     }
-    if (table.query?.bulkInsert) {
+    if (getBulkInsertMutationName(table)) {
       lines.push(
         `| \`${getBulkCreateMutationHookName(table)}\` | Mutation | Bulk create ${pluralName} |`,
       );
     }
-    if (table.query?.bulkUpsert) {
+    if (getBulkUpsertMutationName(table)) {
       lines.push(
         `| \`${getBulkUpsertMutationHookName(table)}\` | Mutation | Bulk upsert ${pluralName} |`,
       );
@@ -169,7 +171,7 @@ export function generateHooksReadme(
           `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
         );
       }
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push('');
         lines.push(`// Bulk create ${pluralName}`);
         lines.push(
@@ -320,8 +322,8 @@ export function generateHooksSkills(
               `${getDeleteMutationHookName(table)}({})`,
             ]
             : []),
-          ...(table.query?.bulkInsert ? [`${getBulkCreateMutationHookName(table)}() — bulk create with data array`] : []),
-          ...(table.query?.bulkUpsert ? [`${getBulkUpsertMutationHookName(table)}() — bulk upsert with onConflict`] : []),
+          ...(getBulkInsertMutationName(table) ? [`${getBulkCreateMutationHookName(table)}() — bulk create with data array`] : []),
+          ...(getBulkUpsertMutationName(table) ? [`${getBulkUpsertMutationHookName(table)}() — bulk upsert with onConflict`] : []),
           ...(table.query?.bulkUpdate ? [`${getBulkUpdateMutationHookName(table)}() — bulk update with where + data`] : []),
           ...(table.query?.bulkDelete ? [`${getBulkDeleteMutationHookName(table)}() — bulk delete with where`] : []),
         ],

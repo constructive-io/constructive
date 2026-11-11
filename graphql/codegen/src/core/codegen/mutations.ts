@@ -43,10 +43,12 @@ import {
   getBulkCreateMutationHookName,
   getBulkDeleteMutationFileName,
   getBulkDeleteMutationHookName,
+  getBulkInsertMutationName,
   getBulkUpdateMutationFileName,
   getBulkUpdateMutationHookName,
   getBulkUpsertMutationFileName,
   getBulkUpsertMutationHookName,
+  getBulkUpsertMutationName,
   getCreateMutationFileName,
   getCreateMutationHookName,
   getCreateMutationName,
@@ -903,8 +905,8 @@ function generateBulkMutationHook(
 
   const mutationFieldName = (() => {
     switch (op) {
-    case 'bulkCreate': return table.query?.bulkInsert;
-    case 'bulkUpsert': return table.query?.bulkUpsert;
+    case 'bulkCreate': return getBulkInsertMutationName(table);
+    case 'bulkUpsert': return getBulkUpsertMutationName(table);
     case 'bulkUpdate': return table.query?.bulkUpdate;
     case 'bulkDelete': return table.query?.bulkDelete;
     }

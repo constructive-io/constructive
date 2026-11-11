@@ -6,6 +6,8 @@ import { generateCode } from '../babel-ast';
 import type { SpecialFieldGroup } from '../docs-utils';
 import { categorizeSpecialFields } from '../docs-utils';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getCreateInputTypeName,
   getDeleteInputTypeName,
   getExtraInputKeys,
@@ -1752,8 +1754,8 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   }
 
   // Detect bulk mutations
-  const hasBulkCreate = !!table.query?.bulkInsert;
-  const hasBulkUpsert = !!table.query?.bulkUpsert;
+  const hasBulkCreate = !!getBulkInsertMutationName(table);
+  const hasBulkUpsert = !!getBulkUpsertMutationName(table);
   const hasBulkUpdate = !!table.query?.bulkUpdate;
   const hasBulkDelete = !!table.query?.bulkDelete;
 

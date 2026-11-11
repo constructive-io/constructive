@@ -10,6 +10,8 @@ import { singularize } from 'inflekt';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getCreateInputTypeName,
   getCreateMutationName,
   getDeleteInputTypeName,
@@ -219,8 +221,8 @@ export function generateModelFile(
   });
 
   // Detect which bulk mutations are available for this table
-  const bulkInsertMutationName = table.query?.bulkInsert ?? null;
-  const bulkUpsertMutationName = table.query?.bulkUpsert ?? null;
+  const bulkInsertMutationName = getBulkInsertMutationName(table) ?? null;
+  const bulkUpsertMutationName = getBulkUpsertMutationName(table) ?? null;
   const bulkUpdateMutationName = table.query?.bulkUpdate ?? null;
   const bulkDeleteMutationName = table.query?.bulkDelete ?? null;
   const hasBulk = !!(bulkInsertMutationName || bulkUpsertMutationName || bulkUpdateMutationName || bulkDeleteMutationName);

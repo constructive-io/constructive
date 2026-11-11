@@ -18,7 +18,7 @@ import {
   generateCode,
   typedParam,
 } from './babel-ast';
-import { getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
+import { getBulkInsertMutationName, getBulkUpsertMutationName, getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
 
 export interface MutationKeyGeneratorOptions {
   tables: Table[];
@@ -142,8 +142,8 @@ function generateEntityMutationKeysDeclaration(
 
   // Bulk mutation keys (only if table has bulk operations)
   const bulkOps: Array<{ key: string; queryField: string | null | undefined }> = [
-    { key: 'bulkCreate', queryField: table.query?.bulkInsert },
-    { key: 'bulkUpsert', queryField: table.query?.bulkUpsert },
+    { key: 'bulkCreate', queryField: getBulkInsertMutationName(table) },
+    { key: 'bulkUpsert', queryField: getBulkUpsertMutationName(table) },
     { key: 'bulkUpdate', queryField: table.query?.bulkUpdate },
     { key: 'bulkDelete', queryField: table.query?.bulkDelete },
   ];
