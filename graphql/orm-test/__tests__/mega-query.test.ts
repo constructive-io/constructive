@@ -316,12 +316,10 @@ describe('Mega query integration (ORM)', () => {
       expect(result.ok).toBe(true);
       const nodes = unwrapData(result.data).nodes as { name: string; bodyBm25Score: number }[];
 
-      // Separate matches (negative score) from non-matches (zero)
-      const matches = nodes.filter((n) => n.bodyBm25Score < 0);
-      const nonMatches = nodes.filter((n) => n.bodyBm25Score === 0);
-
-      expect(matches).toHaveLength(4); // 4 locations mention "park"
-      expect(nonMatches).toHaveLength(3); // MoMA, Times Square Diner, Met Museum
+      // Only matches (negative score) come back: 4 locations mention "park";
+      // MoMA, Times Square Diner and Met Museum do not.
+      const matches = nodes;
+      expect(matches).toHaveLength(4);
 
       // Prospect Park (3x "park") has the strongest (most negative) BM25 score
       const prospect = matches.find((n) => n.name === 'Prospect Park')!;
@@ -353,7 +351,7 @@ describe('Mega query integration (ORM)', () => {
       const moma = nodes.find((n) => n.name === 'MoMA')!;
       const met = nodes.find((n) => n.name === 'Met Museum')!;
       const highLine = nodes.find((n) => n.name === 'High Line Park')!;
-      const diner = nodes.find((n) => n.name === 'Times Square Diner')!;
+      const diner = nodes.find((n) => n.name === 'Times Square Diner');
 
       // Both museums score strongly (body has "museum" + "art" multiple times)
       expect(moma.bodyBm25Score).toBeLessThan(-2);
@@ -363,8 +361,8 @@ describe('Mega query integration (ORM)', () => {
       expect(highLine.bodyBm25Score).toBeLessThan(0);
       expect(highLine.bodyBm25Score).toBeGreaterThan(met.bodyBm25Score);
 
-      // Diner has no museum/art terms \u2014 zero
-      expect(diner.bodyBm25Score).toBe(0);
+      // Diner has no museum/art terms \u2014 not returned
+      expect(diner).toBeUndefined();
     });
 
     it('single-result BM25 \u2014 "cafe coffee" matches only Central Park Cafe', async () => {
