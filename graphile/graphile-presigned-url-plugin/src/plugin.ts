@@ -34,7 +34,7 @@ import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
-import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
+import { deleteS3Object,generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
 import { getBucketConfig, loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
@@ -212,6 +212,17 @@ export function createPresignedUrlPlugin(
               name: names.uploadPayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString, description: 'Presigned PUT URL (null if deduplicated)' },
+                ...(jsonType
+                  ? {
+                    uploadHeaders: {
+                      type: jsonType,
+                      description:
+                          'The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is ' +
+                          'signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. ' +
+                          'Null if deduplicated.',
+                    },
+                  }
+                  : {}),
                 fileId: { type: new GraphQLNonNull(GraphQLString), description: 'The file ID (UUID)' },
                 key: { type: new GraphQLNonNull(GraphQLString), description: 'The S3 object key' },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean), description: 'Whether this file was deduplicated (content already exists)' },
@@ -338,6 +349,7 @@ export function createPresignedUrlPlugin(
               name: names.bulkUploadFilePayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString },
+                ...(jsonType ? { uploadHeaders: { type: jsonType, description: 'The exact headers the PUT to uploadUrl must send.' } } : {}),
                 fileId: { type: new GraphQLNonNull(GraphQLString) },
                 key: { type: new GraphQLNonNull(GraphQLString) },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean) },
@@ -741,6 +753,7 @@ export async function processSingleFile(
           log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
           return {
             uploadUrl: null as string | null,
+            uploadHeaders: null as Record<string, string> | null,
             fileId: existing.id as string,
             key: s3Key,
             deduplicated: true,
@@ -789,6 +802,7 @@ export async function processSingleFile(
 
         return {
           uploadUrl: null as string | null,
+          uploadHeaders: null as Record<string, string> | null,
           fileId: existingFile.id as string,
           key: existingKey,
           deduplicated: true,
@@ -839,12 +853,15 @@ export async function processSingleFile(
     size,
     storageConfig.uploadUrlExpirySeconds,
     contentHash,
+    fileId,
   );
+  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId);
 
   const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 
   return {
     uploadUrl,
+    uploadHeaders,
     fileId,
     key: s3Key,
     deduplicated: false,

@@ -94,7 +94,7 @@ export async function uploadToSurface(
   }
 
   const payload = data?.[surface.upload.mutation] as
-    | (StorageUploadResult & { uploadUrl: string | null })
+    | (StorageUploadResult & { uploadUrl: string | null; uploadHeaders?: Record<string, string> | null })
     | undefined;
   if (!payload) {
     throw new StorageError(
@@ -114,7 +114,14 @@ export async function uploadToSurface(
   }
 
   checkAborted(signal);
-  await transport.putObject(payload.uploadUrl, await file.arrayBuffer(), contentType, signal, contentHash);
+  await transport.putObject(
+    payload.uploadUrl,
+    await file.arrayBuffer(),
+    contentType,
+    signal,
+    contentHash,
+    payload.uploadHeaders ?? undefined,
+  );
 
   return toResult(payload);
 }

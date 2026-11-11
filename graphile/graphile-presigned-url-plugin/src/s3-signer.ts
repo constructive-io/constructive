@@ -17,6 +17,17 @@ const log = new Logger('graphile-presigned-url:s3');
 export const CHECKSUM_SHA256_HEADER = 'x-amz-checksum-sha256';
 
 /**
+ * The header a row-bound presigned PUT must carry: the id of the file row the
+ * URL was issued for, stored as the object's `upload-id` metadata. The confirm
+ * worker accepts only an object whose metadata names its own row, so bytes at
+ * the key that some other upload wrote are never adopted.
+ */
+export const UPLOAD_ID_HEADER = 'x-amz-meta-upload-id';
+
+/** The metadata key {@link UPLOAD_ID_HEADER} is stored under (and HEAD returns). */
+export const UPLOAD_ID_METADATA_KEY = 'upload-id';
+
+/**
  * Convert a hex-encoded SHA-256 (the `content_hash` clients send) to the
  * base64-of-raw-digest form S3 expects in `x-amz-checksum-sha256`.
  */
@@ -25,6 +36,23 @@ export function checksumSha256Base64(contentHashHex: string): string {
     throw new Error('INVALID_CONTENT_HASH_FORMAT: must be a 64-char hex SHA-256');
   }
   return Buffer.from(contentHashHex, 'hex').toString('base64');
+}
+
+/**
+ * The exact headers a PUT to {@link generatePresignedPutUrl}'s URL must send,
+ * for the same arguments. Returned to clients as `uploadHeaders` so they forward
+ * them rather than rebuild them, which makes the next signed header free.
+ */
+export function presignedPutHeaders(
+  contentType: string,
+  contentHash?: string,
+  uploadId?: string,
+): Record<string, string> {
+  return {
+    'Content-Type': contentType,
+    ...(contentHash ? { [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(contentHash) } : {}),
+    ...(uploadId ? { [UPLOAD_ID_HEADER]: uploadId } : {}),
+  };
 }
 
 /**
@@ -40,12 +68,18 @@ export function checksumSha256Base64(contentHashHex: string): string {
  * (`BadDigest`), and a PUT without the header fails the signature. This is
  * what makes a content-addressed key actually hold the content it names.
  *
+ * When `uploadId` is given, it is signed in the same way as
+ * `x-amz-meta-upload-id`, so the stored object names the file row whose upload
+ * wrote it. A PUT without the header, or with another row's id, fails the
+ * signature.
+ *
  * @param s3Config - S3 client and bucket configuration
  * @param key - S3 object key (content hash or UUID)
  * @param contentType - MIME type (locked into the signature)
  * @param contentLength - File size in bytes (locked into the signature)
  * @param expiresIn - URL expiry in seconds (default: 900 = 15 minutes)
  * @param contentHash - Hex SHA-256 the uploaded bytes must hash to
+ * @param uploadId - Id of the file row the upload is for
  * @returns Presigned PUT URL
  */
 export async function generatePresignedPutUrl(
@@ -55,6 +89,7 @@ export async function generatePresignedPutUrl(
   contentLength: number,
   expiresIn: number = 900,
   contentHash?: string,
+  uploadId?: string,
 ): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: s3Config.bucket,
@@ -62,13 +97,18 @@ export async function generatePresignedPutUrl(
     ContentType: contentType,
     ContentLength: contentLength,
     ...(contentHash ? { ChecksumSHA256: checksumSha256Base64(contentHash) } : {}),
+    ...(uploadId ? { Metadata: { [UPLOAD_ID_METADATA_KEY]: uploadId } } : {}),
   });
+  const unhoistableHeaders = new Set([
+    ...(contentHash ? [CHECKSUM_SHA256_HEADER] : []),
+    ...(uploadId ? [UPLOAD_ID_HEADER] : []),
+  ]);
 
   let url: string;
   try {
     url = await getSignedUrl(s3Config.client as any, command, {
       expiresIn,
-      ...(contentHash ? { unhoistableHeaders: new Set([CHECKSUM_SHA256_HEADER]) } : {}),
+      ...(unhoistableHeaders.size > 0 ? { unhoistableHeaders } : {}),
     });
   } catch (err) {
     throw s3FailureError(
@@ -78,7 +118,7 @@ export async function generatePresignedPutUrl(
     );
   }
   log.debug(
-    `Generated presigned PUT URL for key=${key}, contentType=${contentType}, checksum=${contentHash ? 'sha256' : 'none'}, expires=${expiresIn}s`,
+    `Generated presigned PUT URL for key=${key}, contentType=${contentType}, checksum=${contentHash ? 'sha256' : 'none'}, uploadId=${uploadId ?? 'none'}, expires=${expiresIn}s`,
   );
   return url;
 }
@@ -190,7 +230,7 @@ export async function headObject(
   s3Config: S3Config,
   key: string,
   expectedContentType?: string,
-): Promise<{ contentType?: string; contentLength?: number; checksumSha256?: string } | null> {
+): Promise<{ contentType?: string; contentLength?: number; checksumSha256?: string; uploadId?: string } | null> {
   try {
     const response = await s3Config.client.send(
       new HeadObjectCommand({
@@ -210,6 +250,9 @@ export async function headObject(
       contentType: response.ContentType,
       contentLength: response.ContentLength,
       ...(response.ChecksumSHA256 ? { checksumSha256: response.ChecksumSHA256 } : {}),
+      ...(response.Metadata?.[UPLOAD_ID_METADATA_KEY]
+        ? { uploadId: response.Metadata[UPLOAD_ID_METADATA_KEY] }
+        : {}),
     };
   } catch (e: any) {
     if (e.name === 'NotFound' || e.$metadata?.httpStatusCode === 404) {

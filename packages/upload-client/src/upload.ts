@@ -90,11 +90,11 @@ export async function uploadFile(options: UploadFileOptions): Promise<UploadResu
     );
   }
 
+  const contentType = file.type || 'application/octet-stream';
   await putToS3(
     requestPayload.uploadUrl,
     file,
-    file.type || 'application/octet-stream',
-    contentHash,
+    requestPayload.uploadHeaders ?? presignedPutHeaders(contentType, contentHash),
     onProgress,
     signal,
   );
@@ -162,18 +162,17 @@ async function requestUploadUrl(
 async function putToS3(
   url: string,
   file: UploadFileOptions['file'],
-  contentType: string,
-  contentHash: string,
+  headers: Record<string, string>,
   onProgress?: (percent: number) => void,
   signal?: AbortSignal,
 ): Promise<void> {
   // Use XMLHttpRequest for progress support if available
   if (typeof XMLHttpRequest !== 'undefined' && onProgress) {
-    return putWithXHR(url, file, contentType, contentHash, onProgress, signal);
+    return putWithXHR(url, file, headers, onProgress, signal);
   }
 
   const body = await file.arrayBuffer();
-  await putToPresignedUrl(url, body, contentType, { signal, contentHash });
+  await putToPresignedUrl(url, body, headers['Content-Type'], { signal, headers });
 }
 
 /**
@@ -182,15 +181,14 @@ async function putToS3(
 function putWithXHR(
   url: string,
   file: UploadFileOptions['file'],
-  contentType: string,
-  contentHash: string,
+  headers: Record<string, string>,
   onProgress: (percent: number) => void,
   signal?: AbortSignal,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', url);
-    for (const [name, value] of Object.entries(presignedPutHeaders(contentType, contentHash))) {
+    for (const [name, value] of Object.entries(headers)) {
       xhr.setRequestHeader(name, value);
     }
 

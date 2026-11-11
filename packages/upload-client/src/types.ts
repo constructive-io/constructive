@@ -24,6 +24,12 @@ export interface RequestUploadUrlInput {
 export interface RequestUploadUrlPayload {
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl: string | null;
+  /**
+   * The exact headers the PUT to `uploadUrl` must send: `Content-Type` and every
+   * header the URL is signed over (`x-amz-checksum-sha256`,
+   * `x-amz-meta-upload-id`). Forward them as-is. Null if deduplicated.
+   */
+  uploadHeaders?: Record<string, string> | null;
   /** The file ID (UUID) */
   fileId: string;
   /** The S3 object key */

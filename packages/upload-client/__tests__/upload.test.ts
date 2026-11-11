@@ -115,6 +115,34 @@ describe('uploadFile', () => {
     });
   });
 
+  describe('server-issued upload headers', () => {
+    it('forwards uploadHeaders as-is instead of rebuilding them', async () => {
+      const uploadHeaders = {
+        'Content-Type': 'text/plain',
+        'x-amz-checksum-sha256': 'uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek=',
+        'x-amz-meta-upload-id': 'file-uuid-456',
+      };
+      const { execute, calls } = createMockExecutor({
+        uploadUrl: 'https://s3.example.com/presigned-put-url',
+        uploadHeaders,
+        fileId: 'file-uuid-456',
+        key: HELLO_WORLD_HASH,
+        deduplicated: false,
+        expiresAt: new Date(Date.now() + 900_000).toISOString(),
+        previousVersionId: null,
+      });
+      global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, text: async () => '' });
+
+      await uploadFile({ file: createMockFile('hello world'), bucketKey: 'avatars', execute });
+
+      expect(calls[0].query).toContain('uploadHeaders');
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://s3.example.com/presigned-put-url',
+        expect.objectContaining({ method: 'PUT', headers: uploadHeaders }),
+      );
+    });
+  });
+
   describe('deduplicated upload', () => {
     it('should skip PUT when deduplicated', async () => {
       const file = createMockFile('hello world');

@@ -46,6 +46,9 @@ export {
   generatePresignedGetUrl,
   generatePresignedPutUrl,
   headObject,
+  presignedPutHeaders,
+  UPLOAD_ID_HEADER,
+  UPLOAD_ID_METADATA_KEY,
 } from './s3-signer';
 export { clearBucketCache, clearStorageModuleCache, getBucketConfig, loadAllStorageModules,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {

@@ -24,6 +24,7 @@ describe('buildUploadCorsRules', () => {
     expect(rule.allowedHeaders).toContain('Content-Length');
     expect(rule.allowedHeaders).toContain('Authorization');
     expect(rule.allowedHeaders).toContain('x-amz-checksum-sha256');
+    expect(rule.allowedHeaders).toContain('x-amz-meta-upload-id');
   });
 
   it('exposes ETag and Content-Length', () => {
@@ -76,6 +77,7 @@ describe('buildPrivateCorsRules', () => {
     expect(rule.allowedHeaders).toContain('Content-Length');
     expect(rule.allowedHeaders).toContain('Authorization');
     expect(rule.allowedHeaders).toContain('x-amz-checksum-sha256');
+    expect(rule.allowedHeaders).toContain('x-amz-meta-upload-id');
   });
 
   it('uses default maxAgeSeconds of 3600', () => {
