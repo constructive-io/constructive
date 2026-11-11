@@ -314,7 +314,7 @@ function buildCleanTable(
   const query: TableQueryNames = {
     all: queryOps.all ?? lcFirst(pluralize(entityName)),
     one: queryOps.one,
-    create: mutationOps.create ?? `create${entityName}`,
+    create: mutationOps.create,
     update: mutationOps.update,
     delete: mutationOps.delete,
     patchFieldName,

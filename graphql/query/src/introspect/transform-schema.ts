@@ -366,7 +366,7 @@ export function getTableOperationNames(
       }
 
       // Add exact mutation names from _meta
-      mutations.add(table.query.create);
+      if (table.query.create) mutations.add(table.query.create);
       if (table.query.update) mutations.add(table.query.update);
       if (table.query.delete) mutations.add(table.query.delete);
 

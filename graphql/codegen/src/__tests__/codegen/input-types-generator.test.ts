@@ -411,6 +411,13 @@ describe('generateInputTypesFile', () => {
     expect(result.content).toMatchSnapshot();
   });
 
+  it('generates no create input for a table whose schema exposes no create mutation', () => {
+    const fileTable = { ...userTable, name: 'File', query: { ...userTable.query, create: null as string | null } };
+    const result = generateInputTypesFile(new Map(), new Set(), [fileTable]);
+    expect(result.content).not.toContain('CreateFileInput');
+    expect(result.content).toContain('UpdateFileInput');
+  });
+
   it('handles empty tables array', () => {
     const result = generateInputTypesFile(new Map(), new Set());
     expect(result.content).toMatchSnapshot();

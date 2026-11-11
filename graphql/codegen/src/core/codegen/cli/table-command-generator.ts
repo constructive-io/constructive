@@ -1723,6 +1723,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   // read-only record type with no `findOne`.
   const hasUpdate = table.query?.update !== undefined && table.query?.update !== null;
   const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
+  const hasCreate = table.query?.create !== null;
   const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
 
   // Detect whether this table has search-capable fields (tsvector, BM25, trgm, vector embedding)
@@ -1759,7 +1760,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const subcommands: string[] = ['list', 'find-first'];
   if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
-  subcommands.push('create');
+  if (hasCreate) subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
   if (hasDelete) subcommands.push('delete');
   if (hasBulkCreate) subcommands.push('bulk-create');
@@ -2007,7 +2008,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
   if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
-  statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
+  if (hasCreate) statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasDelete) statements.push(buildMutationHandler(table, 'delete', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasBulkCreate) statements.push(buildBulkMutationHandler(table, 'bulk-create', tn));

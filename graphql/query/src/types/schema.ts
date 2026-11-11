@@ -80,8 +80,8 @@ export interface TableQueryNames {
   all: string;
   /** Single row query name */
   one: string | null;
-  /** Create mutation name */
-  create: string;
+  /** Create mutation name (null when the schema exposes no create mutation) */
+  create: string | null;
   /** Update mutation name */
   update: string | null;
   /** Delete mutation name */
