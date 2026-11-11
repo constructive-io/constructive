@@ -35,6 +35,13 @@ export interface PhysicalBucketIdentity {
   databaseId: string;
   /** The bucket's logical key, as declared on the row. */
   bucketKey: string;
+  /**
+   * The bucket row's own id. Several rows may share a scope, a database and a
+   * key (one per owning entity), and a deleted row's key may be declared again
+   * while the old bucket is still being torn down; the id is what makes the
+   * physical bucket belong to exactly one row.
+   */
+  bucketId: string;
 }
 
 /**
@@ -91,7 +98,8 @@ function assembleBucketName(
 
 /**
  * The physical name a bucket gets from its own identity:
- * `{scope}-{database label}-{bucketKey}-{digest}`
+ * `{scope}-{database label}-{bucketKey}-{digest}`, where the digest covers the
+ * bucket row's id, so no two rows ever mint the same name
  * (e.g. `database-028752cb-buildlogs-3f9c1a2b7e04`).
  *
  * This is the policy for a platform-provisioned bucket, and it takes no prefix
@@ -106,14 +114,19 @@ function assembleBucketName(
  * readable labels truncate to the same thing.
  */
 export function physicalBucketName(identity: PhysicalBucketIdentity): string {
-  const { scope, databaseId, bucketKey } = identity;
+  const { scope, databaseId, bucketKey, bucketId } = identity;
+  if (!bucketId) {
+    throw new Error(
+      `[bucket-provisioner] Cannot mint a physical bucket name for key "${bucketKey}" at scope "${scope}" without the bucket's id`,
+    );
+  }
   return assembleBucketName(
     [
       readableComponent(scope, SCOPE_BUDGET),
       readableComponent(databaseId, DATABASE_LABEL_LENGTH),
       readableComponent(bucketKey, IDENTITY_KEY_BUDGET),
     ],
-    `${scope}/${databaseId}/${bucketKey}`,
+    `${scope}/${databaseId}/${bucketKey}/${bucketId}`,
     `key "${bucketKey}" at scope "${scope}"`,
   );
 }

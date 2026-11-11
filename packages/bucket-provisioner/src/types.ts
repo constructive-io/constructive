@@ -58,6 +58,13 @@ export interface CreateBucketOptions {
   accessType: BucketAccessType;
   /** S3 region for bucket creation (defaults to connection config region) */
   region?: string;
+  /**
+   * Who the bucket belongs to — the id of the one logical bucket it backs.
+   * Recorded on the bucket as the `constructive-owner` tag; a bucket that
+   * already carries another owner, or that holds objects nobody claimed, is
+   * refused rather than adopted.
+   */
+  owner: string;
   /** Whether to enable versioning (recommended for durability) */
   versioning?: boolean;
   /**
@@ -168,6 +175,7 @@ export interface ProvisionResult {
 export type ProvisionerErrorCode =
   | 'CONNECTION_FAILED'
   | 'BUCKET_ALREADY_EXISTS'
+  | 'BUCKET_OWNED_ELSEWHERE'
   | 'BUCKET_NOT_FOUND'
   | 'INVALID_CONFIG'
   | 'POLICY_FAILED'
