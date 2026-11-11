@@ -18,12 +18,15 @@ import {
   GetBucketCorsCommand,
   GetBucketLifecycleConfigurationCommand,
   GetBucketPolicyCommand,
+  GetBucketTaggingCommand,
   GetBucketVersioningCommand,
   GetPublicAccessBlockCommand,
   HeadBucketCommand,
+  ListObjectsV2Command,
   PutBucketCorsCommand,
   PutBucketLifecycleConfigurationCommand,
   PutBucketPolicyCommand,
+  PutBucketTaggingCommand,
   PutBucketVersioningCommand,
   PutPublicAccessBlockCommand,
 } from '@aws-sdk/client-s3';
@@ -65,6 +68,13 @@ function isUnsupportedOperation(err: any, extraCodes: string[] = []): boolean {
 /**
  * Options for the BucketProvisioner constructor.
  */
+/**
+ * The bucket tag naming the one logical bucket a physical bucket belongs to.
+ * Written when the bucket is first claimed and checked before it is
+ * reconfigured or torn down.
+ */
+export const BUCKET_OWNER_TAG = 'constructive-owner';
+
 export interface BucketProvisionerOptions {
   /** Storage connection config — credentials, endpoint, provider */
   connection: StorageConnectionConfig;
@@ -140,11 +150,12 @@ export class BucketProvisioner {
    * @returns ProvisionResult with all configuration details
    */
   async provision(options: CreateBucketOptions): Promise<ProvisionResult> {
-    const { bucketName, accessType, versioning = false } = options;
+    const { bucketName, accessType, owner, versioning = false } = options;
     const region = options.region ?? this.config.region;
 
-    // 1. Create the bucket
+    // 1. Create the bucket, and make sure it is this owner's to configure
     await this.createBucket(bucketName, region);
+    await this.claimBucket(bucketName, owner);
 
     // 2. Configure Block Public Access
     const publicAccessBlock = getPublicAccessBlock(accessType);
@@ -210,7 +221,8 @@ export class BucketProvisioner {
   }
 
   /**
-   * Create an S3 bucket. Handles the "bucket already exists" case gracefully.
+   * Create an S3 bucket. A bucket this account already owns is left for
+   * claimBucket to judge; a name held by another account is refused.
    */
   async createBucket(bucketName: string, region?: string): Promise<void> {
     try {
@@ -222,18 +234,113 @@ export class BucketProvisioner {
       });
       await this.client.send(command);
     } catch (err: any) {
-      // Bucket already exists and we own it — that's fine
-      if (
-        err.name === 'BucketAlreadyOwnedByYou' ||
-        err.name === 'BucketAlreadyExists' ||
-        err.Code === 'BucketAlreadyOwnedByYou' ||
-        err.Code === 'BucketAlreadyExists'
-      ) {
+      // Already ours (a retry, or another row's): claimBucket decides whose
+      if (err.name === 'BucketAlreadyOwnedByYou' || err.Code === 'BucketAlreadyOwnedByYou') {
         return;
+      }
+      // Someone else's account holds the name: never ours to configure
+      if (err.name === 'BucketAlreadyExists' || err.Code === 'BucketAlreadyExists') {
+        throw new ProvisionerError(
+          'BUCKET_ALREADY_EXISTS',
+          `Bucket '${bucketName}' already exists and belongs to another account`,
+          err,
+        );
       }
       throw new ProvisionerError(
         'PROVIDER_ERROR',
         `Failed to create bucket '${bucketName}': ${err.message}`,
+        err,
+      );
+    }
+  }
+
+  /**
+   * Make sure an existing bucket belongs to `owner` before anything
+   * configures it. A bucket tagged for this owner is a retry; an untagged,
+   * empty bucket is claimed by tagging it; a bucket tagged for another owner,
+   * or untagged but holding objects, is refused with BUCKET_OWNED_ELSEWHERE.
+   *
+   * S3 answers CreateBucket for a bucket the caller already owns with success
+   * (us-east-1, MinIO, RustFS) or BucketAlreadyOwnedByYou, so creation alone
+   * cannot tell a retry from a name another logical bucket already holds.
+   */
+  async claimBucket(bucketName: string, owner: string): Promise<void> {
+    if (!owner) {
+      throw new ProvisionerError(
+        'INVALID_CONFIG',
+        `Cannot claim bucket '${bucketName}' without an owner`,
+      );
+    }
+    const current = await this.bucketOwner(bucketName);
+    if (current === owner) return;
+    if (current !== null) {
+      throw new ProvisionerError(
+        'BUCKET_OWNED_ELSEWHERE',
+        `Bucket '${bucketName}' belongs to '${current}', not '${owner}'`,
+      );
+    }
+    if (!(await this.isEmpty(bucketName))) {
+      throw new ProvisionerError(
+        'BUCKET_OWNED_ELSEWHERE',
+        `Bucket '${bucketName}' holds objects but records no owner; refusing to claim it for '${owner}'`,
+      );
+    }
+    try {
+      await this.client.send(
+        new PutBucketTaggingCommand({
+          Bucket: bucketName,
+          Tagging: { TagSet: [{ Key: BUCKET_OWNER_TAG, Value: owner }] },
+        }),
+      );
+    } catch (err: any) {
+      throw new ProvisionerError(
+        'PROVIDER_ERROR',
+        `Failed to record the owner of bucket '${bucketName}': ${err.message}`,
+        err,
+      );
+    }
+  }
+
+  /**
+   * The owner recorded on a bucket (its `constructive-owner` tag), or null
+   * when the bucket carries none.
+   */
+  async bucketOwner(bucketName: string): Promise<string | null> {
+    try {
+      const result = await this.client.send(
+        new GetBucketTaggingCommand({ Bucket: bucketName }),
+      );
+      const tag = (result.TagSet ?? []).find((t) => t.Key === BUCKET_OWNER_TAG);
+      return tag?.Value ?? null;
+    } catch (err: any) {
+      if (err.name === 'NoSuchTagSet' || err.Code === 'NoSuchTagSet') {
+        return null;
+      }
+      if (err.name === 'NoSuchBucket' || err.Code === 'NoSuchBucket') {
+        throw new ProvisionerError(
+          'BUCKET_NOT_FOUND',
+          `Bucket '${bucketName}' does not exist`,
+          err,
+        );
+      }
+      throw new ProvisionerError(
+        'PROVIDER_ERROR',
+        `Failed to read the owner of bucket '${bucketName}': ${err.message}`,
+        err,
+      );
+    }
+  }
+
+  private async isEmpty(bucketName: string): Promise<boolean> {
+    try {
+      const result = await this.client.send(
+        new ListObjectsV2Command({ Bucket: bucketName, MaxKeys: 1 }),
+      );
+      return (result.KeyCount ?? result.Contents?.length ?? 0) === 0;
+    } catch (err: any) {
+      throw new ProvisionerError(
+        'PROVIDER_ERROR',
+        `Failed to list bucket '${bucketName}': ${err.message}`,
         err,
       );
     }

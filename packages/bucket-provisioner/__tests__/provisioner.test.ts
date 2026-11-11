@@ -67,6 +67,7 @@ describe('BucketProvisioner.provision — private bucket', () => {
   it('provisions a private bucket with correct steps', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-private',
       accessType: 'private',
     });
@@ -106,25 +107,33 @@ describe('BucketProvisioner.provision — private bucket', () => {
   it('calls S3 commands in correct order', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-private',
       accessType: 'private',
     });
 
-    // Should have called: CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy, PutBucketCors
-    expect(mockSend).toHaveBeenCalledTimes(4);
-
     const commandNames = mockSend.mock.calls.map(
       (call: any[]) => call[0].constructor.name,
     );
-    expect(commandNames[0]).toBe('CreateBucketCommand');
-    expect(commandNames[1]).toBe('PutPublicAccessBlockCommand');
-    expect(commandNames[2]).toBe('DeleteBucketPolicyCommand');
-    expect(commandNames[3]).toBe('PutBucketCorsCommand');
+    expect(commandNames).toEqual([
+      'CreateBucketCommand',
+      'GetBucketTaggingCommand',
+      'ListObjectsV2Command',
+      'PutBucketTaggingCommand',
+      'PutPublicAccessBlockCommand',
+      'DeleteBucketPolicyCommand',
+      'PutBucketCorsCommand',
+    ]);
+    const tagging = mockSend.mock.calls[3][0];
+    expect(tagging.input.Tagging.TagSet).toEqual([
+      { Key: 'constructive-owner', Value: 'logical-bucket-1' },
+    ]);
   });
 
   it('deletes leftover bucket policy for private buckets', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-private',
       accessType: 'private',
     });
@@ -143,6 +152,7 @@ describe('BucketProvisioner.provision — no browser origins', () => {
       allowedOrigins: [],
     });
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-build-logs',
       accessType: 'private',
     });
@@ -153,6 +163,9 @@ describe('BucketProvisioner.provision — no browser origins', () => {
     );
     expect(commandNames).toEqual([
       'CreateBucketCommand',
+      'GetBucketTaggingCommand',
+      'ListObjectsV2Command',
+      'PutBucketTaggingCommand',
       'PutPublicAccessBlockCommand',
       'DeleteBucketPolicyCommand',
       'DeleteBucketCorsCommand',
@@ -161,11 +174,11 @@ describe('BucketProvisioner.provision — no browser origins', () => {
 
   it('removes the rule set an earlier provision wrote once the origins are gone', async () => {
     const browsed = new BucketProvisioner(defaultOptions);
-    await browsed.provision({ bucketName: 'test-origins-removed', accessType: 'private' });
+    await browsed.provision({ owner: 'logical-bucket-1', bucketName: 'test-origins-removed', accessType: 'private' });
     mockSend.mockClear();
 
     const unbrowsed = new BucketProvisioner({ connection: defaultOptions.connection, allowedOrigins: [] });
-    await unbrowsed.provision({ bucketName: 'test-origins-removed', accessType: 'private' });
+    await unbrowsed.provision({ owner: 'logical-bucket-1', bucketName: 'test-origins-removed', accessType: 'private' });
 
     const commandNames = mockSend.mock.calls.map(
       (call: any[]) => call[0].constructor.name,
@@ -179,6 +192,7 @@ describe('BucketProvisioner.provision — no browser origins', () => {
       connection: defaultOptions.connection,
     });
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-temp-unbrowsed',
       accessType: 'temp',
     });
@@ -198,6 +212,7 @@ describe('BucketProvisioner.provision — no browser origins', () => {
       allowedOrigins: [],
     });
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-browsed',
       accessType: 'private',
       allowedOrigins: ['https://app.example.com'],
@@ -215,6 +230,7 @@ describe('BucketProvisioner.provision — public bucket', () => {
   it('provisions a public bucket with correct steps', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-public',
       accessType: 'public',
       publicUrlPrefix: 'https://cdn.example.com',
@@ -235,6 +251,7 @@ describe('BucketProvisioner.provision — public bucket', () => {
   it('applies public-read bucket policy', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-public',
       accessType: 'public',
     });
@@ -254,6 +271,7 @@ describe('BucketProvisioner.provision — public bucket', () => {
   it('returns null publicUrlPrefix when not provided', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-public',
       accessType: 'public',
     });
@@ -265,6 +283,7 @@ describe('BucketProvisioner.provision — temp bucket', () => {
   it('provisions a temp bucket with lifecycle rules', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-temp',
       accessType: 'temp',
     });
@@ -281,6 +300,7 @@ describe('BucketProvisioner.provision — temp bucket', () => {
   it('calls PutBucketLifecycleConfiguration for temp buckets', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-temp',
       accessType: 'temp',
     });
@@ -294,6 +314,7 @@ describe('BucketProvisioner.provision — temp bucket', () => {
   it('uses upload CORS (PUT + GET + HEAD) for temp buckets', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-temp',
       accessType: 'temp',
     });
@@ -307,6 +328,7 @@ describe('BucketProvisioner.provision — versioning', () => {
   it('enables versioning when requested', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-versioned',
       accessType: 'private',
       versioning: true,
@@ -323,6 +345,7 @@ describe('BucketProvisioner.provision — versioning', () => {
   it('skips versioning when not requested', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-no-version',
       accessType: 'private',
     });
@@ -340,6 +363,7 @@ describe('BucketProvisioner.provision — region handling', () => {
   it('uses connection region by default', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-region',
       accessType: 'private',
     });
@@ -350,6 +374,7 @@ describe('BucketProvisioner.provision — region handling', () => {
   it('overrides region with per-bucket option', async () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'test-region',
       accessType: 'private',
       region: 'eu-west-1',
@@ -370,13 +395,15 @@ describe('BucketProvisioner.createBucket — error handling', () => {
     await provisioner.createBucket('existing-bucket');
   });
 
-  it('tolerates BucketAlreadyExists', async () => {
+  it('refuses a name another account holds (BucketAlreadyExists)', async () => {
     const err = new Error('Bucket already exists');
     (err as any).name = 'BucketAlreadyExists';
     mockSend.mockRejectedValueOnce(err);
 
     const provisioner = new BucketProvisioner(defaultOptions);
-    await provisioner.createBucket('existing-bucket');
+    await expect(provisioner.createBucket('existing-bucket')).rejects.toMatchObject({
+      code: 'BUCKET_ALREADY_EXISTS',
+    });
   });
 
   it('wraps unknown errors in ProvisionerError', async () => {
@@ -394,6 +421,119 @@ describe('BucketProvisioner.createBucket — error handling', () => {
     // Reset to default
     mockSend.mockReset();
     mockSend.mockResolvedValue({});
+  });
+});
+
+describe('BucketProvisioner.claimBucket — ownership', () => {
+  const sendByCommand = (responses: Record<string, () => any>) =>
+    mockSend.mockImplementation(async (command: any) => {
+      const respond = responses[command.constructor.name];
+      return respond ? respond() : {};
+    });
+
+  const noTagSet = () => {
+    const err = new Error('The TagSet does not exist');
+    (err as any).name = 'NoSuchTagSet';
+    throw err;
+  };
+
+  const sentCommands = () =>
+    mockSend.mock.calls.map((call: any[]) => call[0].constructor.name);
+
+  it('claims an untagged, empty bucket by tagging it with the owner', async () => {
+    sendByCommand({
+      GetBucketTaggingCommand: noTagSet,
+      ListObjectsV2Command: () => ({ KeyCount: 0 }),
+    });
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.claimBucket('fresh-bucket', 'logical-bucket-1');
+
+    expect(sentCommands()).toContain('PutBucketTaggingCommand');
+  });
+
+  it('accepts a bucket already tagged for the same owner (a retry)', async () => {
+    sendByCommand({
+      GetBucketTaggingCommand: () => ({
+        TagSet: [{ Key: 'constructive-owner', Value: 'logical-bucket-1' }],
+      }),
+    });
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.claimBucket('mine', 'logical-bucket-1');
+
+    expect(sentCommands()).toEqual(['GetBucketTaggingCommand']);
+  });
+
+  it('refuses a bucket tagged for another owner, before configuring anything', async () => {
+    sendByCommand({
+      GetBucketTaggingCommand: () => ({
+        TagSet: [{ Key: 'constructive-owner', Value: 'logical-bucket-2' }],
+      }),
+    });
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(
+      provisioner.provision({
+        owner: 'logical-bucket-1',
+        bucketName: 'theirs',
+        accessType: 'public',
+      }),
+    ).rejects.toMatchObject({ code: 'BUCKET_OWNED_ELSEWHERE' });
+
+    expect(sentCommands()).toEqual(['CreateBucketCommand', 'GetBucketTaggingCommand']);
+  });
+
+  it('refuses an untagged bucket that already holds objects', async () => {
+    sendByCommand({
+      GetBucketTaggingCommand: noTagSet,
+      ListObjectsV2Command: () => ({ KeyCount: 1, Contents: [{ Key: 'a' }] }),
+    });
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(
+      provisioner.claimBucket('legacy', 'logical-bucket-1'),
+    ).rejects.toMatchObject({ code: 'BUCKET_OWNED_ELSEWHERE' });
+    expect(sentCommands()).not.toContain('PutBucketTaggingCommand');
+  });
+
+  it('requires an owner', async () => {
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(provisioner.claimBucket('any', '')).rejects.toMatchObject({
+      code: 'INVALID_CONFIG',
+    });
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+});
+
+describe('BucketProvisioner.bucketOwner', () => {
+  it('reads the owner tag', async () => {
+    mockSend.mockResolvedValueOnce({
+      TagSet: [
+        { Key: 'team', Value: 'x' },
+        { Key: 'constructive-owner', Value: 'logical-bucket-1' },
+      ],
+    });
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(provisioner.bucketOwner('b')).resolves.toBe('logical-bucket-1');
+  });
+
+  it('returns null for an untagged bucket', async () => {
+    const err = new Error('none');
+    (err as any).name = 'NoSuchTagSet';
+    mockSend.mockRejectedValueOnce(err);
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(provisioner.bucketOwner('b')).resolves.toBeNull();
+  });
+
+  it('reports a missing bucket as BUCKET_NOT_FOUND', async () => {
+    const err = new Error('gone');
+    (err as any).name = 'NoSuchBucket';
+    mockSend.mockRejectedValueOnce(err);
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await expect(provisioner.bucketOwner('b')).rejects.toMatchObject({
+      code: 'BUCKET_NOT_FOUND',
+    });
   });
 });
 
@@ -565,6 +705,7 @@ describe('BucketProvisioner — S3 provider', () => {
     });
 
     const result = await provisioner.provision({
+      owner: 'logical-bucket-1',
       bucketName: 'aws-bucket',
       accessType: 'private',
     });
@@ -776,12 +917,17 @@ describe('BucketProvisioner — error propagation', () => {
   it('wraps PutPublicAccessBlock failure as POLICY_FAILED', async () => {
     // CreateBucket succeeds
     mockSend.mockResolvedValueOnce({});
+    // GetBucketTagging (untagged), ListObjectsV2 (empty), PutBucketTagging
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
     // PutPublicAccessBlock fails
     mockSend.mockRejectedValueOnce(new Error('Access denied'));
 
     const provisioner = new BucketProvisioner(defaultOptions);
     try {
       await provisioner.provision({
+        owner: 'logical-bucket-1',
         bucketName: 'fail-bucket',
         accessType: 'private',
       });
@@ -795,6 +941,10 @@ describe('BucketProvisioner — error propagation', () => {
   it('wraps PutBucketCors failure as CORS_FAILED', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy succeed
     mockSend.mockResolvedValueOnce({});
+    // GetBucketTagging (untagged), ListObjectsV2 (empty), PutBucketTagging
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     // PutBucketCors fails
@@ -803,6 +953,7 @@ describe('BucketProvisioner — error propagation', () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     try {
       await provisioner.provision({
+        owner: 'logical-bucket-1',
         bucketName: 'cors-fail',
         accessType: 'private',
       });
@@ -816,6 +967,10 @@ describe('BucketProvisioner — error propagation', () => {
   it('wraps PutBucketVersioning failure as VERSIONING_FAILED', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy, PutBucketCors succeed
     mockSend.mockResolvedValueOnce({});
+    // GetBucketTagging (untagged), ListObjectsV2 (empty), PutBucketTagging
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
@@ -825,6 +980,7 @@ describe('BucketProvisioner — error propagation', () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     try {
       await provisioner.provision({
+        owner: 'logical-bucket-1',
         bucketName: 'version-fail',
         accessType: 'private',
         versioning: true,
@@ -839,6 +995,10 @@ describe('BucketProvisioner — error propagation', () => {
   it('wraps PutBucketLifecycleConfiguration failure as LIFECYCLE_FAILED', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy, PutBucketCors succeed
     mockSend.mockResolvedValueOnce({});
+    // GetBucketTagging (untagged), ListObjectsV2 (empty), PutBucketTagging
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
+    mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
@@ -848,6 +1008,7 @@ describe('BucketProvisioner — error propagation', () => {
     const provisioner = new BucketProvisioner(defaultOptions);
     try {
       await provisioner.provision({
+        owner: 'logical-bucket-1',
         bucketName: 'lifecycle-fail',
         accessType: 'temp',
       });
