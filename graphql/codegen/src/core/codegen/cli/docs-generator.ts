@@ -16,6 +16,8 @@ import {
   getReadmeHeader,
 } from '../docs-utils';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getPrimaryKeyInfo,
   getScalarFields,
   getTableNames,
@@ -137,10 +139,10 @@ export function generateReadme(
       }
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
       }
-      if (table.query?.bulkUpsert) {
+      if (getBulkUpsertMutationName(table)) {
         lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
       }
       if (table.query?.bulkUpdate) {
@@ -474,8 +476,8 @@ export function generateSkills(
           ...(table.query?.create !== null ? [`${toolName} ${kebab} create ${createFlags}`] : []),
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
           `${toolName} ${kebab} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
-          ...(table.query?.bulkInsert ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
-          ...(table.query?.bulkUpsert ? [`${toolName} ${kebab} bulk-upsert --data '<JSON array>'`] : []),
+          ...(getBulkInsertMutationName(table) ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
+          ...(getBulkUpsertMutationName(table) ? [`${toolName} ${kebab} bulk-upsert --data '<JSON array>'`] : []),
           ...(table.query?.bulkUpdate ? [`${toolName} ${kebab} bulk-update --where '<JSON>' --data '<JSON>'`] : []),
           ...(table.query?.bulkDelete ? [`${toolName} ${kebab} bulk-delete --where '<JSON>'`] : []),
         ],
@@ -812,10 +814,10 @@ export function generateMultiTargetReadme(
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
       }
-      if (table.query?.bulkUpsert) {
+      if (getBulkUpsertMutationName(table)) {
         lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
       }
       if (table.query?.bulkUpdate) {

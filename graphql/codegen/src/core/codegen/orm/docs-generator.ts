@@ -15,6 +15,8 @@ import {
   pkPlaceholder,
 } from '../docs-utils';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getPrimaryKeyInfo,
   getScalarFields,
   getTableNames,
@@ -48,8 +50,8 @@ export function generateOrmReadme(
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const bulkOps: string[] = [];
-    if (table.query?.bulkInsert) bulkOps.push('bulkCreate');
-    if (table.query?.bulkUpsert) bulkOps.push('bulkUpsert');
+    if (getBulkInsertMutationName(table)) bulkOps.push('bulkCreate');
+    if (getBulkUpsertMutationName(table)) bulkOps.push('bulkUpsert');
     if (table.query?.bulkUpdate) bulkOps.push('bulkUpdate');
     if (table.query?.bulkDelete) bulkOps.push('bulkDelete');
     const ops = ['findMany', 'findOne', ...(table.query?.create !== null ? ['create'] : []), 'update', 'delete', ...bulkOps].join(', ');
@@ -113,14 +115,14 @@ export function generateOrmReadme(
       lines.push(
         `const deleted = await db.${singularName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute();`,
       );
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push('');
         lines.push(`// Bulk Create`);
         lines.push(
           `const bulkCreated = await db.${singularName}.bulkCreate({ data: [{ ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }], select: { ${pk.name}: true } }).execute();`,
         );
       }
-      if (table.query?.bulkUpsert) {
+      if (getBulkUpsertMutationName(table)) {
         lines.push('');
         lines.push(`// Bulk Upsert`);
         lines.push(
@@ -303,10 +305,10 @@ export function generateOrmSkills(
       : ormSkillBaseDesc;
 
     const bulkUsageLines: string[] = [];
-    if (table.query?.bulkInsert) {
+    if (getBulkInsertMutationName(table)) {
       bulkUsageLines.push(`db.${modelName}.bulkCreate({ data: [...], select: { id: true } }).execute()`);
     }
-    if (table.query?.bulkUpsert) {
+    if (getBulkUpsertMutationName(table)) {
       bulkUsageLines.push(`db.${modelName}.bulkUpsert({ data: [...], onConflict: { constraint: '...', action: 'UPDATE' }, select: { id: true } }).execute()`);
     }
     if (table.query?.bulkUpdate) {
@@ -385,7 +387,7 @@ export function generateOrmSkills(
 
   // Generate the overview SKILL.md
   const tableNames = tables.map((t) => lcFirst(getTableNames(t).singularName));
-  const hasBulkTables = tables.some((t) => t.query?.bulkInsert || t.query?.bulkUpsert || t.query?.bulkUpdate || t.query?.bulkDelete);
+  const hasBulkTables = tables.some((t) => getBulkInsertMutationName(t) || getBulkUpsertMutationName(t) || t.query?.bulkUpdate || t.query?.bulkDelete);
   files.push({
     fileName: `${skillName}/SKILL.md`,
     content: buildSkillFile(

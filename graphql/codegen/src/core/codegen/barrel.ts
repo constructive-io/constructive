@@ -10,12 +10,12 @@ import { addJSDocComment, generateCode } from './babel-ast';
 import { getOperationHookName } from './type-resolver';
 import {
   getCreateMutationHookName,
-  hasCreateMutation,
   getDeleteMutationHookName,
   getListQueryHookName,
   getSingleQueryHookName,
   getSubscriptionHookName,
   getUpdateMutationHookName,
+  hasCreateMutation,
   hasValidPrimaryKey,
 } from './utils';
 

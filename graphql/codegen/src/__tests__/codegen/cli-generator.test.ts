@@ -252,6 +252,35 @@ describe('cli-generator', () => {
 
 const allCustomOps: Operation[] = [currentUserQuery, loginMutation];
 
+describe('cli-generator without a create mutation', () => {
+  it('neither offers create nor imports Create<Table>Input', () => {
+    const fileTable = createTable({
+      name: 'File',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'filename', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'files',
+        one: 'file',
+        create: null,
+        update: 'updateFile',
+        delete: 'deleteFile',
+      },
+    });
+    const { files } = generateCli({
+      tables: [fileTable],
+      customOperations: { queries: [], mutations: [] },
+      config: { cli: { toolName: 'myapp' } },
+    });
+    const file = files.find((f) => f.fileName === 'commands/file.ts');
+    expect(file).toBeDefined();
+    expect(file!.content).not.toContain('CreateFileInput');
+    expect(file!.content).not.toContain("'create'");
+    expect(file!.content).toContain('FilePatch');
+  });
+});
+
 describe('cli docs generator', () => {
   it('generates CLI README', () => {
     const readme = generateCliReadme([carTable, driverTable], allCustomOps, 'myapp');

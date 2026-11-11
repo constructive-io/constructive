@@ -418,6 +418,18 @@ describe('generateInputTypesFile', () => {
     expect(result.content).toContain('UpdateFileInput');
   });
 
+  it('generates a custom mutation\'s Create<Table>Input from the schema when the table has no create mutation', () => {
+    const principalTable = { ...userTable, name: 'Principal', query: { ...userTable.query, create: null as string | null } };
+    const registry = new Map(sampleTypeRegistry);
+    registry.set('CreatePrincipalInput', {
+      kind: 'INPUT_OBJECT',
+      name: 'CreatePrincipalInput',
+      inputFields: [{ name: 'name', type: createNonNull(createTypeRef('SCALAR', 'String')) }],
+    });
+    const result = generateInputTypesFile(registry, new Set(['CreatePrincipalInput']), [principalTable]);
+    expect(result.content).toMatch(/export interface CreatePrincipalInput \{\s*name: string;\s*\}/);
+  });
+
   it('handles empty tables array', () => {
     const result = generateInputTypesFile(new Map(), new Set());
     expect(result.content).toMatchSnapshot();

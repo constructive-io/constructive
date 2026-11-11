@@ -196,6 +196,15 @@ export function hasCreateMutation(table: Table): boolean {
   return table.query?.create !== null;
 }
 
+/** Bulk create/upsert take `Create<Table>Input`, so a table without create has neither. */
+export function getBulkInsertMutationName(table: Table): string | null {
+  return hasCreateMutation(table) ? table.query?.bulkInsert ?? null : null;
+}
+
+export function getBulkUpsertMutationName(table: Table): string | null {
+  return hasCreateMutation(table) ? table.query?.bulkUpsert ?? null : null;
+}
+
 /**
  * Get the GraphQL mutation name for creating
  */

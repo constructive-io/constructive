@@ -1657,7 +1657,7 @@ function buildTableCrudTypeNames(tables: Table[]): Set<string> {
   const crudTypes = new Set<string>();
   for (const table of tables) {
     const { typeName } = getTableNames(table);
-    crudTypes.add(`Create${typeName}Input`);
+    if (hasCreateMutation(table)) crudTypes.add(`Create${typeName}Input`);
     crudTypes.add(`Update${typeName}Input`);
     crudTypes.add(`Delete${typeName}Input`);
     crudTypes.add(`${typeName}Filter`);
