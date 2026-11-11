@@ -839,7 +839,6 @@ export async function processSingleFile(
     mimeType: contentType,
     size,
     filename: filename || null,
-    previousVersionId,
     path: derivedPath,
   });
 

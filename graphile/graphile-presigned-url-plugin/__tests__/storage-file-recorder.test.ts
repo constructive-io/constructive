@@ -75,7 +75,7 @@ describe('recordManagedFile', () => {
     expect(query.mock.calls[0][0].text).not.toContain('is_public');
   });
 
-  it('appends supported version and path arguments by name', async () => {
+  it('appends a supported path argument by name and never a version link', async () => {
     const query = jest.fn().mockResolvedValue({ rows: [{ id: 'file-id' }] });
 
     await recordManagedFile(
@@ -83,15 +83,13 @@ describe('recordManagedFile', () => {
       storageConfig({ hasVersioning: true, hasPathShares: true }),
       {
         ...input(),
-        previousVersionId: '44444444-4444-4444-4444-444444444444',
         path: 'assets',
       },
     );
 
+    expect(query.mock.calls[0][0].text).not.toContain('previous_version_id');
     expect(query.mock.calls[0][0]).toEqual({
-      text: expect.stringMatching(
-        /previous_version_id := \$8::uuid, path := \$9::text/,
-      ),
+      text: expect.stringMatching(/upload := \$7::jsonb, path := \$8::text\)/),
       values: [
         input().bucketId,
         input().key,
@@ -100,28 +98,9 @@ describe('recordManagedFile', () => {
         input().size,
         input().filename,
         null,
-        '44444444-4444-4444-4444-444444444444',
         'assets',
       ],
     });
-  });
-
-  it('fails loudly when a version chain is requested on a non-versioned module', async () => {
-    const query = jest.fn();
-
-    await expect(
-      recordManagedFile(
-        { query },
-        storageConfig(),
-        {
-          ...input(),
-          previousVersionId: '44444444-4444-4444-4444-444444444444',
-        },
-      ),
-    ).rejects.toThrow(
-      'STORAGE_VERSIONING_UNSUPPORTED: storage module 11111111-1111-1111-1111-111111111111 (app_files)',
-    );
-    expect(query).not.toHaveBeenCalled();
   });
 
   it('fails loudly when a path is requested on a module without path shares', async () => {
