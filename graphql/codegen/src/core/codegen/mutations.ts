@@ -61,6 +61,7 @@ import {
   getUpdateMutationFileName,
   getUpdateMutationHookName,
   getUpdateMutationName,
+  hasCreateMutation,
   hasValidPrimaryKey,
   lcFirst,
 } from './utils';
@@ -124,6 +125,7 @@ export function generateCreateMutationHook(
   const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
 
   if (!reactQueryEnabled) return null;
+  if (!hasCreateMutation(table)) return null;
 
   const { typeName, singularName } = getTableNames(table);
   const hookName = getCreateMutationHookName(table);

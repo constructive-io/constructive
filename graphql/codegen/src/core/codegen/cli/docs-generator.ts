@@ -132,7 +132,9 @@ export function generateReadme(
         lines.push(`| \`search <query>\` | Search ${singularName} records |`);
       }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
-      lines.push(`| \`create\` | Create a new ${singularName} |`);
+      if (table.query?.create !== null) {
+        lines.push(`| \`create\` | Create a new ${singularName} |`);
+      }
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
       if (table.query?.bulkInsert) {
@@ -469,7 +471,7 @@ export function generateSkills(
             ? [`${toolName} ${kebab} search <query>`]
             : []),
           `${toolName} ${kebab} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
-          `${toolName} ${kebab} create ${createFlags}`,
+          ...(table.query?.create !== null ? [`${toolName} ${kebab} create ${createFlags}`] : []),
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
           `${toolName} ${kebab} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
           ...(table.query?.bulkInsert ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
@@ -503,12 +505,14 @@ export function generateSkills(
             code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
           },
           ...buildSearchExamples(skillSpecialGroups, toolName, kebab),
-          {
-            description: `Create a ${singularName}`,
-            code: [
-              `${toolName} ${kebab} create ${createFlags}`,
-            ],
-          },
+          ...(table.query?.create !== null
+            ? [{
+              description: `Create a ${singularName}`,
+              code: [
+                `${toolName} ${kebab} create ${createFlags}`,
+              ],
+            }]
+            : []),
           {
             description: `Get a ${singularName} by ${pk.name}`,
             code: [`${toolName} ${kebab} get --${pk.name} <value>`],

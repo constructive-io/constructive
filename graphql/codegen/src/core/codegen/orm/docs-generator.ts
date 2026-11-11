@@ -52,7 +52,7 @@ export function generateOrmReadme(
     if (table.query?.bulkUpsert) bulkOps.push('bulkUpsert');
     if (table.query?.bulkUpdate) bulkOps.push('bulkUpdate');
     if (table.query?.bulkDelete) bulkOps.push('bulkDelete');
-    const ops = ['findMany', 'findOne', 'create', 'update', 'delete', ...bulkOps].join(', ');
+    const ops = ['findMany', 'findOne', ...(table.query?.create !== null ? ['create'] : []), 'update', 'delete', ...bulkOps].join(', ');
     lines.push(
       `| \`${singularName}\` | ${ops} |`,
     );
@@ -97,11 +97,13 @@ export function generateOrmReadme(
         `const item = await db.${singularName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
       );
       lines.push('');
-      lines.push(`// Create`);
-      lines.push(
-        `const created = await db.${singularName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { ${pk.name}: true } }).execute();`,
-      );
-      lines.push('');
+      if (table.query?.create !== null) {
+        lines.push(`// Create`);
+        lines.push(
+          `const created = await db.${singularName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { ${pk.name}: true } }).execute();`,
+        );
+        lines.push('');
+      }
       lines.push(`// Update`);
       lines.push(
         `const updated = await db.${singularName}.update({ where: { ${pk.name}: ${pkPlaceholder(pk)} }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { ${pk.name}: true } }).execute();`,
@@ -323,7 +325,7 @@ export function generateOrmSkills(
         usage: [
           `db.${modelName}.findMany({ select: { id: true } }).execute()`,
           `db.${modelName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { id: true } }).execute()`,
-          `db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { id: true } }).execute()`,
+          ...(table.query?.create !== null ? [`db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { id: true } }).execute()`] : []),
           `db.${modelName}.update({ where: { ${pk.name}: ${pkPlaceholder(pk)} }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { id: true } }).execute()`,
           `db.${modelName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute()`,
           ...bulkUsageLines,
@@ -337,15 +339,17 @@ export function generateOrmSkills(
               '}).execute();',
             ],
           },
-          {
-            description: `Create a ${singularName}`,
-            code: [
-              `const item = await db.${modelName}.create({`,
-              `  data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} },`,
-              `  select: { ${pk.name}: true }`,
-              '}).execute();',
-            ],
-          },
+          ...(table.query?.create !== null
+            ? [{
+              description: `Create a ${singularName}`,
+              code: [
+                `const item = await db.${modelName}.create({`,
+                `  data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} },`,
+                `  select: { ${pk.name}: true }`,
+                '}).execute();',
+              ],
+            }]
+            : []),
         ],
       }),
     });

@@ -100,6 +100,30 @@ describe('model-generator', () => {
     expect(result.content).not.toContain('delete(');
   });
 
+  it('generates model without create when the schema exposes no create mutation', () => {
+    const table = createTable({
+      name: 'File',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'filename', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'files',
+        one: 'file',
+        create: null,
+        update: 'updateFile',
+        delete: 'deleteFile',
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    expect(result.content).not.toContain('create<');
+    expect(result.content).not.toContain('"createFile"');
+    expect(result.content).toContain('update<');
+    expect(result.content).toContain('delete<');
+  });
+
   it('handles custom query/mutation names', () => {
     const table = createTable({
       name: 'Organization',

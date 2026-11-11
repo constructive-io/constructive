@@ -190,6 +190,13 @@ export function getSingleRowQueryName(table: Table): string {
 }
 
 /**
+ * Whether the schema exposes a create mutation for the table
+ */
+export function hasCreateMutation(table: Table): boolean {
+  return table.query?.create !== null;
+}
+
+/**
  * Get the GraphQL mutation name for creating
  */
 export function getCreateMutationName(table: Table): string {

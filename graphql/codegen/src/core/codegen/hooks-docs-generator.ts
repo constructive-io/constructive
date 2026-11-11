@@ -80,9 +80,11 @@ export function generateHooksReadme(
         `| \`${getSingleQueryHookName(table)}\` | Query | ${table.description || `Get one ${singularName}`} |`,
       );
     }
-    lines.push(
-      `| \`${getCreateMutationHookName(table)}\` | Mutation | ${table.description || `Create a ${singularName}`} |`,
-    );
+    if (table.query?.create !== null) {
+      lines.push(
+        `| \`${getCreateMutationHookName(table)}\` | Mutation | ${table.description || `Create a ${singularName}`} |`,
+      );
+    }
     if (hasValidPrimaryKey(table)) {
       lines.push(
         `| \`${getUpdateMutationHookName(table)}\` | Mutation | ${table.description || `Update a ${singularName}`} |`,
@@ -154,17 +156,19 @@ export function generateHooksReadme(
         lines.push('');
       }
 
-      lines.push(`// Create a ${singularName}`);
-      lines.push(
-        `const { mutate: create } = ${getCreateMutationHookName(table)}({`,
-      );
-      lines.push(
-        `  selection: { fields: { ${pk.name}: true } },`,
-      );
-      lines.push('});');
-      lines.push(
-        `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
-      );
+      if (table.query?.create !== null) {
+        lines.push(`// Create a ${singularName}`);
+        lines.push(
+          `const { mutate: create } = ${getCreateMutationHookName(table)}({`,
+        );
+        lines.push(
+          `  selection: { fields: { ${pk.name}: true } },`,
+        );
+        lines.push('});');
+        lines.push(
+          `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
+        );
+      }
       if (table.query?.bulkInsert) {
         lines.push('');
         lines.push(`// Bulk create ${pluralName}`);
@@ -309,7 +313,7 @@ export function generateHooksSkills(
               `${getSingleQueryHookName(table)}({ ${pk.name}: ${pkPlaceholder(pk)}, selection: { fields: { ${selectFields} } } })`,
             ]
             : []),
-          `${getCreateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
+          ...(table.query?.create !== null ? [`${getCreateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`] : []),
           ...(hasValidPrimaryKey(table)
             ? [
               `${getUpdateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
@@ -330,15 +334,17 @@ export function generateHooksSkills(
               '});',
             ],
           },
-          {
-            description: `Create a ${singularName}`,
-            code: [
-              `const { mutate } = ${getCreateMutationHookName(table)}({`,
-              `  selection: { fields: { ${pk.name}: true } },`,
-              '});',
-              `mutate({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
-            ],
-          },
+          ...(table.query?.create !== null
+            ? [{
+              description: `Create a ${singularName}`,
+              code: [
+                `const { mutate } = ${getCreateMutationHookName(table)}({`,
+                `  selection: { fields: { ${pk.name}: true } },`,
+                '});',
+                `mutate({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
+              ],
+            }]
+            : []),
         ],
       }),
     });
