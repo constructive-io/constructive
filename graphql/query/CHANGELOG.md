@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.24.0...@constructive-io/graphql-query@4.24.1) (2026-11-11)
+
+### Bug Fixes
+
+- **codegen:** create is optional like update/delete — no create op, hook, model method, CLI command or docs for a table without one ([62c6315](https://github.com/constructive-io/constructive/commit/62c631583a7176966a4a123e7133cca666615e7a))
+
 # [4.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.23.0...@constructive-io/graphql-query@4.24.0) (2026-11-11)
 
 ### Features

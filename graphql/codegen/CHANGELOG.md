@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.25](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.24...@constructive-io/graphql-codegen@5.25.25) (2026-11-11)
+
+### Bug Fixes
+
+- **codegen:** create is optional like update/delete — no create op, hook, model method, CLI command or docs for a table without one ([62c6315](https://github.com/constructive-io/constructive/commit/62c631583a7176966a4a123e7133cca666615e7a))
+- **codegen:** no Create<Table>Input for a table without a create mutation ([6993575](https://github.com/constructive-io/constructive/commit/6993575c165b9c257bf93fcb412521567953586f))
+
 ## [5.25.24](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.23...@constructive-io/graphql-codegen@5.25.24) (2026-11-11)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

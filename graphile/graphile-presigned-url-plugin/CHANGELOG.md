@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.27.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.0...graphile-presigned-url-plugin@1.27.1) (2026-11-11)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** never pass previous_version_id to the recorder — the files table derives it from the head at the key ([a75e30e](https://github.com/constructive-io/constructive/commit/a75e30e404e9b03a753a5f63e7ef9771627adcb2))
+
 # [1.27.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.26.0...graphile-presigned-url-plugin@1.27.0) (2026-11-11)
 
 ### Features
