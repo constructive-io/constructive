@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.26](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.25...@constructive-io/graphql-codegen@5.25.26) (2026-11-11)
+
+### Bug Fixes
+
+- **codegen:** a custom mutation's Create<Table>Input is generated from the schema when the table has no create mutation ([b9473c6](https://github.com/constructive-io/constructive/commit/b9473c6bd0931e19b2a695b21e55f5c1049e8106))
+- **codegen:** a table without a create mutation has no bulkCreate/bulkUpsert; generated ORM for it type-checks ([a8a0176](https://github.com/constructive-io/constructive/commit/a8a0176df8d9196cf3921795c38f1e90efd1965c))
+- **codegen:** no Create<Table>Input import in the ORM model or CLI command of a table without a create mutation ([fb73284](https://github.com/constructive-io/constructive/commit/fb7328417e4bdb1243706819823364ae0efebcfa))
+
 ## [5.25.25](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.24...@constructive-io/graphql-codegen@5.25.25) (2026-11-11)
 
 ### Bug Fixes
