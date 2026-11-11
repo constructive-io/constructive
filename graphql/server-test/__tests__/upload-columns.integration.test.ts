@@ -53,6 +53,7 @@ const UPLOAD_APP_FILE = `
       fileId
       key
       uploadUrl
+      uploadHeaders
     }
   }
 `;
@@ -151,8 +152,8 @@ describe('image / upload / attachment columns', () => {
       }
     });
     expect(uploaded.body.errors).toBeUndefined();
-    const { fileId, key, uploadUrl } = uploaded.body.data.uploadAppFile;
-    expect((await putToPresignedUrl(uploadUrl, content, 'text/plain', { contentHash })).ok).toBe(true);
+    const { fileId, key, uploadUrl, uploadHeaders } = uploaded.body.data.uploadAppFile;
+    expect((await putToPresignedUrl(uploadUrl, content, 'text/plain', { headers: uploadHeaders })).ok).toBe(true);
     // The confirm worker is not part of this fixture; it is what moves a row
     // from `requested` to `uploaded` once it has inspected the object.
     await pg.query(`UPDATE "${storageSchema}".app_files SET status = 'uploaded' WHERE id = $1`, [fileId]);
