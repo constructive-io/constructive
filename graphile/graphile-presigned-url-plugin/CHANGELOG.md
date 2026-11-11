@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.27.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.26.0...graphile-presigned-url-plugin@1.27.0) (2026-11-11)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file row (x-amz-meta-upload-id) and return uploadHeaders ([7a879d3](https://github.com/constructive-io/constructive/commit/7a879d3840bb1cbea7829652678fd31ae72c6ead))
+
 # [1.26.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.25.1...graphile-presigned-url-plugin@1.26.0) (2026-11-10)
 
 ### Features
