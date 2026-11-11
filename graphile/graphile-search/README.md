@@ -53,10 +53,20 @@ const preset = {
 - **4 search algorithms** via adapters: tsvector (ts_rank), BM25 (pg_textsearch), pg_trgm (similarity), pgvector (distance)
 - **Per-algorithm score fields**: `{column}{Algorithm}{Metric}` (e.g. `bodyBm25Score`, `titleTrgmSimilarity`)
 - **Composite `searchScore`**: Normalized 0..1 aggregating all active search signals
-- **OrderBy enums**: `{COLUMN}_{ALGORITHM}_{METRIC}_ASC/DESC` + `SEARCH_SCORE_ASC/DESC`
+- **OrderBy enums**: `{COLUMN}_{ALGORITHM}_{METRIC}_ASC/DESC` + `SEARCH_SCORE_ASC/DESC` (see [Ordering by a score](#ordering-by-a-score))
 - **Filter fields**: `{algorithm}{Column}` on connection filter input types
 - **Hybrid search**: Combine multiple algorithms in a single query
 - **Zero config**: Auto-discovers columns and indexes per adapter
+
+## Ordering by a score
+
+A search orderBy sorts by the score its filter computes, so it needs that filter in `where`: `BODY_BM25_SCORE_ASC` needs `bm25Body` (or `unifiedSearch`), `SEARCH_SCORE_DESC` needs any search filter. A search orderBy without its filter is an error that names the filter to add.
+
+`SEARCH_SCORE_ASC/DESC` orders by the same Reciprocal Rank Fusion sum that `searchScore` displays, so `first`/`offset` paging returns the best rows first. Because the sum is built from window functions, `SEARCH_SCORE_*` cannot be combined with cursor paging (`after`/`before`); use `offset`, or a per-adapter orderBy for cursors.
+
+When a column is scored by both its own filter (e.g. `bm25Body`) and `unifiedSearch`, the explicit filter's score is the one displayed and ordered by; the column is scored once per query.
+
+Limitation: in a *literal* `orderBy` list, plain column terms are planned before search-score terms, so `[EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC]` sorts by `ROW_ID` first. Pass `orderBy` as a GraphQL variable to keep the requested order, or do not mix search terms with column terms in a literal list.
 
 ## Architecture
 

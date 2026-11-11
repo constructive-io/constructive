@@ -118,6 +118,14 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
       expect(ids(top)).toEqual(ids(sortedBy(all, 'searchScore', 'DESC')).slice(0, 2));
     });
 
+    it('rejects cursor paging with a message pointing at offset', async () => {
+      const result = await query<Result>(
+        `query($w: DocumentFilter) { allDocuments(where: $w, orderBy: [SEARCH_SCORE_DESC], first: 2, after: "WyJuYXR1cmFsIiwxXQ==") { ${NODES} } }`,
+        { w: UNIFIED },
+      );
+      expect(result.errors?.map((e: any) => e.message).join('\n')).toMatch(/SEARCH_SCORE_DESC.*after\/before.*offset/);
+    });
+
     it('orders by searchScore when several explicit filters are active', async () => {
       const where = {
         bm25Body: { query: 'learning' },
@@ -133,12 +141,16 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
   });
 
   describe('a column filtered explicitly and by unifiedSearch is scored once', () => {
-    const where = { unifiedSearch: 'learning', bm25Body: { query: 'machine' } };
+    // Both filters match rows 1, 2, 3 and 5; the explicit query scores
+    // row 1 differently from unifiedSearch's "learning".
+    const EXPLICIT = 'learning systems data';
+    const where = { unifiedSearch: 'learning', bm25Body: { query: EXPLICIT } };
 
     async function explicitScores(): Promise<Map<number, number>> {
       const { rows } = await pg.query(
-        `SELECT id, (body <@> to_bm25query('machine', '"unified_search_test"."idx_documents_body_bm25"'))::float8 AS score
+        `SELECT id, (body <@> to_bm25query($1, '"unified_search_test"."idx_documents_body_bm25"'))::float8 AS score
          FROM unified_search_test.documents`,
+        [EXPLICIT],
       );
       return new Map(rows.map((r: any) => [r.id, Number(r.score)]));
     }
@@ -150,7 +162,7 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
       const expected = await explicitScores();
       const nodes = await nodesFor(q, { w: where, ...extra });
 
-      expect(nodes.length).toBeGreaterThan(2);
+      expect(ids(nodes).sort()).toEqual([1, 2, 3, 5]);
       for (const node of nodes) {
         expect(node.bodyBm25Score).toBeCloseTo(expected.get(node.rowId)!, 6);
       }
@@ -159,8 +171,8 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
 
     it('the explicit filter\'s score feeds searchScore whichever filter is listed first', async () => {
       const q = `query($w: DocumentFilter) { allDocuments(where: $w, orderBy: [SEARCH_SCORE_DESC]) { ${NODES} } }`;
-      const explicitFirst = await nodesFor(q, { w: { bm25Body: { query: 'machine' }, unifiedSearch: 'learning' } });
-      const unifiedFirst = await nodesFor(q, { w: { unifiedSearch: 'learning', bm25Body: { query: 'machine' } } });
+      const explicitFirst = await nodesFor(q, { w: { bm25Body: { query: EXPLICIT }, unifiedSearch: 'learning' } });
+      const unifiedFirst = await nodesFor(q, { w: { unifiedSearch: 'learning', bm25Body: { query: EXPLICIT } } });
 
       expect(ids(explicitFirst)).toEqual(ids(unifiedFirst));
       expect(explicitFirst.map((n) => n.searchScore)).toEqual(unifiedFirst.map((n) => n.searchScore));
@@ -222,6 +234,15 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
         { w: { or: [{ bm25Body: { query: 'learning' } }, { title: { equalTo: 'none' } }] } },
       );
       expect(nodes.length).toBeGreaterThan(0);
+    });
+
+    it('a variable orderBy keeps a search term ahead of a column term', async () => {
+      const nodes = await nodesFor(
+        `query($w: DocumentFilter, $ob: [DocumentOrderBy!]) { allDocuments(where: $w, orderBy: $ob) { nodes { rowId searchScore bodyBm25Score titleTrgmSimilarity } } }`,
+        { w: { trgmTitle: { value: 'Learning', threshold: 0.05 } }, ob: ['TITLE_TRGM_SIMILARITY_DESC', 'ROW_ID_ASC'] },
+      );
+      expect(ids(nodes)).toEqual(ids(sortedBy(nodes, 'titleTrgmSimilarity', 'DESC')));
+      expect(ids(nodes)).not.toEqual([...ids(nodes)].sort((a, b) => a - b));
     });
 
     it('a plain column orderBy without any filter still works', async () => {
