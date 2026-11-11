@@ -69,6 +69,7 @@ const UPLOAD_FILE = `
   mutation UploadFile($input: UploadFileInput!) {
     uploadFile(input: $input) {
       uploadUrl
+      uploadHeaders
       fileId
       key
       deduplicated
@@ -169,6 +170,7 @@ describe('database-scope upload surface', () => {
     const contentType = 'text/plain';
     let contentHash: string;
     let uploadUrl: string;
+    let uploadHeaders: Record<string, string>;
 
     // RustFS uses path-style URLs: http://host:9000/<bucket>/<key>?...
     const bucketFromPresignedUrl = (url: string): string =>
@@ -201,10 +203,11 @@ describe('database-scope upload surface', () => {
       expect(payload.deduplicated).toBe(false);
 
       uploadUrl = payload.uploadUrl;
+      uploadHeaders = payload.uploadHeaders;
     });
 
     it('accepts the PUT, into a physical bucket recorded on the tenant row', async () => {
-      const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
+      const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { headers: uploadHeaders });
       expect(putRes.ok).toBe(true);
 
       const stored = await pg.query(

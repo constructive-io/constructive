@@ -90,6 +90,7 @@ const UPLOAD_APP_FILE = `
   mutation UploadAppFile($input: UploadAppFileInput!) {
     uploadAppFile(input: $input) {
       uploadUrl
+      uploadHeaders
       fileId
       key
       deduplicated
@@ -392,6 +393,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const contentType = 'text/plain';
       let contentHash: string;
       let uploadUrl: string;
+      let uploadHeaders: Record<string, string>;
 
       beforeAll(async () => {
         contentHash = await hashContent(fileContent);
@@ -422,10 +424,16 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(payload.expiresAt).toBeTruthy();
 
         uploadUrl = payload.uploadUrl;
+        uploadHeaders = payload.uploadHeaders;
+        expect(uploadHeaders).toEqual({
+          'Content-Type': contentType,
+          'x-amz-checksum-sha256': Buffer.from(contentHash, 'hex').toString('base64'),
+          'x-amz-meta-upload-id': payload.fileId,
+        });
       });
 
       it('should accept a PUT to the presigned URL', async () => {
-        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
+        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { headers: uploadHeaders });
         expect(putRes.ok).toBe(true);
         await confirmUploaded(contentHash);
       });
@@ -436,6 +444,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       const contentType = 'text/plain';
       let contentHash: string;
       let uploadUrl: string;
+      let uploadHeaders: Record<string, string>;
 
       beforeAll(async () => {
         contentHash = await hashContent(fileContent);
@@ -465,10 +474,16 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(payload.expiresAt).toBeTruthy();
 
         uploadUrl = payload.uploadUrl;
+        uploadHeaders = payload.uploadHeaders;
+        expect(uploadHeaders).toEqual({
+          'Content-Type': contentType,
+          'x-amz-checksum-sha256': Buffer.from(contentHash, 'hex').toString('base64'),
+          'x-amz-meta-upload-id': payload.fileId,
+        });
       });
 
       it('should accept a PUT to the presigned URL', async () => {
-        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { contentHash });
+        const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { headers: uploadHeaders });
         expect(putRes.ok).toBe(true);
       });
     });
@@ -524,7 +539,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(retry.uploadUrl).toBeTruthy();
         expect(retry.fileId).not.toBe(first.fileId);
 
-        const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain', { contentHash });
+        const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain', { headers: retry.uploadHeaders });
         expect(putRes.ok).toBe(true);
         await confirmUploaded(contentHash);
 
@@ -869,7 +884,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       expect(payload.fileId).toBeTruthy();
       expect(payload.uploadUrl).toBeTruthy();
 
-      const putRes = await putToPresignedUrl(payload.uploadUrl, fileContent, 'text/plain', { contentHash });
+      const putRes = await putToPresignedUrl(payload.uploadUrl, fileContent, 'text/plain', { headers: payload.uploadHeaders });
       expect(putRes.ok).toBe(true);
     });
 

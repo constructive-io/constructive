@@ -16,6 +16,7 @@ export interface StorageTransportPort {
   /**
    * PUT the bytes to a presigned URL. `contentHash` is the hex SHA-256 the
    * URL was requested with; it is sent as the signed `x-amz-checksum-sha256`.
+   * `headers` are the payload's `uploadHeaders`; when given they are sent as-is.
    */
   putObject(
     url: string,
@@ -23,14 +24,15 @@ export interface StorageTransportPort {
     contentType: string,
     signal?: AbortSignal,
     contentHash?: string,
+    headers?: Record<string, string>,
   ): Promise<void>;
 }
 
 /** The presigned-URL transport: SHA-256 hashing plus a checksum-bound presigned PUT. */
 export const storageTransport: StorageTransportPort = {
   hashFile: (file) => hashFile(file),
-  putObject: async (url, body, contentType, signal, contentHash) => {
-    await putToPresignedUrl(url, body, contentType, { signal, contentHash });
+  putObject: async (url, body, contentType, signal, contentHash, headers) => {
+    await putToPresignedUrl(url, body, contentType, { signal, contentHash, headers });
   },
 };
 

@@ -35,6 +35,13 @@ export interface PutToPresignedUrlOptions {
    * typed array, Blob); a streamed body must pass it explicitly.
    */
   contentHash?: string;
+  /**
+   * The exact headers to send, as `requestUploadUrl` returned them in
+   * `uploadHeaders`. When given they are sent as-is (they already carry
+   * `Content-Type`, the checksum and the upload id the URL is signed over) and
+   * `contentHash` is not needed.
+   */
+  headers?: Record<string, string>;
 }
 
 function normalizePutOptions(
@@ -56,7 +63,8 @@ function normalizePutOptions(
  * @param url - Presigned PUT URL
  * @param body - Content to upload
  * @param contentType - MIME type (must match the presigned URL's content-type constraint)
- * @param signal - Optional AbortSignal for cancellation
+ * @param signalOrOptions - AbortSignal, or options: `headers` (the payload's
+ *   `uploadHeaders`), `contentHash`, `signal`
  * @returns The fetch Response (already verified as ok)
  * @throws {UploadError} If the PUT fails or is aborted
  */
@@ -66,12 +74,11 @@ export async function putToPresignedUrl(
   contentType: string,
   signalOrOptions?: AbortSignal | PutToPresignedUrlOptions,
 ): Promise<Response> {
-  const { signal, contentHash } = normalizePutOptions(signalOrOptions);
+  const { signal, contentHash, headers } = normalizePutOptions(signalOrOptions);
   try {
-    const checksumSource = contentHash ?? (await sha256HexOfBody(body));
     const response = await fetch(url, {
       method: 'PUT',
-      headers: presignedPutHeaders(contentType, checksumSource),
+      headers: headers ?? presignedPutHeaders(contentType, contentHash ?? (await sha256HexOfBody(body))),
       body: body as BodyInit,
       signal,
     });

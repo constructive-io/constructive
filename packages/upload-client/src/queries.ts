@@ -28,6 +28,7 @@ export function buildRequestUploadUrlQuery(bucketQueryField: string): string {
         filename: $filename
       ) {
         uploadUrl
+        uploadHeaders
         fileId
         key
         deduplicated

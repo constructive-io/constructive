@@ -20,6 +20,8 @@ import {
   generatePresignedGetUrl,
   generatePresignedPutUrl,
   headObject,
+  presignedPutHeaders,
+  UPLOAD_ID_HEADER,
 } from '../src/s3-signer';
 import type { S3Config } from '../src/types';
 
@@ -213,6 +215,50 @@ describe('s3-signer integration (RustFS)', () => {
 
       const getUrl = await generatePresignedGetUrl(s3Config, key);
       expect((await downloadFromPresignedUrl(getUrl)).body).toBe(real);
+    });
+  });
+
+  describe('row-bound presigned PUT (x-amz-meta-upload-id names the file row)', () => {
+    const content = 'bytes this upload writes';
+    const hash = sha256Hex(content);
+    const fileId = '11111111-1111-4111-8111-111111111111';
+    const otherFileId = '22222222-2222-4222-8222-222222222222';
+
+    async function boundUrl(key: string): Promise<string> {
+      return generatePresignedPutUrl(s3Config, key, 'text/plain', Buffer.byteLength(content), 300, hash, fileId);
+    }
+
+    it('signs the upload id as a header, not a query parameter', async () => {
+      const url = new URL(await boundUrl(`row-bound/${Date.now()}-q`));
+      expect(url.searchParams.get('X-Amz-SignedHeaders')).toContain(UPLOAD_ID_HEADER);
+      expect(url.searchParams.has(UPLOAD_ID_HEADER)).toBe(false);
+    });
+
+    it('accepts the PUT that sends the headers it was issued with, and HEAD names the row', async () => {
+      const key = `row-bound/${Date.now()}-ok`;
+      const headers = presignedPutHeaders('text/plain', hash, fileId);
+      const res = await fetch(await boundUrl(key), { method: 'PUT', headers, body: content });
+      expect(res.status).toBe(200);
+      expect(await headObject(s3Config, key)).toEqual(expect.objectContaining({ uploadId: fileId }));
+    });
+
+    it('refuses a PUT that omits the upload id header (signature covers it)', async () => {
+      const key = `row-bound/${Date.now()}-missing`;
+      const res = await uploadToPresignedUrl(await boundUrl(key), content, 'text/plain', {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it("refuses a PUT that names another row's id", async () => {
+      const key = `row-bound/${Date.now()}-other`;
+      const res = await uploadToPresignedUrl(await boundUrl(key), content, 'text/plain', {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+        [UPLOAD_ID_HEADER]: otherFileId,
+      });
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
     });
   });
 
