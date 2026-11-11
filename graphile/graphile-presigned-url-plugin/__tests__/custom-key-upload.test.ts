@@ -122,7 +122,7 @@ describe('custom-key upload of changed bytes', () => {
     expect(queries).toHaveLength(1);
   });
 
-  it('links the new row to the previous version when the module has versioning', async () => {
+  it('reports the previous version and leaves the link to the database when the module has versioning', async () => {
     const { txClient, queries } = fakeTx('a'.repeat(64));
 
     const result = await upload(storageConfig({ hasVersioning: true }), txClient);
@@ -130,8 +130,8 @@ describe('custom-key upload of changed bytes', () => {
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, previousVersionId: OLD_FILE_ID, deduplicated: false });
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
     const record = queries.find((q) => /record_file\(/.test(q.text))!;
-    expect(record.text).toContain('previous_version_id');
-    expect(record.values).toContain(OLD_FILE_ID);
+    expect(record.text).not.toContain('previous_version_id');
+    expect(record.values).not.toContain(OLD_FILE_ID);
   });
 
   it('deduplicates identical bytes at the key without touching the row', async () => {

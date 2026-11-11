@@ -7,7 +7,6 @@ interface RecordManagedFileInput {
   mimeType: string;
   size: number;
   filename: string | null | undefined;
-  previousVersionId?: string | null;
   path?: string | null;
 }
 
@@ -16,7 +15,9 @@ interface RecordManagedFileInput {
  *
  * The recorder owns the files-table insert so bucket inheritance and claims
  * attribution run at the database boundary. Optional arguments are only named
- * when the generated function supports them and the caller has a value.
+ * when the generated function supports them and the caller has a value. A
+ * version's previous_version_id is not an argument: the files table derives it
+ * from the head at the key, under the caller's own RLS.
  */
 export async function recordManagedFile(
   pgClient: { query: (opts: { text: string; values: unknown[] }) => Promise<{ rows: unknown[] }> },
@@ -27,12 +28,6 @@ export async function recordManagedFile(
     throw new Error(
       `STORAGE_RECORDER_MISSING: storage module ${storageConfig.id} (${storageConfig.filesTableName}) ` +
       `must expose ${storageConfig.filesTableName}_record_file in its private schema`,
-    );
-  }
-  if (input.previousVersionId != null && !storageConfig.hasVersioning) {
-    throw new Error(
-      `STORAGE_VERSIONING_UNSUPPORTED: storage module ${storageConfig.id} (${storageConfig.filesTableName}) ` +
-      'does not support previous_version_id',
     );
   }
   if (input.path != null && !storageConfig.hasPathShares) {
@@ -61,10 +56,6 @@ export async function recordManagedFile(
     null,
   ];
 
-  if (storageConfig.hasVersioning && input.previousVersionId != null) {
-    args.push(`previous_version_id := $${values.length + 1}::uuid`);
-    values.push(input.previousVersionId);
-  }
   if (storageConfig.hasPathShares && input.path != null) {
     args.push(`path := $${values.length + 1}::text`);
     values.push(input.path);
