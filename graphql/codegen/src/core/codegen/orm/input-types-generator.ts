@@ -29,6 +29,7 @@ import {
   getPatchTypeName,
   getPrimaryKeyInfo,
   getTableNames,
+  hasCreateMutation,
   isRelationField,
   lcFirst,
   stripSmartComments,
@@ -1505,8 +1506,9 @@ function generateCrudInputTypes(
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
 
-  // Create input
-  statements.push(buildCreateInputInterface(table, typeRegistry));
+  if (hasCreateMutation(table)) {
+    statements.push(buildCreateInputInterface(table, typeRegistry));
+  }
 
   // Patch interface
   statements.push(
