@@ -10,7 +10,7 @@
  * - Public buckets: Block Public Access partially relaxed, public-read bucket policy applied
  */
 
-import type { S3Client } from '@aws-sdk/client-s3';
+import type { S3Client, Tag } from '@aws-sdk/client-s3';
 import {
   CreateBucketCommand,
   DeleteBucketCorsCommand,
@@ -74,6 +74,10 @@ function isUnsupportedOperation(err: any, extraCodes: string[] = []): boolean {
  * reconfigured or torn down.
  */
 export const BUCKET_OWNER_TAG = 'constructive-owner';
+
+function ownerOf(tags: Tag[]): string | null {
+  return tags.find((t) => t.Key === BUCKET_OWNER_TAG)?.Value ?? null;
+}
 
 export interface BucketProvisionerOptions {
   /** Storage connection config — credentials, endpoint, provider */
@@ -257,8 +261,9 @@ export class BucketProvisioner {
   /**
    * Make sure an existing bucket belongs to `owner` before anything
    * configures it. A bucket tagged for this owner is a retry; an untagged,
-   * empty bucket is claimed by tagging it; a bucket tagged for another owner,
-   * or untagged but holding objects, is refused with BUCKET_OWNED_ELSEWHERE.
+   * empty bucket is claimed by adding the owner tag beside any tags it already
+   * carries; a bucket tagged for another owner, or untagged but holding
+   * objects, is refused with BUCKET_OWNED_ELSEWHERE.
    *
    * S3 answers CreateBucket for a bucket the caller already owns with success
    * (us-east-1, MinIO, RustFS) or BucketAlreadyOwnedByYou, so creation alone
@@ -271,7 +276,8 @@ export class BucketProvisioner {
         `Cannot claim bucket '${bucketName}' without an owner`,
       );
     }
-    const current = await this.bucketOwner(bucketName);
+    const tags = await this.bucketTags(bucketName);
+    const current = ownerOf(tags);
     if (current === owner) return;
     if (current !== null) {
       throw new ProvisionerError(
@@ -289,7 +295,7 @@ export class BucketProvisioner {
       await this.client.send(
         new PutBucketTaggingCommand({
           Bucket: bucketName,
-          Tagging: { TagSet: [{ Key: BUCKET_OWNER_TAG, Value: owner }] },
+          Tagging: { TagSet: [...tags, { Key: BUCKET_OWNER_TAG, Value: owner }] },
         }),
       );
     } catch (err: any) {
@@ -306,15 +312,19 @@ export class BucketProvisioner {
    * when the bucket carries none.
    */
   async bucketOwner(bucketName: string): Promise<string | null> {
+    return ownerOf(await this.bucketTags(bucketName));
+  }
+
+  /** The bucket's tags; empty when it carries none. */
+  private async bucketTags(bucketName: string): Promise<Tag[]> {
     try {
       const result = await this.client.send(
         new GetBucketTaggingCommand({ Bucket: bucketName }),
       );
-      const tag = (result.TagSet ?? []).find((t) => t.Key === BUCKET_OWNER_TAG);
-      return tag?.Value ?? null;
+      return result.TagSet ?? [];
     } catch (err: any) {
       if (err.name === 'NoSuchTagSet' || err.Code === 'NoSuchTagSet') {
-        return null;
+        return [];
       }
       if (err.name === 'NoSuchBucket' || err.Code === 'NoSuchBucket') {
         throw new ProvisionerError(

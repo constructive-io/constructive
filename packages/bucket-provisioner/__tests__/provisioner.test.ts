@@ -452,6 +452,35 @@ describe('BucketProvisioner.claimBucket — ownership', () => {
     expect(sentCommands()).toContain('PutBucketTaggingCommand');
   });
 
+  it('keeps the tags an untagged bucket already carries when claiming it', async () => {
+    sendByCommand({
+      GetBucketTaggingCommand: () => ({
+        TagSet: [
+          { Key: 'cost-center', Value: 'storage' },
+          { Key: 'env', Value: 'prod' },
+        ],
+      }),
+      ListObjectsV2Command: () => ({ KeyCount: 0 }),
+    });
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.claimBucket('tagged-bucket', 'logical-bucket-1');
+
+    const put = mockSend.mock.calls
+      .map((call: any[]) => call[0])
+      .find((command: any) => command.constructor.name === 'PutBucketTaggingCommand');
+    expect(put.input).toEqual({
+      Bucket: 'tagged-bucket',
+      Tagging: {
+        TagSet: [
+          { Key: 'cost-center', Value: 'storage' },
+          { Key: 'env', Value: 'prod' },
+          { Key: 'constructive-owner', Value: 'logical-bucket-1' },
+        ],
+      },
+    });
+  });
+
   it('accepts a bucket already tagged for the same owner (a retry)', async () => {
     sendByCommand({
       GetBucketTaggingCommand: () => ({
