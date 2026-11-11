@@ -44,6 +44,7 @@ export function buildBulkUploadMutation(mutation: string): string {
     ${mutation}(input: $input) {
       files {
         uploadUrl
+        uploadHeaders
         fileId
         key
         deduplicated

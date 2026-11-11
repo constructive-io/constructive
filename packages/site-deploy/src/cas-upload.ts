@@ -19,6 +19,7 @@ import { DeployError } from './types';
 /** One entry of the bulk mutation's payload. */
 interface BulkFilePayload {
   uploadUrl: string | null;
+  uploadHeaders: Record<string, string> | null;
   fileId: string;
   key: string;
   deduplicated: boolean;
@@ -50,8 +51,8 @@ export interface UploadCasResult {
 
 /** The bytes the server does not have yet, as told by the bulk mutation. */
 export interface CasDiff {
-  /** Files whose bytes must be PUT, paired with their presigned URL. */
-  missing: { file: HashedFile; uploadUrl: string }[];
+  /** Files whose bytes must be PUT, paired with their presigned URL and the headers it is signed over. */
+  missing: { file: HashedFile; uploadUrl: string; uploadHeaders: Record<string, string> }[];
   /** Files the server already had. */
   deduplicated: HashedFile[];
 }
@@ -109,13 +110,13 @@ export async function diffCas(
         deduplicated.push(file);
         return;
       }
-      if (!result.uploadUrl) {
+      if (!result.uploadUrl || !result.uploadHeaders) {
         throw new DeployError(
           'UPLOAD_FAILED',
-          `No upload URL for "${file.path}" and deduplicated=false`,
+          `No upload URL or upload headers for "${file.path}" and deduplicated=false`,
         );
       }
-      missing.push({ file, uploadUrl: result.uploadUrl });
+      missing.push({ file, uploadUrl: result.uploadUrl, uploadHeaders: result.uploadHeaders });
     });
   }
 
@@ -141,9 +142,9 @@ export async function uploadMissing(
       throwIfAborted(options.signal);
       const index = next++;
       if (index >= diff.missing.length) return;
-      const { file, uploadUrl } = diff.missing[index];
+      const { file, uploadUrl, uploadHeaders } = diff.missing[index];
       await withRetries(
-        () => put(uploadUrl, file.bytes, file.contentType, options.signal, file.hash),
+        () => put(uploadUrl, file.bytes, file.contentType, options.signal, file.hash, uploadHeaders),
         options.retries,
         file.path,
         options.signal,
@@ -163,11 +164,11 @@ export async function uploadMissing(
   };
 }
 
-const defaultPut: PutObject = async (url, body, contentType, signal, contentHash) => {
+const defaultPut: PutObject = async (url, body, contentType, signal, contentHash, headers) => {
   // A fresh copy: putToPresignedUrl takes a BodyInit, and a Uint8Array view
   // over a pooled Buffer would send the whole pool.
   const buffer = body.slice().buffer as ArrayBuffer;
-  await putToPresignedUrl(url, buffer, contentType, { signal, contentHash });
+  await putToPresignedUrl(url, buffer, contentType, { signal, contentHash, headers });
 };
 
 async function withRetries(

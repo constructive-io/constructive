@@ -1,5 +1,5 @@
 import { deploySite } from '../src/deploy';
-import type { DeployProgress } from '../src/types';
+import type { DeployProgress, GraphQLExecutor, PutObject } from '../src/types';
 import { DeployError } from '../src/types';
 import { createMockServer, failingPut, file, hashOf, keyOf } from './mock-api';
 
@@ -36,6 +36,11 @@ describe('deploySite', () => {
       size: 13,
     });
     expect(server.puts).toHaveLength(2);
+    expect(server.puts.find((put) => put.url.endsWith(hashOf('<h1>home</h1>')))?.headers).toEqual({
+      'Content-Type': 'text/html; charset=utf-8',
+      'x-amz-checksum-sha256': Buffer.from(hashOf('<h1>home</h1>'), 'hex').toString('base64'),
+      'x-amz-meta-upload-id': `file-${hashOf('<h1>home</h1>').slice(0, 8)}`,
+    });
     expect(server.countOf('createSiteRelease')).toBe(1);
     expect(server.countOf('updateSiteRelease')).toBe(0);
   });
@@ -212,13 +217,27 @@ describe('deploySite', () => {
     expect(server.activeCommitId).toBeNull();
   });
 
+  it('refuses to upload a file the server returned no signed headers for', async () => {
+    const server = createMockServer();
+    const unsigned: GraphQLExecutor = async (query, variables) => {
+      const data = await server.api(query, variables);
+      for (const result of (data.uploadFiles as any)?.files ?? []) result.uploadHeaders = null;
+      return data;
+    };
+    await expect(
+      deploySite({ ...base, api: unsigned, putObject: server.putObject, source: build }),
+    ).rejects.toMatchObject({ code: 'UPLOAD_FAILED' });
+    expect(server.puts).toHaveLength(0);
+    expect(server.countOf('createSiteRelease')).toBe(0);
+  });
+
   it('retries a transient upload failure before giving up', async () => {
     const server = createMockServer();
     let attempts = 0;
-    const flaky = async (url: string, body: Uint8Array, contentType: string) => {
+    const flaky: PutObject = async (url, body, contentType, signal, contentHash, headers) => {
       attempts += 1;
       if (attempts === 1) throw new Error('502 bad gateway');
-      await server.putObject(url, body, contentType);
+      await server.putObject(url, body, contentType, signal, contentHash, headers);
     };
 
     const result = await deploySite({
