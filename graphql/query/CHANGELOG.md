@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.24.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.24.1...@constructive-io/graphql-query@4.24.2) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
 ## [4.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@4.24.0...@constructive-io/graphql-query@4.24.1) (2026-11-11)
 
 ### Bug Fixes

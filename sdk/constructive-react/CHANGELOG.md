@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.27](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.26...@constructive-io/react@1.21.27) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
 ## [1.21.26](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.25...@constructive-io/react@1.21.26) (2026-11-11)
 
 **Note:** Version bump only for package @constructive-io/react

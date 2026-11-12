@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.1](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.31.0...@constructive-io/upload-client@0.31.1) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
 # [0.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.30.0...@constructive-io/upload-client@0.31.0) (2026-11-11)
 
 ### Features

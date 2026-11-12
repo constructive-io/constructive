@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.10](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.9...graphile-search@2.19.10) (2026-11-12)
+
+### Bug Fixes
+
+- **graphile-search:** apply search orderBy when orderBy is a variable ([1fd9110](https://github.com/constructive-io/constructive/commit/1fd91102909a05039eca21b4cdc12c0fc3674da6))
+- **graphile-search:** order by composite score, match-only bm25, float8 cursors, per-build codec cache ([b0a5b44](https://github.com/constructive-io/constructive/commit/b0a5b446ebdf80c564f3ee44701c67880889d260))
+- **graphile-search:** page SEARCH_SCORE order with cursors via a scoring join ([f0c3483](https://github.com/constructive-io/constructive/commit/f0c3483ede866180dcabcc80beba090e4d975440))
+
 ## [2.19.9](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.8...graphile-search@2.19.9) (2026-11-09)
 
 ### Bug Fixes
