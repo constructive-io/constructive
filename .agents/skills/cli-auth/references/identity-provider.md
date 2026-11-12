@@ -12,7 +12,6 @@ csdk identity-provider list --where.<field>.<op> <value> --orderBy <values>
 csdk identity-provider list --limit 10 --after <cursor>
 csdk identity-provider find-first --where.<field>.<op> <value>
 csdk identity-provider get --id <UUID>
-csdk identity-provider create --displayName <String> --enabled <Boolean> --kind <String> --slug <String>
 csdk identity-provider update --id <UUID> [--displayName <String>] [--enabled <Boolean>] [--kind <String>] [--slug <String>]
 csdk identity-provider delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk identity-provider list --select id,id
 
 ```bash
 csdk identity-provider list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a identityProvider
-
-```bash
-csdk identity-provider create --displayName <String> --enabled <Boolean> --kind <String> --slug <String>
 ```
 
 ### Get a identityProvider by id

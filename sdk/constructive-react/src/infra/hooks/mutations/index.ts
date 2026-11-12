@@ -18,7 +18,6 @@ export * from './useDeleteNamespaceEventMutation';
 export * from './useCreatePlatformInfraCommitMutation';
 export * from './useUpdatePlatformInfraCommitMutation';
 export * from './useDeletePlatformInfraCommitMutation';
-export * from './useCreatePlatformInfraGetAllTreeNodesRecordMutation';
 export * from './useCreatePlatformInfraObjectMutation';
 export * from './useUpdatePlatformInfraObjectMutation';
 export * from './useDeletePlatformInfraObjectMutation';

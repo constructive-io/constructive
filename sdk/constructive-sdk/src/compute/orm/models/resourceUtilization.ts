@@ -29,7 +29,6 @@ import type {
   ResourceUtilizationSelect,
   ResourceUtilizationFilter,
   ResourceUtilizationOrderBy,
-  CreateResourceUtilizationInput,
   UpdateResourceUtilizationInput,
   ResourceUtilizationPatch,
 } from '../input-types';
@@ -102,33 +101,6 @@ export class ResourceUtilizationModel {
       }) => ({
         resourceUtilization: data.resourceUtilizations?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourceUtilizationSelect>(
-    args: CreateArgs<S, CreateResourceUtilizationInput['resourceUtilization']> & {
-      select: S;
-    } & StrictSelect<S, ResourceUtilizationSelect>
-  ): QueryBuilder<{
-    createResourceUtilization: {
-      resourceUtilization: InferSelectResult<ResourceUtilizationWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourceUtilization',
-      'createResourceUtilization',
-      'resourceUtilization',
-      args.select,
-      args.data,
-      'CreateResourceUtilizationInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourceUtilization',
-      fieldName: 'createResourceUtilization',
-      document,
-      variables,
     });
   }
 }

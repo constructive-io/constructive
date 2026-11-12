@@ -114,7 +114,7 @@ csdk auth set-token <your-token>
 | `webauthn-auth-module` | webauthnAuthModule CRUD operations |
 | `webauthn-credentials-module` | webauthnCredentialsModule CRUD operations |
 | `webhook-module` | webhookModule CRUD operations |
-| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). A table entry either names its table (table_name plus optional schema_name) or references one an installed module generated ("module": {"type": "agent", "scope": "org", "table": "message"}), which resolves through the module row's recorded table ids and raises when it matches nothing instead of creating an empty table. After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID. A failure raises its coded error to the caller and rolls back the whole construction, including the construction record. |
+| `construct-blueprint` | Requests a build of a blueprint: snapshots its definition into a pending blueprint_construction row, enqueues the blueprint:construct job that runs metaschema_private.construct_blueprint_run on it, and returns the construction id immediately. Poll the row: pending -> constructing -> constructed (table_map populated) or failed (error holds the coded error). schema_id is the default schema for tables without an explicit schema_name. |
 | `copy-template-to-blueprint` | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
 | `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
 Records the request on the bucket row via RLS; the bucket's job
@@ -517,6 +517,7 @@ CRUD operations for BlueprintConstruction records.
 | `constructedDefinition` | JSON |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
+| `error` | JSON |
 | `id` | UUID |
 | `schemaId` | UUID |
 | `status` | String |
@@ -524,7 +525,7 @@ CRUD operations for BlueprintConstruction records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `blueprintId`, `databaseId`
-**Optional create fields (backend defaults):** `constructedAt`, `constructedDefinition`, `schemaId`, `status`, `tableMap`
+**Optional create fields (backend defaults):** `constructedAt`, `constructedDefinition`, `error`, `schemaId`, `status`, `tableMap`
 
 ### `blueprint-template`
 
@@ -1157,6 +1158,8 @@ CRUD operations for DbUsageModule records.
 | `queryStatsLogTableName` | String |
 | `queryStatsSummaryTableId` | UUID |
 | `queryStatsSummaryTableName` | String |
+| `readDbQueryStatsUsagePeriodFunction` | String |
+| `readDbTableStatsUsagePeriodFunction` | String |
 | `retention` | String |
 | `rollupDbQueryStatsUsageSummaryFunction` | String |
 | `rollupDbTableStatsUsageSummaryFunction` | String |
@@ -1168,7 +1171,7 @@ CRUD operations for DbUsageModule records.
 | `tableStatsSummaryTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `collectDbQueryStatsFunction`, `collectDbTableStatsFunction`, `defaultCapabilities`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsSummaryTableId`, `queryStatsSummaryTableName`, `retention`, `rollupDbQueryStatsUsageSummaryFunction`, `rollupDbTableStatsUsageSummaryFunction`, `schemaId`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsSummaryTableId`, `tableStatsSummaryTableName`
+**Optional create fields (backend defaults):** `apiName`, `collectDbQueryStatsFunction`, `collectDbTableStatsFunction`, `defaultCapabilities`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `queryStatsLogTableId`, `queryStatsLogTableName`, `queryStatsSummaryTableId`, `queryStatsSummaryTableName`, `readDbQueryStatsUsagePeriodFunction`, `readDbTableStatsUsagePeriodFunction`, `retention`, `rollupDbQueryStatsUsageSummaryFunction`, `rollupDbTableStatsUsageSummaryFunction`, `schemaId`, `tableStatsLogTableId`, `tableStatsLogTableName`, `tableStatsSummaryTableId`, `tableStatsSummaryTableName`
 
 ### `default-ids-module`
 
@@ -1274,6 +1277,7 @@ CRUD operations for DomainModule records.
 | `catalogModuleId` | UUID |
 | `databaseId` | UUID |
 | `defaultCapabilities` | String |
+| `defaultReservedSubdomains` | JSON |
 | `domainEventsTableId` | UUID |
 | `domainEventsTableName` | String |
 | `domainVerificationsTableId` | UUID |
@@ -1292,11 +1296,14 @@ CRUD operations for DomainModule records.
 | `privateSchemaName` | String |
 | `provisions` | JSON |
 | `publicSchemaName` | String |
+| `reservedSubdomainsTableId` | UUID |
+| `reservedSubdomainsTableName` | String |
 | `schemaId` | UUID |
 | `scope` | String |
+| `sweepUnverifiedDomainsFunction` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultCapabilities`, `domainEventsTableId`, `domainEventsTableName`, `domainVerificationsTableId`, `domainVerificationsTableName`, `domainsTableId`, `domainsTableName`, `entityField`, `entityTableId`, `managedDomainsTableId`, `managedDomainsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `catalogModuleId`, `defaultCapabilities`, `defaultReservedSubdomains`, `domainEventsTableId`, `domainEventsTableName`, `domainVerificationsTableId`, `domainVerificationsTableName`, `domainsTableId`, `domainsTableName`, `entityField`, `entityTableId`, `managedDomainsTableId`, `managedDomainsTableName`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `reservedSubdomainsTableId`, `reservedSubdomainsTableName`, `schemaId`, `sweepUnverifiedDomainsFunction`
 
 ### `email-sender-module`
 
@@ -3019,8 +3026,6 @@ CRUD operations for ResourceModule records.
 | Field | Type |
 |-------|------|
 | `apiName` | String |
-| `builderBindingsTableId` | UUID |
-| `builderBindingsTableName` | String |
 | `databaseId` | UUID |
 | `defaultCapabilities` | String |
 | `entityField` | String |
@@ -3058,9 +3063,11 @@ CRUD operations for ResourceModule records.
 | `rollupResourceUsageSummaryFunction` | String |
 | `schemaId` | UUID |
 | `scope` | String |
+| `serviceBindingsTableId` | UUID |
+| `serviceBindingsTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `builderBindingsTableId`, `builderBindingsTableName`, `defaultCapabilities`, `entityField`, `entityTableId`, `installationStoreName`, `merkleStoreModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `registryBindingsTableId`, `registryBindingsTableName`, `requirementsStateViewName`, `resolvedRequirementsViewName`, `resourceBillingRollupFunction`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceEventsTableId`, `resourceEventsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourceStatusChecksTableId`, `resourceStatusChecksTableName`, `resourceUsageLogTableId`, `resourceUsageLogTableName`, `resourceUsageSummaryTableId`, `resourceUsageSummaryTableName`, `resourcesTableId`, `resourcesTableName`, `rollupResourceUsageSummaryFunction`, `schemaId`
+**Optional create fields (backend defaults):** `apiName`, `defaultCapabilities`, `entityField`, `entityTableId`, `installationStoreName`, `merkleStoreModuleId`, `namespaceModuleId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provisions`, `publicSchemaName`, `registryBindingsTableId`, `registryBindingsTableName`, `requirementsStateViewName`, `resolvedRequirementsViewName`, `resourceBillingRollupFunction`, `resourceDefinitionsTableId`, `resourceDefinitionsTableName`, `resourceEventsTableId`, `resourceEventsTableName`, `resourceInstallationsTableId`, `resourceInstallationsTableName`, `resourceStatusChecksTableId`, `resourceStatusChecksTableName`, `resourceUsageLogTableId`, `resourceUsageLogTableName`, `resourceUsageSummaryTableId`, `resourceUsageSummaryTableName`, `resourcesTableId`, `resourcesTableName`, `rollupResourceUsageSummaryFunction`, `schemaId`, `serviceBindingsTableId`, `serviceBindingsTableName`
 
 ### `rls-module`
 
@@ -3350,6 +3357,7 @@ CRUD operations for StorageLogModule records.
 | `privateSchemaId` | UUID |
 | `privateSchemaName` | String |
 | `publicSchemaName` | String |
+| `readStorageUsagePeriodFunction` | String |
 | `retention` | String |
 | `rollupFunctionName` | String |
 | `schemaId` | UUID |
@@ -3360,7 +3368,7 @@ CRUD operations for StorageLogModule records.
 | `usageSummaryTableName` | String |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `apiName`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `retention`, `rollupFunctionName`, `schemaId`, `storageLogTableId`, `storageLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
+**Optional create fields (backend defaults):** `apiName`, `entityField`, `interval`, `prefix`, `premake`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `publicSchemaName`, `readStorageUsagePeriodFunction`, `retention`, `rollupFunctionName`, `schemaId`, `storageLogTableId`, `storageLogTableName`, `usageSummaryTableId`, `usageSummaryTableName`
 
 ### `storage-module`
 
@@ -3397,7 +3405,6 @@ CRUD operations for StorageModule records.
 | `filesTableId` | UUID |
 | `filesTableName` | String |
 | `hasAuditLog` | Boolean |
-| `hasConfirmUpload` | Boolean |
 | `hasContentHash` | Boolean |
 | `hasCustomKeys` | Boolean |
 | `hasPathShares` | Boolean |
@@ -3424,7 +3431,7 @@ CRUD operations for StorageModule records.
 | `uploadUrlExpirySeconds` | Int |
 
 **Required create fields:** `databaseId`, `scope`
-**Optional create fields (backend defaults):** `allowedOrigins`, `apiName`, `bucketsTableId`, `bucketsTableName`, `cacheTtlSeconds`, `catalogModuleId`, `confirmUploadDelay`, `defaultCapabilities`, `defaultMaxFileSize`, `downloadUrlExpirySeconds`, `endpoint`, `entityField`, `entityTableId`, `fileEventsTableId`, `filesTableId`, `filesTableName`, `hasAuditLog`, `hasConfirmUpload`, `hasContentHash`, `hasCustomKeys`, `hasPathShares`, `hasVersioning`, `key`, `maxBulkFiles`, `maxBulkTotalSize`, `maxFilenameLength`, `pathSharesTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provider`, `provisions`, `publicSchemaName`, `publicUrlPrefix`, `region`, `restrictReads`, `schemaId`, `uploadUrlExpirySeconds`
+**Optional create fields (backend defaults):** `allowedOrigins`, `apiName`, `bucketsTableId`, `bucketsTableName`, `cacheTtlSeconds`, `catalogModuleId`, `confirmUploadDelay`, `defaultCapabilities`, `defaultMaxFileSize`, `downloadUrlExpirySeconds`, `endpoint`, `entityField`, `entityTableId`, `fileEventsTableId`, `filesTableId`, `filesTableName`, `hasAuditLog`, `hasContentHash`, `hasCustomKeys`, `hasPathShares`, `hasVersioning`, `key`, `maxBulkFiles`, `maxBulkTotalSize`, `maxFilenameLength`, `pathSharesTableId`, `policies`, `prefix`, `privateApiName`, `privateSchemaId`, `privateSchemaName`, `provider`, `provisions`, `publicSchemaName`, `publicUrlPrefix`, `region`, `restrictReads`, `schemaId`, `uploadUrlExpirySeconds`
 
 ### `transfer-log-module`
 
@@ -3775,7 +3782,7 @@ CRUD operations for WebhookModule records.
 
 ### `construct-blueprint`
 
-Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Eight phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security. When a prefix already exists (e.g., 'org'), the entry extends the existing entity type instead of creating a new one; if a storage[] key is present, it provisions entity-scoped storage for that type. (0.5) scope-based storage: each storage[] entry has an optional scope ('app' or 'org' only). App-scoped storage seeds buckets at migration time. Org-scoped storage resolves the org membership type, creates org_buckets/org_files with owner_id, and seeds buckets per-entity via an AFTER INSERT trigger on the users table. When function_module is installed, a private functions bucket is auto-injected into org-scoped or entity-scoped storage entries. (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints/check_constraints are deferred). A table entry either names its table (table_name plus optional schema_name) or references one an installed module generated ("module": {"type": "agent", "scope": "org", "table": "message"}), which resolves through the module row's recorded table ids and raises when it matches nothing instead of creating an empty table. After provisioning, optional smart_tags (jsonb object) on the table entry are applied via metaschema.append_table_smart_tags(), and optional smart_tags on individual field entries are applied via metaschema.append_field_smart_tags(). (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints, (6) provision_check_constraint() for top-level + deferred check constraints, (7) seed achievements from definition.achievements[] — resolves events_module by entity_prefix and creates INSERT actions for levels, level_requirements, and achievement_rewards tables. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level entries are deferred to phases 3-6 so they can reference columns created by relations in phase 2. Returns the construction record ID. A failure raises its coded error to the caller and rolls back the whole construction, including the construction record.
+Requests a build of a blueprint: snapshots its definition into a pending blueprint_construction row, enqueues the blueprint:construct job that runs metaschema_private.construct_blueprint_run on it, and returns the construction id immediately. Poll the row: pending -> constructing -> constructed (table_map populated) or failed (error holds the coded error). schema_id is the default schema for tables without an explicit schema_name.
 
 - **Type:** mutation
 - **Arguments:**

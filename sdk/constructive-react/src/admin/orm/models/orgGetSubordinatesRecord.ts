@@ -29,7 +29,6 @@ import type {
   OrgGetSubordinatesRecordSelect,
   OrgGetSubordinatesRecordFilter,
   OrgGetSubordinatesRecordsOrderBy,
-  CreateOrgGetSubordinatesRecordInput,
   UpdateOrgGetSubordinatesRecordInput,
   OrgGetSubordinatesRecordPatch,
 } from '../input-types';
@@ -104,33 +103,6 @@ export class OrgGetSubordinatesRecordModel {
       }) => ({
         orgGetSubordinatesRecord: data.orgGetSubordinates?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends OrgGetSubordinatesRecordSelect>(
-    args: CreateArgs<S, CreateOrgGetSubordinatesRecordInput['orgGetSubordinatesRecord']> & {
-      select: S;
-    } & StrictSelect<S, OrgGetSubordinatesRecordSelect>
-  ): QueryBuilder<{
-    createOrgGetSubordinatesRecord: {
-      orgGetSubordinatesRecord: InferSelectResult<OrgGetSubordinatesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'OrgGetSubordinatesRecord',
-      'createOrgGetSubordinatesRecord',
-      'orgGetSubordinatesRecord',
-      args.select,
-      args.data,
-      'CreateOrgGetSubordinatesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'OrgGetSubordinatesRecord',
-      fieldName: 'createOrgGetSubordinatesRecord',
-      document,
-      variables,
     });
   }
 }

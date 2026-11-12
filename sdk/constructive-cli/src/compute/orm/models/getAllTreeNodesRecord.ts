@@ -29,7 +29,6 @@ import type {
   GetAllTreeNodesRecordSelect,
   GetAllTreeNodesRecordFilter,
   GetAllTreeNodesRecordsOrderBy,
-  CreateGetAllTreeNodesRecordInput,
   UpdateGetAllTreeNodesRecordInput,
   GetAllTreeNodesRecordPatch,
 } from '../input-types';
@@ -102,33 +101,6 @@ export class GetAllTreeNodesRecordModel {
       }) => ({
         getAllTreeNodesRecord: data.getAllTreeNodes?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends GetAllTreeNodesRecordSelect>(
-    args: CreateArgs<S, CreateGetAllTreeNodesRecordInput['getAllTreeNodesRecord']> & {
-      select: S;
-    } & StrictSelect<S, GetAllTreeNodesRecordSelect>
-  ): QueryBuilder<{
-    createGetAllTreeNodesRecord: {
-      getAllTreeNodesRecord: InferSelectResult<GetAllTreeNodesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'GetAllTreeNodesRecord',
-      'createGetAllTreeNodesRecord',
-      'getAllTreeNodesRecord',
-      args.select,
-      args.data,
-      'CreateGetAllTreeNodesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'GetAllTreeNodesRecord',
-      fieldName: 'createGetAllTreeNodesRecord',
-      document,
-      variables,
     });
   }
 }

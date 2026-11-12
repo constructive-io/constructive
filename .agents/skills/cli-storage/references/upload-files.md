@@ -7,7 +7,7 @@ Upload multiple files: resolves the bucket by key, creates file rows, and return
 ## Usage
 
 ```bash
-csdk upload-files --input.bucketKey <String> --input.files <UploadFileBulkFileInput> --input.isPublic <Boolean>
+csdk upload-files --input.bucketKey <String> --input.databaseId <UUID> --input.files <UploadFileBulkFileInput> --input.isPublic <Boolean>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk upload-files --input.bucketKey <String> --input.files <UploadFileBulkFileIn
 ### Run uploadFiles
 
 ```bash
-csdk upload-files --input.bucketKey <String> --input.files <UploadFileBulkFileInput> --input.isPublic <Boolean>
+csdk upload-files --input.bucketKey <String> --input.databaseId <UUID> --input.files <UploadFileBulkFileInput> --input.isPublic <Boolean>
 ```

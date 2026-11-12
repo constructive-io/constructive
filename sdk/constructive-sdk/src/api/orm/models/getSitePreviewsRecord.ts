@@ -29,7 +29,6 @@ import type {
   GetSitePreviewsRecordSelect,
   GetSitePreviewsRecordFilter,
   GetSitePreviewsRecordsOrderBy,
-  CreateGetSitePreviewsRecordInput,
   UpdateGetSitePreviewsRecordInput,
   GetSitePreviewsRecordPatch,
 } from '../input-types';
@@ -102,33 +101,6 @@ export class GetSitePreviewsRecordModel {
       }) => ({
         getSitePreviewsRecord: data.getSitePreviews?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends GetSitePreviewsRecordSelect>(
-    args: CreateArgs<S, CreateGetSitePreviewsRecordInput['getSitePreviewsRecord']> & {
-      select: S;
-    } & StrictSelect<S, GetSitePreviewsRecordSelect>
-  ): QueryBuilder<{
-    createGetSitePreviewsRecord: {
-      getSitePreviewsRecord: InferSelectResult<GetSitePreviewsRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'GetSitePreviewsRecord',
-      'createGetSitePreviewsRecord',
-      'getSitePreviewsRecord',
-      args.select,
-      args.data,
-      'CreateGetSitePreviewsRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'GetSitePreviewsRecord',
-      fieldName: 'createGetSitePreviewsRecord',
-      document,
-      variables,
     });
   }
 }

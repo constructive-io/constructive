@@ -5,7 +5,6 @@
  */
 export { BuildModel } from './build';
 export { BuildStepModel } from './buildStep';
-export { BuilderBindingModel } from './builderBinding';
 export { ContentPresetModel } from './contentPreset';
 export { DatabaseFunctionGraphModel } from './databaseFunctionGraph';
 export { DatabaseFunctionGraphExecutionCancelRequestModel } from './databaseFunctionGraphExecutionCancelRequest';
@@ -49,7 +48,6 @@ export { NamespaceModel } from './namespace';
 export { NamespaceEventModel } from './namespaceEvent';
 export { PlatformBuildModel } from './platformBuild';
 export { PlatformBuildStepModel } from './platformBuildStep';
-export { PlatformBuilderBindingModel } from './platformBuilderBinding';
 export { PlatformFunctionApiBindingModel } from './platformFunctionApiBinding';
 export { PlatformFunctionCapabilityBindingModel } from './platformFunctionCapabilityBinding';
 export { PlatformFunctionDefinitionModel } from './platformFunctionDefinition';
@@ -96,6 +94,7 @@ export { PlatformResourceUtilizationModel } from './platformResourceUtilization'
 export { PlatformResourcesHealthModel } from './platformResourcesHealth';
 export { PlatformResourcesRequirementsStateModel } from './platformResourcesRequirementsState';
 export { PlatformResourcesResolvedRequirementModel } from './platformResourcesResolvedRequirement';
+export { PlatformServiceBindingModel } from './platformServiceBinding';
 export { PlatformWebhookEndpointModel } from './platformWebhookEndpoint';
 export { PlatformWebhookEventModel } from './platformWebhookEvent';
 export { ProposalCommentModel } from './proposalComment';
@@ -124,5 +123,6 @@ export { ResourceUtilizationModel } from './resourceUtilization';
 export { ResourcesHealthModel } from './resourcesHealth';
 export { ResourcesRequirementsStateModel } from './resourcesRequirementsState';
 export { ResourcesResolvedRequirementModel } from './resourcesResolvedRequirement';
+export { ServiceBindingModel } from './serviceBinding';
 export { WebhookEndpointModel } from './webhookEndpoint';
 export { WebhookEventModel } from './webhookEvent';

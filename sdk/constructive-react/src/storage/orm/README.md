@@ -22,9 +22,9 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `bucket` | findMany, findOne, create, update, delete |
-| `file` | findMany, findOne, create, update, delete |
+| `file` | findMany, findOne, update, delete |
 | `platformBucket` | findMany, findOne, create, update, delete |
-| `platformFile` | findMany, findOne, create, update, delete |
+| `platformFile` | findMany, findOne, update, delete |
 
 ## Table Operations
 
@@ -98,6 +98,7 @@ CRUD operations for File records.
 | `key` | String | Yes |
 | `mimeType` | String | Yes |
 | `promotedAt` | Datetime | Yes |
+| `rejectionReason` | String | Yes |
 | `size` | BigInt | Yes |
 | `status` | FileStatus | Yes |
 | `tags` | String | Yes |
@@ -108,13 +109,10 @@ CRUD operations for File records.
 
 ```typescript
 // List all file records
-const items = await db.file.findMany({ select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
+const items = await db.file.findMany({ select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
 
 // Get one by id
-const item = await db.file.findOne({ id: '<UUID>', select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
-
-// Create
-const created = await db.file.create({ data: { actorId: '<UUID>', bucketId: '<UUID>', contentHash: '<String>', databaseId: '<UUID>', description: '<String>', downloadUrl: '<String>', expiryEnqueuedAt: '<Datetime>', filePath: '<String>', filename: '<String>', isPublic: '<Boolean>', key: '<String>', mimeType: '<String>', promotedAt: '<Datetime>', size: '<BigInt>', status: '<FileStatus>', tags: '<String>', upload: '<Upload>' }, select: { id: true } }).execute();
+const item = await db.file.findOne({ id: '<UUID>', select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
 
 // Update
 const updated = await db.file.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -191,6 +189,7 @@ CRUD operations for PlatformFile records.
 | `key` | String | Yes |
 | `mimeType` | String | Yes |
 | `promotedAt` | Datetime | Yes |
+| `rejectionReason` | String | Yes |
 | `size` | BigInt | Yes |
 | `status` | FileStatus | Yes |
 | `tags` | String | Yes |
@@ -201,13 +200,10 @@ CRUD operations for PlatformFile records.
 
 ```typescript
 // List all platformFile records
-const items = await db.platformFile.findMany({ select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
+const items = await db.platformFile.findMany({ select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
 
 // Get one by id
-const item = await db.platformFile.findOne({ id: '<UUID>', select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
-
-// Create
-const created = await db.platformFile.create({ data: { actorId: '<UUID>', bucketId: '<UUID>', contentHash: '<String>', description: '<String>', downloadUrl: '<String>', expiryEnqueuedAt: '<Datetime>', filePath: '<String>', filename: '<String>', isPublic: '<Boolean>', key: '<String>', mimeType: '<String>', promotedAt: '<Datetime>', size: '<BigInt>', status: '<FileStatus>', tags: '<String>', upload: '<Upload>' }, select: { id: true } }).execute();
+const item = await db.platformFile.findOne({ id: '<UUID>', select: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } }).execute();
 
 // Update
 const updated = await db.platformFile.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -295,7 +291,7 @@ Upload multiple files: resolves the bucket by key, creates file rows, and return
   | `input` | UploadFileBulkInput (required) |
 
 ```typescript
-const result = await db.mutation.uploadFiles({ input: { bucketKey: '<String>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } }).execute();
+const result = await db.mutation.uploadFiles({ input: { bucketKey: '<String>', databaseId: '<UUID>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.uploadPlatformFile`

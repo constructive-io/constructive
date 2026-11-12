@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateFunctionGraphInput,
   FunctionGraphPatch,
   FunctionGraphSelect,
   FunctionGraphFilter,
@@ -47,7 +46,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -66,8 +65,6 @@ async function handleTableSubcommand(
       return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     case 'update':
       return handleUpdate(argv, prompter);
     case 'delete':
@@ -174,108 +171,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Record not found.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'context',
-        message: 'context',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'createdBy',
-        message: 'createdBy',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'definitionsCommitId',
-        message: 'definitionsCommitId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'description',
-        message: 'description',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isValid',
-        message: 'isValid',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'scopeId',
-        message: 'scopeId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storeId',
-        message: 'storeId',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'validationErrors',
-        message: 'validationErrors',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateFunctionGraphInput['functionGraph'];
-    const client = getClient();
-    const result = await client.functionGraph
-      .create({
-        data: {
-          context: cleanedData.context,
-          createdBy: cleanedData.createdBy,
-          definitionsCommitId: cleanedData.definitionsCommitId,
-          description: cleanedData.description,
-          isValid: cleanedData.isValid,
-          name: cleanedData.name,
-          scopeId: cleanedData.scopeId,
-          storeId: cleanedData.storeId,
-          validationErrors: cleanedData.validationErrors,
-        },
-        select: {
-          context: true,
-          createdAt: true,
-          createdBy: true,
-          definitionsCommitId: true,
-          description: true,
-          id: true,
-          isValid: true,
-          name: true,
-          scopeId: true,
-          storeId: true,
-          updatedAt: true,
-          validationErrors: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

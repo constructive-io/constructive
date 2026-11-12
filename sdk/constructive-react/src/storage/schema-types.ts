@@ -101,6 +101,8 @@ export type FileOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROMOTED_AT_ASC'
   | 'PROMOTED_AT_DESC'
+  | 'REJECTION_REASON_ASC'
+  | 'REJECTION_REASON_DESC'
   | 'SIZE_ASC'
   | 'SIZE_DESC'
   | 'STATUS_ASC'
@@ -111,7 +113,7 @@ export type FileOrderBy =
   | 'UPDATED_AT_DESC'
   | 'UPLOAD_ASC'
   | 'UPLOAD_DESC';
-export type FileStatus = 'EXPIRED' | 'PROCESSED' | 'REJECTED' | 'REQUESTED' | 'UPLOADED';
+export type FileStatus = 'PROCESSED' | 'REJECTED' | 'REQUESTED' | 'UPLOADED';
 /** Methods to use when ordering `PlatformBucket`. */
 export type PlatformBucketOrderBy =
   | 'ACTOR_ID_ASC'
@@ -180,6 +182,8 @@ export type PlatformFileOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROMOTED_AT_ASC'
   | 'PROMOTED_AT_DESC'
+  | 'REJECTION_REASON_ASC'
+  | 'REJECTION_REASON_DESC'
   | 'SIZE_ASC'
   | 'SIZE_DESC'
   | 'STATUS_ASC'
@@ -402,20 +406,10 @@ export interface CreateBucketInput {
   bucket: BucketInput;
   clientMutationId?: string;
 }
-export interface CreateFileInput {
-  clientMutationId?: string;
-  /** The `File` to be created by this mutation. */
-  file: FileInput;
-}
 export interface CreatePlatformBucketInput {
   clientMutationId?: string;
   /** The `PlatformBucket` to be created by this mutation. */
   platformBucket: PlatformBucketInput;
-}
-export interface CreatePlatformFileInput {
-  clientMutationId?: string;
-  /** The `PlatformFile` to be created by this mutation. */
-  platformFile: PlatformFileInput;
 }
 export interface DeleteBucketInput {
   clientMutationId?: string;
@@ -469,6 +463,8 @@ export interface FileFilter {
   or?: FileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -479,38 +475,6 @@ export interface FileFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `upload` field. */
   upload?: ConstructiveInternalTypeUploadFilter;
-}
-/** An input for mutations affecting `File` */
-export interface FileInput {
-  /** User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization. */
-  actorId: string;
-  /** Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger. */
-  bucketId: string;
-  /** SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately. */
-  contentHash?: string;
-  createdAt?: string;
-  /** Human-readable description or alt text for the file (mutable) */
-  description?: string;
-  /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
-  expiryEnqueuedAt?: string;
-  /** Original filename provided by the uploader. Used for display and Content-Disposition header on download. */
-  filename?: string;
-  id?: string;
-  /** S3 object key for this file, unique within its bucket */
-  key: string;
-  /** MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT. */
-  mimeType: string;
-  /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
-  promotedAt?: string;
-  /** File size in bytes. Immutable after INSERT. */
-  size: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
-  status?: FileStatus;
-  /** User-defined tags for categorization and search (mutable) */
-  tags?: string[];
-  updatedAt?: string;
-  /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  upload?: ConstructiveInternalTypeUpload;
 }
 /** Represents an update to a `File`. Fields that are set will be updated. */
 export interface FilePatch {
@@ -538,17 +502,17 @@ export interface FilePatch {
   mimeType?: string;
   /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
   promotedAt?: string;
+  /** Why the upload was rejected (declared MIME, extension and magic bytes disagreed, size mismatch, ...). NULL unless status is rejected. */
+  rejectionReason?: string;
   /** File size in bytes. Immutable after INSERT. */
   size?: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
+  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes). A requested row whose bytes never arrive within upload_url_expiry_seconds is deleted by the confirm loop. */
   status?: FileStatus;
   /** User-defined tags for categorization and search (mutable) */
   tags?: string[];
   updatedAt?: string;
   /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
   upload?: ConstructiveInternalTypeUpload;
-  /** Upload for Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  uploadUpload?: File;
 }
 /** A filter to be used against FileStatus fields. All fields are combined with a logical ‘and.’ */
 export interface FileStatusFilter {
@@ -799,6 +763,8 @@ export interface PlatformFileFilter {
   or?: PlatformFileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -809,38 +775,6 @@ export interface PlatformFileFilter {
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `upload` field. */
   upload?: ConstructiveInternalTypeUploadFilter;
-}
-/** An input for mutations affecting `PlatformFile` */
-export interface PlatformFileInput {
-  /** User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization. */
-  actorId: string;
-  /** Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger. */
-  bucketId: string;
-  /** SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately. */
-  contentHash?: string;
-  createdAt?: string;
-  /** Human-readable description or alt text for the file (mutable) */
-  description?: string;
-  /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
-  expiryEnqueuedAt?: string;
-  /** Original filename provided by the uploader. Used for display and Content-Disposition header on download. */
-  filename?: string;
-  id?: string;
-  /** S3 object key for this file, unique within its bucket */
-  key: string;
-  /** MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT. */
-  mimeType: string;
-  /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
-  promotedAt?: string;
-  /** File size in bytes. Immutable after INSERT. */
-  size: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
-  status?: FileStatus;
-  /** User-defined tags for categorization and search (mutable) */
-  tags?: string[];
-  updatedAt?: string;
-  /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  upload?: ConstructiveInternalTypeUpload;
 }
 /** Represents an update to a `PlatformFile`. Fields that are set will be updated. */
 export interface PlatformFilePatch {
@@ -866,17 +800,17 @@ export interface PlatformFilePatch {
   mimeType?: string;
   /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
   promotedAt?: string;
+  /** Why the upload was rejected (declared MIME, extension and magic bytes disagreed, size mismatch, ...). NULL unless status is rejected. */
+  rejectionReason?: string;
   /** File size in bytes. Immutable after INSERT. */
   size?: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
+  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes). A requested row whose bytes never arrive within upload_url_expiry_seconds is deleted by the confirm loop. */
   status?: FileStatus;
   /** User-defined tags for categorization and search (mutable) */
   tags?: string[];
   updatedAt?: string;
   /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
   upload?: ConstructiveInternalTypeUpload;
-  /** Upload for Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  uploadUpload?: File;
 }
 export interface PlatformFilesRenameInput {
   clientMutationId?: string;
@@ -931,6 +865,8 @@ export interface UploadFileBulkFileInput {
 export interface UploadFileBulkInput {
   /** Bucket key (e.g., "public", "private"). Omit to use the database's default bucket for the requested access. */
   bucketKey?: string;
+  /** Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused. */
+  databaseId?: string;
   /** Array of files to upload */
   files: UploadFileBulkFileInput[];
   /** Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given. */
@@ -943,6 +879,8 @@ export interface UploadFileInput {
   contentHash: string;
   /** MIME type of the file */
   contentType: string;
+  /** Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused. */
+  databaseId?: string;
   /** Original filename (optional) */
   filename?: string;
   /** Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given. */
@@ -1026,23 +964,11 @@ export interface CreateBucketPayload {
   bucketEdge?: BucketEdge | null;
   clientMutationId?: string | null;
 }
-export interface CreateFilePayload {
-  clientMutationId?: string | null;
-  /** The `File` that was created by this mutation. */
-  file?: File | null;
-  fileEdge?: FileEdge | null;
-}
 export interface CreatePlatformBucketPayload {
   clientMutationId?: string | null;
   /** The `PlatformBucket` that was created by this mutation. */
   platformBucket?: PlatformBucket | null;
   platformBucketEdge?: PlatformBucketEdge | null;
-}
-export interface CreatePlatformFilePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformFile` that was created by this mutation. */
-  platformFile?: PlatformFile | null;
-  platformFileEdge?: PlatformFileEdge | null;
 }
 export interface DeleteBucketPayload {
   /** The `Bucket` that was deleted by this mutation. */
@@ -1122,6 +1048,8 @@ export interface UploadFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
+  /** The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. Null if deduplicated. */
+  uploadHeaders?: unknown | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1139,6 +1067,8 @@ export interface UploadPlatformFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
+  /** The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. Null if deduplicated. */
+  uploadHeaders?: unknown | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1150,19 +1080,21 @@ export interface MetaTable {
   constraints: MetaConstraints;
   fields: MetaField[];
   foreignKeyConstraints: MetaForeignKeyConstraint[];
-  /** i18n metadata (null if no @i18n tag) */
+  /** i18n metadata (null if the table is not translatable) */
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Whether this table only links rows of two other tables; the link appears in their manyToMany relations */
+  isJunction: boolean;
   /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
-  /** Realtime metadata (null if no @realtime tag) */
+  /** Realtime metadata (null if the table has no change subscriptions) */
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
-  /** Provisioning scope metadata (null if no @scope tag) */
+  /** Provisioning scope metadata (null if the table has no scope) */
   scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
@@ -1214,6 +1146,8 @@ export interface UploadFileBulkFilePayload {
   file?: unknown | null;
   fileId: string;
   key: string;
+  /** The exact headers the PUT to uploadUrl must send. */
+  uploadHeaders?: unknown | null;
   uploadUrl?: string | null;
 }
 export interface UploadPlatformFileBulkFilePayload {
@@ -1223,6 +1157,8 @@ export interface UploadPlatformFileBulkFilePayload {
   file?: unknown | null;
   fileId: string;
   key: string;
+  /** The exact headers the PUT to uploadUrl must send. */
+  uploadHeaders?: unknown | null;
   uploadUrl?: string | null;
 }
 /** Table constraints */
@@ -1233,6 +1169,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only. */
+  allowedValues?: string[] | null;
   /** PostgreSQL column name */
   columnName: string;
   description?: string | null;
@@ -1242,6 +1180,12 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Whether a create must provide this field. Set on a table's own fields only. */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether a create may set this field. Set on a table's own fields only. */
+  isWritableOnCreate?: boolean | null;
+  /** Whether an update may change this field. Set on a table's own fields only. */
+  isWritableOnUpdate?: boolean | null;
   /** Final GraphQL field name */
   name: string;
   type: MetaType;
@@ -1255,7 +1199,7 @@ export interface MetaForeignKeyConstraint {
   referencedFields: string[];
   referencedTable: string;
 }
-/** i18n metadata for a table with @i18n tag */
+/** i18n metadata for a translatable table */
 export interface MetaI18n {
   /** Fields that are translatable */
   translatableFields: MetaI18nField[];
@@ -1270,7 +1214,7 @@ export interface MetaIndex {
   isUnique: boolean;
   name: string;
 }
-/** Table inflection names */
+/** Type and field names generated for this table */
 export interface MetaInflection {
   allRows: string;
   conditionType: string;
@@ -1298,7 +1242,7 @@ export interface MetaQuery {
   one?: string | null;
   update?: string | null;
 }
-/** Realtime metadata for a table with @realtime tag */
+/** Realtime metadata for a table with change subscriptions */
 export interface MetaRealtime {
   /** The generated subscription field name (e.g. onPostChanged) */
   subscriptionFieldName: string;
@@ -1313,13 +1257,13 @@ export interface MetaRelations {
 }
 /** Provisioning scope metadata for a table */
 export interface MetaScope {
-  /** SQL name of the entity table for entity scopes, else null */
+  /** Name of the entity table for entity scopes, else null */
   entityTable?: string | null;
-  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  /** Field name of the scope key (e.g. databaseId, orgId), null for global tiers */
   keyColumn?: string | null;
   /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
   scope: string;
-  /** Provenance of the scope metadata (always 'smartTag') */
+  /** Where this scope metadata comes from */
   source: string;
   /** Coarse bucket: 'global', 'database', or 'entity' */
   tier: string;
@@ -1337,17 +1281,17 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
-  /** GraphQL type name of the plane's buckets table */
+  /** GraphQL type name of the paired buckets table */
   bucketsType: string;
   /** Computed download-URL field on the files type; null on the buckets side */
   downloadUrlField?: string | null;
-  /** GraphQL type name of the plane's files table */
+  /** GraphQL type name of the paired files table */
   filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
-  /** The plane's GraphQL upload surface */
+  /** Upload mutations and types for this storage */
   upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
@@ -1420,7 +1364,7 @@ export interface MetaSearchColumn {
   /** Column name (camelCase) */
   name: string;
 }
-/** Per-table search configuration from @searchConfig smart tag */
+/** Per-table search configuration */
 export interface MetaSearchConfig {
   /** Exponential decay factor per day */
   boostRecencyDecay?: number | null;
@@ -1431,7 +1375,7 @@ export interface MetaSearchConfig {
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
 }
-/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+/** The upload mutations and types for a storage table pair */
 export interface MetaStorageUpload {
   /** Per-file input type inside the bulk input */
   bulkFileInputType: string;
@@ -1449,10 +1393,10 @@ export interface MetaStorageUpload {
   mutation: string;
   /** Payload type of the single upload mutation */
   payloadType: string;
-  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  /** Whether the upload input requires ownerId */
   requiresOwnerId: boolean;
 }
-/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+/** How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {
   /** For 'vector': declared length, else null. */
   dimensions?: number | null;

@@ -29,7 +29,6 @@ import type {
   SqlActionSelect,
   SqlActionFilter,
   SqlActionOrderBy,
-  CreateSqlActionInput,
   UpdateSqlActionInput,
   SqlActionPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class SqlActionModel {
       }) => ({
         sqlAction: data.sqlActions?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends SqlActionSelect>(
-    args: CreateArgs<S, CreateSqlActionInput['sqlAction']> & {
-      select: S;
-    } & StrictSelect<S, SqlActionSelect>
-  ): QueryBuilder<{
-    createSqlAction: {
-      sqlAction: InferSelectResult<SqlActionWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'SqlAction',
-      'createSqlAction',
-      'sqlAction',
-      args.select,
-      args.data,
-      'CreateSqlActionInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'SqlAction',
-      fieldName: 'createSqlAction',
-      document,
-      variables,
     });
   }
 }

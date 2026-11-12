@@ -7,13 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type {
-  CreateSecretInput,
-  SecretPatch,
-  SecretSelect,
-  SecretFilter,
-  SecretOrderBy,
-} from '../../orm/input-types';
+import type { SecretPatch, SecretSelect, SecretFilter, SecretOrderBy } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   annotations: 'json',
@@ -48,7 +42,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -65,8 +59,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -132,113 +124,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'json',
-        name: 'annotations',
-        message: 'annotations',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'description',
-        message: 'description',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'labels',
-        message: 'labels',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'provider',
-        message: 'provider',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'realm',
-        message: 'realm',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'retiredAt',
-        message: 'retiredAt',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'rotatedAt',
-        message: 'rotatedAt',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema) as CreateSecretInput['secret'];
-    const client = getClient();
-    const result = await client.secret
-      .create({
-        data: {
-          annotations: cleanedData.annotations,
-          databaseId: cleanedData.databaseId,
-          description: cleanedData.description,
-          labels: cleanedData.labels,
-          name: cleanedData.name,
-          namespaceId: cleanedData.namespaceId,
-          provider: cleanedData.provider,
-          realm: cleanedData.realm,
-          retiredAt: cleanedData.retiredAt,
-          rotatedAt: cleanedData.rotatedAt,
-        },
-        select: {
-          annotations: true,
-          createdAt: true,
-          databaseId: true,
-          description: true,
-          id: true,
-          labels: true,
-          name: true,
-          namespaceId: true,
-          provider: true,
-          realm: true,
-          retiredAt: true,
-          rotatedAt: true,
-          updatedAt: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

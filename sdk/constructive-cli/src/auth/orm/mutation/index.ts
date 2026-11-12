@@ -16,6 +16,7 @@ import type {
   CreateChildPrincipalInput,
   CreateOrgApiKeyInput,
   CreateOrgPrincipalInput,
+  CreatePrincipalInput,
   CreatePrincipalFromPresetInput,
   DeleteOrgPrincipalInput,
   DeletePrincipalInput,
@@ -26,6 +27,8 @@ import type {
   EnableEmailMfaInput,
   EnableSmsMfaInput,
   EnableTotpInput,
+  EnsureAuthCsrfInput,
+  ExchangeNativeHandoffInput,
   ExtendTokenExpiresInput,
   ForgotPasswordInput,
   GenerateBackupCodesInput,
@@ -34,6 +37,7 @@ import type {
   ProvisionBucketInput,
   RefreshAccessTokenInput,
   RequestCrossOriginTokenInput,
+  RequestDeviceApprovalInput,
   RequestMagicLinkInput,
   ResetPasswordInput,
   RevokeApiKeyInput,
@@ -71,6 +75,7 @@ import type {
   CreateChildPrincipalPayload,
   CreateOrgApiKeyPayload,
   CreateOrgPrincipalPayload,
+  CreatePrincipalPayload,
   CreatePrincipalFromPresetPayload,
   DeleteOrgPrincipalPayload,
   DeletePrincipalPayload,
@@ -81,6 +86,8 @@ import type {
   EnableEmailMfaPayload,
   EnableSmsMfaPayload,
   EnableTotpPayload,
+  EnsureAuthCsrfPayload,
+  ExchangeNativeHandoffPayload,
   ExtendTokenExpiresPayload,
   ForgotPasswordPayload,
   GenerateBackupCodesPayload,
@@ -89,6 +96,7 @@ import type {
   ProvisionBucketPayload,
   RefreshAccessTokenPayload,
   RequestCrossOriginTokenPayload,
+  RequestDeviceApprovalPayload,
   RequestMagicLinkPayload,
   ResetPasswordPayload,
   RevokeApiKeyPayload,
@@ -126,6 +134,7 @@ import type {
   CreateChildPrincipalPayloadSelect,
   CreateOrgApiKeyPayloadSelect,
   CreateOrgPrincipalPayloadSelect,
+  CreatePrincipalPayloadSelect,
   CreatePrincipalFromPresetPayloadSelect,
   DeleteOrgPrincipalPayloadSelect,
   DeletePrincipalPayloadSelect,
@@ -136,6 +145,8 @@ import type {
   EnableEmailMfaPayloadSelect,
   EnableSmsMfaPayloadSelect,
   EnableTotpPayloadSelect,
+  EnsureAuthCsrfPayloadSelect,
+  ExchangeNativeHandoffPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   ForgotPasswordPayloadSelect,
   GenerateBackupCodesPayloadSelect,
@@ -144,6 +155,7 @@ import type {
   ProvisionBucketPayloadSelect,
   RefreshAccessTokenPayloadSelect,
   RequestCrossOriginTokenPayloadSelect,
+  RequestDeviceApprovalPayloadSelect,
   RequestMagicLinkPayloadSelect,
   ResetPasswordPayloadSelect,
   RevokeApiKeyPayloadSelect,
@@ -189,6 +201,10 @@ export interface ConfirmDeleteAccountVariables {
 export interface ConfirmTotpSetupVariables {
   input: ConfirmTotpSetupInput;
 }
+/**
+ * Variables for createApiKey
+ * Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
+ */
 export interface CreateApiKeyVariables {
   input: CreateApiKeyInput;
 }
@@ -200,6 +216,9 @@ export interface CreateOrgApiKeyVariables {
 }
 export interface CreateOrgPrincipalVariables {
   input: CreateOrgPrincipalInput;
+}
+export interface CreatePrincipalVariables {
+  input: CreatePrincipalInput;
 }
 export interface CreatePrincipalFromPresetVariables {
   input: CreatePrincipalFromPresetInput;
@@ -230,6 +249,12 @@ export interface EnableSmsMfaVariables {
 }
 export interface EnableTotpVariables {
   input: EnableTotpInput;
+}
+export interface EnsureAuthCsrfVariables {
+  input: EnsureAuthCsrfInput;
+}
+export interface ExchangeNativeHandoffVariables {
+  input: ExchangeNativeHandoffInput;
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
@@ -263,6 +288,9 @@ export interface RefreshAccessTokenVariables {
 }
 export interface RequestCrossOriginTokenVariables {
   input: RequestCrossOriginTokenInput;
+}
+export interface RequestDeviceApprovalVariables {
+  input: RequestDeviceApprovalInput;
 }
 export interface RequestMagicLinkVariables {
   input: RequestMagicLinkInput;
@@ -611,6 +639,35 @@ export function createMutationOperations(client: OrmClient) {
           'CreateOrgPrincipalPayload'
         ),
       }),
+    createPrincipal: <S extends CreatePrincipalPayloadSelect>(
+      args: CreatePrincipalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreatePrincipalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createPrincipal: InferSelectResult<CreatePrincipalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreatePrincipal',
+        fieldName: 'createPrincipal',
+        ...buildCustomDocument(
+          'mutation',
+          'CreatePrincipal',
+          'createPrincipal',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreatePrincipalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreatePrincipalPayload'
+        ),
+      }),
     createPrincipalFromPreset: <S extends CreatePrincipalFromPresetPayloadSelect>(
       args: CreatePrincipalFromPresetVariables,
       options: {
@@ -901,6 +958,64 @@ export function createMutationOperations(client: OrmClient) {
           'EnableTotpPayload'
         ),
       }),
+    ensureAuthCsrf: <S extends EnsureAuthCsrfPayloadSelect>(
+      args: EnsureAuthCsrfVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, EnsureAuthCsrfPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        ensureAuthCsrf: InferSelectResult<EnsureAuthCsrfPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'EnsureAuthCsrf',
+        fieldName: 'ensureAuthCsrf',
+        ...buildCustomDocument(
+          'mutation',
+          'EnsureAuthCsrf',
+          'ensureAuthCsrf',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'EnsureAuthCsrfInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'EnsureAuthCsrfPayload'
+        ),
+      }),
+    exchangeNativeHandoff: <S extends ExchangeNativeHandoffPayloadSelect>(
+      args: ExchangeNativeHandoffVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ExchangeNativeHandoffPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        exchangeNativeHandoff: InferSelectResult<ExchangeNativeHandoffPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ExchangeNativeHandoff',
+        fieldName: 'exchangeNativeHandoff',
+        ...buildCustomDocument(
+          'mutation',
+          'ExchangeNativeHandoff',
+          'exchangeNativeHandoff',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ExchangeNativeHandoffInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ExchangeNativeHandoffPayload'
+        ),
+      }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(
       args: ExtendTokenExpiresVariables,
       options: {
@@ -1131,6 +1246,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'RequestCrossOriginTokenPayload'
+        ),
+      }),
+    requestDeviceApproval: <S extends RequestDeviceApprovalPayloadSelect>(
+      args: RequestDeviceApprovalVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RequestDeviceApprovalPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        requestDeviceApproval: InferSelectResult<RequestDeviceApprovalPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RequestDeviceApproval',
+        fieldName: 'requestDeviceApproval',
+        ...buildCustomDocument(
+          'mutation',
+          'RequestDeviceApproval',
+          'requestDeviceApproval',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RequestDeviceApprovalInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RequestDeviceApprovalPayload'
         ),
       }),
     requestMagicLink: <S extends RequestMagicLinkPayloadSelect>(

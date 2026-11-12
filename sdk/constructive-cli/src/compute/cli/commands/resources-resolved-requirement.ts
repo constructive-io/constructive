@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateResourcesResolvedRequirementInput,
   ResourcesResolvedRequirementPatch,
   ResourcesResolvedRequirementSelect,
   ResourcesResolvedRequirementFilter,
@@ -46,7 +45,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -63,8 +62,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -134,121 +131,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'atomId',
-        message: 'atomId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'configObjectName',
-        message: 'configObjectName',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'present',
-        message: 'present',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'realm',
-        message: 'realm',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'required',
-        message: 'required',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'requirementKind',
-        message: 'requirementKind',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'secretsObjectName',
-        message: 'secretsObjectName',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'slug',
-        message: 'slug',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateResourcesResolvedRequirementInput['resourcesResolvedRequirement'];
-    const client = getClient();
-    const result = await client.resourcesResolvedRequirement
-      .create({
-        data: {
-          atomId: cleanedData.atomId,
-          configObjectName: cleanedData.configObjectName,
-          name: cleanedData.name,
-          namespaceId: cleanedData.namespaceId,
-          present: cleanedData.present,
-          realm: cleanedData.realm,
-          required: cleanedData.required,
-          requirementKind: cleanedData.requirementKind,
-          resourceId: cleanedData.resourceId,
-          secretsObjectName: cleanedData.secretsObjectName,
-          slug: cleanedData.slug,
-        },
-        select: {
-          atomId: true,
-          configObjectName: true,
-          name: true,
-          namespaceId: true,
-          present: true,
-          realm: true,
-          required: true,
-          requirementKind: true,
-          resourceId: true,
-          secretsObjectName: true,
-          slug: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

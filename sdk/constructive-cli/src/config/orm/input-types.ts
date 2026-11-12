@@ -1095,18 +1095,6 @@ export type SecretOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 // ============ CRUD Input Types ============
-export interface CreateAppInternalSecretInput {
-  clientMutationId?: string;
-  appInternalSecret: {
-    annotations?: Record<string, unknown>;
-    description?: string;
-    labels?: Record<string, unknown>;
-    name?: string;
-    realm?: string;
-    retiredAt?: string;
-    rotatedAt?: string;
-  };
-}
 export interface AppInternalSecretPatch {
   annotations?: Record<string, unknown> | null;
   description?: string | null;
@@ -1199,19 +1187,6 @@ export interface DeleteInternalConfigInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateInternalSecretInput {
-  clientMutationId?: string;
-  internalSecret: {
-    annotations?: Record<string, unknown>;
-    databaseId: string;
-    description?: string;
-    labels?: Record<string, unknown>;
-    name?: string;
-    realm?: string;
-    retiredAt?: string;
-    rotatedAt?: string;
-  };
-}
 export interface InternalSecretPatch {
   annotations?: Record<string, unknown> | null;
   databaseId?: string | null;
@@ -1301,18 +1276,6 @@ export interface DeletePlatformInternalConfigInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformInternalSecretInput {
-  clientMutationId?: string;
-  platformInternalSecret: {
-    annotations?: Record<string, unknown>;
-    description?: string;
-    labels?: Record<string, unknown>;
-    name?: string;
-    realm?: string;
-    retiredAt?: string;
-    rotatedAt?: string;
-  };
-}
 export interface PlatformInternalSecretPatch {
   annotations?: Record<string, unknown> | null;
   description?: string | null;
@@ -1330,20 +1293,6 @@ export interface UpdatePlatformInternalSecretInput {
 export interface DeletePlatformInternalSecretInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreatePlatformSecretInput {
-  clientMutationId?: string;
-  platformSecret: {
-    annotations?: Record<string, unknown>;
-    description?: string;
-    labels?: Record<string, unknown>;
-    name?: string;
-    namespaceId: string;
-    provider?: string;
-    realm?: string;
-    retiredAt?: string;
-    rotatedAt?: string;
-  };
 }
 export interface PlatformSecretPatch {
   annotations?: Record<string, unknown> | null;
@@ -1364,21 +1313,6 @@ export interface UpdatePlatformSecretInput {
 export interface DeletePlatformSecretInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateSecretInput {
-  clientMutationId?: string;
-  secret: {
-    annotations?: Record<string, unknown>;
-    databaseId: string;
-    description?: string;
-    labels?: Record<string, unknown>;
-    name?: string;
-    namespaceId: string;
-    provider?: string;
-    realm?: string;
-    retiredAt?: string;
-    rotatedAt?: string;
-  };
 }
 export interface SecretPatch {
   annotations?: Record<string, unknown> | null;

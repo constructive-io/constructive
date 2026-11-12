@@ -8,8 +8,8 @@
 
 ## Overview
 
-- **Tables:** 90
-- **Custom queries:** 18
+- **Tables:** 91
+- **Custom queries:** 14
 - **Custom mutations:** 31
 
 **Generators:** ORM, React Query
