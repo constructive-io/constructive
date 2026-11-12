@@ -77,7 +77,7 @@ export interface StorageModuleConfig {
   uploadUrlExpirySeconds: number;
   /** Presigned GET URL expiry in seconds (default: 3600 = 1 hour) */
   downloadUrlExpirySeconds: number;
-  /** Default max file size in bytes (default: 200MB). Bucket-level max_file_size overrides this. */
+  /** Max file size in bytes for every bucket of this module (default: 200MB). A bucket's max_file_size can only lower it: both limits are checked. */
   defaultMaxFileSize: number;
   /** Max filename length in characters (default: 1024) */
   maxFilenameLength: number;
