@@ -3572,8 +3572,6 @@ type UploadFilePayload {
   """The S3 object key"""
   key: String!
 
-  """ID of the previous version (when using custom keys)"""
-
   """Presigned PUT URL (null if deduplicated)"""
   uploadUrl: String
 }
@@ -3669,8 +3667,6 @@ type UploadPlatformFilePayload {
 
   """The S3 object key"""
   key: String!
-
-  """ID of the previous version (when using custom keys)"""
 
   """Presigned PUT URL (null if deduplicated)"""
   uploadUrl: String
