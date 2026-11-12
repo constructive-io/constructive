@@ -25,6 +25,7 @@ import type { PgCodecWithAttributes } from '@dataplan/pg';
 import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
+import type { SQL } from 'pg-sql2';
 
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
@@ -66,11 +67,49 @@ declare global {
  */
 interface SearchScoreDetails {
   selectIndex: number;
+  /** Which filter scored the column: its own filter field, or unifiedSearch. */
+  source?: ScoreSource;
+}
+
+type ScoreSource = 'explicit' | 'unified';
+
+/** Where the composite score's ranking subquery reads rows from. */
+interface ScoringSource {
+  from: SQL;
+  uniqueAttributes: readonly string[];
+}
+
+/** One adapter/column taking part in the composite score for a query. */
+interface ScoringSlot {
+  n: number;
+  weight: number;
+  lowerIsBetter: boolean;
+  /** Score and match clause written against the ranking subquery's alias. */
+  score: SQL;
+  matches: SQL;
+}
+
+/** Per-execution state of the composite score join (kept in query meta). */
+interface ScoringState {
+  alias: SQL;
+  innerAlias: SQL;
+  slots: Map<string, ScoringSlot>;
+  nextSlot: number;
+  joinSpec: { from: SQL } | null;
+}
+
+/** Resolved composite-score settings for one table. */
+interface SearchScoreConfig {
+  weights: Record<string, number> | undefined;
+  boostRecent: boolean;
+  boostRecencyField: string;
+  boostRecencyDecay: number;
+  /** Set when boost_recent named a column the table does not have. */
+  missingRecencyField: string | null;
 }
 
 /**
  * Per-table search configuration read from the @searchConfig smart tag.
- * Written by SearchFullText, SearchBm25, and SearchUnified in constructive-db.
  */
 interface SearchConfig {
   weights?: Record<string, number>;
@@ -98,6 +137,31 @@ function getSearchConfig(codec: PgCodecWithAttributes): SearchConfig | undefined
   }
   if (typeof raw === 'object') return raw as SearchConfig;
   return undefined;
+}
+
+/**
+ * Resolve the composite searchScore settings for a table: per-table
+ * @searchConfig first, then the plugin's global options.
+ */
+function resolveSearchScoreConfig(
+  codec: PgCodecWithAttributes,
+  globalWeights: Record<string, number> | undefined,
+): SearchScoreConfig {
+  const tableSearchConfig = getSearchConfig(codec);
+  let boostRecent = tableSearchConfig?.boost_recent ?? false;
+  const boostRecencyField = tableSearchConfig?.boost_recency_field ?? 'updated_at';
+  let missingRecencyField: string | null = null;
+  if (boostRecent && boostRecencyField && !codec.attributes[boostRecencyField]) {
+    missingRecencyField = boostRecencyField;
+    boostRecent = false;
+  }
+  return {
+    weights: tableSearchConfig?.weights ?? globalWeights,
+    boostRecent,
+    boostRecencyField,
+    boostRecencyDecay: tableSearchConfig?.boost_recency_decay ?? 0.95,
+    missingRecencyField,
+  };
 }
 
 /**
@@ -171,8 +235,16 @@ export function createUnifiedSearchPlugin(
 ): GraphileConfig.Plugin {
   const { adapters, enableSearchScore = true, enableUnifiedSearch = true, rrfK = 60 } = options;
 
-  // Per-codec cache of discovered columns, keyed by codec name
-  const codecCache = new Map<string, AdapterColumnCache[]>();
+  // Discovered columns per codec. One plugin instance can build several
+  // schemas (a shared preset), and two builds can have codecs with the same
+  // name but different attributes, so the cache is keyed by build and then
+  // by codec identity, never by name.
+  const codecCache = new WeakMap<object, WeakMap<object, AdapterColumnCache[]>>();
+
+  const SEARCH_SCORE_ORDER_KEY = 'unified_order_search_score';
+  // Set when the query reads searchScore or orders by SEARCH_SCORE_*: only
+  // then are ranks computed (they need a second scan of the table).
+  const RANKS_WANTED_KEY = 'unified_search_ranks_wanted';
 
   // A search orderBy needs the direction (from the orderBy enum) and the
   // score expression (from the filter). The filter always applies at
@@ -180,12 +252,131 @@ export function createUnifiedSearchPlugin(
   // variable orderBy applies at runtime, after it. Each side stores its
   // half in the query builder's meta, which is copied per execution, and
   // whichever side runs second adds the ORDER BY.
-  function orderBySearchScore(qb: any, orderKey: string): void {
+  //
+  // The ORDER BY spec object is kept in meta so a later filter can swap
+  // the expression in place (pgSelect renders `orders` after every apply
+  // has run): unifiedSearch adds adapters to the composite score one at a
+  // time, and an explicit column filter replaces the unifiedSearch score
+  // for the same column.
+  function setSearchOrder(qb: any, orderKey: string, fragment: SQL, nulls?: 'LAST'): void {
     const direction = qb.getMetaRaw(`${orderKey}__direction`);
-    const fragment = qb.getMetaRaw(`${orderKey}__score`);
-    if (direction && fragment) {
-      qb.orderBy({ fragment, codec: TYPES.float, direction });
+    if (!direction) return;
+    const spec = qb.getMetaRaw(`${orderKey}__spec`);
+    if (spec) {
+      spec.fragment = fragment;
+      return;
     }
+    const newSpec: Record<string, unknown> = { fragment, codec: TYPES.float, direction };
+    if (nulls) newSpec.nulls = nulls;
+    qb.orderBy(newSpec);
+    qb.setMeta(`${orderKey}__spec`, newSpec);
+  }
+
+  function orderBySearchScore(qb: any, orderKey: string): void {
+    const fragment = qb.getMetaRaw(`${orderKey}__score`);
+    if (fragment) setSearchOrder(qb, orderKey, fragment);
+  }
+
+  // SEARCH_SCORE_* orders by the same Reciprocal Rank Fusion sum the
+  // searchScore field displays: each active adapter contributes
+  // weight / (k + rank), rank being the row's position by that adapter's
+  // score. The field divides by a per-query constant to land in 0..1,
+  // which does not change the order, so the SQL skips it.
+  //
+  // Ranks are window functions, which cannot appear in the WHERE a cursor
+  // becomes, so they are computed in a subquery over the table's matching
+  // rows that is LEFT JOINed to the query on the primary key. The outer
+  // query then orders by, pages on and displays plain columns of that join.
+  function getScoringState(qb: any, sql: any): ScoringState {
+    let state: ScoringState | undefined = qb.getMetaRaw(`${SEARCH_SCORE_ORDER_KEY}__scoring`);
+    if (!state) {
+      state = {
+        alias: sql.identifier(Symbol('search_scores')),
+        innerAlias: sql.identifier(Symbol('search_scores_rows')),
+        slots: new Map(),
+        nextSlot: 0,
+        joinSpec: null,
+      };
+      qb.setMeta(`${SEARCH_SCORE_ORDER_KEY}__scoring`, state);
+    }
+    return state;
+  }
+
+  function rankColumn(slot: ScoringSlot, sql: any): SQL {
+    return sql.identifier(`rank_${slot.n}`);
+  }
+
+  function scoreColumn(slot: ScoringSlot, sql: any): SQL {
+    return sql.identifier(`score_${slot.n}`);
+  }
+
+  function buildScoringSubquery(
+    state: ScoringState,
+    source: ScoringSource,
+    scoreConfig: SearchScoreConfig,
+    sql: any,
+  ): SQL {
+    const t = state.innerAlias;
+    const r = sql.identifier(Symbol('search_scores_ranked'));
+    const slots = [...state.slots.values()];
+    const keyColumns = source.uniqueAttributes.map((name) => sql.identifier(name));
+    const recency = scoreConfig.boostRecent ? sql.identifier('recency') : null;
+
+    const innerSelects: SQL[] = keyColumns.map((c: SQL) => sql`${t}.${c}`);
+    if (recency) {
+      innerSelects.push(sql`${t}.${sql.identifier(scoreConfig.boostRecencyField)} AS ${recency}`);
+    }
+    const terms: SQL[] = [];
+    for (const slot of slots) {
+      const rank = rankColumn(slot, sql);
+      const direction = slot.lowerIsBetter ? sql.fragment`ASC` : sql.fragment`DESC`;
+      // Scores such as similarity() and ts_rank() are real; the cursor
+      // round-trips them through the float8 codec, so the ORDER BY must
+      // compare as float8 too or the boundary row repeats on `before`.
+      innerSelects.push(sql`${slot.score}::float8 AS ${scoreColumn(slot, sql)}`);
+      // RANK(): rows with the same score share a rank, so equal evidence
+      // gives an equal composite score (the primary key then orders them).
+      // A row without a score has no rank: otherwise it would be handed the
+      // position right after the scored ones.
+      innerSelects.push(
+        sql`(CASE WHEN ${slot.score} IS NULL THEN NULL ELSE RANK() OVER (ORDER BY ${slot.score} ${direction} NULLS LAST) END) AS ${rank}`,
+      );
+      terms.push(
+        sql`CASE WHEN ${r}.${rank} IS NULL THEN 0::float8 ELSE ${sql.literal(slot.weight)}::float8 / (${sql.literal(rrfK)}::float8 + ${r}.${rank}) END`,
+      );
+    }
+    let score = sql`(${sql.join(terms, ' + ')})`;
+    if (recency) {
+      const age = sql`GREATEST(0::float8, EXTRACT(EPOCH FROM (now() - ${r}.${recency}))::float8 / 86400)`;
+      score = sql`${score} * CASE WHEN ${r}.${recency} IS NULL THEN 1::float8 ELSE power(${sql.literal(scoreConfig.boostRecencyDecay)}::float8, ${age}) END`;
+    }
+
+    const inner = sql`SELECT ${sql.join(innerSelects, ', ')} FROM ${source.from} AS ${t} WHERE ${sql.join(slots.map((slot) => sql.parens(slot.matches)), ' OR ')}`;
+    const outerSelects: SQL[] = [
+      ...keyColumns.map((c: SQL) => sql`${r}.${c}`),
+      ...slots.map((slot) => sql`${r}.${scoreColumn(slot, sql)}`),
+      ...slots.map((slot) => sql`${r}.${rankColumn(slot, sql)}`),
+      sql`${score}::float8 AS ${sql.identifier('score')}`,
+    ];
+    return sql`(SELECT ${sql.join(outerSelects, ', ')} FROM (${inner}) AS ${r})`;
+  }
+
+  function orderByCompositeScore(qb: any, sql: any): void {
+    const state: ScoringState | undefined = qb.getMetaRaw(`${SEARCH_SCORE_ORDER_KEY}__scoring`);
+    if (!state || state.slots.size === 0) return;
+    setSearchOrder(qb, SEARCH_SCORE_ORDER_KEY, sql`${state.alias}.${sql.identifier('score')}`, 'LAST');
+  }
+
+  /**
+   * The table the composite score ranks rows in, joined back on its
+   * primary key. Null when the codec has no table or no unique key.
+   */
+  function getScoringSource(codec: PgCodecWithAttributes, build: any): ScoringSource | null {
+    const resource = build.pgTableResource?.(codec);
+    if (!resource || typeof resource.from === 'function') return null;
+    const unique = resource.uniques?.[0];
+    if (!unique || unique.attributes.length === 0) return null;
+    return { from: resource.from, uniqueAttributes: unique.attributes };
   }
 
   /**
@@ -201,10 +392,13 @@ export function createUnifiedSearchPlugin(
    * count as intentional search.
    */
   function getAdapterColumns(codec: PgCodecWithAttributes, build: any): AdapterColumnCache[] {
-    const cacheKey = codec.name;
-    if (codecCache.has(cacheKey)) {
-      return codecCache.get(cacheKey)!;
+    let buildCache = codecCache.get(build);
+    if (!buildCache) {
+      buildCache = new WeakMap();
+      codecCache.set(build, buildCache);
     }
+    const cached = buildCache.get(codec);
+    if (cached) return cached;
 
     const primaryAdapters = adapters.filter((a) => !a.isSupplementary);
     const supplementaryAdapters = adapters.filter((a) => a.isSupplementary);
@@ -244,8 +438,37 @@ export function createUnifiedSearchPlugin(
       }
     }
 
-    codecCache.set(cacheKey, results);
+    buildCache.set(codec, results);
     return results;
+  }
+
+  /**
+   * The filter fields that give an adapter's column a score: the column's
+   * own filter, and unifiedSearch when the adapter takes part in it.
+   */
+  function filtersScoring(adapter: SearchAdapter, column: SearchableColumn, inflection: any): string[] {
+    const names = [inflection.camelCase(`${adapter.filterPrefix}_${column.attributeName}`)];
+    if (enableUnifiedSearch && (adapter.supportsTextSearch || adapter.name === 'vector')) {
+      names.push('unifiedSearch');
+    }
+    return names;
+  }
+
+  /** Filter field names present (non-null) anywhere in a `where` value. */
+  function collectFilterFields(where: unknown, into: Set<string>): Set<string> {
+    if (Array.isArray(where)) {
+      for (const item of where) collectFilterFields(item, into);
+    } else if (where && typeof where === 'object') {
+      for (const [key, value] of Object.entries(where as Record<string, unknown>)) {
+        if (value == null) continue;
+        if (key === 'and' || key === 'or' || key === 'not') {
+          collectFilterFields(value, into);
+        } else {
+          into.add(key);
+        }
+      }
+    }
+    return into;
   }
 
   return {
@@ -373,6 +596,100 @@ export function createUnifiedSearchPlugin(
         },
 
         /**
+         * A search orderBy only has a score to order by when the filter that
+         * computes it is active. Validate `orderBy` against `where` on every
+         * collection field of a searchable table and fail the request with
+         * the filter that is missing, instead of silently returning rows in
+         * primary key order.
+         */
+        GraphQLObjectType_fields_field(field, build, context) {
+          const {
+            inflection,
+            grafast: { lambda, constant },
+          } = build;
+          const {
+            scope: { isPgFieldConnection, isPgFieldSimpleCollection, pgFieldResource },
+          } = context;
+          if (!isPgFieldConnection && !isPgFieldSimpleCollection) return field;
+          const codec = pgFieldResource?.codec as PgCodecWithAttributes | undefined;
+          if (!codec?.attributes || (codec as any).isAnonymous) return field;
+          const adapterColumns = getAdapterColumns(codec, build);
+          if (adapterColumns.length === 0) return field;
+          const plan = (field as any).plan;
+          if (typeof plan !== 'function') return field;
+
+          const requiredFilters = new Map<string, string[]>();
+          const anySearchFilter = new Set<string>();
+          for (const { adapter, columns } of adapterColumns) {
+            for (const column of columns) {
+              const filters = filtersScoring(adapter, column, inflection);
+              filters.forEach((f) => anySearchFilter.add(f));
+              for (const ascending of [true, false]) {
+                const name = inflection.pgSearchOrderByEnum(
+                  codec, column.attributeName, adapter.name, adapter.scoreSemantics.metric, ascending,
+                );
+                requiredFilters.set(name, filters);
+              }
+            }
+          }
+          if (enableSearchScore) {
+            const all = [...anySearchFilter];
+            requiredFilters.set(inflection.constantCase('search_score_asc'), all);
+            requiredFilters.set(inflection.constantCase('search_score_desc'), all);
+          }
+
+          const compositeOrders = enableSearchScore
+            ? [inflection.constantCase('search_score_asc'), inflection.constantCase('search_score_desc')]
+            : [];
+          const hasScoringSource = getScoringSource(codec, build) != null;
+
+          function validateOrderBy(orderBy: unknown, where: unknown): void {
+            if (orderBy == null) return;
+            const values = Array.isArray(orderBy) ? orderBy : [orderBy];
+            let present: Set<string> | null = null;
+            for (const value of values) {
+              const name = String(value);
+              const filters = requiredFilters.get(name);
+              if (!filters) continue;
+              present ??= collectFilterFields(where, new Set());
+              if (!filters.some((f) => present!.has(f))) {
+                throw new Error(
+                  `Cannot order by ${name} without a search filter that scores it: ` +
+                  `add ${filters.map((f) => `where.${f}`).join(' or ')}.`,
+                );
+              }
+              if (!hasScoringSource && compositeOrders.includes(name)) {
+                throw new Error(
+                  `Cannot order by ${name}: the composite score is joined on the table's ` +
+                  'primary key, and this table has none.',
+                );
+              }
+            }
+          }
+
+          return {
+            ...field,
+            plan($parent: any, fieldArgs: any, info: any) {
+              const $result = plan($parent, fieldArgs, info);
+              const argNames: string[] = (info?.field?.args ?? []).map((a: any) => a.name);
+              if ($result == null || !argNames.includes('orderBy')) return $result;
+              const $select = typeof $result.getSubplan === 'function' ? $result.getSubplan() : $result;
+              if (typeof $select?.apply !== 'function') return $result;
+              const $where = argNames.includes('where') ? fieldArgs.getRaw('where') : constant(null);
+              $select.apply(
+                lambda([fieldArgs.getRaw('orderBy'), $where], ([orderBy, where]: readonly [unknown, unknown]) => {
+                  validateOrderBy(orderBy, where);
+                  const values = Array.isArray(orderBy) ? orderBy : [orderBy];
+                  if (!values.some((v) => compositeOrders.includes(String(v)))) return undefined;
+                  return (qb: any) => qb.setMeta(RANKS_WANTED_KEY, true);
+                }),
+              );
+              return $result;
+            },
+          } as typeof field;
+        },
+
+        /**
          * Add score/rank/similarity/distance fields for each adapter's columns
          * on the appropriate output types.
          */
@@ -486,26 +803,14 @@ export function createUnifiedSearchPlugin(
               }
             }
 
-            // Read per-table @searchConfig smart tag (written by SearchUnified/SearchFullText/SearchBm25)
-            // Per-table config overrides global searchScoreWeights
-            const tableSearchConfig = getSearchConfig(codec);
-
-            // Resolve effective weights: per-table > global > equal (undefined)
-            const effectiveWeights = tableSearchConfig?.weights ?? options.searchScoreWeights;
-            // Recency boost config from per-table smart tag
-            let boostRecent = tableSearchConfig?.boost_recent ?? false;
-            const boostRecencyField = tableSearchConfig?.boost_recency_field ?? 'updated_at';
-            const boostRecencyDecay = tableSearchConfig?.boost_recency_decay ?? 0.95;
-
-
-            // Phase I: Validate that the recency field actually exists on the table.
-            // If it doesn't, disable recency boost gracefully instead of crashing at query time.
-            if (boostRecent && boostRecencyField && !codec.attributes[boostRecencyField]) {
+            const scoreConfig = resolveSearchScoreConfig(codec, options.searchScoreWeights);
+            const effectiveWeights = scoreConfig.weights;
+            const { boostRecent, boostRecencyField, boostRecencyDecay } = scoreConfig;
+            if (scoreConfig.missingRecencyField) {
               console.warn(
-                `[graphile-search] @searchConfig.boost_recency_field "${boostRecencyField}" ` +
+                `[graphile-search] @searchConfig.boost_recency_field "${scoreConfig.missingRecencyField}" ` +
                 `not found on table "${codec.name}". Recency boost disabled for this table.`
               );
-              boostRecent = false;
             }
 
             newFields = build.extend(
@@ -533,6 +838,7 @@ export function createUnifiedSearchPlugin(
                       if (typeof $select.setInliningForbidden === 'function') {
                         $select.setInliningForbidden();
                       }
+                      $select.setMeta(RANKS_WANTED_KEY, true);
 
                       // Collect all meta steps for all adapters
                       const $metaSteps = allMetaKeys.map((mk) => $select.getMeta(mk.metaKey));
@@ -548,10 +854,9 @@ export function createUnifiedSearchPlugin(
                       // Capture the index in a local const for the lambda closure
                       const capturedRecencyIndex = recencySelectIndex;
 
-                      // For RRF we also need rank expressions. Inject ROW_NUMBER()
-                      // window functions for each adapter score into the SELECT.
-                      // These will be populated at filter-apply time via meta.
-                      // We store a meta key suffix "__rank" alongside the score.
+                      // RRF needs each adapter's rank for the row. The filter
+                      // apply selects it from the scoring join and records the
+                      // select index under the "__rank" meta key.
                       const rankMetaKeys = allMetaKeys.map(
                         (mk) => `${mk.metaKey}__rank`
                       );
@@ -738,7 +1043,8 @@ export function createUnifiedSearchPlugin(
 
             const makeSearchScorePlan =
               (direction: 'ASC' | 'DESC') => (qb: any) => {
-                qb.setMeta('unified_order_search_score', direction);
+                qb.setMeta(`${SEARCH_SCORE_ORDER_KEY}__direction`, direction);
+                orderByCompositeScore(qb, build.sql);
               };
 
             newValues = build.extend(
@@ -783,36 +1089,86 @@ export function createUnifiedSearchPlugin(
            *
            * Shared by per-adapter filter fields AND the unifiedSearch
            * composite filter (both text and vector adapter branches).
+           *
+           * A column is scored once per query: its own filter field wins
+           * over unifiedSearch, whichever applied first.
            */
           function injectScoreAndRank(
             qb: any,
             adapter: SearchAdapter,
             column: SearchableColumn,
-            result: { scoreExpression: any },
+            applyFor: (alias: SQL) => { whereClause: SQL | null; scoreExpression: SQL; scorableClause?: SQL | null } | null,
             codec_: PgCodecWithAttributes,
+            source: ScoreSource,
+            scoreConfig: SearchScoreConfig,
+            scoring: ScoringSource | null,
           ): void {
             if (!qb || qb.mode !== 'normal') return;
+            const result = applyFor(qb.alias);
+            if (!result) return;
 
             const baseFieldName = inflection.attribute({
               codec: codec_ as any,
               attributeName: column.attributeName,
             });
             const scoreMetaKey = `__unified_search_${adapter.name}_${baseFieldName}`;
-            const wrappedScoreSql = sql`${sql.parens(result.scoreExpression)}::text`;
-            const scoreIndex = qb.selectAndReturnIndex(wrappedScoreSql);
-            qb.setMeta(scoreMetaKey, { selectIndex: scoreIndex } as SearchScoreDetails);
+            const existing: SearchScoreDetails | undefined = qb.getMetaRaw(scoreMetaKey);
+            if (existing && (existing.source === 'explicit' || source === 'unified')) return;
 
-            const rankMetaKey = `${scoreMetaKey}__rank`;
-            const orderDirection = adapter.scoreSemantics.lowerIsBetter ? 'ASC' : 'DESC';
-            // A row without a score has no rank: otherwise ROW_NUMBER() would
-            // hand unscored rows the positions right after the scored ones.
-            const rankSql = sql`(CASE WHEN ${sql.parens(result.scoreExpression)} IS NULL THEN NULL ELSE ROW_NUMBER() OVER (ORDER BY ${sql.parens(result.scoreExpression)} ${orderDirection === 'ASC' ? sql.fragment`ASC` : sql.fragment`DESC`} NULLS LAST) END)::text`;
-            const rankIndex = qb.selectAndReturnIndex(rankSql);
-            qb.setMeta(rankMetaKey, { selectIndex: rankIndex } as SearchScoreDetails);
+            const score = sql.parens(result.scoreExpression);
+            const scoreIndex = qb.selectAndReturnIndex(sql`${score}::text`);
+            qb.setMeta(scoreMetaKey, { selectIndex: scoreIndex, source } as SearchScoreDetails);
 
             const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
-            qb.setMeta(`${orderKey}__score`, result.scoreExpression);
+            const wantsRanks =
+              qb.getMetaRaw(RANKS_WANTED_KEY) || qb.getMetaRaw(`${SEARCH_SCORE_ORDER_KEY}__direction`);
+            if (!scoring || !wantsRanks) {
+              // Scores such as similarity() and ts_rank() are real; the cursor
+              // round-trips them through the float8 codec, so the ORDER BY must
+              // compare as float8 too or the boundary row repeats on `before`.
+              qb.setMeta(`${orderKey}__score`, sql`${score}::float8`);
+              orderBySearchScore(qb, orderKey);
+              return;
+            }
+
+            const state = getScoringState(qb, sql);
+            const inner = applyFor(state.innerAlias);
+            if (!inner) return;
+            const previous = state.slots.get(scoreMetaKey);
+            const slot: ScoringSlot = {
+              n: previous?.n ?? state.nextSlot++,
+              weight: scoreConfig.weights?.[adapter.name] ?? 1,
+              lowerIsBetter: adapter.scoreSemantics.lowerIsBetter,
+              score: sql.parens(inner.scoreExpression),
+              matches: inner.whereClause ?? inner.scorableClause ?? sql.true,
+            };
+            state.slots.set(scoreMetaKey, slot);
+
+            const rankIndex = qb.selectAndReturnIndex(sql`${state.alias}.${rankColumn(slot, sql)}::text`);
+            qb.setMeta(`${scoreMetaKey}__rank`, { selectIndex: rankIndex } as SearchScoreDetails);
+
+            // With the scoring join in the query, every search ORDER BY reads a
+            // column of it: a bm25 `<@>` in an outer ORDER BY is rewritten by
+            // its extension to read the score of "the current" index scan, and
+            // with the join there are two.
+            qb.setMeta(`${orderKey}__score`, sql`${state.alias}.${scoreColumn(slot, sql)}`);
             orderBySearchScore(qb, orderKey);
+
+            const from = buildScoringSubquery(state, scoring, scoreConfig, sql);
+            if (state.joinSpec) {
+              state.joinSpec.from = from;
+            } else {
+              state.joinSpec = {
+                type: 'left',
+                from,
+                alias: state.alias,
+                conditions: scoring.uniqueAttributes.map(
+                  (name) => sql`${state.alias}.${sql.identifier(name)} = ${qb.alias}.${sql.identifier(name)}`,
+                ),
+              } as { from: SQL };
+              qb.join(state.joinSpec);
+            }
+            orderByCompositeScore(qb, sql);
           }
 
           if (
@@ -830,6 +1186,9 @@ export function createUnifiedSearchPlugin(
           if (adapterColumns.length === 0) {
             return fields;
           }
+
+          const scoreConfig = resolveSearchScoreConfig(codec, options.searchScoreWeights);
+          const scoring = enableSearchScore ? getScoringSource(codec, build) : null;
 
           let newFields = fields;
 
@@ -881,13 +1240,9 @@ export function createUnifiedSearchPlugin(
                       apply: function plan($condition: any, val: any) {
                         if (val == null) return;
 
-                        const result = adapter.buildFilterApply(
-                          sql,
-                          $condition.alias,
-                          column,
-                          val,
-                          build,
-                        );
+                        const applyFor = (alias: SQL) =>
+                          adapter.buildFilterApply(sql, alias, column, val, build);
+                        const result = applyFor($condition.alias);
                         if (!result) return;
 
                         // Apply WHERE clause
@@ -900,7 +1255,7 @@ export function createUnifiedSearchPlugin(
                         }
 
                         const qb = getQueryBuilder(build, $condition);
-                        injectScoreAndRank(qb, adapter, column, result, codec);
+                        injectScoreAndRank(qb, adapter, column, applyFor, codec, 'explicit', scoreConfig, scoring);
                       },
                     }
                   ),
@@ -972,19 +1327,15 @@ export function createUnifiedSearchPlugin(
                             // Convert text to adapter-specific filter input
                             const filterInput = adapter.buildTextSearchInput!(text);
 
-                            const result = adapter.buildFilterApply(
-                              sql,
-                              $condition.alias,
-                              column,
-                              filterInput,
-                              build,
-                            );
+                            const applyFor = (alias: SQL) =>
+                              adapter.buildFilterApply(sql, alias, column, filterInput, build);
+                            const result = applyFor($condition.alias);
                             if (!result) continue;
 
                             if (result.whereClause) {
                               whereClauses.push(result.whereClause);
                             }
-                            injectScoreAndRank(qb, adapter, column, result, codec);
+                            injectScoreAndRank(qb, adapter, column, applyFor, codec, 'unified', scoreConfig, scoring);
                           }
                         }
 
@@ -992,19 +1343,15 @@ export function createUnifiedSearchPlugin(
                         if (vector && vectorAdapterColumns.length > 0) {
                           for (const { adapter, columns } of vectorAdapterColumns) {
                             for (const column of columns) {
-                              const result = adapter.buildFilterApply(
-                                sql,
-                                $condition.alias,
-                                column,
-                                { vector, metric: 'COSINE' },
-                                build,
-                              );
+                              const applyFor = (alias: SQL) =>
+                                adapter.buildFilterApply(sql, alias, column, { vector, metric: 'COSINE' }, build);
+                              const result = applyFor($condition.alias);
                               if (!result) continue;
 
                               if (result.whereClause) {
                                 whereClauses.push(result.whereClause);
                               }
-                              injectScoreAndRank(qb, adapter, column, result, codec);
+                              injectScoreAndRank(qb, adapter, column, applyFor, codec, 'unified', scoreConfig, scoring);
                             }
                           }
                         }
