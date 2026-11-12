@@ -1272,10 +1272,12 @@ describe('RRF scoring — custom rrfK parameter', () => {
   });
 
   it('with small rrfK, score difference between rank 1 and rank 2 is larger', async () => {
+    // bm25 scores differ per row (ts_rank would tie every "learning" row,
+    // and tied scores share a rank).
     const result = await query<AllDocumentsResult>(`
       query {
         allDocuments(where: {
-          tsvTsv: "learning"
+          bm25Body: { query: "learning" }
         }) {
           nodes {
             rowId

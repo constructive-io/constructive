@@ -118,14 +118,6 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
       expect(ids(top)).toEqual(ids(sortedBy(all, 'searchScore', 'DESC')).slice(0, 2));
     });
 
-    it('rejects cursor paging with a message pointing at offset', async () => {
-      const result = await query<Result>(
-        `query($w: DocumentFilter) { allDocuments(where: $w, orderBy: [SEARCH_SCORE_DESC], first: 2, after: "WyJuYXR1cmFsIiwxXQ==") { ${NODES} } }`,
-        { w: UNIFIED },
-      );
-      expect(result.errors?.map((e: any) => e.message).join('\n')).toMatch(/SEARCH_SCORE_DESC.*after\/before.*offset/);
-    });
-
     it('orders by searchScore when several explicit filters are active', async () => {
       const where = {
         bm25Body: { query: 'learning' },

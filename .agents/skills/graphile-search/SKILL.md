@@ -164,7 +164,7 @@ enum ArticlesOrderBy {
 Rules for search orderBy:
 
 - A search orderBy requires the filter that computes its score in `where` (`BODY_BM25_SCORE_ASC` needs `bm25Body` or `unifiedSearch`; `SEARCH_SCORE_*` needs any search filter). Without it the query errors and names the filter to add.
-- `SEARCH_SCORE_ASC/DESC` orders by the displayed composite `searchScore`. It works with `first`/`offset` but not with cursor paging (`after`/`before`), because the score is a window-function sum.
+- `SEARCH_SCORE_ASC/DESC` orders by the displayed composite `searchScore` and pages with `first`/`after` and `last`/`before` like any other order (the primary key breaks ties, so cursors are total).
 - A column scored by its own filter and by `unifiedSearch` in the same query uses the explicit filter's score for display and ordering.
 - Limitation: in a literal `orderBy` list, plain column terms (`ROW_ID_ASC`) are applied before search terms, so `[EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC]` sorts by `ROW_ID` first. Pass `orderBy` as a variable to keep the requested order.
 
@@ -245,7 +245,7 @@ Each adapter declares how its scores behave:
 | trgm | `similarity` | No (higher = better) | [0, 1] |
 | pgvector | `distance` | Yes (closer = better) | Unbounded |
 
-**Composite `searchScore` uses Reciprocal Rank Fusion (RRF)** — not score normalization. Each adapter's results are ranked by `ROW_NUMBER()` window functions in SQL, and the composite score is:
+**Composite `searchScore` uses Reciprocal Rank Fusion (RRF)** — not score normalization. Each adapter's matching rows are ranked by `RANK()` window functions in a subquery LEFT JOINed to the query on the primary key (tied scores share a rank), and the composite score is:
 
 ```
 searchScore = Σ(weight_i / (rrfK + rank_i)) / Σ(weight_i / (rrfK + 1))

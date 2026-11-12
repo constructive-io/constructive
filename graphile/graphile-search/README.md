@@ -62,7 +62,7 @@ const preset = {
 
 A search orderBy sorts by the score its filter computes, so it needs that filter in `where`: `BODY_BM25_SCORE_ASC` needs `bm25Body` (or `unifiedSearch`), `SEARCH_SCORE_DESC` needs any search filter. A search orderBy without its filter is an error that names the filter to add.
 
-`SEARCH_SCORE_ASC/DESC` orders by the same Reciprocal Rank Fusion sum that `searchScore` displays, so `first`/`offset` paging returns the best rows first. Because the sum is built from window functions, `SEARCH_SCORE_*` cannot be combined with cursor paging (`after`/`before`); use `offset`, or a per-adapter orderBy for cursors.
+`SEARCH_SCORE_ASC/DESC` orders by the same Reciprocal Rank Fusion sum that `searchScore` displays. The ranks are computed once, in a subquery over the table's matching rows that is joined to the query on the primary key, so the order is a plain column and `first`/`after` and `last`/`before` cursors work; tied scores (equal evidence shares a rank) are separated by the primary key.
 
 When a column is scored by both its own filter (e.g. `bm25Body`) and `unifiedSearch`, the explicit filter's score is the one displayed and ordered by; the column is scored once per query.
 

@@ -2,6 +2,7 @@ import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import type { GraphQLResponse } from 'graphile-test';
 import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test';
 
 import { createBm25Adapter } from '../adapters/bm25';
 import { createPgvectorAdapter } from '../adapters/pgvector';
@@ -14,7 +15,7 @@ import { createUnifiedSearchPlugin } from '../plugin';
 
 interface Page {
   allDocuments: {
-    edges: Array<{ cursor: string; node: { rowId: number } }>;
+    edges: Array<{ cursor: string; node: { rowId: number; searchScore: number | null } }>;
     pageInfo: { hasPreviousPage: boolean; hasNextPage: boolean; startCursor: string | null; endCursor: string | null };
   };
 }
@@ -23,7 +24,7 @@ type QueryFn = <T>(query: string, variables?: Record<string, unknown>) => Promis
 const PAGE = `
   query($w: DocumentFilter, $ob: [DocumentOrderBy!], $first: Int, $last: Int, $after: Cursor, $before: Cursor) {
     allDocuments(where: $w, orderBy: $ob, first: $first, last: $last, after: $after, before: $before) {
-      edges { cursor node { rowId } }
+      edges { cursor node { rowId searchScore } }
       pageInfo { hasPreviousPage hasNextPage startCursor endCursor }
     }
   }
@@ -31,8 +32,11 @@ const PAGE = `
 
 const TRGM = { trgmTitle: { value: 'Learning', threshold: 0.05 } };
 const TSV = { tsvTsv: 'learning' };
+// Fans out to tsvector, bm25 and trgm: rows 1, 2, 3 and 5 match.
+const UNIFIED = { unifiedSearch: 'learning' };
 
 describe('cursor paging over search-ordered results', () => {
+  let pg: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;
 
@@ -58,6 +62,7 @@ describe('cursor paging over search-ordered results', () => {
       useRoot: true,
       authRole: 'postgres',
     }, [seed.sqlfile([join(__dirname, './setup.sql')])]);
+    pg = connections.pg;
     teardown = connections.teardown;
     query = connections.query as QueryFn;
   });
@@ -114,6 +119,51 @@ describe('cursor paging over search-ordered results', () => {
 
     const forwards = await pageForwards(where, [orderBy], 1);
     expect(forwards).toEqual(all);
+  });
+
+  describe('SEARCH_SCORE_DESC with unifiedSearch across adapters', () => {
+    it('first/after and last/before visit every row once, in the forward order', async () => {
+      const { edges } = await page({ w: UNIFIED, ob: ['SEARCH_SCORE_DESC'] });
+      const all = edges.map((e) => e.node.rowId);
+      expect(all.length).toBeGreaterThan(3);
+      const scores = edges.map((e) => e.node.searchScore as number);
+      expect(scores).toEqual([...scores].sort((a, b) => b - a));
+
+      expect(await pageForwards(UNIFIED, ['SEARCH_SCORE_DESC'], 1)).toEqual(all);
+      expect(await pageBackwards(UNIFIED, ['SEARCH_SCORE_DESC'], 1)).toEqual(all);
+      expect(await pageForwards(UNIFIED, ['SEARCH_SCORE_ASC'], 2)).toEqual([...all].reverse());
+      expect(await pageBackwards(UNIFIED, ['SEARCH_SCORE_ASC'], 2)).toEqual([...all].reverse());
+    });
+
+    describe('with rows whose scores tie', () => {
+      // Two copies of row 5 score the same in every adapter, so the three
+      // share one composite score; only the primary key separates them.
+      beforeAll(async () => {
+        await pg.query(`
+          INSERT INTO unified_search_test.documents (id, title, body, tsv, embedding)
+          SELECT id + 100, title, body, tsv, embedding FROM unified_search_test.documents WHERE id = 5
+          UNION ALL
+          SELECT id + 200, title, body, tsv, embedding FROM unified_search_test.documents WHERE id = 5
+        `);
+      });
+      afterAll(async () => {
+        await pg.query('DELETE FROM unified_search_test.documents WHERE id > 100');
+      });
+
+      it.each([1, 2])('pages across the tied rows with %d per page, forwards and backwards', async (pageSize) => {
+        const { edges } = await page({ w: UNIFIED, ob: ['SEARCH_SCORE_DESC'] });
+        const all = edges.map((e) => e.node.rowId);
+        expect(all).toEqual(expect.arrayContaining([5, 105, 205]));
+        const tied = edges.filter((e) => [5, 105, 205].includes(e.node.rowId)).map((e) => e.node.searchScore);
+        expect(new Set(tied).size).toBe(1);
+        // The tied rows are adjacent, separated only by the primary key.
+        const positions = [5, 105, 205].map((id) => all.indexOf(id)).sort((a, b) => a - b);
+        expect(positions[2] - positions[0]).toBe(2);
+
+        expect(await pageForwards(UNIFIED, ['SEARCH_SCORE_DESC'], pageSize)).toEqual(all);
+        expect(await pageBackwards(UNIFIED, ['SEARCH_SCORE_DESC'], pageSize)).toEqual(all);
+      });
+    });
   });
 
   it('last/before and first/after agree on a two-row page size', async () => {
