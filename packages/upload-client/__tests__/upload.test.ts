@@ -71,7 +71,6 @@ describe('uploadFile', () => {
         key: HELLO_WORLD_HASH,
         deduplicated: false,
         expiresAt: new Date(Date.now() + 900_000).toISOString(),
-        previousVersionId: null,
       });
 
       global.fetch = jest.fn().mockResolvedValue({
@@ -129,7 +128,6 @@ describe('uploadFile', () => {
         key: HELLO_WORLD_HASH,
         deduplicated: false,
         expiresAt: new Date(Date.now() + 900_000).toISOString(),
-        previousVersionId: null,
       });
       global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, text: async () => '' });
 
@@ -152,7 +150,6 @@ describe('uploadFile', () => {
         key: HELLO_WORLD_HASH,
         deduplicated: true,
         expiresAt: null,
-        previousVersionId: null,
       });
 
       global.fetch = jest.fn();
@@ -181,7 +178,6 @@ describe('uploadFile', () => {
           key: HELLO_WORLD_HASH,
           deduplicated: false,
           expiresAt: new Date().toISOString(),
-          previousVersionId: null,
         },
         'appBucketByKey',
       );
@@ -249,7 +245,6 @@ describe('uploadFile', () => {
         key: 'hash',
         deduplicated: false,
         expiresAt: new Date().toISOString(),
-        previousVersionId: null,
       });
 
       global.fetch = jest.fn().mockResolvedValue({
@@ -286,7 +281,6 @@ describe('uploadFile', () => {
         key: 'hash',
         deduplicated: false,
         expiresAt: new Date().toISOString(),
-        previousVersionId: null,
       });
 
       global.fetch = jest.fn().mockResolvedValue({

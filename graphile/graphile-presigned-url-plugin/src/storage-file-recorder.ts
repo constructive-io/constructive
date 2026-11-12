@@ -16,8 +16,9 @@ interface RecordManagedFileInput {
  * The recorder owns the files-table insert so bucket inheritance and claims
  * attribution run at the database boundary. Optional arguments are only named
  * when the generated function supports them and the caller has a value. A
- * version's previous_version_id is not an argument: the files table derives it
- * from the head at the key, under the caller's own RLS.
+ * version's previous_version_id is not an argument: a version chain is written
+ * only by a platform writer, and a custom key has none — a re-upload at a key
+ * replaces the row at it.
  */
 export async function recordManagedFile(
   pgClient: { query: (opts: { text: string; values: unknown[] }) => Promise<{ rows: unknown[] }> },

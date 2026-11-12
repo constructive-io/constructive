@@ -156,8 +156,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
-  /** ID of the previous version (set when re-uploading to an existing custom key) */
-  previousVersionId: string | null;
   /**
    * The projection document to store in an `image`/`upload` column.
    *

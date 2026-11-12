@@ -36,8 +36,6 @@ export interface StorageUploadResult {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
-  /** ID of the previous version (when uploading a new version of a custom-keyed file) */
-  previousVersionId: string | null;
 }
 
 export interface UploadToSurfaceContext {
@@ -132,7 +130,6 @@ function toResult(payload: StorageUploadResult): StorageUploadResult {
     key: payload.key,
     deduplicated: payload.deduplicated,
     expiresAt: payload.expiresAt ?? null,
-    previousVersionId: payload.previousVersionId ?? null,
   };
 }
 

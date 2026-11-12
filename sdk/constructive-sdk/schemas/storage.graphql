@@ -3505,7 +3505,6 @@ type UploadFileBulkFilePayload {
   file: JSON
   fileId: String!
   key: String!
-  previousVersionId: String
   uploadUrl: String
 }
 
@@ -3574,7 +3573,6 @@ type UploadFilePayload {
   key: String!
 
   """ID of the previous version (when using custom keys)"""
-  previousVersionId: String
 
   """Presigned PUT URL (null if deduplicated)"""
   uploadUrl: String
@@ -3605,7 +3603,6 @@ type UploadPlatformFileBulkFilePayload {
   file: JSON
   fileId: String!
   key: String!
-  previousVersionId: String
   uploadUrl: String
 }
 
@@ -3674,7 +3671,6 @@ type UploadPlatformFilePayload {
   key: String!
 
   """ID of the previous version (when using custom keys)"""
-  previousVersionId: String
 
   """Presigned PUT URL (null if deduplicated)"""
   uploadUrl: String

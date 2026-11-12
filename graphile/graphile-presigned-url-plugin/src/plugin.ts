@@ -227,7 +227,6 @@ export function createPresignedUrlPlugin(
                 key: { type: new GraphQLNonNull(GraphQLString), description: 'The S3 object key' },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean), description: 'Whether this file was deduplicated (content already exists)' },
                 expiresAt: { type: GraphQLString, description: 'Presigned URL expiry time (null if deduplicated)' },
-                previousVersionId: { type: GraphQLString, description: 'ID of the previous version (when using custom keys)' },
                 ...(jsonType
                   ? {
                     file: {
@@ -354,7 +353,6 @@ export function createPresignedUrlPlugin(
                 key: { type: new GraphQLNonNull(GraphQLString) },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean) },
                 expiresAt: { type: GraphQLString },
-                previousVersionId: { type: GraphQLString },
                 ...(jsonType ? { file: { type: jsonType, description: 'The projection document for the created file.' } } : {}),
               },
             });
@@ -721,9 +719,9 @@ export async function processSingleFile(
     s3Key = buildS3Key(contentHash);
   }
 
-  // Dedup / versioning check
-  let previousVersionId: string | null = null;
-
+  // Dedup check. A key is one stored object: a row at the key with the same
+  // hash already describes these bytes, and a live one is a dedup hit.
+  //
   // A row whose bytes never landed must not be reported as a dedup hit: the
   // caller would store a reference to an object that is not in S3. Such a row is
   // dropped instead, and the upload proceeds as a fresh one below — the insert is
@@ -733,70 +731,59 @@ export async function processSingleFile(
   // hash and a second row would collide on (bucket_id, key). The GC job the
   // delete enqueues re-takes the reference count when it runs (≥5s later), by
   // which point the replacement row exists, so it no-ops.
+  //
+  // A custom key holding different bytes is replaced in place, by the database:
+  // the new row is inserted as `requested` beside the current one (its BEFORE
+  // INSERT trigger refuses a key held by a row this caller cannot read), the PUT
+  // through its URL overwrites the object, and its confirm deletes the row it
+  // replaced. Until then the current row stays listable and downloadable, so
+  // nothing is deleted here and no version link is made — a custom key has no
+  // version chain.
   let staleFileId: string | null = null;
 
   if (isCustomKey) {
     const existingResult = await txClient.query({
-      text: `SELECT id, content_hash, status
+      text: `SELECT id, status
        FROM ${storageConfig.filesQualifiedName}
        WHERE key = $1
          AND bucket_id = $2
+         AND content_hash = $3
        ORDER BY created_at DESC
        LIMIT 1`,
-      values: [s3Key, bucket.id],
+      values: [s3Key, bucket.id, contentHash],
     });
 
     if (existingResult.rows.length > 0) {
       const existing = existingResult.rows[0];
-      if (existing.content_hash === contentHash) {
-        if (isLiveFileRow(existing)) {
-          log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
-          return {
-            uploadUrl: null as string | null,
-            uploadHeaders: null as Record<string, string> | null,
-            fileId: existing.id as string,
-            key: s3Key,
-            deduplicated: true,
-            expiresAt: null as string | null,
-            previousVersionId: null as string | null,
-            file: projectFile(existing.id as string, s3Key),
-          };
-        }
-        staleFileId = existing.id as string;
-        log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} has no bytes behind it`);
-      } else if (storageConfig.hasVersioning) {
-        previousVersionId = existing.id;
-        log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
-      } else if (storageConfig.hasContentHash) {
-        // GC of the deleted row counts references by its content hash, which the
-        // replacement does not share, so it would delete the object at this key
-        // after the new bytes land.
-        throw new Error(
-          `STORAGE_REPLACE_UNSUPPORTED: key ${s3Key} already holds file ${existing.id}; ` +
-            'a content-addressed module needs versioning to replace a custom key'
-        );
-      } else {
-        // Without versioning a key names one row: the new bytes replace the old
-        // row in this transaction, and the PUT overwrites the object at the key.
-        // GC of the old row counts references by key, so the replacement keeps it.
-        staleFileId = existing.id as string;
-        log.info(`Replacing key ${s3Key}: file ${staleFileId} is superseded (module has no versioning)`);
+      if (isLiveFileRow(existing)) {
+        log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
+        return {
+          uploadUrl: null as string | null,
+          uploadHeaders: null as Record<string, string> | null,
+          fileId: existing.id as string,
+          key: s3Key,
+          deduplicated: true,
+          expiresAt: null as string | null,
+          file: projectFile(existing.id as string, s3Key),
+        };
       }
+      staleFileId = existing.id as string;
+      log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} has no bytes behind it`);
     }
   } else {
+    // Only the row at the hash's own key names these bytes for good: a custom-key
+    // row carrying the hash holds them at a key whose next upload replaces them.
     const dedupResult = await txClient.query({
-      text: `SELECT id, key, status
+      text: `SELECT id, status
        FROM ${storageConfig.filesQualifiedName}
-       WHERE content_hash = $1
+       WHERE key = $1
          AND bucket_id = $2
        LIMIT 1`,
-      values: [contentHash, bucket.id],
+      values: [s3Key, bucket.id],
     });
 
     if (dedupResult.rows.length > 0) {
       const existingFile = dedupResult.rows[0];
-      // A custom-key row can carry this hash, so the bytes are at the row's own key.
-      const existingKey = existingFile.key as string;
       if (isLiveFileRow(existingFile)) {
         log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
@@ -804,11 +791,10 @@ export async function processSingleFile(
           uploadUrl: null as string | null,
           uploadHeaders: null as Record<string, string> | null,
           fileId: existingFile.id as string,
-          key: existingKey,
+          key: s3Key,
           deduplicated: true,
           expiresAt: null as string | null,
-          previousVersionId: null as string | null,
-          file: projectFile(existingFile.id as string, existingKey),
+          file: projectFile(existingFile.id as string, s3Key),
         };
       }
       staleFileId = existingFile.id as string;
@@ -865,7 +851,6 @@ export async function processSingleFile(
     key: s3Key,
     deduplicated: false,
     expiresAt,
-    previousVersionId,
     file: projectFile(fileId, s3Key),
   };
 }

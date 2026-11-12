@@ -76,7 +76,11 @@ const heads = (s3: S3Config) =>
 
 const options: PresignedUrlPluginOptions = { credentials: { accessKeyId: 'test', secretAccessKey: 'test' } };
 
-/** A tx whose one existing row sits at `rowKey` carrying HASH in `status`. */
+/**
+ * A tx whose one existing row sits at `rowKey` carrying HASH in `status`. The
+ * resolver probes by key (the custom key, or the hash's own key), so the row is
+ * found only when the probed key is its own.
+ */
 function fakeTx(rowKey: string, status: string) {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const txClient = {
@@ -84,7 +88,7 @@ function fakeTx(rowKey: string, status: string) {
       queries.push(opts);
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       if (/^SELECT id/.test(opts.text)) {
-        return { rows: [{ id: OLD_FILE_ID, key: rowKey, content_hash: HASH, status }] };
+        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -138,26 +142,18 @@ describe.each([
   });
 });
 
-describe('content-addressed upload whose hash matches a custom-key row', () => {
-  // Custom-key rows carry content_hash too, so the hash probe can match a row
-  // whose bytes live at its own key, not at the hash.
-  it('deduplicates against a live row and leaves it in place', async () => {
+describe('content-addressed upload whose hash a custom-key row carries', () => {
+  // A custom-key row carrying the hash holds the bytes at a key whose next
+  // upload replaces them, so it is no dedup target: the probe is by the hash's
+  // own key, and a fresh upload is recorded there.
+  it('does not deduplicate against it', async () => {
     const s3 = fakeS3();
     const { txClient, queries } = fakeTx(SITE_KEY, 'uploaded');
 
     const result = await upload(txClient, s3);
 
-    expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null, key: SITE_KEY });
-    expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
-  });
-
-  it('restarts the upload when that row is still requested', async () => {
-    const s3 = fakeS3();
-    const { txClient, queries } = fakeTx(SITE_KEY, 'requested');
-
-    const result = await upload(txClient, s3);
-
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
-    expect(queries.find((q) => /^DELETE/.test(q.text))?.values).toEqual([OLD_FILE_ID]);
+    expect(queries[0].values).toEqual([HASH, BUCKET_ID]);
+    expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
   });
 });

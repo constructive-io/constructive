@@ -209,7 +209,6 @@ describe('buildUploadDocument()', () => {
     expect(document).toContain('uploadFile(input: $input)');
     expect(document).toContain('uploadUrl');
     expect(document).toContain('uploadHeaders');
-    expect(document).toContain('previousVersionId');
   });
 });
 
@@ -279,7 +278,6 @@ describe('createStorageClient()', () => {
           key: 'abc123',
           deduplicated: true,
           expiresAt: null,
-          previousVersionId: null,
         },
       },
       calls,
@@ -292,7 +290,6 @@ describe('createStorageClient()', () => {
       key: 'abc123',
       deduplicated: true,
       expiresAt: null,
-      previousVersionId: null,
     });
 
     const mutationCall = calls.find((c) => c.query.includes('uploadFile(input: $input)'))!;
@@ -314,7 +311,6 @@ describe('createStorageClient()', () => {
         key: 'abc123',
         deduplicated: false,
         expiresAt: null,
-        previousVersionId: null,
       },
     });
 
@@ -345,7 +341,6 @@ describe('createStorageClient()', () => {
         key: 'def456',
         deduplicated: false,
         expiresAt: '2030-01-01T00:00:00Z',
-        previousVersionId: null,
       },
     });
 
@@ -371,7 +366,6 @@ describe('createStorageClient()', () => {
         key: 'ghi789',
         deduplicated: false,
         expiresAt: '2030-01-01T00:00:00Z',
-        previousVersionId: null,
       },
     });
 

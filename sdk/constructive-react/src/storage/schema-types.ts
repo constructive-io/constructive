@@ -1122,8 +1122,6 @@ export interface UploadFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
-  /** ID of the previous version (when using custom keys) */
-  previousVersionId?: string | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1141,8 +1139,6 @@ export interface UploadPlatformFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
-  /** ID of the previous version (when using custom keys) */
-  previousVersionId?: string | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1218,7 +1214,6 @@ export interface UploadFileBulkFilePayload {
   file?: unknown | null;
   fileId: string;
   key: string;
-  previousVersionId?: string | null;
   uploadUrl?: string | null;
 }
 export interface UploadPlatformFileBulkFilePayload {
@@ -1228,7 +1223,6 @@ export interface UploadPlatformFileBulkFilePayload {
   file?: unknown | null;
   fileId: string;
   key: string;
-  previousVersionId?: string | null;
   uploadUrl?: string | null;
 }
 /** Table constraints */
