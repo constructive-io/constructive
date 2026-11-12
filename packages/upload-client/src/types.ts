@@ -38,8 +38,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (ISO string, null if deduplicated) */
   expiresAt: string | null;
-  /** ID of the previous version (when uploading a new version of a custom-keyed file) */
-  previousVersionId: string | null;
 }
 
 // --- Client options ---

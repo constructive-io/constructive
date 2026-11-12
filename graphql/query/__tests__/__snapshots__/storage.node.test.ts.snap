@@ -18,7 +18,6 @@ exports[`buildUploadDocument() builds the mutation entirely from the surface 1`]
     key
     deduplicated
     expiresAt
-    previousVersionId
   }
 }"
 `;

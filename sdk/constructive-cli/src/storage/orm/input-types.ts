@@ -1956,8 +1956,6 @@ export interface UploadFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
-  /** ID of the previous version (when using custom keys) */
-  previousVersionId?: string | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1967,7 +1965,6 @@ export type UploadFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
-  previousVersionId?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadFileBulkPayload {
@@ -1989,8 +1986,6 @@ export interface UploadPlatformFilePayload {
   fileId: string;
   /** The S3 object key */
   key: string;
-  /** ID of the previous version (when using custom keys) */
-  previousVersionId?: string | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -2000,7 +1995,6 @@ export type UploadPlatformFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
-  previousVersionId?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadPlatformFileBulkPayload {
@@ -2222,7 +2216,6 @@ export interface UploadFileBulkFilePayload {
   file?: Record<string, unknown> | null;
   fileId: string;
   key: string;
-  previousVersionId?: string | null;
   uploadUrl?: string | null;
 }
 export type UploadFileBulkFilePayloadSelect = {
@@ -2231,7 +2224,6 @@ export type UploadFileBulkFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
-  previousVersionId?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadPlatformFileBulkFilePayload {
@@ -2241,7 +2233,6 @@ export interface UploadPlatformFileBulkFilePayload {
   file?: Record<string, unknown> | null;
   fileId: string;
   key: string;
-  previousVersionId?: string | null;
   uploadUrl?: string | null;
 }
 export type UploadPlatformFileBulkFilePayloadSelect = {
@@ -2250,7 +2241,6 @@ export type UploadPlatformFileBulkFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
-  previousVersionId?: boolean;
   uploadUrl?: boolean;
 };
 /** A `Bucket` edge in the connection. */

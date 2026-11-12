@@ -17,7 +17,6 @@ const UPLOAD_PAYLOAD_FIELDS = [
   'key',
   'deduplicated',
   'expiresAt',
-  'previousVersionId',
 ] as const;
 
 /**
@@ -25,7 +24,7 @@ const UPLOAD_PAYLOAD_FIELDS = [
  *
  *   mutation UploadAppFileMutation($input: UploadAppFileInput!) {
  *     uploadAppFile(input: $input) {
- *       uploadUrl uploadHeaders fileId key deduplicated expiresAt previousVersionId
+ *       uploadUrl uploadHeaders fileId key deduplicated expiresAt
  *     }
  *   }
  */
