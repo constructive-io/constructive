@@ -41,7 +41,11 @@ function createMetaSchemaType(): GraphQLObjectType {
       dimensions: { type: GraphQLInt, description: "For 'vector': declared length, else null." },
       geometrySubtype: { type: GraphQLString, description: "For 'geojson': Point/LineString/Polygon/…, else null." },
       srid: { type: GraphQLInt, description: "For 'geojson': spatial reference id, else null." },
-      dotPath: { type: GraphQLBoolean, description: "For 'ltree': values are dot-separated path strings." }
+      dotPath: {
+        type: GraphQLBoolean,
+        description:
+          "For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c')."
+      }
     })
   });
 
@@ -55,9 +59,43 @@ function createMetaSchemaType(): GraphQLObjectType {
       isNotNull: { type: GraphQLBoolean },
       hasDefault: { type: GraphQLBoolean },
       subtype: { type: GraphQLString },
+      maxLength: {
+        type: GraphQLInt,
+        description:
+          'Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded.'
+      },
+      precision: {
+        type: GraphQLInt,
+        description: 'Most significant digits a decimal number may hold. Null when unbounded.'
+      },
+      scale: {
+        type: GraphQLInt,
+        description: 'Digits a decimal number keeps after the decimal point. Null when unbounded.'
+      },
       encoding: {
         type: MetaScalarEncodingType,
         description: 'Scalar serialization contract (null for plain scalars)'
+      }
+    })
+  });
+
+  const MetaFileFieldType = new GraphQLObjectType({
+    name: 'MetaFileField',
+    description: 'How a field holds files',
+    fields: () => ({
+      kind: {
+        type: nn(GraphQLString),
+        description:
+          'image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.'
+      },
+      isMultiple: {
+        type: nn(GraphQLBoolean),
+        description: 'Whether the field holds a list of files'
+      },
+      filesType: {
+        type: GraphQLString,
+        description:
+          'GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise'
       }
     })
   });
@@ -107,6 +145,15 @@ function createMetaSchemaType(): GraphQLObjectType {
       isWritableOnUpdate: {
         type: GraphQLBoolean,
         description: "Whether an update may change this field. Set on a table's own fields only."
+      },
+      isComputed: {
+        type: GraphQLBoolean,
+        description:
+          "Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only."
+      },
+      file: {
+        type: MetaFileFieldType,
+        description: "Set when the field holds files; null otherwise. Set on a table's own fields only."
       }
     })
   });
@@ -211,6 +258,10 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
+      refKeys: {
+        type: nnList(MetaFieldType),
+        description: 'Fields on the referenced table that keys point at, in the same order as keys'
+      },
       references: { type: nn(MetaRefTableType) }
     })
   });
@@ -223,6 +274,10 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
+      remoteKeys: {
+        type: nnList(MetaFieldType),
+        description: 'Fields on the related table that point at this table, in the same order as keys'
+      },
       referencedBy: { type: nn(MetaRefTableType) }
     })
   });
@@ -373,6 +428,14 @@ function createMetaSchemaType(): GraphQLObjectType {
         description: 'PostgreSQL table name'
       },
       schemaName: { type: nn(GraphQLString) },
+      kind: {
+        type: nn(GraphQLString),
+        description: "'table' when rows are stored in this table, 'view' when they come from a view of other tables"
+      },
+      description: {
+        type: GraphQLString,
+        description: 'Description written for this table, or null'
+      },
       fields: { type: nnList(MetaFieldType) },
       indexes: { type: nnList(MetaIndexType) },
       constraints: { type: nn(MetaConstraintsType) },

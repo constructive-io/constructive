@@ -5,7 +5,9 @@ import {
   type StoragePlanePair,
   uploadSurfaceNames,
 } from 'graphile-storage-registry';
+import type { GraphQLSchema } from 'graphql';
 
+import { getFieldContainerType } from './graphql-schema-utils';
 import type {
   I18nFieldMeta,
   I18nMeta,
@@ -98,6 +100,18 @@ export function buildStorageMeta(codec: PgCodec, build: MetaBuild): StorageMeta 
       requiresOwnerId: plane.hasOwnerId,
     },
   };
+}
+
+/**
+ * GraphQL type name of the API's storage files table when it has exactly one
+ * (counting only files types the final schema serves); null for none or
+ * several, since a file column then can't be tied to one table.
+ */
+export function soleFilesTypeName(build: MetaBuild, schema?: GraphQLSchema): string | null {
+  const filesTypes = storagePlanesForBuild(build)
+    .map((plane) => uploadSurfaceNames(build.inflection as any, plane.filesCodec).filesTypeName)
+    .filter((typeName) => !schema || !!getFieldContainerType(schema, typeName));
+  return filesTypes.length === 1 ? filesTypes[0] : null;
 }
 
 /**

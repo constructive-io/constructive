@@ -13,6 +13,7 @@ import {
   buildUniqueConstraints
 } from './constraint-meta-builders';
 import { exposedColumns } from './exposure';
+import { buildFileFieldMeta } from './file-meta-builders';
 import { getFieldContainerType } from './graphql-schema-utils';
 import { safeInflection } from './inflection-utils';
 import { indexJunctions } from './junction-meta-builders';
@@ -23,7 +24,13 @@ import {
   buildReverseRelations
 } from './relation-meta-builders';
 import { buildScopeMeta } from './scope-meta-builders';
-import { buildI18nMeta, buildRealtimeMeta,buildSearchMeta, buildStorageMeta } from './storage-search-meta-builders';
+import {
+  buildI18nMeta,
+  buildRealtimeMeta,
+  buildSearchMeta,
+  buildStorageMeta,
+  soleFilesTypeName
+} from './storage-search-meta-builders';
 import {
   type BuildContext,
   createBuildContext,
@@ -33,10 +40,12 @@ import {
   getConfiguredSchemas,
   getRelations,
   getSchemaName,
+  getTableDescription,
+  getTableKind,
   getUniques,
   isTableResource
 } from './table-resource-utils';
-import { buildFieldMeta, readAllowedValues } from './type-mappings';
+import { buildFieldMeta, readAllowedValues, readIsComputed } from './type-mappings';
 import type {
   ConstraintsMeta,
   MetaBuild,
@@ -146,6 +155,8 @@ function buildTableMeta(
     // Only an exposed field reports its CHECK values, so a constraint on a
     // hidden column contributes nothing.
     fieldMeta.allowedValues = readAllowedValues(attr);
+    fieldMeta.isComputed = readIsComputed(attr);
+    fieldMeta.file = buildFileFieldMeta(attr, context.filesType ?? null);
 
     if (writeInputs) {
       const { create, patch } = writeInputs;
@@ -199,6 +210,8 @@ function buildTableMeta(
     name: tableType,
     tableName: codec.extensions?.pg?.name ?? codec.name,
     schemaName,
+    kind: getTableKind(resource),
+    description: getTableDescription(resource),
     fields,
     indexes,
     constraints,
@@ -253,6 +266,7 @@ export function collectTablesMeta(
     context
   );
   context.emittedJunctions = new Set();
+  context.filesType = soleFilesTypeName(build, schema);
 
   const built: { codec: PgCodec; meta: TableMeta }[] = [];
   for (const { resource, schemaName } of tables) {
