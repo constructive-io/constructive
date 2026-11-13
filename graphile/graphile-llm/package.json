@@ -31,6 +31,7 @@
   "dependencies": {
     "@agentic-kit/metering": "workspace:^",
     "@constructive-io/llm-env": "workspace:^",
+    "@pgsql/quotes": "^18.2.4",
     "graphile-cache": "workspace:^"
   },
   "peerDependencies": {

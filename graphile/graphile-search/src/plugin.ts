@@ -27,6 +27,10 @@ import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
 import type { SQL } from 'pg-sql2';
 
+import {
+  extensionSchemasByService,
+  SearchExtensionMetadataGather,
+} from './extension-metadata';
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
 // ─── TypeScript Namespace Augmentations ──────────────────────────────────────
@@ -489,6 +493,8 @@ export function createUnifiedSearchPlugin(
       'VectorCodecPlugin',
     ],
 
+    gather: SearchExtensionMetadataGather,
+
     // ─── Custom Inflection Methods ─────────────────────────────────────
     inflection: {
       add: {
@@ -557,6 +563,16 @@ export function createUnifiedSearchPlugin(
       },
 
       hooks: {
+        build(build) {
+          return build.extend(
+            build,
+            {
+              pgSearchExtensionSchemasByService: extensionSchemasByService(build),
+            },
+            'UnifiedSearchPlugin adding per-service extension schemas'
+          );
+        },
+
         /**
          * Register all adapter-specific GraphQL types during init.
          */
