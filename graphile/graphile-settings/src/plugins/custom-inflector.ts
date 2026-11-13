@@ -8,6 +8,8 @@ import {
   toCamelCase,
 } from 'inflekt';
 
+import { enumValueName } from './enum-value-names';
+
 /**
  * Custom inflector plugin for Constructive using the inflekt library.
  *
@@ -626,10 +628,12 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        * OUR FIX:
        * We call the previous inflector to retain all special character handling
        * (asterisks, symbols, etc.), then uppercase the result to restore v4 behavior.
+       * A label that still isn't a valid, unique GraphQL name (a space, a dash,
+       * a case-only duplicate) gets one from `enumValueName`, which keeps every
+       * name that was valid before.
        */
       enumValue(previous, _options, value, codec) {
-        const result = previous!(value, codec);
-        return result.toUpperCase();
+        return enumValueName(value, codec, (label) => previous!(label, codec).toUpperCase());
       },
     },
   },
