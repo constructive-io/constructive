@@ -11,7 +11,7 @@ import cookieParser from 'cookie-parser';
 import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import { closeAllCaches,graphileCache } from 'graphile-cache';
 import type { Server as HttpServer } from 'http';
-import { Pool, PoolClient } from 'pg';
+import { Notification, Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
 
 import { createAgenticRouter } from './agentic';
@@ -34,7 +34,7 @@ import { parseCookieValue, rejectInvalidSessionCookieHeader, SESSION_COOKIE_NAME
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { createFlushMiddleware, flushService } from './middleware/flush';
+import { createFlushMiddleware, flushAllServices, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
 import { graphile } from './middleware/graphile';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
@@ -46,6 +46,9 @@ import { createStandingMiddleware } from './middleware/standing';
 import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
 const log = new Logger('server');
+const LISTENER_RETRY_MS = 5000;
+const LISTENER_QUERY_TIMEOUT_MS = 5000;
+const LISTENER_HEARTBEAT_MS = 30000;
 
 /**
  * Creates and starts a GraphQL server instance
@@ -79,7 +82,11 @@ class Server {
   private app: Express;
   private opts: ConstructiveOptions;
   private listenClient: PoolClient | null = null;
-  private listenRelease: (() => void) | null = null;
+  private listenRelease: ((destroy?: boolean) => void) | null = null;
+  private listenerCleanup: (() => void) | null = null;
+  private listenerRetry: ReturnType<typeof setTimeout> | null = null;
+  private listenerConnecting = false;
+  private listenerAttempt = 0;
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
@@ -267,88 +274,120 @@ class Server {
   }
 
   addEventListener(): void {
-    if (this.shuttingDown) return;
-    const pgPool = this.getPool();
-    pgPool.connect(this.listenForChanges.bind(this));
+    if (this.shuttingDown || this.listenClient || this.listenerConnecting || this.listenerRetry) return;
+    this.listenerConnecting = true;
+    const attempt = ++this.listenerAttempt;
+    this.getPool().connect((err, client, release) => {
+      if (attempt !== this.listenerAttempt) {
+        release?.(true);
+        return;
+      }
+      this.listenerConnecting = false;
+      this.listenForChanges(err, client, release);
+    });
   }
 
-  listenForChanges(err: Error | null, client: PoolClient, release: () => void): void {
+  private retryListener(): void {
+    if (this.shuttingDown || this.listenerRetry) return;
+    this.listenerRetry = setTimeout(() => {
+      this.listenerRetry = null;
+      this.addEventListener();
+    }, LISTENER_RETRY_MS);
+    this.listenerRetry.unref();
+  }
+
+  listenForChanges(err: Error | null, client: PoolClient, release: (destroy?: boolean) => void): void {
     if (err) {
       this.error('Error connecting with notify listener', err);
-      if (!this.shuttingDown) {
-        setTimeout(() => this.addEventListener(), 5000);
-      }
+      this.retryListener();
       return;
     }
-
-    if (this.shuttingDown) {
-      release();
+    if (this.shuttingDown || this.listenClient) {
+      release(true);
       return;
     }
 
     this.listenClient = client;
     this.listenRelease = release;
-
-    // Attached before any query is issued: an 'error' event on a Client with no
-    // listener is rethrown by Node and takes the whole process down.
-    client.on('error', (e) => {
-      this.dropListener(client, 'Error with database notify listener', e);
-    });
-
-    client.on('notification', ({ channel, payload }) => {
+    let heartbeat: ReturnType<typeof setTimeout> | undefined;
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    const onError = (error: Error) => this.dropListener(client, 'Error with database notify listener', error);
+    const onEnd = () => this.dropListener(client, 'Database notify listener ended');
+    const onNotification = ({ channel, payload }: Notification) => {
       if (channel === 'schema:update' && payload) {
         log.info('schema:update', payload);
-        this.flush(payload);
+        void this.flush(payload).catch((error) => {
+          // A failed routing lookup must not leave an unhandled rejection or
+          // retain services whose targeted invalidation did not finish.
+          flushAllServices();
+          this.error('Failed to flush schema:update; invalidated all services', error);
+        });
       }
-    });
+    };
 
-    client.query('LISTEN "schema:update"').catch((e) => {
-      this.dropListener(client, 'Failed to LISTEN for schema:update', e);
-    });
+    // Register before querying: an unhandled Client error terminates Node.
+    client.on('error', onError);
+    client.on('end', onEnd);
+    client.on('notification', onNotification);
+    this.listenerCleanup = () => {
+      clearTimeout(heartbeat);
+      clearTimeout(deadline);
+      client.removeListener('error', onError);
+      client.removeListener('end', onEnd);
+      client.removeListener('notification', onNotification);
+    };
 
-    this.log('connected and listening for changes...');
+    const query = (sql: string, onSuccess: () => void): void => {
+      // Destroy a stalled session; a query timeout alone can leave it stuck
+      // in pg's queue and cannot establish that LISTEN is still working.
+      deadline = setTimeout(() => {
+        this.dropListener(client, 'Database notify listener query timed out');
+      }, LISTENER_QUERY_TIMEOUT_MS);
+      deadline.unref();
+      void client.query(sql).then(() => {
+        if (this.listenClient !== client) return;
+        clearTimeout(deadline);
+        onSuccess();
+      }).catch((error) => this.dropListener(client, 'Database notify listener query failed', error));
+    };
+    const scheduleHeartbeat = (): void => {
+      heartbeat = setTimeout(() => query('SELECT 1', scheduleHeartbeat), LISTENER_HEARTBEAT_MS);
+      heartbeat.unref();
+    };
+    query('LISTEN "schema:update"', () => {
+      // Subscribe first, then invalidate: notifications missed during the gap
+      // will never be replayed, and builds started before recovery are stale.
+      flushAllServices();
+      this.log('connected and listening for changes; invalidated all services');
+      scheduleHeartbeat();
+    });
   }
 
-  private dropListener(client: PoolClient, message: string, err: unknown): void {
-    // Another path (shutdown, an earlier failure) already tore this client down.
+  private dropListener(client: PoolClient, message: string, err?: unknown): void {
     if (this.listenClient !== client) return;
+    this.releaseListener();
+    if (this.shuttingDown) return;
+    this.error(message, err);
+    this.retryListener();
+  }
 
+  private releaseListener(): void {
     const release = this.listenRelease;
     this.listenClient = null;
     this.listenRelease = null;
-    client.removeAllListeners('notification');
-    client.removeAllListeners('error');
-
-    if (this.shuttingDown) {
-      release?.();
-      return;
-    }
-
-    this.error(message, err);
-    release?.();
-    this.addEventListener();
+    this.listenerCleanup?.();
+    this.listenerCleanup = null;
+    // This is a dedicated long-lived session. Destroy it on failure/shutdown;
+    // never return a broken or still-subscribed session to the query pool.
+    release?.(true);
   }
 
   async removeEventListener(): Promise<void> {
-    if (!this.listenClient || !this.listenRelease) {
-      return;
-    }
-
-    const client = this.listenClient;
-    const release = this.listenRelease;
-    this.listenClient = null;
-    this.listenRelease = null;
-
-    client.removeAllListeners('notification');
-    client.removeAllListeners('error');
-
-    try {
-      await client.query('UNLISTEN "schema:update"');
-    } catch {
-      // Ignore listener cleanup errors during shutdown.
-    }
-
-    release();
+    ++this.listenerAttempt;
+    this.listenerConnecting = false;
+    if (this.listenerRetry) clearTimeout(this.listenerRetry);
+    this.listenerRetry = null;
+    this.releaseListener();
   }
 
   async close(opts: { closeCaches?: boolean } = {}): Promise<void> {

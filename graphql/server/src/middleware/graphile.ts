@@ -336,6 +336,11 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
     key: string,
     label: string
   ): Promise<GraphileCacheEntry> => {
+    // Authentication and other middleware may await between API resolution
+    // and handler creation. A pre-recovery request must resolve again too.
+    if (req.apiGeneration !== undefined && req.apiGeneration !== generationOf(key)) {
+      throw new ServiceInvalidatedError(key);
+    }
     const { anonRole, roleName, schema } = api;
     const databaseLabel = api.databaseId ?? 'none';
     const schemaLabel = schema?.join(',') || 'unknown';

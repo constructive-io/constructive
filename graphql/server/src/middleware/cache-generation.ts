@@ -6,15 +6,27 @@ import { graphileCache } from 'graphile-cache';
 // the key's generation, and the build compares the generation it started
 // under with the one it sees at admission time.
 const generations = new Map<string, number>();
+let sequence = 0;
+let globalGeneration = 0;
 
-export const generationOf = (key: string): number => generations.get(key) ?? 0;
+export const generationOf = (key: string): number => generations.get(key) ?? globalGeneration;
 
 export const evictServiceKey = (key: string): void => {
-  generations.set(key, generationOf(key) + 1);
+  generations.set(key, ++sequence);
   graphileCache.delete(key);
   svcCache.delete(key);
 };
 
+// Advance even keys absent from both caches: they may have a build in flight.
+export const evictAllServiceKeys = (): void => {
+  globalGeneration = ++sequence;
+  generations.clear();
+  graphileCache.clear();
+  svcCache.clear();
+};
+
 export const clearGenerations = (): void => {
+  sequence = 0;
+  globalGeneration = 0;
   generations.clear();
 };
