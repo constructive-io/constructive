@@ -6,9 +6,10 @@ import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLSchema } from 'graphql';
 
 import { allowedValuesForAttribute } from './check-constraint-values';
-import { isGeneratedColumn } from './column-defaults';
+import { isComputedColumn, isGeneratedColumn } from './column-defaults';
 import { extendQueryWithMetaField } from './graphql-meta-field';
 import { collectTablesMeta } from './table-meta-builder';
+import { readTypeModifier } from './type-modifiers';
 import type { MetaBuild, TableMeta } from './types';
 
 declare global {
@@ -22,6 +23,21 @@ declare global {
        * `nextval(...)`.
        */
       generatedValue?: boolean;
+      /**
+       * The database always computes the column's value and rejects a written
+       * one: a generated column or an identity ALWAYS column.
+       */
+      computedValue?: boolean;
+      /** Declared length of a varchar/char (characters) or bit/varbit (bits) column. */
+      maxLength?: number;
+      /** Declared precision of a numeric column. */
+      precision?: number;
+      /** Declared scale of a numeric column. */
+      scale?: number;
+      /** Declared spatial reference id of a geometry/geography column. */
+      geometrySrid?: number;
+      /** Declared dimensions of a vector column. */
+      vectorDimensions?: number;
     }
   }
 }
@@ -107,8 +123,9 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           defaults.set(adnum, adbin);
         }
       },
-      // Record each column's CHECK-constraint values, and whether the database
-      // generates its value, on the codec attribute, where _meta reads them.
+      // Record each column's CHECK-constraint values, whether the database
+      // generates or always computes its value, and the limits its type
+      // modifier declares, on the codec attribute, where _meta reads them.
       pgCodecs_attribute(_info, event) {
         const { pgClass, pgAttribute, attribute } = event;
         const allowedValues = allowedValuesForAttribute(
@@ -119,12 +136,14 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
           pgAttribute,
           columnDefaultsByClass.get(pgClass)?.get(pgAttribute.attnum)
         );
-        if (!allowedValues && !generatedValue) return;
-        attribute.extensions = {
-          ...attribute.extensions,
+        const facts = {
           ...(allowedValues && { allowedValues }),
           ...(generatedValue && { generatedValue }),
+          ...(isComputedColumn(pgAttribute) && { computedValue: true }),
+          ...readTypeModifier(attribute.codec, pgAttribute.atttypmod),
         };
+        if (Object.keys(facts).length === 0) return;
+        attribute.extensions = { ...attribute.extensions, ...facts };
       },
     },
   },

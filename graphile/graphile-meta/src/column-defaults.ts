@@ -66,3 +66,14 @@ export function isGeneratedColumn(attribute: GeneratedColumnLike, adbin: string 
   if (attribute.attidentity || attribute.attgenerated) return true;
   return adbin != null && !isConstantDefault(adbin);
 }
+
+/**
+ * Whether the database always computes the column's value and rejects a
+ * written one: a generated column (stored or virtual, `attgenerated`) or an
+ * identity ALWAYS column (`attidentity = 'a'`). Narrower than
+ * `isGeneratedColumn`: identity BY DEFAULT and non-constant defaults such as
+ * `now()` fill a value only when none is written, so they accept writes.
+ */
+export function isComputedColumn(attribute: GeneratedColumnLike): boolean {
+  return !!attribute.attgenerated || attribute.attidentity === 'a';
+}
