@@ -35,7 +35,7 @@
     "@agentic-kit/harness": "workspace:*",
     "@agentic-kit/pi": "workspace:*",
     "@constructive-io/sdk": "workspace:^",
-    "@earendil-works/pi-coding-agent": "1.4.0",
+    "@earendil-works/pi-coding-agent": "1.5.2",
     "appstash": "^0.8.0",
     "inquirerer": "^4.9.4"
   },
