@@ -21,15 +21,15 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `appInternalSecret` | findMany, findOne, create, update, delete |
+| `appInternalSecret` | findMany, findOne, update, delete |
 | `config` | findMany, findOne, create, update, delete |
 | `internalConfig` | findMany, findOne, create, update, delete |
-| `internalSecret` | findMany, findOne, create, update, delete |
+| `internalSecret` | findMany, findOne, update, delete |
 | `platformConfig` | findMany, findOne, create, update, delete |
 | `platformInternalConfig` | findMany, findOne, create, update, delete |
-| `platformInternalSecret` | findMany, findOne, create, update, delete |
-| `platformSecret` | findMany, findOne, create, update, delete |
-| `secret` | findMany, findOne, create, update, delete |
+| `platformInternalSecret` | findMany, findOne, update, delete |
+| `platformSecret` | findMany, findOne, update, delete |
+| `secret` | findMany, findOne, update, delete |
 
 ## Table Operations
 
@@ -60,9 +60,6 @@ const items = await db.appInternalSecret.findMany({ select: { annotations: true,
 
 // Get one by id
 const item = await db.appInternalSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.appInternalSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appInternalSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -183,9 +180,6 @@ const items = await db.internalSecret.findMany({ select: { annotations: true, cr
 // Get one by id
 const item = await db.internalSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
-// Create
-const created = await db.internalSecret.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.internalSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
@@ -302,9 +296,6 @@ const items = await db.platformInternalSecret.findMany({ select: { annotations: 
 // Get one by id
 const item = await db.platformInternalSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
 
-// Create
-const created = await db.platformInternalSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformInternalSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
@@ -341,9 +332,6 @@ const items = await db.platformSecret.findMany({ select: { annotations: true, cr
 
 // Get one by id
 const item = await db.platformSecret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.platformSecret.create({ data: { annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformSecret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
@@ -382,9 +370,6 @@ const items = await db.secret.findMany({ select: { annotations: true, createdAt:
 
 // Get one by id
 const item = await db.secret.findOne({ id: '<UUID>', select: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.secret.create({ data: { annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.secret.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();

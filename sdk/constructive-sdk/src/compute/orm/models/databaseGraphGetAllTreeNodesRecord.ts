@@ -29,7 +29,6 @@ import type {
   DatabaseGraphGetAllTreeNodesRecordSelect,
   DatabaseGraphGetAllTreeNodesRecordFilter,
   DatabaseGraphGetAllTreeNodesRecordsOrderBy,
-  CreateDatabaseGraphGetAllTreeNodesRecordInput,
   UpdateDatabaseGraphGetAllTreeNodesRecordInput,
   DatabaseGraphGetAllTreeNodesRecordPatch,
 } from '../input-types';
@@ -115,39 +114,6 @@ export class DatabaseGraphGetAllTreeNodesRecordModel {
       }) => ({
         databaseGraphGetAllTreeNodesRecord: data.databaseGraphGetAllTreeNodes?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends DatabaseGraphGetAllTreeNodesRecordSelect>(
-    args: CreateArgs<
-      S,
-      CreateDatabaseGraphGetAllTreeNodesRecordInput['databaseGraphGetAllTreeNodesRecord']
-    > & {
-      select: S;
-    } & StrictSelect<S, DatabaseGraphGetAllTreeNodesRecordSelect>
-  ): QueryBuilder<{
-    createDatabaseGraphGetAllTreeNodesRecord: {
-      databaseGraphGetAllTreeNodesRecord: InferSelectResult<
-        DatabaseGraphGetAllTreeNodesRecordWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'DatabaseGraphGetAllTreeNodesRecord',
-      'createDatabaseGraphGetAllTreeNodesRecord',
-      'databaseGraphGetAllTreeNodesRecord',
-      args.select,
-      args.data,
-      'CreateDatabaseGraphGetAllTreeNodesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'DatabaseGraphGetAllTreeNodesRecord',
-      fieldName: 'createDatabaseGraphGetAllTreeNodesRecord',
-      document,
-      variables,
     });
   }
 }

@@ -258,7 +258,6 @@ CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
 | `list` | List all platformInfraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
 | `get` | Get a platformInfraGetAllTreeNodesRecord by id |
-| `create` | Create a new platformInfraGetAllTreeNodesRecord |
 | `update` | Update an existing platformInfraGetAllTreeNodesRecord |
 | `delete` | Delete a platformInfraGetAllTreeNodesRecord |
 

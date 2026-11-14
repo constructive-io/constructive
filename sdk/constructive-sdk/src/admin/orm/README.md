@@ -31,16 +31,16 @@ const db = createClient({
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `appOwnerGrant` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
-| `myPendingAppInvitesRecord` | findMany, findOne, create, update, delete |
-| `myPendingOrgInvitesRecord` | findMany, findOne, create, update, delete |
+| `myPendingAppInvitesRecord` | findMany, findOne, update, delete |
+| `myPendingOrgInvitesRecord` | findMany, findOne, update, delete |
 | `orgAdminGrant` | findMany, findOne, create, update, delete |
 | `orgCapabilityDefaultCapability` | findMany, findOne, create, update, delete |
 | `orgCapabilityDefaultGrant` | findMany, findOne, create, update, delete |
 | `orgChartEdge` | findMany, findOne, create, update, delete |
 | `orgChartEdgeGrant` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
-| `orgGetManagersRecord` | findMany, findOne, create, update, delete |
-| `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
+| `orgGetManagersRecord` | findMany, findOne, update, delete |
+| `orgGetSubordinatesRecord` | findMany, findOne, update, delete |
 | `orgGrant` | findMany, findOne, create, update, delete |
 | `orgInvite` | findMany, findOne, create, update, delete |
 | `orgMember` | findMany, findOne, create, update, delete |
@@ -438,9 +438,6 @@ const items = await db.myPendingAppInvitesRecord.findMany({ select: { channel: t
 // Get one by id
 const item = await db.myPendingAppInvitesRecord.findOne({ id: '<UUID>', select: { channel: true, createdAt: true, expiresAt: true, id: true, senderId: true } }).execute();
 
-// Create
-const created = await db.myPendingAppInvitesRecord.create({ data: { channel: '<String>', expiresAt: '<Datetime>', senderId: '<UUID>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.myPendingAppInvitesRecord.update({ where: { id: '<UUID>' }, data: { channel: '<String>' }, select: { id: true } }).execute();
 
@@ -471,9 +468,6 @@ const items = await db.myPendingOrgInvitesRecord.findMany({ select: { channel: t
 
 // Get one by id
 const item = await db.myPendingOrgInvitesRecord.findOne({ id: '<UUID>', select: { channel: true, createdAt: true, entityId: true, expiresAt: true, id: true, senderId: true } }).execute();
-
-// Create
-const created = await db.myPendingOrgInvitesRecord.create({ data: { channel: '<String>', entityId: '<UUID>', expiresAt: '<Datetime>', senderId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.myPendingOrgInvitesRecord.update({ where: { id: '<UUID>' }, data: { channel: '<String>' }, select: { id: true } }).execute();
@@ -713,9 +707,6 @@ const items = await db.orgGetManagersRecord.findMany({ select: { depth: true, us
 // Get one by id
 const item = await db.orgGetManagersRecord.findOne({ id: '<UUID>', select: { depth: true, userId: true } }).execute();
 
-// Create
-const created = await db.orgGetManagersRecord.create({ data: { depth: '<Int>', userId: '<UUID>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.orgGetManagersRecord.update({ where: { id: '<UUID>' }, data: { depth: '<Int>' }, select: { id: true } }).execute();
 
@@ -742,9 +733,6 @@ const items = await db.orgGetSubordinatesRecord.findMany({ select: { depth: true
 
 // Get one by id
 const item = await db.orgGetSubordinatesRecord.findOne({ id: '<UUID>', select: { depth: true, userId: true } }).execute();
-
-// Create
-const created = await db.orgGetSubordinatesRecord.create({ data: { depth: '<Int>', userId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgGetSubordinatesRecord.update({ where: { id: '<UUID>' }, data: { depth: '<Int>' }, select: { id: true } }).execute();

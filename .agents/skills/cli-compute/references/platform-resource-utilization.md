@@ -12,7 +12,6 @@ csdk platform-resource-utilization list --where.<field>.<op> <value> --orderBy <
 csdk platform-resource-utilization list --limit 10 --after <cursor>
 csdk platform-resource-utilization find-first --where.<field>.<op> <value>
 csdk platform-resource-utilization get --id <UUID>
-csdk platform-resource-utilization create --avgMemoryBytes <BigInt> --cpuLimitMillicores <BigInt> --cpuPeakUtilization <BigFloat> --cpuRequestHeadroomMillicores <BigInt> --cpuRequestMillicores <BigInt> --date <Date> --gbSeconds <BigFloat> --kind <String> --maxCpuMillicores <BigInt> --maxMemoryBytes <BigInt> --memoryLimitBytes <BigInt> --memoryPeakUtilization <BigFloat> --memoryRequestBytes <BigInt> --memoryRequestHeadroomBytes <BigInt> --namespaceId <UUID> --replicas <Int> --resourceId <UUID> --runtimeSeconds <BigInt> --sampleCount <Int>
 csdk platform-resource-utilization update --id <UUID> [--avgMemoryBytes <BigInt>] [--cpuLimitMillicores <BigInt>] [--cpuPeakUtilization <BigFloat>] [--cpuRequestHeadroomMillicores <BigInt>] [--cpuRequestMillicores <BigInt>] [--date <Date>] [--gbSeconds <BigFloat>] [--kind <String>] [--maxCpuMillicores <BigInt>] [--maxMemoryBytes <BigInt>] [--memoryLimitBytes <BigInt>] [--memoryPeakUtilization <BigFloat>] [--memoryRequestBytes <BigInt>] [--memoryRequestHeadroomBytes <BigInt>] [--namespaceId <UUID>] [--replicas <Int>] [--resourceId <UUID>] [--runtimeSeconds <BigInt>] [--sampleCount <Int>]
 csdk platform-resource-utilization delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk platform-resource-utilization list --select id,id
 
 ```bash
 csdk platform-resource-utilization list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a platformResourceUtilization
-
-```bash
-csdk platform-resource-utilization create --avgMemoryBytes <BigInt> --cpuLimitMillicores <BigInt> --cpuPeakUtilization <BigFloat> --cpuRequestHeadroomMillicores <BigInt> --cpuRequestMillicores <BigInt> --date <Date> --gbSeconds <BigFloat> --kind <String> --maxCpuMillicores <BigInt> --maxMemoryBytes <BigInt> --memoryLimitBytes <BigInt> --memoryPeakUtilization <BigFloat> --memoryRequestBytes <BigInt> --memoryRequestHeadroomBytes <BigInt> --namespaceId <UUID> --replicas <Int> --resourceId <UUID> --runtimeSeconds <BigInt> --sampleCount <Int>
 ```
 
 ### Get a platformResourceUtilization by id

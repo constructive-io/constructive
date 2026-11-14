@@ -54,6 +54,7 @@ import { PlatformEmailSiteIdentityModel } from './models/platformEmailSiteIdenti
 import { PlatformGetSitePreviewsRecordModel } from './models/platformGetSitePreviewsRecord';
 import { PlatformManagedDomainModel } from './models/platformManagedDomain';
 import { PlatformPageModel } from './models/platformPage';
+import { PlatformReservedSubdomainModel } from './models/platformReservedSubdomain';
 import { PlatformSiteAppLinkModel } from './models/platformSiteAppLink';
 import { PlatformSiteModel } from './models/platformSite';
 import { PlatformSiteDeepLinkModel } from './models/platformSiteDeepLink';
@@ -179,6 +180,7 @@ export function createClient(config: OrmClientConfig) {
     platformGetSitePreviewsRecord: new PlatformGetSitePreviewsRecordModel(client),
     platformManagedDomain: new PlatformManagedDomainModel(client),
     platformPage: new PlatformPageModel(client),
+    platformReservedSubdomain: new PlatformReservedSubdomainModel(client),
     platformSiteAppLink: new PlatformSiteAppLinkModel(client),
     platformSite: new PlatformSiteModel(client),
     platformSiteDeepLink: new PlatformSiteDeepLinkModel(client),

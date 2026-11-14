@@ -407,7 +407,6 @@ CRUD operations for MyPendingAppInvitesRecord records.
 | `list` | List all myPendingAppInvitesRecord records |
 | `find-first` | Find first matching myPendingAppInvitesRecord record |
 | `get` | Get a myPendingAppInvitesRecord by id |
-| `create` | Create a new myPendingAppInvitesRecord |
 | `update` | Update an existing myPendingAppInvitesRecord |
 | `delete` | Delete a myPendingAppInvitesRecord |
 
@@ -432,7 +431,6 @@ CRUD operations for MyPendingOrgInvitesRecord records.
 | `list` | List all myPendingOrgInvitesRecord records |
 | `find-first` | Find first matching myPendingOrgInvitesRecord record |
 | `get` | Get a myPendingOrgInvitesRecord by id |
-| `create` | Create a new myPendingOrgInvitesRecord |
 | `update` | Update an existing myPendingOrgInvitesRecord |
 | `delete` | Delete a myPendingOrgInvitesRecord |
 
@@ -626,7 +624,6 @@ CRUD operations for OrgGetManagersRecord records.
 | `list` | List all orgGetManagersRecord records |
 | `find-first` | Find first matching orgGetManagersRecord record |
 | `get` | Get a orgGetManagersRecord by id |
-| `create` | Create a new orgGetManagersRecord |
 | `update` | Update an existing orgGetManagersRecord |
 | `delete` | Delete a orgGetManagersRecord |
 
@@ -648,7 +645,6 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | `list` | List all orgGetSubordinatesRecord records |
 | `find-first` | Find first matching orgGetSubordinatesRecord record |
 | `get` | Get a orgGetSubordinatesRecord by id |
-| `create` | Create a new orgGetSubordinatesRecord |
 | `update` | Update an existing orgGetSubordinatesRecord |
 | `delete` | Delete a orgGetSubordinatesRecord |
 

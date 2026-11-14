@@ -7,13 +7,7 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type {
-  CreateFileInput,
-  FilePatch,
-  FileSelect,
-  FileFilter,
-  FileOrderBy,
-} from '../../orm/input-types';
+import type { FilePatch, FileSelect, FileFilter, FileOrderBy } from '../../orm/input-types';
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
@@ -31,6 +25,7 @@ const fieldSchema: FieldSchema = {
   key: 'string',
   mimeType: 'string',
   promotedAt: 'string',
+  rejectionReason: 'string',
   size: 'int',
   status: 'string',
   tags: 'string',
@@ -55,7 +50,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -74,8 +69,6 @@ async function handleTableSubcommand(
       return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     case 'update':
       return handleUpdate(argv, prompter);
     case 'delete':
@@ -92,13 +85,18 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       bucketId: true,
       contentHash: true,
       createdAt: true,
+      databaseId: true,
       description: true,
+      downloadUrl: true,
       expiryEnqueuedAt: true,
+      filePath: true,
       filename: true,
       id: true,
+      isPublic: true,
       key: true,
       mimeType: true,
       promotedAt: true,
+      rejectionReason: true,
       size: true,
       status: true,
       tags: true,
@@ -128,13 +126,18 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       bucketId: true,
       contentHash: true,
       createdAt: true,
+      databaseId: true,
       description: true,
+      downloadUrl: true,
       expiryEnqueuedAt: true,
+      filePath: true,
       filename: true,
       id: true,
+      isPublic: true,
       key: true,
       mimeType: true,
       promotedAt: true,
+      rejectionReason: true,
       size: true,
       status: true,
       tags: true,
@@ -176,13 +179,18 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           bucketId: true,
           contentHash: true,
           createdAt: true,
+          databaseId: true,
           description: true,
+          downloadUrl: true,
           expiryEnqueuedAt: true,
+          filePath: true,
           filename: true,
           id: true,
+          isPublic: true,
           key: true,
           mimeType: true,
           promotedAt: true,
+          rejectionReason: true,
           size: true,
           status: true,
           tags: true,
@@ -194,145 +202,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Record not found.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'bucketId',
-        message: 'bucketId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'contentHash',
-        message: 'contentHash',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'description',
-        message: 'description',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'expiryEnqueuedAt',
-        message: 'expiryEnqueuedAt',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'filename',
-        message: 'filename',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'key',
-        message: 'key',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'mimeType',
-        message: 'mimeType',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'promotedAt',
-        message: 'promotedAt',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'size',
-        message: 'size',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'status',
-        message: 'status',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'tags',
-        message: 'tags',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'upload',
-        message: 'upload',
-        required: false,
-        skipPrompt: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema) as CreateFileInput['file'];
-    const client = getClient();
-    const result = await client.file
-      .create({
-        data: {
-          actorId: cleanedData.actorId,
-          bucketId: cleanedData.bucketId,
-          contentHash: cleanedData.contentHash,
-          description: cleanedData.description,
-          expiryEnqueuedAt: cleanedData.expiryEnqueuedAt,
-          filename: cleanedData.filename,
-          key: cleanedData.key,
-          mimeType: cleanedData.mimeType,
-          promotedAt: cleanedData.promotedAt,
-          size: cleanedData.size,
-          status: cleanedData.status,
-          tags: cleanedData.tags,
-          upload: cleanedData.upload,
-        },
-        select: {
-          actorId: true,
-          bucketId: true,
-          contentHash: true,
-          createdAt: true,
-          description: true,
-          expiryEnqueuedAt: true,
-          filename: true,
-          id: true,
-          key: true,
-          mimeType: true,
-          promotedAt: true,
-          size: true,
-          status: true,
-          tags: true,
-          updatedAt: true,
-          upload: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -365,28 +234,48 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'contentHash',
         message: 'contentHash',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'downloadUrl',
+        message: 'downloadUrl',
+        required: false,
       },
       {
         type: 'text',
         name: 'expiryEnqueuedAt',
         message: 'expiryEnqueuedAt',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'filePath',
+        message: 'filePath',
+        required: false,
       },
       {
         type: 'text',
         name: 'filename',
         message: 'filename',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isPublic',
+        message: 'isPublic',
+        required: false,
       },
       {
         type: 'text',
@@ -405,7 +294,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'promotedAt',
         message: 'promotedAt',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rejectionReason',
+        message: 'rejectionReason',
+        required: false,
       },
       {
         type: 'text',
@@ -418,21 +312,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'status',
         message: 'status',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'upload',
         message: 'upload',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -447,12 +338,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           bucketId: cleanedData.bucketId,
           contentHash: cleanedData.contentHash,
+          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
+          downloadUrl: cleanedData.downloadUrl,
           expiryEnqueuedAt: cleanedData.expiryEnqueuedAt,
+          filePath: cleanedData.filePath,
           filename: cleanedData.filename,
+          isPublic: cleanedData.isPublic,
           key: cleanedData.key,
           mimeType: cleanedData.mimeType,
           promotedAt: cleanedData.promotedAt,
+          rejectionReason: cleanedData.rejectionReason,
           size: cleanedData.size,
           status: cleanedData.status,
           tags: cleanedData.tags,
@@ -463,13 +359,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           bucketId: true,
           contentHash: true,
           createdAt: true,
+          databaseId: true,
           description: true,
+          downloadUrl: true,
           expiryEnqueuedAt: true,
+          filePath: true,
           filename: true,
           id: true,
+          isPublic: true,
           key: true,
           mimeType: true,
           promotedAt: true,
+          rejectionReason: true,
           size: true,
           status: true,
           tags: true,

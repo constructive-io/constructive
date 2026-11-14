@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreatePlatformResourceObservedStorageInput,
   PlatformResourceObservedStoragePatch,
   PlatformResourceObservedStorageSelect,
   PlatformResourceObservedStorageFilter,
@@ -53,7 +52,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -70,8 +69,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -155,177 +152,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'capacity',
-        message: 'capacity',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'capacityBytes',
-        message: 'capacityBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'claimName',
-        message: 'claimName',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'declaredStorageClass',
-        message: 'declaredStorageClass',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'declaredStorageSizeBytes',
-        message: 'declaredStorageSizeBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'declaredStorageTotalBytes',
-        message: 'declaredStorageTotalBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'installationId',
-        message: 'installationId',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isBound',
-        message: 'isBound',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'kind',
-        message: 'kind',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'phase',
-        message: 'phase',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'requested',
-        message: 'requested',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'requestedBytes',
-        message: 'requestedBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'resourceStatus',
-        message: 'resourceStatus',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'slug',
-        message: 'slug',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storageClass',
-        message: 'storageClass',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storageName',
-        message: 'storageName',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreatePlatformResourceObservedStorageInput['platformResourceObservedStorage'];
-    const client = getClient();
-    const result = await client.platformResourceObservedStorage
-      .create({
-        data: {
-          capacity: cleanedData.capacity,
-          capacityBytes: cleanedData.capacityBytes,
-          claimName: cleanedData.claimName,
-          declaredStorageClass: cleanedData.declaredStorageClass,
-          declaredStorageSizeBytes: cleanedData.declaredStorageSizeBytes,
-          declaredStorageTotalBytes: cleanedData.declaredStorageTotalBytes,
-          installationId: cleanedData.installationId,
-          isBound: cleanedData.isBound,
-          kind: cleanedData.kind,
-          namespaceId: cleanedData.namespaceId,
-          phase: cleanedData.phase,
-          requested: cleanedData.requested,
-          requestedBytes: cleanedData.requestedBytes,
-          resourceId: cleanedData.resourceId,
-          resourceStatus: cleanedData.resourceStatus,
-          slug: cleanedData.slug,
-          storageClass: cleanedData.storageClass,
-          storageName: cleanedData.storageName,
-        },
-        select: {
-          capacity: true,
-          capacityBytes: true,
-          claimName: true,
-          declaredStorageClass: true,
-          declaredStorageSizeBytes: true,
-          declaredStorageTotalBytes: true,
-          installationId: true,
-          isBound: true,
-          kind: true,
-          namespaceId: true,
-          phase: true,
-          requested: true,
-          requestedBytes: true,
-          resourceId: true,
-          resourceStatus: true,
-          slug: true,
-          storageClass: true,
-          storageName: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

@@ -12,7 +12,6 @@ csdk principal list --where.<field>.<op> <value> --orderBy <values>
 csdk principal list --limit 10 --after <cursor>
 csdk principal find-first --where.<field>.<op> <value>
 csdk principal get --principalId <UUID>
-csdk principal create --apiKeyMaxDuration <Interval> --bypassStepUp <Boolean> --createdBySessionId <UUID> --depth <Int> --expiresAt <Datetime> --id <UUID> --isReadOnly <Boolean> --name <String> --ownerId <UUID> --parentPrincipalId <UUID> --useAdminOwner <Boolean> --userId <UUID>
 csdk principal update --principalId <UUID> [--apiKeyMaxDuration <Interval>] [--bypassStepUp <Boolean>] [--createdBySessionId <UUID>] [--depth <Int>] [--expiresAt <Datetime>] [--id <UUID>] [--isReadOnly <Boolean>] [--name <String>] [--ownerId <UUID>] [--parentPrincipalId <UUID>] [--useAdminOwner <Boolean>] [--userId <UUID>]
 csdk principal delete --principalId <UUID>
 ```
@@ -53,12 +52,6 @@ csdk principal list --select id,principalId
 
 ```bash
 csdk principal list --where.principalId.equalTo <value> --orderBy PRINCIPAL_ID_ASC
-```
-
-### Create a principal
-
-```bash
-csdk principal create --apiKeyMaxDuration <Interval> --bypassStepUp <Boolean> --createdBySessionId <UUID> --depth <Int> --expiresAt <Datetime> --id <UUID> --isReadOnly <Boolean> --name <String> --ownerId <UUID> --parentPrincipalId <UUID> --useAdminOwner <Boolean> --userId <UUID>
 ```
 
 ### Get a principal by principalId

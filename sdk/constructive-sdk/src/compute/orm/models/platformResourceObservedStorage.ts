@@ -29,7 +29,6 @@ import type {
   PlatformResourceObservedStorageSelect,
   PlatformResourceObservedStorageFilter,
   PlatformResourceObservedStorageOrderBy,
-  CreatePlatformResourceObservedStorageInput,
   UpdatePlatformResourceObservedStorageInput,
   PlatformResourceObservedStoragePatch,
 } from '../input-types';
@@ -115,39 +114,6 @@ export class PlatformResourceObservedStorageModel {
       }) => ({
         platformResourceObservedStorage: data.platformResourceObservedStorages?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourceObservedStorageSelect>(
-    args: CreateArgs<
-      S,
-      CreatePlatformResourceObservedStorageInput['platformResourceObservedStorage']
-    > & {
-      select: S;
-    } & StrictSelect<S, PlatformResourceObservedStorageSelect>
-  ): QueryBuilder<{
-    createPlatformResourceObservedStorage: {
-      platformResourceObservedStorage: InferSelectResult<
-        PlatformResourceObservedStorageWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourceObservedStorage',
-      'createPlatformResourceObservedStorage',
-      'platformResourceObservedStorage',
-      args.select,
-      args.data,
-      'CreatePlatformResourceObservedStorageInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourceObservedStorage',
-      fieldName: 'createPlatformResourceObservedStorage',
-      document,
-      variables,
     });
   }
 }

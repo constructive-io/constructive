@@ -29,7 +29,6 @@ import type {
   PlatformSecretSelect,
   PlatformSecretFilter,
   PlatformSecretOrderBy,
-  CreatePlatformSecretInput,
   UpdatePlatformSecretInput,
   PlatformSecretPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class PlatformSecretModel {
       }) => ({
         platformSecret: data.platformSecrets?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformSecretSelect>(
-    args: CreateArgs<S, CreatePlatformSecretInput['platformSecret']> & {
-      select: S;
-    } & StrictSelect<S, PlatformSecretSelect>
-  ): QueryBuilder<{
-    createPlatformSecret: {
-      platformSecret: InferSelectResult<PlatformSecretWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformSecret',
-      'createPlatformSecret',
-      'platformSecret',
-      args.select,
-      args.data,
-      'CreatePlatformSecretInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformSecret',
-      fieldName: 'createPlatformSecret',
-      document,
-      variables,
     });
   }
 }

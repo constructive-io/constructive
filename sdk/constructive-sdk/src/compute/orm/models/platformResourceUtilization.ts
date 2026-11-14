@@ -29,7 +29,6 @@ import type {
   PlatformResourceUtilizationSelect,
   PlatformResourceUtilizationFilter,
   PlatformResourceUtilizationOrderBy,
-  CreatePlatformResourceUtilizationInput,
   UpdatePlatformResourceUtilizationInput,
   PlatformResourceUtilizationPatch,
 } from '../input-types';
@@ -111,33 +110,6 @@ export class PlatformResourceUtilizationModel {
       }) => ({
         platformResourceUtilization: data.platformResourceUtilizations?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourceUtilizationSelect>(
-    args: CreateArgs<S, CreatePlatformResourceUtilizationInput['platformResourceUtilization']> & {
-      select: S;
-    } & StrictSelect<S, PlatformResourceUtilizationSelect>
-  ): QueryBuilder<{
-    createPlatformResourceUtilization: {
-      platformResourceUtilization: InferSelectResult<PlatformResourceUtilizationWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourceUtilization',
-      'createPlatformResourceUtilization',
-      'platformResourceUtilization',
-      args.select,
-      args.data,
-      'CreatePlatformResourceUtilizationInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourceUtilization',
-      fieldName: 'createPlatformResourceUtilization',
-      document,
-      variables,
     });
   }
 }

@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateAstMigrationInput,
   AstMigrationPatch,
   AstMigrationSelect,
   AstMigrationFilter,
@@ -48,7 +47,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -65,8 +64,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -132,123 +129,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'actionId',
-        message: 'actionId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'actionName',
-        message: 'actionName',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'databaseId',
-        message: 'databaseId',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'deploy',
-        message: 'deploy',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'deploys',
-        message: 'deploys',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'payload',
-        message: 'payload',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'requires',
-        message: 'requires',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'revert',
-        message: 'revert',
-        required: true,
-      },
-      {
-        type: 'json',
-        name: 'verify',
-        message: 'verify',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateAstMigrationInput['astMigration'];
-    const client = getClient();
-    const result = await client.astMigration
-      .create({
-        data: {
-          actionId: cleanedData.actionId,
-          actionName: cleanedData.actionName,
-          actorId: cleanedData.actorId,
-          databaseId: cleanedData.databaseId,
-          deploy: cleanedData.deploy,
-          deploys: cleanedData.deploys,
-          name: cleanedData.name,
-          payload: cleanedData.payload,
-          requires: cleanedData.requires,
-          revert: cleanedData.revert,
-          verify: cleanedData.verify,
-        },
-        select: {
-          actionId: true,
-          actionName: true,
-          actorId: true,
-          createdAt: true,
-          databaseId: true,
-          deploy: true,
-          deploys: true,
-          id: true,
-          name: true,
-          payload: true,
-          requires: true,
-          revert: true,
-          verify: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

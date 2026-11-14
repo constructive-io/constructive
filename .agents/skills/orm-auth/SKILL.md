@@ -1,13 +1,13 @@
 ---
 name: orm-auth
-description: ORM client for the auth API — provides typed CRUD operations for 15 tables and 61 custom operations
+description: ORM client for the auth API — provides typed CRUD operations for 15 tables and 66 custom operations
 ---
 
 # orm-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the auth API — provides typed CRUD operations for 15 tables and 61 custom operations
+ORM client for the auth API — provides typed CRUD operations for 15 tables and 66 custom operations
 
 ## Usage
 
@@ -58,6 +58,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [current-user-id](references/current-user-id.md)
 - [get-mfa-status](references/get-mfa-status.md)
 - [require-step-up](references/require-step-up.md)
+- [sign-in-options](references/sign-in-options.md)
 - [approve-device](references/approve-device.md)
 - [check-password](references/check-password.md)
 - [complete-mfa-challenge](references/complete-mfa-challenge.md)
@@ -67,6 +68,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [create-child-principal](references/create-child-principal.md)
 - [create-org-api-key](references/create-org-api-key.md)
 - [create-org-principal](references/create-org-principal.md)
+- [create-principal](references/create-principal.md)
 - [create-principal-from-preset](references/create-principal-from-preset.md)
 - [delete-org-principal](references/delete-org-principal.md)
 - [delete-principal](references/delete-principal.md)
@@ -77,6 +79,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [enable-email-mfa](references/enable-email-mfa.md)
 - [enable-sms-mfa](references/enable-sms-mfa.md)
 - [enable-totp](references/enable-totp.md)
+- [ensure-auth-csrf](references/ensure-auth-csrf.md)
+- [exchange-native-handoff](references/exchange-native-handoff.md)
 - [extend-token-expires](references/extend-token-expires.md)
 - [forgot-password](references/forgot-password.md)
 - [generate-backup-codes](references/generate-backup-codes.md)
@@ -85,6 +89,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-bucket](references/provision-bucket.md)
 - [refresh-access-token](references/refresh-access-token.md)
 - [request-cross-origin-token](references/request-cross-origin-token.md)
+- [request-device-approval](references/request-device-approval.md)
 - [request-magic-link](references/request-magic-link.md)
 - [reset-password](references/reset-password.md)
 - [revoke-api-key](references/revoke-api-key.md)

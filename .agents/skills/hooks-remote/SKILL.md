@@ -1,13 +1,13 @@
 ---
 name: hooks-remote
-description: React Query hooks for the remote API — provides typed query and mutation hooks for 3 tables and 2 custom operations
+description: React Query hooks for the remote API — provides typed query and mutation hooks for 3 tables and 3 custom operations
 ---
 
 # hooks-remote
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the remote API — provides typed query and mutation hooks for 3 tables and 2 custom operations
+React Query hooks for the remote API — provides typed query and mutation hooks for 3 tables and 3 custom operations
 
 ## Usage
 
@@ -41,5 +41,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [machine](references/machine.md)
 - [machine-message](references/machine-message.md)
 - [machine-session](references/machine-session.md)
+- [current-database-id](references/current-database-id.md)
 - [machines-enroll](references/machines-enroll.md)
 - [provision-bucket](references/provision-bucket.md)

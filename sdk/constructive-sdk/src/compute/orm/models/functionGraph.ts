@@ -29,7 +29,6 @@ import type {
   FunctionGraphSelect,
   FunctionGraphFilter,
   FunctionGraphOrderBy,
-  CreateFunctionGraphInput,
   UpdateFunctionGraphInput,
   FunctionGraphPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class FunctionGraphModel {
       }) => ({
         functionGraph: data.functionGraphs?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends FunctionGraphSelect>(
-    args: CreateArgs<S, CreateFunctionGraphInput['functionGraph']> & {
-      select: S;
-    } & StrictSelect<S, FunctionGraphSelect>
-  ): QueryBuilder<{
-    createFunctionGraph: {
-      functionGraph: InferSelectResult<FunctionGraphWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'FunctionGraph',
-      'createFunctionGraph',
-      'functionGraph',
-      args.select,
-      args.data,
-      'CreateFunctionGraphInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'FunctionGraph',
-      fieldName: 'createFunctionGraph',
-      document,
-      variables,
     });
   }
   update<S extends FunctionGraphSelect>(

@@ -8,7 +8,6 @@ React Query hooks for PlatformResourcesResolvedRequirement data operations
 
 ```typescript
 usePlatformResourcesResolvedRequirementsQuery({ selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } } })
-useCreatePlatformResourcesResolvedRequirementMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreatePlatformResourcesResolvedRequirementMutation({ selection: { fields: { i
 const { data, isLoading } = usePlatformResourcesResolvedRequirementsQuery({
   selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
 });
-```
-
-### Create a platformResourcesResolvedRequirement
-
-```typescript
-const { mutate } = useCreatePlatformResourcesResolvedRequirementMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
 ```

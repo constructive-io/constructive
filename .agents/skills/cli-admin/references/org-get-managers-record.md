@@ -12,7 +12,6 @@ csdk org-get-managers-record list --where.<field>.<op> <value> --orderBy <values
 csdk org-get-managers-record list --limit 10 --after <cursor>
 csdk org-get-managers-record find-first --where.<field>.<op> <value>
 csdk org-get-managers-record get --id <UUID>
-csdk org-get-managers-record create --depth <Int> --userId <UUID>
 csdk org-get-managers-record update --id <UUID> [--depth <Int>] [--userId <UUID>]
 csdk org-get-managers-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk org-get-managers-record list --select id,id
 
 ```bash
 csdk org-get-managers-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a orgGetManagersRecord
-
-```bash
-csdk org-get-managers-record create --depth <Int> --userId <UUID>
 ```
 
 ### Get a orgGetManagersRecord by id
