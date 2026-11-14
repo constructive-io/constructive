@@ -194,6 +194,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'createOrgPrincipal', identifier] as const)
       : (['mutation', 'createOrgPrincipal'] as const),
+  /** Mutation key for createPrincipal */ createPrincipal: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createPrincipal', identifier] as const)
+      : (['mutation', 'createPrincipal'] as const),
   /** Mutation key for createPrincipalFromPreset */ createPrincipalFromPreset: (
     identifier?: string
   ) =>
@@ -236,6 +240,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'enableTotp', identifier] as const)
       : (['mutation', 'enableTotp'] as const),
+  /** Mutation key for ensureAuthCsrf */ ensureAuthCsrf: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'ensureAuthCsrf', identifier] as const)
+      : (['mutation', 'ensureAuthCsrf'] as const),
+  /** Mutation key for exchangeNativeHandoff */ exchangeNativeHandoff: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'exchangeNativeHandoff', identifier] as const)
+      : (['mutation', 'exchangeNativeHandoff'] as const),
   /** Mutation key for extendTokenExpires */ extendTokenExpires: (identifier?: string) =>
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)
@@ -268,6 +280,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'requestCrossOriginToken', identifier] as const)
       : (['mutation', 'requestCrossOriginToken'] as const),
+  /** Mutation key for requestDeviceApproval */ requestDeviceApproval: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestDeviceApproval', identifier] as const)
+      : (['mutation', 'requestDeviceApproval'] as const),
   /** Mutation key for requestMagicLink */ requestMagicLink: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestMagicLink', identifier] as const)

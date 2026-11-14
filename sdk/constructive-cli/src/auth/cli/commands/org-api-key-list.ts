@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateOrgApiKeyListInput,
   OrgApiKeyListPatch,
   OrgApiKeyListSelect,
   OrgApiKeyListFilter,
@@ -47,7 +46,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -64,8 +63,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -129,108 +126,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'accessLevel',
-        message: 'accessLevel',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'expiresAt',
-        message: 'expiresAt',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'keyId',
-        message: 'keyId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'lastUsedAt',
-        message: 'lastUsedAt',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'mfaLevel',
-        message: 'mfaLevel',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'orgId',
-        message: 'orgId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'principalId',
-        message: 'principalId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'revokedAt',
-        message: 'revokedAt',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateOrgApiKeyListInput['orgApiKeyList'];
-    const client = getClient();
-    const result = await client.orgApiKeyList
-      .create({
-        data: {
-          accessLevel: cleanedData.accessLevel,
-          expiresAt: cleanedData.expiresAt,
-          keyId: cleanedData.keyId,
-          lastUsedAt: cleanedData.lastUsedAt,
-          mfaLevel: cleanedData.mfaLevel,
-          name: cleanedData.name,
-          orgId: cleanedData.orgId,
-          principalId: cleanedData.principalId,
-          revokedAt: cleanedData.revokedAt,
-        },
-        select: {
-          accessLevel: true,
-          createdAt: true,
-          expiresAt: true,
-          id: true,
-          keyId: true,
-          lastUsedAt: true,
-          mfaLevel: true,
-          name: true,
-          orgId: true,
-          principalId: true,
-          revokedAt: true,
-          updatedAt: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

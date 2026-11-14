@@ -58,7 +58,6 @@ function App() {
 | `useUpdatePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeletePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `usePlatformInfraGetAllTreeNodesQuery` | Query | List all platformInfraGetAllTreeNodes |
-| `useCreatePlatformInfraGetAllTreeNodesRecordMutation` | Mutation | Create a platformInfraGetAllTreeNodesRecord |
 | `usePlatformInfraObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `usePlatformInfraObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreatePlatformInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -212,11 +211,6 @@ const { data, isLoading } = usePlatformInfraGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a platformInfraGetAllTreeNodesRecord
-const { mutate: create } = useCreatePlatformInfraGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### PlatformInfraObject

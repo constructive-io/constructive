@@ -22,7 +22,7 @@ const db = createClient({
 | Model | Operations |
 |-------|------------|
 | `commit` | findMany, findOne, create, update, delete |
-| `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `getAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `object` | findMany, findOne, create, update, delete |
 | `ref` | findMany, findOne, create, update, delete |
 | `store` | findMany, findOne, create, update, delete |
@@ -85,9 +85,6 @@ const items = await db.getAllTreeNodesRecord.findMany({ select: { data: true, pa
 
 // Get one by id
 const item = await db.getAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
-
-// Create
-const created = await db.getAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.getAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();

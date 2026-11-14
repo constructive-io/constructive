@@ -29,7 +29,6 @@ import type {
   IdentityProviderSelect,
   IdentityProviderFilter,
   IdentityProviderOrderBy,
-  CreateIdentityProviderInput,
   UpdateIdentityProviderInput,
   IdentityProviderPatch,
 } from '../input-types';
@@ -102,33 +101,6 @@ export class IdentityProviderModel {
       }) => ({
         identityProvider: data.identityProviders?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends IdentityProviderSelect>(
-    args: CreateArgs<S, CreateIdentityProviderInput['identityProvider']> & {
-      select: S;
-    } & StrictSelect<S, IdentityProviderSelect>
-  ): QueryBuilder<{
-    createIdentityProvider: {
-      identityProvider: InferSelectResult<IdentityProviderWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'IdentityProvider',
-      'createIdentityProvider',
-      'identityProvider',
-      args.select,
-      args.data,
-      'CreateIdentityProviderInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'IdentityProvider',
-      fieldName: 'createIdentityProvider',
-      document,
-      variables,
     });
   }
 }

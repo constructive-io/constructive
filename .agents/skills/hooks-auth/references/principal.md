@@ -9,7 +9,6 @@ Scoped sub-identities (API keys and agents) with precomputed SPRT
 ```typescript
 usePrincipalsQuery({ selection: { fields: { apiKeyMaxDuration: true, bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } } })
 usePrincipalQuery({ principalId: '<UUID>', selection: { fields: { apiKeyMaxDuration: true, bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } } })
-useCreatePrincipalMutation({ selection: { fields: { principalId: true } } })
 useUpdatePrincipalMutation({ selection: { fields: { principalId: true } } })
 useDeletePrincipalMutation({})
 ```
@@ -22,13 +21,4 @@ useDeletePrincipalMutation({})
 const { data, isLoading } = usePrincipalsQuery({
   selection: { fields: { apiKeyMaxDuration: true, bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } },
 });
-```
-
-### Create a principal
-
-```typescript
-const { mutate } = useCreatePrincipalMutation({
-  selection: { fields: { principalId: true } },
-});
-mutate({ apiKeyMaxDuration: '<Interval>', bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' });
 ```

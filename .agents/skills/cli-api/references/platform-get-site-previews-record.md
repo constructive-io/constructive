@@ -12,7 +12,6 @@ csdk platform-get-site-previews-record list --where.<field>.<op> <value> --order
 csdk platform-get-site-previews-record list --limit 10 --after <cursor>
 csdk platform-get-site-previews-record find-first --where.<field>.<op> <value>
 csdk platform-get-site-previews-record get --id <UUID>
-csdk platform-get-site-previews-record create --commitId <UUID> --name <String>
 csdk platform-get-site-previews-record update --id <UUID> [--commitId <UUID>] [--name <String>]
 csdk platform-get-site-previews-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk platform-get-site-previews-record list --select id,id
 
 ```bash
 csdk platform-get-site-previews-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a platformGetSitePreviewsRecord
-
-```bash
-csdk platform-get-site-previews-record create --commitId <UUID> --name <String>
 ```
 
 ### Get a platformGetSitePreviewsRecord by id

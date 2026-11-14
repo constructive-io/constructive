@@ -12,7 +12,6 @@ csdk my-pending-org-invites-record list --where.<field>.<op> <value> --orderBy <
 csdk my-pending-org-invites-record list --limit 10 --after <cursor>
 csdk my-pending-org-invites-record find-first --where.<field>.<op> <value>
 csdk my-pending-org-invites-record get --id <UUID>
-csdk my-pending-org-invites-record create --channel <String> --entityId <UUID> --expiresAt <Datetime> --senderId <UUID>
 csdk my-pending-org-invites-record update --id <UUID> [--channel <String>] [--entityId <UUID>] [--expiresAt <Datetime>] [--senderId <UUID>]
 csdk my-pending-org-invites-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk my-pending-org-invites-record list --select id,id
 
 ```bash
 csdk my-pending-org-invites-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a myPendingOrgInvitesRecord
-
-```bash
-csdk my-pending-org-invites-record create --channel <String> --entityId <UUID> --expiresAt <Datetime> --senderId <UUID>
 ```
 
 ### Get a myPendingOrgInvitesRecord by id

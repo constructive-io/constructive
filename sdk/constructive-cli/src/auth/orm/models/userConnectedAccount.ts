@@ -29,7 +29,6 @@ import type {
   UserConnectedAccountSelect,
   UserConnectedAccountFilter,
   UserConnectedAccountOrderBy,
-  CreateUserConnectedAccountInput,
   UpdateUserConnectedAccountInput,
   UserConnectedAccountPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class UserConnectedAccountModel {
       }) => ({
         userConnectedAccount: data.userConnectedAccounts?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends UserConnectedAccountSelect>(
-    args: CreateArgs<S, CreateUserConnectedAccountInput['userConnectedAccount']> & {
-      select: S;
-    } & StrictSelect<S, UserConnectedAccountSelect>
-  ): QueryBuilder<{
-    createUserConnectedAccount: {
-      userConnectedAccount: InferSelectResult<UserConnectedAccountWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'UserConnectedAccount',
-      'createUserConnectedAccount',
-      'userConnectedAccount',
-      args.select,
-      args.data,
-      'CreateUserConnectedAccountInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'UserConnectedAccount',
-      fieldName: 'createUserConnectedAccount',
-      document,
-      variables,
     });
   }
 }

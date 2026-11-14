@@ -29,7 +29,6 @@ import type {
   PlatformResourcesHealthSelect,
   PlatformResourcesHealthFilter,
   PlatformResourcesHealthOrderBy,
-  CreatePlatformResourcesHealthInput,
   UpdatePlatformResourcesHealthInput,
   PlatformResourcesHealthPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class PlatformResourcesHealthModel {
       }) => ({
         platformResourcesHealth: data.platformResourcesHealths?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourcesHealthSelect>(
-    args: CreateArgs<S, CreatePlatformResourcesHealthInput['platformResourcesHealth']> & {
-      select: S;
-    } & StrictSelect<S, PlatformResourcesHealthSelect>
-  ): QueryBuilder<{
-    createPlatformResourcesHealth: {
-      platformResourcesHealth: InferSelectResult<PlatformResourcesHealthWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourcesHealth',
-      'createPlatformResourcesHealth',
-      'platformResourcesHealth',
-      args.select,
-      args.data,
-      'CreatePlatformResourcesHealthInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourcesHealth',
-      fieldName: 'createPlatformResourcesHealth',
-      document,
-      variables,
     });
   }
 }

@@ -29,7 +29,6 @@ import type {
   PlatformInfraGetAllTreeNodesRecordSelect,
   PlatformInfraGetAllTreeNodesRecordFilter,
   PlatformInfraGetAllTreeNodesRecordsOrderBy,
-  CreatePlatformInfraGetAllTreeNodesRecordInput,
   UpdatePlatformInfraGetAllTreeNodesRecordInput,
   PlatformInfraGetAllTreeNodesRecordPatch,
 } from '../input-types';
@@ -115,39 +114,6 @@ export class PlatformInfraGetAllTreeNodesRecordModel {
       }) => ({
         platformInfraGetAllTreeNodesRecord: data.platformInfraGetAllTreeNodes?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformInfraGetAllTreeNodesRecordSelect>(
-    args: CreateArgs<
-      S,
-      CreatePlatformInfraGetAllTreeNodesRecordInput['platformInfraGetAllTreeNodesRecord']
-    > & {
-      select: S;
-    } & StrictSelect<S, PlatformInfraGetAllTreeNodesRecordSelect>
-  ): QueryBuilder<{
-    createPlatformInfraGetAllTreeNodesRecord: {
-      platformInfraGetAllTreeNodesRecord: InferSelectResult<
-        PlatformInfraGetAllTreeNodesRecordWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformInfraGetAllTreeNodesRecord',
-      'createPlatformInfraGetAllTreeNodesRecord',
-      'platformInfraGetAllTreeNodesRecord',
-      args.select,
-      args.data,
-      'CreatePlatformInfraGetAllTreeNodesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformInfraGetAllTreeNodesRecord',
-      fieldName: 'createPlatformInfraGetAllTreeNodesRecord',
-      document,
-      variables,
     });
   }
 }

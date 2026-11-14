@@ -9,7 +9,6 @@ React Query hooks for AstMigration data operations
 ```typescript
 useAstMigrationsQuery({ selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } } })
 useAstMigrationQuery({ id: '<Int>', selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } } })
-useCreateAstMigrationMutation({ selection: { fields: { id: true } } })
 useUpdateAstMigrationMutation({ selection: { fields: { id: true } } })
 useDeleteAstMigrationMutation({})
 ```
@@ -22,13 +21,4 @@ useDeleteAstMigrationMutation({})
 const { data, isLoading } = useAstMigrationsQuery({
   selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
-```
-
-### Create a astMigration
-
-```typescript
-const { mutate } = useCreateAstMigrationMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```

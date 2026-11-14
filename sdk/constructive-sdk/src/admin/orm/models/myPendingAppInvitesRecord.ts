@@ -29,7 +29,6 @@ import type {
   MyPendingAppInvitesRecordSelect,
   MyPendingAppInvitesRecordFilter,
   MyPendingAppInvitesRecordsOrderBy,
-  CreateMyPendingAppInvitesRecordInput,
   UpdateMyPendingAppInvitesRecordInput,
   MyPendingAppInvitesRecordPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class MyPendingAppInvitesRecordModel {
       }) => ({
         myPendingAppInvitesRecord: data.myPendingAppInvites?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends MyPendingAppInvitesRecordSelect>(
-    args: CreateArgs<S, CreateMyPendingAppInvitesRecordInput['myPendingAppInvitesRecord']> & {
-      select: S;
-    } & StrictSelect<S, MyPendingAppInvitesRecordSelect>
-  ): QueryBuilder<{
-    createMyPendingAppInvitesRecord: {
-      myPendingAppInvitesRecord: InferSelectResult<MyPendingAppInvitesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'MyPendingAppInvitesRecord',
-      'createMyPendingAppInvitesRecord',
-      'myPendingAppInvitesRecord',
-      args.select,
-      args.data,
-      'CreateMyPendingAppInvitesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'MyPendingAppInvitesRecord',
-      fieldName: 'createMyPendingAppInvitesRecord',
-      document,
-      variables,
     });
   }
 }
