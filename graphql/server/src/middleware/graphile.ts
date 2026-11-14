@@ -26,6 +26,7 @@ import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
+import { OwnerHandoffPlugin } from '../plugins/owner-handoff-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
 import type { ApiOptions, DatabaseSettings } from '../types';
@@ -118,6 +119,10 @@ const buildPreset = (
       // Only when the tenant provisioned the WebAuthn module; the policy
       // itself is read per request from `req.api.webauthnSettings`.
       ...(webauthn ? [WebauthnPlugin] : []),
+      // planning#2511: the platform's passwordless owner hand-off. Registered
+      // only on the platform database's own APIs — a tenant must never mint a
+      // session into another tenant.
+      ...(platform ? [OwnerHandoffPlugin] : []),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
