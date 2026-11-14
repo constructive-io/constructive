@@ -66,9 +66,9 @@ afterEach(async () => {
 ### Test Isolation
 
 Each test runs in a transaction with savepoints:
-- `beforeEach()` starts a savepoint
-- `afterEach()` rolls back to savepoint
-- Tests are completely isolated
+- `beforeEach()` opens a transaction and a savepoint
+- `afterEach()` rolls back to the savepoint and ends the transaction
+- Data seeded before the first test (seed adapters, or `pg` in `beforeAll`) is committed, so every test starts from it
 
 ## Testing RLS Policies
 
@@ -194,18 +194,17 @@ Consult these reference files for detailed documentation on specific topics:
 
 | Reference | Topic | Consult When |
 |-----------|-------|--------------|
-| [references/rls.md](references/rls.md) | Testing RLS policies | SELECT/INSERT/UPDATE/DELETE policies, multi-user isolation, anonymous access |
-| [references/seeding.md](references/seeding.md) | Seeding test databases | loadJson, loadSql, loadCsv, RLS-aware seeding, fixture organization |
-| [references/exceptions.md](references/exceptions.md) | Handling aborted transactions | Savepoint pattern for expected failures, constraint violations, permission errors |
-| [references/snapshot.md](references/snapshot.md) | Snapshot testing utilities | pruneIds, pruneDates, IdHash tracking, custom pruners, error formatting |
-| [references/helpers.md](references/helpers.md) | Reusable test helpers | Constants, typed helpers, assertion utilities, test-utils organization |
-| [references/jwt-context.md](references/jwt-context.md) | JWT claims and role context | setContext API, auth() helper, reading claims in SQL, context timing |
-| [references/scenario-setup.md](references/scenario-setup.md) | Complex test scenarios | Two-client pattern, transaction management, publish(), per-describe setup |
+| [pgsql-test-rls.md](./pgsql-test-rls.md) | Testing RLS policies | SELECT/INSERT/UPDATE/DELETE policies, multi-user isolation, anonymous access |
+| [pgsql-test-seeding.md](./pgsql-test-seeding.md) | Seeding test databases | loadJson, loadSql, loadCsv, RLS-aware seeding, fixture organization |
+| [pgsql-test-exceptions.md](./pgsql-test-exceptions.md) | Handling aborted transactions | Savepoint pattern for expected failures, constraint violations, permission errors |
+| [pgsql-test-snapshot.md](./pgsql-test-snapshot.md) | Snapshot testing utilities | pruneIds, pruneDates, IdHash tracking, custom pruners, error formatting |
+| [pgsql-test-helpers.md](./pgsql-test-helpers.md) | Reusable test helpers | Constants, typed helpers, assertion utilities, test-utils organization |
+| [pgsql-test-jwt-context.md](./pgsql-test-jwt-context.md) | JWT claims and role context | setContext API, auth() helper, reading claims in SQL, context timing |
+| [pgsql-test-scenario-setup.md](./pgsql-test-scenario-setup.md) | Complex test scenarios | Two-client pattern, transaction management, publish(), per-describe setup |
 
 ## Cross-References
 
-Related skills (separate from this skill):
-- **`constructive-testing`** — Framework selection guide: which testing framework to use (pgsql-test vs graphile-test vs graphql-test vs server-test) and anti-patterns to avoid
-- `pgpm` (`references/testing.md`) — General pgpm test setup and seed adapters
-- `drizzle-orm-test` — Testing with Drizzle ORM (uses pgsql-test utilities)
-- `constructive-security` — Constructive Authz authorization policies that RLS tests validate
+- [`constructive-testing`](../SKILL.md) — framework selection (pgsql-test vs graphile-test vs graphql-test vs server-test) and anti-patterns
+- [pgsql-test-transactions.md](./pgsql-test-transactions.md) — transaction-local context and `pg` vs `db`
+- [drizzle-orm-test.md](./drizzle-orm-test.md) — testing with Drizzle ORM (uses pgsql-test utilities)
+- `pgpm` (`references/testing.md`) — general pgpm test setup and seed adapters

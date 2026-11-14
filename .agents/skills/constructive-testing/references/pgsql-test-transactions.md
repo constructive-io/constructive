@@ -50,24 +50,22 @@ PostgreSQL supports multiple roles with different privilege levels. `pgsql-test`
 | Role | Client | Bypasses RLS? | Fires Triggers? | When to use |
 |------|--------|---------------|-----------------|-------------|
 | **superuser** | `pg` | Yes | Yes | Schema setup, DDL, seed data in `beforeAll` |
-| **administrator** | `db` + `setContext({ role: 'administrator' })` | Depends on grants | Yes | Elevated data ops that should still exercise triggers |
+| **administrator** | `db` + `setContext({ role: 'administrator' })` | Yes (`BYPASSRLS`) | Yes | Elevated data ops that should still exercise triggers |
 | **authenticated** | `db` + `setContext({ role: 'authenticated', ... })` | No (full RLS) | Yes | All test queries — this is what real users experience |
 
 ### Why Use `db` with an Elevated Role Instead of `pg` for Data Operations
 
-The superuser (`pg`) bypasses RLS entirely, but it also means your tests skip the real code path. If your application has triggers that fire on INSERT (e.g., populating audit logs, updating membership tables, or maintaining denormalized data), using `pg` bypasses none of those — triggers still fire for superusers. However, `pg` **does** bypass all RLS policies, which can mask broken policies.
+Triggers and FK constraints fire for every role, superuser included. What differs is privileges: the superuser (`pg`) skips every grant check. `administrator` is created with `BYPASSRLS`, so it also skips RLS, but it still goes through table and function grants. Using `db` with `administrator` therefore:
+- Runs on the same connection as the rest of the test, so no cross-connection visibility issues
+- Verifies that your grant/privilege setup actually works
 
-Using `db` with an elevated role like `administrator`:
-- Triggers fire normally
-- FK constraints are validated
-- The test exercises a more realistic code path
-- You can verify that your grant/privilege setup actually works
+Neither tests your RLS policies: only `authenticated` (or another `NOBYPASSRLS` role) does.
 
 ```typescript
 // Superuser — bypasses RLS, may hide policy bugs
 await pg.query(`INSERT INTO app.posts (owner_id, title) VALUES ($1, 'test')`, [ALICE_ID]);
 
-// Elevated role via db — triggers fire, grants are tested
+// Elevated role via db — same connection, grants are tested (RLS still bypassed)
 db.setContext({ role: 'administrator' });
 await db.query(`INSERT INTO app.posts (owner_id, title) VALUES ($1, 'test')`, [ALICE_ID]);
 ```
