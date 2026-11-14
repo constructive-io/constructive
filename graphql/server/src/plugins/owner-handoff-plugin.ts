@@ -56,6 +56,7 @@ export interface OwnerHandoffResult {
   mfaSetupRequired: boolean;
   deviceApprovalRequired: boolean;
   mfaChallengeToken: string | null;
+  deviceToken: string | null;
 }
 
 const isUuid = (value: unknown): value is string =>
@@ -71,15 +72,10 @@ function fail(code: string, message: string): never {
   throw error;
 }
 
+// The auth module's own row names the private schema, so this works for a
+// tenant that enabled auth but no identity provider — `identity_providers_module`
+// is optional in a few presets, `user_auth_module` is not.
 const authPrivateSchemaSql = `
-  SELECT auth_private.schema_name
-    FROM metaschema_modules_public.identity_providers_module providers
-    JOIN metaschema_public.schema auth_private ON auth_private.id = providers.private_schema_id
-   WHERE providers.database_id = $1
-   LIMIT 1
-`;
-
-const platformEvidenceSchemaSql = `
   SELECT auth_private.schema_name
     FROM metaschema_modules_public.user_auth_module uam
     JOIN metaschema_public.schema auth_private ON auth_private.id = uam.private_schema_id
@@ -104,18 +100,19 @@ export const mintTenantOwnerHandoff = async (
   }
 
   // Ownership is the platform's own row, not a client claim. A missing row and
-  // someone else's row answer the same way: the caller may not learn which
+  // someone else's row answer the same way, so the caller cannot probe which
   // database ids exist.
   const database = await tx.query({
     text: 'SELECT owner_id::text AS owner_id FROM metaschema_public.database WHERE id = $1',
     values: [input.databaseId]
   });
   const ownerId = database.rows[0]?.owner_id;
-  if (typeof ownerId !== 'string') fail('DATABASE_NOT_FOUND', 'no such database');
-  if (ownerId !== input.userId) fail('NOT_DATABASE_OWNER', 'only the database owner may hand off a session');
+  if (ownerId !== input.userId) {
+    fail('NOT_DATABASE_OWNER', 'only the database owner may hand off a session');
+  }
 
   const evidenceSchema = await tx.query({
-    text: platformEvidenceSchemaSql,
+    text: authPrivateSchemaSql,
     values: [input.platformDatabaseId]
   });
   const evidenceSchemaName = evidenceSchema.rows[0]?.schema_name;
@@ -177,7 +174,10 @@ export const mintTenantOwnerHandoff = async (
     mfaRequired: row.mfa_required === true,
     mfaSetupRequired: row.mfa_setup_required === true,
     deviceApprovalRequired: row.device_approval_required === true,
-    mfaChallengeToken: typeof row.mfa_challenge_token === 'string' ? row.mfa_challenge_token : null
+    mfaChallengeToken: typeof row.mfa_challenge_token === 'string' ? row.mfa_challenge_token : null,
+    // Pending device approval finishes on the tenant's existing approve_device
+    // path, which needs this token; without it the desktop cannot continue.
+    deviceToken: typeof row.out_device_token === 'string' ? row.out_device_token : null
   };
 
   // A challenged owner finishes on the tenant's existing MFA/device path; no
@@ -247,6 +247,8 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
         deviceApprovalRequired: Boolean!
         """Token for the tenant's completeMfaChallenge path."""
         mfaChallengeToken: String
+        """Device token for the tenant's device-approval path."""
+        deviceToken: String
       }
 
       extend type Mutation {
