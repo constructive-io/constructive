@@ -47,6 +47,7 @@ function App() {
 | `useCreateMachineSessionMutation` | Mutation | Command or terminal sessions running on an enrolled machine |
 | `useUpdateMachineSessionMutation` | Mutation | Command or terminal sessions running on an enrolled machine |
 | `useDeleteMachineSessionMutation` | Mutation | Command or terminal sessions running on an enrolled machine |
+| `useCurrentDatabaseIdQuery` | Query | currentDatabaseId |
 | `useMachinesEnrollMutation` | Mutation | machinesEnroll |
 | `useProvisionBucketMutation` | Mutation | Reconcile an S3 bucket for a logical bucket in the database.
 Records the request on the bucket row via RLS; the bucket's job
@@ -121,6 +122,13 @@ create({ agentMode: '<String>', agentSessionRef: '<String>', args: '<String>', c
 ```
 
 ## Custom Operation Hooks
+
+### `useCurrentDatabaseIdQuery`
+
+currentDatabaseId
+
+- **Type:** query
+- **Arguments:** none
 
 ### `useMachinesEnrollMutation`
 

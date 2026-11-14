@@ -10,11 +10,11 @@ export interface Api {
   config: unknown | null;
   createdAt: string | null;
   databaseId: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
   roleName: string | null;
+  serviceHostname: string | null;
   updatedAt: string | null;
 }
 export interface ApiSchema {
@@ -32,7 +32,6 @@ export interface ApiSetting {
   enableAggregates: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -129,7 +128,6 @@ export interface DatabaseSetting {
   enableBilling: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -549,11 +547,11 @@ export interface PlatformApi {
   anonRole: string | null;
   config: unknown | null;
   createdAt: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
   roleName: string | null;
+  serviceHostname: string | null;
   updatedAt: string | null;
 }
 export interface PlatformApiSchema {
@@ -569,7 +567,6 @@ export interface PlatformApiSetting {
   enableAggregates: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -716,6 +713,16 @@ export interface PlatformPage {
   slug: string | null;
   storeId: string | null;
   updatedAt: string | null;
+}
+export interface PlatformReservedSubdomain {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  label: string | null;
+  match: string | null;
+  reason: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface PlatformSiteAppLink {
   appStoreIdentityId: string | null;

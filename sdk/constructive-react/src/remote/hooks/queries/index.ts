@@ -9,3 +9,4 @@ export * from './useMachineMessagesQuery';
 export * from './useMachineMessageQuery';
 export * from './useMachineSessionsQuery';
 export * from './useMachineSessionQuery';
+export * from './useCurrentDatabaseIdQuery';

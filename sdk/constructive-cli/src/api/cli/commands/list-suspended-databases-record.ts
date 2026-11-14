@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateListSuspendedDatabasesRecordInput,
   ListSuspendedDatabasesRecordPatch,
   ListSuspendedDatabasesRecordSelect,
   ListSuspendedDatabasesRecordFilter,
@@ -40,7 +39,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -57,8 +56,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -116,66 +113,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'suspendedAt',
-        message: 'suspendedAt',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'suspendedReason',
-        message: 'suspendedReason',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateListSuspendedDatabasesRecordInput['listSuspendedDatabasesRecord'];
-    const client = getClient();
-    const result = await client.listSuspendedDatabasesRecord
-      .create({
-        data: {
-          name: cleanedData.name,
-          ownerId: cleanedData.ownerId,
-          suspendedAt: cleanedData.suspendedAt,
-          suspendedReason: cleanedData.suspendedReason,
-        },
-        select: {
-          id: true,
-          name: true,
-          ownerId: true,
-          suspendedAt: true,
-          suspendedReason: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

@@ -7,7 +7,7 @@ React Query mutation hook for verifyEmail
 ## Usage
 
 ```typescript
-const { mutate } = useVerifyEmailMutation(); mutate({ input: { emailId: '<UUID>', token: '<String>' } });
+const { mutate } = useVerifyEmailMutation(); mutate({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useVerifyEmailMutation(); mutate({ input: { emailId: '<UUID>'
 
 ```typescript
 const { mutate, isLoading } = useVerifyEmailMutation();
-mutate({ input: { emailId: '<UUID>', token: '<String>' } });
+mutate({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } });
 ```

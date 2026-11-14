@@ -75,6 +75,7 @@ csdk auth set-token <your-token>
 | `platform-get-site-previews-record` | platformGetSitePreviewsRecord CRUD operations |
 | `platform-managed-domain` | platformManagedDomain CRUD operations |
 | `platform-page` | platformPage CRUD operations |
+| `platform-reserved-subdomain` | platformReservedSubdomain CRUD operations |
 | `platform-site-app-link` | platformSiteAppLink CRUD operations |
 | `platform-site` | platformSite CRUD operations |
 | `platform-site-deep-link` | platformSiteDeepLink CRUD operations |
@@ -116,7 +117,6 @@ csdk auth set-token <your-token>
 | `view-rule` | viewRule CRUD operations |
 | `view-table` | viewTable CRUD operations |
 | `webauthn-setting` | webauthnSetting CRUD operations |
-| `api-schema-names` | apiSchemaNames |
 | `apply-registry-defaults` | applyRegistryDefaults |
 | `email-shared-account` | emailSharedAccount |
 | `get-site-preview-commit` | getSitePreviewCommit |
@@ -128,9 +128,6 @@ csdk auth set-token <your-token>
 | `platform-sites-deep-link-url` | platformSitesDeepLinkUrl |
 | `platform-sites-site-origin` | platformSitesSiteOrigin |
 | `platform-verify-site-preview-token` | platformVerifySitePreviewToken |
-| `resolve-deep-link` | resolveDeepLink |
-| `resolve-route` | resolveRoute |
-| `resolve-site-app-links` | resolveSiteAppLinks |
 | `sites-deep-link-url` | sitesDeepLinkUrl |
 | `sites-site-origin` | sitesSiteOrigin |
 | `verify-site-preview-token` | verifySitePreviewToken |
@@ -240,15 +237,15 @@ CRUD operations for Api records.
 | `config` | JSON |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
-| `dbname` | String |
 | `id` | UUID |
 | `isPublished` | Boolean |
 | `name` | String |
 | `roleName` | String |
+| `serviceHostname` | String |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `isPublished`, `roleName`
 
 ### `api-schema`
 
@@ -299,7 +296,6 @@ CRUD operations for ApiSetting records.
 | `enableAggregates` | Boolean |
 | `enableBulk` | Boolean |
 | `enableConnectionFilter` | Boolean |
-| `enableDirectUploads` | Boolean |
 | `enableI18N` | Boolean |
 | `enableIntrospection` | Boolean |
 | `enableLlm` | Boolean |
@@ -325,7 +321,7 @@ CRUD operations for ApiSetting records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `apiId`, `databaseId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
+**Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
 
 ### `ast-migration`
 
@@ -336,7 +332,6 @@ CRUD operations for AstMigration records.
 | `list` | List all astMigration records |
 | `find-first` | Find first matching astMigration record |
 | `get` | Get a astMigration by id |
-| `create` | Create a new astMigration |
 | `update` | Update an existing astMigration |
 | `delete` | Delete a astMigration |
 
@@ -508,7 +503,6 @@ CRUD operations for DatabaseSetting records.
 | `enableBilling` | Boolean |
 | `enableBulk` | Boolean |
 | `enableConnectionFilter` | Boolean |
-| `enableDirectUploads` | Boolean |
 | `enableI18N` | Boolean |
 | `enableIntrospection` | Boolean |
 | `enableLlm` | Boolean |
@@ -535,7 +529,7 @@ CRUD operations for DatabaseSetting records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `annotations`, `creditsPerCent`, `enableAggregates`, `enableBilling`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `labels`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
+**Optional create fields (backend defaults):** `annotations`, `creditsPerCent`, `enableAggregates`, `enableBilling`, `enableBulk`, `enableConnectionFilter`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `labels`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
 
 ### `database-transfer`
 
@@ -1201,7 +1195,6 @@ CRUD operations for GetSitePreviewsRecord records.
 | `list` | List all getSitePreviewsRecord records |
 | `find-first` | Find first matching getSitePreviewsRecord record |
 | `get` | Get a getSitePreviewsRecord by id |
-| `create` | Create a new getSitePreviewsRecord |
 | `update` | Update an existing getSitePreviewsRecord |
 | `delete` | Delete a getSitePreviewsRecord |
 
@@ -1291,7 +1284,6 @@ CRUD operations for ListSuspendedDatabasesRecord records.
 | `list` | List all listSuspendedDatabasesRecord records |
 | `find-first` | Find first matching listSuspendedDatabasesRecord record |
 | `get` | Get a listSuspendedDatabasesRecord by id |
-| `create` | Create a new listSuspendedDatabasesRecord |
 | `update` | Update an existing listSuspendedDatabasesRecord |
 | `delete` | Delete a listSuspendedDatabasesRecord |
 
@@ -1457,15 +1449,15 @@ CRUD operations for PlatformApi records.
 | `anonRole` | String |
 | `config` | JSON |
 | `createdAt` | Datetime |
-| `dbname` | String |
 | `id` | UUID |
 | `isPublished` | Boolean |
 | `name` | String |
 | `roleName` | String |
+| `serviceHostname` | String |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `isPublished`, `roleName`
 
 ### `platform-api-schema`
 
@@ -1514,7 +1506,6 @@ CRUD operations for PlatformApiSetting records.
 | `enableAggregates` | Boolean |
 | `enableBulk` | Boolean |
 | `enableConnectionFilter` | Boolean |
-| `enableDirectUploads` | Boolean |
 | `enableI18N` | Boolean |
 | `enableIntrospection` | Boolean |
 | `enableLlm` | Boolean |
@@ -1540,7 +1531,7 @@ CRUD operations for PlatformApiSetting records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `apiId`
-**Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableDirectUploads`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
+**Optional create fields (backend defaults):** `enableAggregates`, `enableBulk`, `enableConnectionFilter`, `enableI18N`, `enableIntrospection`, `enableLlm`, `enableLtree`, `enableManyToMany`, `enablePostgis`, `enablePresignedUploads`, `enableRealtime`, `enableSearch`, `idleInTransactionTimeoutMs`, `lockTimeoutMs`, `maxConcurrentRequests`, `maxPageSize`, `maxQueryCost`, `maxQueryDepth`, `maxQueueWaitMs`, `maxRequestBytes`, `options`, `rateLimitBurst`, `rateLimitRpm`, `statementTimeoutMs`
 
 ### `platform-cors-setting`
 
@@ -1773,7 +1764,6 @@ CRUD operations for PlatformGetSitePreviewsRecord records.
 | `list` | List all platformGetSitePreviewsRecord records |
 | `find-first` | Find first matching platformGetSitePreviewsRecord record |
 | `get` | Get a platformGetSitePreviewsRecord by id |
-| `create` | Create a new platformGetSitePreviewsRecord |
 | `update` | Update an existing platformGetSitePreviewsRecord |
 | `delete` | Delete a platformGetSitePreviewsRecord |
 
@@ -1851,6 +1841,35 @@ CRUD operations for PlatformPage records.
 
 **Required create fields:** `content`, `siteId`, `slug`
 **Optional create fields (backend defaults):** `commitId`, `seededFrom`, `storeId`
+
+### `platform-reserved-subdomain`
+
+CRUD operations for PlatformReservedSubdomain records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformReservedSubdomain records |
+| `find-first` | Find first matching platformReservedSubdomain record |
+| `get` | Get a platformReservedSubdomain by id |
+| `create` | Create a new platformReservedSubdomain |
+| `update` | Update an existing platformReservedSubdomain |
+| `delete` | Delete a platformReservedSubdomain |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `label` | String |
+| `match` | String |
+| `reason` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `label`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `match`, `reason`, `updatedByPrincipal`
 
 ### `platform-site-app-link`
 
@@ -2720,7 +2739,6 @@ CRUD operations for SqlAction records.
 | `list` | List all sqlAction records |
 | `find-first` | Find first matching sqlAction record |
 | `get` | Get a sqlAction by id |
-| `create` | Create a new sqlAction |
 | `update` | Update an existing sqlAction |
 | `delete` | Delete a sqlAction |
 
@@ -3168,17 +3186,6 @@ CRUD operations for WebauthnSetting records.
 
 ## Custom Operations
 
-### `api-schema-names`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--targetApiId` | UUID |
-
 ### `apply-registry-defaults`
 
 applyRegistryDefaults
@@ -3304,42 +3311,6 @@ platformVerifySitePreviewToken
   |----------|------|
   | `--siteId` | UUID |
   | `--token` | String |
-
-### `resolve-deep-link`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--linkSlug` | String |
-  | `--targetSiteId` | UUID |
-
-### `resolve-route`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--requestHost` | String |
-  | `--requestMethod` | String |
-  | `--requestPath` | String |
-
-### `resolve-site-app-links`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--targetSiteId` | UUID |
 
 ### `sites-deep-link-url`
 

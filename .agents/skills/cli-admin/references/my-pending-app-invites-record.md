@@ -12,7 +12,6 @@ csdk my-pending-app-invites-record list --where.<field>.<op> <value> --orderBy <
 csdk my-pending-app-invites-record list --limit 10 --after <cursor>
 csdk my-pending-app-invites-record find-first --where.<field>.<op> <value>
 csdk my-pending-app-invites-record get --id <UUID>
-csdk my-pending-app-invites-record create --channel <String> --expiresAt <Datetime> --senderId <UUID>
 csdk my-pending-app-invites-record update --id <UUID> [--channel <String>] [--expiresAt <Datetime>] [--senderId <UUID>]
 csdk my-pending-app-invites-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk my-pending-app-invites-record list --select id,id
 
 ```bash
 csdk my-pending-app-invites-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a myPendingAppInvitesRecord
-
-```bash
-csdk my-pending-app-invites-record create --channel <String> --expiresAt <Datetime> --senderId <UUID>
 ```
 
 ### Get a myPendingAppInvitesRecord by id

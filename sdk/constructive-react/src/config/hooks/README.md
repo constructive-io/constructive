@@ -34,7 +34,6 @@ function App() {
 |------|------|-------------|
 | `useAppInternalSecretsQuery` | Query | List all appInternalSecrets |
 | `useAppInternalSecretQuery` | Query | Get one appInternalSecret |
-| `useCreateAppInternalSecretMutation` | Mutation | Create a appInternalSecret |
 | `useUpdateAppInternalSecretMutation` | Mutation | Update a appInternalSecret |
 | `useDeleteAppInternalSecretMutation` | Mutation | Delete a appInternalSecret |
 | `useConfigsQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
@@ -49,7 +48,6 @@ function App() {
 | `useDeleteInternalConfigMutation` | Mutation | -level plaintext key-value config store; database-resident, never projected into Kubernetes |
 | `useInternalSecretsQuery` | Query | List all internalSecrets |
 | `useInternalSecretQuery` | Query | Get one internalSecret |
-| `useCreateInternalSecretMutation` | Mutation | Create a internalSecret |
 | `useUpdateInternalSecretMutation` | Mutation | Update a internalSecret |
 | `useDeleteInternalSecretMutation` | Mutation | Delete a internalSecret |
 | `usePlatformConfigsQuery` | Query | Namespace-backed plaintext key-value config store (like a k8s ConfigMap); admin-only, fully CRUD-exposed |
@@ -64,17 +62,14 @@ function App() {
 | `useDeletePlatformInternalConfigMutation` | Mutation | platform-level plaintext key-value config store; database-resident, never projected into Kubernetes |
 | `usePlatformInternalSecretsQuery` | Query | List all platformInternalSecrets |
 | `usePlatformInternalSecretQuery` | Query | Get one platformInternalSecret |
-| `useCreatePlatformInternalSecretMutation` | Mutation | Create a platformInternalSecret |
 | `useUpdatePlatformInternalSecretMutation` | Mutation | Update a platformInternalSecret |
 | `useDeletePlatformInternalSecretMutation` | Mutation | Delete a platformInternalSecret |
 | `usePlatformSecretsQuery` | Query | List all platformSecrets |
 | `usePlatformSecretQuery` | Query | Get one platformSecret |
-| `useCreatePlatformSecretMutation` | Mutation | Create a platformSecret |
 | `useUpdatePlatformSecretMutation` | Mutation | Update a platformSecret |
 | `useDeletePlatformSecretMutation` | Mutation | Delete a platformSecret |
 | `useSecretsQuery` | Query | List all secrets |
 | `useSecretQuery` | Query | Get one secret |
-| `useCreateSecretMutation` | Mutation | Create a secret |
 | `useUpdateSecretMutation` | Mutation | Update a secret |
 | `useDeleteSecretMutation` | Mutation | Delete a secret |
 | `use_internalSecretsDelMutation` | Mutation | _internalSecretsDel |
@@ -120,11 +115,6 @@ const { data: item } = useAppInternalSecretQuery({
   selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
-// Create a appInternalSecret
-const { mutate: create } = useCreateAppInternalSecretMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### Config
@@ -183,11 +173,6 @@ const { data: item } = useInternalSecretQuery({
   selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
-// Create a internalSecret
-const { mutate: create } = useCreateInternalSecretMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### PlatformConfig
@@ -246,11 +231,6 @@ const { data: item } = usePlatformInternalSecretQuery({
   selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
-// Create a platformInternalSecret
-const { mutate: create } = useCreatePlatformInternalSecretMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### PlatformSecret
@@ -267,11 +247,6 @@ const { data: item } = usePlatformSecretQuery({
   selection: { fields: { annotations: true, createdAt: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
-// Create a platformSecret
-const { mutate: create } = useCreatePlatformSecretMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ### Secret
@@ -288,11 +263,6 @@ const { data: item } = useSecretQuery({
   selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
 
-// Create a secret
-const { mutate: create } = useCreateSecretMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```
 
 ## Custom Operation Hooks

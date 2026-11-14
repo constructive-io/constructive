@@ -17,8 +17,6 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   apiName: 'string',
-  builderBindingsTableId: 'uuid',
-  builderBindingsTableName: 'string',
   databaseId: 'uuid',
   defaultCapabilities: 'string',
   entityField: 'string',
@@ -56,6 +54,8 @@ const fieldSchema: FieldSchema = {
   rollupResourceUsageSummaryFunction: 'string',
   schemaId: 'uuid',
   scope: 'string',
+  serviceBindingsTableId: 'uuid',
+  serviceBindingsTableName: 'string',
 };
 const usage =
   '\nresource-module <command>\n\nCommands:\n  list                  List resourceModule records\n  find-first            Find first matching resourceModule record\n  get                   Get a resourceModule by ID\n  create                Create a new resourceModule\n  update                Update an existing resourceModule\n  delete                Delete a resourceModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -109,8 +109,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       apiName: true,
-      builderBindingsTableId: true,
-      builderBindingsTableName: true,
       databaseId: true,
       defaultCapabilities: true,
       entityField: true,
@@ -148,6 +146,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       rollupResourceUsageSummaryFunction: true,
       schemaId: true,
       scope: true,
+      serviceBindingsTableId: true,
+      serviceBindingsTableName: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<ResourceModuleSelect, ResourceModuleFilter, ResourceModuleOrderBy> & {
@@ -169,8 +169,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       apiName: true,
-      builderBindingsTableId: true,
-      builderBindingsTableName: true,
       databaseId: true,
       defaultCapabilities: true,
       entityField: true,
@@ -208,6 +206,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       rollupResourceUsageSummaryFunction: true,
       schemaId: true,
       scope: true,
+      serviceBindingsTableId: true,
+      serviceBindingsTableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<ResourceModuleSelect, ResourceModuleFilter, ResourceModuleOrderBy> & {
@@ -241,8 +241,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           apiName: true,
-          builderBindingsTableId: true,
-          builderBindingsTableName: true,
           databaseId: true,
           defaultCapabilities: true,
           entityField: true,
@@ -280,6 +278,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           rollupResourceUsageSummaryFunction: true,
           schemaId: true,
           scope: true,
+          serviceBindingsTableId: true,
+          serviceBindingsTableName: true,
         },
       })
       .execute();
@@ -299,20 +299,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'apiName',
         message: 'apiName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'builderBindingsTableId',
-        message: 'builderBindingsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'builderBindingsTableName',
-        message: 'builderBindingsTableName',
         required: false,
         skipPrompt: true,
       },
@@ -566,6 +552,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: true,
       },
+      {
+        type: 'text',
+        name: 'serviceBindingsTableId',
+        message: 'serviceBindingsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'serviceBindingsTableName',
+        message: 'serviceBindingsTableName',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -577,8 +577,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           apiName: cleanedData.apiName,
-          builderBindingsTableId: cleanedData.builderBindingsTableId,
-          builderBindingsTableName: cleanedData.builderBindingsTableName,
           databaseId: cleanedData.databaseId,
           defaultCapabilities: cleanedData.defaultCapabilities,
           entityField: cleanedData.entityField,
@@ -615,11 +613,11 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           rollupResourceUsageSummaryFunction: cleanedData.rollupResourceUsageSummaryFunction,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          serviceBindingsTableId: cleanedData.serviceBindingsTableId,
+          serviceBindingsTableName: cleanedData.serviceBindingsTableName,
         },
         select: {
           apiName: true,
-          builderBindingsTableId: true,
-          builderBindingsTableName: true,
           databaseId: true,
           defaultCapabilities: true,
           entityField: true,
@@ -657,6 +655,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           rollupResourceUsageSummaryFunction: true,
           schemaId: true,
           scope: true,
+          serviceBindingsTableId: true,
+          serviceBindingsTableName: true,
         },
       })
       .execute();
@@ -687,20 +687,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'builderBindingsTableId',
-        message: 'builderBindingsTableId',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'builderBindingsTableName',
-        message: 'builderBindingsTableName',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'databaseId',
         message: 'databaseId',
         required: false,
@@ -949,6 +935,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'scope',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'serviceBindingsTableId',
+        message: 'serviceBindingsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'serviceBindingsTableName',
+        message: 'serviceBindingsTableName',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as ResourceModulePatch;
@@ -960,8 +960,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           apiName: cleanedData.apiName,
-          builderBindingsTableId: cleanedData.builderBindingsTableId,
-          builderBindingsTableName: cleanedData.builderBindingsTableName,
           databaseId: cleanedData.databaseId,
           defaultCapabilities: cleanedData.defaultCapabilities,
           entityField: cleanedData.entityField,
@@ -998,11 +996,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           rollupResourceUsageSummaryFunction: cleanedData.rollupResourceUsageSummaryFunction,
           schemaId: cleanedData.schemaId,
           scope: cleanedData.scope,
+          serviceBindingsTableId: cleanedData.serviceBindingsTableId,
+          serviceBindingsTableName: cleanedData.serviceBindingsTableName,
         },
         select: {
           apiName: true,
-          builderBindingsTableId: true,
-          builderBindingsTableName: true,
           databaseId: true,
           defaultCapabilities: true,
           entityField: true,
@@ -1040,6 +1038,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           rollupResourceUsageSummaryFunction: true,
           schemaId: true,
           scope: true,
+          serviceBindingsTableId: true,
+          serviceBindingsTableName: true,
         },
       })
       .execute();

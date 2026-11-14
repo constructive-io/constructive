@@ -12,8 +12,7 @@ csdk platform-file list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-file list --limit 10 --after <cursor>
 csdk platform-file find-first --where.<field>.<op> <value>
 csdk platform-file get --id <UUID>
-csdk platform-file create --actorId <UUID> --bucketId <UUID> --key <String> --mimeType <String> --size <BigInt> [--contentHash <String>] [--description <String>] [--expiryEnqueuedAt <Datetime>] [--filename <String>] [--promotedAt <Datetime>] [--status <FileStatus>] [--tags <String>] [--upload <Upload>]
-csdk platform-file update --id <UUID> [--actorId <UUID>] [--bucketId <UUID>] [--contentHash <String>] [--description <String>] [--expiryEnqueuedAt <Datetime>] [--filename <String>] [--key <String>] [--mimeType <String>] [--promotedAt <Datetime>] [--size <BigInt>] [--status <FileStatus>] [--tags <String>] [--upload <Upload>]
+csdk platform-file update --id <UUID> [--actorId <UUID>] [--bucketId <UUID>] [--contentHash <String>] [--description <String>] [--downloadUrl <String>] [--expiryEnqueuedAt <Datetime>] [--filePath <String>] [--filename <String>] [--isPublic <Boolean>] [--key <String>] [--mimeType <String>] [--promotedAt <Datetime>] [--rejectionReason <String>] [--size <BigInt>] [--status <FileStatus>] [--tags <String>] [--upload <Upload>]
 csdk platform-file delete --id <UUID>
 ```
 
@@ -53,12 +52,6 @@ csdk platform-file list --select id,id
 
 ```bash
 csdk platform-file list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a platformFile
-
-```bash
-csdk platform-file create --actorId <UUID> --bucketId <UUID> --key <String> --mimeType <String> --size <BigInt> [--contentHash <String>] [--description <String>] [--expiryEnqueuedAt <Datetime>] [--filename <String>] [--promotedAt <Datetime>] [--status <FileStatus>] [--tags <String>] [--upload <Upload>]
 ```
 
 ### Get a platformFile by id

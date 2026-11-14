@@ -9,7 +9,6 @@ React Query hooks for Secret data operations
 ```typescript
 useSecretsQuery({ selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
 useSecretQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } } })
-useCreateSecretMutation({ selection: { fields: { id: true } } })
 useUpdateSecretMutation({ selection: { fields: { id: true } } })
 useDeleteSecretMutation({})
 ```
@@ -22,13 +21,4 @@ useDeleteSecretMutation({})
 const { data, isLoading } = useSecretsQuery({
   selection: { fields: { annotations: true, createdAt: true, databaseId: true, description: true, id: true, labels: true, name: true, namespaceId: true, provider: true, realm: true, retiredAt: true, rotatedAt: true, updatedAt: true } },
 });
-```
-
-### Create a secret
-
-```typescript
-const { mutate } = useCreateSecretMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ annotations: '<JSON>', databaseId: '<UUID>', description: '<String>', labels: '<JSON>', name: '<String>', namespaceId: '<UUID>', provider: '<String>', realm: '<String>', retiredAt: '<Datetime>', rotatedAt: '<Datetime>' });
 ```

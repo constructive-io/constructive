@@ -29,7 +29,6 @@ import type {
   PrincipalScopeOverrideSelect,
   PrincipalScopeOverrideFilter,
   PrincipalScopeOverrideOrderBy,
-  CreatePrincipalScopeOverrideInput,
   UpdatePrincipalScopeOverrideInput,
   PrincipalScopeOverridePatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class PrincipalScopeOverrideModel {
       }) => ({
         principalScopeOverride: data.principalScopeOverrides?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PrincipalScopeOverrideSelect>(
-    args: CreateArgs<S, CreatePrincipalScopeOverrideInput['principalScopeOverride']> & {
-      select: S;
-    } & StrictSelect<S, PrincipalScopeOverrideSelect>
-  ): QueryBuilder<{
-    createPrincipalScopeOverride: {
-      principalScopeOverride: InferSelectResult<PrincipalScopeOverrideWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PrincipalScopeOverride',
-      'createPrincipalScopeOverride',
-      'principalScopeOverride',
-      args.select,
-      args.data,
-      'CreatePrincipalScopeOverrideInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PrincipalScopeOverride',
-      fieldName: 'createPrincipalScopeOverride',
-      document,
-      variables,
     });
   }
 }

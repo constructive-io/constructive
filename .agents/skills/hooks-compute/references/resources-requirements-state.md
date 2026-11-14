@@ -8,7 +8,6 @@ React Query hooks for ResourcesRequirementsState data operations
 
 ```typescript
 useResourcesRequirementsStatesQuery({ selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } } })
-useCreateResourcesRequirementsStateMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateResourcesRequirementsStateMutation({ selection: { fields: { id: true } 
 const { data, isLoading } = useResourcesRequirementsStatesQuery({
   selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } },
 });
-```
-
-### Create a resourcesRequirementsState
-
-```typescript
-const { mutate } = useCreateResourcesRequirementsStateMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' });
 ```

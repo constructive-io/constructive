@@ -4838,10 +4838,10 @@ export interface VectorNearbyInput {
   includeChunks?: boolean;
   /** Similarity metric to use (default: COSINE). */
   metric?: VectorMetric;
-  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side for similarity search. Provide exactly one of `text` or `vector`; sending both or neither is an error. Blank text on its own counts as not given. Requires the LLM plugin to be configured with an embedding provider. */
   text?: string;
   /** Query vector for similarity search. */
-  vector: number[];
+  vector?: number[];
 }
 /** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceToManyAgentResourceChunkFilter {
@@ -5266,7 +5266,7 @@ export interface AgentResourceChunkInput {
   /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
   databaseId?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -5286,7 +5286,7 @@ export interface AgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -5581,7 +5581,7 @@ export interface PlatformAgentResourceChunkInput {
   chunkIndex?: number;
   createdAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -5600,7 +5600,7 @@ export interface PlatformAgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */

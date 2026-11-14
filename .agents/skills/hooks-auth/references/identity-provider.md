@@ -8,7 +8,6 @@ React Query hooks for IdentityProvider data operations
 
 ```typescript
 useIdentityProvidersQuery({ selection: { fields: { displayName: true, enabled: true, kind: true, slug: true } } })
-useCreateIdentityProviderMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateIdentityProviderMutation({ selection: { fields: { id: true } } })
 const { data, isLoading } = useIdentityProvidersQuery({
   selection: { fields: { displayName: true, enabled: true, kind: true, slug: true } },
 });
-```
-
-### Create a identityProvider
-
-```typescript
-const { mutate } = useCreateIdentityProviderMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' });
 ```

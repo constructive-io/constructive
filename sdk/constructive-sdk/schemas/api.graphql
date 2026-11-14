@@ -97,9 +97,6 @@ type Api {
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID!
 
   """Whether other scopes may see and route to this API surface"""
@@ -110,6 +107,7 @@ type Api {
 
   """Authenticated role the API executes as"""
   roleName: String
+  serviceHostname: String
   updatedAt: Datetime
 }
 
@@ -224,9 +222,6 @@ input ApiFilter {
   """Filter by the object’s `databaseId` field."""
   databaseId: UUIDFilter
 
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
-
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -260,9 +255,6 @@ input ApiInput {
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID
 
   """Whether other scopes may see and route to this API surface"""
@@ -286,8 +278,6 @@ enum ApiOrderBy {
   CREATED_AT_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  DBNAME_ASC
-  DBNAME_DESC
   ID_ASC
   ID_DESC
   IS_PUBLISHED_ASC
@@ -314,9 +304,6 @@ input ApiPatch {
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID
 
   """Whether other scopes may see and route to this API surface"""
@@ -496,11 +483,6 @@ type ApiSetting {
   enableConnectionFilter: Boolean
 
   """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
-
-  """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
   """
   enableI18N: Boolean
@@ -662,9 +644,6 @@ input ApiSettingFilter {
   """Filter by the object’s `enableConnectionFilter` field."""
   enableConnectionFilter: BooleanFilter
 
-  """Filter by the object’s `enableDirectUploads` field."""
-  enableDirectUploads: BooleanFilter
-
   """Filter by the object’s `enableI18N` field."""
   enableI18N: BooleanFilter
 
@@ -764,11 +743,6 @@ input ApiSettingInput {
   Override: enable connection filter (NULL = inherit from database_settings)
   """
   enableConnectionFilter: Boolean
-
-  """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
 
   """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
@@ -892,8 +866,6 @@ enum ApiSettingOrderBy {
   ENABLE_BULK_DESC
   ENABLE_CONNECTION_FILTER_ASC
   ENABLE_CONNECTION_FILTER_DESC
-  ENABLE_DIRECT_UPLOADS_ASC
-  ENABLE_DIRECT_UPLOADS_DESC
   ENABLE_I18N_ASC
   ENABLE_I18N_DESC
   ENABLE_INTROSPECTION_ASC
@@ -970,11 +942,6 @@ input ApiSettingPatch {
   Override: enable connection filter (NULL = inherit from database_settings)
   """
   enableConnectionFilter: Boolean
-
-  """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
 
   """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
@@ -3510,6 +3477,41 @@ type CreatePlatformPagePayload {
     """The method to use when ordering `PlatformPage`."""
     orderBy: [PlatformPageOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformPageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PlatformReservedSubdomain` mutation."""
+input CreatePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` to be created by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomainInput!
+}
+
+"""The output of our create `PlatformReservedSubdomain` mutation."""
+type CreatePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was created by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -6354,9 +6356,6 @@ type DatabaseSetting {
   """Enable connection filter (where argument) in the GraphQL API"""
   enableConnectionFilter: Boolean!
 
-  """Enable direct (multipart) file upload mutations in the GraphQL API"""
-  enableDirectUploads: Boolean!
-
   """
   Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
   """
@@ -6517,9 +6516,6 @@ input DatabaseSettingFilter {
   """Filter by the object’s `enableConnectionFilter` field."""
   enableConnectionFilter: BooleanFilter
 
-  """Filter by the object’s `enableDirectUploads` field."""
-  enableDirectUploads: BooleanFilter
-
   """Filter by the object’s `enableI18N` field."""
   enableI18N: BooleanFilter
 
@@ -6628,9 +6624,6 @@ input DatabaseSettingInput {
 
   """Enable connection filter (where argument) in the GraphQL API"""
   enableConnectionFilter: Boolean
-
-  """Enable direct (multipart) file upload mutations in the GraphQL API"""
-  enableDirectUploads: Boolean
 
   """
   Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
@@ -6751,8 +6744,6 @@ enum DatabaseSettingOrderBy {
   ENABLE_BULK_DESC
   ENABLE_CONNECTION_FILTER_ASC
   ENABLE_CONNECTION_FILTER_DESC
-  ENABLE_DIRECT_UPLOADS_ASC
-  ENABLE_DIRECT_UPLOADS_DESC
   ENABLE_I18N_ASC
   ENABLE_I18N_DESC
   ENABLE_INTROSPECTION_ASC
@@ -6837,9 +6828,6 @@ input DatabaseSettingPatch {
 
   """Enable connection filter (where argument) in the GraphQL API"""
   enableConnectionFilter: Boolean
-
-  """Enable direct (multipart) file upload mutations in the GraphQL API"""
-  enableDirectUploads: Boolean
 
   """
   Enable internationalization plugin (localeStrings field, translation table discovery) in the GraphQL API
@@ -9264,6 +9252,39 @@ type DeletePlatformPagePayload {
     """The method to use when ordering `PlatformPage`."""
     orderBy: [PlatformPageOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PlatformPageEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deletePlatformReservedSubdomain` mutation."""
+input DeletePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `PlatformReservedSubdomain` mutation."""
+type DeletePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was deleted by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -15817,6 +15838,11 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """
+  Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only.
+  """
+  allowedValues: [String!]
+
   """PostgreSQL column name"""
   columnName: String!
   description: String
@@ -15827,6 +15853,19 @@ type MetaField {
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
+
+  """
+  Whether a create must provide this field. Set on a table's own fields only.
+  """
+  isRequiredOnCreate: Boolean
+
+  """Whether a create may set this field. Set on a table's own fields only."""
+  isWritableOnCreate: Boolean
+
+  """
+  Whether an update may change this field. Set on a table's own fields only.
+  """
+  isWritableOnUpdate: Boolean
 
   """Final GraphQL field name"""
   name: String!
@@ -15852,7 +15891,7 @@ type MetaHasRelation {
   type: String
 }
 
-"""i18n metadata for a table with @i18n tag"""
+"""i18n metadata for a translatable table"""
 type MetaI18n {
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
@@ -15879,7 +15918,7 @@ type MetaIndex {
   name: String!
 }
 
-"""Table inflection names"""
+"""Type and field names generated for this table"""
 type MetaInflection {
   allRows: String!
   conditionType: String!
@@ -15924,7 +15963,7 @@ type MetaQuery {
   update: String
 }
 
-"""Realtime metadata for a table with @realtime tag"""
+"""Realtime metadata for a table with change subscriptions"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
@@ -15945,7 +15984,7 @@ type MetaRelations {
 }
 
 """
-How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.
 """
 type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
@@ -15976,11 +16015,11 @@ type MetaSchema {
 
 """Provisioning scope metadata for a table"""
 type MetaScope {
-  """SQL name of the entity table for entity scopes, else null"""
+  """Name of the entity table for entity scopes, else null"""
   entityTable: String
 
   """
-  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  Field name of the scope key (e.g. databaseId, orgId), null for global tiers
   """
   keyColumn: String
 
@@ -15989,7 +16028,7 @@ type MetaScope {
   """
   scope: String!
 
-  """Provenance of the scope metadata (always 'smartTag')"""
+  """Where this scope metadata comes from"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -16020,7 +16059,7 @@ type MetaSearchColumn {
   name: String!
 }
 
-"""Per-table search configuration from @searchConfig smart tag"""
+"""Per-table search configuration"""
 type MetaSearchConfig {
   """Exponential decay factor per day"""
   boostRecencyDecay: Float
@@ -16037,7 +16076,7 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
-  """GraphQL type name of the plane's buckets table"""
+  """GraphQL type name of the paired buckets table"""
   bucketsType: String!
 
   """
@@ -16045,7 +16084,7 @@ type MetaStorage {
   """
   downloadUrlField: String
 
-  """GraphQL type name of the plane's files table"""
+  """GraphQL type name of the paired files table"""
   filesType: String!
 
   """Whether this table is a storage buckets table"""
@@ -16054,13 +16093,11 @@ type MetaStorage {
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
 
-  """The plane's GraphQL upload surface"""
+  """Upload mutations and types for this storage"""
   upload: MetaStorageUpload!
 }
 
-"""
-The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
-"""
+"""The upload mutations and types for a storage table pair"""
 type MetaStorageUpload {
   """Per-file input type inside the bulk input"""
   bulkFileInputType: String!
@@ -16086,7 +16123,7 @@ type MetaStorageUpload {
   """Payload type of the single upload mutation"""
   payloadType: String!
 
-  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  """Whether the upload input requires ownerId"""
   requiresOwnerId: Boolean!
 }
 
@@ -16096,22 +16133,27 @@ type MetaTable {
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
-  """i18n metadata (null if no @i18n tag)"""
+  """i18n metadata (null if the table is not translatable)"""
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """
+  Whether this table only links rows of two other tables; the link appears in their manyToMany relations
+  """
+  isJunction: Boolean!
 
   """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
 
-  """Realtime metadata (null if no @realtime tag)"""
+  """Realtime metadata (null if the table has no change subscriptions)"""
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag)"""
+  """Provisioning scope metadata (null if the table has no scope)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
@@ -16566,6 +16608,14 @@ type Mutation {
     """
     input: CreatePlatformPageInput!
   ): CreatePlatformPagePayload
+
+  """Creates a single `PlatformReservedSubdomain`."""
+  createPlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePlatformReservedSubdomainInput!
+  ): CreatePlatformReservedSubdomainPayload
 
   """Creates a single `PlatformSite`."""
   createPlatformSite(
@@ -17246,6 +17296,14 @@ type Mutation {
     """
     input: DeletePlatformPageInput!
   ): DeletePlatformPagePayload
+
+  """Deletes a single `PlatformReservedSubdomain` using a unique key."""
+  deletePlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePlatformReservedSubdomainInput!
+  ): DeletePlatformReservedSubdomainPayload
 
   """Deletes a single `PlatformSite` using a unique key."""
   deletePlatformSite(
@@ -18130,6 +18188,16 @@ type Mutation {
     """
     input: UpdatePlatformPageInput!
   ): UpdatePlatformPagePayload
+
+  """
+  Updates a single `PlatformReservedSubdomain` using a unique key and a patch.
+  """
+  updatePlatformReservedSubdomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePlatformReservedSubdomainInput!
+  ): UpdatePlatformReservedSubdomainPayload
 
   """Updates a single `PlatformSite` using a unique key and a patch."""
   updatePlatformSite(
@@ -19101,9 +19169,6 @@ type PlatformApi {
   """Module-specific configuration for this API surface"""
   config: JSON
   createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID!
 
   """Whether other scopes may see and route to this API surface"""
@@ -19153,6 +19218,7 @@ type PlatformApi {
 
   """Authenticated role the API executes as"""
   roleName: String
+  serviceHostname: String
   updatedAt: Datetime
 }
 
@@ -19197,9 +19263,6 @@ input PlatformApiFilter {
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
-
-  """Filter by the object’s `dbname` field."""
-  dbname: StringFilter
 
   """Filter by the object’s `id` field."""
   id: UUIDFilter
@@ -19249,9 +19312,6 @@ input PlatformApiInput {
   """Module-specific configuration for this API surface"""
   config: JSON
   createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID
 
   """Whether other scopes may see and route to this API surface"""
@@ -19273,8 +19333,6 @@ enum PlatformApiOrderBy {
   CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  DBNAME_ASC
-  DBNAME_DESC
   ID_ASC
   ID_DESC
   IS_PUBLISHED_ASC
@@ -19300,9 +19358,6 @@ input PlatformApiPatch {
   """Module-specific configuration for this API surface"""
   config: JSON
   createdAt: Datetime
-
-  """Database this API surface serves"""
-  dbname: String
   id: UUID
 
   """Whether other scopes may see and route to this API surface"""
@@ -19471,11 +19526,6 @@ type PlatformApiSetting {
   enableConnectionFilter: Boolean
 
   """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
-
-  """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
   """
   enableI18N: Boolean
@@ -19636,9 +19686,6 @@ input PlatformApiSettingFilter {
   """Filter by the object’s `enableConnectionFilter` field."""
   enableConnectionFilter: BooleanFilter
 
-  """Filter by the object’s `enableDirectUploads` field."""
-  enableDirectUploads: BooleanFilter
-
   """Filter by the object’s `enableI18N` field."""
   enableI18N: BooleanFilter
 
@@ -19735,11 +19782,6 @@ input PlatformApiSettingInput {
   Override: enable connection filter (NULL = inherit from database_settings)
   """
   enableConnectionFilter: Boolean
-
-  """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
 
   """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
@@ -19861,8 +19903,6 @@ enum PlatformApiSettingOrderBy {
   ENABLE_BULK_DESC
   ENABLE_CONNECTION_FILTER_ASC
   ENABLE_CONNECTION_FILTER_DESC
-  ENABLE_DIRECT_UPLOADS_ASC
-  ENABLE_DIRECT_UPLOADS_DESC
   ENABLE_I18N_ASC
   ENABLE_I18N_DESC
   ENABLE_INTROSPECTION_ASC
@@ -19936,11 +19976,6 @@ input PlatformApiSettingPatch {
   Override: enable connection filter (NULL = inherit from database_settings)
   """
   enableConnectionFilter: Boolean
-
-  """
-  Override: enable direct (multipart) file uploads (NULL = inherit from database_settings)
-  """
-  enableDirectUploads: Boolean
 
   """
   Override: enable internationalization plugin (NULL = inherit from database_settings)
@@ -22591,6 +22626,151 @@ type PlatformProvisionSitePreviewPayload {
   result: PlatformRoute
 }
 
+"""Subdomain labels no tenant may claim under a platform apex"""
+type PlatformReservedSubdomain {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID!
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String!
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String!
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""A connection to a list of `PlatformReservedSubdomain` values."""
+type PlatformReservedSubdomainConnection {
+  """
+  A list of edges which contains the `PlatformReservedSubdomain` and cursor to aid in pagination.
+  """
+  edges: [PlatformReservedSubdomainEdge]!
+
+  """A list of `PlatformReservedSubdomain` objects."""
+  nodes: [PlatformReservedSubdomain]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `PlatformReservedSubdomain` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `PlatformReservedSubdomain` edge in the connection."""
+type PlatformReservedSubdomainEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PlatformReservedSubdomain` at the end of the edge."""
+  node: PlatformReservedSubdomain
+}
+
+"""
+A filter to be used against `PlatformReservedSubdomain` object types. All fields are combined with a logical ‘and.’
+"""
+input PlatformReservedSubdomainFilter {
+  """Checks for all expressions in this list."""
+  and: [PlatformReservedSubdomainFilter!]
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `createdByPrincipal` field."""
+  createdByPrincipal: UUIDFilter
+
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `label` field."""
+  label: StringFilter
+
+  """Filter by the object’s `match` field."""
+  match: StringFilter
+
+  """Negates the expression."""
+  not: PlatformReservedSubdomainFilter
+
+  """Checks for any expressions in this list."""
+  or: [PlatformReservedSubdomainFilter!]
+
+  """Filter by the object’s `reason` field."""
+  reason: StringFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `updatedByPrincipal` field."""
+  updatedByPrincipal: UUIDFilter
+}
+
+"""An input for mutations affecting `PlatformReservedSubdomain`"""
+input PlatformReservedSubdomainInput {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String!
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
+"""Methods to use when ordering `PlatformReservedSubdomain`."""
+enum PlatformReservedSubdomainOrderBy {
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  CREATED_BY_PRINCIPAL_ASC
+  CREATED_BY_PRINCIPAL_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  MATCH_ASC
+  MATCH_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  REASON_ASC
+  REASON_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  UPDATED_BY_PRINCIPAL_ASC
+  UPDATED_BY_PRINCIPAL_DESC
+}
+
+"""
+Represents an update to a `PlatformReservedSubdomain`. Fields that are set will be updated.
+"""
+input PlatformReservedSubdomainPatch {
+  createdAt: Datetime
+  createdByPrincipal: UUID
+  id: UUID
+
+  """Lowercase subdomain label, or the label prefix/suffix the match names"""
+  label: String
+
+  """How the label matches a claimed label: exact, prefix or suffix"""
+  match: String
+
+  """Why the label is reserved (free text, e.g. platform, brand, lookalike)"""
+  reason: String
+  updatedAt: Datetime
+  updatedByPrincipal: UUID
+}
+
 """Routes binding a domain hostname and path to a typed catalog target"""
 type PlatformRoute {
   """
@@ -23902,9 +24082,6 @@ input PlatformSiteMetadatumPatch {
   """Apple touch icon image (home-screen bookmark)"""
   appleTouchIcon: ConstructiveInternalTypeImage
 
-  """Upload for Apple touch icon image (home-screen bookmark)"""
-  appleTouchIconUpload: Upload
-
   """Canonical URL emitted in <link rel="canonical"> for this site"""
   canonicalUrl: String
 
@@ -23919,22 +24096,13 @@ input PlatformSiteMetadatumPatch {
 
   """Site favicon image"""
   favicon: ConstructiveInternalTypeImage
-
-  """Upload for Site favicon image"""
-  faviconUpload: Upload
   id: UUID
 
   """Primary site logo image"""
   logo: ConstructiveInternalTypeImage
 
-  """Upload for Primary site logo image"""
-  logoUpload: Upload
-
   """Open Graph image used when sharing site links"""
   ogImage: ConstructiveInternalTypeImage
-
-  """Upload for Open Graph image used when sharing site links"""
-  ogImageUpload: Upload
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
@@ -25711,7 +25879,6 @@ type Query {
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
   _meta: MetaSchema
-  apiSchemaNames(targetApiId: UUID): JSON
 
   """Reads and enables pagination through a set of `ApiSchema`."""
   apiSchemas(
@@ -27118,6 +27285,37 @@ type Query {
     where: PlatformPageFilter
   ): PlatformPageConnection
 
+  """
+  Reads and enables pagination through a set of `PlatformReservedSubdomain`.
+  """
+  platformReservedSubdomains(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PlatformReservedSubdomainFilter
+  ): PlatformReservedSubdomainConnection
+
   """Reads and enables pagination through a set of `PlatformSiteAppLink`."""
   platformSiteAppLinks(
     """Read all values in the set after (below) this cursor."""
@@ -27497,9 +27695,6 @@ type Query {
     """
     where: RedirectFilter
   ): RedirectConnection
-  resolveDeepLink(linkSlug: String, targetSiteId: UUID): JSON
-  resolveRoute(requestHost: String, requestMethod: String, requestPath: String): ResolveRouteRecord
-  resolveSiteAppLinks(targetSiteId: UUID): JSON
 
   """Reads and enables pagination through a set of `RlsSetting`."""
   rlsSettings(
@@ -28607,26 +28802,6 @@ type RequestDatabasePayload {
   """
   query: Query
   result: DatabaseProvisionModule
-}
-
-type ResolveRouteRecord {
-  domainId: UUID
-  hostname: String
-  matchedPath: String
-  matchedWildcard: Boolean
-  method: String
-  priority: Int
-  resolvedConfig: JSON
-  routeBindingId: UUID
-  servingLane: String
-  targetCatalogId: UUID
-  targetModule: String
-  targetOwnerKey: UUID
-  targetOwnerScope: String
-  targetSourceId: UUID
-  tlsSecretName: String
-  tlsStatus: String
-  verificationStatus: String
 }
 
 """
@@ -31476,9 +31651,6 @@ input SiteMetadatumPatch {
   """Apple touch icon image (home-screen bookmark)"""
   appleTouchIcon: ConstructiveInternalTypeImage
 
-  """Upload for Apple touch icon image (home-screen bookmark)"""
-  appleTouchIconUpload: Upload
-
   """Canonical URL emitted in <link rel="canonical"> for this site"""
   canonicalUrl: String
 
@@ -31496,22 +31668,13 @@ input SiteMetadatumPatch {
 
   """Site favicon image"""
   favicon: ConstructiveInternalTypeImage
-
-  """Upload for Site favicon image"""
-  faviconUpload: Upload
   id: UUID
 
   """Primary site logo image"""
   logo: ConstructiveInternalTypeImage
 
-  """Upload for Primary site logo image"""
-  logoUpload: Upload
-
   """Open Graph image used when sharing site links"""
   ogImage: ConstructiveInternalTypeImage
-
-  """Upload for Open Graph image used when sharing site links"""
-  ogImageUpload: Upload
 
   """robots meta directive (e.g. index,follow / noindex,nofollow)"""
   robots: String
@@ -37294,6 +37457,44 @@ type UpdatePlatformPagePayload {
   query: Query
 }
 
+"""All input for the `updatePlatformReservedSubdomain` mutation."""
+input UpdatePlatformReservedSubdomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `PlatformReservedSubdomain` being updated.
+  """
+  platformReservedSubdomainPatch: PlatformReservedSubdomainPatch!
+}
+
+"""The output of our update `PlatformReservedSubdomain` mutation."""
+type UpdatePlatformReservedSubdomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PlatformReservedSubdomain` that was updated by this mutation."""
+  platformReservedSubdomain: PlatformReservedSubdomain
+
+  """An edge for our `PlatformReservedSubdomain`. May be used by Relay 1."""
+  platformReservedSubdomainEdge(
+    """The method to use when ordering `PlatformReservedSubdomain`."""
+    orderBy: [PlatformReservedSubdomainOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PlatformReservedSubdomainEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `updatePlatformSiteAppLink` mutation."""
 input UpdatePlatformSiteAppLinkInput {
   """
@@ -38813,9 +39014,6 @@ type UpdateWebauthnSettingPayload {
     orderBy: [WebauthnSettingOrderBy!]! = [PRIMARY_KEY_ASC]
   ): WebauthnSettingEdge
 }
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 type View {
   category: ObjectCategory!

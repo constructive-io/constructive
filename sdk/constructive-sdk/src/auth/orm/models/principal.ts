@@ -29,7 +29,6 @@ import type {
   PrincipalSelect,
   PrincipalFilter,
   PrincipalOrderBy,
-  CreatePrincipalInput,
   UpdatePrincipalInput,
   PrincipalPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class PrincipalModel {
       }) => ({
         principal: data.principals?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PrincipalSelect>(
-    args: CreateArgs<S, CreatePrincipalInput['principal']> & {
-      select: S;
-    } & StrictSelect<S, PrincipalSelect>
-  ): QueryBuilder<{
-    createPrincipal: {
-      principal: InferSelectResult<PrincipalWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'Principal',
-      'createPrincipal',
-      'principal',
-      args.select,
-      args.data,
-      'CreatePrincipalInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'Principal',
-      fieldName: 'createPrincipal',
-      document,
-      variables,
     });
   }
 }

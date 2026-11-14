@@ -29,7 +29,6 @@ import type {
   ResourceDeclaredCapacitySelect,
   ResourceDeclaredCapacityFilter,
   ResourceDeclaredCapacityOrderBy,
-  CreateResourceDeclaredCapacityInput,
   UpdateResourceDeclaredCapacityInput,
   ResourceDeclaredCapacityPatch,
 } from '../input-types';
@@ -104,33 +103,6 @@ export class ResourceDeclaredCapacityModel {
       }) => ({
         resourceDeclaredCapacity: data.resourceDeclaredCapacities?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourceDeclaredCapacitySelect>(
-    args: CreateArgs<S, CreateResourceDeclaredCapacityInput['resourceDeclaredCapacity']> & {
-      select: S;
-    } & StrictSelect<S, ResourceDeclaredCapacitySelect>
-  ): QueryBuilder<{
-    createResourceDeclaredCapacity: {
-      resourceDeclaredCapacity: InferSelectResult<ResourceDeclaredCapacityWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourceDeclaredCapacity',
-      'createResourceDeclaredCapacity',
-      'resourceDeclaredCapacity',
-      args.select,
-      args.data,
-      'CreateResourceDeclaredCapacityInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourceDeclaredCapacity',
-      fieldName: 'createResourceDeclaredCapacity',
-      document,
-      variables,
     });
   }
 }

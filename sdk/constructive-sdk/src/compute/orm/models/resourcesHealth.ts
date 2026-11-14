@@ -29,7 +29,6 @@ import type {
   ResourcesHealthSelect,
   ResourcesHealthFilter,
   ResourcesHealthOrderBy,
-  CreateResourcesHealthInput,
   UpdateResourcesHealthInput,
   ResourcesHealthPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class ResourcesHealthModel {
       }) => ({
         resourcesHealth: data.resourcesHealths?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourcesHealthSelect>(
-    args: CreateArgs<S, CreateResourcesHealthInput['resourcesHealth']> & {
-      select: S;
-    } & StrictSelect<S, ResourcesHealthSelect>
-  ): QueryBuilder<{
-    createResourcesHealth: {
-      resourcesHealth: InferSelectResult<ResourcesHealthWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourcesHealth',
-      'createResourcesHealth',
-      'resourcesHealth',
-      args.select,
-      args.data,
-      'CreateResourcesHealthInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourcesHealth',
-      fieldName: 'createResourcesHealth',
-      document,
-      variables,
     });
   }
 }

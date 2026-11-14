@@ -435,22 +435,6 @@ export type SqlActionOrderBy =
   | 'VERIFY_ASC'
   | 'VERIFY_DESC';
 // ============ CRUD Input Types ============
-export interface CreateAstMigrationInput {
-  clientMutationId?: string;
-  astMigration: {
-    actionId: string;
-    actionName?: string;
-    actorId: string;
-    databaseId: string;
-    deploy?: Record<string, unknown>;
-    deploys?: string;
-    name?: string;
-    payload?: Record<string, unknown>;
-    requires?: string[];
-    revert?: Record<string, unknown>;
-    verify?: Record<string, unknown>;
-  };
-}
 export interface AstMigrationPatch {
   actionId?: string | null;
   actionName?: string | null;
@@ -472,22 +456,6 @@ export interface UpdateAstMigrationInput {
 export interface DeleteAstMigrationInput {
   clientMutationId?: string;
   id: number;
-}
-export interface CreateSqlActionInput {
-  clientMutationId?: string;
-  sqlAction: {
-    actionId: string;
-    actionName?: string;
-    actorId: string;
-    content?: string;
-    databaseId: string;
-    deploy?: string;
-    deps?: string[];
-    name?: string;
-    payload?: Record<string, unknown>;
-    revert?: string;
-    verify?: string;
-  };
 }
 export interface SqlActionPatch {
   actionId?: string | null;

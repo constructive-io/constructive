@@ -29,7 +29,6 @@ import type {
   PrincipalEntitySelect,
   PrincipalEntityFilter,
   PrincipalEntityOrderBy,
-  CreatePrincipalEntityInput,
   UpdatePrincipalEntityInput,
   PrincipalEntityPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class PrincipalEntityModel {
       }) => ({
         principalEntity: data.principalEntities?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PrincipalEntitySelect>(
-    args: CreateArgs<S, CreatePrincipalEntityInput['principalEntity']> & {
-      select: S;
-    } & StrictSelect<S, PrincipalEntitySelect>
-  ): QueryBuilder<{
-    createPrincipalEntity: {
-      principalEntity: InferSelectResult<PrincipalEntityWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PrincipalEntity',
-      'createPrincipalEntity',
-      'principalEntity',
-      args.select,
-      args.data,
-      'CreatePrincipalEntityInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PrincipalEntity',
-      fieldName: 'createPrincipalEntity',
-      document,
-      variables,
     });
   }
 }

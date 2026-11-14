@@ -28,7 +28,6 @@ csdk auth set-token <your-token>
 | `config` | Manage config key-value store (per-context) |
 | `build` | build CRUD operations |
 | `build-step` | buildStep CRUD operations |
-| `builder-binding` | builderBinding CRUD operations |
 | `content-preset` | contentPreset CRUD operations |
 | `database-function-graph` | databaseFunctionGraph CRUD operations |
 | `database-function-graph-execution-cancel-request` | databaseFunctionGraphExecutionCancelRequest CRUD operations |
@@ -72,7 +71,6 @@ csdk auth set-token <your-token>
 | `namespace-event` | namespaceEvent CRUD operations |
 | `platform-build` | platformBuild CRUD operations |
 | `platform-build-step` | platformBuildStep CRUD operations |
-| `platform-builder-binding` | platformBuilderBinding CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
@@ -119,6 +117,7 @@ csdk auth set-token <your-token>
 | `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `platform-service-binding` | platformServiceBinding CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `proposal-comment` | proposalComment CRUD operations |
@@ -147,6 +146,7 @@ csdk auth set-token <your-token>
 | `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `service-binding` | serviceBinding CRUD operations |
 | `webhook-endpoint` | webhookEndpoint CRUD operations |
 | `webhook-event` | webhookEvent CRUD operations |
 | `database-read-function-graph` | databaseReadFunctionGraph |
@@ -157,6 +157,7 @@ csdk auth set-token <your-token>
 | `add-node-and-save` | addNodeAndSave |
 | `approve-node` | approveNode |
 | `copy-graph` | copyGraph |
+| `create-function-graph` | createFunctionGraph |
 | `database-add-edge` | databaseAddEdge |
 | `database-add-edge-and-save` | databaseAddEdgeAndSave |
 | `database-add-node` | databaseAddNode |
@@ -341,42 +342,6 @@ CRUD operations for BuildStep records.
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
 
-### `builder-binding`
-
-CRUD operations for BuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all builderBinding records |
-| `find-first` | Find first matching builderBinding record |
-| `get` | Get a builderBinding by id |
-| `create` | Create a new builderBinding |
-| `update` | Update an existing builderBinding |
-| `delete` | Delete a builderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `databaseId`, `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
-
 ### `content-preset`
 
 CRUD operations for ContentPreset records.
@@ -418,7 +383,6 @@ CRUD operations for DatabaseFunctionGraph records.
 | `list` | List all databaseFunctionGraph records |
 | `find-first` | Find first matching databaseFunctionGraph record |
 | `get` | Get a databaseFunctionGraph by id |
-| `create` | Create a new databaseFunctionGraph |
 | `update` | Update an existing databaseFunctionGraph |
 | `delete` | Delete a databaseFunctionGraph |
 
@@ -625,7 +589,6 @@ CRUD operations for DatabaseGraphGetAllTreeNodesRecord records.
 | `list` | List all databaseGraphGetAllTreeNodesRecord records |
 | `find-first` | Find first matching databaseGraphGetAllTreeNodesRecord record |
 | `get` | Get a databaseGraphGetAllTreeNodesRecord by id |
-| `create` | Create a new databaseGraphGetAllTreeNodesRecord |
 | `update` | Update an existing databaseGraphGetAllTreeNodesRecord |
 | `delete` | Delete a databaseGraphGetAllTreeNodesRecord |
 
@@ -1021,7 +984,6 @@ CRUD operations for FunctionGraph records.
 | `list` | List all functionGraph records |
 | `find-first` | Find first matching functionGraph record |
 | `get` | Get a functionGraph by id |
-| `create` | Create a new functionGraph |
 | `update` | Update an existing functionGraph |
 | `delete` | Delete a functionGraph |
 
@@ -1393,7 +1355,6 @@ CRUD operations for GetAllTreeNodesRecord records.
 | `list` | List all getAllTreeNodesRecord records |
 | `find-first` | Find first matching getAllTreeNodesRecord record |
 | `get` | Get a getAllTreeNodesRecord by id |
-| `create` | Create a new getAllTreeNodesRecord |
 | `update` | Update an existing getAllTreeNodesRecord |
 | `delete` | Delete a getAllTreeNodesRecord |
 
@@ -1518,7 +1479,6 @@ CRUD operations for InfraGetAllTreeNodesRecord records.
 | `list` | List all infraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching infraGetAllTreeNodesRecord record |
 | `get` | Get a infraGetAllTreeNodesRecord by id |
-| `create` | Create a new infraGetAllTreeNodesRecord |
 | `update` | Update an existing infraGetAllTreeNodesRecord |
 | `delete` | Delete a infraGetAllTreeNodesRecord |
 
@@ -1785,41 +1745,6 @@ CRUD operations for PlatformBuildStep records.
 
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `platform-builder-binding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformBuilderBinding records |
-| `find-first` | Find first matching platformBuilderBinding record |
-| `get` | Get a platformBuilderBinding by id |
-| `create` | Create a new platformBuilderBinding |
-| `update` | Update an existing platformBuilderBinding |
-| `delete` | Delete a platformBuilderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-function-api-binding`
 
@@ -2275,7 +2200,6 @@ CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
 | `list` | List all platformInfraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
 | `get` | Get a platformInfraGetAllTreeNodesRecord by id |
-| `create` | Create a new platformInfraGetAllTreeNodesRecord |
 | `update` | Update an existing platformInfraGetAllTreeNodesRecord |
 | `delete` | Delete a platformInfraGetAllTreeNodesRecord |
 
@@ -3360,7 +3284,6 @@ CRUD operations for PlatformResourceDeclaredCapacity records.
 | `list` | List all platformResourceDeclaredCapacity records |
 | `find-first` | Find first matching platformResourceDeclaredCapacity record |
 | `get` | Get a platformResourceDeclaredCapacity by id |
-| `create` | Create a new platformResourceDeclaredCapacity |
 | `update` | Update an existing platformResourceDeclaredCapacity |
 | `delete` | Delete a platformResourceDeclaredCapacity |
 
@@ -3499,7 +3422,6 @@ CRUD operations for PlatformResourceObservedStorage records.
 | `list` | List all platformResourceObservedStorage records |
 | `find-first` | Find first matching platformResourceObservedStorage record |
 | `get` | Get a platformResourceObservedStorage by id |
-| `create` | Create a new platformResourceObservedStorage |
 | `update` | Update an existing platformResourceObservedStorage |
 | `delete` | Delete a platformResourceObservedStorage |
 
@@ -3625,7 +3547,6 @@ CRUD operations for PlatformResourceUtilization records.
 | `list` | List all platformResourceUtilization records |
 | `find-first` | Find first matching platformResourceUtilization record |
 | `get` | Get a platformResourceUtilization by id |
-| `create` | Create a new platformResourceUtilization |
 | `update` | Update an existing platformResourceUtilization |
 | `delete` | Delete a platformResourceUtilization |
 
@@ -3664,7 +3585,6 @@ CRUD operations for PlatformResourcesHealth records.
 | `list` | List all platformResourcesHealth records |
 | `find-first` | Find first matching platformResourcesHealth record |
 | `get` | Get a platformResourcesHealth by id |
-| `create` | Create a new platformResourcesHealth |
 | `update` | Update an existing platformResourcesHealth |
 | `delete` | Delete a platformResourcesHealth |
 
@@ -3719,7 +3639,6 @@ CRUD operations for PlatformResourcesRequirementsState records.
 | `list` | List all platformResourcesRequirementsState records |
 | `find-first` | Find first matching platformResourcesRequirementsState record |
 | `get` | Get a platformResourcesRequirementsState by id |
-| `create` | Create a new platformResourcesRequirementsState |
 | `update` | Update an existing platformResourcesRequirementsState |
 | `delete` | Delete a platformResourcesRequirementsState |
 
@@ -3746,7 +3665,6 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `list` | List all platformResourcesResolvedRequirement records |
 | `find-first` | Find first matching platformResourcesResolvedRequirement record |
 | `get` | Get a platformResourcesResolvedRequirement by id |
-| `create` | Create a new platformResourcesResolvedRequirement |
 | `update` | Update an existing platformResourcesResolvedRequirement |
 | `delete` | Delete a platformResourcesResolvedRequirement |
 
@@ -3767,6 +3685,43 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `platform-service-binding`
+
+CRUD operations for PlatformServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformServiceBinding records |
+| `find-first` | Find first matching platformServiceBinding record |
+| `get` | Get a platformServiceBinding by id |
+| `create` | Create a new platformServiceBinding |
+| `update` | Update an existing platformServiceBinding |
+| `delete` | Delete a platformServiceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-webhook-endpoint`
 
@@ -4720,7 +4675,6 @@ CRUD operations for ResourceDeclaredCapacity records.
 | `list` | List all resourceDeclaredCapacity records |
 | `find-first` | Find first matching resourceDeclaredCapacity record |
 | `get` | Get a resourceDeclaredCapacity by id |
-| `create` | Create a new resourceDeclaredCapacity |
 | `update` | Update an existing resourceDeclaredCapacity |
 | `delete` | Delete a resourceDeclaredCapacity |
 
@@ -4862,7 +4816,6 @@ CRUD operations for ResourceObservedStorage records.
 | `list` | List all resourceObservedStorage records |
 | `find-first` | Find first matching resourceObservedStorage record |
 | `get` | Get a resourceObservedStorage by id |
-| `create` | Create a new resourceObservedStorage |
 | `update` | Update an existing resourceObservedStorage |
 | `delete` | Delete a resourceObservedStorage |
 
@@ -4991,7 +4944,6 @@ CRUD operations for ResourceUtilization records.
 | `list` | List all resourceUtilization records |
 | `find-first` | Find first matching resourceUtilization record |
 | `get` | Get a resourceUtilization by id |
-| `create` | Create a new resourceUtilization |
 | `update` | Update an existing resourceUtilization |
 | `delete` | Delete a resourceUtilization |
 
@@ -5030,7 +4982,6 @@ CRUD operations for ResourcesHealth records.
 | `list` | List all resourcesHealth records |
 | `find-first` | Find first matching resourcesHealth record |
 | `get` | Get a resourcesHealth by id |
-| `create` | Create a new resourcesHealth |
 | `update` | Update an existing resourcesHealth |
 | `delete` | Delete a resourcesHealth |
 
@@ -5086,7 +5037,6 @@ CRUD operations for ResourcesRequirementsState records.
 | `list` | List all resourcesRequirementsState records |
 | `find-first` | Find first matching resourcesRequirementsState record |
 | `get` | Get a resourcesRequirementsState by id |
-| `create` | Create a new resourcesRequirementsState |
 | `update` | Update an existing resourcesRequirementsState |
 | `delete` | Delete a resourcesRequirementsState |
 
@@ -5113,7 +5063,6 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `list` | List all resourcesResolvedRequirement records |
 | `find-first` | Find first matching resourcesResolvedRequirement record |
 | `get` | Get a resourcesResolvedRequirement by id |
-| `create` | Create a new resourcesResolvedRequirement |
 | `update` | Update an existing resourcesResolvedRequirement |
 | `delete` | Delete a resourcesResolvedRequirement |
 
@@ -5134,6 +5083,44 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `service-binding`
+
+CRUD operations for ServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all serviceBinding records |
+| `find-first` | Find first matching serviceBinding record |
+| `get` | Get a serviceBinding by id |
+| `create` | Create a new serviceBinding |
+| `update` | Update an existing serviceBinding |
+| `delete` | Delete a serviceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `webhook-endpoint`
 
@@ -5328,6 +5315,23 @@ copyGraph
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.graphId` | UUID |
+  | `--input.name` | String |
+  | `--input.scopeId` | UUID |
+
+### `create-function-graph`
+
+createFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+  | `--input.description` | String |
   | `--input.name` | String |
   | `--input.scopeId` | UUID |
 
