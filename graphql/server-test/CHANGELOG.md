@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.40.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.4...graphql-server-test@3.40.5) (2026-11-14)
+
+### Bug Fixes
+
+- **graphql:** recover schema caches after listener interruptions ([425c725](https://github.com/constructive-io/constructive/commit/425c725d3d1ee2393819d7474a0213f4dc69b781))
+
 ## [3.40.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.3...graphql-server-test@3.40.4) (2026-11-12)
 
 **Note:** Version bump only for package graphql-server-test

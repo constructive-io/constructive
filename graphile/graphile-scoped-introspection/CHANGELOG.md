@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.9](https://github.com/constructive-io/constructive/compare/graphile-scoped-introspection@0.6.8...graphile-scoped-introspection@0.6.9) (2026-11-14)
+
+**Note:** Version bump only for package graphile-scoped-introspection
+
 ## [0.6.8](https://github.com/constructive-io/constructive/compare/graphile-scoped-introspection@0.6.7...graphile-scoped-introspection@0.6.8) (2026-11-09)
 
 **Note:** Version bump only for package graphile-scoped-introspection

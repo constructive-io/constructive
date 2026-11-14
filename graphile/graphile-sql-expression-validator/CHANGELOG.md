@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.3](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@3.15.2...graphile-sql-expression-validator@3.15.3) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
 ## [3.15.2](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@3.15.1...graphile-sql-expression-validator@3.15.2) (2026-11-05)
 
 **Note:** Version bump only for package graphile-sql-expression-validator

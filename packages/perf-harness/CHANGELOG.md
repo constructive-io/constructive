@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.9](https://github.com/constructive-io/constructive/compare/@constructive-io/perf-harness@0.6.8...@constructive-io/perf-harness@0.6.9) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/perf-harness
+
 ## [0.6.8](https://github.com/constructive-io/constructive/compare/@constructive-io/perf-harness@0.6.7...@constructive-io/perf-harness@0.6.8) (2026-11-09)
 
 **Note:** Version bump only for package @constructive-io/perf-harness

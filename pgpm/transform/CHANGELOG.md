@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.3...@pgpmjs/transform@0.32.4) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
 ## [0.32.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.2...@pgpmjs/transform@0.32.3) (2026-11-09)
 
 **Note:** Version bump only for package @pgpmjs/transform
