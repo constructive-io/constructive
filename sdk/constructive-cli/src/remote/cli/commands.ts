@@ -9,6 +9,7 @@ import authCmd from './commands/auth';
 import machineCmd from './commands/machine';
 import machineMessageCmd from './commands/machine-message';
 import machineSessionCmd from './commands/machine-session';
+import currentDatabaseIdCmd from './commands/current-database-id';
 import machinesEnrollCmd from './commands/machines-enroll';
 import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
@@ -24,11 +25,12 @@ const createCommandMap: () => Record<
   machine: machineCmd,
   'machine-message': machineMessageCmd,
   'machine-session': machineSessionCmd,
+  'current-database-id': currentDatabaseIdCmd,
   'machines-enroll': machinesEnrollCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  machine              machine CRUD operations\n  machine-message      machineMessage CRUD operations\n  machine-session      machineSession CRUD operations\n  machines-enroll      machinesEnroll\n  provision-bucket     Reconcile an S3 bucket for a logical bucket in the database.\nRecords the request on the bucket row via RLS; the bucket's job\ntrigger then enqueues the same storage:provision_bucket job used on\nINSERT, and repeated requests collapse into one pending job. This is\nidempotent for an already-reconciled bucket; failures become GraphQL\nerrors.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  machine              machine CRUD operations\n  machine-message      machineMessage CRUD operations\n  machine-session      machineSession CRUD operations\n  current-database-id  currentDatabaseId\n  machines-enroll      machinesEnroll\n  provision-bucket     Reconcile an S3 bucket for a logical bucket in the database.\nRecords the request on the bucket row via RLS; the bucket's job\ntrigger then enqueues the same storage:provision_bucket job used on\nINSERT, and repeated requests collapse into one pending job. This is\nidempotent for an already-reconciled bucket; failures become GraphQL\nerrors.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

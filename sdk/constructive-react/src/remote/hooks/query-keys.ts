@@ -46,6 +46,14 @@ export const machineSessionKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...machineSessionKeys.details(), id] as const,
 } as const;
+
+// ============================================================================
+// Custom Query Keys
+// ============================================================================
+
+export const customQueryKeys = {
+  /** Query key for currentDatabaseId */ currentDatabaseId: () => ['currentDatabaseId'] as const,
+} as const;
 /**
 
 // ============================================================================
@@ -72,6 +80,7 @@ export const queryKeys = {
   machine: machineKeys,
   machineMessage: machineMessageKeys,
   machineSession: machineSessionKeys,
+  custom: customQueryKeys,
 } as const;
 /** Type representing all available query key scopes */
 export type QueryKeyScope = keyof typeof queryKeys;

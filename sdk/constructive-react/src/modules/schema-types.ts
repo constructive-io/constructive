@@ -534,6 +534,8 @@ export type BlueprintConstructionOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -1339,6 +1341,8 @@ export type DomainModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_CAPABILITIES_ASC'
   | 'DEFAULT_CAPABILITIES_DESC'
+  | 'DEFAULT_RESERVED_SUBDOMAINS_ASC'
+  | 'DEFAULT_RESERVED_SUBDOMAINS_DESC'
   | 'DOMAINS_TABLE_ID_ASC'
   | 'DOMAINS_TABLE_ID_DESC'
   | 'DOMAINS_TABLE_NAME_ASC'
@@ -1378,10 +1382,16 @@ export type DomainModuleOrderBy =
   | 'PROVISIONS_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'RESERVED_SUBDOMAINS_TABLE_ID_ASC'
+  | 'RESERVED_SUBDOMAINS_TABLE_ID_DESC'
+  | 'RESERVED_SUBDOMAINS_TABLE_NAME_ASC'
+  | 'RESERVED_SUBDOMAINS_TABLE_NAME_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
+  | 'SCOPE_DESC'
+  | 'SWEEP_UNVERIFIED_DOMAINS_FUNCTION_ASC'
+  | 'SWEEP_UNVERIFIED_DOMAINS_FUNCTION_DESC';
 /** Methods to use when ordering `EmailSenderModule`. */
 export type EmailSenderModuleOrderBy =
   | 'API_NAME_ASC'
@@ -3275,10 +3285,6 @@ export type RepositoryModuleOrderBy =
 export type ResourceModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
-  | 'BUILDER_BINDINGS_TABLE_ID_ASC'
-  | 'BUILDER_BINDINGS_TABLE_ID_DESC'
-  | 'BUILDER_BINDINGS_TABLE_NAME_ASC'
-  | 'BUILDER_BINDINGS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_CAPABILITIES_ASC'
@@ -3355,7 +3361,11 @@ export type ResourceModuleOrderBy =
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
+  | 'SCOPE_DESC'
+  | 'SERVICE_BINDINGS_TABLE_ID_ASC'
+  | 'SERVICE_BINDINGS_TABLE_ID_DESC'
+  | 'SERVICE_BINDINGS_TABLE_NAME_ASC'
+  | 'SERVICE_BINDINGS_TABLE_NAME_DESC';
 /** Methods to use when ordering `RlsModule`. */
 export type RlsModuleOrderBy =
   | 'API_NAME_ASC'
@@ -4942,6 +4952,8 @@ export interface BlueprintConstructionFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: JSONFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -4969,11 +4981,13 @@ export interface BlueprintConstructionInput {
   createdAt?: string;
   /** The database the blueprint was constructed into. */
   databaseId: string;
+  /** The coded error ({"code", "context", "class"} as raised through errors.raise_error, or {"code": <SQLSTATE>, "message"} for a database error) a failed construction ended with. NULL unless status is failed. */
+  error?: unknown;
   /** Unique identifier for this construction attempt. */
   id?: string;
   /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
   schemaId?: string;
-  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. A failed construction raises and rolls back, so it leaves no row. */
+  /** Execution state of this construction attempt. pending: enqueued, the blueprint:construct job has not started. constructing: the job is executing. constructed: successfully completed. failed: the job raised; the build rolled back and error carries its coded error. */
   status?: string;
   /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
   tableMap?: unknown;
@@ -4992,11 +5006,13 @@ export interface BlueprintConstructionPatch {
   createdAt?: string;
   /** The database the blueprint was constructed into. */
   databaseId?: string;
+  /** The coded error ({"code", "context", "class"} as raised through errors.raise_error, or {"code": <SQLSTATE>, "message"} for a database error) a failed construction ended with. NULL unless status is failed. */
+  error?: unknown;
   /** Unique identifier for this construction attempt. */
   id?: string;
   /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
   schemaId?: string;
-  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. A failed construction raises and rolls back, so it leaves no row. */
+  /** Execution state of this construction attempt. pending: enqueued, the blueprint:construct job has not started. constructing: the job is executing. constructed: successfully completed. failed: the job raised; the build rolled back and error carries its coded error. */
   status?: string;
   /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
   tableMap?: unknown;
@@ -7745,6 +7761,8 @@ export interface DomainModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
   defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `defaultReservedSubdomains` field. */
+  defaultReservedSubdomains?: JSONFilter;
   /** Filter by the object’s `domainEventsTableId` field. */
   domainEventsTableId?: UUIDFilter;
   /** Filter by the object’s `domainEventsTableName` field. */
@@ -7785,6 +7803,10 @@ export interface DomainModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `reservedSubdomainsTableId` field. */
+  reservedSubdomainsTableId?: UUIDFilter;
+  /** Filter by the object’s `reservedSubdomainsTableName` field. */
+  reservedSubdomainsTableName?: StringFilter;
   /** Filter by the object’s `routeModules` relation. */
   routeModules?: DomainModuleToManyRouteModuleFilter;
   /** `routeModules` exist. */
@@ -7793,6 +7815,8 @@ export interface DomainModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `sweepUnverifiedDomainsFunction` field. */
+  sweepUnverifiedDomainsFunction?: StringFilter;
 }
 /** An input for mutations affecting `DomainModule` */
 export interface DomainModuleInput {
@@ -7800,6 +7824,7 @@ export interface DomainModuleInput {
   catalogModuleId?: string;
   databaseId: string;
   defaultCapabilities?: string[];
+  defaultReservedSubdomains?: unknown;
   domainEventsTableId?: string;
   domainEventsTableName?: string;
   domainVerificationsTableId?: string;
@@ -7818,8 +7843,11 @@ export interface DomainModuleInput {
   privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
+  reservedSubdomainsTableId?: string;
+  reservedSubdomainsTableName?: string;
   schemaId?: string;
   scope: string;
+  sweepUnverifiedDomainsFunction?: string;
 }
 /** Represents an update to a `DomainModule`. Fields that are set will be updated. */
 export interface DomainModulePatch {
@@ -7827,6 +7855,7 @@ export interface DomainModulePatch {
   catalogModuleId?: string;
   databaseId?: string;
   defaultCapabilities?: string[];
+  defaultReservedSubdomains?: unknown;
   domainEventsTableId?: string;
   domainEventsTableName?: string;
   domainVerificationsTableId?: string;
@@ -7845,8 +7874,11 @@ export interface DomainModulePatch {
   privateSchemaName?: string;
   provisions?: unknown;
   publicSchemaName?: string;
+  reservedSubdomainsTableId?: string;
+  reservedSubdomainsTableName?: string;
   schemaId?: string;
   scope?: string;
+  sweepUnverifiedDomainsFunction?: string;
 }
 /** A filter to be used against many `RouteModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DomainModuleToManyRouteModuleFilter {
@@ -12760,10 +12792,6 @@ export interface ResourceModuleFilter {
   and?: ResourceModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
-  /** Filter by the object’s `builderBindingsTableId` field. */
-  builderBindingsTableId?: UUIDFilter;
-  /** Filter by the object’s `builderBindingsTableName` field. */
-  builderBindingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
@@ -12850,12 +12878,14 @@ export interface ResourceModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `serviceBindingsTableId` field. */
+  serviceBindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `serviceBindingsTableName` field. */
+  serviceBindingsTableName?: StringFilter;
 }
 /** An input for mutations affecting `ResourceModule` */
 export interface ResourceModuleInput {
   apiName?: string;
-  builderBindingsTableId?: string;
-  builderBindingsTableName?: string;
   databaseId: string;
   defaultCapabilities?: string[];
   entityField?: string;
@@ -12893,12 +12923,12 @@ export interface ResourceModuleInput {
   rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope: string;
+  serviceBindingsTableId?: string;
+  serviceBindingsTableName?: string;
 }
 /** Represents an update to a `ResourceModule`. Fields that are set will be updated. */
 export interface ResourceModulePatch {
   apiName?: string;
-  builderBindingsTableId?: string;
-  builderBindingsTableName?: string;
   databaseId?: string;
   defaultCapabilities?: string[];
   entityField?: string;
@@ -12936,6 +12966,8 @@ export interface ResourceModulePatch {
   rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope?: string;
+  serviceBindingsTableId?: string;
+  serviceBindingsTableName?: string;
 }
 /** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface RlsModuleFilter {
@@ -17319,19 +17351,21 @@ export interface MetaTable {
   constraints: MetaConstraints;
   fields: MetaField[];
   foreignKeyConstraints: MetaForeignKeyConstraint[];
-  /** i18n metadata (null if no @i18n tag) */
+  /** i18n metadata (null if the table is not translatable) */
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Whether this table only links rows of two other tables; the link appears in their manyToMany relations */
+  isJunction: boolean;
   /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
-  /** Realtime metadata (null if no @realtime tag) */
+  /** Realtime metadata (null if the table has no change subscriptions) */
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
-  /** Provisioning scope metadata (null if no @scope tag) */
+  /** Provisioning scope metadata (null if the table has no scope) */
   scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
@@ -17888,6 +17922,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only. */
+  allowedValues?: string[] | null;
   /** PostgreSQL column name */
   columnName: string;
   description?: string | null;
@@ -17897,6 +17933,12 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Whether a create must provide this field. Set on a table's own fields only. */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether a create may set this field. Set on a table's own fields only. */
+  isWritableOnCreate?: boolean | null;
+  /** Whether an update may change this field. Set on a table's own fields only. */
+  isWritableOnUpdate?: boolean | null;
   /** Final GraphQL field name */
   name: string;
   type: MetaType;
@@ -17910,7 +17952,7 @@ export interface MetaForeignKeyConstraint {
   referencedFields: string[];
   referencedTable: string;
 }
-/** i18n metadata for a table with @i18n tag */
+/** i18n metadata for a translatable table */
 export interface MetaI18n {
   /** Fields that are translatable */
   translatableFields: MetaI18nField[];
@@ -17925,7 +17967,7 @@ export interface MetaIndex {
   isUnique: boolean;
   name: string;
 }
-/** Table inflection names */
+/** Type and field names generated for this table */
 export interface MetaInflection {
   allRows: string;
   conditionType: string;
@@ -17953,7 +17995,7 @@ export interface MetaQuery {
   one?: string | null;
   update?: string | null;
 }
-/** Realtime metadata for a table with @realtime tag */
+/** Realtime metadata for a table with change subscriptions */
 export interface MetaRealtime {
   /** The generated subscription field name (e.g. onPostChanged) */
   subscriptionFieldName: string;
@@ -17968,13 +18010,13 @@ export interface MetaRelations {
 }
 /** Provisioning scope metadata for a table */
 export interface MetaScope {
-  /** SQL name of the entity table for entity scopes, else null */
+  /** Name of the entity table for entity scopes, else null */
   entityTable?: string | null;
-  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  /** Field name of the scope key (e.g. databaseId, orgId), null for global tiers */
   keyColumn?: string | null;
   /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
   scope: string;
-  /** Provenance of the scope metadata (always 'smartTag') */
+  /** Where this scope metadata comes from */
   source: string;
   /** Coarse bucket: 'global', 'database', or 'entity' */
   tier: string;
@@ -17992,17 +18034,17 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
-  /** GraphQL type name of the plane's buckets table */
+  /** GraphQL type name of the paired buckets table */
   bucketsType: string;
   /** Computed download-URL field on the files type; null on the buckets side */
   downloadUrlField?: string | null;
-  /** GraphQL type name of the plane's files table */
+  /** GraphQL type name of the paired files table */
   filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
-  /** The plane's GraphQL upload surface */
+  /** Upload mutations and types for this storage */
   upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
@@ -18075,7 +18117,7 @@ export interface MetaSearchColumn {
   /** Column name (camelCase) */
   name: string;
 }
-/** Per-table search configuration from @searchConfig smart tag */
+/** Per-table search configuration */
 export interface MetaSearchConfig {
   /** Exponential decay factor per day */
   boostRecencyDecay?: number | null;
@@ -18086,7 +18128,7 @@ export interface MetaSearchConfig {
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
 }
-/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+/** The upload mutations and types for a storage table pair */
 export interface MetaStorageUpload {
   /** Per-file input type inside the bulk input */
   bulkFileInputType: string;
@@ -18104,10 +18146,10 @@ export interface MetaStorageUpload {
   mutation: string;
   /** Payload type of the single upload mutation */
   payloadType: string;
-  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  /** Whether the upload input requires ownerId */
   requiresOwnerId: boolean;
 }
-/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+/** How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {
   /** For 'vector': declared length, else null. */
   dimensions?: number | null;

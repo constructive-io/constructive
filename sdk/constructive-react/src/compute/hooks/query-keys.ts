@@ -37,15 +37,6 @@ export const buildStepKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...buildStepKeys.details(), id] as const,
 } as const;
-export const builderBindingKeys = {
-  /** All builderBinding queries */ all: ['builderbinding'] as const,
-  /** List query keys */ lists: () => [...builderBindingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...builderBindingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...builderBindingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...builderBindingKeys.details(), id] as const,
-} as const;
 export const contentPresetKeys = {
   /** All contentPreset queries */ all: ['contentpreset'] as const,
   /** List query keys */ lists: () => [...contentPresetKeys.all, 'list'] as const,
@@ -460,15 +451,6 @@ export const platformBuildStepKeys = {
   /** Detail query keys */ details: () => [...platformBuildStepKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformBuildStepKeys.details(), id] as const,
-} as const;
-export const platformBuilderBindingKeys = {
-  /** All platformBuilderBinding queries */ all: ['platformbuilderbinding'] as const,
-  /** List query keys */ lists: () => [...platformBuilderBindingKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...platformBuilderBindingKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...platformBuilderBindingKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...platformBuilderBindingKeys.details(), id] as const,
 } as const;
 export const platformFunctionApiBindingKeys = {
   /** All platformFunctionApiBinding queries */ all: ['platformfunctionapibinding'] as const,
@@ -928,6 +910,15 @@ export const platformResourcesResolvedRequirementKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...platformResourcesResolvedRequirementKeys.details(), id] as const,
 } as const;
+export const platformServiceBindingKeys = {
+  /** All platformServiceBinding queries */ all: ['platformservicebinding'] as const,
+  /** List query keys */ lists: () => [...platformServiceBindingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...platformServiceBindingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...platformServiceBindingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...platformServiceBindingKeys.details(), id] as const,
+} as const;
 export const platformWebhookEndpointKeys = {
   /** All platformWebhookEndpoint queries */ all: ['platformwebhookendpoint'] as const,
   /** List query keys */ lists: () => [...platformWebhookEndpointKeys.all, 'list'] as const,
@@ -1182,6 +1173,15 @@ export const resourcesResolvedRequirementKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...resourcesResolvedRequirementKeys.details(), id] as const,
 } as const;
+export const serviceBindingKeys = {
+  /** All serviceBinding queries */ all: ['servicebinding'] as const,
+  /** List query keys */ lists: () => [...serviceBindingKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...serviceBindingKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...serviceBindingKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...serviceBindingKeys.details(), id] as const,
+} as const;
 export const webhookEndpointKeys = {
   /** All webhookEndpoint queries */ all: ['webhookendpoint'] as const,
   /** List query keys */ lists: () => [...webhookEndpointKeys.all, 'list'] as const,
@@ -1236,7 +1236,6 @@ export const customQueryKeys = {
 export const queryKeys = {
   build: buildKeys,
   buildStep: buildStepKeys,
-  builderBinding: builderBindingKeys,
   contentPreset: contentPresetKeys,
   databaseFunctionGraph: databaseFunctionGraphKeys,
   databaseFunctionGraphExecutionCancelRequest: databaseFunctionGraphExecutionCancelRequestKeys,
@@ -1280,7 +1279,6 @@ export const queryKeys = {
   namespaceEvent: namespaceEventKeys,
   platformBuild: platformBuildKeys,
   platformBuildStep: platformBuildStepKeys,
-  platformBuilderBinding: platformBuilderBindingKeys,
   platformFunctionApiBinding: platformFunctionApiBindingKeys,
   platformFunctionCapabilityBinding: platformFunctionCapabilityBindingKeys,
   platformFunctionDefinition: platformFunctionDefinitionKeys,
@@ -1327,6 +1325,7 @@ export const queryKeys = {
   platformResourcesHealth: platformResourcesHealthKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementKeys,
+  platformServiceBinding: platformServiceBindingKeys,
   platformWebhookEndpoint: platformWebhookEndpointKeys,
   platformWebhookEvent: platformWebhookEventKeys,
   proposalComment: proposalCommentKeys,
@@ -1355,6 +1354,7 @@ export const queryKeys = {
   resourcesHealth: resourcesHealthKeys,
   resourcesRequirementsState: resourcesRequirementsStateKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementKeys,
+  serviceBinding: serviceBindingKeys,
   webhookEndpoint: webhookEndpointKeys,
   webhookEvent: webhookEventKeys,
   custom: customQueryKeys,

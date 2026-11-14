@@ -23,7 +23,6 @@ const db = createClient({
 |-------|------------|
 | `build` | findMany, findOne, create, update, delete |
 | `buildStep` | findMany, findOne, create, update, delete |
-| `builderBinding` | findMany, findOne, create, update, delete |
 | `contentPreset` | findMany, findOne, create, update, delete |
 | `databaseFunctionGraph` | findMany, findOne, create, update, delete |
 | `databaseFunctionGraphExecutionCancelRequest` | findMany, findOne, create, update, delete |
@@ -67,7 +66,6 @@ const db = createClient({
 | `namespaceEvent` | findMany, findOne, create, update, delete |
 | `platformBuild` | findMany, findOne, create, update, delete |
 | `platformBuildStep` | findMany, findOne, create, update, delete |
-| `platformBuilderBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionApiBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionCapabilityBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionDefinition` | findMany, findOne, create, update, delete |
@@ -114,6 +112,7 @@ const db = createClient({
 | `platformResourcesHealth` | findMany, findOne, create, update, delete |
 | `platformResourcesRequirementsState` | findMany, findOne, create, update, delete |
 | `platformResourcesResolvedRequirement` | findMany, findOne, create, update, delete |
+| `platformServiceBinding` | findMany, findOne, create, update, delete |
 | `platformWebhookEndpoint` | findMany, findOne, create, update, delete |
 | `platformWebhookEvent` | findMany, findOne, create, update, delete |
 | `proposalComment` | findMany, findOne, create, update, delete |
@@ -142,6 +141,7 @@ const db = createClient({
 | `resourcesHealth` | findMany, findOne, create, update, delete |
 | `resourcesRequirementsState` | findMany, findOne, create, update, delete |
 | `resourcesResolvedRequirement` | findMany, findOne, create, update, delete |
+| `serviceBinding` | findMany, findOne, create, update, delete |
 | `webhookEndpoint` | findMany, findOne, create, update, delete |
 | `webhookEvent` | findMany, findOne, create, update, delete |
 
@@ -240,49 +240,6 @@ const updated = await db.buildStep.update({ where: { id: '<UUID>' }, data: { bui
 
 // Delete
 const deleted = await db.buildStep.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.builderBinding`
-
-CRUD operations for BuilderBinding records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `createdBy` | UUID | Yes |
-| `createdByPrincipal` | UUID | Yes |
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `installationId` | UUID | Yes |
-| `lastError` | String | Yes |
-| `metadata` | JSON | Yes |
-| `namespaceId` | UUID | Yes |
-| `observedHost` | String | Yes |
-| `realm` | String | Yes |
-| `status` | String | Yes |
-| `updatedAt` | Datetime | No |
-| `updatedBy` | UUID | Yes |
-| `updatedByPrincipal` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all builderBinding records
-const items = await db.builderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Get one by id
-const item = await db.builderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Create
-const created = await db.builderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.builderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.builderBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.contentPreset`
@@ -2000,48 +1957,6 @@ const updated = await db.platformBuildStep.update({ where: { id: '<UUID>' }, dat
 
 // Delete
 const deleted = await db.platformBuildStep.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformBuilderBinding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `createdBy` | UUID | Yes |
-| `createdByPrincipal` | UUID | Yes |
-| `id` | UUID | No |
-| `installationId` | UUID | Yes |
-| `lastError` | String | Yes |
-| `metadata` | JSON | Yes |
-| `namespaceId` | UUID | Yes |
-| `observedHost` | String | Yes |
-| `realm` | String | Yes |
-| `status` | String | Yes |
-| `updatedAt` | Datetime | No |
-| `updatedBy` | UUID | Yes |
-| `updatedByPrincipal` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all platformBuilderBinding records
-const items = await db.platformBuilderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Get one by id
-const item = await db.platformBuilderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Create
-const created = await db.platformBuilderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformBuilderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformBuilderBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformFunctionApiBinding`
@@ -4038,6 +3953,50 @@ const updated = await db.platformResourcesResolvedRequirement.update({ where: { 
 const deleted = await db.platformResourcesResolvedRequirement.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.platformServiceBinding`
+
+CRUD operations for PlatformServiceBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `installationScope` | String | Yes |
+| `kind` | String | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformServiceBinding records
+const items = await db.platformServiceBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformServiceBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformServiceBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformServiceBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformServiceBinding.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.platformWebhookEndpoint`
 
 CRUD operations for PlatformWebhookEndpoint records.
@@ -5323,6 +5282,51 @@ const updated = await db.resourcesResolvedRequirement.update({ where: { id: '<UU
 
 // Delete
 const deleted = await db.resourcesResolvedRequirement.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.serviceBinding`
+
+CRUD operations for ServiceBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `installationScope` | String | Yes |
+| `kind` | String | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all serviceBinding records
+const items = await db.serviceBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.serviceBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.serviceBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.serviceBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.serviceBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.webhookEndpoint`
