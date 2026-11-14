@@ -9,7 +9,7 @@ import { graphileCache } from 'graphile-cache';
 import { clearStorageModuleCache } from 'graphile-presigned-url-plugin';
 import { getPgPool } from 'pg-cache';
 
-import { evictServiceKey } from './cache-generation';
+import { evictAllServiceKeys, evictServiceKey } from './cache-generation';
 
 
 const log = new Logger('flush');
@@ -68,6 +68,13 @@ export const createFlushMiddleware = (
     evictServiceKey((req as any).svc_key);
     res.status(200).send('OK');
   };
+};
+
+// NOTIFY is not replayed after a disconnect. Re-subscribing must invalidate
+// every service, including hosts deleted while the listener was unavailable.
+export const flushAllServices = (): void => {
+  clearStorageModuleCache();
+  evictAllServiceKeys();
 };
 
 export const flushService = async (

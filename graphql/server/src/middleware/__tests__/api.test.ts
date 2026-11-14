@@ -1,4 +1,5 @@
 jest.mock('pg-cache', () => ({
+  ...jest.requireActual('pg-cache'),
   getPgPool: jest.fn()
 }));
 
@@ -15,6 +16,7 @@ import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
 import { getApiConfig, getSvcKey } from '../api';
+import { evictAllServiceKeys } from '../cache-generation';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 const SERVED_DATABASE = 'constructive';
@@ -185,5 +187,34 @@ describe('missing served role on an X-Api-Name row', () => {
 
     expect(result).toMatchObject({ roleName: 'authenticated', anonRole: 'anonymous' });
     expect(svcCache.get('api:db-123:customer-api')).toBe(result);
+  });
+});
+
+
+describe('API resolution across listener recovery', () => {
+  afterEach(() => { svcCache.clear(); jest.clearAllMocks(); });
+
+  it('does not publish a route read before recovery into the cleared cache', async () => {
+    let finishLookup!: (value: { rows: object[] }) => void;
+    const pendingLookup = new Promise<{ rows: object[] }>(resolve => { finishLookup = resolve; });
+    const row = {
+      api_id: 'api-123', database_id: 'db-123', role_name: 'authenticated',
+      anon_role: 'anonymous', is_public: false, schemas: ['old_schema']
+    };
+    let reads = 0;
+    const query = jest.fn(async (_sql: string, params: unknown[]) => {
+      if (Array.isArray(params[0])) return { rows: [{ schema_name: 'metaschema_public' }] };
+      return ++reads === 1 ? pendingLookup : { rows: [{ ...row, schemas: ['new_schema'] }] };
+    });
+    mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+    const req = createRequest({ host: 'admin.localhost', 'X-Database-Id': 'db-123', 'X-Api-Name': 'customer-api' });
+    const pending = getApiConfig(createPrivateOptions(), req);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(reads).toBe(1);
+    evictAllServiceKeys();
+    finishLookup({ rows: [row] });
+    expect(await pending).toMatchObject({ schema: ['new_schema'] });
+    expect(svcCache.get(req.svc_key!)).toMatchObject({ schema: ['new_schema'] });
   });
 });

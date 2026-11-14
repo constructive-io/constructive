@@ -15,6 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
+import { generationOf } from './cache-generation';
 import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool } from './routing';
 
 const log = new Logger('api');
@@ -373,9 +374,10 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 // Main Resolution Function
 // =============================================================================
 
-export const getApiConfig = async (
+const resolveApiConfig = async (
   opts: ApiOptions,
-  req: Request
+  req: Request,
+  retries: number
 ): Promise<ApiConfigResult> => {
   const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
@@ -383,6 +385,8 @@ export const getApiConfig = async (
   const cacheKey = getSvcKey(opts, req);
 
   req.svc_key = cacheKey;
+  const startedUnder = generationOf(cacheKey);
+  req.apiGeneration = startedUnder;
 
   // Check cache first
   if (svcCache.has(cacheKey)) {
@@ -442,6 +446,13 @@ export const getApiConfig = async (
     break;
   }
 
+  // A lookup can straddle a flush too. Do not repopulate the routing cache
+  // (or hand a request a route) read before that invalidation.
+  if (generationOf(cacheKey) !== startedUnder) {
+    if (retries === 0) throw new Error('API configuration kept changing during resolution');
+    return resolveApiConfig(opts, req, retries - 1);
+  }
+
   // Cache successful results
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
@@ -450,6 +461,9 @@ export const getApiConfig = async (
 
   return result;
 };
+
+export const getApiConfig = (opts: ApiOptions, req: Request): Promise<ApiConfigResult> =>
+  resolveApiConfig(opts, req, 2);
 
 // =============================================================================
 // Express Middleware
