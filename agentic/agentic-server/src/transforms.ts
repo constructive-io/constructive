@@ -172,7 +172,10 @@ export function transformChatRequest(
   return { ...body, model: model || 'gpt-4o' };
 }
 
-const IMAGE_DATA_URL = /^data:image\/[^;,]+;base64,/;
+// Anchored, so text that merely mentions a data url stays text. A media type
+// may carry parameters before the encoding (`image/svg+xml;charset=utf-8;base64,`)
+// and both are case-insensitive (RFC 2397).
+const IMAGE_DATA_URL = /^data:image\/[^;,]+(?:;[^;,]+)*;base64,/i;
 
 /**
  * One embed input in Ollama's shape. An image arrives as a base64 `data:` url,
@@ -301,8 +304,15 @@ export function transformEmbedResponse(
   provider: ResolvedProvider
 ): { body: Record<string, unknown>; usage: UsageResult } {
   if (provider.type === 'ollama') {
-    const raw = (data.embeddings || data.embedding || []) as number[][];
-    const embeddings: number[][] = Array.isArray(raw[0]) ? raw : [raw as unknown as number[]];
+    const raw = (data.embeddings ?? data.embedding) as number[][] | number[] | undefined;
+    const embeddings = (Array.isArray(raw) && Array.isArray(raw[0]) ? raw : [raw]) as number[][];
+    // An answer with no vector in it is not an embedding of nothing: passing it
+    // on would hand the caller one empty vector to store.
+    if (!Array.isArray(raw) || raw.length === 0 || embeddings.some((e) => !Array.isArray(e) || e.length === 0)) {
+      throw new Error(
+        `ollama: the embed response carries no embedding${typeof data.error === 'string' ? ` (${data.error})` : ''}`
+      );
+    }
     // Ollama reports the prompt tokens of an embed as `prompt_eval_count`.
     const promptTokens = (data.prompt_eval_count as number) || 0;
     const usage = { prompt_tokens: promptTokens, completion_tokens: 0, total_tokens: promptTokens };

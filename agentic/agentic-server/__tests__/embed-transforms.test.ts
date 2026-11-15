@@ -7,7 +7,7 @@
  * well-formed vector of the wrong thing.
  */
 
-import { transformEmbedRequest } from '../src/transforms';
+import { transformEmbedRequest, transformEmbedResponse } from '../src/transforms';
 import type { ResolvedProvider } from '../src/types';
 
 const ollama: ResolvedProvider = { type: 'ollama', baseUrl: 'http://ollama.test:11434' };
@@ -68,5 +68,46 @@ describe('transformEmbedRequest for an OpenAI-compatible provider', () => {
     const body = transformEmbedRequest(openai, { model: 'text-embedding-3-small', input: [dataUrl, 'text'], dimensions: 512 });
 
     expect(body).toEqual({ model: 'text-embedding-3-small', input: [dataUrl, 'text'], dimensions: 512 });
+  });
+});
+
+describe('image data urls ollama must not embed as text', () => {
+  it.each([
+    ['a media type with parameters', `data:image/svg+xml;charset=utf-8;base64,${base64}`],
+    ['an uppercase encoding', `data:image/png;BASE64,${base64}`],
+    ['an uppercase scheme and type', `DATA:IMAGE/PNG;base64,${base64}`]
+  ])('sends %s as an image', (_name, url) => {
+    expect(transformEmbedRequest(ollama, { input: url }).input).toEqual({ image: base64 });
+    expect(transformEmbedRequest(ollama, { input: [url, 'a caption'] }).input).toEqual([{ image: base64 }, 'a caption']);
+  });
+
+  it('leaves text that mentions an image data url, with parameters or not, as text', () => {
+    const text = `see data:image/svg+xml;charset=utf-8;base64,${base64}`;
+    expect(transformEmbedRequest(ollama, { input: text }).input).toBe(text);
+  });
+});
+
+describe('transformEmbedResponse for ollama', () => {
+  it('maps embeddings to the openai list shape', () => {
+    const { body, usage } = transformEmbedResponse({ embeddings: [[0.1, 0.2], [0.3, 0.4]], prompt_eval_count: 7 }, ollama);
+    expect(body.data).toEqual([
+      { object: 'embedding', embedding: [0.1, 0.2], index: 0 },
+      { object: 'embedding', embedding: [0.3, 0.4], index: 1 }
+    ]);
+    expect(usage.prompt_tokens).toBe(7);
+  });
+
+  it('maps the single `embedding` of the older endpoint', () => {
+    const { body } = transformEmbedResponse({ embedding: [0.1, 0.2] }, ollama);
+    expect(body.data).toEqual([{ object: 'embedding', embedding: [0.1, 0.2], index: 0 }]);
+  });
+
+  it.each([
+    ['no embeddings field', {}],
+    ['an empty embeddings list', { embeddings: [] }],
+    ['an empty vector', { embeddings: [[]] }],
+    ['an error body', { error: 'model does not support embeddings' }]
+  ])('throws on %s instead of answering one empty embedding', (_name, data) => {
+    expect(() => transformEmbedResponse(data, ollama)).toThrow(/no embedding/);
   });
 });
