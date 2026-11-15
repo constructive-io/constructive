@@ -10,7 +10,6 @@ import type {
   AcceptDatabaseTransferInput,
   ApplyRlsInput,
   CancelDatabaseTransferInput,
-  CreateFunctionFromSourceInput,
   DeleteSitePreviewInput,
   DomainsAssignSubdomainInput,
   MintSitePreviewTokenInput,
@@ -37,11 +36,9 @@ import type {
   SitesProvisionStaticSiteInput,
   SuspendDatabaseInput,
   UnsuspendDatabaseInput,
-  UpdateFunctionFromSourceInput,
   AcceptDatabaseTransferPayload,
   ApplyRlsPayload,
   CancelDatabaseTransferPayload,
-  CreateFunctionPayload,
   DeleteSitePreviewPayload,
   DomainsAssignSubdomainPayload,
   MintSitePreviewTokenPayload,
@@ -68,11 +65,9 @@ import type {
   SitesProvisionStaticSitePayload,
   SuspendDatabasePayload,
   UnsuspendDatabasePayload,
-  UpdateFunctionPayload,
   AcceptDatabaseTransferPayloadSelect,
   ApplyRlsPayloadSelect,
   CancelDatabaseTransferPayloadSelect,
-  CreateFunctionPayloadSelect,
   DeleteSitePreviewPayloadSelect,
   DomainsAssignSubdomainPayloadSelect,
   MintSitePreviewTokenPayloadSelect,
@@ -99,7 +94,6 @@ import type {
   SitesProvisionStaticSitePayloadSelect,
   SuspendDatabasePayloadSelect,
   UnsuspendDatabasePayloadSelect,
-  UpdateFunctionPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface AcceptDatabaseTransferVariables {
@@ -110,13 +104,6 @@ export interface ApplyRlsVariables {
 }
 export interface CancelDatabaseTransferVariables {
   input: CancelDatabaseTransferInput;
-}
-/**
- * Variables for createFunctionFromSource
- * Creates a `Function` from its `CREATE FUNCTION` source text.
- */
-export interface CreateFunctionFromSourceVariables {
-  input: CreateFunctionFromSourceInput;
 }
 export interface DeleteSitePreviewVariables {
   input: DeleteSitePreviewInput;
@@ -216,13 +203,6 @@ export interface SuspendDatabaseVariables {
 export interface UnsuspendDatabaseVariables {
   input: UnsuspendDatabaseInput;
 }
-/**
- * Variables for updateFunctionFromSource
- * Replaces a `Function`'s definition from its source text; its database, schema and exposure are unchanged.
- */
-export interface UpdateFunctionFromSourceVariables {
-  input: UpdateFunctionFromSourceInput;
-}
 export function createMutationOperations(client: OrmClient) {
   return {
     acceptDatabaseTransfer: <S extends AcceptDatabaseTransferPayloadSelect>(
@@ -310,35 +290,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CancelDatabaseTransferPayload'
-        ),
-      }),
-    createFunctionFromSource: <S extends CreateFunctionPayloadSelect>(
-      args: CreateFunctionFromSourceVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CreateFunctionPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        createFunctionFromSource: InferSelectResult<CreateFunctionPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CreateFunctionFromSource',
-        fieldName: 'createFunctionFromSource',
-        ...buildCustomDocument(
-          'mutation',
-          'CreateFunctionFromSource',
-          'createFunctionFromSource',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CreateFunctionFromSourceInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CreateFunctionPayload'
         ),
       }),
     deleteSitePreview: <S extends DeleteSitePreviewPayloadSelect>(
@@ -1111,35 +1062,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'UnsuspendDatabasePayload'
-        ),
-      }),
-    updateFunctionFromSource: <S extends UpdateFunctionPayloadSelect>(
-      args: UpdateFunctionFromSourceVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, UpdateFunctionPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        updateFunctionFromSource: InferSelectResult<UpdateFunctionPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'UpdateFunctionFromSource',
-        fieldName: 'updateFunctionFromSource',
-        ...buildCustomDocument(
-          'mutation',
-          'UpdateFunctionFromSource',
-          'updateFunctionFromSource',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'UpdateFunctionFromSourceInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'UpdateFunctionPayload'
         ),
       }),
   };

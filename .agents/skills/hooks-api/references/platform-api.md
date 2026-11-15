@@ -7,8 +7,8 @@ API surfaces exposed by this scope; publication makes a surface bindable from ot
 ## Usage
 
 ```typescript
-usePlatformApisQuery({ selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
-usePlatformApiQuery({ id: '<UUID>', selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
+usePlatformApisQuery({ selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
+usePlatformApiQuery({ id: '<UUID>', selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } } })
 useCreatePlatformApiMutation({ selection: { fields: { id: true } } })
 useUpdatePlatformApiMutation({ selection: { fields: { id: true } } })
 useDeletePlatformApiMutation({})
@@ -20,7 +20,7 @@ useDeletePlatformApiMutation({})
 
 ```typescript
 const { data, isLoading } = usePlatformApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformApisQuery({
 const { mutate } = useCreatePlatformApiMutation({
   selection: { fields: { id: true } },
 });
-mutate({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+mutate({ anonRole: '<String>', config: '<JSON>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
 ```

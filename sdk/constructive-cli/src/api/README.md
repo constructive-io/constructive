@@ -8,9 +8,9 @@
 
 ## Overview
 
-- **Tables:** 90
-- **Custom queries:** 18
-- **Custom mutations:** 31
+- **Tables:** 91
+- **Custom queries:** 14
+- **Custom mutations:** 29
 
 **Generators:** ORM, CLI
 

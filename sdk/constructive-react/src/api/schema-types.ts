@@ -54,6 +54,7 @@ import type {
   PlatformGetSitePreviewsRecord,
   PlatformManagedDomain,
   PlatformPage,
+  PlatformReservedSubdomain,
   PlatformSite,
   PlatformSiteAppLink,
   PlatformSiteDeepLink,
@@ -125,8 +126,6 @@ export type ApiOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'IS_PUBLISHED_ASC'
@@ -1214,8 +1213,6 @@ export type PlatformApiOrderBy =
   | 'CONFIG_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'IS_PUBLISHED_ASC'
@@ -1554,6 +1551,27 @@ export type PlatformPageOrderBy =
   | 'STORE_ID_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `PlatformReservedSubdomain`. */
+export type PlatformReservedSubdomainOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'LABEL_ASC'
+  | 'LABEL_DESC'
+  | 'MATCH_ASC'
+  | 'MATCH_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REASON_ASC'
+  | 'REASON_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 /** Methods to use when ordering `PlatformSiteAppLink`. */
 export type PlatformSiteAppLinkOrderBy =
   | 'APP_STORE_IDENTITY_ID_ASC'
@@ -2722,8 +2740,6 @@ export interface ApiFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isPublished` field. */
@@ -2748,8 +2764,6 @@ export interface ApiInput {
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
-  /** Database this API surface serves */
-  dbname?: string;
   id?: string;
   /** Whether other scopes may see and route to this API surface */
   isPublished?: boolean;
@@ -2768,8 +2782,6 @@ export interface ApiPatch {
   createdAt?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string;
-  /** Database this API surface serves */
-  dbname?: string;
   id?: string;
   /** Whether other scopes may see and route to this API surface */
   isPublished?: boolean;
@@ -3434,15 +3446,6 @@ export interface CreateFullTextSearchInput {
   /** The `FullTextSearch` to be created by this mutation. */
   fullTextSearch: FullTextSearchInput;
 }
-/** Author a function from its `CREATE FUNCTION` source text. */
-export interface CreateFunctionFromSourceInput {
-  apiExposed?: boolean;
-  clientMutationId?: string;
-  databaseId: string;
-  schemaId: string;
-  /** One `CREATE FUNCTION` statement (LANGUAGE plpgsql or sql). */
-  source: string;
-}
 export interface CreateFunctionInput {
   clientMutationId?: string;
   /** The `Function` to be created by this mutation. */
@@ -3537,6 +3540,11 @@ export interface CreatePlatformPageInput {
   clientMutationId?: string;
   /** The `PlatformPage` to be created by this mutation. */
   platformPage: PlatformPageInput;
+}
+export interface CreatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  /** The `PlatformReservedSubdomain` to be created by this mutation. */
+  platformReservedSubdomain: PlatformReservedSubdomainInput;
 }
 export interface CreatePlatformSiteAppLinkInput {
   clientMutationId?: string;
@@ -4738,6 +4746,10 @@ export interface DeletePlatformManagedDomainInput {
 export interface DeletePlatformPageInput {
   clientMutationId?: string;
   /** Unique page identifier */
+  id: string;
+}
+export interface DeletePlatformReservedSubdomainInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeletePlatformSiteAppLinkInput {
@@ -6971,8 +6983,6 @@ export interface PlatformApiFilter {
   config?: JSONFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  /** Filter by the object’s `dbname` field. */
-  dbname?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isPublished` field. */
@@ -7007,8 +7017,6 @@ export interface PlatformApiInput {
   /** Module-specific configuration for this API surface */
   config?: unknown;
   createdAt?: string;
-  /** Database this API surface serves */
-  dbname?: string;
   id?: string;
   /** Whether other scopes may see and route to this API surface */
   isPublished?: boolean;
@@ -7025,8 +7033,6 @@ export interface PlatformApiPatch {
   /** Module-specific configuration for this API surface */
   config?: unknown;
   createdAt?: string;
-  /** Database this API surface serves */
-  dbname?: string;
   id?: string;
   /** Whether other scopes may see and route to this API surface */
   isPublished?: boolean;
@@ -8100,6 +8106,59 @@ export interface PlatformProvisionSitePreviewInput {
   commitId?: string;
   name?: string;
   siteId?: string;
+}
+/** A filter to be used against `PlatformReservedSubdomain` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformReservedSubdomainFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `match` field. */
+  match?: StringFilter;
+  /** Negates the expression. */
+  not?: PlatformReservedSubdomainFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformReservedSubdomainFilter[];
+  /** Filter by the object’s `reason` field. */
+  reason?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** An input for mutations affecting `PlatformReservedSubdomain` */
+export interface PlatformReservedSubdomainInput {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label: string;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
+}
+/** Represents an update to a `PlatformReservedSubdomain`. Fields that are set will be updated. */
+export interface PlatformReservedSubdomainPatch {
+  createdAt?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Lowercase subdomain label, or the label prefix/suffix the match names */
+  label?: string;
+  /** How the label matches a claimed label: exact, prefix or suffix */
+  match?: string;
+  /** Why the label is reserved (free text, e.g. platform, brand, lookalike) */
+  reason?: string;
+  updatedAt?: string;
+  updatedByPrincipal?: string;
 }
 export interface PlatformSetSitePreviewInput {
   clientMutationId?: string;
@@ -11551,13 +11610,6 @@ export interface UpdateFullTextSearchInput {
   fullTextSearchPatch: FullTextSearchPatch;
   id: string;
 }
-/** Replace a function's definition from its `CREATE FUNCTION` source text. */
-export interface UpdateFunctionFromSourceInput {
-  clientMutationId?: string;
-  id: string;
-  /** One `CREATE FUNCTION` statement (LANGUAGE plpgsql or sql). */
-  source: string;
-}
 export interface UpdateFunctionInput {
   clientMutationId?: string;
   /** An object where the defined keys will be set on the `Function` being updated. */
@@ -11673,6 +11725,12 @@ export interface UpdatePlatformPageInput {
   id: string;
   /** An object where the defined keys will be set on the `PlatformPage` being updated. */
   platformPagePatch: PlatformPagePatch;
+}
+export interface UpdatePlatformReservedSubdomainInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PlatformReservedSubdomain` being updated. */
+  platformReservedSubdomainPatch: PlatformReservedSubdomainPatch;
 }
 export interface UpdatePlatformSiteAppLinkInput {
   clientMutationId?: string;
@@ -12751,6 +12809,13 @@ export interface PlatformPageConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PlatformReservedSubdomain` values. */
+export interface PlatformReservedSubdomainConnection {
+  edges: PlatformReservedSubdomainEdge[];
+  nodes: PlatformReservedSubdomain[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `PlatformSiteAppLink` values. */
 export interface PlatformSiteAppLinkConnection {
   edges: PlatformSiteAppLinkEdge[];
@@ -12841,25 +12906,6 @@ export interface RedirectConnection {
   nodes: Redirect[];
   pageInfo: PageInfo;
   totalCount: number;
-}
-export interface ResolveRouteRecord {
-  domainId?: string | null;
-  hostname?: string | null;
-  matchedPath?: string | null;
-  matchedWildcard?: boolean | null;
-  method?: string | null;
-  priority?: number | null;
-  resolvedConfig?: unknown | null;
-  routeBindingId?: string | null;
-  servingLane?: string | null;
-  targetCatalogId?: string | null;
-  targetModule?: string | null;
-  targetOwnerKey?: string | null;
-  targetOwnerScope?: string | null;
-  targetSourceId?: string | null;
-  tlsSecretName?: string | null;
-  tlsStatus?: string | null;
-  verificationStatus?: string | null;
 }
 /** A connection to a list of `RlsSetting` values. */
 export interface RlsSettingConnection {
@@ -13337,6 +13383,12 @@ export interface CreatePlatformPagePayload {
   /** The `PlatformPage` that was created by this mutation. */
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
+}
+export interface CreatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was created by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
 }
 export interface CreatePlatformSitePayload {
   clientMutationId?: string | null;
@@ -13847,6 +13899,12 @@ export interface DeletePlatformPagePayload {
   /** The `PlatformPage` that was deleted by this mutation. */
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
+}
+export interface DeletePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was deleted by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
 }
 export interface DeletePlatformSitePayload {
   clientMutationId?: string | null;
@@ -14472,6 +14530,12 @@ export interface UpdatePlatformPagePayload {
   platformPage?: PlatformPage | null;
   platformPageEdge?: PlatformPageEdge | null;
 }
+export interface UpdatePlatformReservedSubdomainPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformReservedSubdomain` that was updated by this mutation. */
+  platformReservedSubdomain?: PlatformReservedSubdomain | null;
+  platformReservedSubdomainEdge?: PlatformReservedSubdomainEdge | null;
+}
 export interface UpdatePlatformSitePayload {
   clientMutationId?: string | null;
   /** The `PlatformSite` that was updated by this mutation. */
@@ -14717,19 +14781,21 @@ export interface MetaTable {
   constraints: MetaConstraints;
   fields: MetaField[];
   foreignKeyConstraints: MetaForeignKeyConstraint[];
-  /** i18n metadata (null if no @i18n tag) */
+  /** i18n metadata (null if the table is not translatable) */
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Whether this table only links rows of two other tables; the link appears in their manyToMany relations */
+  isJunction: boolean;
   /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
-  /** Realtime metadata (null if no @realtime tag) */
+  /** Realtime metadata (null if the table has no change subscriptions) */
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
-  /** Provisioning scope metadata (null if no @scope tag) */
+  /** Provisioning scope metadata (null if the table has no scope) */
   scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
@@ -15043,6 +15109,12 @@ export interface PlatformPageEdge {
   cursor?: string | null;
   /** The `PlatformPage` at the end of the edge. */
   node?: PlatformPage | null;
+}
+/** A `PlatformReservedSubdomain` edge in the connection. */
+export interface PlatformReservedSubdomainEdge {
+  cursor?: string | null;
+  /** The `PlatformReservedSubdomain` at the end of the edge. */
+  node?: PlatformReservedSubdomain | null;
 }
 /** A `PlatformSiteAppLink` edge in the connection. */
 export interface PlatformSiteAppLinkEdge {
@@ -15380,6 +15452,8 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only. */
+  allowedValues?: string[] | null;
   /** PostgreSQL column name */
   columnName: string;
   description?: string | null;
@@ -15389,6 +15463,12 @@ export interface MetaField {
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Whether a create must provide this field. Set on a table's own fields only. */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether a create may set this field. Set on a table's own fields only. */
+  isWritableOnCreate?: boolean | null;
+  /** Whether an update may change this field. Set on a table's own fields only. */
+  isWritableOnUpdate?: boolean | null;
   /** Final GraphQL field name */
   name: string;
   type: MetaType;
@@ -15402,7 +15482,7 @@ export interface MetaForeignKeyConstraint {
   referencedFields: string[];
   referencedTable: string;
 }
-/** i18n metadata for a table with @i18n tag */
+/** i18n metadata for a translatable table */
 export interface MetaI18n {
   /** Fields that are translatable */
   translatableFields: MetaI18nField[];
@@ -15417,7 +15497,7 @@ export interface MetaIndex {
   isUnique: boolean;
   name: string;
 }
-/** Table inflection names */
+/** Type and field names generated for this table */
 export interface MetaInflection {
   allRows: string;
   conditionType: string;
@@ -15445,7 +15525,7 @@ export interface MetaQuery {
   one?: string | null;
   update?: string | null;
 }
-/** Realtime metadata for a table with @realtime tag */
+/** Realtime metadata for a table with change subscriptions */
 export interface MetaRealtime {
   /** The generated subscription field name (e.g. onPostChanged) */
   subscriptionFieldName: string;
@@ -15460,13 +15540,13 @@ export interface MetaRelations {
 }
 /** Provisioning scope metadata for a table */
 export interface MetaScope {
-  /** SQL name of the entity table for entity scopes, else null */
+  /** Name of the entity table for entity scopes, else null */
   entityTable?: string | null;
-  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  /** Field name of the scope key (e.g. databaseId, orgId), null for global tiers */
   keyColumn?: string | null;
   /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
   scope: string;
-  /** Provenance of the scope metadata (always 'smartTag') */
+  /** Where this scope metadata comes from */
   source: string;
   /** Coarse bucket: 'global', 'database', or 'entity' */
   tier: string;
@@ -15484,17 +15564,17 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
-  /** GraphQL type name of the plane's buckets table */
+  /** GraphQL type name of the paired buckets table */
   bucketsType: string;
   /** Computed download-URL field on the files type; null on the buckets side */
   downloadUrlField?: string | null;
-  /** GraphQL type name of the plane's files table */
+  /** GraphQL type name of the paired files table */
   filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
-  /** The plane's GraphQL upload surface */
+  /** Upload mutations and types for this storage */
   upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
@@ -15567,7 +15647,7 @@ export interface MetaSearchColumn {
   /** Column name (camelCase) */
   name: string;
 }
-/** Per-table search configuration from @searchConfig smart tag */
+/** Per-table search configuration */
 export interface MetaSearchConfig {
   /** Exponential decay factor per day */
   boostRecencyDecay?: number | null;
@@ -15578,7 +15658,7 @@ export interface MetaSearchConfig {
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
 }
-/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+/** The upload mutations and types for a storage table pair */
 export interface MetaStorageUpload {
   /** Per-file input type inside the bulk input */
   bulkFileInputType: string;
@@ -15596,10 +15676,10 @@ export interface MetaStorageUpload {
   mutation: string;
   /** Payload type of the single upload mutation */
   payloadType: string;
-  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  /** Whether the upload input requires ownerId */
   requiresOwnerId: boolean;
 }
-/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+/** How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {
   /** For 'vector': declared length, else null. */
   dimensions?: number | null;

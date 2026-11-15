@@ -1,13 +1,13 @@
 ---
 name: cli-auth
-description: CLI tool (csdk) for the auth API — provides CRUD commands for 15 tables and 61 custom operations
+description: CLI tool (csdk) for the auth API — provides CRUD commands for 15 tables and 63 custom operations
 ---
 
 # cli-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the auth API — provides CRUD commands for 15 tables and 61 custom operations
+CLI tool (csdk) for the auth API — provides CRUD commands for 15 tables and 63 custom operations
 
 ## Usage
 
@@ -77,6 +77,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [current-user-id](references/current-user-id.md)
 - [get-mfa-status](references/get-mfa-status.md)
 - [require-step-up](references/require-step-up.md)
+- [sign-in-options](references/sign-in-options.md)
 - [approve-device](references/approve-device.md)
 - [check-password](references/check-password.md)
 - [complete-mfa-challenge](references/complete-mfa-challenge.md)
@@ -96,6 +97,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [enable-email-mfa](references/enable-email-mfa.md)
 - [enable-sms-mfa](references/enable-sms-mfa.md)
 - [enable-totp](references/enable-totp.md)
+- [exchange-native-handoff](references/exchange-native-handoff.md)
 - [extend-token-expires](references/extend-token-expires.md)
 - [forgot-password](references/forgot-password.md)
 - [generate-backup-codes](references/generate-backup-codes.md)
