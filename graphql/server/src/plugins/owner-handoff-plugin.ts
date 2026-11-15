@@ -39,8 +39,6 @@ type WithPgClient = <T>(
 export interface OwnerHandoffInput {
   /** The signed-in platform user (jwt.claims.user_id). */
   userId: string;
-  /** The credential this request presented (jwt.claims.token_id). */
-  tokenId: string | null;
   /** The platform database serving the request (where evidence lives). */
   platformDatabaseId: string;
   /** The tenant database to sign the owner into. */
@@ -264,7 +262,6 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
         mintTenantOwnerHandoff(_$mutation: any, fieldArgs: any) {
           return lambda(resolveArgs(fieldArgs), async ({ input, withPgClient, pgSettings }: ResolvedArgs) => {
             const userId = pgSettings?.['jwt.claims.user_id'];
-            const tokenId = pgSettings?.['jwt.claims.token_id'] ?? null;
             const platformDatabaseId = pgSettings?.['jwt.claims.database_id'];
             if (!userId) fail('UNAUTHENTICATED', 'a platform session is required');
 
@@ -277,7 +274,6 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
             return withPgClient(pgSettings, (tx) =>
               mintTenantOwnerHandoff(tx, {
                 userId,
-                tokenId,
                 platformDatabaseId: String(platformDatabaseId ?? ''),
                 databaseId,
                 codeChallenge
