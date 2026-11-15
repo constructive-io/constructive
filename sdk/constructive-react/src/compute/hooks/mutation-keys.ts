@@ -34,15 +34,6 @@ export const buildStepMutationKeys = {
   /** Delete buildStep mutation key */ delete: (id: string | number) =>
     ['mutation', 'buildstep', 'delete', id] as const,
 } as const;
-export const builderBindingMutationKeys = {
-  /** All builderBinding mutation keys */ all: ['mutation', 'builderbinding'] as const,
-  /** Create builderBinding mutation key */ create: () =>
-    ['mutation', 'builderbinding', 'create'] as const,
-  /** Update builderBinding mutation key */ update: (id: string | number) =>
-    ['mutation', 'builderbinding', 'update', id] as const,
-  /** Delete builderBinding mutation key */ delete: (id: string | number) =>
-    ['mutation', 'builderbinding', 'delete', id] as const,
-} as const;
 export const contentPresetMutationKeys = {
   /** All contentPreset mutation keys */ all: ['mutation', 'contentpreset'] as const,
   /** Create contentPreset mutation key */ create: () =>
@@ -472,18 +463,6 @@ export const platformBuildStepMutationKeys = {
     ['mutation', 'platformbuildstep', 'update', id] as const,
   /** Delete platformBuildStep mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformbuildstep', 'delete', id] as const,
-} as const;
-export const platformBuilderBindingMutationKeys = {
-  /** All platformBuilderBinding mutation keys */ all: [
-    'mutation',
-    'platformbuilderbinding',
-  ] as const,
-  /** Create platformBuilderBinding mutation key */ create: () =>
-    ['mutation', 'platformbuilderbinding', 'create'] as const,
-  /** Update platformBuilderBinding mutation key */ update: (id: string | number) =>
-    ['mutation', 'platformbuilderbinding', 'update', id] as const,
-  /** Delete platformBuilderBinding mutation key */ delete: (id: string | number) =>
-    ['mutation', 'platformbuilderbinding', 'delete', id] as const,
 } as const;
 export const platformFunctionApiBindingMutationKeys = {
   /** All platformFunctionApiBinding mutation keys */ all: [
@@ -1001,6 +980,18 @@ export const platformResourcesResolvedRequirementMutationKeys = {
   /** Delete platformResourcesResolvedRequirement mutation key */ delete: (id: string | number) =>
     ['mutation', 'platformresourcesresolvedrequirement', 'delete', id] as const,
 } as const;
+export const platformServiceBindingMutationKeys = {
+  /** All platformServiceBinding mutation keys */ all: [
+    'mutation',
+    'platformservicebinding',
+  ] as const,
+  /** Create platformServiceBinding mutation key */ create: () =>
+    ['mutation', 'platformservicebinding', 'create'] as const,
+  /** Update platformServiceBinding mutation key */ update: (id: string | number) =>
+    ['mutation', 'platformservicebinding', 'update', id] as const,
+  /** Delete platformServiceBinding mutation key */ delete: (id: string | number) =>
+    ['mutation', 'platformservicebinding', 'delete', id] as const,
+} as const;
 export const platformWebhookEndpointMutationKeys = {
   /** All platformWebhookEndpoint mutation keys */ all: [
     'mutation',
@@ -1266,6 +1257,15 @@ export const resourcesResolvedRequirementMutationKeys = {
     ['mutation', 'resourcesresolvedrequirement', 'update', id] as const,
   /** Delete resourcesResolvedRequirement mutation key */ delete: (id: string | number) =>
     ['mutation', 'resourcesresolvedrequirement', 'delete', id] as const,
+} as const;
+export const serviceBindingMutationKeys = {
+  /** All serviceBinding mutation keys */ all: ['mutation', 'servicebinding'] as const,
+  /** Create serviceBinding mutation key */ create: () =>
+    ['mutation', 'servicebinding', 'create'] as const,
+  /** Update serviceBinding mutation key */ update: (id: string | number) =>
+    ['mutation', 'servicebinding', 'update', id] as const,
+  /** Delete serviceBinding mutation key */ delete: (id: string | number) =>
+    ['mutation', 'servicebinding', 'delete', id] as const,
 } as const;
 export const webhookEndpointMutationKeys = {
   /** All webhookEndpoint mutation keys */ all: ['mutation', 'webhookendpoint'] as const,
@@ -1617,7 +1617,6 @@ export const customMutationKeys = {
 export const mutationKeys = {
   build: buildMutationKeys,
   buildStep: buildStepMutationKeys,
-  builderBinding: builderBindingMutationKeys,
   contentPreset: contentPresetMutationKeys,
   databaseFunctionGraph: databaseFunctionGraphMutationKeys,
   databaseFunctionGraphExecutionCancelRequest:
@@ -1662,7 +1661,6 @@ export const mutationKeys = {
   namespaceEvent: namespaceEventMutationKeys,
   platformBuild: platformBuildMutationKeys,
   platformBuildStep: platformBuildStepMutationKeys,
-  platformBuilderBinding: platformBuilderBindingMutationKeys,
   platformFunctionApiBinding: platformFunctionApiBindingMutationKeys,
   platformFunctionCapabilityBinding: platformFunctionCapabilityBindingMutationKeys,
   platformFunctionDefinition: platformFunctionDefinitionMutationKeys,
@@ -1709,6 +1707,7 @@ export const mutationKeys = {
   platformResourcesHealth: platformResourcesHealthMutationKeys,
   platformResourcesRequirementsState: platformResourcesRequirementsStateMutationKeys,
   platformResourcesResolvedRequirement: platformResourcesResolvedRequirementMutationKeys,
+  platformServiceBinding: platformServiceBindingMutationKeys,
   platformWebhookEndpoint: platformWebhookEndpointMutationKeys,
   platformWebhookEvent: platformWebhookEventMutationKeys,
   proposalComment: proposalCommentMutationKeys,
@@ -1737,6 +1736,7 @@ export const mutationKeys = {
   resourcesHealth: resourcesHealthMutationKeys,
   resourcesRequirementsState: resourcesRequirementsStateMutationKeys,
   resourcesResolvedRequirement: resourcesResolvedRequirementMutationKeys,
+  serviceBinding: serviceBindingMutationKeys,
   webhookEndpoint: webhookEndpointMutationKeys,
   webhookEvent: webhookEventMutationKeys,
   custom: customMutationKeys,

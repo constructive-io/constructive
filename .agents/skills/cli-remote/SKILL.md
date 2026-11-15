@@ -1,13 +1,13 @@
 ---
 name: cli-remote
-description: CLI tool (csdk) for the remote API — provides CRUD commands for 3 tables and 2 custom operations
+description: CLI tool (csdk) for the remote API — provides CRUD commands for 3 tables and 3 custom operations
 ---
 
 # cli-remote
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the remote API — provides CRUD commands for 3 tables and 2 custom operations
+CLI tool (csdk) for the remote API — provides CRUD commands for 3 tables and 3 custom operations
 
 ## Usage
 
@@ -59,5 +59,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [machine](references/machine.md)
 - [machine-message](references/machine-message.md)
 - [machine-session](references/machine-session.md)
+- [current-database-id](references/current-database-id.md)
 - [machines-enroll](references/machines-enroll.md)
 - [provision-bucket](references/provision-bucket.md)
