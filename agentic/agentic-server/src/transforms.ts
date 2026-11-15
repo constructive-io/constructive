@@ -172,6 +172,20 @@ export function transformChatRequest(
   return { ...body, model: model || 'gpt-4o' };
 }
 
+const IMAGE_DATA_URL = /^data:image\/[^;,]+;base64,/;
+
+/**
+ * One embed input in Ollama's shape. An image arrives as a base64 `data:` url,
+ * the way OpenAI-style clients carry bytes; Ollama's multimodal embed takes it
+ * as `{ image: <base64> }`, and embeds the same url left as a string as text —
+ * a vector of the right length for the wrong thing, with no error.
+ */
+function ollamaEmbedInput(input: unknown): unknown {
+  if (typeof input !== 'string') return input;
+  const prefix = IMAGE_DATA_URL.exec(input)?.[0];
+  return prefix ? { image: input.slice(prefix.length) } : input;
+}
+
 export function transformEmbedRequest(
   provider: ResolvedProvider,
   body: Record<string, unknown>
@@ -181,7 +195,8 @@ export function transformEmbedRequest(
   if (provider.type === 'ollama') {
     return {
       model: model || 'nomic-embed-text',
-      input: body.input
+      input: Array.isArray(body.input) ? body.input.map(ollamaEmbedInput) : ollamaEmbedInput(body.input),
+      ...(body.dimensions !== undefined && { dimensions: body.dimensions })
     };
   }
   return { ...body, model: model || 'text-embedding-3-small' };
