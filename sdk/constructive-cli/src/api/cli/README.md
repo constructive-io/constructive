@@ -75,6 +75,7 @@ csdk auth set-token <your-token>
 | `platform-get-site-previews-record` | platformGetSitePreviewsRecord CRUD operations |
 | `platform-managed-domain` | platformManagedDomain CRUD operations |
 | `platform-page` | platformPage CRUD operations |
+| `platform-reserved-subdomain` | platformReservedSubdomain CRUD operations |
 | `platform-site-app-link` | platformSiteAppLink CRUD operations |
 | `platform-site` | platformSite CRUD operations |
 | `platform-site-deep-link` | platformSiteDeepLink CRUD operations |
@@ -116,7 +117,6 @@ csdk auth set-token <your-token>
 | `view-rule` | viewRule CRUD operations |
 | `view-table` | viewTable CRUD operations |
 | `webauthn-setting` | webauthnSetting CRUD operations |
-| `api-schema-names` | apiSchemaNames |
 | `apply-registry-defaults` | applyRegistryDefaults |
 | `email-shared-account` | emailSharedAccount |
 | `get-site-preview-commit` | getSitePreviewCommit |
@@ -128,9 +128,6 @@ csdk auth set-token <your-token>
 | `platform-sites-deep-link-url` | platformSitesDeepLinkUrl |
 | `platform-sites-site-origin` | platformSitesSiteOrigin |
 | `platform-verify-site-preview-token` | platformVerifySitePreviewToken |
-| `resolve-deep-link` | resolveDeepLink |
-| `resolve-route` | resolveRoute |
-| `resolve-site-app-links` | resolveSiteAppLinks |
 | `sites-deep-link-url` | sitesDeepLinkUrl |
 | `sites-site-origin` | sitesSiteOrigin |
 | `verify-site-preview-token` | verifySitePreviewToken |
@@ -240,7 +237,6 @@ CRUD operations for Api records.
 | `config` | JSON |
 | `createdAt` | Datetime |
 | `databaseId` | UUID |
-| `dbname` | String |
 | `id` | UUID |
 | `isPublished` | Boolean |
 | `name` | String |
@@ -248,7 +244,7 @@ CRUD operations for Api records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `databaseId`, `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `isPublished`, `roleName`
 
 ### `api-schema`
 
@@ -1457,7 +1453,6 @@ CRUD operations for PlatformApi records.
 | `anonRole` | String |
 | `config` | JSON |
 | `createdAt` | Datetime |
-| `dbname` | String |
 | `id` | UUID |
 | `isPublished` | Boolean |
 | `name` | String |
@@ -1465,7 +1460,7 @@ CRUD operations for PlatformApi records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `name`
-**Optional create fields (backend defaults):** `anonRole`, `config`, `dbname`, `isPublished`, `roleName`
+**Optional create fields (backend defaults):** `anonRole`, `config`, `isPublished`, `roleName`
 
 ### `platform-api-schema`
 
@@ -1851,6 +1846,35 @@ CRUD operations for PlatformPage records.
 
 **Required create fields:** `content`, `siteId`, `slug`
 **Optional create fields (backend defaults):** `commitId`, `seededFrom`, `storeId`
+
+### `platform-reserved-subdomain`
+
+CRUD operations for PlatformReservedSubdomain records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformReservedSubdomain records |
+| `find-first` | Find first matching platformReservedSubdomain record |
+| `get` | Get a platformReservedSubdomain by id |
+| `create` | Create a new platformReservedSubdomain |
+| `update` | Update an existing platformReservedSubdomain |
+| `delete` | Delete a platformReservedSubdomain |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `label` | String |
+| `match` | String |
+| `reason` | String |
+| `updatedAt` | Datetime |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `label`
+**Optional create fields (backend defaults):** `createdByPrincipal`, `match`, `reason`, `updatedByPrincipal`
 
 ### `platform-site-app-link`
 
@@ -3168,17 +3192,6 @@ CRUD operations for WebauthnSetting records.
 
 ## Custom Operations
 
-### `api-schema-names`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--targetApiId` | UUID |
-
 ### `apply-registry-defaults`
 
 applyRegistryDefaults
@@ -3304,42 +3317,6 @@ platformVerifySitePreviewToken
   |----------|------|
   | `--siteId` | UUID |
   | `--token` | String |
-
-### `resolve-deep-link`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--linkSlug` | String |
-  | `--targetSiteId` | UUID |
-
-### `resolve-route`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--requestHost` | String |
-  | `--requestMethod` | String |
-  | `--requestPath` | String |
-
-### `resolve-site-app-links`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--targetSiteId` | UUID |
 
 ### `sites-deep-link-url`
 
