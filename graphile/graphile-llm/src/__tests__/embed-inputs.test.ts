@@ -79,6 +79,12 @@ const SETUP_SQL = `
     ('warehouse-lease.txt', 'warehouse lease and monthly rent', '[1,0,0]'),
     ('q3-results.txt', 'quarterly revenue results', '[0,1,0]'),
     ('breach-report.txt', 'customer data breach', '[0,0,1]');
+  CREATE TABLE llm_embed_inputs.frozen_docs (
+    id serial PRIMARY KEY,
+    name text NOT NULL,
+    embedding vector(3)
+  );
+  COMMENT ON COLUMN llm_embed_inputs.frozen_docs.embedding IS E'@behavior -attribute:update';
 `;
 
 interface Harness {
@@ -190,6 +196,23 @@ describe('plan-time embedding (onQuotaExceeded: degrade)', () => {
     ];
     const errors = documents.map((d) => validate(h.schema, parse(d)).map((e) => e.message));
     expect(errors).toEqual([[], [], []]);
+  });
+
+  it('offers {col}Text only on inputs that can write {col}', async () => {
+    const fields = async (type: string) => {
+      const r = await h.query<{ t: { inputFields: Array<{ name: string }> } }>(
+        `{ t: __type(name: "${type}") { inputFields { name } } }`
+      );
+      return r.data!.t.inputFields.map((f) => f.name).filter((n) => n.startsWith('embedding'));
+    };
+    expect(await fields('FrozenDocInput')).toEqual(['embedding', 'embeddingText']);
+    expect(await fields('FrozenDocPatch')).toEqual([]);
+
+    const update = await h.query(
+      'mutation { updateFrozenDocByRowId(input: { rowId: 1, frozenDocPatch: { embeddingText: "rent" } }) { frozenDoc { rowId } } }'
+    );
+    expect(update.errors?.[0]?.message).toMatch(/embeddingText/);
+    expect(calls).toHaveLength(0);
   });
 
   describe('embedder returning the provider shape', () => {
