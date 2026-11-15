@@ -132,5 +132,6 @@ it('clears bucket metadata and fences an in-flight bucket read with its schema',
 
   clearStorageModuleCache(DATABASE);
   await getBucketConfig(client, config, DATABASE, 'documents');
-  expect(client.query).toHaveBeenCalledTimes(3);
+  expect(client.query).toHaveBeenCalledTimes(4);
+  expect(client.query.mock.calls[3][0].text).toContain('physical_name');
 });
