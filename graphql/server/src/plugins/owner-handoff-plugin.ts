@@ -16,8 +16,10 @@ import { extendSchema, gql } from 'graphile-utils';
  * into the owner's tenant session:
  *
  *   1. the caller must own the target database (never a client-supplied id);
- *   2. the evidence row must belong to this caller and to the credential this
- *      request presented (`jwt.claims.token_id`), and be unexpired/unconsumed;
+ *   2. the evidence row must belong to this caller and to the platform session
+ *      this request belongs to (`jwt.claims.session_id`), and be
+ *      unexpired/unconsumed — the browser hand-off rotates the credential, so
+ *      the session is what survives to bind the proof;
  *   3. the tenant's own `sign_in_platform_identity` resolves the owner from the
  *      identifier and applies the tenant's MFA / device policy;
  *   4. the tenant mints a one-time, PKCE-bound hand-off code that the desktop
@@ -39,8 +41,11 @@ type WithPgClient = <T>(
 export interface OwnerHandoffInput {
   /** The signed-in platform user (jwt.claims.user_id). */
   userId: string;
-  /** The platform database serving the request (where evidence lives). */
-  platformDatabaseId: string;
+  /**
+   * The platform realm's private auth schema (where `sign_in_evidence` lives),
+   * resolved by the wiring on the server lane — see `platformAuthSchemaSql`.
+   */
+  platformAuthSchema: string;
   /** The tenant database to sign the owner into. */
   databaseId: string;
   /** S256 challenge the desktop will present at the exchange. */
@@ -72,12 +77,25 @@ function fail(code: string, message: string): never {
 
 // The auth module's own row names the private schema, so this works for a
 // tenant that enabled auth but no identity provider — `identity_providers_module`
-// is optional in a few presets, `user_auth_module` is not.
+// is optional in a few presets, `user_auth_module` is not. Only the tenant row
+// is read here: it belongs to the caller's org, so the request role sees it.
 const authPrivateSchemaSql = `
   SELECT auth_private.schema_name
     FROM metaschema_modules_public.user_auth_module uam
     JOIN metaschema_public.schema auth_private ON auth_private.id = uam.private_schema_id
    WHERE uam.database_id = $1
+   LIMIT 1
+`;
+
+// The platform realm's row is owned by the platform actor, not by the caller's
+// org, so RLS hides it from the request role — and `metaschema_modules_public`
+// hides it from table reads by the serving login too (NOBYPASSRLS). The
+// platform login is granted EXECUTE on this SECURITY DEFINER reader instead
+// (constructive-db `function_resolution`), the same reader the module loaders
+// use; it projects the schema name and nothing else.
+const platformAuthSchemaSql = `
+  SELECT private_schema AS schema_name
+    FROM function_resolution.user_auth_module_registrations($1::uuid)
    LIMIT 1
 `;
 
@@ -109,17 +127,21 @@ export const mintTenantOwnerHandoff = async (
     fail('NOT_DATABASE_OWNER', 'only the database owner may hand off a session');
   }
 
-  const evidenceSchema = await tx.query({
-    text: authPrivateSchemaSql,
-    values: [input.platformDatabaseId]
-  });
-  const evidenceSchemaName = evidenceSchema.rows[0]?.schema_name;
-  if (typeof evidenceSchemaName !== 'string') {
+  // Resolved on the server lane before this transaction: the request role
+  // cannot see the platform realm's module row (see `platformAuthSchemaSql`).
+  const evidenceSchemaName = input.platformAuthSchema;
+  if (typeof evidenceSchemaName !== 'string' || !evidenceSchemaName) {
     fail('TENANT_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
   }
 
   // Consume and read in one statement: the subselect locks the row, and the
   // outer UPDATE stamps it, so two concurrent calls cannot both spend it.
+  //
+  // The proof is bound to the *session*, not the credential that wrote it: the
+  // browser hand-off rotates that credential in place (`exchange_native_handoff`
+  // and `refresh_access_token` each mint a new id for the same session), so the
+  // credential id the desktop presents is never the one the sign-in wrote. The
+  // session id survives the rotation and still names exactly one sign-in.
   const evidenceTable = QuoteUtils.quoteQualifiedIdentifier(evidenceSchemaName, 'sign_in_evidence');
   const evidence = await tx.query({
     text: `
@@ -129,7 +151,7 @@ export const mintTenantOwnerHandoff = async (
                SELECT candidate.id
                  FROM ${evidenceTable} AS candidate
                 WHERE candidate.user_id = $1
-                  AND candidate.credential_id = jwt_private.current_token_id()
+                  AND candidate.session_id = jwt_private.current_session_id()
                   AND candidate.consumed_at IS NULL
                   AND candidate.expires_at > now()
                 ORDER BY candidate.auth_time DESC
@@ -218,6 +240,24 @@ const resolveArgs = (fieldArgs: any): Step<ResolvedArgs> =>
   }) as unknown as Step<ResolvedArgs>;
 
 /**
+ * The connection's own login, no request role. It is the only lane that holds
+ * EXECUTE on the privileged module readers (the webauthn plugin uses the same
+ * lane for the same reason), so a request role can never widen it.
+ */
+const resolvePlatformAuthSchema = async (
+  withPgClient: WithPgClient,
+  platformDatabaseId: string
+): Promise<string | undefined> =>
+  withPgClient(null, async (client) => {
+    const { rows } = await client.query({
+      text: platformAuthSchemaSql,
+      values: [platformDatabaseId]
+    });
+    const name = rows[0]?.schema_name;
+    return typeof name === 'string' && name ? name : undefined;
+  });
+
+/**
  * Platform-only: a tenant must never author a session for another tenant, so
  * this plugin is registered only on the platform database's own APIs.
  */
@@ -264,6 +304,11 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
             const userId = pgSettings?.['jwt.claims.user_id'];
             const platformDatabaseId = pgSettings?.['jwt.claims.database_id'];
             if (!userId) fail('UNAUTHENTICATED', 'a platform session is required');
+            // The API resolved this request's database id; without it there is
+            // no platform realm to read and no evidence to consume.
+            if (!isUuid(platformDatabaseId)) {
+              fail('UNAUTHENTICATED', 'a platform session is required');
+            }
 
             const databaseId = input?.databaseId;
             const codeChallenge = input?.codeChallenge;
@@ -271,10 +316,22 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
               fail('BAD_REQUEST', 'databaseId and codeChallenge are required');
             }
 
+            // The platform realm's auth schema is registry knowledge, hidden
+            // from the request role; resolve it on the server lane, then run
+            // every caller-scoped read and the tenant procedures on the request
+            // lane.
+            const platformAuthSchema = await resolvePlatformAuthSchema(
+              withPgClient,
+              platformDatabaseId
+            );
+            if (!platformAuthSchema) {
+              fail('TENANT_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
+            }
+
             return withPgClient(pgSettings, (tx) =>
               mintTenantOwnerHandoff(tx, {
                 userId,
-                platformDatabaseId: String(platformDatabaseId ?? ''),
+                platformAuthSchema,
                 databaseId,
                 codeChallenge
               })
