@@ -102,9 +102,11 @@ describe('server-side embedding runs before SQL', () => {
             name text NOT NULL,
             body text NOT NULL,
             tsv tsvector GENERATED ALWAYS AS (to_tsvector('english', name || ' ' || body)) STORED,
-            embedding vector(768)
+            embedding vector(768),
+            cover_embedding vector(3)
           );
           INSERT INTO llm_plan_embed.docs (name, body, embedding) VALUES ${values};
+          UPDATE llm_plan_embed.docs SET cover_embedding = '[1,0,0]';
         `);
       })
     ]);
@@ -165,6 +167,23 @@ describe('server-side embedding runs before SQL', () => {
     const lease = result.data!.allDocs.nodes.find((n) => n.name === 'warehouse-lease.txt');
     expect(lease).toBeDefined();
     expect(typeof lease!.embeddingVectorDistance).toBe('number');
+  });
+
+  it('unifiedSearch leaves out a vector column of another length than the query vector', async () => {
+    // docs.cover_embedding is vector(3) beside the 768-d text column: one text
+    // query vector cannot be compared with it ("different vector dimensions").
+    const result = await query<{ allDocs: { nodes: Array<{ name: string; embeddingVectorDistance: number | null; coverEmbeddingVectorDistance: number | null }> } }>(`
+      query($t: String!) {
+        allDocs(where: { unifiedSearch: $t }) {
+          nodes { name embeddingVectorDistance coverEmbeddingVectorDistance }
+        }
+      }
+    `, { t: 'warehouse rent' });
+
+    expect(result.errors).toBeUndefined();
+    const lease = result.data!.allDocs.nodes.find((n) => n.name === 'warehouse-lease.txt');
+    expect(typeof lease!.embeddingVectorDistance).toBe('number');
+    expect(lease!.coverEmbeddingVectorDistance).toBeNull();
   });
 
   it('stores the embedding of {col}Text on create', async () => {

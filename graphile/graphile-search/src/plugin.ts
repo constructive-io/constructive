@@ -1343,6 +1343,12 @@ export function createUnifiedSearchPlugin(
                         if (vector && vectorAdapterColumns.length > 0) {
                           for (const { adapter, columns } of vectorAdapterColumns) {
                             for (const column of columns) {
+                              // One query vector, embedded by the text model: a column of
+                              // another declared length (an image-embedding column beside
+                              // the text one) holds vectors it cannot be compared with —
+                              // pgvector raises on the operator — so it sits this search out.
+                              const declared = (column.adapterData as { dimensions?: number } | undefined)?.dimensions;
+                              if (declared && declared !== vector.length) continue;
                               const applyFor = (alias: SQL) =>
                                 adapter.buildFilterApply(sql, alias, column, { vector, metric: 'COSINE' }, build);
                               const result = applyFor($condition.alias);
