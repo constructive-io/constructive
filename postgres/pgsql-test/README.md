@@ -255,11 +255,57 @@ This array lets you fully customize how your test database is seeded. You can co
 * [`seed.fn()`](#-programmatic-seeding) – Run JavaScript/TypeScript logic to programmatically insert data
 * [`seed.csv()`](#️-csv-seeding) – Load tabular data from CSV files
 * [`seed.json()`](#️-json-seeding) – Use in-memory objects as seed data
-* [`seed.loadPgpm()`](#-pgpm-seeding) – Apply a pgpm project or set of packages (compatible with sqitch)
+* [`seed.pgpm()`](#-pgpm-seeding) – Apply a pgpm project or set of packages (compatible with sqitch)
 
 > ✨ **Default Behavior:** If no `SeedAdapter[]` is passed, pgpm seeding is assumed. This makes `pgsql-test` zero-config for pgpm-based projects.
 
 This composable system allows you to mix-and-match data setup strategies for flexible, realistic, and fast database tests.
+
+#### Shared fixtures survive per-test rollbacks
+
+Seed adapters run once, before any test, and are committed. `beforeEach()` then opens a transaction and a savepoint, and `afterEach()` rolls back to it, so every test starts from the seeded state no matter what the previous test changed:
+
+```ts
+beforeAll(async () => {
+  ({ db, teardown } = await getConnections({}, [
+    seed.sqlfile([sql('schema.sql')]),
+    seed.json({ users: [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }] })
+  ]));
+});
+
+beforeEach(() => db.beforeEach());
+afterEach(() => db.afterEach());
+
+it('can delete everything', async () => {
+  await db.query('DELETE FROM users');
+});
+
+it('still sees the fixtures', async () => {
+  expect((await db.one('SELECT count(*) FROM users')).count).toBe('2');
+});
+```
+
+For fixtures shared by one `describe` block only, open a transaction and a named savepoint in its `beforeAll`, seed, give each test its own inner savepoint, and roll the block back in `afterAll`. Jest runs outer hooks for nested tests too, so keep the file-level `beforeEach()`/`afterEach()` in a sibling `describe` rather than around this block:
+
+```ts
+describe('with an extra admin', () => {
+  beforeAll(async () => {
+    await db.begin();
+    await db.query(`INSERT INTO users VALUES (99, 'Admin')`);
+    await db.savepoint('group');
+  });
+  afterAll(async () => {
+    await db.rollback('group');
+    await db.query('ROLLBACK');
+  });
+  beforeEach(() => db.savepoint('test'));
+  afterEach(() => db.rollback('test'));
+
+  // tests here see Alice, Bob and Admin; the next block sees Alice and Bob
+});
+```
+
+To make the whole per-file setup cheap too, point `db.template` (or `PGTEMPLATE`) at a database that already has your schema: each test database is then cloned from it instead of re-deployed.
 
 #### Two Seeding Patterns
 
@@ -531,13 +577,13 @@ const { db, teardown } = await getConnections();
 **Adapter Pattern (Custom Path):**
 ```ts
 const { db, teardown } = await getConnections({}, [
-  seed.loadPgpm('/path/to/pgpm-workspace', true) // with cache
+  seed.pgpm('/path/to/pgpm-workspace', true) // with cache
 ]);
 ```
 
 **Direct Load Method:**
 ```ts
-await db.loadPpgm('/path/to/pgpm-workspace', true); // with cache
+await db.loadPgpm('/path/to/pgpm-workspace', true); // with cache
 ```
 
 > **Note:** pgpm deployment has its own client handling and does not apply RLS context.
@@ -559,7 +605,7 @@ beforeAll(async () => {
 
 pgpm uses Sqitch-compatible syntax with a TypeScript-based migration engine. By default, `pgsql-test` automatically deploys any pgpm module found in the current working directory (`process.cwd()`).
 
-To specify a custom path to your pgpm module, use `seed.loadPgpm()` explicitly:
+To specify a custom path to your pgpm module, use `seed.pgpm()` explicitly:
 
 ```ts
 import path from 'path';
@@ -569,7 +615,7 @@ const cwd = path.resolve(__dirname, '../path/to/pgpm-workspace');
 
 beforeAll(async () => {
   ({ db, teardown } = await getConnections({}, [
-    seed.loadPgpm(cwd)
+    seed.pgpm(cwd)
   ]));
 });
 ```
@@ -663,7 +709,7 @@ Environment variables will override these options when available:
 | `pg.user`     | `string` | `'postgres'`  | Superuser for PostgreSQL                        |
 | `pg.password` | `string` | `'password'`  | Password for the PostgreSQL superuser           |
 | `pg.host`     | `string` | `'localhost'` | Hostname for PostgreSQL                         |
-| `pg.port`     | `number` | `5423`        | Port for PostgreSQL                             |
+| `pg.port`     | `number` | `5432`        | Port for PostgreSQL                             |
 | `pg.database` | `string` | `'postgres'`  | Default database used when connecting initially |
 
 ### Usage

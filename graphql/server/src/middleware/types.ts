@@ -7,6 +7,8 @@ declare global {
     interface Request {
       api?: ApiStructure;
       svc_key?: string;
+      /** Cache generation under which this request resolved its API. */
+      apiGeneration?: number;
       clientIp?: string;
       databaseId?: string;
       requestId?: string;

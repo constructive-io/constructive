@@ -151,6 +151,25 @@ describe('createFlushMiddleware', () => {
         files_schema: 'tenant_storage',
         files_table: `${scope}_files`,
       });
+      let server: Server | undefined;
+      let listener: EventEmitter;
+      let flush: jest.SpyInstance;
+      if (path === 'notification') {
+        // Exercise the real listener and Server.flush without opening sockets.
+        // Empty routing rows must not prevent storage discovery invalidation.
+        server = Object.create(Server.prototype) as Server;
+        Object.assign(server, { opts: { api: { isPublic: true } } });
+        listener = Object.assign(new EventEmitter(), {
+          query: jest.fn().mockResolvedValue({ rows: [] }),
+        });
+        flush = jest.spyOn(server, 'flush');
+        server.listenForChanges(
+          null,
+          listener as unknown as PoolClient,
+          jest.fn()
+        );
+        await Promise.resolve();
+      }
       let rows = [row('app')];
       const client = { query: jest.fn(async () => ({ rows })) };
       const other = { query: jest.fn(async () => ({ rows: [row('other')] })) };
@@ -159,27 +178,14 @@ describe('createFlushMiddleware', () => {
       rows = [...rows, row('data_room')];
 
       if (path === 'notification') {
-        // Exercise the real listener and Server.flush without opening sockets.
-        // Empty routing rows must not prevent storage discovery invalidation.
-        const server = Object.create(Server.prototype) as Server;
-        Object.assign(server, { opts: { api: { isPublic: true } } });
-        const listener = Object.assign(new EventEmitter(), {
-          query: jest.fn().mockResolvedValue({ rows: [] }),
-        });
-        const flush = jest.spyOn(server, 'flush');
-        server.listenForChanges(
-          null,
-          listener as unknown as PoolClient,
-          jest.fn()
-        );
-        expect(listener.query).toHaveBeenCalledWith('LISTEN "schema:update"');
+        expect((listener as EventEmitter & { query: jest.Mock }).query).toHaveBeenCalledWith('LISTEN "schema:update"');
         listener.emit('notification', {
           channel: 'schema:update',
           payload: DATABASE_ID,
         });
         expect(flush).toHaveBeenCalledWith(DATABASE_ID);
         await flush.mock.results[0].value;
-        listener.removeAllListeners();
+        await server!.removeEventListener();
         expect(mockRoutingQuery).toHaveBeenCalledWith(expect.any(String), [
           DATABASE_ID,
         ]);

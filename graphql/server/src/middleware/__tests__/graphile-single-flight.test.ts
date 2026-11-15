@@ -9,12 +9,12 @@ jest.mock('graphile-cache', () => ({
   createGraphileInstance: mockCreateGraphileInstance,
   graphileCache: {
     get: mockCacheGet,
-    delete: jest.fn()
+    delete: jest.fn(), clear: jest.fn()
   }
 }));
 
 jest.mock('@pgpmjs/server-utils', () => ({
-  svcCache: { delete: jest.fn() }
+  svcCache: { delete: jest.fn(), clear: jest.fn() }
 }));
 
 jest.mock('graphile-settings', () => ({
@@ -35,7 +35,7 @@ jest.mock('../api', () => ({
 
 import type { Request, Response } from 'express';
 
-import { clearGenerations, evictServiceKey } from '../cache-generation';
+import { clearGenerations, evictAllServiceKeys, evictServiceKey, generationOf } from '../cache-generation';
 import {
   clearInFlightMap,
   getInFlightCount,
@@ -169,7 +169,7 @@ describe('graphile single-flight handler creation', () => {
     expect(getInFlightCount()).toBe(0);
   });
 
-  it('does not admit a handler whose service was evicted while it was being built, and serves the request from a rebuild', async () => {
+  it.each(['database flush', 'listener recovery'])('rejects a stale pending build after %s and serves a fresh rebuild', async (reason) => {
     let releaseFirstBuild!: () => void;
     const firstBuildReady = new Promise<void>((resolve) => {
       releaseFirstBuild = resolve;
@@ -199,7 +199,8 @@ describe('graphile single-flight handler creation', () => {
     await Promise.resolve();
     expect(getInFlightCount()).toBe(1);
 
-    evictServiceKey('service-key');
+    if (reason === 'listener recovery') evictAllServiceKeys();
+    else evictServiceKey('service-key');
     releaseFirstBuild();
     await pending;
 
@@ -214,6 +215,24 @@ describe('graphile single-flight handler creation', () => {
     expect(freshHandler).toHaveBeenCalledTimes(1);
     expect(next).not.toHaveBeenCalled();
     expect(getInFlightCount()).toBe(0);
+  });
+
+  it('re-resolves a request whose API was read before listener recovery', async () => {
+    const req = makeRequest();
+    req.apiGeneration = generationOf(req.svc_key!);
+    evictAllServiceKeys();
+    const fresh = { ...req.api, schema: ['fresh_schema'] };
+    mockGetApiConfig.mockImplementation(async () => {
+      req.apiGeneration = generationOf(req.svc_key!);
+      return fresh;
+    });
+    mockMakeIntrospectionWiring.mockReturnValue({ presets: [], pgService: {} });
+    const next = jest.fn();
+    await graphile({ graphile: {} } as any)(req, { headersSent: false } as Response, next);
+    expect(mockGetApiConfig).toHaveBeenCalledTimes(1);
+    expect(req.api).toBe(fresh);
+    expect(mockCreateGraphileInstance).toHaveBeenCalledTimes(1);
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('fails the request with the reason when the service keeps changing during every build', async () => {
