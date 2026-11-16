@@ -6,6 +6,7 @@ import type {
   PgRelation,
   PgTableResource,
   PgUnique,
+  TableKind,
 } from './types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -23,6 +24,16 @@ export function isTableResource(
     !resource.isVirtual &&
     !resource.isUnique
   );
+}
+
+export function getTableKind(resource: PgTableResource): TableKind {
+  const extensions = resource.extensions;
+  return extensions?.isView || extensions?.isMaterializedView ? 'view' : 'table';
+}
+
+/** The table's comment without smart tags; null when it has none. */
+export function getTableDescription(resource: PgTableResource): string | null {
+  return resource.description || resource.codec?.description || null;
 }
 
 export function getSchemaName(resource: PgTableResource): string | null {

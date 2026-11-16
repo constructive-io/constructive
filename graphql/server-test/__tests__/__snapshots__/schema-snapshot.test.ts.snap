@@ -685,6 +685,11 @@ type MetaBelongsToRelation {
   fieldName: String
   isUnique: Boolean!
   keys: [MetaField!]!
+
+  """
+  Fields on the referenced table that keys point at, in the same order as keys
+  """
+  refKeys: [MetaField!]!
   references: MetaRefTable!
   type: String
 }
@@ -718,7 +723,17 @@ type MetaField {
 
   """Enum metadata if this field has an enum type"""
   enumValues: MetaEnum
+
+  """
+  Set when the field holds files; null otherwise. Set on a table's own fields only.
+  """
+  file: MetaFileField
   hasDefault: Boolean!
+
+  """
+  Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only.
+  """
+  isComputed: Boolean
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
@@ -741,6 +756,22 @@ type MetaField {
   type: MetaType!
 }
 
+"""How a field holds files"""
+type MetaFileField {
+  """
+  GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise
+  """
+  filesType: String
+
+  """Whether the field holds a list of files"""
+  isMultiple: Boolean!
+
+  """
+  image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.
+  """
+  kind: String!
+}
+
 """Information about a foreign key constraint"""
 type MetaForeignKeyConstraint {
   fields: [MetaField!]!
@@ -757,6 +788,11 @@ type MetaHasRelation {
   isUnique: Boolean!
   keys: [MetaField!]!
   referencedBy: MetaRefTable!
+
+  """
+  Fields on the related table that point at this table, in the same order as keys
+  """
+  remoteKeys: [MetaField!]!
   type: String
 }
 
@@ -859,7 +895,9 @@ type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
   dimensions: Int
 
-  """For 'ltree': values are dot-separated path strings."""
+  """
+  For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c').
+  """
   dotPath: Boolean
 
   """For 'vector': element scalar (e.g. 'float')."""
@@ -999,6 +1037,9 @@ type MetaStorageUpload {
 """Information about a database table"""
 type MetaTable {
   constraints: MetaConstraints!
+
+  """Description written for this table, or null"""
+  description: String
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
@@ -1011,6 +1052,11 @@ type MetaTable {
   Whether this table only links rows of two other tables; the link appears in their manyToMany relations
   """
   isJunction: Boolean!
+
+  """
+  'table' when rows are stored in this table, 'view' when they come from a view of other tables
+  """
+  kind: String!
 
   """Final GraphQL output type name"""
   name: String!
@@ -1044,7 +1090,22 @@ type MetaType {
   hasDefault: Boolean
   isArray: Boolean!
   isNotNull: Boolean
+
+  """
+  Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded.
+  """
+  maxLength: Int
   pgType: String!
+
+  """
+  Most significant digits a decimal number may hold. Null when unbounded.
+  """
+  precision: Int
+
+  """
+  Digits a decimal number keeps after the decimal point. Null when unbounded.
+  """
+  scale: Int
   subtype: String
 }
 
