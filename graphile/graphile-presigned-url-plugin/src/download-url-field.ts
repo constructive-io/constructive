@@ -2,7 +2,7 @@
  * downloadUrl Computed Field Plugin
  *
  * Adds a `downloadUrl` computed field to File types in the GraphQL schema.
- * For public files, returns the public URL prefix + key.
+ * For public files, returns the public URL prefix + physical bucket + key.
  * For private files, generates a presigned GET URL.
  *
  * Detection: Uses the `@storageFiles` smart tag on the codec (table).
@@ -29,6 +29,7 @@ import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
 import { isLiveFileRow } from './file-lifecycle';
 import { resolveS3ForDatabase } from './physical-bucket';
+import { buildPublicFileUrl } from './public-file-url';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
 import type { PresignedUrlPluginOptions } from './types';
@@ -149,7 +150,7 @@ export function createDownloadUrlPlugin(
 
                       const s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.physicalName);
                       if (isPublic && s3ForDb.publicUrlPrefix) {
-                        return `${s3ForDb.publicUrlPrefix}/${s3ForDb.bucket}/${key}`;
+                        return buildPublicFileUrl(s3ForDb.publicUrlPrefix, s3ForDb.bucket, key);
                       }
 
                       return generatePresignedGetUrl(

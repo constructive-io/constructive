@@ -22,6 +22,26 @@ Presigned URL upload plugin for PostGraphile v5.
 - Content-hash based S3 keys (SHA-256) with automatic deduplication — only against rows whose bytes are in S3, so a retry of a never-completed upload gets a fresh URL
 - Per-bucket MIME type and file size validation
 
+## Public file URLs
+
+The effective storage module's `public_url_prefix` is a base URL shared by its
+physical buckets. Public upload projections (`file.url`) and confirmed file
+rows (`downloadUrl`) use the same address:
+
+```text
+<public_url_prefix>/<physical_bucket>/<object_key>
+```
+
+For example, a prefix of `http://localhost:9000` and a resolved physical bucket
+of `database-public-123` produce `http://localhost:9000/database-public-123/abc`
+for key `abc`. Trailing slashes on the prefix are removed. A CDN prefix may
+include a base path, but must serve the same physical-bucket/key layout; the
+plugin does not infer a bucket-specific or virtual-host layout from the URL.
+
+Private upload projections omit `url`; use the file row's `downloadUrl` for
+time-limited access. Public files without a public prefix also use signed
+downloads. The `downloadUrl` field retains its existing file-status checks.
+
 ## Usage
 
 ```typescript
