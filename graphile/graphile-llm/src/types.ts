@@ -14,12 +14,14 @@ export interface EmbeddingResult {
   embedding: number[];
   /** Number of prompt tokens consumed (from provider; 0 if unavailable) */
   promptTokens: number;
+  /** The model the gateway was asked for */
+  model?: string;
 }
 
 /**
  * A function that converts text into a vector embedding with token usage.
  */
-export type EmbedderFunction = (text: string) => Promise<EmbeddingResult>;
+export type EmbedderFunction = (text: string, model?: string) => Promise<EmbeddingResult>;
 
 /**
  * Configuration for an embedding provider.

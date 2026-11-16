@@ -29,6 +29,19 @@ import type { SQL } from 'pg-sql2';
 
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
+/**
+ * Carried on a filter field that searches vector columns, for whatever embeds
+ * the search text (graphile-llm): which columns, and the model each column's
+ * own definition names. Vectors of two models are not comparable, so the text
+ * is embedded per model.
+ */
+export const VECTOR_COLUMNS_EXT = 'graphileSearchVectorColumns';
+
+function vectorColumnRef(column: SearchableColumn): { attributeName: string; model?: string } {
+  const model = (column.adapterData as { model?: string } | undefined)?.model;
+  return { attributeName: column.attributeName, ...(model && { model }) };
+}
+
 // ─── TypeScript Namespace Augmentations ──────────────────────────────────────
 
 declare global {
@@ -1237,6 +1250,9 @@ export function createUnifiedSearchPlugin(
                         'field'
                       ),
                       type: build.getTypeByName(adapter.getFilterTypeName(build)) as any,
+                      ...(adapter.name === 'vector' && {
+                        extensions: { [VECTOR_COLUMNS_EXT]: [vectorColumnRef(column)] },
+                      }),
                       apply: function plan($condition: any, val: any) {
                         if (val == null) return;
 
@@ -1302,15 +1318,22 @@ export function createUnifiedSearchPlugin(
                         'field'
                       ),
                       type: build.graphql.GraphQLString as any,
+                      extensions: {
+                        [VECTOR_COLUMNS_EXT]: vectorAdapterColumns.flatMap((ac) => ac.columns.map(vectorColumnRef)),
+                      },
                       apply: function plan($condition: any, val: any) {
                         if (val == null) return;
 
                         // Support both plain string and { __text, __vector } from LLM plugin
                         let text: string;
                         let vector: number[] | null = null;
+                        let model: string | undefined;
+                        let perColumn: Record<string, { vector: number[]; model?: string }> = {};
                         if (typeof val === 'object' && val.__text) {
                           text = val.__text;
                           vector = val.__vector ?? null;
+                          model = val.__model ?? undefined;
+                          perColumn = val.__vectors ?? {};
                         } else {
                           text = typeof val === 'string' ? val : String(val);
                           if (text.trim().length === 0) return;
@@ -1340,17 +1363,24 @@ export function createUnifiedSearchPlugin(
                         }
 
                         // Vector adapters (pgvector) — only when __vector is injected
-                        if (vector && vectorAdapterColumns.length > 0) {
+                        if ((vector || Object.keys(perColumn).length > 0) && vectorAdapterColumns.length > 0) {
                           for (const { adapter, columns } of vectorAdapterColumns) {
                             for (const column of columns) {
                               // One query vector, embedded by the text model: a column of
                               // another declared length (an image-embedding column beside
                               // the text one) holds vectors it cannot be compared with —
                               // pgvector raises on the operator — so it sits this search out.
+                              // Each column is searched with the vector its own model produced.
+                              const query = perColumn[column.attributeName] ?? (vector ? { vector, model } : null);
+                              if (!query) continue;
                               const declared = (column.adapterData as { dimensions?: number } | undefined)?.dimensions;
-                              if (declared && declared !== vector.length) continue;
+                              if (declared && declared !== query.vector.length) continue;
                               const applyFor = (alias: SQL) =>
-                                adapter.buildFilterApply(sql, alias, column, { vector, metric: 'COSINE' }, build);
+                                adapter.buildFilterApply(
+                                  sql, alias, column,
+                                  { vector: query.vector, model: query.model, metric: 'COSINE' },
+                                  build
+                                );
                               const result = applyFor($condition.alias);
                               if (!result) continue;
 

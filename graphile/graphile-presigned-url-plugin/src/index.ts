@@ -26,6 +26,7 @@ export { validateCustomKey } from './custom-key';
 export type { ResolvedBucketCoordinate } from './default-bucket';
 export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
+export { buildFileProjection, type FileProjection } from './file-projection';
 export {
   createImageVersionUrlsPlugin,
   type ImageVersionUrl,
@@ -34,7 +35,6 @@ export {
   pickUrl,
   type ResolvedImage,
 } from './image-version-urls';
-export { buildFileProjection, type FileProjection } from './file-projection';
 export {
   assertBucketReconciled,
   resolveS3ForDatabase,
