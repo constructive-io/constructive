@@ -203,7 +203,9 @@ constructive-db's `SearchVector` generator emits both (`<field>_model` carries
 `@embeddingModelOf`; `@embeddingModel` only when the node names a model).
 
 - The vector filter input has a `model` field. On a column with a model
-  column, only rows whose stamp equals `model` are compared.
+  column, when `model` is given only rows whose stamp equals it are compared;
+  rows stamped with another model (or not stamped) are skipped until they are
+  embedded again with that model.
 - With `graphile-llm`, a search `text` is embedded once per model its columns
   use (`@embeddingModel`, else the request's model) and `model` is filled in
   server-side (`graphile/graphile-llm/src/embed-inputs.ts`). A column whose
