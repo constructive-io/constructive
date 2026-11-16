@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.41.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.6...graphql-server-test@3.41.0) (2026-11-16)
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
 ## [3.40.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.5...graphql-server-test@3.40.6) (2026-11-16)
 
 **Note:** Version bump only for package graphql-server-test

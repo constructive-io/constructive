@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.3](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.2...agentic-server@0.30.3) (2026-11-16)
+
+### Bug Fixes
+
+- **agentic-server:** accept JSON bodies large enough to carry an image (bodyLimit, default 32mb) ([5cd773e](https://github.com/constructive-io/constructive/commit/5cd773e471f578c2f12e8f47c1807bfae65153bf))
+
 ## [0.30.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.1...agentic-server@0.30.2) (2026-11-16)
 
 ### Bug Fixes

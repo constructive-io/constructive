@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.32.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.15...graphile-settings@6.32.0) (2026-11-16)
+
+### Bug Fixes
+
+- **graphile-settings:** give every enum label a valid, stable GraphQL name ([642df68](https://github.com/constructive-io/constructive/commit/642df68e928fa62ee3e7db21a0e3191aca87975a))
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
 ## [6.31.15](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.14...graphile-settings@6.31.15) (2026-11-16)
 
 **Note:** Version bump only for package graphile-settings

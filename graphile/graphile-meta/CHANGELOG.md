@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.2...graphile-meta@1.13.0) (2026-11-16)
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
 ## [1.12.2](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.1...graphile-meta@1.12.2) (2026-11-09)
 
 **Note:** Version bump only for package graphile-meta
