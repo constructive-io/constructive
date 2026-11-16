@@ -176,7 +176,7 @@ export interface FileProjection {
   mime: string;
   size: number;
   filename?: string;
-  /** @deprecated Read the files row's `downloadUrl` via `id` instead. */
+  /** @deprecated Resolve the files row's `downloadUrl` via `id`; stored URLs are not refreshed on upgrade. */
   url?: string;
 }
 
