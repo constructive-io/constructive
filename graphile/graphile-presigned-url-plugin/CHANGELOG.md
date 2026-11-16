@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.28.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.2...graphile-presigned-url-plugin@1.28.0) (2026-11-16)
+
+### Bug Fixes
+
+- **presigned-url:** no file of its own under another file's .versions/ prefix ([640dbca](https://github.com/constructive-io/constructive/commit/640dbca7a23001b4aed0c3345652554b72a5c7ea))
+- **presigned-url:** no image URL fields for a column the API does not select ([05993d0](https://github.com/constructive-io/constructive/commit/05993d0db8aca42817eaa4169c21e78f0c8ea822))
+
+### Features
+
+- **presigned-url:** one URL mechanism for every file-reference column ([a1ba7c6](https://github.com/constructive-io/constructive/commit/a1ba7c6c4c1d049f4eeebc7ce454dbba4faa6cb5))
+- **presigned-url:** URLs for an image column and its own rendered versions ([3f72c41](https://github.com/constructive-io/constructive/commit/3f72c419cd4dc4e6628d69294925dcfdd3df1bde))
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
 ## [1.27.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.1...graphile-presigned-url-plugin@1.27.2) (2026-11-12)
 
 ### Bug Fixes

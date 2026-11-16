@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.10...graphile-llm@1.24.0) (2026-11-16)
+
+### Bug Fixes
+
+- **llm:** stamp the model beside a vector embedded on a write; label an embedded text with its own model ([c4f034b](https://github.com/constructive-io/constructive/commit/c4f034be008210d53774587b53b4f2d3db6637cb))
+
+### Features
+
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
 ## [1.23.10](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.9...graphile-llm@1.23.10) (2026-11-16)
 
 **Note:** Version bump only for package graphile-llm

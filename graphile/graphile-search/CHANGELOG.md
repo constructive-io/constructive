@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.20.0](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.12...graphile-search@2.20.0) (2026-11-16)
+
+### Bug Fixes
+
+- **search:** a column whose model failed to embed sits unifiedSearch out ([cc96598](https://github.com/constructive-io/constructive/commit/cc9659846211885a17ee665b662523b1c64a159f))
+- **search:** the model stamp narrows the parent vector, not its chunks ([fc9a3d9](https://github.com/constructive-io/constructive/commit/fc9a3d96903c38a2a4bc64fb911f4a102b95fe1d))
+
+### Features
+
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
 ## [2.19.12](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.11...graphile-search@2.19.12) (2026-11-16)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/graphile-storage-registry@0.4.0...graphile-storage-registry@0.5.0) (2026-11-16)
+
+### Features
+
+- **presigned-url:** one URL mechanism for every file-reference column ([a1ba7c6](https://github.com/constructive-io/constructive/commit/a1ba7c6c4c1d049f4eeebc7ce454dbba4faa6cb5))
+
 # [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-storage-registry@0.3.0...graphile-storage-registry@0.4.0) (2026-11-09)
 
 ### Features
