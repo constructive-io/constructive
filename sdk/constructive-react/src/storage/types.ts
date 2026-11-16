@@ -42,6 +42,7 @@ export interface File {
   key: string | null;
   mimeType: string | null;
   promotedAt: string | null;
+  rejectionReason: string | null;
   size: string | null;
   status: FileStatus | null;
   tags: string[] | null;
@@ -83,6 +84,7 @@ export interface PlatformFile {
   key: string | null;
   mimeType: string | null;
   promotedAt: string | null;
+  rejectionReason: string | null;
   size: string | null;
   status: FileStatus | null;
   tags: string[] | null;

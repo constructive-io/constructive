@@ -48,10 +48,8 @@ function App() {
 | `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useIdentityProvidersQuery` | Query | List all identityProviders |
-| `useCreateIdentityProviderMutation` | Mutation | Create a identityProvider |
 | `useOrgApiKeyListsQuery` | Query | List all orgApiKeyLists |
 | `useOrgApiKeyListQuery` | Query | Get one orgApiKeyList |
-| `useCreateOrgApiKeyListMutation` | Mutation | Create a orgApiKeyList |
 | `useUpdateOrgApiKeyListMutation` | Mutation | Update a orgApiKeyList |
 | `useDeleteOrgApiKeyListMutation` | Mutation | Delete a orgApiKeyList |
 | `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
@@ -61,17 +59,14 @@ function App() {
 | `useDeletePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
 | `usePrincipalsQuery` | Query | Scoped sub-identities (API keys and agents) with precomputed SPRT |
 | `usePrincipalQuery` | Query | Scoped sub-identities (API keys and agents) with precomputed SPRT |
-| `useCreatePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
 | `useUpdatePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
 | `useDeletePrincipalMutation` | Mutation | Scoped sub-identities (API keys and agents) with precomputed SPRT |
 | `usePrincipalEntitiesQuery` | Query | Association table scoping principals to specific organizations |
 | `usePrincipalEntityQuery` | Query | Association table scoping principals to specific organizations |
-| `useCreatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
 | `useUpdatePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
 | `useDeletePrincipalEntityMutation` | Mutation | Association table scoping principals to specific organizations |
 | `usePrincipalScopeOverridesQuery` | Query | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
 | `usePrincipalScopeOverrideQuery` | Query | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
-| `useCreatePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
 | `useUpdatePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
 | `useDeletePrincipalScopeOverrideMutation` | Mutation | Per-scope capability overrides for principals. No row = full access; row exists = apply restrictions. |
 | `useRoleTypesQuery` | Query | List all roleTypes |
@@ -81,7 +76,6 @@ function App() {
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
 | `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
 | `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
-| `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
 | `useUpdateUserConnectedAccountMutation` | Mutation | Update a userConnectedAccount |
 | `useDeleteUserConnectedAccountMutation` | Mutation | Delete a userConnectedAccount |
 | `useUsersQuery` | Query | List all users |
@@ -110,15 +104,17 @@ function App() {
 | `useCurrentUserIdQuery` | Query | currentUserId |
 | `useGetMfaStatusQuery` | Query | getMfaStatus |
 | `useRequireStepUpQuery` | Query | requireStepUp |
+| `useSignInOptionsQuery` | Query | signInOptions |
 | `useApproveDeviceMutation` | Mutation | approveDevice |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
 | `useCompleteMfaChallengeMutation` | Mutation | completeMfaChallenge |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
 | `useConfirmTotpSetupMutation` | Mutation | confirmTotpSetup |
-| `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useCreateApiKeyMutation` | Mutation | Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key. |
 | `useCreateChildPrincipalMutation` | Mutation | createChildPrincipal |
 | `useCreateOrgApiKeyMutation` | Mutation | createOrgApiKey |
 | `useCreateOrgPrincipalMutation` | Mutation | createOrgPrincipal |
+| `useCreatePrincipalMutation` | Mutation | createPrincipal |
 | `useCreatePrincipalFromPresetMutation` | Mutation | createPrincipalFromPreset |
 | `useDeleteOrgPrincipalMutation` | Mutation | deleteOrgPrincipal |
 | `useDeletePrincipalMutation` | Mutation | deletePrincipal |
@@ -129,6 +125,8 @@ function App() {
 | `useEnableEmailMfaMutation` | Mutation | enableEmailMfa |
 | `useEnableSmsMfaMutation` | Mutation | enableSmsMfa |
 | `useEnableTotpMutation` | Mutation | enableTotp |
+| `useEnsureAuthCsrfMutation` | Mutation | ensureAuthCsrf |
+| `useExchangeNativeHandoffMutation` | Mutation | exchangeNativeHandoff |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useGenerateBackupCodesMutation` | Mutation | generateBackupCodes |
@@ -142,6 +140,7 @@ idempotent for an already-reconciled bucket; failures become GraphQL
 errors. |
 | `useRefreshAccessTokenMutation` | Mutation | refreshAccessToken |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
+| `useRequestDeviceApprovalMutation` | Mutation | requestDeviceApproval |
 | `useRequestMagicLinkMutation` | Mutation | requestMagicLink |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
@@ -244,11 +243,6 @@ const { data, isLoading } = useIdentityProvidersQuery({
   selection: { fields: { displayName: true, enabled: true, kind: true, slug: true } },
 });
 
-// Create a identityProvider
-const { mutate: create } = useCreateIdentityProviderMutation({
-  selection: { fields: { id: true } },
-});
-create({ displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' });
 ```
 
 ### OrgApiKeyList
@@ -265,11 +259,6 @@ const { data: item } = useOrgApiKeyListQuery({
   selection: { fields: { accessLevel: true, createdAt: true, expiresAt: true, id: true, keyId: true, lastUsedAt: true, mfaLevel: true, name: true, orgId: true, principalId: true, revokedAt: true, updatedAt: true } },
 });
 
-// Create a orgApiKeyList
-const { mutate: create } = useCreateOrgApiKeyListMutation({
-  selection: { fields: { id: true } },
-});
-create({ accessLevel: '<String>', expiresAt: '<Datetime>', keyId: '<String>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', name: '<String>', orgId: '<UUID>', principalId: '<UUID>', revokedAt: '<Datetime>' });
 ```
 
 ### PhoneNumber
@@ -307,11 +296,6 @@ const { data: item } = usePrincipalQuery({
   selection: { fields: { apiKeyMaxDuration: true, bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } },
 });
 
-// Create a principal
-const { mutate: create } = useCreatePrincipalMutation({
-  selection: { fields: { principalId: true } },
-});
-create({ apiKeyMaxDuration: '<Interval>', bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' });
 ```
 
 ### PrincipalEntity
@@ -328,11 +312,6 @@ const { data: item } = usePrincipalEntityQuery({
   selection: { fields: { createdAt: true, entityId: true, id: true, ownerId: true, principalId: true, updatedAt: true } },
 });
 
-// Create a principalEntity
-const { mutate: create } = useCreatePrincipalEntityMutation({
-  selection: { fields: { id: true } },
-});
-create({ entityId: '<UUID>', ownerId: '<UUID>', principalId: '<UUID>' });
 ```
 
 ### PrincipalScopeOverride
@@ -349,11 +328,6 @@ const { data: item } = usePrincipalScopeOverrideQuery({
   selection: { fields: { allowedMask: true, createdAt: true, id: true, isActive: true, isReadOnly: true, membershipType: true, principalId: true, updatedAt: true, useAdminOwner: true } },
 });
 
-// Create a principalScopeOverride
-const { mutate: create } = useCreatePrincipalScopeOverrideMutation({
-  selection: { fields: { id: true } },
-});
-create({ allowedMask: '<BitString>', isActive: '<Boolean>', isReadOnly: '<Boolean>', membershipType: '<Int>', principalId: '<UUID>', useAdminOwner: '<Boolean>' });
 ```
 
 ### RoleType
@@ -391,11 +365,6 @@ const { data: item } = useUserConnectedAccountQuery({
   selection: { fields: { createdAt: true, details: true, id: true, identifier: true, isVerified: true, ownerId: true, service: true, updatedAt: true } },
 });
 
-// Create a userConnectedAccount
-const { mutate: create } = useCreateUserConnectedAccountMutation({
-  selection: { fields: { id: true } },
-});
-create({ details: '<JSON>', identifier: '<String>', isVerified: '<Boolean>', ownerId: '<UUID>', service: '<String>' });
 ```
 
 ### User
@@ -530,6 +499,13 @@ requireStepUp
   |----------|------|
   | `stepUpType` | String |
 
+### `useSignInOptionsQuery`
+
+signInOptions
+
+- **Type:** query
+- **Arguments:** none
+
 ### `useApproveDeviceMutation`
 
 approveDevice
@@ -587,7 +563,7 @@ confirmTotpSetup
 
 ### `useCreateApiKeyMutation`
 
-createApiKey
+Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
 
 - **Type:** mutation
 - **Arguments:**
@@ -628,6 +604,17 @@ createOrgPrincipal
   | Argument | Type |
   |----------|------|
   | `input` | CreateOrgPrincipalInput (required) |
+
+### `useCreatePrincipalMutation`
+
+createPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreatePrincipalInput (required) |
 
 ### `useCreatePrincipalFromPresetMutation`
 
@@ -739,6 +726,28 @@ enableTotp
   |----------|------|
   | `input` | EnableTotpInput (required) |
 
+### `useEnsureAuthCsrfMutation`
+
+ensureAuthCsrf
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnsureAuthCsrfInput (required) |
+
+### `useExchangeNativeHandoffMutation`
+
+exchangeNativeHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ExchangeNativeHandoffInput (required) |
+
 ### `useExtendTokenExpiresMutation`
 
 extendTokenExpires
@@ -831,6 +840,17 @@ requestCrossOriginToken
   | Argument | Type |
   |----------|------|
   | `input` | RequestCrossOriginTokenInput (required) |
+
+### `useRequestDeviceApprovalMutation`
+
+requestDeviceApproval
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestDeviceApprovalInput (required) |
 
 ### `useRequestMagicLinkMutation`
 

@@ -29,7 +29,6 @@ import type {
   PlatformInternalSecretSelect,
   PlatformInternalSecretFilter,
   PlatformInternalSecretOrderBy,
-  CreatePlatformInternalSecretInput,
   UpdatePlatformInternalSecretInput,
   PlatformInternalSecretPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class PlatformInternalSecretModel {
       }) => ({
         platformInternalSecret: data.platformInternalSecrets?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformInternalSecretSelect>(
-    args: CreateArgs<S, CreatePlatformInternalSecretInput['platformInternalSecret']> & {
-      select: S;
-    } & StrictSelect<S, PlatformInternalSecretSelect>
-  ): QueryBuilder<{
-    createPlatformInternalSecret: {
-      platformInternalSecret: InferSelectResult<PlatformInternalSecretWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformInternalSecret',
-      'createPlatformInternalSecret',
-      'platformInternalSecret',
-      args.select,
-      args.data,
-      'CreatePlatformInternalSecretInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformInternalSecret',
-      fieldName: 'createPlatformInternalSecret',
-      document,
-      variables,
     });
   }
 }

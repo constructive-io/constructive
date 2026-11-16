@@ -29,7 +29,6 @@ import type {
   ResourcesRequirementsStateSelect,
   ResourcesRequirementsStateFilter,
   ResourcesRequirementsStateOrderBy,
-  CreateResourcesRequirementsStateInput,
   UpdateResourcesRequirementsStateInput,
   ResourcesRequirementsStatePatch,
 } from '../input-types';
@@ -107,33 +106,6 @@ export class ResourcesRequirementsStateModel {
       }) => ({
         resourcesRequirementsState: data.resourcesRequirementsStates?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourcesRequirementsStateSelect>(
-    args: CreateArgs<S, CreateResourcesRequirementsStateInput['resourcesRequirementsState']> & {
-      select: S;
-    } & StrictSelect<S, ResourcesRequirementsStateSelect>
-  ): QueryBuilder<{
-    createResourcesRequirementsState: {
-      resourcesRequirementsState: InferSelectResult<ResourcesRequirementsStateWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourcesRequirementsState',
-      'createResourcesRequirementsState',
-      'resourcesRequirementsState',
-      args.select,
-      args.data,
-      'CreateResourcesRequirementsStateInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourcesRequirementsState',
-      fieldName: 'createResourcesRequirementsState',
-      document,
-      variables,
     });
   }
 }

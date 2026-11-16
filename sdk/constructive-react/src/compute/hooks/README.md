@@ -42,11 +42,6 @@ function App() {
 | `useCreateBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `useUpdateBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `useDeleteBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
-| `useBuilderBindingsQuery` | Query | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useBuilderBindingQuery` | Query | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useCreateBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useUpdateBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useDeleteBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
 | `useContentPresetsQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useContentPresetQuery` | Query | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useCreateContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
@@ -54,7 +49,6 @@ function App() {
 | `useDeleteContentPresetMutation` | Mutation | Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store |
 | `useDatabaseFunctionGraphsQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDatabaseFunctionGraphQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
-| `useCreateDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useUpdateDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDeleteDatabaseFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDatabaseFunctionGraphExecutionCancelRequestsQuery` | Query | Requests to stop a graph execution; each insert settles it cancelled and tears down the Jobs its nodes dispatched |
@@ -83,7 +77,6 @@ function App() {
 | `useUpdateDatabaseGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeleteDatabaseGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDatabaseGraphGetAllTreeNodesQuery` | Query | List all databaseGraphGetAllTreeNodes |
-| `useCreateDatabaseGraphGetAllTreeNodesRecordMutation` | Mutation | Create a databaseGraphGetAllTreeNodesRecord |
 | `useDatabaseGraphObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useDatabaseGraphObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreateDatabaseGraphObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -141,7 +134,6 @@ function App() {
 | `useDeleteFunctionGraphCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useFunctionGraphsQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useFunctionGraphQuery` | Query | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
-| `useCreateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useUpdateFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useDeleteFunctionGraphMutation` | Mutation | Flow graph definitions — FBP graphs stored in the dedicated graph Merkle store |
 | `useFunctionGraphExecutionCancelRequestsQuery` | Query | Requests to stop a graph execution; each insert settles it cancelled and tears down the Jobs its nodes dispatched |
@@ -195,7 +187,6 @@ function App() {
 | `useUpdateFunctionScheduleMutation` | Mutation | Function schedules — user-facing cron schedules synced into the worker scheduler (app_jobs.scheduled_jobs) |
 | `useDeleteFunctionScheduleMutation` | Mutation | Function schedules — user-facing cron schedules synced into the worker scheduler (app_jobs.scheduled_jobs) |
 | `useGetAllTreeNodesQuery` | Query | List all getAllTreeNodes |
-| `useCreateGetAllTreeNodesRecordMutation` | Mutation | Create a getAllTreeNodesRecord |
 | `useImagesQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
 | `useImageQuery` | Query | Container image catalog: images available to run as functions, resources, and builds |
 | `useCreateImageMutation` | Mutation | Container image catalog: images available to run as functions, resources, and builds |
@@ -212,7 +203,6 @@ function App() {
 | `useUpdateInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeleteInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useInfraGetAllTreeNodesQuery` | Query | List all infraGetAllTreeNodes |
-| `useCreateInfraGetAllTreeNodesRecordMutation` | Mutation | Create a infraGetAllTreeNodesRecord |
 | `useInfraObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useInfraObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreateInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -253,11 +243,6 @@ function App() {
 | `useCreatePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `useUpdatePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
 | `useDeletePlatformBuildStepMutation` | Mutation | Partitioned append-only step and test results of a build, keyed into its log object |
-| `usePlatformBuilderBindingsQuery` | Query | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `usePlatformBuilderBindingQuery` | Query | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useCreatePlatformBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useUpdatePlatformBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
-| `useDeletePlatformBuilderBindingMutation` | Mutation | Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST |
 | `usePlatformFunctionApiBindingsQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `usePlatformFunctionApiBindingQuery` | Query | Join table binding function definitions to API endpoints with per-binding alias and config |
 | `useCreatePlatformFunctionApiBindingMutation` | Mutation | Join table binding function definitions to API endpoints with per-binding alias and config |
@@ -319,7 +304,6 @@ function App() {
 | `useUpdatePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeletePlatformInfraCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `usePlatformInfraGetAllTreeNodesQuery` | Query | List all platformInfraGetAllTreeNodes |
-| `useCreatePlatformInfraGetAllTreeNodesRecordMutation` | Mutation | Create a platformInfraGetAllTreeNodesRecord |
 | `usePlatformInfraObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `usePlatformInfraObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreatePlatformInfraObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -426,7 +410,6 @@ function App() {
 | `useUpdatePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useDeletePlatformResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `usePlatformResourceDeclaredCapacitiesQuery` | Query | List all platformResourceDeclaredCapacities |
-| `useCreatePlatformResourceDeclaredCapacityMutation` | Mutation | Create a platformResourceDeclaredCapacity |
 | `usePlatformResourceDefinitionsQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `usePlatformResourceDefinitionQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useCreatePlatformResourceDefinitionMutation` | Mutation | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
@@ -443,7 +426,6 @@ function App() {
 | `useUpdatePlatformResourceInstallationMutation` | Mutation | Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback |
 | `useDeletePlatformResourceInstallationMutation` | Mutation | Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback |
 | `usePlatformResourceObservedStoragesQuery` | Query | List all platformResourceObservedStorages |
-| `useCreatePlatformResourceObservedStorageMutation` | Mutation | Create a platformResourceObservedStorage |
 | `usePlatformResourceStatusChecksQuery` | Query | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `usePlatformResourceStatusCheckQuery` | Query | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useCreatePlatformResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
@@ -460,16 +442,17 @@ function App() {
 | `useUpdatePlatformResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useDeletePlatformResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `usePlatformResourceUtilizationsQuery` | Query | List all platformResourceUtilizations |
-| `useCreatePlatformResourceUtilizationMutation` | Mutation | Create a platformResourceUtilization |
 | `usePlatformResourcesHealthsQuery` | Query | List all platformResourcesHealths |
 | `usePlatformResourcesHealthQuery` | Query | Get one platformResourcesHealth |
-| `useCreatePlatformResourcesHealthMutation` | Mutation | Create a platformResourcesHealth |
 | `useUpdatePlatformResourcesHealthMutation` | Mutation | Update a platformResourcesHealth |
 | `useDeletePlatformResourcesHealthMutation` | Mutation | Delete a platformResourcesHealth |
 | `usePlatformResourcesRequirementsStatesQuery` | Query | List all platformResourcesRequirementsStates |
-| `useCreatePlatformResourcesRequirementsStateMutation` | Mutation | Create a platformResourcesRequirementsState |
 | `usePlatformResourcesResolvedRequirementsQuery` | Query | List all platformResourcesResolvedRequirements |
-| `useCreatePlatformResourcesResolvedRequirementMutation` | Mutation | Create a platformResourcesResolvedRequirement |
+| `usePlatformServiceBindingsQuery` | Query | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `usePlatformServiceBindingQuery` | Query | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useCreatePlatformServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useUpdatePlatformServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useDeletePlatformServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
 | `usePlatformWebhookEndpointsQuery` | Query | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
 | `usePlatformWebhookEndpointQuery` | Query | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
 | `useCreatePlatformWebhookEndpointMutation` | Mutation | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
@@ -551,7 +534,6 @@ function App() {
 | `useUpdateResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useDeleteResourceMutation` | Mutation | Unified K8s resource declarations — stores desired state (spec) and observed state (status) for all resource kinds within a namespace |
 | `useResourceDeclaredCapacitiesQuery` | Query | List all resourceDeclaredCapacities |
-| `useCreateResourceDeclaredCapacityMutation` | Mutation | Create a resourceDeclaredCapacity |
 | `useResourceDefinitionsQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useResourceDefinitionQuery` | Query | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
 | `useCreateResourceDefinitionMutation` | Mutation | Resource definitions — templates for resource kinds declaring default spec and secret/config requirements |
@@ -568,7 +550,6 @@ function App() {
 | `useUpdateResourceInstallationMutation` | Mutation | Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback |
 | `useDeleteResourceInstallationMutation` | Mutation | Installed resource bundle ("release") — groups a set of resources; params are merkle-versioned in the scope's shared infra store for rollback |
 | `useResourceObservedStoragesQuery` | Query | List all resourceObservedStorages |
-| `useCreateResourceObservedStorageMutation` | Mutation | Create a resourceObservedStorage |
 | `useResourceStatusChecksQuery` | Query | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useResourceStatusCheckQuery` | Query | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
 | `useCreateResourceStatusCheckMutation` | Mutation | On-demand resource status checks — diagnostic snapshots from the runtime (K8s status, conditions, log tails) |
@@ -585,16 +566,17 @@ function App() {
 | `useUpdateResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useDeleteResourceUsageSummaryMutation` | Mutation | Resource usage summaries — runtime seconds, GB-seconds, and max gauges per (resource, namespace, day); resource_id-NULL rows are namespace-grain totals |
 | `useResourceUtilizationsQuery` | Query | List all resourceUtilizations |
-| `useCreateResourceUtilizationMutation` | Mutation | Create a resourceUtilization |
 | `useResourcesHealthsQuery` | Query | List all resourcesHealths |
 | `useResourcesHealthQuery` | Query | Get one resourcesHealth |
-| `useCreateResourcesHealthMutation` | Mutation | Create a resourcesHealth |
 | `useUpdateResourcesHealthMutation` | Mutation | Update a resourcesHealth |
 | `useDeleteResourcesHealthMutation` | Mutation | Delete a resourcesHealth |
 | `useResourcesRequirementsStatesQuery` | Query | List all resourcesRequirementsStates |
-| `useCreateResourcesRequirementsStateMutation` | Mutation | Create a resourcesRequirementsState |
 | `useResourcesResolvedRequirementsQuery` | Query | List all resourcesResolvedRequirements |
-| `useCreateResourcesResolvedRequirementMutation` | Mutation | Create a resourcesResolvedRequirement |
+| `useServiceBindingsQuery` | Query | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useServiceBindingQuery` | Query | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useCreateServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useUpdateServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
+| `useDeleteServiceBindingMutation` | Mutation | Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config |
 | `useWebhookEndpointsQuery` | Query | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
 | `useWebhookEndpointQuery` | Query | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
 | `useCreateWebhookEndpointMutation` | Mutation | Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window |
@@ -613,6 +595,7 @@ function App() {
 | `useAddNodeAndSaveMutation` | Mutation | addNodeAndSave |
 | `useApproveNodeMutation` | Mutation | approveNode |
 | `useCopyGraphMutation` | Mutation | copyGraph |
+| `useCreateFunctionGraphMutation` | Mutation | createFunctionGraph |
 | `useDatabaseAddEdgeMutation` | Mutation | databaseAddEdge |
 | `useDatabaseAddEdgeAndSaveMutation` | Mutation | databaseAddEdgeAndSave |
 | `useDatabaseAddNodeMutation` | Mutation | databaseAddNode |
@@ -719,27 +702,6 @@ const { mutate: create } = useCreateBuildStepMutation({
 create({ buildId: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' });
 ```
 
-### BuilderBinding
-
-```typescript
-// List all builderBindings
-const { data, isLoading } = useBuilderBindingsQuery({
-  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
-});
-
-// Get one builderBinding
-const { data: item } = useBuilderBindingQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
-});
-
-// Create a builderBinding
-const { mutate: create } = useCreateBuilderBindingMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
-```
-
 ### ContentPreset
 
 ```typescript
@@ -775,11 +737,6 @@ const { data: item } = useDatabaseFunctionGraphQuery({
   selection: { fields: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } },
 });
 
-// Create a databaseFunctionGraph
-const { mutate: create } = useCreateDatabaseFunctionGraphMutation({
-  selection: { fields: { id: true } },
-});
-create({ context: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', storeId: '<UUID>', validationErrors: '<JSON>' });
 ```
 
 ### DatabaseFunctionGraphExecutionCancelRequest
@@ -895,11 +852,6 @@ const { data, isLoading } = useDatabaseGraphGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a databaseGraphGetAllTreeNodesRecord
-const { mutate: create } = useCreateDatabaseGraphGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### DatabaseGraphObject
@@ -1147,11 +1099,6 @@ const { data: item } = useFunctionGraphQuery({
   selection: { fields: { context: true, createdAt: true, createdBy: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, scopeId: true, storeId: true, updatedAt: true, validationErrors: true } },
 });
 
-// Create a functionGraph
-const { mutate: create } = useCreateFunctionGraphMutation({
-  selection: { fields: { id: true } },
-});
-create({ context: '<String>', createdBy: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', validationErrors: '<JSON>' });
 ```
 
 ### FunctionGraphExecutionCancelRequest
@@ -1372,11 +1319,6 @@ const { data, isLoading } = useGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a getAllTreeNodesRecord
-const { mutate: create } = useCreateGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### Image
@@ -1450,11 +1392,6 @@ const { data, isLoading } = useInfraGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a infraGetAllTreeNodesRecord
-const { mutate: create } = useCreateInfraGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### InfraObject
@@ -1623,27 +1560,6 @@ const { mutate: create } = useCreatePlatformBuildStepMutation({
   selection: { fields: { id: true } },
 });
 create({ buildId: '<UUID>', createdByPrincipal: '<UUID>', exitCode: '<Int>', finishedAt: '<Datetime>', kind: '<String>', logBytes: '<BigInt>', logOffset: '<BigInt>', name: '<String>', parentSeq: '<Int>', recordedAt: '<Datetime>', seq: '<Int>', startedAt: '<Datetime>', status: '<String>', summary: '<JSON>' });
-```
-
-### PlatformBuilderBinding
-
-```typescript
-// List all platformBuilderBindings
-const { data, isLoading } = usePlatformBuilderBindingsQuery({
-  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
-});
-
-// Get one platformBuilderBinding
-const { data: item } = usePlatformBuilderBindingQuery({
-  id: '<UUID>',
-  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
-});
-
-// Create a platformBuilderBinding
-const { mutate: create } = useCreatePlatformBuilderBindingMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformFunctionApiBinding
@@ -1906,11 +1822,6 @@ const { data, isLoading } = usePlatformInfraGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a platformInfraGetAllTreeNodesRecord
-const { mutate: create } = useCreatePlatformInfraGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### PlatformInfraObject
@@ -2362,11 +2273,6 @@ const { data, isLoading } = usePlatformResourceDeclaredCapacitiesQuery({
   selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } },
 });
 
-// Create a platformResourceDeclaredCapacity
-const { mutate: create } = useCreatePlatformResourceDeclaredCapacityMutation({
-  selection: { fields: { id: true } },
-});
-create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' });
 ```
 
 ### PlatformResourceDefinition
@@ -2440,11 +2346,6 @@ const { data, isLoading } = usePlatformResourceObservedStoragesQuery({
   selection: { fields: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } },
 });
 
-// Create a platformResourceObservedStorage
-const { mutate: create } = useCreatePlatformResourceObservedStorageMutation({
-  selection: { fields: { id: true } },
-});
-create({ capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' });
 ```
 
 ### PlatformResourceStatusCheck
@@ -2518,11 +2419,6 @@ const { data, isLoading } = usePlatformResourceUtilizationsQuery({
   selection: { fields: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } },
 });
 
-// Create a platformResourceUtilization
-const { mutate: create } = useCreatePlatformResourceUtilizationMutation({
-  selection: { fields: { id: true } },
-});
-create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });
 ```
 
 ### PlatformResourcesHealth
@@ -2539,11 +2435,6 @@ const { data: item } = usePlatformResourcesHealthQuery({
   selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
-// Create a platformResourcesHealth
-const { mutate: create } = useCreatePlatformResourcesHealthMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformResourcesRequirementsState
@@ -2554,11 +2445,6 @@ const { data, isLoading } = usePlatformResourcesRequirementsStatesQuery({
   selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } },
 });
 
-// Create a platformResourcesRequirementsState
-const { mutate: create } = useCreatePlatformResourcesRequirementsStateMutation({
-  selection: { fields: { id: true } },
-});
-create({ configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' });
 ```
 
 ### PlatformResourcesResolvedRequirement
@@ -2569,11 +2455,27 @@ const { data, isLoading } = usePlatformResourcesResolvedRequirementsQuery({
   selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
 });
 
-// Create a platformResourcesResolvedRequirement
-const { mutate: create } = useCreatePlatformResourcesResolvedRequirementMutation({
+```
+
+### PlatformServiceBinding
+
+```typescript
+// List all platformServiceBindings
+const { data, isLoading } = usePlatformServiceBindingsQuery({
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one platformServiceBinding
+const { data: item } = usePlatformServiceBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a platformServiceBinding
+const { mutate: create } = useCreatePlatformServiceBindingMutation({
   selection: { fields: { id: true } },
 });
-create({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformWebhookEndpoint
@@ -2920,11 +2822,6 @@ const { data, isLoading } = useResourceDeclaredCapacitiesQuery({
   selection: { fields: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } },
 });
 
-// Create a resourceDeclaredCapacity
-const { mutate: create } = useCreateResourceDeclaredCapacityMutation({
-  selection: { fields: { id: true } },
-});
-create({ cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' });
 ```
 
 ### ResourceDefinition
@@ -2998,11 +2895,6 @@ const { data, isLoading } = useResourceObservedStoragesQuery({
   selection: { fields: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } },
 });
 
-// Create a resourceObservedStorage
-const { mutate: create } = useCreateResourceObservedStorageMutation({
-  selection: { fields: { id: true } },
-});
-create({ capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' });
 ```
 
 ### ResourceStatusCheck
@@ -3076,11 +2968,6 @@ const { data, isLoading } = useResourceUtilizationsQuery({
   selection: { fields: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } },
 });
 
-// Create a resourceUtilization
-const { mutate: create } = useCreateResourceUtilizationMutation({
-  selection: { fields: { id: true } },
-});
-create({ avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' });
 ```
 
 ### ResourcesHealth
@@ -3097,11 +2984,6 @@ const { data: item } = useResourcesHealthQuery({
   selection: { fields: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 
-// Create a resourcesHealth
-const { mutate: create } = useCreateResourcesHealthMutation({
-  selection: { fields: { id: true } },
-});
-create({ annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### ResourcesRequirementsState
@@ -3112,11 +2994,6 @@ const { data, isLoading } = useResourcesRequirementsStatesQuery({
   selection: { fields: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } },
 });
 
-// Create a resourcesRequirementsState
-const { mutate: create } = useCreateResourcesRequirementsStateMutation({
-  selection: { fields: { id: true } },
-});
-create({ configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' });
 ```
 
 ### ResourcesResolvedRequirement
@@ -3127,11 +3004,27 @@ const { data, isLoading } = useResourcesResolvedRequirementsQuery({
   selection: { fields: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } },
 });
 
-// Create a resourcesResolvedRequirement
-const { mutate: create } = useCreateResourcesResolvedRequirementMutation({
+```
+
+### ServiceBinding
+
+```typescript
+// List all serviceBindings
+const { data, isLoading } = useServiceBindingsQuery({
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Get one serviceBinding
+const { data: item } = useServiceBindingQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+});
+
+// Create a serviceBinding
+const { mutate: create } = useCreateServiceBindingMutation({
   selection: { fields: { id: true } },
 });
-create({ atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' });
+create({ createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### WebhookEndpoint
@@ -3265,6 +3158,17 @@ copyGraph
   | Argument | Type |
   |----------|------|
   | `input` | CopyGraphInput (required) |
+
+### `useCreateFunctionGraphMutation`
+
+createFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateFunctionGraphInput (required) |
 
 ### `useDatabaseAddEdgeMutation`
 

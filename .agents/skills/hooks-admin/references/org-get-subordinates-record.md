@@ -8,7 +8,6 @@ React Query hooks for OrgGetSubordinatesRecord data operations
 
 ```typescript
 useOrgGetSubordinatesQuery({ selection: { fields: { depth: true, userId: true } } })
-useCreateOrgGetSubordinatesRecordMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateOrgGetSubordinatesRecordMutation({ selection: { fields: { id: true } } 
 const { data, isLoading } = useOrgGetSubordinatesQuery({
   selection: { fields: { depth: true, userId: true } },
 });
-```
-
-### Create a orgGetSubordinatesRecord
-
-```typescript
-const { mutate } = useCreateOrgGetSubordinatesRecordMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ depth: '<Int>', userId: '<UUID>' });
 ```

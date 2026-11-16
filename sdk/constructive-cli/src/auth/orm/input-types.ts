@@ -1678,15 +1678,6 @@ export interface DeleteEmailInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateIdentityProviderInput {
-  clientMutationId?: string;
-  identityProvider: {
-    displayName?: string;
-    enabled?: boolean;
-    kind?: string;
-    slug?: string;
-  };
-}
 export interface IdentityProviderPatch {
   displayName?: string | null;
   enabled?: boolean | null;
@@ -1701,20 +1692,6 @@ export interface UpdateIdentityProviderInput {
 export interface DeleteIdentityProviderInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateOrgApiKeyListInput {
-  clientMutationId?: string;
-  orgApiKeyList: {
-    accessLevel?: string;
-    expiresAt?: string;
-    keyId: string;
-    lastUsedAt?: string;
-    mfaLevel?: string;
-    name?: string;
-    orgId: string;
-    principalId: string;
-    revokedAt?: string;
-  };
 }
 export interface OrgApiKeyListPatch {
   accessLevel?: string | null;
@@ -1764,22 +1741,6 @@ export interface DeletePhoneNumberInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePrincipalInput {
-  clientMutationId?: string;
-  principal: {
-    apiKeyMaxDuration?: string;
-    bypassStepUp?: boolean;
-    createdBySessionId: string;
-    depth?: number;
-    expiresAt?: string;
-    isReadOnly?: boolean;
-    name?: string;
-    ownerId: string;
-    parentPrincipalId: string;
-    useAdminOwner?: boolean;
-    userId: string;
-  };
-}
 export interface PrincipalPatch {
   apiKeyMaxDuration?: string | null;
   bypassStepUp?: boolean | null;
@@ -1802,14 +1763,6 @@ export interface DeletePrincipalInput {
   clientMutationId?: string;
   principalId: string;
 }
-export interface CreatePrincipalEntityInput {
-  clientMutationId?: string;
-  principalEntity: {
-    entityId: string;
-    ownerId: string;
-    principalId: string;
-  };
-}
 export interface PrincipalEntityPatch {
   entityId?: string | null;
   ownerId?: string | null;
@@ -1823,17 +1776,6 @@ export interface UpdatePrincipalEntityInput {
 export interface DeletePrincipalEntityInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreatePrincipalScopeOverrideInput {
-  clientMutationId?: string;
-  principalScopeOverride: {
-    allowedMask?: string;
-    isActive?: boolean;
-    isReadOnly?: boolean;
-    membershipType?: number;
-    principalId: string;
-    useAdminOwner?: boolean;
-  };
 }
 export interface PrincipalScopeOverridePatch {
   allowedMask?: string | null;
@@ -1870,16 +1812,6 @@ export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
 }
-export interface CreateUserConnectedAccountInput {
-  clientMutationId?: string;
-  userConnectedAccount: {
-    details?: Record<string, unknown>;
-    identifier?: string;
-    isVerified?: boolean;
-    ownerId: string;
-    service?: string;
-  };
-}
 export interface UserConnectedAccountPatch {
   details?: Record<string, unknown> | null;
   identifier?: string | null;
@@ -1908,7 +1840,6 @@ export interface CreateUserInput {
 export interface UserPatch {
   displayName?: string | null;
   profilePicture?: ConstructiveInternalTypeImage | null;
-  profilePictureUpload?: File | null;
   type?: number | null;
   username?: string | null;
 }
@@ -2088,6 +2019,14 @@ export interface CreateOrgPrincipalInput {
   orgId?: string;
   useAdminOwner?: boolean;
 }
+export interface CreatePrincipalInput {
+  bypassStepUp?: boolean;
+  clientMutationId?: string;
+  entityIds?: string[];
+  isReadOnly?: boolean;
+  name?: string;
+  useAdminOwner?: boolean;
+}
 export interface CreatePrincipalFromPresetInput {
   clientMutationId?: string;
   entityIds?: string[];
@@ -2122,6 +2061,16 @@ export interface EnableSmsMfaInput {
 export interface EnableTotpInput {
   clientMutationId?: string;
 }
+export interface EnsureAuthCsrfInput {
+  clientMutationId?: string;
+  existingToken?: string;
+}
+export interface ExchangeNativeHandoffInput {
+  clientMutationId?: string;
+  code?: string;
+  codeVerifier?: string;
+  credentialKind?: string;
+}
 export interface ExtendTokenExpiresInput {
   amount?: IntervalInput;
   clientMutationId?: string;
@@ -2135,7 +2084,7 @@ export interface GenerateBackupCodesInput {
 }
 export interface LinkIdentityInput {
   clientMutationId?: string;
-  ticket: string;
+  ticket?: string;
 }
 export interface MintAccessTokenInput {
   accessTtl?: IntervalInput;
@@ -2163,9 +2112,17 @@ export interface RequestCrossOriginTokenInput {
   password?: string;
   rememberMe?: boolean;
 }
+export interface RequestDeviceApprovalInput {
+  clientMutationId?: string;
+  deviceToken?: string;
+  next?: string;
+  userId?: string;
+}
 export interface RequestMagicLinkInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   email?: string;
+  nativeRedirectUri?: string;
   next?: string;
 }
 export interface ResetPasswordInput {
@@ -2216,6 +2173,7 @@ export interface SetPasswordInput {
   clientMutationId?: string;
   currentPassword?: string;
   newPassword?: string;
+  signOutOtherSessions?: boolean;
 }
 export interface SetPrincipalEntitiesInput {
   clientMutationId?: string;
@@ -2290,6 +2248,7 @@ export interface SignUpSmsInput {
 export interface VerifyEmailInput {
   clientMutationId?: string;
   emailId?: string;
+  password?: string;
   token?: string;
 }
 export interface VerifyPasswordInput {
@@ -3644,6 +3603,46 @@ export type GetMfaStatusRecordSelect = {
   smsMfaEnabled?: boolean;
   totpEnabled?: boolean;
 };
+export interface SignInOptionsRecord {
+  allowAnonymousSessions?: boolean | null;
+  allowEmailOtpSignIn?: boolean | null;
+  allowIdentitySignIn?: boolean | null;
+  allowIdentitySignUp?: boolean | null;
+  allowMagicLinkSignIn?: boolean | null;
+  allowMagicLinkSignUp?: boolean | null;
+  allowPasswordSignIn?: boolean | null;
+  allowPasswordSignUp?: boolean | null;
+  allowSignUp?: boolean | null;
+  allowSmsSignIn?: boolean | null;
+  allowSmsSignUp?: boolean | null;
+  allowWebauthnSignIn?: boolean | null;
+  allowWebauthnSignUp?: boolean | null;
+  allowWebauthnUsernameless?: boolean | null;
+  enableCaptcha?: boolean | null;
+  identityProviders?: Record<string, unknown> | null;
+  requireMfa?: boolean | null;
+  signUpRequiresInvite?: boolean | null;
+}
+export type SignInOptionsRecordSelect = {
+  allowAnonymousSessions?: boolean;
+  allowEmailOtpSignIn?: boolean;
+  allowIdentitySignIn?: boolean;
+  allowIdentitySignUp?: boolean;
+  allowMagicLinkSignIn?: boolean;
+  allowMagicLinkSignUp?: boolean;
+  allowPasswordSignIn?: boolean;
+  allowPasswordSignUp?: boolean;
+  allowSignUp?: boolean;
+  allowSmsSignIn?: boolean;
+  allowSmsSignUp?: boolean;
+  allowWebauthnSignIn?: boolean;
+  allowWebauthnSignUp?: boolean;
+  allowWebauthnUsernameless?: boolean;
+  enableCaptcha?: boolean;
+  identityProviders?: boolean;
+  requireMfa?: boolean;
+  signUpRequiresInvite?: boolean;
+};
 export interface ApproveDevicePayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -3717,6 +3716,14 @@ export interface CreateOrgPrincipalPayload {
   result?: string | null;
 }
 export type CreateOrgPrincipalPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CreatePrincipalPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreatePrincipalPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -3800,6 +3807,24 @@ export type EnableTotpPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface EnsureAuthCsrfPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type EnsureAuthCsrfPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface ExchangeNativeHandoffPayload {
+  clientMutationId?: string | null;
+  result?: ExchangeNativeHandoffRecord | null;
+}
+export type ExchangeNativeHandoffPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: ExchangeNativeHandoffRecordSelect;
+  };
+};
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
   result?: ExtendTokenExpiresRecord[] | null;
@@ -3872,6 +3897,14 @@ export interface RequestCrossOriginTokenPayload {
   result?: string | null;
 }
 export type RequestCrossOriginTokenPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RequestDeviceApprovalPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RequestDeviceApprovalPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -4285,14 +4318,6 @@ export type DeletePhoneNumberPayloadSelect = {
     select: PhoneNumberEdgeSelect;
   };
 };
-export interface CreatePrincipalPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type CreatePrincipalPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
@@ -4556,6 +4581,22 @@ export type CreateOrgApiKeyRecordSelect = {
   expiresAt?: boolean;
   keyId?: boolean;
 };
+export interface ExchangeNativeHandoffRecord {
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  id?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  userId?: string | null;
+}
+export type ExchangeNativeHandoffRecordSelect = {
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+  id?: boolean;
+  isVerified?: boolean;
+  totpEnabled?: boolean;
+  userId?: boolean;
+};
 export interface ExtendTokenExpiresRecord {
   expiresAt?: string | null;
   id?: string | null;
@@ -4643,18 +4684,22 @@ export type SignInCrossOriginRecordSelect = {
 export interface SignInMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
   deviceApprovalRequired?: boolean | null;
   mfaChallengeToken?: string | null;
   mfaRequired?: boolean | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
 export type SignInMagicLinkRecordSelect = {
   accessToken?: boolean;
   accessTokenExpiresAt?: boolean;
+  codeChallenge?: boolean;
   deviceApprovalRequired?: boolean;
   mfaChallengeToken?: boolean;
   mfaRequired?: boolean;
+  nativeRedirectUri?: boolean;
   outDeviceToken?: boolean;
   userId?: boolean;
 };
@@ -4679,12 +4724,16 @@ export type SignInSmsOtpRecordSelect = {
 export interface SignUpMagicLinkRecord {
   accessToken?: string | null;
   accessTokenExpiresAt?: string | null;
+  codeChallenge?: string | null;
+  nativeRedirectUri?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
 }
 export type SignUpMagicLinkRecordSelect = {
   accessToken?: boolean;
   accessTokenExpiresAt?: boolean;
+  codeChallenge?: boolean;
+  nativeRedirectUri?: boolean;
   outDeviceToken?: boolean;
   userId?: boolean;
 };

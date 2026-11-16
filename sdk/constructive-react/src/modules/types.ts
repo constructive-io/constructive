@@ -226,6 +226,7 @@ export interface BlueprintConstruction {
   constructedDefinition: unknown | null;
   createdAt: string | null;
   databaseId: string | null;
+  error: unknown | null;
   id: string | null;
   schemaId: string | null;
   status: string | null;
@@ -562,6 +563,8 @@ export interface DbUsageModule {
   queryStatsLogTableName: string | null;
   queryStatsSummaryTableId: string | null;
   queryStatsSummaryTableName: string | null;
+  readDbQueryStatsUsagePeriodFunction: string | null;
+  readDbTableStatsUsagePeriodFunction: string | null;
   retention: string | null;
   rollupDbQueryStatsUsageSummaryFunction: string | null;
   rollupDbTableStatsUsageSummaryFunction: string | null;
@@ -604,6 +607,7 @@ export interface DomainModule {
   catalogModuleId: string | null;
   databaseId: string | null;
   defaultCapabilities: string[] | null;
+  defaultReservedSubdomains: unknown | null;
   domainEventsTableId: string | null;
   domainEventsTableName: string | null;
   domainVerificationsTableId: string | null;
@@ -622,8 +626,11 @@ export interface DomainModule {
   privateSchemaName: string | null;
   provisions: unknown | null;
   publicSchemaName: string | null;
+  reservedSubdomainsTableId: string | null;
+  reservedSubdomainsTableName: string | null;
   schemaId: string | null;
   scope: string | null;
+  sweepUnverifiedDomainsFunction: string | null;
 }
 export interface EmailSenderModule {
   apiName: string | null;
@@ -1551,8 +1558,6 @@ export interface RepositoryModule {
 }
 export interface ResourceModule {
   apiName: string | null;
-  builderBindingsTableId: string | null;
-  builderBindingsTableName: string | null;
   databaseId: string | null;
   defaultCapabilities: string[] | null;
   entityField: string | null;
@@ -1590,6 +1595,8 @@ export interface ResourceModule {
   rollupResourceUsageSummaryFunction: string | null;
   schemaId: string | null;
   scope: string | null;
+  serviceBindingsTableId: string | null;
+  serviceBindingsTableName: string | null;
 }
 export interface RlsModule {
   apiName: string | null;
@@ -1730,6 +1737,7 @@ export interface StorageLogModule {
   privateSchemaId: string | null;
   privateSchemaName: string | null;
   publicSchemaName: string | null;
+  readStorageUsagePeriodFunction: string | null;
   retention: string | null;
   rollupFunctionName: string | null;
   schemaId: string | null;
@@ -1758,7 +1766,6 @@ export interface StorageModule {
   filesTableId: string | null;
   filesTableName: string | null;
   hasAuditLog: boolean | null;
-  hasConfirmUpload: boolean | null;
   hasContentHash: boolean | null;
   hasCustomKeys: boolean | null;
   hasPathShares: boolean | null;

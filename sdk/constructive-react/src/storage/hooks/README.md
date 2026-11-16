@@ -39,7 +39,6 @@ function App() {
 | `useDeleteBucketMutation` | Mutation | Logical storage containers that group files with shared access policies and CDN behavior |
 | `useFilesQuery` | Query | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useFileQuery` | Query | Individual file records within buckets, with immutable identity fields and mutable metadata |
-| `useCreateFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useUpdateFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useDeleteFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `usePlatformBucketsQuery` | Query | Logical storage containers that group files with shared access policies and CDN behavior |
@@ -49,7 +48,6 @@ function App() {
 | `useDeletePlatformBucketMutation` | Mutation | Logical storage containers that group files with shared access policies and CDN behavior |
 | `usePlatformFilesQuery` | Query | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `usePlatformFileQuery` | Query | Individual file records within buckets, with immutable identity fields and mutable metadata |
-| `useCreatePlatformFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useUpdatePlatformFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useDeletePlatformFileMutation` | Mutation | Individual file records within buckets, with immutable identity fields and mutable metadata |
 | `useFilesRenameMutation` | Mutation | filesRename |
@@ -93,20 +91,15 @@ create({ actorId: '<UUID>', allowCustomKeys: '<Boolean>', allowedMimeTypes: '<St
 ```typescript
 // List all files
 const { data, isLoading } = useFilesQuery({
-  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
+  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
 });
 
 // Get one file
 const { data: item } = useFileQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
+  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, databaseId: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
 });
 
-// Create a file
-const { mutate: create } = useCreateFileMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', bucketId: '<UUID>', contentHash: '<String>', databaseId: '<UUID>', description: '<String>', downloadUrl: '<String>', expiryEnqueuedAt: '<Datetime>', filePath: '<String>', filename: '<String>', isPublic: '<Boolean>', key: '<String>', mimeType: '<String>', promotedAt: '<Datetime>', size: '<BigInt>', status: '<FileStatus>', tags: '<String>', upload: '<Upload>' });
 ```
 
 ### PlatformBucket
@@ -135,20 +128,15 @@ create({ actorId: '<UUID>', allowCustomKeys: '<Boolean>', allowedMimeTypes: '<St
 ```typescript
 // List all platformFiles
 const { data, isLoading } = usePlatformFilesQuery({
-  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
+  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
 });
 
 // Get one platformFile
 const { data: item } = usePlatformFileQuery({
   id: '<UUID>',
-  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
+  selection: { fields: { actorId: true, bucketId: true, contentHash: true, createdAt: true, description: true, downloadUrl: true, expiryEnqueuedAt: true, filePath: true, filename: true, id: true, isPublic: true, key: true, mimeType: true, promotedAt: true, rejectionReason: true, size: true, status: true, tags: true, updatedAt: true, upload: true } },
 });
 
-// Create a platformFile
-const { mutate: create } = useCreatePlatformFileMutation({
-  selection: { fields: { id: true } },
-});
-create({ actorId: '<UUID>', bucketId: '<UUID>', contentHash: '<String>', description: '<String>', downloadUrl: '<String>', expiryEnqueuedAt: '<Datetime>', filePath: '<String>', filename: '<String>', isPublic: '<Boolean>', key: '<String>', mimeType: '<String>', promotedAt: '<Datetime>', size: '<BigInt>', status: '<FileStatus>', tags: '<String>', upload: '<Upload>' });
 ```
 
 ## Custom Operation Hooks

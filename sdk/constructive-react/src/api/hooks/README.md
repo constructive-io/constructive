@@ -49,7 +49,6 @@ function App() {
 | `useDeleteApiSettingMutation` | Mutation | Per-API feature flag overrides; NULL columns inherit from database_settings |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
-| `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
 | `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
 | `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
 | `useCheckConstraintsQuery` | Query | List all checkConstraints |
@@ -173,7 +172,6 @@ function App() {
 | `useUpdateFunctionMutation` | Mutation | Update a function |
 | `useDeleteFunctionMutation` | Mutation | Delete a function |
 | `useGetSitePreviewsQuery` | Query | List all getSitePreviews |
-| `useCreateGetSitePreviewsRecordMutation` | Mutation | Create a getSitePreviewsRecord |
 | `useIdentityProviderRegistriesQuery` | Query | List all identityProviderRegistries |
 | `useIdentityProviderRegistryQuery` | Query | Get one identityProviderRegistry |
 | `useCreateIdentityProviderRegistryMutation` | Mutation | Create a identityProviderRegistry |
@@ -186,7 +184,6 @@ function App() {
 | `useDeleteIndexMutation` | Mutation | Delete a index |
 | `useListSuspendedDatabasesQuery` | Query | List all listSuspendedDatabases |
 | `useListSuspendedDatabasesRecordQuery` | Query | Get one listSuspendedDatabasesRecord |
-| `useCreateListSuspendedDatabasesRecordMutation` | Mutation | Create a listSuspendedDatabasesRecord |
 | `useUpdateListSuspendedDatabasesRecordMutation` | Mutation | Update a listSuspendedDatabasesRecord |
 | `useDeleteListSuspendedDatabasesRecordMutation` | Mutation | Delete a listSuspendedDatabasesRecord |
 | `useManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
@@ -260,7 +257,6 @@ function App() {
 | `useUpdatePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `useDeletePlatformEmailSiteIdentityMutation` | Mutation | Binds a site to the identity it sends as. Unique on site_id: one identity per site, but many sites may share an identity. |
 | `usePlatformGetSitePreviewsQuery` | Query | List all platformGetSitePreviews |
-| `useCreatePlatformGetSitePreviewsRecordMutation` | Mutation | Create a platformGetSitePreviewsRecord |
 | `usePlatformManagedDomainsQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `usePlatformManagedDomainQuery` | Query | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
 | `useCreatePlatformManagedDomainMutation` | Mutation | Platform-operated hostnames whose DNS and certificate lifecycle the platform drives |
@@ -271,6 +267,11 @@ function App() {
 | `useCreatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useUpdatePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
 | `useDeletePlatformPageMutation` | Mutation | Site-owned page content — merkle-versioned head over the infra store; never a routing surface |
+| `usePlatformReservedSubdomainsQuery` | Query | Subdomain labels no tenant may claim under a platform apex |
+| `usePlatformReservedSubdomainQuery` | Query | Subdomain labels no tenant may claim under a platform apex |
+| `useCreatePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
+| `useUpdatePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
+| `useDeletePlatformReservedSubdomainMutation` | Mutation | Subdomain labels no tenant may claim under a platform apex |
 | `usePlatformSiteAppLinksQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `usePlatformSiteAppLinkQuery` | Query | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
 | `useCreatePlatformSiteAppLinkMutation` | Mutation | Per-host native-app association for a site surface: which app-owned store identity this host serves, and the path patterns it claims (joined with the store identity to render AASA / assetlinks.json) |
@@ -408,7 +409,6 @@ function App() {
 | `useDeleteSpatialRelationMutation` | Mutation | Delete a spatialRelation |
 | `useSqlActionsQuery` | Query | List all sqlActions |
 | `useSqlActionQuery` | Query | Get one sqlAction |
-| `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
 | `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
 | `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
 | `useTableBehaviorsQuery` | Query | List all tableBehaviors |
@@ -476,7 +476,6 @@ function App() {
 | `useCreateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useUpdateWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
 | `useDeleteWebauthnSettingMutation` | Mutation | WebAuthn/passkey runtime configuration; relying party options and typed references to the credential/session storage |
-| `useApiSchemaNamesQuery` | Query | apiSchemaNames |
 | `useApplyRegistryDefaultsQuery` | Query | applyRegistryDefaults |
 | `useEmailSharedAccountQuery` | Query | emailSharedAccount |
 | `useGetSitePreviewCommitQuery` | Query | getSitePreviewCommit |
@@ -488,9 +487,6 @@ function App() {
 | `usePlatformSitesDeepLinkUrlQuery` | Query | platformSitesDeepLinkUrl |
 | `usePlatformSitesSiteOriginQuery` | Query | platformSitesSiteOrigin |
 | `usePlatformVerifySitePreviewTokenQuery` | Query | platformVerifySitePreviewToken |
-| `useResolveDeepLinkQuery` | Query | resolveDeepLink |
-| `useResolveRouteQuery` | Query | resolveRoute |
-| `useResolveSiteAppLinksQuery` | Query | resolveSiteAppLinks |
 | `useSitesDeepLinkUrlQuery` | Query | sitesDeepLinkUrl |
 | `useSitesSiteOriginQuery` | Query | sitesSiteOrigin |
 | `useVerifySitePreviewTokenQuery` | Query | verifySitePreviewToken |
@@ -545,20 +541,20 @@ Example usage:
 ```typescript
 // List all apis
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, serviceHostname: true, updatedAt: true } },
 });
 
 // Get one api
 const { data: item } = useApiQuery({
   id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, databaseId: true, id: true, isPublished: true, name: true, roleName: true, serviceHostname: true, updatedAt: true } },
 });
 
 // Create a api
 const { mutate: create } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+create({ anonRole: '<String>', config: '<JSON>', databaseId: '<UUID>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>', serviceHostname: '<String>' });
 ```
 
 ### ApiSchema
@@ -587,20 +583,20 @@ create({ apiId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>' });
 ```typescript
 // List all apiSettings
 const { data, isLoading } = useApiSettingsQuery({
-  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one apiSetting
 const { data: item } = useApiSettingQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, databaseId: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a apiSetting
 const { mutate: create } = useCreateApiSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
+create({ apiId: '<UUID>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
 ```
 
 ### AstMigration
@@ -617,11 +613,6 @@ const { data: item } = useAstMigrationQuery({
   selection: { fields: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } },
 });
 
-// Create a astMigration
-const { mutate: create } = useCreateAstMigrationMutation({
-  selection: { fields: { id: true } },
-});
-create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' });
 ```
 
 ### CheckConstraint
@@ -713,20 +704,20 @@ create({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>',
 ```typescript
 // List all databaseSettings
 const { data, isLoading } = useDatabaseSettingsQuery({
-  selection: { fields: { annotations: true, createdAt: true, creditsPerCent: true, databaseId: true, enableAggregates: true, enableBilling: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, labels: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, creditsPerCent: true, databaseId: true, enableAggregates: true, enableBilling: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, labels: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one databaseSetting
 const { data: item } = useDatabaseSettingQuery({
   id: '<UUID>',
-  selection: { fields: { annotations: true, createdAt: true, creditsPerCent: true, databaseId: true, enableAggregates: true, enableBilling: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, labels: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { annotations: true, createdAt: true, creditsPerCent: true, databaseId: true, enableAggregates: true, enableBilling: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, labels: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a databaseSetting
 const { mutate: create } = useCreateDatabaseSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ annotations: '<JSON>', creditsPerCent: '<Int>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBilling: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', labels: '<JSON>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
+create({ annotations: '<JSON>', creditsPerCent: '<Int>', databaseId: '<UUID>', enableAggregates: '<Boolean>', enableBilling: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', labels: '<JSON>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
 ```
 
 ### DatabaseTransfer
@@ -1136,11 +1127,6 @@ const { data, isLoading } = useGetSitePreviewsQuery({
   selection: { fields: { commitId: true, name: true } },
 });
 
-// Create a getSitePreviewsRecord
-const { mutate: create } = useCreateGetSitePreviewsRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ commitId: '<UUID>', name: '<String>' });
 ```
 
 ### IdentityProviderRegistry
@@ -1199,11 +1185,6 @@ const { data: item } = useListSuspendedDatabasesRecordQuery({
   selection: { fields: { id: true, name: true, ownerId: true, suspendedAt: true, suspendedReason: true } },
 });
 
-// Create a listSuspendedDatabasesRecord
-const { mutate: create } = useCreateListSuspendedDatabasesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', ownerId: '<UUID>', suspendedAt: '<Datetime>', suspendedReason: '<String>' });
 ```
 
 ### ManagedDomain
@@ -1295,20 +1276,20 @@ create({ databaseId: '<UUID>', interval: '<String>', isParented: '<Boolean>', na
 ```typescript
 // List all platformApis
 const { data, isLoading } = usePlatformApisQuery({
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, serviceHostname: true, updatedAt: true } },
 });
 
 // Get one platformApi
 const { data: item } = usePlatformApiQuery({
   id: '<UUID>',
-  selection: { fields: { anonRole: true, config: true, createdAt: true, dbname: true, id: true, isPublished: true, name: true, roleName: true, updatedAt: true } },
+  selection: { fields: { anonRole: true, config: true, createdAt: true, id: true, isPublished: true, name: true, roleName: true, serviceHostname: true, updatedAt: true } },
 });
 
 // Create a platformApi
 const { mutate: create } = useCreatePlatformApiMutation({
   selection: { fields: { id: true } },
 });
-create({ anonRole: '<String>', config: '<JSON>', dbname: '<String>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>' });
+create({ anonRole: '<String>', config: '<JSON>', isPublished: '<Boolean>', name: '<String>', roleName: '<String>', serviceHostname: '<String>' });
 ```
 
 ### PlatformApiSchema
@@ -1337,20 +1318,20 @@ create({ apiId: '<UUID>', schemaId: '<UUID>' });
 ```typescript
 // List all platformApiSettings
 const { data, isLoading } = usePlatformApiSettingsQuery({
-  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Get one platformApiSetting
 const { data: item } = usePlatformApiSettingQuery({
   id: '<UUID>',
-  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableDirectUploads: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
+  selection: { fields: { apiId: true, createdAt: true, enableAggregates: true, enableBulk: true, enableConnectionFilter: true, enableI18N: true, enableIntrospection: true, enableLlm: true, enableLtree: true, enableManyToMany: true, enablePostgis: true, enablePresignedUploads: true, enableRealtime: true, enableSearch: true, id: true, idleInTransactionTimeoutMs: true, lockTimeoutMs: true, maxConcurrentRequests: true, maxPageSize: true, maxQueryCost: true, maxQueryDepth: true, maxQueueWaitMs: true, maxRequestBytes: true, options: true, rateLimitBurst: true, rateLimitRpm: true, statementTimeoutMs: true, updatedAt: true } },
 });
 
 // Create a platformApiSetting
 const { mutate: create } = useCreatePlatformApiSettingMutation({
   selection: { fields: { id: true } },
 });
-create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableDirectUploads: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
+create({ apiId: '<UUID>', enableAggregates: '<Boolean>', enableBulk: '<Boolean>', enableConnectionFilter: '<Boolean>', enableI18N: '<Boolean>', enableIntrospection: '<Boolean>', enableLlm: '<Boolean>', enableLtree: '<Boolean>', enableManyToMany: '<Boolean>', enablePostgis: '<Boolean>', enablePresignedUploads: '<Boolean>', enableRealtime: '<Boolean>', enableSearch: '<Boolean>', idleInTransactionTimeoutMs: '<BigInt>', lockTimeoutMs: '<BigInt>', maxConcurrentRequests: '<Int>', maxPageSize: '<Int>', maxQueryCost: '<Int>', maxQueryDepth: '<Int>', maxQueueWaitMs: '<Int>', maxRequestBytes: '<Int>', options: '<JSON>', rateLimitBurst: '<Int>', rateLimitRpm: '<Int>', statementTimeoutMs: '<BigInt>' });
 ```
 
 ### PlatformCorsSetting
@@ -1508,11 +1489,6 @@ const { data, isLoading } = usePlatformGetSitePreviewsQuery({
   selection: { fields: { commitId: true, name: true } },
 });
 
-// Create a platformGetSitePreviewsRecord
-const { mutate: create } = useCreatePlatformGetSitePreviewsRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ commitId: '<UUID>', name: '<String>' });
 ```
 
 ### PlatformManagedDomain
@@ -1555,6 +1531,27 @@ const { mutate: create } = useCreatePlatformPageMutation({
   selection: { fields: { id: true } },
 });
 create({ commitId: '<UUID>', content: '<JSON>', seededFrom: '<JSON>', siteId: '<UUID>', slug: '<String>', storeId: '<UUID>' });
+```
+
+### PlatformReservedSubdomain
+
+```typescript
+// List all platformReservedSubdomains
+const { data, isLoading } = usePlatformReservedSubdomainsQuery({
+  selection: { fields: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Get one platformReservedSubdomain
+const { data: item } = usePlatformReservedSubdomainQuery({
+  id: '<UUID>',
+  selection: { fields: { createdAt: true, createdByPrincipal: true, id: true, label: true, match: true, reason: true, updatedAt: true, updatedByPrincipal: true } },
+});
+
+// Create a platformReservedSubdomain
+const { mutate: create } = useCreatePlatformReservedSubdomainMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdByPrincipal: '<UUID>', label: '<String>', match: '<String>', reason: '<String>', updatedByPrincipal: '<UUID>' });
 ```
 
 ### PlatformSiteAppLink
@@ -2138,11 +2135,6 @@ const { data: item } = useSqlActionQuery({
   selection: { fields: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } },
 });
 
-// Create a sqlAction
-const { mutate: create } = useCreateSqlActionMutation({
-  selection: { fields: { id: true } },
-});
-create({ actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' });
 ```
 
 ### TableBehavior
@@ -2420,17 +2412,6 @@ create({ attestationType: '<String>', challengeExpirySeconds: '<BigInt>', creden
 
 ## Custom Operation Hooks
 
-### `useApiSchemaNamesQuery`
-
-apiSchemaNames
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetApiId` | UUID |
-
 ### `useApplyRegistryDefaultsQuery`
 
 applyRegistryDefaults
@@ -2556,42 +2537,6 @@ platformVerifySitePreviewToken
   |----------|------|
   | `siteId` | UUID |
   | `token` | String |
-
-### `useResolveDeepLinkQuery`
-
-resolveDeepLink
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `linkSlug` | String |
-  | `targetSiteId` | UUID |
-
-### `useResolveRouteQuery`
-
-resolveRoute
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `requestHost` | String |
-  | `requestMethod` | String |
-  | `requestPath` | String |
-
-### `useResolveSiteAppLinksQuery`
-
-resolveSiteAppLinks
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `targetSiteId` | UUID |
 
 ### `useSitesDeepLinkUrlQuery`
 

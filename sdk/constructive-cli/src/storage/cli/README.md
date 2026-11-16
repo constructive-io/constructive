@@ -133,7 +133,6 @@ CRUD operations for File records.
 | `list` | List all file records |
 | `find-first` | Find first matching file record |
 | `get` | Get a file by id |
-| `create` | Create a new file |
 | `update` | Update an existing file |
 | `delete` | Delete a file |
 
@@ -156,14 +155,14 @@ CRUD operations for File records.
 | `key` | String |
 | `mimeType` | String |
 | `promotedAt` | Datetime |
+| `rejectionReason` | String |
 | `size` | BigInt |
 | `status` | FileStatus |
 | `tags` | String |
 | `updatedAt` | Datetime |
 | `upload` | Upload |
 
-**Required create fields:** `actorId`, `bucketId`, `key`, `mimeType`, `size`
-**Optional create fields (backend defaults):** `contentHash`, `description`, `expiryEnqueuedAt`, `filename`, `promotedAt`, `status`, `tags`, `upload`
+**Required create fields:** `actorId`, `bucketId`, `contentHash`, `databaseId`, `description`, `downloadUrl`, `expiryEnqueuedAt`, `filePath`, `filename`, `isPublic`, `key`, `mimeType`, `promotedAt`, `rejectionReason`, `size`, `status`, `tags`, `upload`
 
 ### `platform-bucket`
 
@@ -213,7 +212,6 @@ CRUD operations for PlatformFile records.
 | `list` | List all platformFile records |
 | `find-first` | Find first matching platformFile record |
 | `get` | Get a platformFile by id |
-| `create` | Create a new platformFile |
 | `update` | Update an existing platformFile |
 | `delete` | Delete a platformFile |
 
@@ -235,14 +233,14 @@ CRUD operations for PlatformFile records.
 | `key` | String |
 | `mimeType` | String |
 | `promotedAt` | Datetime |
+| `rejectionReason` | String |
 | `size` | BigInt |
 | `status` | FileStatus |
 | `tags` | String |
 | `updatedAt` | Datetime |
 | `upload` | Upload |
 
-**Required create fields:** `actorId`, `bucketId`, `key`, `mimeType`, `size`
-**Optional create fields (backend defaults):** `contentHash`, `description`, `expiryEnqueuedAt`, `filename`, `promotedAt`, `status`, `tags`, `upload`
+**Required create fields:** `actorId`, `bucketId`, `contentHash`, `description`, `downloadUrl`, `expiryEnqueuedAt`, `filePath`, `filename`, `isPublic`, `key`, `mimeType`, `promotedAt`, `rejectionReason`, `size`, `status`, `tags`, `upload`
 
 ## Custom Operations
 
@@ -301,6 +299,7 @@ Upload a file: resolves the bucket by key, creates the file row, and returns a p
   | `--input.bucketKey` | String |
   | `--input.contentHash` | String (required) |
   | `--input.contentType` | String (required) |
+  | `--input.databaseId` | UUID |
   | `--input.filename` | String |
   | `--input.isPublic` | Boolean |
   | `--input.key` | String |
@@ -316,6 +315,7 @@ Upload multiple files: resolves the bucket by key, creates file rows, and return
   | Argument | Type |
   |----------|------|
   | `--input.bucketKey` | String |
+  | `--input.databaseId` | UUID |
   | `--input.files` | UploadFileBulkFileInput (required) |
   | `--input.isPublic` | Boolean |
 

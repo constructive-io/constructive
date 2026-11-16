@@ -38,7 +38,6 @@ function App() {
 | `useUpdateCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useDeleteCommitMutation` | Mutation | Commit history — each commit snapshots a tree root for a store |
 | `useGetAllTreeNodesQuery` | Query | List all getAllTreeNodes |
-| `useCreateGetAllTreeNodesRecordMutation` | Mutation | Create a getAllTreeNodesRecord |
 | `useObjectsQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useObjectQuery` | Query | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
 | `useCreateObjectMutation` | Mutation | Content-addressed Merkle tree objects keyed by UUID v5 hash of data + children |
@@ -98,11 +97,6 @@ const { data, isLoading } = useGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
 
-// Create a getAllTreeNodesRecord
-const { mutate: create } = useCreateGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ data: '<JSON>', path: '<String>' });
 ```
 
 ### Object
