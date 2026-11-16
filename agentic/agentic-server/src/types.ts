@@ -34,6 +34,11 @@ export interface AgenticServerOptions {
    *  When true, identity headers are stripped from incoming requests
    *  (external clients cannot set tenant context). */
   isPublic?: boolean;
+  /** Largest JSON request body accepted, as express.json's `limit` (bytes, or
+   *  a string such as '32mb'). A request carries an image as base64 — an embed
+   *  input, a chat image part — so express's 100kb default refuses any real
+   *  one with a 413. Default: '32mb'. */
+  bodyLimit?: number | string;
 }
 
 export interface ResolvedProvider {
