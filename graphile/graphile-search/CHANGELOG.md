@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.12](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.11...graphile-search@2.19.12) (2026-11-16)
+
+### Bug Fixes
+
+- **graphile-search:** unifiedSearch leaves out a vector column of another length than the query vector ([54b4cbd](https://github.com/constructive-io/constructive/commit/54b4cbd877570baff4fa13de553db59bbe421d02))
+
 ## [2.19.11](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.10...graphile-search@2.19.11) (2026-11-14)
 
 **Note:** Version bump only for package graphile-search
