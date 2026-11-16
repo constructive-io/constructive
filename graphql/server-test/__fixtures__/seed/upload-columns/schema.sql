@@ -33,3 +33,6 @@ CREATE TABLE upload_columns.albums (
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON upload_columns.albums TO administrator, authenticated, anonymous;
 GRANT USAGE, SELECT ON SEQUENCE upload_columns.albums_id_seq TO administrator, authenticated, anonymous;
+
+-- A column holding a list of uploads.
+ALTER TABLE upload_columns.albums ADD COLUMN papers public.upload[];
