@@ -123,8 +123,10 @@ export function createGatewayEmbedder(
 ): EmbedderFunction {
   const root = normalizeGatewayUrl(gatewayUrl);
 
-  return async (text: string): Promise<EmbeddingResult> => {
-    const model = llmConfigStore.getStore()?.embeddingModel ?? defaultModel;
+  // A caller that names a model (a vector column that records its own) gets
+  // that one; otherwise the database's, then the deployment's.
+  return async (text: string, named?: string): Promise<EmbeddingResult> => {
+    const model = named ?? llmConfigStore.getStore()?.embeddingModel ?? defaultModel;
     const response = await fetch(`${root}/v1/embeddings`, {
       method: 'POST',
       headers: gatewayHeaders(provider),
@@ -137,6 +139,7 @@ export function createGatewayEmbedder(
     const payload = (await response.json()) as GatewayEmbeddingsResponse;
     return {
       embedding: payload.data?.[0]?.embedding ?? [],
+      model,
       promptTokens: payload.usage?.prompt_tokens ?? 0
     };
   };

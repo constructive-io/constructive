@@ -27,11 +27,47 @@ export type EmbedRule =
   /** `unifiedSearch: String`: becomes `{ __text, __vector }` for graphile-search. */
   | { kind: 'unified'; onQuotaExceeded: QuotaPolicy }
   /** `{col}Text` on a create input or patch. `required` means the column is NOT NULL. */
-  | { kind: 'companion'; into: string; required: boolean };
+  | {
+    kind: 'companion';
+    into: string;
+    required: boolean;
+    /** The model the column's vectors are declared to come from. */
+    model?: string;
+    /** The input field of the column that records each vector's model. */
+    modelField?: string;
+  };
 
 export const EMBED_EXT = 'graphileLlmEmbed';
 
-export type VectorEmbedder = (text: string) => Promise<number[] | null>;
+/**
+ * Set by graphile-search on a filter field that searches vector columns: which
+ * columns, and the model each one's own definition names (`@embeddingModel`).
+ * Vectors of two models are not comparable, so a search text is embedded once
+ * per model its columns use, never once for all of them.
+ */
+export const VECTOR_COLUMNS_EXT = 'graphileSearchVectorColumns';
+export interface VectorColumnRef {
+  attributeName: string;
+  model?: string;
+}
+
+/** A query vector and the model that produced it. */
+export interface Embedded {
+  vector: number[];
+  model?: string;
+}
+
+export interface VectorEmbedder {
+  (text: string): Promise<number[] | null>;
+  /** Embed with `model` when given, else the request's; reports the model used. */
+  withModel?: (text: string, model?: string) => Promise<Embedded | null>;
+}
+
+const embedWith = async (embed: VectorEmbedder, text: string, model?: string): Promise<Embedded | null> => {
+  if (embed.withModel) return embed.withModel(text, model);
+  const vector = await embed(text);
+  return vector ? { vector } : null;
+};
 
 export function embedField<T extends object>(rule: EmbedRule, spec: T): T {
   return { ...spec, extensions: { ...(spec as { extensions?: object }).extensions, [EMBED_EXT]: rule } };
@@ -40,11 +76,12 @@ export function embedField<T extends object>(rule: EmbedRule, spec: T): T {
 /** `build.llmEmbedder` resolves to `{ embedding }`; an empty or missing vector is a failed embed. */
 export function toVectorEmbedder(raw: unknown): VectorEmbedder | null {
   if (typeof raw !== 'function') return null;
-  return async (text) => {
-    const result = await raw(text);
+  const withModel = async (text: string, model?: string): Promise<Embedded | null> => {
+    const result = await raw(text, model);
     const vector = result?.embedding;
-    return isNonEmptyVector(vector) ? vector : null;
+    return isNonEmptyVector(vector) ? { vector, model: result.model ?? model } : null;
   };
+  return Object.assign(async (text: string) => (await withModel(text))?.vector ?? null, { withModel });
 }
 
 function isNonEmptyVector(value: unknown): boolean {
@@ -58,16 +95,29 @@ function isNonEmptyVector(value: unknown): boolean {
 function forRequest(embedder: VectorEmbedder | null, graphqlContext: unknown): VectorEmbedder | null {
   if (!embedder) return null;
   let scope: Promise<LlmRequestScope> | undefined;
-  return async (text) => {
-    scope ??= resolveRequestScope(graphqlContext);
-    const resolved = await scope;
-    const startTime = Date.now();
-    const vector = await llmConfigStore.run(resolved, () => embedder(text));
-    if (vector) {
-      console.log(`[graphile-llm] embed: dims=${vector.length}, latency=${Date.now() - startTime}ms`);
+  // One search may name the same text for several columns of one model.
+  const memo = new Map<string, Promise<Embedded | null>>();
+  const withModel = (text: string, model?: string): Promise<Embedded | null> => {
+    const memoKey = JSON.stringify([model ?? null, text]);
+    let pending = memo.get(memoKey);
+    if (!pending) {
+      pending = (async () => {
+        scope ??= resolveRequestScope(graphqlContext);
+        const resolved = await scope;
+        const startTime = Date.now();
+        const embedded = await llmConfigStore.run(resolved, () => embedWith(embedder, text, model));
+        if (embedded) {
+          console.log(
+            `[graphile-llm] embed: model=${embedded.model ?? 'default'}, dims=${embedded.vector.length}, latency=${Date.now() - startTime}ms`
+          );
+        }
+        return embedded;
+      })();
+      memo.set(memoKey, pending);
     }
-    return vector;
+    return pending;
   };
+  return Object.assign(async (text: string) => (await withModel(text))?.vector ?? null, { withModel });
 }
 
 export function createEmbedIndex(graphql: any) {
@@ -132,7 +182,8 @@ export function createEmbedIndex(graphql: any) {
     typeName: string,
     value: Record<string, any>,
     next: Record<string, any>,
-    embed: VectorEmbedder | null
+    embed: VectorEmbedder | null,
+    columns: VectorColumnRef[] | undefined
   ): Promise<void> {
     const text = value[fieldName];
 
@@ -159,9 +210,13 @@ export function createEmbedIndex(graphql: any) {
           `send \`${rule.into}\` instead.`
         );
       }
-      const vector = await embed(text);
-      if (vector) {
-        next[rule.into] = vector;
+      // The filter field this input sits under searches one column.
+      const embedded = await embedWith(embed, text, columns?.[0]?.model);
+      if (embedded) {
+        next[rule.into] = embedded.vector;
+        // The label is the model that made this vector, whatever the client sent.
+        if (embedded.model) next.model = embedded.model;
+        else delete next.model;
       } else if (rule.onQuotaExceeded === 'throw') {
         throw new Error(
           `${typeName}: embedding failed (provider unavailable). ` +
@@ -173,9 +228,31 @@ export function createEmbedIndex(graphql: any) {
 
     case 'unified': {
       if (typeof text !== 'string' || text.trim().length === 0 || !embed) return;
-      const vector = await embed(text);
-      if (vector) {
-        next[fieldName] = { __text: text, __vector: vector };
+      // One vector per model the table's vector columns use; `__vector` stays
+      // the request model's, for a column nothing is known about.
+      const models = [...new Set<string | undefined>(columns?.length ? columns.map((c) => c.model) : [undefined])];
+      const byModel = new Map<string | undefined, Embedded | null>(
+        await Promise.all(models.map(async (m) => [m, await embedWith(embed, text, m)] as const))
+      );
+      if (rule.onQuotaExceeded === 'throw' && models.some((m) => !byModel.get(m))) {
+        throw new Error(
+          `${fieldName}: embedding failed (provider unavailable). ` +
+          'onQuotaExceeded is set to \'throw\'; set it to \'degrade\' for text-only fallback.'
+        );
+      }
+      const base = byModel.get(undefined);
+      const perColumn: Record<string, Embedded> = {};
+      for (const column of columns ?? []) {
+        const embedded = byModel.get(column.model);
+        if (embedded) perColumn[column.attributeName] = embedded;
+      }
+      if (base || Object.keys(perColumn).length > 0) {
+        next[fieldName] = {
+          __text: text,
+          __vector: base?.vector ?? null,
+          __model: base?.model,
+          __vectors: perColumn
+        };
       } else if (rule.onQuotaExceeded === 'throw') {
         throw new Error(
           `${fieldName}: embedding failed (provider unavailable). ` +
@@ -209,25 +286,33 @@ export function createEmbedIndex(graphql: any) {
           'Set defaultEmbedder in GraphileLlmPreset options or EMBEDDER_PROVIDER env var.'
         );
       }
-      const vector = await embed(text);
-      if (!vector) {
+      const embedded = await embedWith(embed, text, rule.model);
+      if (!embedded) {
         throw new Error(
           `EMBED_FAILED: Cannot embed ${fieldName} — the embedding provider returned no vector.`
         );
       }
-      next[rule.into] = vector;
+      next[rule.into] = embedded.vector;
+      // The vector and the model that made it are written together: a search
+      // compares only rows whose stamp is the model of its query vector.
+      if (rule.modelField && embedded.model) next[rule.modelField] = embedded.model;
       return;
     }
     }
   }
 
   /** Returns `value` itself when its type cannot reach a tagged field. */
-  async function embedValue(type: any, value: any, embed: VectorEmbedder | null): Promise<any> {
+  async function embedValue(
+    type: any,
+    value: any,
+    embed: VectorEmbedder | null,
+    columns?: VectorColumnRef[]
+  ): Promise<any> {
     if (value == null) return value;
     const inner = isNonNullType(type) ? type.ofType : type;
     if (isListType(inner)) {
       if (!Array.isArray(value) || !reaches(inner.ofType)) return value;
-      return Promise.all(value.map((item: any) => embedValue(inner.ofType, item, embed)));
+      return Promise.all(value.map((item: any) => embedValue(inner.ofType, item, embed, columns)));
     }
     if (!isInputObjectType(inner) || !reaches(inner)) return value;
 
@@ -235,10 +320,11 @@ export function createEmbedIndex(graphql: any) {
     const jobs: Promise<void>[] = [];
     for (const [name, field] of Object.entries<any>(inner.getFields())) {
       const rule = field.extensions?.[EMBED_EXT] as EmbedRule | undefined;
+      const own = field.extensions?.[VECTOR_COLUMNS_EXT] as VectorColumnRef[] | undefined;
       if (rule) {
-        jobs.push(applyRule(rule, name, inner.name, value, next, embed));
+        jobs.push(applyRule(rule, name, inner.name, value, next, embed, own ?? columns));
       } else if (value[name] != null && reaches(field.type)) {
-        jobs.push(embedValue(field.type, value[name], embed).then((embedded) => { next[name] = embedded; }));
+        jobs.push(embedValue(field.type, value[name], embed, own).then((embedded) => { next[name] = embedded; }));
       }
     }
     await Promise.all(jobs);
