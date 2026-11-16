@@ -65,6 +65,20 @@ export const VectorCodecPlugin: GraphileConfig.Plugin = {
           },
         };
       },
+
+      /**
+       * Record a vector column's declared length (`vector(512)` → 512; pgvector's
+       * type modifier is the length itself) on the attribute, so a search that
+       * holds one query vector can tell which columns it can be compared with.
+       */
+      async pgCodecs_attribute(_info, event) {
+        const { pgAttribute, attribute } = event;
+        if (attribute.codec?.name !== 'vector') return;
+        const typmod = pgAttribute.atttypmod;
+        if (typmod == null || typmod < 1) return;
+        if (!attribute.extensions) attribute.extensions = {};
+        (attribute.extensions as Record<string, unknown>).vectorDimensions = typmod;
+      },
     },
   },
 

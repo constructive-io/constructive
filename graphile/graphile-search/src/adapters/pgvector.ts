@@ -92,9 +92,13 @@ export function createPgvectorAdapter(
         codec.attributes as Record<string, any>
       )) {
         if (isVectorCodec(attribute.codec)) {
+          const dimensions: number | undefined = attribute.extensions?.vectorDimensions;
           columns.push({
             attributeName,
-            adapterData: chunksInfo ? { chunksInfo } : undefined,
+            adapterData:
+              chunksInfo || dimensions
+                ? { ...(chunksInfo && { chunksInfo }), ...(dimensions && { dimensions }) }
+                : undefined,
           });
         }
       }
