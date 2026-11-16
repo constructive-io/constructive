@@ -227,6 +227,8 @@ export function createImageVersionUrlsPlugin(options: PresignedUrlPluginOptions)
           for (const [attributeName, attribute] of Object.entries(pgCodec.attributes as Record<string, any>)) {
             const kind = imageColumnKind(attribute.codec);
             if (!kind) continue;
+            // A column the API does not select stays unread here too.
+            if (!(build as any).behavior.pgCodecAttributeMatches([pgCodec, attributeName], 'attribute:select')) continue;
             const base = (inflection as any).attribute({ attributeName, codec: pgCodec });
             const urlField = `${base}Url`;
             const versionsField = `${base}Versions`;
