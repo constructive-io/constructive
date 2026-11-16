@@ -1328,12 +1328,14 @@ export function createUnifiedSearchPlugin(
                         let text: string;
                         let vector: number[] | null = null;
                         let model: string | undefined;
-                        let perColumn: Record<string, { vector: number[]; model?: string }> = {};
+                        // Absent: one vector for every column. Present: a column it does
+                        // not name has no vector of its own model and sits this search out.
+                        let perColumn: Record<string, { vector: number[]; model?: string }> | undefined;
                         if (typeof val === 'object' && val.__text) {
                           text = val.__text;
                           vector = val.__vector ?? null;
                           model = val.__model ?? undefined;
-                          perColumn = val.__vectors ?? {};
+                          perColumn = val.__vectors ?? undefined;
                         } else {
                           text = typeof val === 'string' ? val : String(val);
                           if (text.trim().length === 0) return;
@@ -1363,7 +1365,7 @@ export function createUnifiedSearchPlugin(
                         }
 
                         // Vector adapters (pgvector) — only when __vector is injected
-                        if ((vector || Object.keys(perColumn).length > 0) && vectorAdapterColumns.length > 0) {
+                        if ((vector || (perColumn && Object.keys(perColumn).length > 0)) && vectorAdapterColumns.length > 0) {
                           for (const { adapter, columns } of vectorAdapterColumns) {
                             for (const column of columns) {
                               // One query vector, embedded by the text model: a column of
@@ -1371,7 +1373,7 @@ export function createUnifiedSearchPlugin(
                               // the text one) holds vectors it cannot be compared with —
                               // pgvector raises on the operator — so it sits this search out.
                               // Each column is searched with the vector its own model produced.
-                              const query = perColumn[column.attributeName] ?? (vector ? { vector, model } : null);
+                              const query = perColumn ? perColumn[column.attributeName] : (vector ? { vector, model } : null);
                               if (!query) continue;
                               const declared = (column.adapterData as { dimensions?: number } | undefined)?.dimensions;
                               if (declared && declared !== query.vector.length) continue;
