@@ -20,6 +20,7 @@ import { getConnections, seed } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 
 import { createLlmModulePlugin } from '../../src/plugins/llm-module-plugin';
+import { createLlmTextMutationPlugin } from '../../src/plugins/text-mutation-plugin';
 import { createLlmTextSearchPlugin } from '../../src/plugins/text-search-plugin';
 
 type QueryFn = <TResult = unknown>(query: string, variables?: Record<string, unknown>) => Promise<GraphQLResponse<TResult>>;
@@ -96,7 +97,8 @@ describe('searching a vector column that records its model', () => {
             }),
             createLlmModulePlugin(),
             FakeEmbedderPlugin,
-            createLlmTextSearchPlugin()
+            createLlmTextSearchPlugin(),
+            createLlmTextMutationPlugin()
           ]
         },
         useRoot: true,
@@ -139,6 +141,22 @@ describe('searching a vector column that records its model', () => {
     expect(await names('{ vectorEmbedding: { vector: [1, 0, 0], model: "model-b" } }')).toEqual(['older']);
     expect(await names('{ vectorEmbedding: { vector: [1, 0, 0] } }')).toEqual(['current', 'older']);
     expect(calls).toEqual([]);
+  });
+
+  it('labels an embedded text with the model that embedded it, whatever label the client sent', async () => {
+    expect(await names('{ vectorEmbedding: { text: "q", model: "model-b" } }')).toEqual(['current']);
+  });
+
+  it('stamps the model beside a vector it embeds on a write, so the row is found by a search', async () => {
+    const res = await query<{ createNote: { note: { name: string; embeddingModel: string; summaryModel: string } } }>(`mutation {
+      createNote(input: { note: { name: "written", embeddingText: "q", summaryText: "q" } }) {
+        note { name embeddingModel summaryModel }
+      }
+    }`);
+    expect(res.errors).toBeUndefined();
+    expect(res.data!.createNote.note).toEqual({ name: 'written', embeddingModel: 'model-a', summaryModel: REQUEST_MODEL });
+    expect(calls.map((c) => c.model).sort()).toEqual(['model-a', undefined]);
+    expect(await names('{ vectorEmbedding: { text: "q" } }')).toEqual(['current', 'written']);
   });
 
   it('embeds unifiedSearch once per model and scores each column with its own', async () => {

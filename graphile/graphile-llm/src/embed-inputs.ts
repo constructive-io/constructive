@@ -27,7 +27,15 @@ export type EmbedRule =
   /** `unifiedSearch: String`: becomes `{ __text, __vector }` for graphile-search. */
   | { kind: 'unified'; onQuotaExceeded: QuotaPolicy }
   /** `{col}Text` on a create input or patch. `required` means the column is NOT NULL. */
-  | { kind: 'companion'; into: string; required: boolean };
+  | {
+    kind: 'companion';
+    into: string;
+    required: boolean;
+    /** The model the column's vectors are declared to come from. */
+    model?: string;
+    /** The input field of the column that records each vector's model. */
+    modelField?: string;
+  };
 
 export const EMBED_EXT = 'graphileLlmEmbed';
 
@@ -206,7 +214,9 @@ export function createEmbedIndex(graphql: any) {
       const embedded = await embedWith(embed, text, columns?.[0]?.model);
       if (embedded) {
         next[rule.into] = embedded.vector;
-        if (embedded.model && next.model == null) next.model = embedded.model;
+        // The label is the model that made this vector, whatever the client sent.
+        if (embedded.model) next.model = embedded.model;
+        else delete next.model;
       } else if (rule.onQuotaExceeded === 'throw') {
         throw new Error(
           `${typeName}: embedding failed (provider unavailable). ` +
@@ -224,6 +234,12 @@ export function createEmbedIndex(graphql: any) {
       const byModel = new Map<string | undefined, Embedded | null>(
         await Promise.all(models.map(async (m) => [m, await embedWith(embed, text, m)] as const))
       );
+      if (rule.onQuotaExceeded === 'throw' && models.some((m) => !byModel.get(m))) {
+        throw new Error(
+          `${fieldName}: embedding failed (provider unavailable). ` +
+          'onQuotaExceeded is set to \'throw\'; set it to \'degrade\' for text-only fallback.'
+        );
+      }
       const base = byModel.get(undefined);
       const perColumn: Record<string, Embedded> = {};
       for (const column of columns ?? []) {
@@ -270,13 +286,16 @@ export function createEmbedIndex(graphql: any) {
           'Set defaultEmbedder in GraphileLlmPreset options or EMBEDDER_PROVIDER env var.'
         );
       }
-      const vector = await embed(text);
-      if (!vector) {
+      const embedded = await embedWith(embed, text, rule.model);
+      if (!embedded) {
         throw new Error(
           `EMBED_FAILED: Cannot embed ${fieldName} — the embedding provider returned no vector.`
         );
       }
-      next[rule.into] = vector;
+      next[rule.into] = embedded.vector;
+      // The vector and the model that made it are written together: a search
+      // compares only rows whose stamp is the model of its query vector.
+      if (rule.modelField && embedded.model) next[rule.modelField] = embedded.model;
       return;
     }
     }
