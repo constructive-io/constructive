@@ -189,6 +189,36 @@ query {
 }
 ```
 
+## Model-Aware Search (`@embeddingModel` / `@embeddingModelOf`)
+
+Vectors of two models are not comparable. The adapter reads two smart tags
+(`graphile/graphile-search/src/adapters/pgvector.ts`, `detectColumns`):
+
+| Tag | On | Meaning |
+|-----|----|---------|
+| `@embeddingModel <model>` | the vector column | the model the column's definition names |
+| `@embeddingModelOf <vector column>` | a sibling text column | records, per row, the model that produced that row's vector |
+
+constructive-db's `SearchVector` generator emits both (`<field>_model` carries
+`@embeddingModelOf`; `@embeddingModel` only when the node names a model).
+
+- The vector filter input has a `model` field. On a column with a model
+  column, when `model` is given only rows whose stamp equals it are compared;
+  rows stamped with another model (or not stamped) are skipped until they are
+  embedded again with that model.
+- With `graphile-llm`, a search `text` is embedded once per model its columns
+  use (`@embeddingModel`, else the request's model) and `model` is filled in
+  server-side (`graphile/graphile-llm/src/embed-inputs.ts`). A column whose
+  embedding failed sits the search out; it is never searched with another
+  model's vector.
+- On write, `graphile-llm`'s `<column>Text` mutation input embeds with the
+  column's `@embeddingModel` and, when the `@embeddingModelOf` column is in
+  the mutation input, writes the model used into it
+  (`graphile/graphile-llm/src/plugins/text-mutation-plugin.ts`).
+- Passing a raw `vector` yourself: pass `model` too, or rows of every model
+  are compared.
+- A column with neither tag behaves as before.
+
 ## VectorCodecPlugin
 
 The `VectorCodecPlugin` (included in `UnifiedSearchPreset`) teaches PostGraphile about the `vector` PostgreSQL type:
