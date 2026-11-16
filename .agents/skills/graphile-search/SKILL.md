@@ -267,6 +267,7 @@ This avoids the problem of BM25/pgvector producing unbounded scores that can't b
 | `includeChunks` field missing | No `@hasChunks` tables in schema | Add `@hasChunks` smart tag to parent table codec |
 | `Unknown type "FullText"` | TsvectorCodecPlugin not loaded | Use `UnifiedSearchPreset()` which includes all codecs |
 | `Unknown type "Vector"` | VectorCodecPlugin not loaded | Use `UnifiedSearchPreset()` which includes all codecs |
+| Vector search returns nothing after changing the embedding model | Rows are stamped with the old model in the `@embeddingModelOf` column | Re-embed the rows; see `references/pgvector-adapter.md` |
 | Duplicate type errors | Multiple search presets | Use only `UnifiedSearchPreset()`, not individual presets |
 
 ## Related Skills
