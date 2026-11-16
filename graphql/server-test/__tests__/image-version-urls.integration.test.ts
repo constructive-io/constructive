@@ -39,10 +39,12 @@ const metaSchemas = [
 
 const PRODUCT = `
   query Product($id: Int!, $width: Int) {
-    product(id: $id) {
-      photoUrl(width: $width)
-      source: photoUrl
-      photoVersions { name key width height format size url }
+    products(where: { id: { equalTo: $id } }) {
+      nodes {
+        photoUrl(width: $width)
+        source: photoUrl
+        photoVersions { name key width height format size url }
+      }
     }
   }
 `;
@@ -60,9 +62,9 @@ describe('image column URLs', () => {
       .set('X-Database-Id', who.databaseId)
       .set('X-Schemata', [who.storageSchema, schema].join(','))
       .send({ query: PRODUCT, variables: { id, width } });
-    expect(res.status).toBe(200);
     expect(res.body.errors).toBeUndefined();
-    return res.body.data.product as {
+    expect(res.status).toBe(200);
+    return res.body.data.products.nodes[0] as {
       photoUrl: string | null;
       source: string | null;
       photoVersions: Array<{ name: string; key: string; width: number; url: string }> | null;
@@ -81,7 +83,7 @@ describe('image column URLs', () => {
   const addProduct = async (photo: unknown) =>
     (
       await pg.query(`INSERT INTO ${schema}.products (title, photo) VALUES ('p', $1::jsonb) RETURNING id`, [
-        JSON.stringify(photo)
+        photo === null ? null : JSON.stringify(photo)
       ])
     ).rows[0].id as number;
 
@@ -160,6 +162,10 @@ describe('image column URLs', () => {
   });
 
   it('reads the files row as the reader: a file RLS hides gives no URL', async () => {
+    // The seed leaves Bob's rows `requested`; both must be live so that only RLS tells them apart.
+    await pg.query(`UPDATE "${bob.storageSchema}".app_files SET status = 'uploaded' WHERE id = ANY($1::uuid[])`, [
+      [bobPrivateFileId, bobPublicFileId]
+    ]);
     const hidden = await addProduct({
       id: bobPrivateFileId,
       key: 'seeded-private-hash',
@@ -169,5 +175,36 @@ describe('image column URLs', () => {
 
     expect(await product(bob, hidden, 320)).toEqual({ photoUrl: null, source: null, photoVersions: null });
     expect((await product(bob, visible, 320)).source).toContain('seeded-public-hash');
+  });
+
+  it('resolves each element of an image[] column on its own', async () => {
+    const one = await addFile('list/one.png');
+    await addFile('list/two.png');
+    const mine = version('list/one.png.versions/small-0a1b2c3d.webp', 'small', 320);
+    const theirs = version('list/two.png.versions/small-0a1b2c3d.webp', 'small', 320);
+    const { rows } = await pg.query(
+      `INSERT INTO ${schema}.albums (shots)
+       VALUES (ARRAY(SELECT jsonb_array_elements($1::jsonb))::public.image[]) RETURNING id`,
+      [JSON.stringify([{ id: one, key: 'list/one.png', versions: [mine, theirs] }, { key: 'list/two.png' }])]
+    );
+
+    const res = await request
+      .post('/graphql')
+      .set('X-Database-Id', alice.databaseId)
+      .set('X-Schemata', [alice.storageSchema, schema].join(','))
+      .send({
+        query: `query Album($id: Int!) {
+          albums(where: { id: { equalTo: $id } }) { nodes { shotsUrl(width: 300) shotsVersions { key url } } }
+        }`,
+        variables: { id: rows[0].id }
+      });
+    expect(res.body.errors).toBeUndefined();
+    const album = res.body.data.albums.nodes[0];
+
+    expect(album.shotsUrl).toHaveLength(2);
+    expect(pathOf(album.shotsUrl[0])).toMatch(new RegExp(`/${mine.key}$`));
+    expect(album.shotsUrl[1]).toBeNull();
+    expect(album.shotsVersions[0].map((v: { key: string }) => v.key)).toEqual([mine.key]);
+    expect(album.shotsVersions[1]).toBeNull();
   });
 });
