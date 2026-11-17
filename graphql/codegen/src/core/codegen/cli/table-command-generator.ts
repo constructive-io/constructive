@@ -1090,9 +1090,11 @@ function buildMutationHandler(
   const allWhereFieldNames = new Set([...pkFieldNames, ...extraKeys.map((ek) => ek.name)]);
 
   // Get the set of writable field names from the type registry
-  // This filters out computed fields (e.g. searchTsvRank, hashUuid) that exist
-  // on the entity type but not on the create/update input type.
-  const writableFields = getWritableFieldNames(table, typeRegistry);
+  // This filters out computed fields (e.g. searchTsvRank, downloadUrl) that exist
+  // on the entity type but not on this operation's input type (create input for
+  // create, patch for update).
+  const writableFields =
+    operation === 'delete' ? null : getWritableFieldNames(table, typeRegistry, operation);
 
   // Get fields that have defaults from introspection (for create operations)
   const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
@@ -1113,7 +1115,9 @@ function buildMutationHandler(
       // Always exclude ORM-excluded fields (except where-clause fields handled above)
       (allWhereFieldNames.has(f.name) || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
       // If we have type registry info, only include fields that exist in the input type
-      (writableFields === null || writableFields.has(f.name)),
+      (writableFields === null || writableFields.has(f.name)) &&
+      // Without it, a field taking arguments is still never a column
+      !(f.args && f.args.length > 0),
   );
 
   const questions: t.Expression[] = [];

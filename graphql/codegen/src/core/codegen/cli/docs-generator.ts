@@ -174,7 +174,7 @@ export function generateReadme(
       }
       const specialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(specialGroups));
-      lines.push(...buildSearchExamplesMarkdown(specialGroups, toolName, kebab));
+      lines.push(...buildSearchExamplesMarkdown(specialGroups, toolName, kebab, table));
       lines.push('');
     }
   }
@@ -506,7 +506,7 @@ export function generateSkills(
             description: `List ${singularName} records with filtering and ordering`,
             code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
           },
-          ...buildSearchExamples(skillSpecialGroups, toolName, kebab),
+          ...buildSearchExamples(skillSpecialGroups, toolName, kebab, table),
           ...(table.query?.create !== null
             ? [{
               description: `Create a ${singularName}`,
@@ -848,7 +848,7 @@ export function generateMultiTargetReadme(
       }
       const mtSpecialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(mtSpecialGroups));
-      lines.push(...buildSearchExamplesMarkdown(mtSpecialGroups, toolName, `${tgt.name}:${kebab}`));
+      lines.push(...buildSearchExamplesMarkdown(mtSpecialGroups, toolName, `${tgt.name}:${kebab}`, table));
       lines.push('');
     }
 
@@ -1243,7 +1243,7 @@ export function generateMultiTargetSkills(
               description: `List ${singularName} records with filtering and ordering`,
               code: [`${toolName} ${cmd} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
             },
-            ...buildSearchExamples(mtSkillSpecialGroups, toolName, cmd),
+            ...buildSearchExamples(mtSkillSpecialGroups, toolName, cmd, table),
             {
               description: `Create a ${singularName}`,
               code: [

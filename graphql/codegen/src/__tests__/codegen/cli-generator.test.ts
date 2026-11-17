@@ -25,6 +25,7 @@ import type {
   Relations,
   Table,
   TypeRef,
+  TypeRegistry,
 } from '../../types/schema';
 
 const fieldTypes = {
@@ -278,6 +279,125 @@ describe('cli-generator without a create mutation', () => {
     expect(file!.content).not.toContain('CreateFileInput');
     expect(file!.content).not.toContain("'create'");
     expect(file!.content).toContain('FilePatch');
+  });
+});
+
+// A table shaped like the storage `File` type: no create mutation, a computed
+// field that takes arguments, and computed fields with and without an object
+// return type. None of the computed fields are in the patch type.
+const computedFileTable = createTable({
+  name: 'Asset',
+  fields: [
+    { name: 'id', type: fieldTypes.uuid },
+    { name: 'filename', type: fieldTypes.string },
+    { name: 'search', type: { gqlType: 'FullText', isArray: false } },
+    { name: 'searchTsvRank', type: { gqlType: 'Float', isArray: false } },
+    { name: 'downloadUrl', type: fieldTypes.string },
+    {
+      name: 'uploadUrl',
+      type: fieldTypes.string,
+      args: [{ name: 'width', type: createTypeRef('SCALAR', 'Int'), isRequired: false }],
+    },
+    { name: 'uploadVersions', type: { gqlType: 'AssetVersion', isArray: true } },
+  ],
+  query: {
+    all: 'assets',
+    one: 'asset',
+    create: null,
+    update: 'updateAsset',
+    delete: 'deleteAsset',
+  },
+});
+
+const computedFileRegistry: TypeRegistry = new Map([
+  [
+    'AssetPatch',
+    {
+      kind: 'INPUT_OBJECT',
+      name: 'AssetPatch',
+      inputFields: [
+        { name: 'filename', type: createTypeRef('SCALAR', 'String') },
+        { name: 'search', type: createTypeRef('SCALAR', 'FullText') },
+      ],
+    },
+  ],
+  [
+    'AssetVersion',
+    {
+      kind: 'OBJECT',
+      name: 'AssetVersion',
+      fields: [
+        { name: 'url', type: createTypeRef('NON_NULL', null, createTypeRef('SCALAR', 'String')) },
+        { name: 'width', type: createTypeRef('SCALAR', 'Int') },
+      ],
+    },
+  ],
+]);
+
+describe('cli-generator with computed fields', () => {
+  const generateAssetCommand = (typeRegistry?: TypeRegistry): string => {
+    const { files } = generateCli({
+      tables: [computedFileTable],
+      customOperations: { queries: [], mutations: [] },
+      config: { cli: { toolName: 'myapp' } },
+      typeRegistry,
+    });
+    return files.find((f) => f.fileName === 'commands/asset.ts')!.content;
+  };
+
+  it('never selects a field that takes arguments as `field: true`', () => {
+    expect(generateAssetCommand(computedFileRegistry)).not.toContain('uploadUrl: true');
+    expect(generateAssetCommand()).not.toContain('uploadUrl: true');
+  });
+
+  it('leaves computed fields out of the default select', () => {
+    const content = generateAssetCommand(computedFileRegistry);
+    expect(content).toContain('filename: true');
+    expect(content).not.toContain('downloadUrl: true');
+    expect(content).not.toContain('uploadVersions: true');
+    expect(content).not.toContain('searchTsvRank: true');
+  });
+
+  it('derives update fields from the patch type when there is no create input', () => {
+    const content = generateAssetCommand(computedFileRegistry);
+    expect(content).toContain('filename: cleanedData.filename');
+    expect(content).not.toContain('cleanedData.downloadUrl');
+    expect(content).not.toContain('cleanedData.uploadUrl');
+    expect(content).not.toContain('cleanedData.uploadVersions');
+    expect(content).not.toContain("name: 'uploadUrl'");
+    expect(content).not.toContain("name: 'uploadVersions'");
+    expect(content).not.toContain("name: 'downloadUrl'");
+  });
+
+  it('keeps computed fields out of docs examples', () => {
+    const docs = [
+      generateOrmReadme([computedFileTable], [], computedFileRegistry),
+      generateHooksReadme([computedFileTable], [], computedFileRegistry),
+      ...generateOrmSkills([computedFileTable], [], 'default', computedFileRegistry),
+      ...generateHooksSkills([computedFileTable], [], 'default', computedFileRegistry),
+    ].map((f) => f.content);
+    for (const content of docs) {
+      expect(content).not.toContain('uploadUrl: true');
+      expect(content).not.toContain('uploadVersions: true');
+      expect(content).not.toContain('uploadUrl: \'');
+    }
+    expect(docs[0]).toMatch(/`uploadUrl` \| String \| No/);
+    expect(docs[0]).toMatch(/`downloadUrl` \| String \| No/);
+  });
+
+  it('references the real tsvector rank field in search examples', () => {
+    const readme = generateCliReadme(
+      [computedFileTable],
+      [],
+      'myapp',
+      computedFileRegistry,
+    ).content;
+    // `filename` and `searchTsvRank` exist on the table; `title`, `tsvRank`
+    // and `searchScore` do not
+    expect(readme).toContain('--where.search "search query" --select filename,searchTsvRank');
+    expect(readme).toContain('--where.unifiedSearch "search query" --select filename,searchTsvRank');
+    expect(readme).toContain('--limit 10 --select id,filename');
+    expect(readme).not.toMatch(/--select \S*\b(title|tsvRank|searchScore)\b/);
   });
 });
 

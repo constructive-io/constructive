@@ -48,7 +48,7 @@ import {
   generateTargetReadme,
 } from './codegen/target-docs-generator';
 import { createSchemaSource, validateSourceOptions } from './introspect';
-import { writeGeneratedFiles } from './output';
+import { removeStaleGeneratedSkills, writeGeneratedFiles, writeGeneratedSkills } from './output';
 import { runCodegenPipeline, validateTablesFound } from './pipeline';
 import { findWorkspaceRoot } from './workspace';
 
@@ -65,6 +65,8 @@ export interface GenerateResult {
   output?: string;
   tables?: string[];
   filesWritten?: string[];
+  /** Generated skill directories written by this run (absent when none were) */
+  skills?: { dir: string; names: string[] };
   errors?: string[];
   pipelineData?: {
     tables: Table[];
@@ -322,6 +324,7 @@ export async function generate(
   ];
   const targetName = internalOptions?.targetName ?? 'default';
   const skillsToWrite: Array<{ path: string; content: string }> = [];
+  let skillsWritten: GenerateResult['skills'];
 
   if (runOrm) {
     if (docsConfig.readme) {
@@ -405,9 +408,7 @@ export async function generate(
 
     if (skillsToWrite.length > 0) {
       const skillsOutputDir = resolveSkillsOutputDir(config, outputRoot);
-      const skillsWriteResult = await writeGeneratedFiles(skillsToWrite, skillsOutputDir, [], {
-        pruneStaleFiles: false,
-      });
+      const skillsWriteResult = await writeGeneratedSkills(skillsToWrite, skillsOutputDir);
       if (!skillsWriteResult.success) {
         return {
           success: false,
@@ -417,6 +418,7 @@ export async function generate(
         };
       }
       allFilesWritten.push(...(skillsWriteResult.filesWritten ?? []));
+      skillsWritten = { dir: skillsOutputDir, names: skillsWriteResult.skillNames };
     }
 
   }
@@ -437,6 +439,7 @@ export async function generate(
     output: outputRoot,
     tables: tables.map((t) => t.name),
     filesWritten: allFilesWritten,
+    skills: skillsWritten,
     pipelineData: {
       tables,
       customOperations: {
@@ -509,7 +512,10 @@ export interface GenerateMultiOptions {
   dryRun?: boolean;
   schema?: SchemaConfig;
   unifiedCli?: CliConfig | boolean;
-  /** Remove subdirectories in the output root that don't match any current target name. */
+  /**
+   * Remove subdirectories in the output root that don't match any current target name,
+   * and generated skill directories of targets that no longer exist.
+   */
   cleanStaleTargets?: boolean;
 }
 
@@ -683,6 +689,13 @@ export async function generateMulti(
 
   const cliTargets: MultiTargetCliTarget[] = [];
 
+  const skillNamesByDir = new Map<string, Set<string>>();
+  const recordSkills = (dir: string, skillNames: string[]) => {
+    const recorded = skillNamesByDir.get(dir) ?? new Set<string>();
+    for (const skillName of skillNames) recorded.add(skillName);
+    skillNamesByDir.set(dir, recorded);
+  };
+
   // Remove stale target directories before generating
   if (cleanStaleTargets && names.length > 0 && !dryRun) {
     const firstOutput = getConfigOptions(configs[names[0]]).output;
@@ -711,6 +724,7 @@ export async function generateMulti(
         useUnifiedCli ? { skipCli: true, targetName: name } : { targetName: name },
       );
       results.push({ name, result });
+      if (result.skills) recordSkills(result.skills.dir, result.skills.names);
       if (!result.success) {
         hasError = true;
       } else {
@@ -815,7 +829,8 @@ export async function generateMulti(
           firstTargetResolved,
           firstTargetResolved.output,
         );
-        await writeGeneratedFiles(cliSkillsToWrite, skillsOutputDir, [], { pruneStaleFiles: false });
+        const cliSkillsResult = await writeGeneratedSkills(cliSkillsToWrite, skillsOutputDir);
+        recordSkills(skillsOutputDir, cliSkillsResult.skillNames);
 
       }
     }
@@ -855,6 +870,24 @@ export async function generateMulti(
       }
     }
 
+    // Remove generated skills of targets that no longer exist. A configured
+    // target that failed (e.g. a schema without tables) did not rewrite its
+    // skills, so those are kept rather than treated as stale.
+    if (cleanStaleTargets && !dryRun) {
+      const failedNames = results.filter((r) => !r.result.success).map((r) => r.name);
+      for (const [skillsDir, skillNames] of skillNamesByDir) {
+        const removedSkills = removeStaleGeneratedSkills(
+          skillsDir,
+          Array.from(skillNames),
+          failedNames,
+        );
+        if (verbose) {
+          for (const skillName of removedSkills) {
+            console.log(`Removed stale generated skill: ${skillName}`);
+          }
+        }
+      }
+    }
   } finally {
     for (const shared of sharedSources.values()) {
       const keepDb = Object.values(configs).some((c) => c.db?.keepDb);

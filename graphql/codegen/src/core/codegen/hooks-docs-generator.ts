@@ -8,6 +8,8 @@ import {
   buildSkillReference,
   fieldPlaceholder,
   formatArgType,
+  getEditableFields,
+  getExampleSelectFields,
   getReadmeHeader,
   pkPlaceholder,
 } from './docs-utils';
@@ -22,7 +24,6 @@ import {
   getDeleteMutationHookName,
   getListQueryHookName,
   getPrimaryKeyInfo,
-  getScalarFields,
   getSingleQueryHookName,
   getTableNames,
   getUpdateMutationHookName,
@@ -129,7 +130,7 @@ export function generateHooksReadme(
     for (const table of tables) {
       const { singularName, pluralName } = getTableNames(table);
       const pk = getPrimaryKeyInfo(table)[0];
-      const scalarFields = getScalarFields(table);
+      const selectFields = getExampleSelectFields(table, registry);
 
       lines.push(`### ${table.name}`);
       lines.push('');
@@ -140,7 +141,7 @@ export function generateHooksReadme(
         `const { data, isLoading } = ${getListQueryHookName(table)}({`,
       );
       lines.push(
-        `  selection: { fields: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } },`,
+        `  selection: { fields: { ${selectFields.map((f) => `${f.name}: true`).join(', ')} } },`,
       );
       lines.push('});');
       lines.push('');
@@ -152,7 +153,7 @@ export function generateHooksReadme(
         );
         lines.push(`  ${pk.name}: ${pkPlaceholder(pk)},`);
         lines.push(
-          `  selection: { fields: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } },`,
+          `  selection: { fields: { ${selectFields.map((f) => `${f.name}: true`).join(', ')} } },`,
         );
         lines.push('});');
         lines.push('');
@@ -168,7 +169,7 @@ export function generateHooksReadme(
         );
         lines.push('});');
         lines.push(
-          `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
+          `create({ ${getEditableFields(table, registry).map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
         );
       }
       if (getBulkInsertMutationName(table)) {
@@ -182,7 +183,7 @@ export function generateHooksReadme(
         );
         lines.push('});');
         lines.push(
-          `bulkCreate({ data: [{ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }] });`,
+          `bulkCreate({ data: [{ ${getEditableFields(table, registry).map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }] });`,
         );
       }
       lines.push('```');
@@ -294,8 +295,7 @@ export function generateHooksSkills(
   for (const table of tables) {
     const { singularName, pluralName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
-    const selectFields = scalarFields
+    const selectFields = getExampleSelectFields(table, registry)
       .map((f) => `${f.name}: true`)
       .join(', ');
 
@@ -343,7 +343,7 @@ export function generateHooksSkills(
                 `const { mutate } = ${getCreateMutationHookName(table)}({`,
                 `  selection: { fields: { ${pk.name}: true } },`,
                 '});',
-                `mutate({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
+                `mutate({ ${getEditableFields(table, registry).map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
               ],
             }]
             : []),

@@ -11,6 +11,7 @@ import {
   fieldPlaceholder,
   formatArgType,
   getEditableFields,
+  getExampleSelectFields,
   getReadmeHeader,
   pkPlaceholder,
 } from '../docs-utils';
@@ -68,7 +69,8 @@ export function generateOrmReadme(
       const { singularName } = getTableNames(table);
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
+      const selectFields = getExampleSelectFields(table, registry);
 
       lines.push(`### \`db.${singularName}\``);
       lines.push('');
@@ -91,12 +93,12 @@ export function generateOrmReadme(
       lines.push('```typescript');
       lines.push(`// List all ${singularName} records`);
       lines.push(
-        `const items = await db.${singularName}.findMany({ select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+        `const items = await db.${singularName}.findMany({ select: { ${selectFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
       );
       lines.push('');
       lines.push(`// Get one by ${pk.name}`);
       lines.push(
-        `const item = await db.${singularName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+        `const item = await db.${singularName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { ${selectFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
       );
       lines.push('');
       if (table.query?.create !== null) {
@@ -291,7 +293,7 @@ export function generateOrmSkills(
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const pk = getPrimaryKeyInfo(table)[0];
-    const editableFields = getEditableFields(table);
+    const editableFields = getEditableFields(table, registry);
 
     const modelName = lcFirst(singularName);
     const refName = toKebabCase(singularName);
