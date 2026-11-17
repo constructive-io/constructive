@@ -119,6 +119,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tokenUsage: true,
       totalCost: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformAgentRunSelect, PlatformAgentRunFilter, PlatformAgentRunOrderBy> & {
@@ -164,6 +165,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tokenUsage: true,
       totalCost: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformAgentRunSelect, PlatformAgentRunFilter, PlatformAgentRunOrderBy> & {
@@ -221,6 +223,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           tokenUsage: true,
           totalCost: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -448,6 +451,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           tokenUsage: true,
           totalCost: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -622,6 +626,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformAgentRunPatch;
@@ -654,6 +664,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: cleanedData.threadId,
           tokenUsage: cleanedData.tokenUsage,
           totalCost: cleanedData.totalCost,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
@@ -681,6 +692,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           tokenUsage: true,
           totalCost: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

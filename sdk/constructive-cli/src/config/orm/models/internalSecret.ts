@@ -29,7 +29,6 @@ import type {
   InternalSecretSelect,
   InternalSecretFilter,
   InternalSecretOrderBy,
-  CreateInternalSecretInput,
   UpdateInternalSecretInput,
   InternalSecretPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class InternalSecretModel {
       }) => ({
         internalSecret: data.internalSecrets?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends InternalSecretSelect>(
-    args: CreateArgs<S, CreateInternalSecretInput['internalSecret']> & {
-      select: S;
-    } & StrictSelect<S, InternalSecretSelect>
-  ): QueryBuilder<{
-    createInternalSecret: {
-      internalSecret: InferSelectResult<InternalSecretWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'InternalSecret',
-      'createInternalSecret',
-      'internalSecret',
-      args.select,
-      args.data,
-      'CreateInternalSecretInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'InternalSecret',
-      fieldName: 'createInternalSecret',
-      document,
-      variables,
     });
   }
 }

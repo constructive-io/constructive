@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreatePlatformResourceUtilizationInput,
   PlatformResourceUtilizationPatch,
   PlatformResourceUtilizationSelect,
   PlatformResourceUtilizationFilter,
@@ -54,7 +53,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -71,8 +70,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -158,185 +155,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'avgMemoryBytes',
-        message: 'avgMemoryBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'cpuLimitMillicores',
-        message: 'cpuLimitMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'cpuPeakUtilization',
-        message: 'cpuPeakUtilization',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'cpuRequestHeadroomMillicores',
-        message: 'cpuRequestHeadroomMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'cpuRequestMillicores',
-        message: 'cpuRequestMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'date',
-        message: 'date',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'gbSeconds',
-        message: 'gbSeconds',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'kind',
-        message: 'kind',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'maxCpuMillicores',
-        message: 'maxCpuMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'maxMemoryBytes',
-        message: 'maxMemoryBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryLimitBytes',
-        message: 'memoryLimitBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryPeakUtilization',
-        message: 'memoryPeakUtilization',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryRequestBytes',
-        message: 'memoryRequestBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryRequestHeadroomBytes',
-        message: 'memoryRequestHeadroomBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'replicas',
-        message: 'replicas',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'resourceId',
-        message: 'resourceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'runtimeSeconds',
-        message: 'runtimeSeconds',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'sampleCount',
-        message: 'sampleCount',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreatePlatformResourceUtilizationInput['platformResourceUtilization'];
-    const client = getClient();
-    const result = await client.platformResourceUtilization
-      .create({
-        data: {
-          avgMemoryBytes: cleanedData.avgMemoryBytes,
-          cpuLimitMillicores: cleanedData.cpuLimitMillicores,
-          cpuPeakUtilization: cleanedData.cpuPeakUtilization,
-          cpuRequestHeadroomMillicores: cleanedData.cpuRequestHeadroomMillicores,
-          cpuRequestMillicores: cleanedData.cpuRequestMillicores,
-          date: cleanedData.date,
-          gbSeconds: cleanedData.gbSeconds,
-          kind: cleanedData.kind,
-          maxCpuMillicores: cleanedData.maxCpuMillicores,
-          maxMemoryBytes: cleanedData.maxMemoryBytes,
-          memoryLimitBytes: cleanedData.memoryLimitBytes,
-          memoryPeakUtilization: cleanedData.memoryPeakUtilization,
-          memoryRequestBytes: cleanedData.memoryRequestBytes,
-          memoryRequestHeadroomBytes: cleanedData.memoryRequestHeadroomBytes,
-          namespaceId: cleanedData.namespaceId,
-          replicas: cleanedData.replicas,
-          resourceId: cleanedData.resourceId,
-          runtimeSeconds: cleanedData.runtimeSeconds,
-          sampleCount: cleanedData.sampleCount,
-        },
-        select: {
-          avgMemoryBytes: true,
-          cpuLimitMillicores: true,
-          cpuPeakUtilization: true,
-          cpuRequestHeadroomMillicores: true,
-          cpuRequestMillicores: true,
-          date: true,
-          gbSeconds: true,
-          kind: true,
-          maxCpuMillicores: true,
-          maxMemoryBytes: true,
-          memoryLimitBytes: true,
-          memoryPeakUtilization: true,
-          memoryRequestBytes: true,
-          memoryRequestHeadroomBytes: true,
-          namespaceId: true,
-          replicas: true,
-          resourceId: true,
-          runtimeSeconds: true,
-          sampleCount: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

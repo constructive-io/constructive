@@ -30,5 +30,5 @@ const { data, isLoading } = useDatabasesQuery({
 const { mutate } = useCreateDatabaseMutation({
   selection: { fields: { id: true } },
 });
-mutate({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>', suspendedAt: '<Datetime>', suspendedReason: '<String>' });
+mutate({ hash: '<UUID>', label: '<String>', name: '<String>', ownerId: '<UUID>', platform: '<Boolean>' });
 ```

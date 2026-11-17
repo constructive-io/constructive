@@ -12,7 +12,6 @@ csdk platform-infra-get-all-tree-nodes-record list --where.<field>.<op> <value> 
 csdk platform-infra-get-all-tree-nodes-record list --limit 10 --after <cursor>
 csdk platform-infra-get-all-tree-nodes-record find-first --where.<field>.<op> <value>
 csdk platform-infra-get-all-tree-nodes-record get --id <UUID>
-csdk platform-infra-get-all-tree-nodes-record create --data <JSON> --path <String>
 csdk platform-infra-get-all-tree-nodes-record update --id <UUID> [--data <JSON>] [--path <String>]
 csdk platform-infra-get-all-tree-nodes-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk platform-infra-get-all-tree-nodes-record list --select id,id
 
 ```bash
 csdk platform-infra-get-all-tree-nodes-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a platformInfraGetAllTreeNodesRecord
-
-```bash
-csdk platform-infra-get-all-tree-nodes-record create --data <JSON> --path <String>
 ```
 
 ### Get a platformInfraGetAllTreeNodesRecord by id

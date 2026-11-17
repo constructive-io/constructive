@@ -9,7 +9,6 @@ Scoped sub-identities (API keys and agents) with precomputed SPRT
 ```typescript
 db.principal.findMany({ select: { id: true } }).execute()
 db.principal.findOne({ principalId: '<UUID>', select: { id: true } }).execute()
-db.principal.create({ data: { apiKeyMaxDuration: '<Interval>', bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' }, select: { id: true } }).execute()
 db.principal.update({ where: { principalId: '<UUID>' }, data: { apiKeyMaxDuration: '<Interval>' }, select: { id: true } }).execute()
 db.principal.delete({ where: { principalId: '<UUID>' } }).execute()
 ```
@@ -21,14 +20,5 @@ db.principal.delete({ where: { principalId: '<UUID>' } }).execute()
 ```typescript
 const items = await db.principal.findMany({
   select: { principalId: true, apiKeyMaxDuration: true }
-}).execute();
-```
-
-### Create a principal
-
-```typescript
-const item = await db.principal.create({
-  data: { apiKeyMaxDuration: '<Interval>', bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' },
-  select: { principalId: true }
 }).execute();
 ```

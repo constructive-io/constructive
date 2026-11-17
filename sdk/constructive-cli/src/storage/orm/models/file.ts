@@ -29,7 +29,6 @@ import type {
   FileSelect,
   FileFilter,
   FileOrderBy,
-  CreateFileInput,
   UpdateFileInput,
   FilePatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class FileModel {
       }) => ({
         file: data.files?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends FileSelect>(
-    args: CreateArgs<S, CreateFileInput['file']> & {
-      select: S;
-    } & StrictSelect<S, FileSelect>
-  ): QueryBuilder<{
-    createFile: {
-      file: InferSelectResult<FileWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'File',
-      'createFile',
-      'file',
-      args.select,
-      args.data,
-      'CreateFileInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'File',
-      fieldName: 'createFile',
-      document,
-      variables,
     });
   }
   update<S extends FileSelect>(

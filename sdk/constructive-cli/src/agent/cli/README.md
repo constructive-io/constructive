@@ -161,7 +161,7 @@ CRUD operations for AgentEvent records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `entry`, `recordedAt`, `runId`, `seq`, `transcriptVersion`
+**Required create fields:** `actorId`, `databaseId`, `entry`, `recordedAt`, `runId`, `seq`, `transcriptVersion`, `visibility`
 **Optional create fields (backend defaults):** `transcriptFormat`
 
 ### `agent-message`
@@ -195,7 +195,7 @@ CRUD operations for AgentMessage records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `authorRole`, `threadId`
+**Required create fields:** `authorRole`, `databaseId`, `threadId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `agentId`, `deliveredRunId`, `kind`, `model`, `parts`
 
 ### `agent-persona`
@@ -262,7 +262,7 @@ CRUD operations for AgentPlan records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `threadId`, `title`
+**Required create fields:** `databaseId`, `threadId`, `title`, `visibility`
 **Optional create fields (backend defaults):** `description`, `ownerId`, `status`
 
 ### `agent-prompt`
@@ -342,14 +342,14 @@ CRUD operations for AgentResourceChunk records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -361,8 +361,8 @@ EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk update --embedding "new text 
 
 *Search with pagination and field projection:*
 ```bash
-csdk agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk agent-resource-chunk search "query" --limit 10 --select id,title,searchScore
+csdk agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk agent-resource-chunk search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -394,6 +394,8 @@ CRUD operations for AgentResource records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -418,7 +420,7 @@ CRUD operations for AgentResource records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -453,6 +455,11 @@ csdk agent-resource list --where.trgmBody.value "approximate query" --where.trgm
 csdk agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk agent-resource list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmKind`):*
 ```bash
 csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
@@ -460,7 +467,7 @@ csdk agent-resource list --where.trgmKind.value "approximate query" --where.trgm
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk agent-resource list --where.search "search query" --select title,tsvRank
+csdk agent-resource list --where.search "search query" --select title,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmTitle`):*
@@ -470,7 +477,7 @@ csdk agent-resource list --where.trgmTitle.value "approximate query" --where.trg
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
+csdk agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,searchTsvRank,searchScore,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -524,7 +531,7 @@ CRUD operations for AgentRun records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `threadId`
+**Required create fields:** `databaseId`, `threadId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `artifacts`, `attempt`, `baseCommit`, `branch`, `deadlineAt`, `entityId`, `error`, `executionId`, `finishedAt`, `headCommit`, `lastEventSeq`, `parentRunId`, `placement`, `principalId`, `repoUrl`, `startedAt`, `status`, `tokenUsage`, `totalCost`
 
 ### `agent-run-workspace`
@@ -565,7 +572,7 @@ CRUD operations for AgentRunWorkspace records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `baseBranch`, `branch`, `provider`, `repo`, `runId`
+**Required create fields:** `actorId`, `baseBranch`, `branch`, `databaseId`, `provider`, `repo`, `runId`, `visibility`
 **Optional create fields (backend defaults):** `artifacts`, `baseCommit`, `clonedAt`, `headCommit`, `lastUsedAt`, `ordinal`, `publication`, `repositoryId`, `state`
 
 ### `agent-task`
@@ -603,7 +610,7 @@ CRUD operations for AgentTask records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `description`, `planId`
+**Required create fields:** `databaseId`, `description`, `planId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`
 
 ### `agent-thread`
@@ -705,7 +712,7 @@ CRUD operations for PlatformAgentEvent records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `entry`, `recordedAt`, `runId`, `seq`, `transcriptVersion`
+**Required create fields:** `actorId`, `entry`, `recordedAt`, `runId`, `seq`, `transcriptVersion`, `visibility`
 **Optional create fields (backend defaults):** `transcriptFormat`
 
 ### `platform-agent-message`
@@ -738,7 +745,7 @@ CRUD operations for PlatformAgentMessage records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `authorRole`, `threadId`
+**Required create fields:** `authorRole`, `threadId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `agentId`, `deliveredRunId`, `kind`, `model`, `parts`
 
 ### `platform-agent-persona`
@@ -803,7 +810,7 @@ CRUD operations for PlatformAgentPlan records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `threadId`, `title`
+**Required create fields:** `threadId`, `title`, `visibility`
 **Optional create fields (backend defaults):** `description`, `ownerId`, `status`
 
 ### `platform-agent-prompt`
@@ -881,14 +888,14 @@ CRUD operations for PlatformAgentResourceChunk records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk platform-agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk platform-agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -900,8 +907,8 @@ EMBEDDER_PROVIDER=ollama csdk platform-agent-resource-chunk update --embedding "
 
 *Search with pagination and field projection:*
 ```bash
-csdk platform-agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-agent-resource-chunk search "query" --limit 10 --select id,title,searchScore
+csdk platform-agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk platform-agent-resource-chunk search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -932,6 +939,8 @@ CRUD operations for PlatformAgentResource records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -956,7 +965,7 @@ CRUD operations for PlatformAgentResource records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -991,6 +1000,11 @@ csdk platform-agent-resource list --where.trgmBody.value "approximate query" --w
 csdk platform-agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-agent-resource list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmKind`):*
 ```bash
 csdk platform-agent-resource list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
@@ -998,7 +1012,7 @@ csdk platform-agent-resource list --where.trgmKind.value "approximate query" --w
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk platform-agent-resource list --where.search "search query" --select title,tsvRank
+csdk platform-agent-resource list --where.search "search query" --select title,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmTitle`):*
@@ -1008,7 +1022,7 @@ csdk platform-agent-resource list --where.trgmTitle.value "approximate query" --
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
+csdk platform-agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,searchTsvRank,searchScore,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -1062,7 +1076,7 @@ CRUD operations for PlatformAgentRun records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `threadId`
+**Required create fields:** `threadId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `artifacts`, `attempt`, `baseCommit`, `branch`, `databaseId`, `deadlineAt`, `entityId`, `error`, `executionId`, `finishedAt`, `headCommit`, `lastEventSeq`, `parentRunId`, `placement`, `principalId`, `repoUrl`, `startedAt`, `status`, `tokenUsage`, `totalCost`
 
 ### `platform-agent-run-workspace`
@@ -1102,7 +1116,7 @@ CRUD operations for PlatformAgentRunWorkspace records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `baseBranch`, `branch`, `provider`, `repo`, `runId`
+**Required create fields:** `actorId`, `baseBranch`, `branch`, `provider`, `repo`, `runId`, `visibility`
 **Optional create fields (backend defaults):** `artifacts`, `baseCommit`, `clonedAt`, `headCommit`, `lastUsedAt`, `ordinal`, `publication`, `repositoryId`, `state`
 
 ### `platform-agent-task`
@@ -1139,7 +1153,7 @@ CRUD operations for PlatformAgentTask records.
 | `updatedAt` | Datetime |
 | `visibility` | String |
 
-**Required create fields:** `description`, `planId`
+**Required create fields:** `description`, `planId`, `visibility`
 **Optional create fields (backend defaults):** `actorId`, `approvalFeedback`, `approvalStatus`, `approvedAt`, `approvedBy`, `error`, `orderIndex`, `requiresApproval`, `source`, `status`
 
 ### `platform-agent-thread`

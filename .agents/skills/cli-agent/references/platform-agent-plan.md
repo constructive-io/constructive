@@ -12,8 +12,8 @@ csdk platform-agent-plan list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-agent-plan list --limit 10 --after <cursor>
 csdk platform-agent-plan find-first --where.<field>.<op> <value>
 csdk platform-agent-plan get --id <UUID>
-csdk platform-agent-plan create --threadId <UUID> --title <String> [--description <String>] [--ownerId <UUID>] [--status <String>]
-csdk platform-agent-plan update --id <UUID> [--description <String>] [--ownerId <UUID>] [--status <String>] [--threadId <UUID>] [--title <String>]
+csdk platform-agent-plan create --threadId <UUID> --title <String> --visibility <String> [--description <String>] [--ownerId <UUID>] [--status <String>]
+csdk platform-agent-plan update --id <UUID> [--description <String>] [--ownerId <UUID>] [--status <String>] [--threadId <UUID>] [--title <String>] [--visibility <String>]
 csdk platform-agent-plan delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-agent-plan list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformAgentPlan
 
 ```bash
-csdk platform-agent-plan create --threadId <UUID> --title <String> [--description <String>] [--ownerId <UUID>] [--status <String>]
+csdk platform-agent-plan create --threadId <UUID> --title <String> --visibility <String> [--description <String>] [--ownerId <UUID>] [--status <String>]
 ```
 
 ### Get a platformAgentPlan by id

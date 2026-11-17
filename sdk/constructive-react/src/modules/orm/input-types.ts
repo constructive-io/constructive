@@ -461,7 +461,7 @@ export interface Blueprint {
   /** Timestamp when this blueprint was last modified. */
   updatedAt?: string | null;
 }
-/** Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. */
+/** Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here as pending and a blueprint:construct job builds it in the background. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts, including failed ones. */
 export interface BlueprintConstruction {
   /** The blueprint that was constructed. */
   blueprintId?: string | null;
@@ -473,11 +473,13 @@ export interface BlueprintConstruction {
   createdAt?: string | null;
   /** The database the blueprint was constructed into. */
   databaseId?: string | null;
+  /** The coded error ({"code", "context", "class"} as raised through errors.raise_error, or {"code": <SQLSTATE>, "message"} for a database error) a failed construction ended with. NULL unless status is failed. */
+  error?: Record<string, unknown> | null;
   /** Unique identifier for this construction attempt. */
   id: string;
   /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
   schemaId?: string | null;
-  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. A failed construction raises and rolls back, so it leaves no row. */
+  /** Execution state of this construction attempt. pending: enqueued, the blueprint:construct job has not started. constructing: the job is executing. constructed: successfully completed. failed: the job raised; the build rolled back and error carries its coded error. */
   status?: string | null;
   /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
   tableMap?: Record<string, unknown> | null;
@@ -866,6 +868,8 @@ export interface DbUsageModule {
   queryStatsLogTableName?: string | null;
   queryStatsSummaryTableId?: string | null;
   queryStatsSummaryTableName?: string | null;
+  readDbQueryStatsUsagePeriodFunction?: string | null;
+  readDbTableStatsUsagePeriodFunction?: string | null;
   retention?: string | null;
   rollupDbQueryStatsUsageSummaryFunction?: string | null;
   rollupDbTableStatsUsageSummaryFunction?: string | null;
@@ -908,6 +912,7 @@ export interface DomainModule {
   catalogModuleId?: string | null;
   databaseId?: string | null;
   defaultCapabilities?: string[] | null;
+  defaultReservedSubdomains?: Record<string, unknown> | null;
   domainEventsTableId?: string | null;
   domainEventsTableName?: string | null;
   domainVerificationsTableId?: string | null;
@@ -926,8 +931,11 @@ export interface DomainModule {
   privateSchemaName?: string | null;
   provisions?: Record<string, unknown> | null;
   publicSchemaName?: string | null;
+  reservedSubdomainsTableId?: string | null;
+  reservedSubdomainsTableName?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+  sweepUnverifiedDomainsFunction?: string | null;
 }
 export interface EmailSenderModule {
   apiName?: string | null;
@@ -1167,7 +1175,6 @@ export interface EntityTypeProvision {
    *        - has_content_hash              (boolean) enable content hash for dedup
    *        - has_custom_keys               (boolean) allow client-provided S3 keys
    *        - has_audit_log                 (boolean) enable file events audit table
-   *        - has_confirm_upload            (boolean) enable HeadObject confirmation flow
    *        - confirm_upload_delay          (interval) delay before first confirmation attempt
    *        - buckets                       (jsonb[]) array of initial bucket definitions to seed.
    *          Each bucket: { name (required), description, is_public, allowed_mime_types, max_file_size, allowed_origins }
@@ -2214,8 +2221,6 @@ export interface RepositoryModule {
 }
 export interface ResourceModule {
   apiName?: string | null;
-  builderBindingsTableId?: string | null;
-  builderBindingsTableName?: string | null;
   databaseId?: string | null;
   defaultCapabilities?: string[] | null;
   entityField?: string | null;
@@ -2253,6 +2258,8 @@ export interface ResourceModule {
   rollupResourceUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+  serviceBindingsTableId?: string | null;
+  serviceBindingsTableName?: string | null;
 }
 export interface RlsModule {
   apiName?: string | null;
@@ -2409,6 +2416,7 @@ export interface StorageLogModule {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
+  readStorageUsagePeriodFunction?: string | null;
   retention?: string | null;
   rollupFunctionName?: string | null;
   schemaId?: string | null;
@@ -2437,7 +2445,6 @@ export interface StorageModule {
   filesTableId?: string | null;
   filesTableName?: string | null;
   hasAuditLog?: boolean | null;
-  hasConfirmUpload?: boolean | null;
   hasContentHash?: boolean | null;
   hasCustomKeys?: boolean | null;
   hasPathShares?: boolean | null;
@@ -3158,6 +3165,7 @@ export type BlueprintConstructionSelect = {
   constructedDefinition?: boolean;
   createdAt?: boolean;
   databaseId?: boolean;
+  error?: boolean;
   id?: boolean;
   schemaId?: boolean;
   status?: boolean;
@@ -3557,6 +3565,8 @@ export type DbUsageModuleSelect = {
   queryStatsLogTableName?: boolean;
   queryStatsSummaryTableId?: boolean;
   queryStatsSummaryTableName?: boolean;
+  readDbQueryStatsUsagePeriodFunction?: boolean;
+  readDbTableStatsUsagePeriodFunction?: boolean;
   retention?: boolean;
   rollupDbQueryStatsUsageSummaryFunction?: boolean;
   rollupDbTableStatsUsageSummaryFunction?: boolean;
@@ -3599,6 +3609,7 @@ export type DomainModuleSelect = {
   catalogModuleId?: boolean;
   databaseId?: boolean;
   defaultCapabilities?: boolean;
+  defaultReservedSubdomains?: boolean;
   domainEventsTableId?: boolean;
   domainEventsTableName?: boolean;
   domainVerificationsTableId?: boolean;
@@ -3617,8 +3628,11 @@ export type DomainModuleSelect = {
   privateSchemaName?: boolean;
   provisions?: boolean;
   publicSchemaName?: boolean;
+  reservedSubdomainsTableId?: boolean;
+  reservedSubdomainsTableName?: boolean;
   schemaId?: boolean;
   scope?: boolean;
+  sweepUnverifiedDomainsFunction?: boolean;
   catalogModule?: {
     select: CatalogModuleSelect;
   };
@@ -4666,8 +4680,6 @@ export type RepositoryModuleSelect = {
 };
 export type ResourceModuleSelect = {
   apiName?: boolean;
-  builderBindingsTableId?: boolean;
-  builderBindingsTableName?: boolean;
   databaseId?: boolean;
   defaultCapabilities?: boolean;
   entityField?: boolean;
@@ -4705,6 +4717,8 @@ export type ResourceModuleSelect = {
   rollupResourceUsageSummaryFunction?: boolean;
   schemaId?: boolean;
   scope?: boolean;
+  serviceBindingsTableId?: boolean;
+  serviceBindingsTableName?: boolean;
   merkleStoreModule?: {
     select: MerkleStoreModuleSelect;
   };
@@ -4872,6 +4886,7 @@ export type StorageLogModuleSelect = {
   privateSchemaId?: boolean;
   privateSchemaName?: boolean;
   publicSchemaName?: boolean;
+  readStorageUsagePeriodFunction?: boolean;
   retention?: boolean;
   rollupFunctionName?: boolean;
   schemaId?: boolean;
@@ -4900,7 +4915,6 @@ export type StorageModuleSelect = {
   filesTableId?: boolean;
   filesTableName?: boolean;
   hasAuditLog?: boolean;
-  hasConfirmUpload?: boolean;
   hasContentHash?: boolean;
   hasCustomKeys?: boolean;
   hasPathShares?: boolean;
@@ -5589,6 +5603,8 @@ export interface BlueprintConstructionFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: JSONFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -6371,6 +6387,10 @@ export interface DbUsageModuleFilter {
   queryStatsSummaryTableId?: UUIDFilter;
   /** Filter by the object’s `queryStatsSummaryTableName` field. */
   queryStatsSummaryTableName?: StringFilter;
+  /** Filter by the object’s `readDbQueryStatsUsagePeriodFunction` field. */
+  readDbQueryStatsUsagePeriodFunction?: StringFilter;
+  /** Filter by the object’s `readDbTableStatsUsagePeriodFunction` field. */
+  readDbTableStatsUsagePeriodFunction?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
   /** Filter by the object’s `rollupDbQueryStatsUsageSummaryFunction` field. */
@@ -6471,6 +6491,8 @@ export interface DomainModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
   defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `defaultReservedSubdomains` field. */
+  defaultReservedSubdomains?: JSONFilter;
   /** Filter by the object’s `domainEventsTableId` field. */
   domainEventsTableId?: UUIDFilter;
   /** Filter by the object’s `domainEventsTableName` field. */
@@ -6511,6 +6533,10 @@ export interface DomainModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `reservedSubdomainsTableId` field. */
+  reservedSubdomainsTableId?: UUIDFilter;
+  /** Filter by the object’s `reservedSubdomainsTableName` field. */
+  reservedSubdomainsTableName?: StringFilter;
   /** Filter by the object’s `routeModules` relation. */
   routeModules?: DomainModuleToManyRouteModuleFilter;
   /** `routeModules` exist. */
@@ -6519,6 +6545,8 @@ export interface DomainModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `sweepUnverifiedDomainsFunction` field. */
+  sweepUnverifiedDomainsFunction?: StringFilter;
 }
 export interface EmailSenderModuleFilter {
   /** Checks for all expressions in this list. */
@@ -8619,10 +8647,6 @@ export interface ResourceModuleFilter {
   and?: ResourceModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
-  /** Filter by the object’s `builderBindingsTableId` field. */
-  builderBindingsTableId?: UUIDFilter;
-  /** Filter by the object’s `builderBindingsTableName` field. */
-  builderBindingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
@@ -8709,6 +8733,10 @@ export interface ResourceModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `serviceBindingsTableId` field. */
+  serviceBindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `serviceBindingsTableName` field. */
+  serviceBindingsTableName?: StringFilter;
 }
 export interface RlsModuleFilter {
   /** Checks for all expressions in this list. */
@@ -9041,6 +9069,8 @@ export interface StorageLogModuleFilter {
   privateSchemaName?: StringFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `readStorageUsagePeriodFunction` field. */
+  readStorageUsagePeriodFunction?: StringFilter;
   /** Filter by the object’s `retention` field. */
   retention?: StringFilter;
   /** Filter by the object’s `rollupFunctionName` field. */
@@ -9101,8 +9131,6 @@ export interface StorageModuleFilter {
   filesTableName?: StringFilter;
   /** Filter by the object’s `hasAuditLog` field. */
   hasAuditLog?: BooleanFilter;
-  /** Filter by the object’s `hasConfirmUpload` field. */
-  hasConfirmUpload?: BooleanFilter;
   /** Filter by the object’s `hasContentHash` field. */
   hasContentHash?: BooleanFilter;
   /** Filter by the object’s `hasCustomKeys` field. */
@@ -9968,6 +9996,8 @@ export type BlueprintConstructionOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'ERROR_ASC'
+  | 'ERROR_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NATURAL'
@@ -10643,6 +10673,10 @@ export type DbUsageModuleOrderBy =
   | 'QUERY_STATS_SUMMARY_TABLE_ID_DESC'
   | 'QUERY_STATS_SUMMARY_TABLE_NAME_ASC'
   | 'QUERY_STATS_SUMMARY_TABLE_NAME_DESC'
+  | 'READ_DB_QUERY_STATS_USAGE_PERIOD_FUNCTION_ASC'
+  | 'READ_DB_QUERY_STATS_USAGE_PERIOD_FUNCTION_DESC'
+  | 'READ_DB_TABLE_STATS_USAGE_PERIOD_FUNCTION_ASC'
+  | 'READ_DB_TABLE_STATS_USAGE_PERIOD_FUNCTION_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
   | 'ROLLUP_DB_QUERY_STATS_USAGE_SUMMARY_FUNCTION_ASC'
@@ -10724,6 +10758,8 @@ export type DomainModuleOrderBy =
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_CAPABILITIES_ASC'
   | 'DEFAULT_CAPABILITIES_DESC'
+  | 'DEFAULT_RESERVED_SUBDOMAINS_ASC'
+  | 'DEFAULT_RESERVED_SUBDOMAINS_DESC'
   | 'DOMAINS_TABLE_ID_ASC'
   | 'DOMAINS_TABLE_ID_DESC'
   | 'DOMAINS_TABLE_NAME_ASC'
@@ -10763,10 +10799,16 @@ export type DomainModuleOrderBy =
   | 'PROVISIONS_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'RESERVED_SUBDOMAINS_TABLE_ID_ASC'
+  | 'RESERVED_SUBDOMAINS_TABLE_ID_DESC'
+  | 'RESERVED_SUBDOMAINS_TABLE_NAME_ASC'
+  | 'RESERVED_SUBDOMAINS_TABLE_NAME_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
+  | 'SCOPE_DESC'
+  | 'SWEEP_UNVERIFIED_DOMAINS_FUNCTION_ASC'
+  | 'SWEEP_UNVERIFIED_DOMAINS_FUNCTION_DESC';
 export type EmailSenderModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -12618,10 +12660,6 @@ export type RepositoryModuleOrderBy =
 export type ResourceModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
-  | 'BUILDER_BINDINGS_TABLE_ID_ASC'
-  | 'BUILDER_BINDINGS_TABLE_ID_DESC'
-  | 'BUILDER_BINDINGS_TABLE_NAME_ASC'
-  | 'BUILDER_BINDINGS_TABLE_NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEFAULT_CAPABILITIES_ASC'
@@ -12698,7 +12736,11 @@ export type ResourceModuleOrderBy =
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
   | 'SCOPE_ASC'
-  | 'SCOPE_DESC';
+  | 'SCOPE_DESC'
+  | 'SERVICE_BINDINGS_TABLE_ID_ASC'
+  | 'SERVICE_BINDINGS_TABLE_ID_DESC'
+  | 'SERVICE_BINDINGS_TABLE_NAME_ASC'
+  | 'SERVICE_BINDINGS_TABLE_NAME_DESC';
 export type RlsModuleOrderBy =
   | 'API_NAME_ASC'
   | 'API_NAME_DESC'
@@ -12979,6 +13021,8 @@ export type StorageLogModuleOrderBy =
   | 'PRIVATE_SCHEMA_NAME_DESC'
   | 'PUBLIC_SCHEMA_NAME_ASC'
   | 'PUBLIC_SCHEMA_NAME_DESC'
+  | 'READ_STORAGE_USAGE_PERIOD_FUNCTION_ASC'
+  | 'READ_STORAGE_USAGE_PERIOD_FUNCTION_DESC'
   | 'RETENTION_ASC'
   | 'RETENTION_DESC'
   | 'ROLLUP_FUNCTION_NAME_ASC'
@@ -13032,8 +13076,6 @@ export type StorageModuleOrderBy =
   | 'FILE_EVENTS_TABLE_ID_DESC'
   | 'HAS_AUDIT_LOG_ASC'
   | 'HAS_AUDIT_LOG_DESC'
-  | 'HAS_CONFIRM_UPLOAD_ASC'
-  | 'HAS_CONFIRM_UPLOAD_DESC'
   | 'HAS_CONTENT_HASH_ASC'
   | 'HAS_CONTENT_HASH_DESC'
   | 'HAS_CUSTOM_KEYS_ASC'
@@ -13893,6 +13935,7 @@ export interface CreateBlueprintConstructionInput {
     constructedAt?: string;
     constructedDefinition?: Record<string, unknown>;
     databaseId: string;
+    error?: Record<string, unknown>;
     schemaId?: string;
     status?: string;
     tableMap?: Record<string, unknown>;
@@ -13903,6 +13946,7 @@ export interface BlueprintConstructionPatch {
   constructedAt?: string | null;
   constructedDefinition?: Record<string, unknown> | null;
   databaseId?: string | null;
+  error?: Record<string, unknown> | null;
   schemaId?: string | null;
   status?: string | null;
   tableMap?: Record<string, unknown> | null;
@@ -14688,6 +14732,8 @@ export interface CreateDbUsageModuleInput {
     queryStatsLogTableName?: string;
     queryStatsSummaryTableId?: string;
     queryStatsSummaryTableName?: string;
+    readDbQueryStatsUsagePeriodFunction?: string;
+    readDbTableStatsUsagePeriodFunction?: string;
     retention?: string;
     rollupDbQueryStatsUsageSummaryFunction?: string;
     rollupDbTableStatsUsageSummaryFunction?: string;
@@ -14717,6 +14763,8 @@ export interface DbUsageModulePatch {
   queryStatsLogTableName?: string | null;
   queryStatsSummaryTableId?: string | null;
   queryStatsSummaryTableName?: string | null;
+  readDbQueryStatsUsagePeriodFunction?: string | null;
+  readDbTableStatsUsagePeriodFunction?: string | null;
   retention?: string | null;
   rollupDbQueryStatsUsageSummaryFunction?: string | null;
   rollupDbTableStatsUsageSummaryFunction?: string | null;
@@ -14827,6 +14875,7 @@ export interface CreateDomainModuleInput {
     catalogModuleId?: string;
     databaseId: string;
     defaultCapabilities?: string[];
+    defaultReservedSubdomains?: Record<string, unknown>;
     domainEventsTableId?: string;
     domainEventsTableName?: string;
     domainVerificationsTableId?: string;
@@ -14844,8 +14893,11 @@ export interface CreateDomainModuleInput {
     privateSchemaName?: string;
     provisions?: Record<string, unknown>;
     publicSchemaName?: string;
+    reservedSubdomainsTableId?: string;
+    reservedSubdomainsTableName?: string;
     schemaId?: string;
     scope: string;
+    sweepUnverifiedDomainsFunction?: string;
   };
 }
 export interface DomainModulePatch {
@@ -14853,6 +14905,7 @@ export interface DomainModulePatch {
   catalogModuleId?: string | null;
   databaseId?: string | null;
   defaultCapabilities?: string[] | null;
+  defaultReservedSubdomains?: Record<string, unknown> | null;
   domainEventsTableId?: string | null;
   domainEventsTableName?: string | null;
   domainVerificationsTableId?: string | null;
@@ -14870,8 +14923,11 @@ export interface DomainModulePatch {
   privateSchemaName?: string | null;
   provisions?: Record<string, unknown> | null;
   publicSchemaName?: string | null;
+  reservedSubdomainsTableId?: string | null;
+  reservedSubdomainsTableName?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+  sweepUnverifiedDomainsFunction?: string | null;
 }
 export interface UpdateDomainModuleInput {
   clientMutationId?: string;
@@ -17132,8 +17188,6 @@ export interface CreateResourceModuleInput {
   clientMutationId?: string;
   resourceModule: {
     apiName?: string;
-    builderBindingsTableId?: string;
-    builderBindingsTableName?: string;
     databaseId: string;
     defaultCapabilities?: string[];
     entityField?: string;
@@ -17170,12 +17224,12 @@ export interface CreateResourceModuleInput {
     rollupResourceUsageSummaryFunction?: string;
     schemaId?: string;
     scope: string;
+    serviceBindingsTableId?: string;
+    serviceBindingsTableName?: string;
   };
 }
 export interface ResourceModulePatch {
   apiName?: string | null;
-  builderBindingsTableId?: string | null;
-  builderBindingsTableName?: string | null;
   databaseId?: string | null;
   defaultCapabilities?: string[] | null;
   entityField?: string | null;
@@ -17212,6 +17266,8 @@ export interface ResourceModulePatch {
   rollupResourceUsageSummaryFunction?: string | null;
   schemaId?: string | null;
   scope?: string | null;
+  serviceBindingsTableId?: string | null;
+  serviceBindingsTableName?: string | null;
 }
 export interface UpdateResourceModuleInput {
   clientMutationId?: string;
@@ -17559,6 +17615,7 @@ export interface CreateStorageLogModuleInput {
     privateSchemaId?: string;
     privateSchemaName?: string;
     publicSchemaName?: string;
+    readStorageUsagePeriodFunction?: string;
     retention?: string;
     rollupFunctionName?: string;
     schemaId?: string;
@@ -17580,6 +17637,7 @@ export interface StorageLogModulePatch {
   privateSchemaId?: string | null;
   privateSchemaName?: string | null;
   publicSchemaName?: string | null;
+  readStorageUsagePeriodFunction?: string | null;
   retention?: string | null;
   rollupFunctionName?: string | null;
   schemaId?: string | null;
@@ -17619,7 +17677,6 @@ export interface CreateStorageModuleInput {
     filesTableId?: string;
     filesTableName?: string;
     hasAuditLog?: boolean;
-    hasConfirmUpload?: boolean;
     hasContentHash?: boolean;
     hasCustomKeys?: boolean;
     hasPathShares?: boolean;
@@ -17664,7 +17721,6 @@ export interface StorageModulePatch {
   filesTableId?: string | null;
   filesTableName?: string | null;
   hasAuditLog?: boolean | null;
-  hasConfirmUpload?: boolean | null;
   hasContentHash?: boolean | null;
   hasCustomKeys?: boolean | null;
   hasPathShares?: boolean | null;
@@ -18741,11 +18797,13 @@ export interface BlueprintConstructionInput {
   createdAt?: string;
   /** The database the blueprint was constructed into. */
   databaseId: string;
+  /** The coded error ({"code", "context", "class"} as raised through errors.raise_error, or {"code": <SQLSTATE>, "message"} for a database error) a failed construction ended with. NULL unless status is failed. */
+  error?: Record<string, unknown>;
   /** Unique identifier for this construction attempt. */
   id?: string;
   /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
   schemaId?: string;
-  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. A failed construction raises and rolls back, so it leaves no row. */
+  /** Execution state of this construction attempt. pending: enqueued, the blueprint:construct job has not started. constructing: the job is executing. constructed: successfully completed. failed: the job raised; the build rolled back and error carries its coded error. */
   status?: string;
   /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
   tableMap?: Record<string, unknown>;
@@ -19165,6 +19223,8 @@ export interface DbUsageModuleInput {
   queryStatsLogTableName?: string;
   queryStatsSummaryTableId?: string;
   queryStatsSummaryTableName?: string;
+  readDbQueryStatsUsagePeriodFunction?: string;
+  readDbTableStatsUsagePeriodFunction?: string;
   retention?: string;
   rollupDbQueryStatsUsageSummaryFunction?: string;
   rollupDbTableStatsUsageSummaryFunction?: string;
@@ -19211,6 +19271,7 @@ export interface DomainModuleInput {
   catalogModuleId?: string;
   databaseId: string;
   defaultCapabilities?: string[];
+  defaultReservedSubdomains?: Record<string, unknown>;
   domainEventsTableId?: string;
   domainEventsTableName?: string;
   domainVerificationsTableId?: string;
@@ -19229,8 +19290,11 @@ export interface DomainModuleInput {
   privateSchemaName?: string;
   provisions?: Record<string, unknown>;
   publicSchemaName?: string;
+  reservedSubdomainsTableId?: string;
+  reservedSubdomainsTableName?: string;
   schemaId?: string;
   scope: string;
+  sweepUnverifiedDomainsFunction?: string;
 }
 /** An input for mutations affecting `EmailSenderModule` */
 export interface EmailSenderModuleInput {
@@ -19463,7 +19527,6 @@ export interface EntityTypeProvisionInput {
    *        - has_content_hash              (boolean) enable content hash for dedup
    *        - has_custom_keys               (boolean) allow client-provided S3 keys
    *        - has_audit_log                 (boolean) enable file events audit table
-   *        - has_confirm_upload            (boolean) enable HeadObject confirmation flow
    *        - confirm_upload_delay          (interval) delay before first confirmation attempt
    *        - buckets                       (jsonb[]) array of initial bucket definitions to seed.
    *          Each bucket: { name (required), description, is_public, allowed_mime_types, max_file_size, allowed_origins }
@@ -20507,8 +20570,6 @@ export interface RepositoryModuleInput {
 /** An input for mutations affecting `ResourceModule` */
 export interface ResourceModuleInput {
   apiName?: string;
-  builderBindingsTableId?: string;
-  builderBindingsTableName?: string;
   databaseId: string;
   defaultCapabilities?: string[];
   entityField?: string;
@@ -20546,6 +20607,8 @@ export interface ResourceModuleInput {
   rollupResourceUsageSummaryFunction?: string;
   schemaId?: string;
   scope: string;
+  serviceBindingsTableId?: string;
+  serviceBindingsTableName?: string;
 }
 /** An input for mutations affecting `RlsModule` */
 export interface RlsModuleInput {
@@ -20708,6 +20771,7 @@ export interface StorageLogModuleInput {
   privateSchemaId?: string;
   privateSchemaName?: string;
   publicSchemaName?: string;
+  readStorageUsagePeriodFunction?: string;
   retention?: string;
   rollupFunctionName?: string;
   schemaId?: string;
@@ -20737,7 +20801,6 @@ export interface StorageModuleInput {
   filesTableId?: string;
   filesTableName?: string;
   hasAuditLog?: boolean;
-  hasConfirmUpload?: boolean;
   hasContentHash?: boolean;
   hasCustomKeys?: boolean;
   hasPathShares?: boolean;
@@ -20945,6 +21008,8 @@ export interface BlueprintConstructionFilter {
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `error` field. */
+  error?: JSONFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Negates the expression. */
@@ -21223,6 +21288,8 @@ export interface DomainModuleFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
   defaultCapabilities?: StringListFilter;
+  /** Filter by the object’s `defaultReservedSubdomains` field. */
+  defaultReservedSubdomains?: JSONFilter;
   /** Filter by the object’s `domainEventsTableId` field. */
   domainEventsTableId?: UUIDFilter;
   /** Filter by the object’s `domainEventsTableName` field. */
@@ -21263,6 +21330,10 @@ export interface DomainModuleFilter {
   provisions?: JSONFilter;
   /** Filter by the object’s `publicSchemaName` field. */
   publicSchemaName?: StringFilter;
+  /** Filter by the object’s `reservedSubdomainsTableId` field. */
+  reservedSubdomainsTableId?: UUIDFilter;
+  /** Filter by the object’s `reservedSubdomainsTableName` field. */
+  reservedSubdomainsTableName?: StringFilter;
   /** Filter by the object’s `routeModules` relation. */
   routeModules?: DomainModuleToManyRouteModuleFilter;
   /** `routeModules` exist. */
@@ -21271,6 +21342,8 @@ export interface DomainModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `sweepUnverifiedDomainsFunction` field. */
+  sweepUnverifiedDomainsFunction?: StringFilter;
 }
 /** A filter to be used against `RouteModule` object types. All fields are combined with a logical ‘and.’ */
 export interface RouteModuleFilter {
@@ -21884,10 +21957,6 @@ export interface ResourceModuleFilter {
   and?: ResourceModuleFilter[];
   /** Filter by the object’s `apiName` field. */
   apiName?: StringFilter;
-  /** Filter by the object’s `builderBindingsTableId` field. */
-  builderBindingsTableId?: UUIDFilter;
-  /** Filter by the object’s `builderBindingsTableName` field. */
-  builderBindingsTableName?: StringFilter;
   /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
   /** Filter by the object’s `defaultCapabilities` field. */
@@ -21974,6 +22043,10 @@ export interface ResourceModuleFilter {
   schemaId?: UUIDFilter;
   /** Filter by the object’s `scope` field. */
   scope?: StringFilter;
+  /** Filter by the object’s `serviceBindingsTableId` field. */
+  serviceBindingsTableId?: UUIDFilter;
+  /** Filter by the object’s `serviceBindingsTableName` field. */
+  serviceBindingsTableName?: StringFilter;
 }
 /** A filter to be used against `EmailSenderModule` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailSenderModuleFilter {
@@ -22833,8 +22906,6 @@ export interface StorageModuleFilter {
   filesTableName?: StringFilter;
   /** Filter by the object’s `hasAuditLog` field. */
   hasAuditLog?: BooleanFilter;
-  /** Filter by the object’s `hasConfirmUpload` field. */
-  hasConfirmUpload?: BooleanFilter;
   /** Filter by the object’s `hasContentHash` field. */
   hasContentHash?: BooleanFilter;
   /** Filter by the object’s `hasCustomKeys` field. */

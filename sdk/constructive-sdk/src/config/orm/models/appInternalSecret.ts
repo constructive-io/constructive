@@ -29,7 +29,6 @@ import type {
   AppInternalSecretSelect,
   AppInternalSecretFilter,
   AppInternalSecretOrderBy,
-  CreateAppInternalSecretInput,
   UpdateAppInternalSecretInput,
   AppInternalSecretPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class AppInternalSecretModel {
       }) => ({
         appInternalSecret: data.appInternalSecrets?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends AppInternalSecretSelect>(
-    args: CreateArgs<S, CreateAppInternalSecretInput['appInternalSecret']> & {
-      select: S;
-    } & StrictSelect<S, AppInternalSecretSelect>
-  ): QueryBuilder<{
-    createAppInternalSecret: {
-      appInternalSecret: InferSelectResult<AppInternalSecretWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'AppInternalSecret',
-      'createAppInternalSecret',
-      'appInternalSecret',
-      args.select,
-      args.data,
-      'CreateAppInternalSecretInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'AppInternalSecret',
-      fieldName: 'createAppInternalSecret',
-      document,
-      variables,
     });
   }
 }

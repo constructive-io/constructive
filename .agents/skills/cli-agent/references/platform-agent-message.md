@@ -12,8 +12,8 @@ csdk platform-agent-message list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-agent-message list --limit 10 --after <cursor>
 csdk platform-agent-message find-first --where.<field>.<op> <value>
 csdk platform-agent-message get --id <UUID>
-csdk platform-agent-message create --authorRole <String> --threadId <UUID> [--actorId <UUID>] [--agentId <UUID>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>]
-csdk platform-agent-message update --id <UUID> [--actorId <UUID>] [--agentId <UUID>] [--authorRole <String>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>] [--threadId <UUID>]
+csdk platform-agent-message create --authorRole <String> --threadId <UUID> --visibility <String> [--actorId <UUID>] [--agentId <UUID>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>]
+csdk platform-agent-message update --id <UUID> [--actorId <UUID>] [--agentId <UUID>] [--authorRole <String>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>] [--threadId <UUID>] [--visibility <String>]
 csdk platform-agent-message delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-agent-message list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformAgentMessage
 
 ```bash
-csdk platform-agent-message create --authorRole <String> --threadId <UUID> [--actorId <UUID>] [--agentId <UUID>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>]
+csdk platform-agent-message create --authorRole <String> --threadId <UUID> --visibility <String> [--actorId <UUID>] [--agentId <UUID>] [--deliveredRunId <UUID>] [--kind <String>] [--model <String>] [--parts <JSON>]
 ```
 
 ### Get a platformAgentMessage by id

@@ -7,6 +7,7 @@ export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
+export type FileVersion = unknown;
 export interface AuditLogAuth {
   actorId: string | null;
   createdAt: string | null;
@@ -124,6 +125,8 @@ export interface User {
   displayNameTrgmSimilarity: number | null;
   id: string | null;
   profilePicture: ConstructiveInternalTypeImage | null;
+  profilePictureUrl: string | null;
+  profilePictureVersions: FileVersion[] | null;
   searchScore: number | null;
   searchTsv: string | null;
   searchTsvRank: number | null;

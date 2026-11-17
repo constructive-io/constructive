@@ -140,9 +140,7 @@ export function buildSelections(
         );
         const nestedSelect = nested.select;
         if (nestedSelect && typeof nestedSelect === 'object') {
-          const subSelections = Object.entries(nestedSelect)
-            .filter(([, v]) => v)
-            .map(([name]) => t.field({ name }));
+          const subSelections = buildSelections(nestedSelect, connectionFieldsMap);
           fields.push(
             t.field({
               name: key,

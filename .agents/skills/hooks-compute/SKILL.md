@@ -1,13 +1,13 @@
 ---
 name: hooks-compute
-description: React Query hooks for the compute API — provides typed query and mutation hooks for 123 tables and 64 custom operations
+description: React Query hooks for the compute API — provides typed query and mutation hooks for 123 tables and 65 custom operations
 ---
 
 # hooks-compute
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the compute API — provides typed query and mutation hooks for 123 tables and 64 custom operations
+React Query hooks for the compute API — provides typed query and mutation hooks for 123 tables and 65 custom operations
 
 ## Usage
 
@@ -40,7 +40,6 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [build](references/build.md)
 - [build-step](references/build-step.md)
-- [builder-binding](references/builder-binding.md)
 - [content-preset](references/content-preset.md)
 - [database-function-graph](references/database-function-graph.md)
 - [database-function-graph-execution-cancel-request](references/database-function-graph-execution-cancel-request.md)
@@ -84,7 +83,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [namespace-event](references/namespace-event.md)
 - [platform-build](references/platform-build.md)
 - [platform-build-step](references/platform-build-step.md)
-- [platform-builder-binding](references/platform-builder-binding.md)
 - [platform-function-api-binding](references/platform-function-api-binding.md)
 - [platform-function-capability-binding](references/platform-function-capability-binding.md)
 - [platform-function-definition](references/platform-function-definition.md)
@@ -131,6 +129,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [platform-resources-health](references/platform-resources-health.md)
 - [platform-resources-requirements-state](references/platform-resources-requirements-state.md)
 - [platform-resources-resolved-requirement](references/platform-resources-resolved-requirement.md)
+- [platform-service-binding](references/platform-service-binding.md)
 - [platform-webhook-endpoint](references/platform-webhook-endpoint.md)
 - [platform-webhook-event](references/platform-webhook-event.md)
 - [proposal-comment](references/proposal-comment.md)
@@ -159,6 +158,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [resources-health](references/resources-health.md)
 - [resources-requirements-state](references/resources-requirements-state.md)
 - [resources-resolved-requirement](references/resources-resolved-requirement.md)
+- [service-binding](references/service-binding.md)
 - [webhook-endpoint](references/webhook-endpoint.md)
 - [webhook-event](references/webhook-event.md)
 - [database-read-function-graph](references/database-read-function-graph.md)
@@ -169,6 +169,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [add-node-and-save](references/add-node-and-save.md)
 - [approve-node](references/approve-node.md)
 - [copy-graph](references/copy-graph.md)
+- [create-function-graph](references/create-function-graph.md)
 - [database-add-edge](references/database-add-edge.md)
 - [database-add-edge-and-save](references/database-add-edge-and-save.md)
 - [database-add-node](references/database-add-node.md)

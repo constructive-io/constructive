@@ -84,12 +84,10 @@ function App() {
 | `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMyPendingAppInvitesQuery` | Query | List all myPendingAppInvites |
 | `useMyPendingAppInvitesRecordQuery` | Query | Get one myPendingAppInvitesRecord |
-| `useCreateMyPendingAppInvitesRecordMutation` | Mutation | Create a myPendingAppInvitesRecord |
 | `useUpdateMyPendingAppInvitesRecordMutation` | Mutation | Update a myPendingAppInvitesRecord |
 | `useDeleteMyPendingAppInvitesRecordMutation` | Mutation | Delete a myPendingAppInvitesRecord |
 | `useMyPendingOrgInvitesQuery` | Query | List all myPendingOrgInvites |
 | `useMyPendingOrgInvitesRecordQuery` | Query | Get one myPendingOrgInvitesRecord |
-| `useCreateMyPendingOrgInvitesRecordMutation` | Mutation | Create a myPendingOrgInvitesRecord |
 | `useUpdateMyPendingOrgInvitesRecordMutation` | Mutation | Update a myPendingOrgInvitesRecord |
 | `useDeleteMyPendingOrgInvitesRecordMutation` | Mutation | Delete a myPendingOrgInvitesRecord |
 | `useOrgAdminGrantsQuery` | Query | Records of admin role grants and revocations between members |
@@ -123,9 +121,7 @@ function App() {
 | `useUpdateOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useDeleteOrgClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useOrgGetManagersQuery` | Query | List all orgGetManagers |
-| `useCreateOrgGetManagersRecordMutation` | Mutation | Create a orgGetManagersRecord |
 | `useOrgGetSubordinatesQuery` | Query | List all orgGetSubordinates |
-| `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
 | `useOrgGrantsQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
 | `useOrgGrantQuery` | Query | Records of individual capability grants and revocations for members via bitmask |
 | `useCreateOrgGrantMutation` | Mutation | Records of individual capability grants and revocations for members via bitmask |
@@ -409,11 +405,6 @@ const { data: item } = useMyPendingAppInvitesRecordQuery({
   selection: { fields: { channel: true, createdAt: true, expiresAt: true, id: true, senderId: true } },
 });
 
-// Create a myPendingAppInvitesRecord
-const { mutate: create } = useCreateMyPendingAppInvitesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ channel: '<String>', expiresAt: '<Datetime>', senderId: '<UUID>' });
 ```
 
 ### MyPendingOrgInvitesRecord
@@ -430,11 +421,6 @@ const { data: item } = useMyPendingOrgInvitesRecordQuery({
   selection: { fields: { channel: true, createdAt: true, entityId: true, expiresAt: true, id: true, senderId: true } },
 });
 
-// Create a myPendingOrgInvitesRecord
-const { mutate: create } = useCreateMyPendingOrgInvitesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ channel: '<String>', entityId: '<UUID>', expiresAt: '<Datetime>', senderId: '<UUID>' });
 ```
 
 ### OrgAdminGrant
@@ -571,11 +557,6 @@ const { data, isLoading } = useOrgGetManagersQuery({
   selection: { fields: { depth: true, userId: true } },
 });
 
-// Create a orgGetManagersRecord
-const { mutate: create } = useCreateOrgGetManagersRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ depth: '<Int>', userId: '<UUID>' });
 ```
 
 ### OrgGetSubordinatesRecord
@@ -586,11 +567,6 @@ const { data, isLoading } = useOrgGetSubordinatesQuery({
   selection: { fields: { depth: true, userId: true } },
 });
 
-// Create a orgGetSubordinatesRecord
-const { mutate: create } = useCreateOrgGetSubordinatesRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ depth: '<Int>', userId: '<UUID>' });
 ```
 
 ### OrgGrant

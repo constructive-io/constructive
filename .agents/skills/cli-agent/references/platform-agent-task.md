@@ -12,8 +12,8 @@ csdk platform-agent-task list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-agent-task list --limit 10 --after <cursor>
 csdk platform-agent-task find-first --where.<field>.<op> <value>
 csdk platform-agent-task get --id <UUID>
-csdk platform-agent-task create --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
-csdk platform-agent-task update --id <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--description <String>] [--error <String>] [--orderIndex <Int>] [--planId <UUID>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
+csdk platform-agent-task create --description <String> --planId <UUID> --visibility <String> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
+csdk platform-agent-task update --id <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--description <String>] [--error <String>] [--orderIndex <Int>] [--planId <UUID>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>] [--visibility <String>]
 csdk platform-agent-task delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-agent-task list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformAgentTask
 
 ```bash
-csdk platform-agent-task create --description <String> --planId <UUID> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
+csdk platform-agent-task create --description <String> --planId <UUID> --visibility <String> [--actorId <UUID>] [--approvalFeedback <String>] [--approvalStatus <String>] [--approvedAt <Datetime>] [--approvedBy <UUID>] [--error <String>] [--orderIndex <Int>] [--requiresApproval <Boolean>] [--source <String>] [--status <String>]
 ```
 
 ### Get a platformAgentTask by id

@@ -79,6 +79,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       createdAt: true,
+      databaseId: true,
       description: true,
       id: true,
       ownerId: true,
@@ -86,6 +87,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentPlanSelect, AgentPlanFilter, AgentPlanOrderBy> & {
@@ -107,6 +109,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       createdAt: true,
+      databaseId: true,
       description: true,
       id: true,
       ownerId: true,
@@ -114,6 +117,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentPlanSelect, AgentPlanFilter, AgentPlanOrderBy> & {
@@ -147,6 +151,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           createdAt: true,
+          databaseId: true,
           description: true,
           id: true,
           ownerId: true,
@@ -154,6 +159,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -217,6 +223,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           createdAt: true,
+          databaseId: true,
           description: true,
           id: true,
           ownerId: true,
@@ -224,6 +231,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -244,6 +252,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
       },
       {
         type: 'text',
@@ -278,6 +292,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'title',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentPlanPatch;
@@ -288,14 +308,17 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           ownerId: cleanedData.ownerId,
           status: cleanedData.status,
           threadId: cleanedData.threadId,
           title: cleanedData.title,
+          visibility: cleanedData.visibility,
         },
         select: {
           createdAt: true,
+          databaseId: true,
           description: true,
           id: true,
           ownerId: true,
@@ -303,6 +326,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

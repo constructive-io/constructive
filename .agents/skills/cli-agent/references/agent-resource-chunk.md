@@ -66,15 +66,15 @@ csdk agent-resource-chunk list --where.id.equalTo <value> --orderBy ID_ASC
 
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk agent-resource-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 ### Vector semantic search via `embedding` with --auto-embed
 
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 ### Create/update with auto-embedded `embedding` via --auto-embed
@@ -88,8 +88,8 @@ EMBEDDER_PROVIDER=ollama csdk agent-resource-chunk update --embedding "new text 
 ### Search with pagination and field projection
 
 ```bash
-csdk agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk agent-resource-chunk search "query" --limit 10 --select id,title,searchScore
+csdk agent-resource-chunk list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk agent-resource-chunk search "query" --limit 10 --select id,body,searchScore
 ```
 
 ### Create a agentResourceChunk

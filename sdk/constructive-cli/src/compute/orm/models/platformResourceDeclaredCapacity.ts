@@ -29,7 +29,6 @@ import type {
   PlatformResourceDeclaredCapacitySelect,
   PlatformResourceDeclaredCapacityFilter,
   PlatformResourceDeclaredCapacityOrderBy,
-  CreatePlatformResourceDeclaredCapacityInput,
   UpdatePlatformResourceDeclaredCapacityInput,
   PlatformResourceDeclaredCapacityPatch,
 } from '../input-types';
@@ -116,39 +115,6 @@ export class PlatformResourceDeclaredCapacityModel {
         platformResourceDeclaredCapacity:
           data.platformResourceDeclaredCapacities?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourceDeclaredCapacitySelect>(
-    args: CreateArgs<
-      S,
-      CreatePlatformResourceDeclaredCapacityInput['platformResourceDeclaredCapacity']
-    > & {
-      select: S;
-    } & StrictSelect<S, PlatformResourceDeclaredCapacitySelect>
-  ): QueryBuilder<{
-    createPlatformResourceDeclaredCapacity: {
-      platformResourceDeclaredCapacity: InferSelectResult<
-        PlatformResourceDeclaredCapacityWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourceDeclaredCapacity',
-      'createPlatformResourceDeclaredCapacity',
-      'platformResourceDeclaredCapacity',
-      args.select,
-      args.data,
-      'CreatePlatformResourceDeclaredCapacityInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourceDeclaredCapacity',
-      fieldName: 'createPlatformResourceDeclaredCapacity',
-      document,
-      variables,
     });
   }
 }

@@ -91,6 +91,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       approvedAt: true,
       approvedBy: true,
       createdAt: true,
+      databaseId: true,
       description: true,
       error: true,
       id: true,
@@ -100,6 +101,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentTaskSelect, AgentTaskFilter, AgentTaskOrderBy> & {
@@ -126,6 +128,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       approvedAt: true,
       approvedBy: true,
       createdAt: true,
+      databaseId: true,
       description: true,
       error: true,
       id: true,
@@ -135,6 +138,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentTaskSelect, AgentTaskFilter, AgentTaskOrderBy> & {
@@ -173,6 +177,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           approvedAt: true,
           approvedBy: true,
           createdAt: true,
+          databaseId: true,
           description: true,
           error: true,
           id: true,
@@ -182,6 +187,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -306,6 +312,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           approvedAt: true,
           approvedBy: true,
           createdAt: true,
+          databaseId: true,
           description: true,
           error: true,
           id: true,
@@ -315,6 +322,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -373,6 +381,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
         name: 'description',
         message: 'description',
         required: false,
@@ -418,6 +432,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentTaskPatch;
@@ -433,6 +453,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           approvalStatus: cleanedData.approvalStatus,
           approvedAt: cleanedData.approvedAt,
           approvedBy: cleanedData.approvedBy,
+          databaseId: cleanedData.databaseId,
           description: cleanedData.description,
           error: cleanedData.error,
           orderIndex: cleanedData.orderIndex,
@@ -440,6 +461,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           requiresApproval: cleanedData.requiresApproval,
           source: cleanedData.source,
           status: cleanedData.status,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
@@ -448,6 +470,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           approvedAt: true,
           approvedBy: true,
           createdAt: true,
+          databaseId: true,
           description: true,
           error: true,
           id: true,
@@ -457,6 +480,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

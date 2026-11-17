@@ -99,6 +99,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformAgentTaskSelect, PlatformAgentTaskFilter, PlatformAgentTaskOrderBy> & {
@@ -134,6 +135,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       source: true,
       status: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformAgentTaskSelect, PlatformAgentTaskFilter, PlatformAgentTaskOrderBy> & {
@@ -181,6 +183,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -317,6 +320,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -420,6 +424,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformAgentTaskPatch;
@@ -442,6 +452,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           requiresApproval: cleanedData.requiresApproval,
           source: cleanedData.source,
           status: cleanedData.status,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
@@ -459,6 +470,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           source: true,
           status: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
