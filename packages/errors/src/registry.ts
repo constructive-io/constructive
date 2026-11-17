@@ -685,11 +685,18 @@ export const registry = {
     message: ({ operation }) =>
       `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`
   }),
+  /**
+   * One code, two producers. pgpm raises it for a path on disk, with
+   * `{ filePath, type }` — the typed shape here. constructive-db's storage
+   * writers raise the same code for a file row that is gone, with
+   * `{ file_id }` and no path, so the copy must not assume `filePath`.
+   */
   FILE_NOT_FOUND: defineError<{ filePath: string; type?: string }>({
     code: 'FILE_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ filePath, type }) => `${type ? `${type} file` : 'File'} not found: ${filePath}`
+    message: ({ filePath, type }) =>
+      filePath ? `${type ? `${type} file` : 'File'} not found: ${filePath}` : 'File not found.'
   })
 } as const;
 
