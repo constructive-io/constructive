@@ -341,8 +341,8 @@ pgpm admin-users bootstrap
 # Add specific user
 pgpm admin-users add --username myuser --password "$PGPASSWORD" --yes
 
-# Opt-in RLS bypass for a platform service login (never for a request role)
-pgpm admin-users add --username platform_service --password "$PGPASSWORD" --bypassrls --yes
+# Opt-in RLS bypass (never for a request role or a Constructive platform login)
+pgpm admin-users add --username migrator --password "$PGPASSWORD" --bypassrls --yes
 
 # Remove user
 pgpm admin-users remove myuser
@@ -350,9 +350,11 @@ pgpm admin-users remove myuser
 
 User provisioning reconciles LOGIN, INHERIT, NOSUPERUSER, NOCREATEDB,
 NOCREATEROLE, NOREPLICATION and the supplied password on every run. RLS bypass
-is off unless `--bypassrls` is passed. Platform components use one such login
-via `PGUSER`/`PGPASSWORD`; requests still switch to `authenticated`/`anonymous`,
-whose current-role attributes enforce RLS. No role environment variable is needed.
+is off unless `--bypassrls` is passed; `--bypassrls` cannot be combined with
+`--test`. Constructive platform components connect through one `NOBYPASSRLS`
+login via `PGUSER`/`PGPASSWORD` (do not pass `--bypassrls` for it); requests
+still switch to `authenticated`/`anonymous`, whose current-role attributes
+enforce RLS. No role environment variable is needed.
 
 ### Utilities
 

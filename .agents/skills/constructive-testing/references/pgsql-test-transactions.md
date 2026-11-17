@@ -43,6 +43,27 @@ db.setContext({ role: 'authenticated', 'jwt.claims.user_id': ADMIN_ID });
 await db.query(`INSERT INTO app.teams (...) VALUES (...)`);  // ERROR: no context
 ```
 
+## Deferred Constraints Under Rollback Isolation
+
+`beforeEach()`/`afterEach()` roll back instead of committing, so checks Postgres runs only at COMMIT never run in a test. A `DEFERRABLE INITIALLY DEFERRED` FK / UNIQUE / EXCLUDE / `CONSTRAINT TRIGGER` violation therefore passes silently by default. Choose a mode with `db.deferredConstraints` (env `DB_DEFERRED_CONSTRAINTS`):
+
+| Mode | Behaviour |
+|------|-----------|
+| `'off'` (default) | Nothing; deferred violations pass |
+| `'check'` | `afterEach()` runs `SET CONSTRAINTS ALL IMMEDIATE` before rolling back, so a pending violation fails the test (in `afterEach`, naming the constraint). Skipped if the test already raised a Postgres error |
+| `'immediate'` | `beforeEach()` (and `publish()`) run `SET CONSTRAINTS ALL IMMEDIATE`, so each statement is checked on its own line. Code that relies on deferral (child before parent) fails in tests |
+
+```typescript
+const { db, teardown } = await getConnections({ db: { deferredConstraints: 'check' } });
+
+it('rejects orphan children at commit', async () => {
+  await db.query(`INSERT INTO children (parent_id) VALUES (999)`);
+  await expect(db.checkConstraints()).rejects.toThrow(/children_parent_id_fkey/);
+});
+```
+
+`db.checkConstraints()` runs the commit-time checks now without committing (it issues `SET CONSTRAINTS ALL IMMEDIATE`, so constraints stay immediate for the rest of that test). `NOTIFY` delivery and visibility to other sessions are not covered by any mode; use `publish()` (which really commits) for those.
+
 ## Role Patterns for RLS Testing
 
 PostgreSQL supports multiple roles with different privilege levels. `pgsql-test` gives you `pg` (superuser) and `db` (app-level) to test against them:

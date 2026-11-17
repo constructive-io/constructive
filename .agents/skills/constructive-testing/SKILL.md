@@ -91,7 +91,7 @@ Choose the **highest-level framework** that fits your test scenario:
 | [pgsql-test-snapshot.md](./references/pgsql-test-snapshot.md) | Snapshot testing | pruneIds, pruneDates, deterministic assertions |
 | [pgsql-test-helpers.md](./references/pgsql-test-helpers.md) | Helper utilities | Common test helper functions |
 | [pgsql-test-jwt-context.md](./references/pgsql-test-jwt-context.md) | JWT context testing | Setting JWT claims, testing authenticated queries |
-| [pgsql-test-transactions.md](./references/pgsql-test-transactions.md) | Transaction-local context & roles | `beforeAll` context gotcha, three roles (superuser/administrator/authenticated), `pg` vs `db` |
+| [pgsql-test-transactions.md](./references/pgsql-test-transactions.md) | Transaction-local context & roles | `beforeAll` context gotcha, `deferredConstraints` (commit-time checks under rollback), three roles (superuser/administrator/authenticated), `pg` vs `db` |
 | [pgsql-test-scenario-setup.md](./references/pgsql-test-scenario-setup.md) | Complex scenario setup | Multi-client scenarios, complex test arrangements |
 
 ### Additional Frameworks

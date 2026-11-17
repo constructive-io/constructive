@@ -126,9 +126,9 @@ Computed via **Reciprocal Rank Fusion (RRF)**: each active adapter ranks its res
 | Adapter | Filter Field | Input Type |
 |---------|-------------|------------|
 | tsvector | `fullTextSearchTsv` | `String` (search query) |
-| BM25 | `bm25Body` | `Bm25SearchInput` (`{ query, indexName }`) |
+| BM25 | `bm25Body` | `Bm25SearchInput` (`{ query, threshold? }`) |
 | trgm | `trgmTitle` | `TrgmSearchInput` (`{ value, threshold? }`) |
-| pgvector | `vectorEmbedding` | `VectorSearchInput` (`{ query: [Float!]!, metric? }`) |
+| pgvector | `vectorEmbedding` | `VectorNearbyInput` (`{ vector: [Float!]!, model?, metric?, distance?, includeChunks? }`) |
 
 **Naming pattern:** `{filterPrefix}{CamelCase(column)}`
 
@@ -228,9 +228,9 @@ After running `cnc codegen`, the generated SDK client exposes search filters, sc
 
 - **Composite fields** — `unifiedSearch` (multi-strategy filter) and `searchScore` (0..1 relevance)
 - **TSVector queries** — `fullTextSearchTsv`, `searchTsvRank`, pagination, combined filters
-- **BM25 queries** — `bm25Content`, `bm25ContentScore` (negative, sort ASC)
+- **BM25 queries** — `bm25Content`, `contentBm25Score` (negative, sort ASC)
 - **Trigram queries** — `similarTo`/`wordSimilarTo` via `StringTrgmFilter`, adapter-level `trgmTitle`, ILIKE
-- **pgvector queries** — `vectorEmbedding`, `embeddingDistance`, distance metrics (COSINE/L2/IP)
+- **pgvector queries** — `vectorEmbedding`, `embeddingVectorDistance`, distance metrics (COSINE/L2/IP)
 - **Chunk-aware search** — `includeChunks` toggle for RAG tables with `@hasChunks`, transparent parent + chunk distance
 - **Multi-strategy patterns** — fuzzy fallback, autocomplete pipeline, semantic + keyword hybrid
 

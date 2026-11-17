@@ -154,17 +154,17 @@ const result = await db.document.findMany({
   where: {
     bm25Content: { query: 'postgres full text search' },
   },
-  orderBy: 'BM25_CONTENT_SCORE_ASC',
+  orderBy: 'CONTENT_BM25_SCORE_ASC',
   select: {
     id: true,
     title: true,
-    bm25ContentScore: true,
+    contentBm25Score: true,
   },
 }).execute();
 
 if (result.ok) {
   result.data.documents.nodes.forEach(d => {
-    console.log(`${d.title} (score: ${d.bm25ContentScore})`);
+    console.log(`${d.title} (score: ${d.contentBm25Score})`);
   });
 }
 ```
@@ -178,13 +178,13 @@ const result = await db.document.findMany({
   where: {
     bm25Content: { query: 'machine learning' },
   },
-  orderBy: 'BM25_CONTENT_SCORE_ASC',
+  orderBy: 'CONTENT_BM25_SCORE_ASC',
   first: 10,
   after: cursor,
   select: {
     id: true,
     title: true,
-    bm25ContentScore: true,
+    contentBm25Score: true,
   },
 }).execute();
 ```
@@ -198,13 +198,13 @@ const result = await db.document.findMany({
     isPublished: { equalTo: true },
     category: { equalTo: 'devops' },
   },
-  orderBy: 'BM25_CONTENT_SCORE_ASC',
+  orderBy: 'CONTENT_BM25_SCORE_ASC',
   first: 20,
   select: {
     id: true,
     title: true,
     category: true,
-    bm25ContentScore: true,
+    contentBm25Score: true,
   },
 }).execute();
 ```
@@ -213,13 +213,14 @@ const result = await db.document.findMany({
 
 | DB Column | Filter Field | Score Field | OrderBy |
 |-----------|-------------|-------------|---------|
-| `content` | `bm25Content` | `bm25ContentScore` | `BM25_CONTENT_SCORE_ASC/DESC` |
-| `body` | `bm25Body` | `bm25BodyScore` | `BM25_BODY_SCORE_ASC/DESC` |
+| `content` | `bm25Content` | `contentBm25Score` | `CONTENT_BM25_SCORE_ASC/DESC` |
+| `body` | `bm25Body` | `bodyBm25Score` | `BODY_BM25_SCORE_ASC/DESC` |
 
 **Pattern:**
-- Filter: `bm25` + CamelCase(column) — accepts `{ query: String }` input
-- Score: `bm25` + CamelCase(column) + `Score` (Float, negative, more negative = better, null when no filter active)
-- OrderBy: `BM25_` + SCREAMING_SNAKE(column) + `_SCORE_ASC/DESC`
+- Filter: `bm25` + CamelCase(column) — accepts `{ query: String!, threshold?: Float }`
+- Score: camelCase(column) + `Bm25Score` (Float, negative, more negative = better, null when no filter active)
+- OrderBy: SCREAMING_SNAKE(column) + `_BM25_SCORE_ASC/DESC`
+- Without `threshold` only rows the query matches (negative score) are returned, so `totalCount` equals the number of matching rows. `threshold` is a maximum score and inclusive: a row scoring exactly the threshold is kept.
 
 ---
 
@@ -326,18 +327,18 @@ const result = await db.document.findMany({
       metric: 'COSINE',
     },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 10,
   select: {
     id: true,
     title: true,
-    embeddingDistance: true,
+    embeddingVectorDistance: true,
   },
 }).execute();
 
 if (result.ok) {
   result.data.documents.nodes.forEach(d => {
-    console.log(`${d.title} (distance: ${d.embeddingDistance})`);
+    console.log(`${d.title} (distance: ${d.embeddingVectorDistance})`);
   });
 }
 ```
@@ -353,11 +354,11 @@ const result = await db.document.findMany({
       distance: 0.5,  // filter out results beyond threshold
     },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   select: {
     id: true,
     title: true,
-    embeddingDistance: true,
+    embeddingVectorDistance: true,
   },
 }).execute();
 ```
@@ -374,13 +375,13 @@ const result = await db.document.findMany({
     isPublished: { equalTo: true },
     category: { equalTo: 'tech' },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 10,
   select: {
     id: true,
     title: true,
     category: true,
-    embeddingDistance: true,
+    embeddingVectorDistance: true,
   },
 }).execute();
 ```
@@ -397,13 +398,13 @@ const result = await db.document.findMany({
 
 | DB Column | Filter Field | Distance Field | OrderBy |
 |-----------|-------------|----------------|---------|
-| `embedding` | `vectorEmbedding` | `embeddingDistance` | `EMBEDDING_DISTANCE_ASC/DESC` |
-| `content_vec` | `vectorContentVec` | `contentVecDistance` | `CONTENT_VEC_DISTANCE_ASC/DESC` |
+| `embedding` | `vectorEmbedding` | `embeddingVectorDistance` | `EMBEDDING_VECTOR_DISTANCE_ASC/DESC` |
+| `content_vec` | `vectorContentVec` | `contentVecVectorDistance` | `CONTENT_VEC_VECTOR_DISTANCE_ASC/DESC` |
 
 **Pattern:**
-- Filter: `vector` + CamelCase(column) — accepts `{ vector: [Float!]!, metric?: String, distance?: Float, includeChunks?: Boolean }`
-- Distance: camelCase(column) + `Distance` (Float, lower = closer, null when no filter active)
-- OrderBy: SCREAMING_SNAKE(column) + `_DISTANCE_ASC/DESC`
+- Filter: `vector` + CamelCase(column) — accepts `{ vector: [Float!]!, model?: String, metric?: String, distance?: Float, includeChunks?: Boolean }`
+- Distance: camelCase(column) + `VectorDistance` (Float, lower = closer, null when no filter active)
+- OrderBy: SCREAMING_SNAKE(column) + `_VECTOR_DISTANCE_ASC/DESC`
 
 ### Chunk-Aware Vector Search
 
@@ -422,18 +423,18 @@ const result = await db.document.findMany({
       // includeChunks defaults to true when @hasChunks is present
     },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 10,
   select: {
     id: true,
     title: true,
-    embeddingDistance: true,   // best distance across parent + all chunks
+    embeddingVectorDistance: true,   // best distance across parent + all chunks
   },
 }).execute();
 
 if (result.ok) {
   result.data.documents.nodes.forEach(d => {
-    console.log(`${d.title} (distance: ${d.embeddingDistance})`);
+    console.log(`${d.title} (distance: ${d.embeddingVectorDistance})`);
   });
 }
 ```
@@ -451,12 +452,12 @@ const result = await db.document.findMany({
       includeChunks: false,    // only use parent embedding
     },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 10,
   select: {
     id: true,
     title: true,
-    embeddingDistance: true,   // parent distance only
+    embeddingVectorDistance: true,   // parent distance only
   },
 }).execute();
 ```
@@ -475,12 +476,12 @@ const result = await db.document.findMany({
     },
     isPublished: { equalTo: true },
   },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 20,
   select: {
     id: true,
     title: true,
-    embeddingDistance: true,
+    embeddingVectorDistance: true,
     searchScore: true,         // composite 0..1 relevance
   },
 }).execute();
@@ -498,9 +499,9 @@ const result = await db.document.findMany({
 // Primary: BM25 search
 const bm25Result = await db.document.findMany({
   where: { bm25Content: { query: userQuery } },
-  orderBy: 'BM25_CONTENT_SCORE_ASC',
+  orderBy: 'CONTENT_BM25_SCORE_ASC',
   first: 10,
-  select: { id: true, title: true, bm25ContentScore: true },
+  select: { id: true, title: true, contentBm25Score: true },
 }).execute();
 
 const bm25Docs = bm25Result.ok ? bm25Result.data.documents.nodes : [];
@@ -546,9 +547,9 @@ const search = await db.article.findMany({
 // Semantic search
 const semanticResult = await db.document.findMany({
   where: { vectorEmbedding: { vector: queryEmbedding, metric: 'COSINE' } },
-  orderBy: 'EMBEDDING_DISTANCE_ASC',
+  orderBy: 'EMBEDDING_VECTOR_DISTANCE_ASC',
   first: 20,
-  select: { id: true, title: true, embeddingDistance: true },
+  select: { id: true, title: true, embeddingVectorDistance: true },
 }).execute();
 
 // Keyword search
