@@ -4,7 +4,7 @@
 
 CRUD operations for User records via csdk CLI
 
-**Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`, `searchTsv`
+**Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`, `searchTsv`, `searchTsvRank`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -62,26 +62,26 @@ csdk user list --where.id.equalTo <value> --orderBy ID_ASC
 ### Fuzzy search via trigram similarity (`trgmDisplayName`)
 
 ```bash
-csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
+csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select displayName,displayNameTrgmSimilarity
 ```
 
 ### Full-text search via tsvector (`searchTsv`)
 
 ```bash
-csdk user list --where.searchTsv "search query" --select title,tsvRank
+csdk user list --where.searchTsv "search query" --select displayName,searchTsvRank
 ```
 
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk user list --where.unifiedSearch "search query" --select title,displayNameTrgmSimilarity,searchScore,tsvRank
+csdk user list --where.unifiedSearch "search query" --select displayName,displayNameTrgmSimilarity,searchScore,searchTsvRank
 ```
 
 ### Search with pagination and field projection
 
 ```bash
-csdk user list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk user search "query" --limit 10 --select id,title,searchScore
+csdk user list --where.unifiedSearch "query" --limit 10 --select id,displayName,searchScore
+csdk user search "query" --limit 10 --select id,displayName,searchScore
 ```
 
 ### Create a user

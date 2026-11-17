@@ -86,6 +86,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     const defaultSelect = {
       buildId: true,
       createdByPrincipal: true,
+      databaseId: true,
       exitCode: true,
       finishedAt: true,
       id: true,
@@ -121,6 +122,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     const defaultSelect = {
       buildId: true,
       createdByPrincipal: true,
+      databaseId: true,
       exitCode: true,
       finishedAt: true,
       id: true,
@@ -168,6 +170,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           buildId: true,
           createdByPrincipal: true,
+          databaseId: true,
           exitCode: true,
           finishedAt: true,
           id: true,
@@ -316,6 +319,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           buildId: true,
           createdByPrincipal: true,
+          databaseId: true,
           exitCode: true,
           finishedAt: true,
           id: true,
@@ -368,6 +372,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'createdByPrincipal',
         required: false,
         skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
       },
       {
         type: 'text',
@@ -457,6 +467,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         data: {
           buildId: cleanedData.buildId,
           createdByPrincipal: cleanedData.createdByPrincipal,
+          databaseId: cleanedData.databaseId,
           exitCode: cleanedData.exitCode,
           finishedAt: cleanedData.finishedAt,
           kind: cleanedData.kind,
@@ -472,6 +483,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           buildId: true,
           createdByPrincipal: true,
+          databaseId: true,
           exitCode: true,
           finishedAt: true,
           id: true,

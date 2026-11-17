@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformBucketsQuery({
 const { mutate } = useCreatePlatformBucketMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', allowCustomKeys: '<Boolean>', allowedMimeTypes: '<String>', allowedOrigins: '<String>', description: '<String>', destinationBucketId: '<UUID>', isPublic: '<Boolean>', key: '<String>', maxBulkFiles: '<Int>', maxFileSize: '<BigInt>', physicalName: '<String>', provisionRequestedAt: '<Datetime>', stagingTtl: '<Interval>', tags: '<String>', type: '<BucketType>' });
+mutate({ actorId: '<UUID>', allowCustomKeys: '<Boolean>', allowedMimeTypes: '<String>', allowedOrigins: '<String>', description: '<String>', destinationBucketId: '<UUID>', isPublic: '<Boolean>', key: '<String>', maxFileSize: '<BigInt>', physicalName: '<String>', provisionRequestedAt: '<Datetime>', stagingTtl: '<Interval>', tags: '<String>', type: '<BucketType>' });
 ```

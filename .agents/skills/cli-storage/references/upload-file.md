@@ -7,7 +7,7 @@ Upload a file: resolves the bucket by key, creates the file row, and returns a p
 ## Usage
 
 ```bash
-csdk upload-file --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.filename <String> --input.isPublic <Boolean> --input.key <String> --input.size <Int>
+csdk upload-file --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.databaseId <UUID> --input.filename <String> --input.isPublic <Boolean> --input.key <String> --input.size <Int>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk upload-file --input.bucketKey <String> --input.contentHash <String> --input
 ### Run uploadFile
 
 ```bash
-csdk upload-file --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.filename <String> --input.isPublic <Boolean> --input.key <String> --input.size <Int>
+csdk upload-file --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.databaseId <UUID> --input.filename <String> --input.isPublic <Boolean> --input.key <String> --input.size <Int>
 ```

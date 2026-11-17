@@ -12,7 +12,7 @@ Fields provided by the Unified Search plugin. Includes full-text search (tsvecto
 ```typescript
 db.proposalReview.findMany({ select: { id: true } }).execute()
 db.proposalReview.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.proposalReview.create({ data: { body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' }, select: { id: true } }).execute()
+db.proposalReview.create({ data: { body: '<String>', commitSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>' }, select: { id: true } }).execute()
 db.proposalReview.update({ where: { id: '<UUID>' }, data: { body: '<String>' }, select: { id: true } }).execute()
 db.proposalReview.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -31,7 +31,7 @@ const items = await db.proposalReview.findMany({
 
 ```typescript
 const item = await db.proposalReview.create({
-  data: { body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' },
+  data: { body: '<String>', commitSha: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>' },
   select: { id: true }
 }).execute();
 ```

@@ -29,7 +29,6 @@ import type {
   ResourceObservedStorageSelect,
   ResourceObservedStorageFilter,
   ResourceObservedStorageOrderBy,
-  CreateResourceObservedStorageInput,
   UpdateResourceObservedStorageInput,
   ResourceObservedStoragePatch,
 } from '../input-types';
@@ -104,33 +103,6 @@ export class ResourceObservedStorageModel {
       }) => ({
         resourceObservedStorage: data.resourceObservedStorages?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourceObservedStorageSelect>(
-    args: CreateArgs<S, CreateResourceObservedStorageInput['resourceObservedStorage']> & {
-      select: S;
-    } & StrictSelect<S, ResourceObservedStorageSelect>
-  ): QueryBuilder<{
-    createResourceObservedStorage: {
-      resourceObservedStorage: InferSelectResult<ResourceObservedStorageWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourceObservedStorage',
-      'createResourceObservedStorage',
-      'resourceObservedStorage',
-      args.select,
-      args.data,
-      'CreateResourceObservedStorageInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourceObservedStorage',
-      fieldName: 'createResourceObservedStorage',
-      document,
-      variables,
     });
   }
 }

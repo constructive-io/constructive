@@ -29,7 +29,6 @@ import type {
   AstMigrationSelect,
   AstMigrationFilter,
   AstMigrationOrderBy,
-  CreateAstMigrationInput,
   UpdateAstMigrationInput,
   AstMigrationPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class AstMigrationModel {
       }) => ({
         astMigration: data.astMigrations?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends AstMigrationSelect>(
-    args: CreateArgs<S, CreateAstMigrationInput['astMigration']> & {
-      select: S;
-    } & StrictSelect<S, AstMigrationSelect>
-  ): QueryBuilder<{
-    createAstMigration: {
-      astMigration: InferSelectResult<AstMigrationWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'AstMigration',
-      'createAstMigration',
-      'astMigration',
-      args.select,
-      args.data,
-      'CreateAstMigrationInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'AstMigration',
-      fieldName: 'createAstMigration',
-      document,
-      variables,
     });
   }
 }

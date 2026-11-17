@@ -12,8 +12,8 @@ csdk platform-agent-event list --where.<field>.<op> <value> --orderBy <values>
 csdk platform-agent-event list --limit 10 --after <cursor>
 csdk platform-agent-event find-first --where.<field>.<op> <value>
 csdk platform-agent-event get --id <UUID>
-csdk platform-agent-event create --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> [--transcriptFormat <String>]
-csdk platform-agent-event update --id <UUID> [--entry <JSON>] [--recordedAt <Datetime>] [--runId <UUID>] [--seq <Int>] [--transcriptFormat <String>] [--transcriptVersion <Int>]
+csdk platform-agent-event create --actorId <UUID> --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> --visibility <String> [--transcriptFormat <String>]
+csdk platform-agent-event update --id <UUID> [--actorId <UUID>] [--entry <JSON>] [--recordedAt <Datetime>] [--runId <UUID>] [--seq <Int>] [--transcriptFormat <String>] [--transcriptVersion <Int>] [--visibility <String>]
 csdk platform-agent-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk platform-agent-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a platformAgentEvent
 
 ```bash
-csdk platform-agent-event create --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> [--transcriptFormat <String>]
+csdk platform-agent-event create --actorId <UUID> --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> --visibility <String> [--transcriptFormat <String>]
 ```
 
 ### Get a platformAgentEvent by id

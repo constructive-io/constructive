@@ -12,7 +12,7 @@ High-dimensional vector columns for semantic similarity search. Query via the Un
 ```typescript
 db.platformAgentResourceChunk.findMany({ select: { id: true } }).execute()
 db.platformAgentResourceChunk.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.platformAgentResourceChunk.create({ data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformAgentResourceId: '<UUID>', searchScore: '<Float>' }, select: { id: true } }).execute()
+db.platformAgentResourceChunk.create({ data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', metadata: '<JSON>', platformAgentResourceId: '<UUID>' }, select: { id: true } }).execute()
 db.platformAgentResourceChunk.update({ where: { id: '<UUID>' }, data: { body: '<String>' }, select: { id: true } }).execute()
 db.platformAgentResourceChunk.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -31,7 +31,7 @@ const items = await db.platformAgentResourceChunk.findMany({
 
 ```typescript
 const item = await db.platformAgentResourceChunk.create({
-  data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformAgentResourceId: '<UUID>', searchScore: '<Float>' },
+  data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', metadata: '<JSON>', platformAgentResourceId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```
