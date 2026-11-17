@@ -26,6 +26,17 @@ const log = new Logger('api');
 
 const defaultRegistry: LoaderRegistry = createDefaultRegistry();
 
+/**
+ * Drop the settings a host is built from (CORS origins, auth, RLS, database,
+ * pubkey and WebAuthn settings) for one database, or for all. Each loader
+ * keeps its own short-lived cache, so a host evicted by a flush and rebuilt
+ * within that time would otherwise take the old settings again, and keep them
+ * for as long as the host stays cached.
+ */
+export const invalidateApiSettings = (databaseId?: string): void => {
+  defaultRegistry.invalidate(databaseId);
+};
+
 // =============================================================================
 // SQL Queries (API resolution only — module queries now live in loaders)
 // =============================================================================

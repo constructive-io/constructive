@@ -4,6 +4,7 @@
  * `server.origin` platform fallback. Nothing else gets credentialed CORS.
  */
 
+import { Server } from '@constructive-io/graphql-server';
 import path from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type supertest from 'supertest';
@@ -166,6 +167,31 @@ describe('per-API CORS', () => {
         expectRefused(res);
       }
     });
+  });
+
+  it('serves a changed cors_settings list once the database is flushed', async () => {
+    const ADDED_ORIGIN = 'https://tenant-site.example';
+    // The host and the settings it was built from are both cached by now.
+    expectAllowed(await preflight(APP_ORIGIN), APP_ORIGIN);
+    expectRefused(await preflight(ADDED_ORIGIN));
+
+    await pg.query(
+      `UPDATE routing_public.cors_settings
+          SET allowed_origins = array_append(allowed_origins, $3::text)
+        WHERE database_id = $1 AND api_id = $2`,
+      [DATABASE_ID, APP_API_ID, ADDED_ORIGIN]
+    );
+    // What a schema:update notification for this database runs.
+    const listener = new Server({ pg: pg.config, api: { isPublic: true } });
+    try {
+      await listener.flush(DATABASE_ID);
+    } finally {
+      await listener.close();
+    }
+
+    expectAllowed(await preflight(ADDED_ORIGIN), ADDED_ORIGIN);
+    expectAllowed(await post(ADDED_ORIGIN), ADDED_ORIGIN);
+    expectAllowed(await preflight(APP_ORIGIN), APP_ORIGIN);
   });
 
   it('refuses an unrelated origin', async () => {

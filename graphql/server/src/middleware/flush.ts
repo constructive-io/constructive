@@ -9,6 +9,7 @@ import { graphileCache } from 'graphile-cache';
 import { clearStorageModuleCache } from 'graphile-presigned-url-plugin';
 import { getPgPool } from 'pg-cache';
 
+import { invalidateApiSettings } from './api';
 import { evictAllServiceKeys, evictServiceKey } from './cache-generation';
 
 
@@ -64,7 +65,10 @@ export const createFlushMiddleware = (
     }
 
     const databaseId = req.databaseId ?? req.api?.databaseId;
-    if (databaseId) clearStorageModuleCache(databaseId);
+    if (databaseId) {
+      clearStorageModuleCache(databaseId);
+      invalidateApiSettings(databaseId);
+    }
     evictServiceKey((req as any).svc_key);
     res.status(200).send('OK');
   };
@@ -74,6 +78,7 @@ export const createFlushMiddleware = (
 // every service, including hosts deleted while the listener was unavailable.
 export const flushAllServices = (): void => {
   clearStorageModuleCache();
+  invalidateApiSettings();
   evictAllServiceKeys();
 };
 
@@ -82,8 +87,11 @@ export const flushService = async (
   databaseId: string
 ): Promise<void> => {
   // Do this before the routing lookup: an empty/removed domain must not leave
-  // module discovery alive after its schema has changed.
+  // module discovery alive after its schema has changed. The settings go
+  // before the hosts too, so a host rebuilt after its eviction reads them
+  // again instead of taking the loaders' cached copy.
   clearStorageModuleCache(databaseId);
+  invalidateApiSettings(databaseId);
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
 
