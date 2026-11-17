@@ -1,6 +1,11 @@
 import type { DocsConfig } from '../../types/config';
 import type { Argument, Field, Operation, Table, TypeRef, TypeRegistry } from '../../types/schema';
-import { getPrimaryKeyInfo, getScalarFields, getWritableFieldNames } from './utils';
+import {
+  getPrimaryKeyInfo,
+  getScalarFields,
+  getWritableFieldNames,
+  isPlainSelectableField,
+} from './utils';
 
 export interface GeneratedDocFile {
   fileName: string;
@@ -80,6 +85,14 @@ export function formatTypeRef(
   return t.name ?? 'unknown';
 }
 
+/**
+ * Fields a docs example can select as `field: true`: everything except
+ * fields that take arguments or return an object type.
+ */
+export function getExampleSelectFields(table: Table, typeRegistry?: TypeRegistry): Field[] {
+  return getScalarFields(table).filter((f) => isPlainSelectableField(f, typeRegistry));
+}
+
 export function getEditableFields(table: Table, typeRegistry?: TypeRegistry): Field[] {
   const pk = getPrimaryKeyInfo(table)[0];
   const writableFields = getWritableFieldNames(table, typeRegistry);
@@ -91,7 +104,9 @@ export function getEditableFields(table: Table, typeRegistry?: TypeRegistry): Fi
       f.name !== 'updatedAt' &&
       // When a TypeRegistry is available, filter out computed/plugin-added
       // fields (e.g. search scores, trgm similarity) that aren't real columns
-      (writableFields === null || writableFields.has(f.name)),
+      (writableFields === null || writableFields.has(f.name)) &&
+      // Without a TypeRegistry, a field taking arguments is still never a column
+      !(f.args && f.args.length > 0),
   );
 }
 
@@ -157,7 +172,7 @@ function isTsvectorField(f: Field): boolean {
 function isSearchComputedField(f: Field): boolean {
   if (f.name === 'searchScore') return true;
   if (/TrgmSimilarity$/.test(f.name)) return true;
-  if (/TsvectorRank$/.test(f.name)) return true;
+  if (/Tsv(ector)?Rank$/.test(f.name)) return true;
   if (/Bm25Score$/.test(f.name)) return true;
   return false;
 }
@@ -301,21 +316,48 @@ export function buildSearchExamples(
   specialGroups: SpecialFieldGroup[],
   toolName: string,
   cmd: string,
+  table?: Table,
 ): SearchExample[] {
   const examples: SearchExample[] = [];
   const scoreFields: string[] = [];
+  // Examples may only reference fields the table really has
+  const allFieldNames = new Set(
+    (table ? table.fields : specialGroups.flatMap((g) => g.fields)).map(
+      (f) => f.name,
+    ),
+  );
+  const specialFieldNames = new Set(
+    specialGroups.flatMap((g) => g.fields.map((f) => f.name)),
+  );
+  const displayField =
+    ['title', 'name', 'displayName', 'label'].find((n) => allFieldNames.has(n)) ??
+    table?.fields.find(
+      (f) =>
+        f.type.gqlType === 'String' &&
+        !f.type.isArray &&
+        !(f.args && f.args.length > 0) &&
+        !specialFieldNames.has(f.name),
+    )?.name ??
+    (table && !allFieldNames.has('title') ? 'id' : 'title');
+  const selectArg = (...extra: string[]): string =>
+    [...new Set([displayField, ...extra.filter((n) => allFieldNames.has(n))])].join(',');
 
   for (const group of specialGroups) {
     for (const field of group.fields) {
       // tsvector (FullText scalar) — where input uses the column name directly
       if (field.type.gqlType === 'FullText' && !field.type.isArray) {
+        // The rank is exposed as `<column>TsvRank` (search → searchTsvRank,
+        // searchTsv → searchTsvRank); only reference it when the table has it
+        const rankField = [`${field.name}TsvRank`, `${field.name}Rank`].find(
+          (name) => allFieldNames.has(name),
+        );
         examples.push({
           description: `Full-text search via tsvector (\`${field.name}\`)`,
           code: [
-            `${toolName} ${cmd} list --where.${field.name} "search query" --select title,tsvRank`,
+            `${toolName} ${cmd} list --where.${field.name} "search query" --select ${selectArg(...(rankField ? [rankField] : []))}`,
           ],
         });
-        scoreFields.push('tsvRank');
+        if (rankField) scoreFields.push(rankField);
       }
 
       // BM25 computed score — bodyBm25Score → bm25Body
@@ -325,7 +367,7 @@ export function buildSearchExamples(
         examples.push({
           description: `BM25 keyword search via \`${inputName}\``,
           code: [
-            `${toolName} ${cmd} list --where.${inputName}.query "search query" --select title,${field.name}`,
+            `${toolName} ${cmd} list --where.${inputName}.query "search query" --select ${selectArg(field.name)}`,
           ],
         });
         scoreFields.push(field.name);
@@ -338,7 +380,7 @@ export function buildSearchExamples(
         examples.push({
           description: `Fuzzy search via trigram similarity (\`${inputName}\`)`,
           code: [
-            `${toolName} ${cmd} list --where.${inputName}.value "approximate query" --where.${inputName}.threshold 0.3 --select title,${field.name}`,
+            `${toolName} ${cmd} list --where.${inputName}.value "approximate query" --where.${inputName}.threshold 0.3 --select ${selectArg(field.name)}`,
           ],
         });
         scoreFields.push(field.name);
@@ -350,15 +392,15 @@ export function buildSearchExamples(
           description: `Vector similarity search via \`${field.name}\` (manual vector)`,
           code: [
             `# Pass a pre-computed vector array via dot-notation`,
-            `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --select title,${field.name}VectorDistance`,
+            `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --select ${selectArg(`${field.name}VectorDistance`)}`,
           ],
         });
         examples.push({
           description: `Vector semantic search via \`${field.name}\` with --auto-embed`,
           code: [
             `# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)`,
-            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
-            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --select ${selectArg(`${field.name}VectorDistance`)}`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --select ${selectArg(`${field.name}VectorDistance`)}`,
           ],
         });
         examples.push({
@@ -385,9 +427,7 @@ export function buildSearchExamples(
     ),
   );
   if (hasTextSearch) {
-    const fieldsArg = scoreFields.length > 0
-      ? `title,${[...new Set(scoreFields)].join(',')}`
-      : 'title';
+    const fieldsArg = selectArg(...scoreFields);
     examples.push({
       description: 'Composite search (unifiedSearch dispatches to all text adapters)',
       code: [
@@ -398,11 +438,14 @@ export function buildSearchExamples(
 
   // Combined search + pagination + ordering example
   if (examples.length > 0) {
+    const paginationSelect = [
+      ...new Set(['id', ...selectArg('searchScore').split(',')]),
+    ].join(',');
     examples.push({
       description: 'Search with pagination and field projection',
       code: [
-        `${toolName} ${cmd} list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore`,
-        `${toolName} ${cmd} search "query" --limit 10 --select id,title,searchScore`,
+        `${toolName} ${cmd} list --where.unifiedSearch "query" --limit 10 --select ${paginationSelect}`,
+        `${toolName} ${cmd} search "query" --limit 10 --select ${paginationSelect}`,
       ],
     });
   }
@@ -418,8 +461,9 @@ export function buildSearchExamplesMarkdown(
   specialGroups: SpecialFieldGroup[],
   toolName: string,
   cmd: string,
+  table?: Table,
 ): string[] {
-  const examples = buildSearchExamples(specialGroups, toolName, cmd);
+  const examples = buildSearchExamples(specialGroups, toolName, cmd, table);
   if (examples.length === 0) return [];
   const lines: string[] = [];
   lines.push('**Search Examples:**');
