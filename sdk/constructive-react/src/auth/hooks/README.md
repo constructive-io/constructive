@@ -106,6 +106,7 @@ function App() {
 | `useRequireStepUpQuery` | Query | requireStepUp |
 | `useSignInOptionsQuery` | Query | signInOptions |
 | `useApproveDeviceMutation` | Mutation | approveDevice |
+| `useCancelSignUpHandoffMutation` | Mutation | cancelSignUpHandoff |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
 | `useCompleteMfaChallengeMutation` | Mutation | completeMfaChallenge |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
@@ -165,6 +166,7 @@ errors. |
 | `useSignUpSmsMutation` | Mutation | signUpSms |
 | `useUpdatePrincipalMutation` | Mutation | updatePrincipal |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
+| `useVerifyEmailHandoffMutation` | Mutation | verifyEmailHandoff |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyPhoneMutation` | Mutation | verifyPhone |
 | `useVerifyStepUpCodeMutation` | Mutation | verifyStepUpCode |
@@ -516,6 +518,17 @@ approveDevice
   | Argument | Type |
   |----------|------|
   | `input` | ApproveDeviceInput (required) |
+
+### `useCancelSignUpHandoffMutation`
+
+cancelSignUpHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CancelSignUpHandoffInput (required) |
 
 ### `useCheckPasswordMutation`
 
@@ -1115,6 +1128,17 @@ verifyEmail
   | Argument | Type |
   |----------|------|
   | `input` | VerifyEmailInput (required) |
+
+### `useVerifyEmailHandoffMutation`
+
+verifyEmailHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyEmailHandoffInput (required) |
 
 ### `useVerifyPasswordMutation`
 

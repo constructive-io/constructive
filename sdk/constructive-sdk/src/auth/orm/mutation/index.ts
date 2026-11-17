@@ -8,6 +8,7 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
   ApproveDeviceInput,
+  CancelSignUpHandoffInput,
   CheckPasswordInput,
   CompleteMfaChallengeInput,
   ConfirmDeleteAccountInput,
@@ -62,11 +63,13 @@ import type {
   SignUpSmsInput,
   UpdatePrincipalInput,
   VerifyEmailInput,
+  VerifyEmailHandoffInput,
   VerifyPasswordInput,
   VerifyPhoneInput,
   VerifyStepUpCodeInput,
   VerifyTotpInput,
   ApproveDevicePayload,
+  CancelSignUpHandoffPayload,
   CheckPasswordPayload,
   CompleteMfaChallengePayload,
   ConfirmDeleteAccountPayload,
@@ -121,11 +124,13 @@ import type {
   SignUpSmsPayload,
   UpdatePrincipalPayload,
   VerifyEmailPayload,
+  VerifyEmailHandoffPayload,
   VerifyPasswordPayload,
   VerifyPhonePayload,
   VerifyStepUpCodePayload,
   VerifyTotpPayload,
   ApproveDevicePayloadSelect,
+  CancelSignUpHandoffPayloadSelect,
   CheckPasswordPayloadSelect,
   CompleteMfaChallengePayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
@@ -180,6 +185,7 @@ import type {
   SignUpSmsPayloadSelect,
   UpdatePrincipalPayloadSelect,
   VerifyEmailPayloadSelect,
+  VerifyEmailHandoffPayloadSelect,
   VerifyPasswordPayloadSelect,
   VerifyPhonePayloadSelect,
   VerifyStepUpCodePayloadSelect,
@@ -188,6 +194,9 @@ import type {
 import { connectionFieldsMap } from '../input-types';
 export interface ApproveDeviceVariables {
   input: ApproveDeviceInput;
+}
+export interface CancelSignUpHandoffVariables {
+  input: CancelSignUpHandoffInput;
 }
 export interface CheckPasswordVariables {
   input: CheckPasswordInput;
@@ -364,6 +373,9 @@ export interface UpdatePrincipalVariables {
 export interface VerifyEmailVariables {
   input: VerifyEmailInput;
 }
+export interface VerifyEmailHandoffVariables {
+  input: VerifyEmailHandoffInput;
+}
 export interface VerifyPasswordVariables {
   input: VerifyPasswordInput;
 }
@@ -405,6 +417,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ApproveDevicePayload'
+        ),
+      }),
+    cancelSignUpHandoff: <S extends CancelSignUpHandoffPayloadSelect>(
+      args: CancelSignUpHandoffVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CancelSignUpHandoffPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        cancelSignUpHandoff: InferSelectResult<CancelSignUpHandoffPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CancelSignUpHandoff',
+        fieldName: 'cancelSignUpHandoff',
+        ...buildCustomDocument(
+          'mutation',
+          'CancelSignUpHandoff',
+          'cancelSignUpHandoff',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CancelSignUpHandoffInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CancelSignUpHandoffPayload'
         ),
       }),
     checkPassword: <S extends CheckPasswordPayloadSelect>(
@@ -1971,6 +2012,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'VerifyEmailPayload'
+        ),
+      }),
+    verifyEmailHandoff: <S extends VerifyEmailHandoffPayloadSelect>(
+      args: VerifyEmailHandoffVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, VerifyEmailHandoffPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        verifyEmailHandoff: InferSelectResult<VerifyEmailHandoffPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'VerifyEmailHandoff',
+        fieldName: 'verifyEmailHandoff',
+        ...buildCustomDocument(
+          'mutation',
+          'VerifyEmailHandoff',
+          'verifyEmailHandoff',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'VerifyEmailHandoffInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'VerifyEmailHandoffPayload'
         ),
       }),
     verifyPassword: <S extends VerifyPasswordPayloadSelect>(

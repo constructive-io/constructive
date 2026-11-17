@@ -1973,6 +1973,11 @@ export interface ApproveDeviceInput {
   approvalToken: string;
   clientMutationId?: string;
 }
+export interface CancelSignUpHandoffInput {
+  clientMutationId?: string;
+  codeChallenge?: string;
+  email?: string;
+}
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
@@ -2236,9 +2241,11 @@ export interface SignOutInput {
 }
 export interface SignUpInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   csrfToken?: string;
   email?: string;
   inviteToken?: string;
+  nativeRedirectUri?: string;
   password?: string;
 }
 export interface SignUpMagicLinkInput {
@@ -2259,6 +2266,12 @@ export interface SignUpSmsInput {
   rememberMe?: boolean;
 }
 export interface VerifyEmailInput {
+  clientMutationId?: string;
+  emailId?: string;
+  password?: string;
+  token?: string;
+}
+export interface VerifyEmailHandoffInput {
   clientMutationId?: string;
   emailId?: string;
   password?: string;
@@ -3633,6 +3646,7 @@ export interface SignInOptionsRecord {
   allowWebauthnUsernameless?: boolean | null;
   enableCaptcha?: boolean | null;
   identityProviders?: Record<string, unknown> | null;
+  nativeSignUpHandoff?: boolean | null;
   requireMfa?: boolean | null;
   signUpRequiresInvite?: boolean | null;
 }
@@ -3653,6 +3667,7 @@ export type SignInOptionsRecordSelect = {
   allowWebauthnUsernameless?: boolean;
   enableCaptcha?: boolean;
   identityProviders?: boolean;
+  nativeSignUpHandoff?: boolean;
   requireMfa?: boolean;
   signUpRequiresInvite?: boolean;
 };
@@ -3663,6 +3678,12 @@ export interface ApproveDevicePayload {
 export type ApproveDevicePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface CancelSignUpHandoffPayload {
+  clientMutationId?: string | null;
+}
+export type CancelSignUpHandoffPayloadSelect = {
+  clientMutationId?: boolean;
 };
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
@@ -4118,6 +4139,16 @@ export interface VerifyEmailPayload {
 export type VerifyEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface VerifyEmailHandoffPayload {
+  clientMutationId?: string | null;
+  result?: VerifyEmailHandoffRecord | null;
+}
+export type VerifyEmailHandoffPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: VerifyEmailHandoffRecordSelect;
+  };
 };
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
@@ -4780,6 +4811,18 @@ export type SignUpSmsRecordSelect = {
   accessTokenExpiresAt?: boolean;
   outDeviceToken?: boolean;
   userId?: boolean;
+};
+export interface VerifyEmailHandoffRecord {
+  codeChallenge?: string | null;
+  email?: string | null;
+  nativeRedirectUri?: string | null;
+  result?: boolean | null;
+}
+export type VerifyEmailHandoffRecordSelect = {
+  codeChallenge?: boolean;
+  email?: boolean;
+  nativeRedirectUri?: boolean;
+  result?: boolean;
 };
 /** A `AuditLogAuth` edge in the connection. */
 export interface AuditLogAuthEdge {

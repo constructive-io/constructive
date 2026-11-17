@@ -672,6 +672,21 @@ approveDevice
 const result = await db.mutation.approveDevice({ input: { approvalToken: '<String>' } }).execute();
 ```
 
+### `db.mutation.cancelSignUpHandoff`
+
+cancelSignUpHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CancelSignUpHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.cancelSignUpHandoff({ input: { codeChallenge: '<String>', email: '<String>' } }).execute();
+```
+
 ### `db.mutation.checkPassword`
 
 checkPassword
@@ -1424,7 +1439,7 @@ signUp
   | `input` | SignUpInput (required) |
 
 ```typescript
-const result = await db.mutation.signUp({ input: { csrfToken: '<String>', email: '<String>', inviteToken: '<String>', password: '<String>' } }).execute();
+const result = await db.mutation.signUp({ input: '<SignUpInput>' }).execute();
 ```
 
 ### `db.mutation.signUpMagicLink`
@@ -1485,6 +1500,21 @@ verifyEmail
 
 ```typescript
 const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute();
+```
+
+### `db.mutation.verifyEmailHandoff`
+
+verifyEmailHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyEmailHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.verifyEmailHandoff({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.verifyPassword`

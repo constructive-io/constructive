@@ -400,6 +400,31 @@ input BooleanFilter {
   notIn: [Boolean!]
 }
 
+"""All input for the `cancelSignUpHandoff` mutation."""
+input CancelSignUpHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  codeChallenge: String
+  email: String
+}
+
+"""The output of our `cancelSignUpHandoff` mutation."""
+type CancelSignUpHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `checkPassword` mutation."""
 input CheckPasswordInput {
   """
@@ -3286,6 +3311,12 @@ type Mutation {
     """
     input: ApproveDeviceInput!
   ): ApproveDevicePayload
+  cancelSignUpHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CancelSignUpHandoffInput!
+  ): CancelSignUpHandoffPayload
   checkPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3841,6 +3872,12 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  verifyEmailHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyEmailHandoffInput!
+  ): VerifyEmailHandoffPayload
   verifyPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -5889,6 +5926,7 @@ type SignInOptionsRecord {
   allowWebauthnUsernameless: Boolean
   enableCaptcha: Boolean
   identityProviders: JSON
+  nativeSignUpHandoff: Boolean
   requireMfa: Boolean
   signUpRequiresInvite: Boolean
 }
@@ -5991,9 +6029,11 @@ input SignUpInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  codeChallenge: String
   csrfToken: String
   email: String
   inviteToken: String
+  nativeRedirectUri: String
   password: String
 }
 
@@ -7779,6 +7819,40 @@ input UserToManyWebauthnCredentialFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: WebauthnCredentialFilter
+}
+
+"""All input for the `verifyEmailHandoff` mutation."""
+input VerifyEmailHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  emailId: UUID
+  password: String
+  token: String
+}
+
+"""The output of our `verifyEmailHandoff` mutation."""
+type VerifyEmailHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: VerifyEmailHandoffRecord
+}
+
+type VerifyEmailHandoffRecord {
+  codeChallenge: String
+  email: String
+  nativeRedirectUri: String
+  result: Boolean
 }
 
 """All input for the `verifyEmail` mutation."""

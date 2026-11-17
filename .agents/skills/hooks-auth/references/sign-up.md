@@ -7,7 +7,7 @@ React Query mutation hook for signUp
 ## Usage
 
 ```typescript
-const { mutate } = useSignUpMutation(); mutate({ input: { csrfToken: '<String>', email: '<String>', inviteToken: '<String>', password: '<String>' } });
+const { mutate } = useSignUpMutation(); mutate({ input: '<SignUpInput>' });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignUpMutation(); mutate({ input: { csrfToken: '<String>',
 
 ```typescript
 const { mutate, isLoading } = useSignUpMutation();
-mutate({ input: { csrfToken: '<String>', email: '<String>', inviteToken: '<String>', password: '<String>' } });
+mutate({ input: '<SignUpInput>' });
 ```
