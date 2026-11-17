@@ -2,7 +2,7 @@
  * LlmTextMutationPlugin
  *
  * Adds `{columnName}Text: String` companion fields on create/update mutation
- * inputs for every vector column. When the client provides a text string in
+ * inputs that carry the vector column's own field. When the client provides a text string in
  * the companion field, the plugin embeds it server-side and injects the
  * resulting vector into the actual column.
  *
@@ -144,7 +144,10 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             }
 
             const vectorField = newFields[fieldName];
-            const required = !!vectorField && isNonNullType(vectorField.type);
+            if (!vectorField) {
+              continue;
+            }
+            const required = isNonNullType(vectorField.type);
             if (required) {
               newFields = {
                 ...newFields,
