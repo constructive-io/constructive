@@ -12,7 +12,6 @@ csdk org-get-subordinates-record list --where.<field>.<op> <value> --orderBy <va
 csdk org-get-subordinates-record list --limit 10 --after <cursor>
 csdk org-get-subordinates-record find-first --where.<field>.<op> <value>
 csdk org-get-subordinates-record get --id <UUID>
-csdk org-get-subordinates-record create --depth <Int> --userId <UUID>
 csdk org-get-subordinates-record update --id <UUID> [--depth <Int>] [--userId <UUID>]
 csdk org-get-subordinates-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk org-get-subordinates-record list --select id,id
 
 ```bash
 csdk org-get-subordinates-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a orgGetSubordinatesRecord
-
-```bash
-csdk org-get-subordinates-record create --depth <Int> --userId <UUID>
 ```
 
 ### Get a orgGetSubordinatesRecord by id

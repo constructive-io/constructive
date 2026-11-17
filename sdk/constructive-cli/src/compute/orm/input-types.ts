@@ -234,7 +234,6 @@ export interface UUIDListFilter {
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
-export type ResourceRequirement = unknown;
 /** One run of a repository workflow: its commit, its job, and what it produced */
 // ============ Entity Types ============
 export interface Build {
@@ -261,6 +260,10 @@ export interface Build {
   jobId?: string | null;
   /** Build log object in storage; step rows slice it by byte range */
   logs?: ConstructiveInternalTypeUpload | null;
+  /** URL to fetch `logs`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  logsUrl?: string | null;
+  /** The versions rendered beside `logs`, narrowest first, each with a URL. Empty when there are none. */
+  logsVersions?: FileVersion[] | null;
   /** Matrix shard identity; NULL for a non-matrix build */
   matrixKey?: string | null;
   /** Build detail (step results, durations, failure reason) */
@@ -314,32 +317,6 @@ export interface BuildStep {
   status?: string | null;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown> | null;
-}
-/** Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST */
-export interface BuilderBinding {
-  createdAt?: string | null;
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId?: string | null;
-  id: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId?: string | null;
-  /** Most recent projection failure */
-  lastError?: string | null;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown> | null;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId?: string | null;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string | null;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string | null;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string | null;
-  updatedAt?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
 }
 /** Seed-content preset catalog (limit defaults, trust ladders, ...) — merkle-versioned head over the infra store */
 export interface ContentPreset {
@@ -1315,6 +1292,10 @@ export interface IntegrationProvider {
   id: string;
   /** Provider logo as an image domain value (url, id, key, bucket, provider) */
   logo?: ConstructiveInternalTypeImage | null;
+  /** URL to fetch `logo`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  logoUrl?: string | null;
+  /** The versions rendered beside `logo`, narrowest first, each with a URL. Empty when there are none. */
+  logoVersions?: FileVersion[] | null;
   /** Human-readable brand name (e.g. 'Mailgun', 'PostgreSQL') */
   name?: string | null;
   /** Canonical config requirements for this provider: array of (name, required, provider) tuples. Used by the UI to auto-fill function/resource required_configs. */
@@ -1395,6 +1376,10 @@ export interface PlatformBuild {
   jobId?: string | null;
   /** Build log object in storage; step rows slice it by byte range */
   logs?: ConstructiveInternalTypeUpload | null;
+  /** URL to fetch `logs`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  logsUrl?: string | null;
+  /** The versions rendered beside `logs`, narrowest first, each with a URL. Empty when there are none. */
+  logsVersions?: FileVersion[] | null;
   /** Matrix shard identity; NULL for a non-matrix build */
   matrixKey?: string | null;
   /** Build detail (step results, durations, failure reason) */
@@ -1446,30 +1431,6 @@ export interface PlatformBuildStep {
   status?: string | null;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown> | null;
-}
-/** Binds a namespace to an installed BuildKit resource for a lane (realm) — the reconciler projects its in-cluster Service address as BUILDKIT_HOST */
-export interface PlatformBuilderBinding {
-  createdAt?: string | null;
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  id: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId?: string | null;
-  /** Most recent projection failure */
-  lastError?: string | null;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown> | null;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId?: string | null;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string | null;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string | null;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string | null;
-  updatedAt?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
 }
 /** Join table binding function definitions to API endpoints with per-binding alias and config */
 export interface PlatformFunctionApiBinding {
@@ -2004,6 +1965,10 @@ export interface PlatformProposalComment {
   actorId?: string | null;
   /** Files referenced by the comment body, in the order they were attached */
   attachments?: ConstructiveInternalTypeUpload[] | null;
+  /** URL to fetch `attachments`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  attachmentsUrl?: string[] | null;
+  /** The versions rendered beside `attachments`, narrowest first, each with a URL. Empty when there are none. */
+  attachmentsVersions?: FileVersion[] | null;
   /** Comment text */
   body?: string | null;
   /** TRGM similarity when searching `body`. Returns null when no trgm search filter is active. */
@@ -2012,6 +1977,9 @@ export interface PlatformProposalComment {
   createdBy?: string | null;
   createdByPrincipal?: string | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -2057,6 +2025,9 @@ export interface PlatformProposal {
   /** When this is wanted by (NULL when nothing is promised) */
   dueAt?: string | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -2297,6 +2268,9 @@ export interface PlatformRepository {
   /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
   descriptionTrgmSimilarity?: number | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -2720,6 +2694,34 @@ export interface PlatformResourcesResolvedRequirement {
   secretsObjectName?: string | null;
   slug?: string | null;
 }
+/** Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config */
+export interface PlatformServiceBinding {
+  createdAt?: string | null;
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  id: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId?: string | null;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope?: string | null;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind?: string | null;
+  /** Most recent projection failure */
+  lastError?: string | null;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown> | null;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string | null;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string | null;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string | null;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
 /** Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window */
 export interface PlatformWebhookEndpoint {
   /** Whether this endpoint currently accepts deliveries */
@@ -2776,6 +2778,10 @@ export interface ProposalComment {
   actorId?: string | null;
   /** Files referenced by the comment body, in the order they were attached */
   attachments?: ConstructiveInternalTypeUpload[] | null;
+  /** URL to fetch `attachments`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  attachmentsUrl?: string[] | null;
+  /** The versions rendered beside `attachments`, narrowest first, each with a URL. Empty when there are none. */
+  attachmentsVersions?: FileVersion[] | null;
   /** Comment text */
   body?: string | null;
   /** TRGM similarity when searching `body`. Returns null when no trgm search filter is active. */
@@ -2786,6 +2792,9 @@ export interface ProposalComment {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -2833,6 +2842,9 @@ export interface Proposal {
   /** When this is wanted by (NULL when nothing is promised) */
   dueAt?: string | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -3089,6 +3101,9 @@ export interface Repository {
   /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
   descriptionTrgmSimilarity?: number | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -3533,6 +3548,36 @@ export interface ResourcesResolvedRequirement {
   secretsObjectName?: string | null;
   slug?: string | null;
 }
+/** Binds a namespace to an installed platform service (BuildKit, hosted Git) for a lane (realm) — the reconciler projects its in-cluster Service address into the namespace config */
+export interface ServiceBinding {
+  createdAt?: string | null;
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId?: string | null;
+  id: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId?: string | null;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope?: string | null;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind?: string | null;
+  /** Most recent projection failure */
+  lastError?: string | null;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown> | null;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId?: string | null;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string | null;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string | null;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
 /** Webhook route authority: (host, path) -> function task_identifier invoked through the webhook channel, with provider, signing-secret reference, and replay window */
 export interface WebhookEndpoint {
   /** Whether this endpoint currently accepts deliveries */
@@ -3607,9 +3652,6 @@ export interface BuildRelations {
   workflow?: RepositoryWorkflow | null;
 }
 export interface BuildStepRelations {}
-export interface BuilderBindingRelations {
-  namespace?: Namespace | null;
-}
 export interface ContentPresetRelations {}
 export interface DatabaseFunctionGraphRelations {
   databaseFunctionGraphExecutionsByGraphId?: ConnectionResult<DatabaseFunctionGraphExecution>;
@@ -3643,7 +3685,7 @@ export interface FunctionDefinitionRelations {
   webhookEndpoints?: ConnectionResult<WebhookEndpoint>;
 }
 export interface FunctionDeploymentRelations {
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
 }
 export interface FunctionDeploymentEventRelations {}
 export interface FunctionExecutionLogRelations {}
@@ -3683,13 +3725,13 @@ export interface InfraRefRelations {}
 export interface InfraStoreRelations {}
 export interface IntegrationProviderRelations {}
 export interface NamespaceRelations {
-  builderBindings?: ConnectionResult<BuilderBinding>;
-  functionDeployments?: ConnectionResult<FunctionDeployment>;
-  registryBindings?: ConnectionResult<RegistryBinding>;
-  resourceDefinitions?: ConnectionResult<ResourceDefinition>;
-  resourceInstallations?: ConnectionResult<ResourceInstallation>;
-  resources?: ConnectionResult<Resource>;
-  webhookEndpoints?: ConnectionResult<WebhookEndpoint>;
+  functionDeploymentsByNamespaceIdAndDatabaseId?: ConnectionResult<FunctionDeployment>;
+  registryBindingsByNamespaceIdAndDatabaseId?: ConnectionResult<RegistryBinding>;
+  resourceDefinitionsByNamespaceIdAndDatabaseId?: ConnectionResult<ResourceDefinition>;
+  resourceInstallationsByNamespaceIdAndDatabaseId?: ConnectionResult<ResourceInstallation>;
+  resourcesByNamespaceIdAndDatabaseId?: ConnectionResult<Resource>;
+  serviceBindingsByNamespaceIdAndDatabaseId?: ConnectionResult<ServiceBinding>;
+  webhookEndpointsByNamespaceIdAndDatabaseId?: ConnectionResult<WebhookEndpoint>;
 }
 export interface NamespaceEventRelations {}
 export interface PlatformBuildRelations {
@@ -3699,9 +3741,6 @@ export interface PlatformBuildRelations {
   workflow?: PlatformRepositoryWorkflow | null;
 }
 export interface PlatformBuildStepRelations {}
-export interface PlatformBuilderBindingRelations {
-  namespace?: PlatformNamespace | null;
-}
 export interface PlatformFunctionApiBindingRelations {
   functionDefinition?: PlatformFunctionDefinition | null;
   platformFunctionInvocationsByApiBindingId?: ConnectionResult<PlatformFunctionInvocation>;
@@ -3742,12 +3781,12 @@ export interface PlatformInfraStoreRelations {}
 export interface PlatformK8sResourceKindRelations {}
 export interface PlatformK8sSpecRuleRelations {}
 export interface PlatformNamespaceRelations {
-  platformBuilderBindingsByNamespaceId?: ConnectionResult<PlatformBuilderBinding>;
   platformFunctionDeploymentsByNamespaceId?: ConnectionResult<PlatformFunctionDeployment>;
   platformRegistryBindingsByNamespaceId?: ConnectionResult<PlatformRegistryBinding>;
   platformResourceDefinitionsByNamespaceId?: ConnectionResult<PlatformResourceDefinition>;
   platformResourceInstallationsByNamespaceId?: ConnectionResult<PlatformResourceInstallation>;
   platformResourcesByNamespaceId?: ConnectionResult<PlatformResource>;
+  platformServiceBindingsByNamespaceId?: ConnectionResult<PlatformServiceBinding>;
   platformWebhookEndpointsByNamespaceId?: ConnectionResult<PlatformWebhookEndpoint>;
 }
 export interface PlatformNamespaceEventRelations {}
@@ -3839,6 +3878,9 @@ export interface PlatformResourceUtilizationRelations {}
 export interface PlatformResourcesHealthRelations {}
 export interface PlatformResourcesRequirementsStateRelations {}
 export interface PlatformResourcesResolvedRequirementRelations {}
+export interface PlatformServiceBindingRelations {
+  namespace?: PlatformNamespace | null;
+}
 export interface PlatformWebhookEndpointRelations {
   functionDefinition?: PlatformFunctionDefinition | null;
   namespace?: PlatformNamespace | null;
@@ -3876,7 +3918,7 @@ export interface ProposalsChunkRelations {
   proposals?: Proposal | null;
 }
 export interface RegistryBindingRelations {
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
   registry?: Registry | null;
 }
 export interface RegistryRelations {
@@ -3910,18 +3952,18 @@ export interface RepositoryWorkflowRelations {
 }
 export interface ResourceRelations {
   installation?: ResourceInstallation | null;
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
   resourceDefinition?: ResourceDefinition | null;
   resourceStatusChecks?: ConnectionResult<ResourceStatusCheck>;
 }
 export interface ResourceDeclaredCapacityRelations {}
 export interface ResourceDefinitionRelations {
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
   resources?: ConnectionResult<Resource>;
 }
 export interface ResourceEventRelations {}
 export interface ResourceInstallationRelations {
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
   registriesByInstallationId?: ConnectionResult<Registry>;
   resourcesByInstallationId?: ConnectionResult<Resource>;
 }
@@ -3935,9 +3977,12 @@ export interface ResourceUtilizationRelations {}
 export interface ResourcesHealthRelations {}
 export interface ResourcesRequirementsStateRelations {}
 export interface ResourcesResolvedRequirementRelations {}
+export interface ServiceBindingRelations {
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
+}
 export interface WebhookEndpointRelations {
   functionDefinition?: FunctionDefinition | null;
-  namespace?: Namespace | null;
+  namespaceByNamespaceIdAndDatabaseId?: Namespace | null;
   webhookEventsByEndpointId?: ConnectionResult<WebhookEvent>;
 }
 export interface WebhookEventRelations {
@@ -3946,7 +3991,6 @@ export interface WebhookEventRelations {
 // ============ Entity Types With Relations ============
 export type BuildWithRelations = Build & BuildRelations;
 export type BuildStepWithRelations = BuildStep & BuildStepRelations;
-export type BuilderBindingWithRelations = BuilderBinding & BuilderBindingRelations;
 export type ContentPresetWithRelations = ContentPreset & ContentPresetRelations;
 export type DatabaseFunctionGraphWithRelations = DatabaseFunctionGraph &
   DatabaseFunctionGraphRelations;
@@ -4007,8 +4051,6 @@ export type NamespaceWithRelations = Namespace & NamespaceRelations;
 export type NamespaceEventWithRelations = NamespaceEvent & NamespaceEventRelations;
 export type PlatformBuildWithRelations = PlatformBuild & PlatformBuildRelations;
 export type PlatformBuildStepWithRelations = PlatformBuildStep & PlatformBuildStepRelations;
-export type PlatformBuilderBindingWithRelations = PlatformBuilderBinding &
-  PlatformBuilderBindingRelations;
 export type PlatformFunctionApiBindingWithRelations = PlatformFunctionApiBinding &
   PlatformFunctionApiBindingRelations;
 export type PlatformFunctionCapabilityBindingWithRelations = PlatformFunctionCapabilityBinding &
@@ -4089,6 +4131,8 @@ export type PlatformResourcesRequirementsStateWithRelations = PlatformResourcesR
   PlatformResourcesRequirementsStateRelations;
 export type PlatformResourcesResolvedRequirementWithRelations =
   PlatformResourcesResolvedRequirement & PlatformResourcesResolvedRequirementRelations;
+export type PlatformServiceBindingWithRelations = PlatformServiceBinding &
+  PlatformServiceBindingRelations;
 export type PlatformWebhookEndpointWithRelations = PlatformWebhookEndpoint &
   PlatformWebhookEndpointRelations;
 export type PlatformWebhookEventWithRelations = PlatformWebhookEvent &
@@ -4126,6 +4170,7 @@ export type ResourcesRequirementsStateWithRelations = ResourcesRequirementsState
   ResourcesRequirementsStateRelations;
 export type ResourcesResolvedRequirementWithRelations = ResourcesResolvedRequirement &
   ResourcesResolvedRequirementRelations;
+export type ServiceBindingWithRelations = ServiceBinding & ServiceBindingRelations;
 export type WebhookEndpointWithRelations = WebhookEndpoint & WebhookEndpointRelations;
 export type WebhookEventWithRelations = WebhookEvent & WebhookEventRelations;
 // ============ Entity Select Types ============
@@ -4143,6 +4188,15 @@ export type BuildSelect = {
   imageRef?: boolean;
   jobId?: boolean;
   logs?: boolean;
+  logsUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  logsVersions?: {
+    select: FileVersionSelect;
+  };
   matrixKey?: boolean;
   metadata?: boolean;
   proposalId?: boolean;
@@ -4183,26 +4237,6 @@ export type BuildStepSelect = {
   startedAt?: boolean;
   status?: boolean;
   summary?: boolean;
-};
-export type BuilderBindingSelect = {
-  createdAt?: boolean;
-  createdBy?: boolean;
-  createdByPrincipal?: boolean;
-  databaseId?: boolean;
-  id?: boolean;
-  installationId?: boolean;
-  lastError?: boolean;
-  metadata?: boolean;
-  namespaceId?: boolean;
-  observedHost?: boolean;
-  realm?: boolean;
-  status?: boolean;
-  updatedAt?: boolean;
-  updatedBy?: boolean;
-  updatedByPrincipal?: boolean;
-  namespace?: {
-    select: NamespaceSelect;
-  };
 };
 export type ContentPresetSelect = {
   active?: boolean;
@@ -4439,10 +4473,14 @@ export type FunctionDefinitionSelect = {
   queueName?: boolean;
   requiredBuckets?: boolean;
   requiredCapabilities?: boolean;
-  requiredConfigs?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
   requiredModels?: boolean;
   requiredModules?: boolean;
-  requiredSecrets?: boolean;
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resources?: boolean;
   runtime?: boolean;
   scaleMax?: boolean;
@@ -4508,7 +4546,7 @@ export type FunctionDeploymentSelect = {
   timeoutSeconds?: boolean;
   updatedAt?: boolean;
   updatedByPrincipal?: boolean;
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
 };
@@ -4829,9 +4867,22 @@ export type IntegrationProviderSelect = {
   icon?: boolean;
   id?: boolean;
   logo?: boolean;
+  logoUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  logoVersions?: {
+    select: FileVersionSelect;
+  };
   name?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   slug?: boolean;
   updatedAt?: boolean;
 };
@@ -4850,43 +4901,43 @@ export type NamespaceSelect = {
   namespaceName?: boolean;
   status?: boolean;
   updatedAt?: boolean;
-  builderBindings?: {
-    select: BuilderBindingSelect;
-    first?: number;
-    filter?: BuilderBindingFilter;
-    orderBy?: BuilderBindingOrderBy[];
-  };
-  functionDeployments?: {
+  functionDeploymentsByNamespaceIdAndDatabaseId?: {
     select: FunctionDeploymentSelect;
     first?: number;
     filter?: FunctionDeploymentFilter;
     orderBy?: FunctionDeploymentOrderBy[];
   };
-  registryBindings?: {
+  registryBindingsByNamespaceIdAndDatabaseId?: {
     select: RegistryBindingSelect;
     first?: number;
     filter?: RegistryBindingFilter;
     orderBy?: RegistryBindingOrderBy[];
   };
-  resourceDefinitions?: {
+  resourceDefinitionsByNamespaceIdAndDatabaseId?: {
     select: ResourceDefinitionSelect;
     first?: number;
     filter?: ResourceDefinitionFilter;
     orderBy?: ResourceDefinitionOrderBy[];
   };
-  resourceInstallations?: {
+  resourceInstallationsByNamespaceIdAndDatabaseId?: {
     select: ResourceInstallationSelect;
     first?: number;
     filter?: ResourceInstallationFilter;
     orderBy?: ResourceInstallationOrderBy[];
   };
-  resources?: {
+  resourcesByNamespaceIdAndDatabaseId?: {
     select: ResourceSelect;
     first?: number;
     filter?: ResourceFilter;
     orderBy?: ResourceOrderBy[];
   };
-  webhookEndpoints?: {
+  serviceBindingsByNamespaceIdAndDatabaseId?: {
+    select: ServiceBindingSelect;
+    first?: number;
+    filter?: ServiceBindingFilter;
+    orderBy?: ServiceBindingOrderBy[];
+  };
+  webhookEndpointsByNamespaceIdAndDatabaseId?: {
     select: WebhookEndpointSelect;
     first?: number;
     filter?: WebhookEndpointFilter;
@@ -4916,6 +4967,15 @@ export type PlatformBuildSelect = {
   imageRef?: boolean;
   jobId?: boolean;
   logs?: boolean;
+  logsUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  logsVersions?: {
+    select: FileVersionSelect;
+  };
   matrixKey?: boolean;
   metadata?: boolean;
   proposalId?: boolean;
@@ -4955,25 +5015,6 @@ export type PlatformBuildStepSelect = {
   startedAt?: boolean;
   status?: boolean;
   summary?: boolean;
-};
-export type PlatformBuilderBindingSelect = {
-  createdAt?: boolean;
-  createdBy?: boolean;
-  createdByPrincipal?: boolean;
-  id?: boolean;
-  installationId?: boolean;
-  lastError?: boolean;
-  metadata?: boolean;
-  namespaceId?: boolean;
-  observedHost?: boolean;
-  realm?: boolean;
-  status?: boolean;
-  updatedAt?: boolean;
-  updatedBy?: boolean;
-  updatedByPrincipal?: boolean;
-  namespace?: {
-    select: PlatformNamespaceSelect;
-  };
 };
 export type PlatformFunctionApiBindingSelect = {
   alias?: boolean;
@@ -5041,10 +5082,14 @@ export type PlatformFunctionDefinitionSelect = {
   queueName?: boolean;
   requiredBuckets?: boolean;
   requiredCapabilities?: boolean;
-  requiredConfigs?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
   requiredModels?: boolean;
   requiredModules?: boolean;
-  requiredSecrets?: boolean;
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resources?: boolean;
   runtime?: boolean;
   scaleMax?: boolean;
@@ -5313,12 +5358,6 @@ export type PlatformNamespaceSelect = {
   namespaceName?: boolean;
   status?: boolean;
   updatedAt?: boolean;
-  platformBuilderBindingsByNamespaceId?: {
-    select: PlatformBuilderBindingSelect;
-    first?: number;
-    filter?: PlatformBuilderBindingFilter;
-    orderBy?: PlatformBuilderBindingOrderBy[];
-  };
   platformFunctionDeploymentsByNamespaceId?: {
     select: PlatformFunctionDeploymentSelect;
     first?: number;
@@ -5349,6 +5388,12 @@ export type PlatformNamespaceSelect = {
     filter?: PlatformResourceFilter;
     orderBy?: PlatformResourceOrderBy[];
   };
+  platformServiceBindingsByNamespaceId?: {
+    select: PlatformServiceBindingSelect;
+    first?: number;
+    filter?: PlatformServiceBindingFilter;
+    orderBy?: PlatformServiceBindingOrderBy[];
+  };
   platformWebhookEndpointsByNamespaceId?: {
     select: PlatformWebhookEndpointSelect;
     first?: number;
@@ -5368,12 +5413,23 @@ export type PlatformNamespaceEventSelect = {
 export type PlatformProposalCommentSelect = {
   actorId?: boolean;
   attachments?: boolean;
+  attachmentsUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  attachmentsVersions?: {
+    select: FileVersionSelect;
+  };
   body?: boolean;
   bodyTrgmSimilarity?: boolean;
   createdAt?: boolean;
   createdBy?: boolean;
   createdByPrincipal?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -5411,6 +5467,8 @@ export type PlatformProposalSelect = {
   decidedAt?: boolean;
   dueAt?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -5648,6 +5706,8 @@ export type PlatformRepositorySelect = {
   description?: boolean;
   descriptionTrgmSimilarity?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   externalId?: boolean;
@@ -5798,8 +5858,12 @@ export type PlatformResourceSelect = {
   namespaceId?: boolean;
   realm?: boolean;
   replicas?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resourceDefinitionId?: boolean;
   slug?: boolean;
   spec?: boolean;
@@ -5857,8 +5921,12 @@ export type PlatformResourceDefinitionSelect = {
   name?: boolean;
   namespaceId?: boolean;
   paramsSchema?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   slug?: boolean;
   stepUpMinAge?: boolean;
   updatedAt?: boolean;
@@ -6012,8 +6080,12 @@ export type PlatformResourcesHealthSelect = {
   namespaceId?: boolean;
   realm?: boolean;
   replicas?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resourceDefinitionId?: boolean;
   slug?: boolean;
   spec?: boolean;
@@ -6048,6 +6120,27 @@ export type PlatformResourcesResolvedRequirementSelect = {
   resourceId?: boolean;
   secretsObjectName?: boolean;
   slug?: boolean;
+};
+export type PlatformServiceBindingSelect = {
+  createdAt?: boolean;
+  createdBy?: boolean;
+  createdByPrincipal?: boolean;
+  id?: boolean;
+  installationId?: boolean;
+  installationScope?: boolean;
+  kind?: boolean;
+  lastError?: boolean;
+  metadata?: boolean;
+  namespaceId?: boolean;
+  observedHost?: boolean;
+  realm?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  updatedByPrincipal?: boolean;
+  namespace?: {
+    select: PlatformNamespaceSelect;
+  };
 };
 export type PlatformWebhookEndpointSelect = {
   active?: boolean;
@@ -6098,6 +6191,15 @@ export type PlatformWebhookEventSelect = {
 export type ProposalCommentSelect = {
   actorId?: boolean;
   attachments?: boolean;
+  attachmentsUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  attachmentsVersions?: {
+    select: FileVersionSelect;
+  };
   body?: boolean;
   bodyTrgmSimilarity?: boolean;
   createdAt?: boolean;
@@ -6105,6 +6207,8 @@ export type ProposalCommentSelect = {
   createdByPrincipal?: boolean;
   databaseId?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -6143,6 +6247,8 @@ export type ProposalSelect = {
   decidedAt?: boolean;
   dueAt?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -6315,7 +6421,7 @@ export type RegistryBindingSelect = {
   updatedAt?: boolean;
   updatedBy?: boolean;
   updatedByPrincipal?: boolean;
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
   registry?: {
@@ -6388,6 +6494,8 @@ export type RepositorySelect = {
   description?: boolean;
   descriptionTrgmSimilarity?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   externalId?: boolean;
@@ -6542,8 +6650,12 @@ export type ResourceSelect = {
   namespaceId?: boolean;
   realm?: boolean;
   replicas?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resourceDefinitionId?: boolean;
   slug?: boolean;
   spec?: boolean;
@@ -6558,7 +6670,7 @@ export type ResourceSelect = {
   installation?: {
     select: ResourceInstallationSelect;
   };
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
   resourceDefinition?: {
@@ -6602,14 +6714,18 @@ export type ResourceDefinitionSelect = {
   name?: boolean;
   namespaceId?: boolean;
   paramsSchema?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   slug?: boolean;
   stepUpMinAge?: boolean;
   updatedAt?: boolean;
   updatedBy?: boolean;
   updatedByPrincipal?: boolean;
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
   resources?: {
@@ -6646,7 +6762,7 @@ export type ResourceInstallationSelect = {
   updatedAt?: boolean;
   updatedBy?: boolean;
   updatedByPrincipal?: boolean;
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
   registriesByInstallationId?: {
@@ -6763,8 +6879,12 @@ export type ResourcesHealthSelect = {
   namespaceId?: boolean;
   realm?: boolean;
   replicas?: boolean;
-  requiredConfigs?: boolean;
-  requiredSecrets?: boolean;
+  requiredConfigs?: {
+    select: ResourceRequirementSelect;
+  };
+  requiredSecrets?: {
+    select: ResourceRequirementSelect;
+  };
   resourceDefinitionId?: boolean;
   slug?: boolean;
   spec?: boolean;
@@ -6800,6 +6920,28 @@ export type ResourcesResolvedRequirementSelect = {
   secretsObjectName?: boolean;
   slug?: boolean;
 };
+export type ServiceBindingSelect = {
+  createdAt?: boolean;
+  createdBy?: boolean;
+  createdByPrincipal?: boolean;
+  databaseId?: boolean;
+  id?: boolean;
+  installationId?: boolean;
+  installationScope?: boolean;
+  kind?: boolean;
+  lastError?: boolean;
+  metadata?: boolean;
+  namespaceId?: boolean;
+  observedHost?: boolean;
+  realm?: boolean;
+  status?: boolean;
+  updatedAt?: boolean;
+  updatedBy?: boolean;
+  updatedByPrincipal?: boolean;
+  namespaceByNamespaceIdAndDatabaseId?: {
+    select: NamespaceSelect;
+  };
+};
 export type WebhookEndpointSelect = {
   active?: boolean;
   createdAt?: boolean;
@@ -6820,7 +6962,7 @@ export type WebhookEndpointSelect = {
   functionDefinition?: {
     select: FunctionDefinitionSelect;
   };
-  namespace?: {
+  namespaceByNamespaceIdAndDatabaseId?: {
     select: NamespaceSelect;
   };
   webhookEventsByEndpointId?: {
@@ -6956,46 +7098,6 @@ export interface BuildStepFilter {
   status?: StringFilter;
   /** Filter by the object’s `summary` field. */
   summary?: JSONFilter;
-}
-export interface BuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: BuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: BuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: BuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
 }
 export interface ContentPresetFilter {
   /** Filter by the object’s `active` field. */
@@ -7557,8 +7659,8 @@ export interface FunctionDeploymentFilter {
   lastError?: StringFilter;
   /** Filter by the object’s `lastErrorAt` field. */
   lastErrorAt?: DatetimeFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -8271,10 +8373,6 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `builderBindings` relation. */
-  builderBindings?: NamespaceToManyBuilderBindingFilter;
-  /** `builderBindings` exist. */
-  builderBindingsExist?: boolean;
   /** Filter by the object’s `clusterId` field. */
   clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -8283,10 +8381,10 @@ export interface NamespaceFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  /** Filter by the object’s `functionDeployments` relation. */
-  functionDeployments?: NamespaceToManyFunctionDeploymentFilter;
-  /** `functionDeployments` exist. */
-  functionDeploymentsExist?: boolean;
+  /** Filter by the object’s `functionDeploymentsByNamespaceIdAndDatabaseId` relation. */
+  functionDeploymentsByNamespaceIdAndDatabaseId?: NamespaceToManyFunctionDeploymentFilter;
+  /** `functionDeploymentsByNamespaceIdAndDatabaseId` exist. */
+  functionDeploymentsByNamespaceIdAndDatabaseIdExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isActive` field. */
@@ -8305,30 +8403,34 @@ export interface NamespaceFilter {
   not?: NamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: NamespaceFilter[];
-  /** Filter by the object’s `registryBindings` relation. */
-  registryBindings?: NamespaceToManyRegistryBindingFilter;
-  /** `registryBindings` exist. */
-  registryBindingsExist?: boolean;
-  /** Filter by the object’s `resourceDefinitions` relation. */
-  resourceDefinitions?: NamespaceToManyResourceDefinitionFilter;
-  /** `resourceDefinitions` exist. */
-  resourceDefinitionsExist?: boolean;
-  /** Filter by the object’s `resourceInstallations` relation. */
-  resourceInstallations?: NamespaceToManyResourceInstallationFilter;
-  /** `resourceInstallations` exist. */
-  resourceInstallationsExist?: boolean;
-  /** Filter by the object’s `resources` relation. */
-  resources?: NamespaceToManyResourceFilter;
-  /** `resources` exist. */
-  resourcesExist?: boolean;
+  /** Filter by the object’s `registryBindingsByNamespaceIdAndDatabaseId` relation. */
+  registryBindingsByNamespaceIdAndDatabaseId?: NamespaceToManyRegistryBindingFilter;
+  /** `registryBindingsByNamespaceIdAndDatabaseId` exist. */
+  registryBindingsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourceDefinitionsByNamespaceIdAndDatabaseId` relation. */
+  resourceDefinitionsByNamespaceIdAndDatabaseId?: NamespaceToManyResourceDefinitionFilter;
+  /** `resourceDefinitionsByNamespaceIdAndDatabaseId` exist. */
+  resourceDefinitionsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourceInstallationsByNamespaceIdAndDatabaseId` relation. */
+  resourceInstallationsByNamespaceIdAndDatabaseId?: NamespaceToManyResourceInstallationFilter;
+  /** `resourceInstallationsByNamespaceIdAndDatabaseId` exist. */
+  resourceInstallationsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourcesByNamespaceIdAndDatabaseId` relation. */
+  resourcesByNamespaceIdAndDatabaseId?: NamespaceToManyResourceFilter;
+  /** `resourcesByNamespaceIdAndDatabaseId` exist. */
+  resourcesByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `serviceBindingsByNamespaceIdAndDatabaseId` relation. */
+  serviceBindingsByNamespaceIdAndDatabaseId?: NamespaceToManyServiceBindingFilter;
+  /** `serviceBindingsByNamespaceIdAndDatabaseId` exist. */
+  serviceBindingsByNamespaceIdAndDatabaseIdExist?: boolean;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `webhookEndpoints` relation. */
-  webhookEndpoints?: NamespaceToManyWebhookEndpointFilter;
-  /** `webhookEndpoints` exist. */
-  webhookEndpointsExist?: boolean;
+  /** Filter by the object’s `webhookEndpointsByNamespaceIdAndDatabaseId` relation. */
+  webhookEndpointsByNamespaceIdAndDatabaseId?: NamespaceToManyWebhookEndpointFilter;
+  /** `webhookEndpointsByNamespaceIdAndDatabaseId` exist. */
+  webhookEndpointsByNamespaceIdAndDatabaseIdExist?: boolean;
 }
 export interface NamespaceEventFilter {
   /** Filter by the object’s `actorId` field. */
@@ -8457,44 +8559,6 @@ export interface PlatformBuildStepFilter {
   status?: StringFilter;
   /** Filter by the object’s `summary` field. */
   summary?: JSONFilter;
-}
-export interface PlatformBuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PlatformBuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
 }
 export interface PlatformFunctionApiBindingFilter {
   /** Filter by the object’s `alias` field. */
@@ -9166,10 +9230,6 @@ export interface PlatformNamespaceFilter {
   not?: PlatformNamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceFilter[];
-  /** Filter by the object’s `platformBuilderBindingsByNamespaceId` relation. */
-  platformBuilderBindingsByNamespaceId?: PlatformNamespaceToManyPlatformBuilderBindingFilter;
-  /** `platformBuilderBindingsByNamespaceId` exist. */
-  platformBuilderBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
   platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
   /** `platformFunctionDeploymentsByNamespaceId` exist. */
@@ -9190,6 +9250,10 @@ export interface PlatformNamespaceFilter {
   platformResourcesByNamespaceId?: PlatformNamespaceToManyPlatformResourceFilter;
   /** `platformResourcesByNamespaceId` exist. */
   platformResourcesByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformServiceBindingsByNamespaceId` relation. */
+  platformServiceBindingsByNamespaceId?: PlatformNamespaceToManyPlatformServiceBindingFilter;
+  /** `platformServiceBindingsByNamespaceId` exist. */
+  platformServiceBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation. */
   platformWebhookEndpointsByNamespaceId?: PlatformNamespaceToManyPlatformWebhookEndpointFilter;
   /** `platformWebhookEndpointsByNamespaceId` exist. */
@@ -9238,6 +9302,8 @@ export interface PlatformProposalCommentFilter {
   createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -9266,6 +9332,8 @@ export interface PlatformProposalCommentFilter {
   search?: FullTextFilter;
   /** TRGM search on the `body` column. */
   trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `path` column. */
   trgmPath?: TrgmSearchInput;
   /** TSV search on the `search` column. */
@@ -9312,6 +9380,8 @@ export interface PlatformProposalFilter {
   dueAt?: DatetimeFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -9386,6 +9456,8 @@ export interface PlatformProposalFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `closed_reason` column. */
   trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `merge_commit` column. */
@@ -9712,6 +9784,8 @@ export interface PlatformRepositoryFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `externalId` field. */
@@ -9762,6 +9836,8 @@ export interface PlatformRepositoryFilter {
   trgmDefaultBranch?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `external_id` column. */
   trgmExternalId?: TrgmSearchInput;
   /** TRGM search on the `name` column. */
@@ -10447,6 +10523,48 @@ export interface PlatformResourcesResolvedRequirementFilter {
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
 }
+export interface PlatformServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 export interface PlatformWebhookEndpointFilter {
   /** Filter by the object’s `active` field. */
   active?: BooleanFilter;
@@ -10546,6 +10664,8 @@ export interface ProposalCommentFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -10574,6 +10694,8 @@ export interface ProposalCommentFilter {
   search?: FullTextFilter;
   /** TRGM search on the `body` column. */
   trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `path` column. */
   trgmPath?: TrgmSearchInput;
   /** TSV search on the `search` column. */
@@ -10626,6 +10748,8 @@ export interface ProposalFilter {
   dueAt?: DatetimeFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -10696,6 +10820,8 @@ export interface ProposalFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `closed_reason` column. */
   trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `merge_commit` column. */
@@ -10896,8 +11022,8 @@ export interface RegistryBindingFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `metadata` field. */
   metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -11042,6 +11168,8 @@ export interface RepositoryFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `externalId` field. */
@@ -11088,6 +11216,8 @@ export interface RepositoryFilter {
   trgmDefaultBranch?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `external_id` column. */
   trgmExternalId?: TrgmSearchInput;
   /** TRGM search on the `name` column. */
@@ -11290,8 +11420,8 @@ export interface ResourceFilter {
   memoryRequestBytes?: BigIntFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -11396,8 +11526,8 @@ export interface ResourceDefinitionFilter {
   labels?: JSONFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -11462,8 +11592,8 @@ export interface ResourceInstallationFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -11795,6 +11925,50 @@ export interface ResourcesResolvedRequirementFilter {
   /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
 }
+export interface ServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: ServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: ServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 export interface WebhookEndpointFilter {
   /** Filter by the object’s `active` field. */
   active?: BooleanFilter;
@@ -11816,8 +11990,8 @@ export interface WebhookEndpointFilter {
   host?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -11966,40 +12140,6 @@ export type BuildStepOrderBy =
   | 'STATUS_DESC'
   | 'SUMMARY_ASC'
   | 'SUMMARY_DESC';
-export type BuilderBindingOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_BY_PRINCIPAL_ASC'
-  | 'CREATED_BY_PRINCIPAL_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'OBSERVED_HOST_ASC'
-  | 'OBSERVED_HOST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REALM_ASC'
-  | 'REALM_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'UPDATED_BY_PRINCIPAL_ASC'
-  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type ContentPresetOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -13198,38 +13338,6 @@ export type PlatformBuildStepOrderBy =
   | 'STATUS_DESC'
   | 'SUMMARY_ASC'
   | 'SUMMARY_DESC';
-export type PlatformBuilderBindingOrderBy =
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'CREATED_BY_PRINCIPAL_ASC'
-  | 'CREATED_BY_PRINCIPAL_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'INSTALLATION_ID_ASC'
-  | 'INSTALLATION_ID_DESC'
-  | 'LAST_ERROR_ASC'
-  | 'LAST_ERROR_DESC'
-  | 'METADATA_ASC'
-  | 'METADATA_DESC'
-  | 'NAMESPACE_ID_ASC'
-  | 'NAMESPACE_ID_DESC'
-  | 'NATURAL'
-  | 'OBSERVED_HOST_ASC'
-  | 'OBSERVED_HOST_DESC'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'REALM_ASC'
-  | 'REALM_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'UPDATED_BY_PRINCIPAL_ASC'
-  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type PlatformFunctionApiBindingOrderBy =
   | 'ALIAS_ASC'
   | 'ALIAS_DESC'
@@ -13829,6 +13937,10 @@ export type PlatformProposalCommentOrderBy =
   | 'CREATED_BY_PRINCIPAL_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -13885,6 +13997,10 @@ export type PlatformProposalOrderBy =
   | 'DUE_AT_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -14185,6 +14301,10 @@ export type PlatformRepositoryOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -14766,6 +14886,42 @@ export type PlatformResourcesResolvedRequirementOrderBy =
   | 'SECRETS_OBJECT_NAME_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC';
+export type PlatformServiceBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INSTALLATION_SCOPE_ASC'
+  | 'INSTALLATION_SCOPE_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type PlatformWebhookEndpointOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -14847,6 +15003,10 @@ export type ProposalCommentOrderBy =
   | 'DATABASE_ID_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -14905,6 +15065,10 @@ export type ProposalOrderBy =
   | 'DUE_AT_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -15221,6 +15385,10 @@ export type RepositoryOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -15824,6 +15992,44 @@ export type ResourcesResolvedRequirementOrderBy =
   | 'SECRETS_OBJECT_NAME_DESC'
   | 'SLUG_ASC'
   | 'SLUG_DESC';
+export type ServiceBindingOrderBy =
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'CREATED_BY_PRINCIPAL_ASC'
+  | 'CREATED_BY_PRINCIPAL_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'INSTALLATION_ID_ASC'
+  | 'INSTALLATION_ID_DESC'
+  | 'INSTALLATION_SCOPE_ASC'
+  | 'INSTALLATION_SCOPE_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'LAST_ERROR_ASC'
+  | 'LAST_ERROR_DESC'
+  | 'METADATA_ASC'
+  | 'METADATA_DESC'
+  | 'NAMESPACE_ID_ASC'
+  | 'NAMESPACE_ID_DESC'
+  | 'NATURAL'
+  | 'OBSERVED_HOST_ASC'
+  | 'OBSERVED_HOST_DESC'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'REALM_ASC'
+  | 'REALM_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'UPDATED_BY_PRINCIPAL_ASC'
+  | 'UPDATED_BY_PRINCIPAL_DESC';
 export type WebhookEndpointOrderBy =
   | 'ACTIVE_ASC'
   | 'ACTIVE_DESC'
@@ -15927,7 +16133,6 @@ export interface BuildPatch {
   imageRef?: string | null;
   jobId?: string | null;
   logs?: ConstructiveInternalTypeUpload | null;
-  logsUpload?: File | null;
   matrixKey?: string | null;
   metadata?: Record<string, unknown> | null;
   proposalId?: string | null;
@@ -15992,46 +16197,6 @@ export interface DeleteBuildStepInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateBuilderBindingInput {
-  clientMutationId?: string;
-  builderBinding: {
-    createdBy?: string;
-    createdByPrincipal?: string;
-    databaseId: string;
-    installationId: string;
-    lastError?: string;
-    metadata?: Record<string, unknown>;
-    namespaceId: string;
-    observedHost?: string;
-    realm?: string;
-    status?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
-}
-export interface BuilderBindingPatch {
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  databaseId?: string | null;
-  installationId?: string | null;
-  lastError?: string | null;
-  metadata?: Record<string, unknown> | null;
-  namespaceId?: string | null;
-  observedHost?: string | null;
-  realm?: string | null;
-  status?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
-}
-export interface UpdateBuilderBindingInput {
-  clientMutationId?: string;
-  id: string;
-  builderBindingPatch: BuilderBindingPatch;
-}
-export interface DeleteBuilderBindingInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateContentPresetInput {
   clientMutationId?: string;
   contentPreset: {
@@ -16063,20 +16228,6 @@ export interface UpdateContentPresetInput {
 export interface DeleteContentPresetInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateDatabaseFunctionGraphInput {
-  clientMutationId?: string;
-  databaseFunctionGraph: {
-    context?: string;
-    createdBy?: string;
-    databaseId: string;
-    definitionsCommitId: string;
-    description?: string;
-    isValid?: boolean;
-    name?: string;
-    storeId: string;
-    validationErrors?: Record<string, unknown>;
-  };
 }
 export interface DatabaseFunctionGraphPatch {
   context?: string | null;
@@ -16303,13 +16454,6 @@ export interface UpdateDatabaseGraphCommitInput {
 export interface DeleteDatabaseGraphCommitInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateDatabaseGraphGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  databaseGraphGetAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
 }
 export interface DatabaseGraphGetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
@@ -16726,20 +16870,6 @@ export interface DeleteFunctionGraphCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateFunctionGraphInput {
-  clientMutationId?: string;
-  functionGraph: {
-    context?: string;
-    createdBy?: string;
-    definitionsCommitId: string;
-    description?: string;
-    isValid?: boolean;
-    name?: string;
-    scopeId: string;
-    storeId: string;
-    validationErrors?: Record<string, unknown>;
-  };
-}
 export interface FunctionGraphPatch {
   context?: string | null;
   createdBy?: string | null;
@@ -17144,13 +17274,6 @@ export interface DeleteFunctionScheduleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  getAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
-}
 export interface GetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
   path?: string[] | null;
@@ -17278,13 +17401,6 @@ export interface DeleteInfraCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateInfraGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  infraGetAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
-}
 export interface InfraGetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
   path?: string[] | null;
@@ -17388,7 +17504,6 @@ export interface IntegrationProviderPatch {
   description?: string | null;
   icon?: string | null;
   logo?: ConstructiveInternalTypeImage | null;
-  logoUpload?: File | null;
   name?: string | null;
   requiredConfigs?: ResourceRequirementInput[] | null;
   requiredSecrets?: ResourceRequirementInput[] | null;
@@ -17504,7 +17619,6 @@ export interface PlatformBuildPatch {
   imageRef?: string | null;
   jobId?: string | null;
   logs?: ConstructiveInternalTypeUpload | null;
-  logsUpload?: File | null;
   matrixKey?: string | null;
   metadata?: Record<string, unknown> | null;
   proposalId?: string | null;
@@ -17565,44 +17679,6 @@ export interface UpdatePlatformBuildStepInput {
   platformBuildStepPatch: PlatformBuildStepPatch;
 }
 export interface DeletePlatformBuildStepInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePlatformBuilderBindingInput {
-  clientMutationId?: string;
-  platformBuilderBinding: {
-    createdBy?: string;
-    createdByPrincipal?: string;
-    installationId: string;
-    lastError?: string;
-    metadata?: Record<string, unknown>;
-    namespaceId: string;
-    observedHost?: string;
-    realm?: string;
-    status?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
-}
-export interface PlatformBuilderBindingPatch {
-  createdBy?: string | null;
-  createdByPrincipal?: string | null;
-  installationId?: string | null;
-  lastError?: string | null;
-  metadata?: Record<string, unknown> | null;
-  namespaceId?: string | null;
-  observedHost?: string | null;
-  realm?: string | null;
-  status?: string | null;
-  updatedBy?: string | null;
-  updatedByPrincipal?: string | null;
-}
-export interface UpdatePlatformBuilderBindingInput {
-  clientMutationId?: string;
-  id: string;
-  platformBuilderBindingPatch: PlatformBuilderBindingPatch;
-}
-export interface DeletePlatformBuilderBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -18113,13 +18189,6 @@ export interface UpdatePlatformInfraCommitInput {
 export interface DeletePlatformInfraCommitInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreatePlatformInfraGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  platformInfraGetAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
 }
 export interface PlatformInfraGetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
@@ -18892,25 +18961,6 @@ export interface DeletePlatformResourceInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformResourceDeclaredCapacityInput {
-  clientMutationId?: string;
-  platformResourceDeclaredCapacity: {
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    installationId: string;
-    isTransient?: boolean;
-    kind?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    namespaceId: string;
-    podCountMax?: number;
-    podCountMin?: number;
-    source?: string;
-    sourceId: string;
-    storageSizeBytes?: string;
-    storageTotalBytes?: string;
-  };
-}
 export interface PlatformResourceDeclaredCapacityPatch {
   cpuLimitMillicores?: string | null;
   cpuRequestMillicores?: string | null;
@@ -19052,29 +19102,6 @@ export interface DeletePlatformResourceInstallationInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformResourceObservedStorageInput {
-  clientMutationId?: string;
-  platformResourceObservedStorage: {
-    capacity?: string;
-    capacityBytes?: string;
-    claimName?: string;
-    declaredStorageClass?: string;
-    declaredStorageSizeBytes?: string;
-    declaredStorageTotalBytes?: string;
-    installationId: string;
-    isBound?: boolean;
-    kind?: string;
-    namespaceId: string;
-    phase?: string;
-    requested?: string;
-    requestedBytes?: string;
-    resourceId: string;
-    resourceStatus?: string;
-    slug?: string;
-    storageClass?: string;
-    storageName?: string;
-  };
-}
 export interface PlatformResourceObservedStoragePatch {
   capacity?: string | null;
   capacityBytes?: string | null;
@@ -19196,30 +19223,6 @@ export interface DeletePlatformResourceUsageSummaryInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformResourceUtilizationInput {
-  clientMutationId?: string;
-  platformResourceUtilization: {
-    avgMemoryBytes?: string;
-    cpuLimitMillicores?: string;
-    cpuPeakUtilization?: string;
-    cpuRequestHeadroomMillicores?: string;
-    cpuRequestMillicores?: string;
-    date?: string;
-    gbSeconds?: string;
-    kind?: string;
-    maxCpuMillicores?: string;
-    maxMemoryBytes?: string;
-    memoryLimitBytes?: string;
-    memoryPeakUtilization?: string;
-    memoryRequestBytes?: string;
-    memoryRequestHeadroomBytes?: string;
-    namespaceId: string;
-    replicas?: number;
-    resourceId: string;
-    runtimeSeconds?: string;
-    sampleCount?: number;
-  };
-}
 export interface PlatformResourceUtilizationPatch {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
@@ -19249,43 +19252,6 @@ export interface UpdatePlatformResourceUtilizationInput {
 export interface DeletePlatformResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreatePlatformResourcesHealthInput {
-  clientMutationId?: string;
-  platformResourcesHealth: {
-    annotations?: Record<string, unknown>;
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    createdBy?: string;
-    createdByPrincipal?: string;
-    errorCount?: number;
-    imageRef?: string;
-    installationId: string;
-    integrations?: string[];
-    kind?: string;
-    labels?: Record<string, unknown>;
-    lastError?: string;
-    lastHeartbeatAt?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    name?: string;
-    namespaceId: string;
-    realm?: string;
-    replicas?: number;
-    requiredConfigs?: ResourceRequirement[];
-    requiredSecrets?: ResourceRequirement[];
-    resourceDefinitionId: string;
-    slug?: string;
-    spec?: Record<string, unknown>;
-    status?: string;
-    statusDetail?: string;
-    statusObserved?: Record<string, unknown>;
-    storageClass?: string;
-    storageSizeBytes?: string;
-    storageTotalBytes?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
 }
 export interface PlatformResourcesHealthPatch {
   annotations?: Record<string, unknown> | null;
@@ -19330,18 +19296,6 @@ export interface DeletePlatformResourcesHealthInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformResourcesRequirementsStateInput {
-  clientMutationId?: string;
-  platformResourcesRequirementsState: {
-    configHash?: string;
-    configObjectName?: string;
-    requirementsHash?: string;
-    resourceId: string;
-    secretsHash?: string;
-    secretsObjectName?: string;
-    slug?: string;
-  };
-}
 export interface PlatformResourcesRequirementsStatePatch {
   configHash?: string | null;
   configObjectName?: string | null;
@@ -19359,22 +19313,6 @@ export interface UpdatePlatformResourcesRequirementsStateInput {
 export interface DeletePlatformResourcesRequirementsStateInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreatePlatformResourcesResolvedRequirementInput {
-  clientMutationId?: string;
-  platformResourcesResolvedRequirement: {
-    atomId: string;
-    configObjectName?: string;
-    name?: string;
-    namespaceId: string;
-    present?: boolean;
-    realm?: string;
-    required?: boolean;
-    requirementKind?: string;
-    resourceId: string;
-    secretsObjectName?: string;
-    slug?: string;
-  };
 }
 export interface PlatformResourcesResolvedRequirementPatch {
   atomId?: string | null;
@@ -19395,6 +19333,48 @@ export interface UpdatePlatformResourcesResolvedRequirementInput {
   platformResourcesResolvedRequirementPatch: PlatformResourcesResolvedRequirementPatch;
 }
 export interface DeletePlatformResourcesResolvedRequirementInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePlatformServiceBindingInput {
+  clientMutationId?: string;
+  platformServiceBinding: {
+    createdBy?: string;
+    createdByPrincipal?: string;
+    installationId: string;
+    installationScope: string;
+    kind: string;
+    lastError?: string;
+    metadata?: Record<string, unknown>;
+    namespaceId: string;
+    observedHost?: string;
+    realm?: string;
+    status?: string;
+    updatedBy?: string;
+    updatedByPrincipal?: string;
+  };
+}
+export interface PlatformServiceBindingPatch {
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  installationId?: string | null;
+  installationScope?: string | null;
+  kind?: string | null;
+  lastError?: string | null;
+  metadata?: Record<string, unknown> | null;
+  namespaceId?: string | null;
+  observedHost?: string | null;
+  realm?: string | null;
+  status?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
+export interface UpdatePlatformServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+  platformServiceBindingPatch: PlatformServiceBindingPatch;
+}
+export interface DeletePlatformServiceBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -20059,25 +20039,6 @@ export interface DeleteResourceInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateResourceDeclaredCapacityInput {
-  clientMutationId?: string;
-  resourceDeclaredCapacity: {
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    installationId: string;
-    isTransient?: boolean;
-    kind?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    namespaceId: string;
-    podCountMax?: number;
-    podCountMin?: number;
-    source?: string;
-    sourceId: string;
-    storageSizeBytes?: string;
-    storageTotalBytes?: string;
-  };
-}
 export interface ResourceDeclaredCapacityPatch {
   cpuLimitMillicores?: string | null;
   cpuRequestMillicores?: string | null;
@@ -20225,29 +20186,6 @@ export interface DeleteResourceInstallationInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateResourceObservedStorageInput {
-  clientMutationId?: string;
-  resourceObservedStorage: {
-    capacity?: string;
-    capacityBytes?: string;
-    claimName?: string;
-    declaredStorageClass?: string;
-    declaredStorageSizeBytes?: string;
-    declaredStorageTotalBytes?: string;
-    installationId: string;
-    isBound?: boolean;
-    kind?: string;
-    namespaceId: string;
-    phase?: string;
-    requested?: string;
-    requestedBytes?: string;
-    resourceId: string;
-    resourceStatus?: string;
-    slug?: string;
-    storageClass?: string;
-    storageName?: string;
-  };
-}
 export interface ResourceObservedStoragePatch {
   capacity?: string | null;
   capacityBytes?: string | null;
@@ -20375,30 +20313,6 @@ export interface DeleteResourceUsageSummaryInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateResourceUtilizationInput {
-  clientMutationId?: string;
-  resourceUtilization: {
-    avgMemoryBytes?: string;
-    cpuLimitMillicores?: string;
-    cpuPeakUtilization?: string;
-    cpuRequestHeadroomMillicores?: string;
-    cpuRequestMillicores?: string;
-    date?: string;
-    gbSeconds?: string;
-    kind?: string;
-    maxCpuMillicores?: string;
-    maxMemoryBytes?: string;
-    memoryLimitBytes?: string;
-    memoryPeakUtilization?: string;
-    memoryRequestBytes?: string;
-    memoryRequestHeadroomBytes?: string;
-    namespaceId: string;
-    replicas?: number;
-    resourceId: string;
-    runtimeSeconds?: string;
-    sampleCount?: number;
-  };
-}
 export interface ResourceUtilizationPatch {
   avgMemoryBytes?: string | null;
   cpuLimitMillicores?: string | null;
@@ -20428,44 +20342,6 @@ export interface UpdateResourceUtilizationInput {
 export interface DeleteResourceUtilizationInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateResourcesHealthInput {
-  clientMutationId?: string;
-  resourcesHealth: {
-    annotations?: Record<string, unknown>;
-    cpuLimitMillicores?: string;
-    cpuRequestMillicores?: string;
-    createdBy?: string;
-    createdByPrincipal?: string;
-    databaseId: string;
-    errorCount?: number;
-    imageRef?: string;
-    installationId: string;
-    integrations?: string[];
-    kind?: string;
-    labels?: Record<string, unknown>;
-    lastError?: string;
-    lastHeartbeatAt?: string;
-    memoryLimitBytes?: string;
-    memoryRequestBytes?: string;
-    name?: string;
-    namespaceId: string;
-    realm?: string;
-    replicas?: number;
-    requiredConfigs?: ResourceRequirement[];
-    requiredSecrets?: ResourceRequirement[];
-    resourceDefinitionId: string;
-    slug?: string;
-    spec?: Record<string, unknown>;
-    status?: string;
-    statusDetail?: string;
-    statusObserved?: Record<string, unknown>;
-    storageClass?: string;
-    storageSizeBytes?: string;
-    storageTotalBytes?: string;
-    updatedBy?: string;
-    updatedByPrincipal?: string;
-  };
 }
 export interface ResourcesHealthPatch {
   annotations?: Record<string, unknown> | null;
@@ -20511,18 +20387,6 @@ export interface DeleteResourcesHealthInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateResourcesRequirementsStateInput {
-  clientMutationId?: string;
-  resourcesRequirementsState: {
-    configHash?: string;
-    configObjectName?: string;
-    requirementsHash?: string;
-    resourceId: string;
-    secretsHash?: string;
-    secretsObjectName?: string;
-    slug?: string;
-  };
-}
 export interface ResourcesRequirementsStatePatch {
   configHash?: string | null;
   configObjectName?: string | null;
@@ -20540,22 +20404,6 @@ export interface UpdateResourcesRequirementsStateInput {
 export interface DeleteResourcesRequirementsStateInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateResourcesResolvedRequirementInput {
-  clientMutationId?: string;
-  resourcesResolvedRequirement: {
-    atomId: string;
-    configObjectName?: string;
-    name?: string;
-    namespaceId: string;
-    present?: boolean;
-    realm?: string;
-    required?: boolean;
-    requirementKind?: string;
-    resourceId: string;
-    secretsObjectName?: string;
-    slug?: string;
-  };
 }
 export interface ResourcesResolvedRequirementPatch {
   atomId?: string | null;
@@ -20576,6 +20424,50 @@ export interface UpdateResourcesResolvedRequirementInput {
   resourcesResolvedRequirementPatch: ResourcesResolvedRequirementPatch;
 }
 export interface DeleteResourcesResolvedRequirementInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateServiceBindingInput {
+  clientMutationId?: string;
+  serviceBinding: {
+    createdBy?: string;
+    createdByPrincipal?: string;
+    databaseId: string;
+    installationId: string;
+    installationScope: string;
+    kind: string;
+    lastError?: string;
+    metadata?: Record<string, unknown>;
+    namespaceId: string;
+    observedHost?: string;
+    realm?: string;
+    status?: string;
+    updatedBy?: string;
+    updatedByPrincipal?: string;
+  };
+}
+export interface ServiceBindingPatch {
+  createdBy?: string | null;
+  createdByPrincipal?: string | null;
+  databaseId?: string | null;
+  installationId?: string | null;
+  installationScope?: string | null;
+  kind?: string | null;
+  lastError?: string | null;
+  metadata?: Record<string, unknown> | null;
+  namespaceId?: string | null;
+  observedHost?: string | null;
+  realm?: string | null;
+  status?: string | null;
+  updatedBy?: string | null;
+  updatedByPrincipal?: string | null;
+}
+export interface UpdateServiceBindingInput {
+  clientMutationId?: string;
+  id: string;
+  serviceBindingPatch: ServiceBindingPatch;
+}
+export interface DeleteServiceBindingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -20682,13 +20574,13 @@ export const connectionFieldsMap = {
     imageGrants: 'ImageGrant',
   },
   Namespace: {
-    builderBindings: 'BuilderBinding',
-    functionDeployments: 'FunctionDeployment',
-    registryBindings: 'RegistryBinding',
-    resourceDefinitions: 'ResourceDefinition',
-    resourceInstallations: 'ResourceInstallation',
-    resources: 'Resource',
-    webhookEndpoints: 'WebhookEndpoint',
+    functionDeploymentsByNamespaceIdAndDatabaseId: 'FunctionDeployment',
+    registryBindingsByNamespaceIdAndDatabaseId: 'RegistryBinding',
+    resourceDefinitionsByNamespaceIdAndDatabaseId: 'ResourceDefinition',
+    resourceInstallationsByNamespaceIdAndDatabaseId: 'ResourceInstallation',
+    resourcesByNamespaceIdAndDatabaseId: 'Resource',
+    serviceBindingsByNamespaceIdAndDatabaseId: 'ServiceBinding',
+    webhookEndpointsByNamespaceIdAndDatabaseId: 'WebhookEndpoint',
   },
   PlatformFunctionApiBinding: {
     platformFunctionInvocationsByApiBindingId: 'PlatformFunctionInvocation',
@@ -20703,12 +20595,12 @@ export const connectionFieldsMap = {
     platformImageGrantsByImageId: 'PlatformImageGrant',
   },
   PlatformNamespace: {
-    platformBuilderBindingsByNamespaceId: 'PlatformBuilderBinding',
     platformFunctionDeploymentsByNamespaceId: 'PlatformFunctionDeployment',
     platformRegistryBindingsByNamespaceId: 'PlatformRegistryBinding',
     platformResourceDefinitionsByNamespaceId: 'PlatformResourceDefinition',
     platformResourceInstallationsByNamespaceId: 'PlatformResourceInstallation',
     platformResourcesByNamespaceId: 'PlatformResource',
+    platformServiceBindingsByNamespaceId: 'PlatformServiceBinding',
     platformWebhookEndpointsByNamespaceId: 'PlatformWebhookEndpoint',
   },
   PlatformProposalComment: {
@@ -20849,6 +20741,15 @@ export interface ApproveNodeInput {
 export interface CopyGraphInput {
   clientMutationId?: string;
   graphId?: string;
+  name?: string;
+  scopeId?: string;
+}
+export interface CreateFunctionGraphInput {
+  clientMutationId?: string;
+  context?: string;
+  createdBy?: string;
+  definitionsCommitId?: string;
+  description?: string;
   name?: string;
   scopeId?: string;
 }
@@ -21488,15 +21389,6 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Not included in the specified list. */
   notIn?: ConstructiveInternalTypeImage[];
 }
-/** A filter to be used against many `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface NamespaceToManyBuilderBindingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: BuilderBindingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: BuilderBindingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: BuilderBindingFilter;
-}
 /** A filter to be used against many `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -21541,6 +21433,15 @@ export interface NamespaceToManyResourceFilter {
   none?: ResourceFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ResourceFilter;
+}
+/** A filter to be used against many `ServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface NamespaceToManyServiceBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: ServiceBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ServiceBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: ServiceBindingFilter;
 }
 /** A filter to be used against many `WebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface NamespaceToManyWebhookEndpointFilter {
@@ -21605,15 +21506,6 @@ export interface PlatformImageToManyPlatformImageGrantFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformImageGrantFilter;
 }
-/** A filter to be used against many `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformNamespaceToManyPlatformBuilderBindingFilter {
-  /** Filters to entities where every related entity matches. */
-  every?: PlatformBuilderBindingFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: PlatformBuilderBindingFilter;
-  /** Filters to entities where at least one related entity matches. */
-  some?: PlatformBuilderBindingFilter;
-}
 /** A filter to be used against many `PlatformFunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformFunctionDeploymentFilter {
   /** Filters to entities where every related entity matches. */
@@ -21658,6 +21550,15 @@ export interface PlatformNamespaceToManyPlatformResourceFilter {
   none?: PlatformResourceFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformResourceFilter;
+}
+/** A filter to be used against many `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformNamespaceToManyPlatformServiceBindingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PlatformServiceBindingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PlatformServiceBindingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PlatformServiceBindingFilter;
 }
 /** A filter to be used against many `PlatformWebhookEndpoint` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformNamespaceToManyPlatformWebhookEndpointFilter {
@@ -21812,10 +21713,12 @@ export interface VectorNearbyInput {
   includeChunks?: boolean;
   /** Similarity metric to use (default: COSINE). */
   metric?: VectorMetric;
-  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** The model that produced `vector`. On a column that records the model of each row's vector, only rows embedded with this model are compared; vectors of two models are not comparable. Filled in server-side when `text` is embedded. */
+  model?: string;
+  /** Natural language text to embed server-side for similarity search. Provide exactly one of `text` or `vector`; sending both or neither is an error. Blank text on its own counts as not given. Requires the LLM plugin to be configured with an embedding provider. */
   text?: string;
   /** Query vector for similarity search. */
-  vector: number[];
+  vector?: number[];
 }
 /** A filter to be used against many `PlatformProposal` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformProposalToManyPlatformProposalFilter {
@@ -22321,32 +22224,6 @@ export interface BuildStepInput {
   status?: string;
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown>;
-}
-/** An input for mutations affecting `BuilderBinding` */
-export interface BuilderBindingInput {
-  createdAt?: string;
-  createdBy?: string;
-  createdByPrincipal?: string;
-  /** Database that owns this resource (database-scoped isolation) */
-  databaseId: string;
-  id?: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId: string;
-  /** Most recent projection failure */
-  lastError?: string;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown>;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId: string;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string;
-  updatedAt?: string;
-  updatedBy?: string;
-  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `ContentPreset` */
 export interface ContentPresetInput {
@@ -23384,30 +23261,6 @@ export interface PlatformBuildStepInput {
   /** Parsed detail: failure message, assertion diff, counts, annotations */
   summary?: Record<string, unknown>;
 }
-/** An input for mutations affecting `PlatformBuilderBinding` */
-export interface PlatformBuilderBindingInput {
-  createdAt?: string;
-  createdBy?: string;
-  createdByPrincipal?: string;
-  id?: string;
-  /** BuildKit resource installation serving this binding; may belong to another resource scope */
-  installationId: string;
-  /** Most recent projection failure */
-  lastError?: string;
-  /** Reconciler detail (projection timestamps and diagnostics) */
-  metadata?: Record<string, unknown>;
-  /** Namespace whose builds use this BuildKit installation */
-  namespaceId: string;
-  /** BuildKit address last projected into the namespace (NULL = never projected) */
-  observedHost?: string;
-  /** Lane this binding applies to (NULL = the scope's default lane) */
-  realm?: string;
-  /** Projection state of BUILDKIT_HOST: pending, active, failed */
-  status?: string;
-  updatedAt?: string;
-  updatedBy?: string;
-  updatedByPrincipal?: string;
-}
 /** An input for mutations affecting `PlatformFunctionApiBinding` */
 export interface PlatformFunctionApiBindingInput {
   /** Binding alias (e.g. default, staging, production) */
@@ -23933,7 +23786,7 @@ export interface PlatformProposalCommentInput {
   createdBy?: string;
   createdByPrincipal?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Line within path the comment is anchored to */
@@ -23966,7 +23819,7 @@ export interface PlatformProposalInput {
   /** When this is wanted by (NULL when nothing is promised) */
   dueAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
@@ -24065,7 +23918,7 @@ export interface PlatformProposalsChunkInput {
   chunkIndex?: number;
   createdAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -24166,7 +24019,7 @@ export interface PlatformRepositoryInput {
   /** What this repository holds */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   /** Identifier of this repository in the external provider (NULL for local) */
   externalId?: string;
@@ -24460,6 +24313,34 @@ export interface PlatformResourceUsageSummaryInput {
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number;
 }
+/** An input for mutations affecting `PlatformServiceBinding` */
+export interface PlatformServiceBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  id?: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId: string;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope: string;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown>;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
+}
 /** An input for mutations affecting `PlatformWebhookEndpoint` */
 export interface PlatformWebhookEndpointInput {
   /** Whether this endpoint currently accepts deliveries */
@@ -24522,7 +24403,7 @@ export interface ProposalCommentInput {
   createdBy?: string;
   createdByPrincipal?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Line within path the comment is anchored to */
@@ -24555,7 +24436,7 @@ export interface ProposalInput {
   /** When this is wanted by (NULL when nothing is promised) */
   dueAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** issue (a report or plan), change (merge one ref into another), discussion (an open question), decision (a question answered) */
@@ -24656,7 +24537,7 @@ export interface ProposalsChunkInput {
   /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
   databaseId?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -24765,7 +24646,7 @@ export interface RepositoryInput {
   /** What this repository holds */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   /** Identifier of this repository in the external provider (NULL for local) */
   externalId?: string;
@@ -25055,6 +24936,36 @@ export interface ResourceUsageSummaryInput {
   runtimeSeconds?: string;
   /** Number of raw samples aggregated into this summary */
   sampleCount?: number;
+}
+/** An input for mutations affecting `ServiceBinding` */
+export interface ServiceBindingInput {
+  createdAt?: string;
+  createdBy?: string;
+  createdByPrincipal?: string;
+  /** Database that owns this resource (database-scoped isolation) */
+  databaseId: string;
+  id?: string;
+  /** Resource installation serving this binding, in the installations table of installation_scope */
+  installationId: string;
+  /** Scope whose installations table holds installation_id: this scope or platform */
+  installationScope: string;
+  /** Service this binding projects: builder (BUILDKIT_HOST) or git (GIT_PROVIDER + GIT_SERVICE_URL) */
+  kind: string;
+  /** Most recent projection failure */
+  lastError?: string;
+  /** Reconciler detail (projection timestamps and diagnostics) */
+  metadata?: Record<string, unknown>;
+  /** Namespace whose builds use this BuildKit installation */
+  namespaceId: string;
+  /** Service address last projected into the namespace (NULL = never projected) */
+  observedHost?: string;
+  /** Lane this binding applies to (NULL = the scope's default lane) */
+  realm?: string;
+  /** Projection state of the bound address: pending, active, failed */
+  status?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  updatedByPrincipal?: string;
 }
 /** An input for mutations affecting `WebhookEndpoint` */
 export interface WebhookEndpointInput {
@@ -25555,8 +25466,8 @@ export interface WebhookEndpointFilter {
   host?: StringFilter;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -25874,47 +25785,6 @@ export interface ImageGrantFilter {
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
-/** A filter to be used against `BuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface BuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: BuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: BuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: BuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
-}
 /** A filter to be used against `FunctionDeployment` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionDeploymentFilter {
   /** Checks for all expressions in this list. */
@@ -25945,8 +25815,8 @@ export interface FunctionDeploymentFilter {
   lastError?: StringFilter;
   /** Filter by the object’s `lastErrorAt` field. */
   lastErrorAt?: DatetimeFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -25992,8 +25862,8 @@ export interface RegistryBindingFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `metadata` field. */
   metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -26049,8 +25919,8 @@ export interface ResourceDefinitionFilter {
   labels?: JSONFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -26092,8 +25962,8 @@ export interface ResourceInstallationFilter {
   id?: UUIDFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -26171,8 +26041,8 @@ export interface ResourceFilter {
   memoryRequestBytes?: BigIntFilter;
   /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: NamespaceFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
   /** Filter by the object’s `namespaceId` field. */
   namespaceId?: UUIDFilter;
   /** Negates the expression. */
@@ -26207,6 +26077,51 @@ export interface ResourceFilter {
   storageSizeBytes?: BigIntFilter;
   /** Filter by the object’s `storageTotalBytes` field. */
   storageTotalBytes?: BigIntFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
+/** A filter to be used against `ServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface ServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: ServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespaceByNamespaceIdAndDatabaseId` relation. */
+  namespaceByNamespaceIdAndDatabaseId?: NamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: ServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: ServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Filter by the object’s `updatedBy` field. */
@@ -26453,45 +26368,6 @@ export interface PlatformImageGrantFilter {
   or?: PlatformImageGrantFilter[];
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedByPrincipal` field. */
-  updatedByPrincipal?: UUIDFilter;
-}
-/** A filter to be used against `PlatformBuilderBinding` object types. All fields are combined with a logical ‘and.’ */
-export interface PlatformBuilderBindingFilter {
-  /** Checks for all expressions in this list. */
-  and?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `createdByPrincipal` field. */
-  createdByPrincipal?: UUIDFilter;
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `installationId` field. */
-  installationId?: UUIDFilter;
-  /** Filter by the object’s `lastError` field. */
-  lastError?: StringFilter;
-  /** Filter by the object’s `metadata` field. */
-  metadata?: JSONFilter;
-  /** Filter by the object’s `namespace` relation. */
-  namespace?: PlatformNamespaceFilter;
-  /** Filter by the object’s `namespaceId` field. */
-  namespaceId?: UUIDFilter;
-  /** Negates the expression. */
-  not?: PlatformBuilderBindingFilter;
-  /** Filter by the object’s `observedHost` field. */
-  observedHost?: StringFilter;
-  /** Checks for any expressions in this list. */
-  or?: PlatformBuilderBindingFilter[];
-  /** Filter by the object’s `realm` field. */
-  realm?: StringFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
@@ -26784,6 +26660,49 @@ export interface PlatformResourceFilter {
   /** Filter by the object’s `updatedByPrincipal` field. */
   updatedByPrincipal?: UUIDFilter;
 }
+/** A filter to be used against `PlatformServiceBinding` object types. All fields are combined with a logical ‘and.’ */
+export interface PlatformServiceBindingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `createdByPrincipal` field. */
+  createdByPrincipal?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `installationId` field. */
+  installationId?: UUIDFilter;
+  /** Filter by the object’s `installationScope` field. */
+  installationScope?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `lastError` field. */
+  lastError?: StringFilter;
+  /** Filter by the object’s `metadata` field. */
+  metadata?: JSONFilter;
+  /** Filter by the object’s `namespace` relation. */
+  namespace?: PlatformNamespaceFilter;
+  /** Filter by the object’s `namespaceId` field. */
+  namespaceId?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PlatformServiceBindingFilter;
+  /** Filter by the object’s `observedHost` field. */
+  observedHost?: StringFilter;
+  /** Checks for any expressions in this list. */
+  or?: PlatformServiceBindingFilter[];
+  /** Filter by the object’s `realm` field. */
+  realm?: StringFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `updatedByPrincipal` field. */
+  updatedByPrincipal?: UUIDFilter;
+}
 /** A filter to be used against `PlatformProposalReaction` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformProposalReactionFilter {
   /** Filter by the object’s `actorId` field. */
@@ -26845,6 +26764,8 @@ export interface PlatformProposalFilter {
   dueAt?: DatetimeFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -26919,6 +26840,8 @@ export interface PlatformProposalFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `closed_reason` column. */
   trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `merge_commit` column. */
@@ -27039,6 +26962,8 @@ export interface PlatformProposalCommentFilter {
   createdByPrincipal?: UUIDFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -27067,6 +26992,8 @@ export interface PlatformProposalCommentFilter {
   search?: FullTextFilter;
   /** TRGM search on the `body` column. */
   trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `path` column. */
   trgmPath?: TrgmSearchInput;
   /** TSV search on the `search` column. */
@@ -27553,6 +27480,8 @@ export interface ProposalFilter {
   dueAt?: DatetimeFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -27623,6 +27552,8 @@ export interface ProposalFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `closed_reason` column. */
   trgmClosedReason?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `merge_commit` column. */
@@ -27678,6 +27609,8 @@ export interface ProposalCommentFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -27706,6 +27639,8 @@ export interface ProposalCommentFilter {
   search?: FullTextFilter;
   /** TRGM search on the `body` column. */
   trgmBody?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `path` column. */
   trgmPath?: TrgmSearchInput;
   /** TSV search on the `search` column. */
@@ -28419,6 +28354,8 @@ export interface RepositoryFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `externalId` field. */
@@ -28465,6 +28402,8 @@ export interface RepositoryFilter {
   trgmDefaultBranch?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `external_id` column. */
   trgmExternalId?: TrgmSearchInput;
   /** TRGM search on the `name` column. */
@@ -28502,10 +28441,6 @@ export interface NamespaceFilter {
   and?: NamespaceFilter[];
   /** Filter by the object’s `annotations` field. */
   annotations?: JSONFilter;
-  /** Filter by the object’s `builderBindings` relation. */
-  builderBindings?: NamespaceToManyBuilderBindingFilter;
-  /** `builderBindings` exist. */
-  builderBindingsExist?: boolean;
   /** Filter by the object’s `clusterId` field. */
   clusterId?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -28514,10 +28449,10 @@ export interface NamespaceFilter {
   databaseId?: UUIDFilter;
   /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  /** Filter by the object’s `functionDeployments` relation. */
-  functionDeployments?: NamespaceToManyFunctionDeploymentFilter;
-  /** `functionDeployments` exist. */
-  functionDeploymentsExist?: boolean;
+  /** Filter by the object’s `functionDeploymentsByNamespaceIdAndDatabaseId` relation. */
+  functionDeploymentsByNamespaceIdAndDatabaseId?: NamespaceToManyFunctionDeploymentFilter;
+  /** `functionDeploymentsByNamespaceIdAndDatabaseId` exist. */
+  functionDeploymentsByNamespaceIdAndDatabaseIdExist?: boolean;
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `isActive` field. */
@@ -28536,30 +28471,34 @@ export interface NamespaceFilter {
   not?: NamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: NamespaceFilter[];
-  /** Filter by the object’s `registryBindings` relation. */
-  registryBindings?: NamespaceToManyRegistryBindingFilter;
-  /** `registryBindings` exist. */
-  registryBindingsExist?: boolean;
-  /** Filter by the object’s `resourceDefinitions` relation. */
-  resourceDefinitions?: NamespaceToManyResourceDefinitionFilter;
-  /** `resourceDefinitions` exist. */
-  resourceDefinitionsExist?: boolean;
-  /** Filter by the object’s `resourceInstallations` relation. */
-  resourceInstallations?: NamespaceToManyResourceInstallationFilter;
-  /** `resourceInstallations` exist. */
-  resourceInstallationsExist?: boolean;
-  /** Filter by the object’s `resources` relation. */
-  resources?: NamespaceToManyResourceFilter;
-  /** `resources` exist. */
-  resourcesExist?: boolean;
+  /** Filter by the object’s `registryBindingsByNamespaceIdAndDatabaseId` relation. */
+  registryBindingsByNamespaceIdAndDatabaseId?: NamespaceToManyRegistryBindingFilter;
+  /** `registryBindingsByNamespaceIdAndDatabaseId` exist. */
+  registryBindingsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourceDefinitionsByNamespaceIdAndDatabaseId` relation. */
+  resourceDefinitionsByNamespaceIdAndDatabaseId?: NamespaceToManyResourceDefinitionFilter;
+  /** `resourceDefinitionsByNamespaceIdAndDatabaseId` exist. */
+  resourceDefinitionsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourceInstallationsByNamespaceIdAndDatabaseId` relation. */
+  resourceInstallationsByNamespaceIdAndDatabaseId?: NamespaceToManyResourceInstallationFilter;
+  /** `resourceInstallationsByNamespaceIdAndDatabaseId` exist. */
+  resourceInstallationsByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `resourcesByNamespaceIdAndDatabaseId` relation. */
+  resourcesByNamespaceIdAndDatabaseId?: NamespaceToManyResourceFilter;
+  /** `resourcesByNamespaceIdAndDatabaseId` exist. */
+  resourcesByNamespaceIdAndDatabaseIdExist?: boolean;
+  /** Filter by the object’s `serviceBindingsByNamespaceIdAndDatabaseId` relation. */
+  serviceBindingsByNamespaceIdAndDatabaseId?: NamespaceToManyServiceBindingFilter;
+  /** `serviceBindingsByNamespaceIdAndDatabaseId` exist. */
+  serviceBindingsByNamespaceIdAndDatabaseIdExist?: boolean;
   /** Filter by the object’s `status` field. */
   status?: StringFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `webhookEndpoints` relation. */
-  webhookEndpoints?: NamespaceToManyWebhookEndpointFilter;
-  /** `webhookEndpoints` exist. */
-  webhookEndpointsExist?: boolean;
+  /** Filter by the object’s `webhookEndpointsByNamespaceIdAndDatabaseId` relation. */
+  webhookEndpointsByNamespaceIdAndDatabaseId?: NamespaceToManyWebhookEndpointFilter;
+  /** `webhookEndpointsByNamespaceIdAndDatabaseId` exist. */
+  webhookEndpointsByNamespaceIdAndDatabaseIdExist?: boolean;
 }
 /** A filter to be used against `FunctionGraph` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionGraphFilter {
@@ -28624,6 +28563,8 @@ export interface PlatformRepositoryFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `externalId` field. */
@@ -28674,6 +28615,8 @@ export interface PlatformRepositoryFilter {
   trgmDefaultBranch?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `external_id` column. */
   trgmExternalId?: TrgmSearchInput;
   /** TRGM search on the `name` column. */
@@ -28786,10 +28729,6 @@ export interface PlatformNamespaceFilter {
   not?: PlatformNamespaceFilter;
   /** Checks for any expressions in this list. */
   or?: PlatformNamespaceFilter[];
-  /** Filter by the object’s `platformBuilderBindingsByNamespaceId` relation. */
-  platformBuilderBindingsByNamespaceId?: PlatformNamespaceToManyPlatformBuilderBindingFilter;
-  /** `platformBuilderBindingsByNamespaceId` exist. */
-  platformBuilderBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformFunctionDeploymentsByNamespaceId` relation. */
   platformFunctionDeploymentsByNamespaceId?: PlatformNamespaceToManyPlatformFunctionDeploymentFilter;
   /** `platformFunctionDeploymentsByNamespaceId` exist. */
@@ -28810,6 +28749,10 @@ export interface PlatformNamespaceFilter {
   platformResourcesByNamespaceId?: PlatformNamespaceToManyPlatformResourceFilter;
   /** `platformResourcesByNamespaceId` exist. */
   platformResourcesByNamespaceIdExist?: boolean;
+  /** Filter by the object’s `platformServiceBindingsByNamespaceId` relation. */
+  platformServiceBindingsByNamespaceId?: PlatformNamespaceToManyPlatformServiceBindingFilter;
+  /** `platformServiceBindingsByNamespaceId` exist. */
+  platformServiceBindingsByNamespaceIdExist?: boolean;
   /** Filter by the object’s `platformWebhookEndpointsByNamespaceId` relation. */
   platformWebhookEndpointsByNamespaceId?: PlatformNamespaceToManyPlatformWebhookEndpointFilter;
   /** `platformWebhookEndpointsByNamespaceId` exist. */
@@ -28973,6 +28916,14 @@ export interface CopyGraphPayload {
   result?: string | null;
 }
 export type CopyGraphPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CreateFunctionGraphPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CreateFunctionGraphPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -29560,51 +29511,6 @@ export type DeleteBuildStepPayloadSelect = {
   };
   buildStepEdge?: {
     select: BuildStepEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface CreateBuilderBindingPayload {
-  /** The `BuilderBinding` that was created by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type CreateBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface UpdateBuilderBindingPayload {
-  /** The `BuilderBinding` that was updated by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type UpdateBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
-  };
-  clientMutationId?: boolean;
-};
-export interface DeleteBuilderBindingPayload {
-  /** The `BuilderBinding` that was deleted by this mutation. */
-  builderBinding?: BuilderBinding | null;
-  builderBindingEdge?: BuilderBindingEdge | null;
-  clientMutationId?: string | null;
-}
-export type DeleteBuilderBindingPayloadSelect = {
-  builderBinding?: {
-    select: BuilderBindingSelect;
-  };
-  builderBindingEdge?: {
-    select: BuilderBindingEdgeSelect;
   };
   clientMutationId?: boolean;
 };
@@ -30402,14 +30308,6 @@ export type DeleteFunctionGraphCommitPayloadSelect = {
   functionGraphCommitEdge?: {
     select: FunctionGraphCommitEdgeSelect;
   };
-};
-export interface CreateFunctionGraphPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type CreateFunctionGraphPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
 };
 export interface UpdateFunctionGraphPayload {
   clientMutationId?: string | null;
@@ -31384,51 +31282,6 @@ export type DeletePlatformBuildStepPayloadSelect = {
   };
   platformBuildStepEdge?: {
     select: PlatformBuildStepEdgeSelect;
-  };
-};
-export interface CreatePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was created by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type CreatePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
-  };
-};
-export interface UpdatePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was updated by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type UpdatePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
-  };
-};
-export interface DeletePlatformBuilderBindingPayload {
-  clientMutationId?: string | null;
-  /** The `PlatformBuilderBinding` that was deleted by this mutation. */
-  platformBuilderBinding?: PlatformBuilderBinding | null;
-  platformBuilderBindingEdge?: PlatformBuilderBindingEdge | null;
-}
-export type DeletePlatformBuilderBindingPayloadSelect = {
-  clientMutationId?: boolean;
-  platformBuilderBinding?: {
-    select: PlatformBuilderBindingSelect;
-  };
-  platformBuilderBindingEdge?: {
-    select: PlatformBuilderBindingEdgeSelect;
   };
 };
 export interface CreatePlatformFunctionApiBindingPayload {
@@ -33186,6 +33039,51 @@ export type DeletePlatformResourceUsageSummaryPayloadSelect = {
     select: PlatformResourceUsageSummaryEdgeSelect;
   };
 };
+export interface CreatePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was created by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type CreatePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
+export interface UpdatePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was updated by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type UpdatePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
+export interface DeletePlatformServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `PlatformServiceBinding` that was deleted by this mutation. */
+  platformServiceBinding?: PlatformServiceBinding | null;
+  platformServiceBindingEdge?: PlatformServiceBindingEdge | null;
+}
+export type DeletePlatformServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  platformServiceBinding?: {
+    select: PlatformServiceBindingSelect;
+  };
+  platformServiceBindingEdge?: {
+    select: PlatformServiceBindingEdgeSelect;
+  };
+};
 export interface CreatePlatformWebhookEndpointPayload {
   clientMutationId?: string | null;
   /** The `PlatformWebhookEndpoint` that was created by this mutation. */
@@ -34176,6 +34074,51 @@ export type DeleteResourceUsageSummaryPayloadSelect = {
     select: ResourceUsageSummaryEdgeSelect;
   };
 };
+export interface CreateServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was created by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type CreateServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
+export interface UpdateServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was updated by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type UpdateServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
+export interface DeleteServiceBindingPayload {
+  clientMutationId?: string | null;
+  /** The `ServiceBinding` that was deleted by this mutation. */
+  serviceBinding?: ServiceBinding | null;
+  serviceBindingEdge?: ServiceBindingEdge | null;
+}
+export type DeleteServiceBindingPayloadSelect = {
+  clientMutationId?: boolean;
+  serviceBinding?: {
+    select: ServiceBindingSelect;
+  };
+  serviceBindingEdge?: {
+    select: ServiceBindingEdgeSelect;
+  };
+};
 export interface CreateWebhookEndpointPayload {
   clientMutationId?: string | null;
   /** The `WebhookEndpoint` that was created by this mutation. */
@@ -34265,6 +34208,35 @@ export type DeleteWebhookEventPayloadSelect = {
   webhookEventEdge?: {
     select: WebhookEventEdgeSelect;
   };
+};
+/** One version rendered beside a file, with a URL to fetch it. */
+export interface FileVersion {
+  format?: string | null;
+  height?: number | null;
+  key: string;
+  name?: string | null;
+  size?: number | null;
+  url: string;
+  width?: number | null;
+}
+export type FileVersionSelect = {
+  format?: boolean;
+  height?: boolean;
+  key?: boolean;
+  name?: boolean;
+  size?: boolean;
+  url?: boolean;
+  width?: boolean;
+};
+export interface ResourceRequirement {
+  name?: string | null;
+  provider?: string | null;
+  required?: boolean | null;
+}
+export type ResourceRequirementSelect = {
+  name?: boolean;
+  provider?: boolean;
+  required?: boolean;
 };
 /** A `DatabaseGraphCommit` edge in the connection. */
 export interface DatabaseGraphCommitEdge {
@@ -34360,18 +34332,6 @@ export type BuildStepEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: BuildStepSelect;
-  };
-};
-/** A `BuilderBinding` edge in the connection. */
-export interface BuilderBindingEdge {
-  cursor?: string | null;
-  /** The `BuilderBinding` at the end of the edge. */
-  node?: BuilderBinding | null;
-}
-export type BuilderBindingEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: BuilderBindingSelect;
   };
 };
 /** A `ContentPreset` edge in the connection. */
@@ -34804,18 +34764,6 @@ export type PlatformBuildStepEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PlatformBuildStepSelect;
-  };
-};
-/** A `PlatformBuilderBinding` edge in the connection. */
-export interface PlatformBuilderBindingEdge {
-  cursor?: string | null;
-  /** The `PlatformBuilderBinding` at the end of the edge. */
-  node?: PlatformBuilderBinding | null;
-}
-export type PlatformBuilderBindingEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PlatformBuilderBindingSelect;
   };
 };
 /** A `PlatformFunctionApiBinding` edge in the connection. */
@@ -35262,6 +35210,18 @@ export type PlatformResourceUsageSummaryEdgeSelect = {
     select: PlatformResourceUsageSummarySelect;
   };
 };
+/** A `PlatformServiceBinding` edge in the connection. */
+export interface PlatformServiceBindingEdge {
+  cursor?: string | null;
+  /** The `PlatformServiceBinding` at the end of the edge. */
+  node?: PlatformServiceBinding | null;
+}
+export type PlatformServiceBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PlatformServiceBindingSelect;
+  };
+};
 /** A `PlatformWebhookEndpoint` edge in the connection. */
 export interface PlatformWebhookEndpointEdge {
   cursor?: string | null;
@@ -35524,6 +35484,18 @@ export type ResourceUsageSummaryEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: ResourceUsageSummarySelect;
+  };
+};
+/** A `ServiceBinding` edge in the connection. */
+export interface ServiceBindingEdge {
+  cursor?: string | null;
+  /** The `ServiceBinding` at the end of the edge. */
+  node?: ServiceBinding | null;
+}
+export type ServiceBindingEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ServiceBindingSelect;
   };
 };
 /** A `WebhookEndpoint` edge in the connection. */

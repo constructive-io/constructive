@@ -12,7 +12,6 @@ csdk internal-secret list --where.<field>.<op> <value> --orderBy <values>
 csdk internal-secret list --limit 10 --after <cursor>
 csdk internal-secret find-first --where.<field>.<op> <value>
 csdk internal-secret get --id <UUID>
-csdk internal-secret create --annotations <JSON> --databaseId <UUID> --description <String> --labels <JSON> --name <String> --realm <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 csdk internal-secret update --id <UUID> [--annotations <JSON>] [--databaseId <UUID>] [--description <String>] [--labels <JSON>] [--name <String>] [--realm <String>] [--retiredAt <Datetime>] [--rotatedAt <Datetime>]
 csdk internal-secret delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk internal-secret list --select id,id
 
 ```bash
 csdk internal-secret list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a internalSecret
-
-```bash
-csdk internal-secret create --annotations <JSON> --databaseId <UUID> --description <String> --labels <JSON> --name <String> --realm <String> --retiredAt <Datetime> --rotatedAt <Datetime>
 ```
 
 ### Get a internalSecret by id

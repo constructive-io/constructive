@@ -5,6 +5,7 @@
  */
 import type { BucketType, FileStatus } from './schema-types';
 export type ConstructiveInternalTypeUpload = unknown;
+export type FileVersion = unknown;
 export interface Bucket {
   actorId: string | null;
   allowCustomKeys: boolean | null;
@@ -42,11 +43,14 @@ export interface File {
   key: string | null;
   mimeType: string | null;
   promotedAt: string | null;
+  rejectionReason: string | null;
   size: string | null;
   status: FileStatus | null;
   tags: string[] | null;
   updatedAt: string | null;
   upload: ConstructiveInternalTypeUpload | null;
+  uploadUrl: string | null;
+  uploadVersions: FileVersion[] | null;
 }
 export interface PlatformBucket {
   actorId: string | null;
@@ -83,11 +87,14 @@ export interface PlatformFile {
   key: string | null;
   mimeType: string | null;
   promotedAt: string | null;
+  rejectionReason: string | null;
   size: string | null;
   status: FileStatus | null;
   tags: string[] | null;
   updatedAt: string | null;
   upload: ConstructiveInternalTypeUpload | null;
+  uploadUrl: string | null;
+  uploadVersions: FileVersion[] | null;
 }
 export interface StringFilter {
   isNull?: boolean;

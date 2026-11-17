@@ -21,6 +21,8 @@ const fieldSchema: FieldSchema = {
   displayNameTrgmSimilarity: 'float',
   id: 'uuid',
   profilePicture: 'string',
+  profilePictureUrl: 'string',
+  profilePictureVersions: 'string',
   searchScore: 'float',
   searchTsv: 'string',
   searchTsvRank: 'float',

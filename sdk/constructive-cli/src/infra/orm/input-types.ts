@@ -1245,13 +1245,6 @@ export interface DeletePlatformInfraCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformInfraGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  platformInfraGetAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
-}
 export interface PlatformInfraGetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
   path?: string[] | null;

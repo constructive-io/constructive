@@ -12,8 +12,8 @@ csdk proposal-file-view list --where.<field>.<op> <value> --orderBy <values>
 csdk proposal-file-view list --limit 10 --after <cursor>
 csdk proposal-file-view find-first --where.<field>.<op> <value>
 csdk proposal-file-view get --id <UUID>
-csdk proposal-file-view create --blobSha <String> --path <String> --proposalId <UUID> --reviewerId <UUID> [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
-csdk proposal-file-view update --id <UUID> [--blobSha <String>] [--createdByPrincipal <UUID>] [--path <String>] [--proposalId <UUID>] [--reviewerId <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
+csdk proposal-file-view create --blobSha <String> --databaseId <UUID> --path <String> --proposalId <UUID> --reviewerId <UUID> [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
+csdk proposal-file-view update --id <UUID> [--blobSha <String>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--path <String>] [--proposalId <UUID>] [--reviewerId <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
 csdk proposal-file-view delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk proposal-file-view list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a proposalFileView
 
 ```bash
-csdk proposal-file-view create --blobSha <String> --path <String> --proposalId <UUID> --reviewerId <UUID> [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
+csdk proposal-file-view create --blobSha <String> --databaseId <UUID> --path <String> --proposalId <UUID> --reviewerId <UUID> [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>] [--viewedAt <Datetime>]
 ```
 
 ### Get a proposalFileView by id

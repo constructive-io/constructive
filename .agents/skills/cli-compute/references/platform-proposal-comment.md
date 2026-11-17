@@ -7,7 +7,7 @@ CRUD operations for PlatformProposalComment records via csdk CLI
 **pgvector embedding fields:** `embedding`
 High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-**Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+**Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -66,15 +66,15 @@ csdk platform-proposal-comment list --where.id.equalTo <value> --orderBy ID_ASC
 
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk platform-proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk platform-proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 ### Vector semantic search via `embedding` with --auto-embed
 
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 ### Create/update with auto-embedded `embedding` via --auto-embed
@@ -88,32 +88,38 @@ EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment update --embedding "new 
 ### Fuzzy search via trigram similarity (`trgmBody`)
 
 ```bash
-csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select body,bodyTrgmSimilarity
+```
+
+### Fuzzy search via trigram similarity (`trgmEmbeddingModel`)
+
+```bash
+csdk platform-proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select body,embeddingModelTrgmSimilarity
 ```
 
 ### Fuzzy search via trigram similarity (`trgmPath`)
 
 ```bash
-csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
+csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select body,pathTrgmSimilarity
 ```
 
 ### Full-text search via tsvector (`search`)
 
 ```bash
-csdk platform-proposal-comment list --where.search "search query" --select title,tsvRank
+csdk platform-proposal-comment list --where.search "search query" --select body,searchTsvRank
 ```
 
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk platform-proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk platform-proposal-comment list --where.unifiedSearch "search query" --select body,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,searchTsvRank,searchScore
 ```
 
 ### Search with pagination and field projection
 
 ```bash
-csdk platform-proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-proposal-comment search "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk platform-proposal-comment search "query" --limit 10 --select id,body,searchScore
 ```
 
 ### Create a platformProposalComment

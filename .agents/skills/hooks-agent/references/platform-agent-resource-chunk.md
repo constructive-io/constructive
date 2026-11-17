@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformAgentResourceChunksQuery({
 const { mutate } = useCreatePlatformAgentResourceChunkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformAgentResourceId: '<UUID>', searchScore: '<Float>' });
+mutate({ body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', metadata: '<JSON>', platformAgentResourceId: '<UUID>' });
 ```

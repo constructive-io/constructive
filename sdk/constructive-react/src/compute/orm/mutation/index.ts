@@ -13,6 +13,7 @@ import type {
   AddNodeAndSaveInput,
   ApproveNodeInput,
   CopyGraphInput,
+  CreateFunctionGraphInput,
   DatabaseAddEdgeInput,
   DatabaseAddEdgeAndSaveInput,
   DatabaseAddNodeInput,
@@ -75,6 +76,7 @@ import type {
   AddNodeAndSavePayload,
   ApproveNodePayload,
   CopyGraphPayload,
+  CreateFunctionGraphPayload,
   DatabaseAddEdgePayload,
   DatabaseAddEdgeAndSavePayload,
   DatabaseAddNodePayload,
@@ -137,6 +139,7 @@ import type {
   AddNodeAndSavePayloadSelect,
   ApproveNodePayloadSelect,
   CopyGraphPayloadSelect,
+  CreateFunctionGraphPayloadSelect,
   DatabaseAddEdgePayloadSelect,
   DatabaseAddEdgeAndSavePayloadSelect,
   DatabaseAddNodePayloadSelect,
@@ -212,6 +215,9 @@ export interface ApproveNodeVariables {
 }
 export interface CopyGraphVariables {
   input: CopyGraphInput;
+}
+export interface CreateFunctionGraphVariables {
+  input: CreateFunctionGraphInput;
 }
 export interface DatabaseAddEdgeVariables {
   input: DatabaseAddEdgeInput;
@@ -564,6 +570,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CopyGraphPayload'
+        ),
+      }),
+    createFunctionGraph: <S extends CreateFunctionGraphPayloadSelect>(
+      args: CreateFunctionGraphVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateFunctionGraphPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createFunctionGraph: InferSelectResult<CreateFunctionGraphPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateFunctionGraph',
+        fieldName: 'createFunctionGraph',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateFunctionGraph',
+          'createFunctionGraph',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateFunctionGraphInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateFunctionGraphPayload'
         ),
       }),
     databaseAddEdge: <S extends DatabaseAddEdgePayloadSelect>(

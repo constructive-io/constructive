@@ -12,8 +12,8 @@ csdk agent-run list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-run list --limit 10 --after <cursor>
 csdk agent-run find-first --where.<field>.<op> <value>
 csdk agent-run get --id <UUID>
-csdk agent-run create --threadId <UUID> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--tokenUsage <JSON>] [--totalCost <BigFloat>]
-csdk agent-run update --id <UUID> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--threadId <UUID>] [--tokenUsage <JSON>] [--totalCost <BigFloat>]
+csdk agent-run create --databaseId <UUID> --threadId <UUID> --visibility <String> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--tokenUsage <JSON>] [--totalCost <BigFloat>]
+csdk agent-run update --id <UUID> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--databaseId <UUID>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--threadId <UUID>] [--tokenUsage <JSON>] [--totalCost <BigFloat>] [--visibility <String>]
 csdk agent-run delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-run list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentRun
 
 ```bash
-csdk agent-run create --threadId <UUID> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--tokenUsage <JSON>] [--totalCost <BigFloat>]
+csdk agent-run create --databaseId <UUID> --threadId <UUID> --visibility <String> [--actorId <UUID>] [--artifacts <JSON>] [--attempt <Int>] [--baseCommit <String>] [--branch <String>] [--deadlineAt <Datetime>] [--entityId <UUID>] [--error <String>] [--executionId <UUID>] [--finishedAt <Datetime>] [--headCommit <String>] [--lastEventSeq <Int>] [--parentRunId <UUID>] [--placement <String>] [--principalId <UUID>] [--repoUrl <String>] [--startedAt <Datetime>] [--status <String>] [--tokenUsage <JSON>] [--totalCost <BigFloat>]
 ```
 
 ### Get a agentRun by id

@@ -7,7 +7,7 @@ CRUD operations for Proposal records via csdk CLI
 **pgvector embedding fields:** `embedding`
 High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-**Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+**Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -19,8 +19,8 @@ csdk proposal list --limit 10 --after <cursor>
 csdk proposal find-first --where.<field>.<op> <value>
 csdk proposal search <query>
 csdk proposal get --id <UUID>
-csdk proposal create --repositoryId <UUID> --title <String> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
-csdk proposal update --id <UUID> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--repositoryId <UUID>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--title <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal create --databaseId <UUID> --repositoryId <UUID> --title <String> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal update --id <UUID> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--repositoryId <UUID>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--title <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk proposal delete --id <UUID>
 ```
 
@@ -97,6 +97,12 @@ csdk proposal list --where.trgmBody.value "approximate query" --where.trgmBody.t
 csdk proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
 ```
 
+### Fuzzy search via trigram similarity (`trgmEmbeddingModel`)
+
+```bash
+csdk proposal list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 ### Fuzzy search via trigram similarity (`trgmKind`)
 
 ```bash
@@ -124,7 +130,7 @@ csdk proposal list --where.trgmResolution.value "approximate query" --where.trgm
 ### Full-text search via tsvector (`search`)
 
 ```bash
-csdk proposal list --where.search "search query" --select title,tsvRank
+csdk proposal list --where.search "search query" --select title,searchTsvRank
 ```
 
 ### Fuzzy search via trigram similarity (`trgmSourceRef`)
@@ -154,7 +160,7 @@ csdk proposal list --where.trgmTitle.value "approximate query" --where.trgmTitle
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,searchTsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
 ```
 
 ### Search with pagination and field projection
@@ -167,7 +173,7 @@ csdk proposal search "query" --limit 10 --select id,title,searchScore
 ### Create a proposal
 
 ```bash
-csdk proposal create --repositoryId <UUID> --title <String> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal create --databaseId <UUID> --repositoryId <UUID> --title <String> [--actorId <UUID>] [--body <String>] [--closedReason <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--decidedAt <Datetime>] [--dueAt <Datetime>] [--embedding <Vector>] [--kind <String>] [--labels <String>] [--mergeCommit <String>] [--mergeMethod <String>] [--mergeRequestedAt <Datetime>] [--mergedAt <Datetime>] [--metadata <JSON>] [--parentId <UUID>] [--priority <BigFloat>] [--resolution <String>] [--sourceRef <String>] [--status <String>] [--targetRef <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a proposal by id

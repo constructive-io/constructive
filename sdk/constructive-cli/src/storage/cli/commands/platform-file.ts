@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreatePlatformFileInput,
   PlatformFilePatch,
   PlatformFileSelect,
   PlatformFileFilter,
@@ -30,11 +29,14 @@ const fieldSchema: FieldSchema = {
   key: 'string',
   mimeType: 'string',
   promotedAt: 'string',
+  rejectionReason: 'string',
   size: 'int',
   status: 'string',
   tags: 'string',
   updatedAt: 'string',
   upload: 'string',
+  uploadUrl: 'string',
+  uploadVersions: 'string',
 };
 const usage =
   '\nplatform-file <command>\n\nCommands:\n  list                  List platformFile records\n  find-first            Find first matching platformFile record\n  get                   Get a platformFile by ID\n  create                Create a new platformFile\n  update                Update an existing platformFile\n  delete                Delete a platformFile\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
@@ -54,7 +56,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -73,8 +75,6 @@ async function handleTableSubcommand(
       return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     case 'update':
       return handleUpdate(argv, prompter);
     case 'delete':
@@ -95,9 +95,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       expiryEnqueuedAt: true,
       filename: true,
       id: true,
+      isPublic: true,
       key: true,
       mimeType: true,
       promotedAt: true,
+      rejectionReason: true,
       size: true,
       status: true,
       tags: true,
@@ -131,9 +133,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       expiryEnqueuedAt: true,
       filename: true,
       id: true,
+      isPublic: true,
       key: true,
       mimeType: true,
       promotedAt: true,
+      rejectionReason: true,
       size: true,
       status: true,
       tags: true,
@@ -179,9 +183,11 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           expiryEnqueuedAt: true,
           filename: true,
           id: true,
+          isPublic: true,
           key: true,
           mimeType: true,
           promotedAt: true,
+          rejectionReason: true,
           size: true,
           status: true,
           tags: true,
@@ -193,148 +199,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Record not found.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'actorId',
-        message: 'actorId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'bucketId',
-        message: 'bucketId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'contentHash',
-        message: 'contentHash',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'description',
-        message: 'description',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'expiryEnqueuedAt',
-        message: 'expiryEnqueuedAt',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'filename',
-        message: 'filename',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'key',
-        message: 'key',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'mimeType',
-        message: 'mimeType',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'promotedAt',
-        message: 'promotedAt',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'size',
-        message: 'size',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'status',
-        message: 'status',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'tags',
-        message: 'tags',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
-        name: 'upload',
-        message: 'upload',
-        required: false,
-        skipPrompt: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreatePlatformFileInput['platformFile'];
-    const client = getClient();
-    const result = await client.platformFile
-      .create({
-        data: {
-          actorId: cleanedData.actorId,
-          bucketId: cleanedData.bucketId,
-          contentHash: cleanedData.contentHash,
-          description: cleanedData.description,
-          expiryEnqueuedAt: cleanedData.expiryEnqueuedAt,
-          filename: cleanedData.filename,
-          key: cleanedData.key,
-          mimeType: cleanedData.mimeType,
-          promotedAt: cleanedData.promotedAt,
-          size: cleanedData.size,
-          status: cleanedData.status,
-          tags: cleanedData.tags,
-          upload: cleanedData.upload,
-        },
-        select: {
-          actorId: true,
-          bucketId: true,
-          contentHash: true,
-          createdAt: true,
-          description: true,
-          expiryEnqueuedAt: true,
-          filename: true,
-          id: true,
-          key: true,
-          mimeType: true,
-          promotedAt: true,
-          size: true,
-          status: true,
-          tags: true,
-          updatedAt: true,
-          upload: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -367,28 +231,30 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'contentHash',
         message: 'contentHash',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'description',
         message: 'description',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'expiryEnqueuedAt',
         message: 'expiryEnqueuedAt',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'filename',
         message: 'filename',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
+        name: 'isPublic',
+        message: 'isPublic',
+        required: false,
       },
       {
         type: 'text',
@@ -407,7 +273,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'promotedAt',
         message: 'promotedAt',
         required: false,
-        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'rejectionReason',
+        message: 'rejectionReason',
+        required: false,
       },
       {
         type: 'text',
@@ -420,21 +291,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'status',
         message: 'status',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'tags',
         message: 'tags',
         required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
         name: 'upload',
         message: 'upload',
         required: false,
-        skipPrompt: true,
       },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
@@ -452,9 +320,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           description: cleanedData.description,
           expiryEnqueuedAt: cleanedData.expiryEnqueuedAt,
           filename: cleanedData.filename,
+          isPublic: cleanedData.isPublic,
           key: cleanedData.key,
           mimeType: cleanedData.mimeType,
           promotedAt: cleanedData.promotedAt,
+          rejectionReason: cleanedData.rejectionReason,
           size: cleanedData.size,
           status: cleanedData.status,
           tags: cleanedData.tags,
@@ -469,9 +339,11 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           expiryEnqueuedAt: true,
           filename: true,
           id: true,
+          isPublic: true,
           key: true,
           mimeType: true,
           promotedAt: true,
+          rejectionReason: true,
           size: true,
           status: true,
           tags: true,

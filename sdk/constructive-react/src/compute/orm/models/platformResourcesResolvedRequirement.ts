@@ -29,7 +29,6 @@ import type {
   PlatformResourcesResolvedRequirementSelect,
   PlatformResourcesResolvedRequirementFilter,
   PlatformResourcesResolvedRequirementOrderBy,
-  CreatePlatformResourcesResolvedRequirementInput,
   UpdatePlatformResourcesResolvedRequirementInput,
   PlatformResourcesResolvedRequirementPatch,
 } from '../input-types';
@@ -116,39 +115,6 @@ export class PlatformResourcesResolvedRequirementModel {
         platformResourcesResolvedRequirement:
           data.platformResourcesResolvedRequirements?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourcesResolvedRequirementSelect>(
-    args: CreateArgs<
-      S,
-      CreatePlatformResourcesResolvedRequirementInput['platformResourcesResolvedRequirement']
-    > & {
-      select: S;
-    } & StrictSelect<S, PlatformResourcesResolvedRequirementSelect>
-  ): QueryBuilder<{
-    createPlatformResourcesResolvedRequirement: {
-      platformResourcesResolvedRequirement: InferSelectResult<
-        PlatformResourcesResolvedRequirementWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourcesResolvedRequirement',
-      'createPlatformResourcesResolvedRequirement',
-      'platformResourcesResolvedRequirement',
-      args.select,
-      args.data,
-      'CreatePlatformResourcesResolvedRequirementInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourcesResolvedRequirement',
-      fieldName: 'createPlatformResourcesResolvedRequirement',
-      document,
-      variables,
     });
   }
 }
