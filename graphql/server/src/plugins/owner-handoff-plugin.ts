@@ -252,8 +252,8 @@ interface ResolvedArgs {
 const resolveArgs = (fieldArgs: any): Step<ResolvedArgs> =>
   object({
     input: fieldArgs.getRaw('input'),
-    withPgClient: grafastContext().get('withPgClient'),
-    pgSettings: grafastContext().get('pgSettings')
+    withPgClient: (grafastContext() as any).get('withPgClient'),
+    pgSettings: (grafastContext() as any).get('pgSettings')
   }) as unknown as Step<ResolvedArgs>;
 
 /**
@@ -261,7 +261,7 @@ const resolveArgs = (fieldArgs: any): Step<ResolvedArgs> =>
  * EXECUTE on the privileged module readers (the webauthn plugin uses the same
  * lane for the same reason), so a request role can never widen it.
  */
-const resolvePlatformAuthSchema = async (
+export const resolvePlatformAuthSchema = async (
   withPgClient: WithPgClient,
   platformDatabaseId: string
 ): Promise<string | undefined> =>

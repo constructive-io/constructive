@@ -1,7 +1,11 @@
 import { GraphQLError } from 'graphql';
 
 import { formatError } from '../../middleware/format-error';
-import { mintTenantOwnerHandoff, type OwnerHandoffInput } from '../owner-handoff-plugin';
+import {
+  mintTenantOwnerHandoff,
+  type OwnerHandoffInput,
+  resolvePlatformAuthSchema
+} from '../owner-handoff-plugin';
 
 const userId = '0192f0c4-1d2e-7c3a-9b4d-5e6f7a8b9c0d';
 const otherUserId = '0192f0c4-1d2e-7c3a-9b4d-5e6f7a8b9c0e';
@@ -190,5 +194,40 @@ describe('mintTenantOwnerHandoff', () => {
       extensions: { code: 'TENANT_AUTH_NOT_IN_SERVED_DATABASE' }
     });
     expectNoStatement(client.statements, 'sign_in_platform_identity');
+  });
+});
+
+type ResolverWithPgClient = Parameters<typeof resolvePlatformAuthSchema>[0];
+
+const callResolver = (client: ReturnType<typeof fakeClient>) => {
+  const settingsArgs: Array<Record<string, string> | null> = [];
+  const withPgClient: ResolverWithPgClient = (settings, cb) => {
+    settingsArgs.push(settings);
+    return cb(client);
+  };
+  return { settingsArgs, withPgClient };
+};
+
+describe('resolvePlatformAuthSchema', () => {
+  it('reads the platform auth schema on the connection login lane', async () => {
+    const client = fakeClient({ rows: [{ schema_name: 'platform_auth_private' }] });
+    const { settingsArgs, withPgClient } = callResolver(client);
+
+    const schema = await resolvePlatformAuthSchema(withPgClient, databaseId);
+
+    expect(schema).toBe('platform_auth_private');
+    expect(settingsArgs).toEqual([null]);
+    expect(client.statements).toHaveLength(1);
+    expect(client.statements[0].text).toContain(
+      'function_resolution.user_auth_module_registrations'
+    );
+    expect(client.statements[0].values).toEqual([databaseId]);
+  });
+
+  it('returns no schema when the platform auth module row is missing', async () => {
+    const client = fakeClient({ rows: [] });
+    const { withPgClient } = callResolver(client);
+
+    await expect(resolvePlatformAuthSchema(withPgClient, databaseId)).resolves.toBeUndefined();
   });
 });
