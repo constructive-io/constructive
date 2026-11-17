@@ -1,3 +1,5 @@
+import { ConstructiveError } from '@constructive-io/errors';
+
 import type { StorageModuleConfig } from './types';
 
 interface RecordManagedFileInput {
@@ -68,5 +70,16 @@ export async function recordManagedFile(
     text: `SELECT id, key FROM ${storageConfig.recorderQualifiedName}(${args.join(', ')})`,
     values,
   });
-  return result.rows[0] as { id: string; key: string };
+  const row = result.rows[0] as { id?: unknown; key?: unknown } | undefined;
+  if (!row || typeof row.id !== 'string' || !row.id ||
+      typeof row.key !== 'string' || !row.key || row.key === input.key) {
+    throw new ConstructiveError({
+      code: 'INTERNAL_ERROR',
+      message: 'Storage recorder did not allocate an independent object identity',
+      errorClass: 'internal',
+      http: 500,
+      context: { storageModuleId: storageConfig.id },
+    });
+  }
+  return { id: row.id, key: row.key };
 }

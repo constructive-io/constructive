@@ -74,7 +74,7 @@ describe('recordManagedFile', () => {
   });
 
   it('appends a supported path argument by name and never a version link', async () => {
-    const query = jest.fn().mockResolvedValue({ rows: [{ id: 'file-id' }] });
+    const query = jest.fn().mockResolvedValue({ rows: [{ id: 'file-id', key: 'originals/server-generated' }] });
 
     await recordManagedFile(
       { query },
@@ -98,6 +98,20 @@ describe('recordManagedFile', () => {
         null,
         'assets',
       ],
+    });
+  });
+
+  it.each([
+    undefined,
+    { id: 'file-id' },
+    { id: 'file-id', key: '' },
+    { key: 'originals/server-generated' },
+    { id: 'file-id', key: input().key },
+  ])('refuses an invalid or echoed recorder identity: %p', async (row) => {
+    const query = jest.fn().mockResolvedValue({ rows: row ? [row] : [] });
+    await expect(recordManagedFile({ query }, storageConfig(), input())).rejects.toMatchObject({
+      code: 'INTERNAL_ERROR',
+      errorClass: 'internal',
     });
   });
 

@@ -5,7 +5,7 @@
  * (`FILE_REF_DOMAINS`: `image`, `upload`), or an array of one. It holds a
  * document that projects a files row — `id`, `key`, `bucket_id` — and, when a
  * lane has rendered versions beside the source, lists them under `versions`
- * (`<key>.versions/<name>-<hash>.<ext>`). The column reaches GraphQL as JSON,
+ * (`derived/<key>/<name>-<hash>.<ext>`). The column reaches GraphQL as JSON,
  * so without these fields a client has no URL to fetch the file with.
  *
  * For each such column `photo` on a table type this adds
@@ -23,7 +23,7 @@
  *   2. the source key, bucket, filename and publicness come from that row,
  *      never from the document;
  *   3. a version is signed only when its key is a direct child of that row's
- *      own `<key>.versions/` prefix. A key the document merely names is never
+ *      own `derived/<key>/` prefix. A key the document merely names is never
  *      signed.
  *
  * Files rows are read once per request, not once per document: every document
@@ -88,11 +88,11 @@ type PgClientLike = {
 
 /**
  * Whether `variantKey` is an object a lane wrote beside the file at
- * `sourceKey`: a direct child of `<sourceKey>.versions/`.
+ * `sourceKey`: a direct child of `derived/<sourceKey>/`.
  */
 export function isVersionKeyOf(sourceKey: string, variantKey: unknown): variantKey is string {
   if (typeof variantKey !== 'string' || !sourceKey) return false;
-  const prefix = `${sourceKey}.versions/`;
+  const prefix = `derived/${sourceKey}/`;
   if (!variantKey.startsWith(prefix)) return false;
   const name = variantKey.slice(prefix.length);
   return name.length > 0 && !name.includes('/') && name !== '.' && name !== '..';

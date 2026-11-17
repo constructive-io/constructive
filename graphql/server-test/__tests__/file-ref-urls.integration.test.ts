@@ -6,7 +6,7 @@
  * included, so it is never the authority for a URL. The files row is read by
  * the document's `id` as the reader; the source key comes from that row; and a
  * version is signed only when its key is a direct child of that row's own
- * `<key>.versions/`.
+ * `derived/<key>/`.
  *
  *   pnpm test -- --testPathPattern=file-ref-urls
  */
@@ -136,8 +136,8 @@ describe('file-reference column URLs', () => {
 
   it('gives the narrowest version covering the width, else the source', async () => {
     const id = await addFile('pick/photo.png');
-    const small = version('pick/photo.png.versions/small-0a1b2c3d.webp', 'small', 320);
-    const large = version('pick/photo.png.versions/large-4e5f6a7b.webp', 'large', 1280);
+    const small = version('derived/pick/photo.png/small-0a1b2c3d.webp', 'small', 320);
+    const large = version('derived/pick/photo.png/large-4e5f6a7b.webp', 'large', 1280);
     const row = await addProduct({ id, key: 'pick/photo.png', versions: [large, small] });
 
     const at300 = await product(alice, row, 300);
@@ -153,13 +153,13 @@ describe('file-reference column URLs', () => {
   it('never signs a key the document names outside its own file', async () => {
     const id = await addFile('forge/mine.png');
     await addFile('forge/victim.png');
-    const own = version('forge/mine.png.versions/small-0a1b2c3d.webp', 'small', 320);
+    const own = version('derived/forge/mine.png/small-0a1b2c3d.webp', 'small', 320);
     const forged = [
       version('forge/victim.png', 'other-file', 400),
-      version('forge/victim.png.versions/small-0a1b2c3d.webp', 'other-files-version', 400),
-      version('forge/mine.png.versions/../victim.png', 'traversal', 400),
-      version('forge/mine.png.versions/nested/deep.webp', 'nested', 400),
-      version('forge/mine.png.versions/', 'prefix-only', 400),
+      version('derived/forge/victim.png/small-0a1b2c3d.webp', 'other-files-version', 400),
+      version('derived/forge/mine.png/../victim.png', 'traversal', 400),
+      version('derived/forge/mine.png/nested/deep.webp', 'nested', 400),
+      version('derived/forge/mine.png/', 'prefix-only', 400),
       version('forge/mine.png', 'source-as-version', 400)
     ];
     // The document also lies about its own key: the row's key is what is signed.
@@ -174,7 +174,7 @@ describe('file-reference column URLs', () => {
 
   it('resolves nothing for a document without a files row the reader can fetch', async () => {
     const requested = await addFile('dead/requested.png', 'requested');
-    const noId = await addProduct({ key: 'pick/photo.png', versions: [version('pick/photo.png.versions/small-0a1b2c3d.webp', 'small', 320)] });
+    const noId = await addProduct({ key: 'pick/photo.png', versions: [version('derived/pick/photo.png/small-0a1b2c3d.webp', 'small', 320)] });
     const notLive = await addProduct({ id: requested, key: 'dead/requested.png' });
     const unknown = await addProduct({ id: '00000000-0000-4000-8000-000000000000', key: 'pick/photo.png' });
     const empty = await addProduct(null);
@@ -192,7 +192,7 @@ describe('file-reference column URLs', () => {
     const hidden = await addProduct({
       id: bobPrivateFileId,
       key: 'seeded-private-hash',
-      versions: [version('seeded-private-hash.versions/small-0a1b2c3d.webp', 'small', 320)]
+      versions: [version('derived/seeded-private-hash/small-0a1b2c3d.webp', 'small', 320)]
     });
     const visible = await addProduct({ id: bobPublicFileId, key: 'seeded-public-hash' });
 
@@ -203,8 +203,8 @@ describe('file-reference column URLs', () => {
   it('resolves each element of an image[] column on its own', async () => {
     const one = await addFile('list/one.png');
     await addFile('list/two.png');
-    const mine = version('list/one.png.versions/small-0a1b2c3d.webp', 'small', 320);
-    const theirs = version('list/two.png.versions/small-0a1b2c3d.webp', 'small', 320);
+    const mine = version('derived/list/one.png/small-0a1b2c3d.webp', 'small', 320);
+    const theirs = version('derived/list/two.png/small-0a1b2c3d.webp', 'small', 320);
     const { rows } = await pg.query(
       `INSERT INTO ${schema}.albums (shots)
        VALUES (ARRAY(SELECT jsonb_array_elements($1::jsonb))::public.image[]) RETURNING id`,
@@ -251,7 +251,7 @@ describe('file-reference column URLs', () => {
 
     it('falls back to the source when no version states a width', async () => {
       const id = await addFile('docs/deck.pdf');
-      const preview = { name: 'preview', key: 'docs/deck.pdf.versions/preview-0a1b2c3d.png' };
+      const preview = { name: 'preview', key: 'derived/docs/deck.pdf/preview-0a1b2c3d.png' };
       const row = await addProduct(null, { id, key: 'docs/deck.pdf', versions: [preview] });
 
       const got = await manual(row, 320);
@@ -264,14 +264,14 @@ describe('file-reference column URLs', () => {
     it('never signs a key the document names outside its own file', async () => {
       const id = await addFile('docs/mine.pdf');
       await addFile('docs/victim.pdf');
-      const own = version('docs/mine.pdf.versions/page-0a1b2c3d.png', 'page', 320);
+      const own = version('derived/docs/mine.pdf/page-0a1b2c3d.png', 'page', 320);
       const row = await addProduct(null, {
         id,
         key: 'docs/victim.pdf',
         versions: [
           version('docs/victim.pdf', 'other-file', 400),
-          version('docs/victim.pdf.versions/page-0a1b2c3d.png', 'other-files-version', 400),
-          version('docs/mine.pdf.versions/../victim.pdf', 'traversal', 400),
+          version('derived/docs/victim.pdf/page-0a1b2c3d.png', 'other-files-version', 400),
+          version('derived/docs/mine.pdf/../victim.pdf', 'traversal', 400),
           own
         ]
       });
@@ -297,7 +297,7 @@ describe('file-reference column URLs', () => {
     it('resolves each element of an upload[] column on its own', async () => {
       const one = await addFile('papers/one.pdf');
       await addFile('papers/two.pdf');
-      const theirs = version('papers/two.pdf.versions/page-0a1b2c3d.png', 'page', 320);
+      const theirs = version('derived/papers/two.pdf/page-0a1b2c3d.png', 'page', 320);
       const { rows } = await pg.query(
         `INSERT INTO ${schema}.albums (papers)
          VALUES (ARRAY(SELECT jsonb_array_elements($1::jsonb))::public.upload[]) RETURNING id`,
@@ -341,7 +341,7 @@ describe('file-reference column URLs', () => {
 
     it('serves a public file from the public URL prefix, its versions too', async () => {
       const id = await addFile('open/logo.png', 'uploaded', alicePublicBucketId, true);
-      const small = version('open/logo.png.versions/small-0a1b2c3d.webp', 'small', 320);
+      const small = version('derived/open/logo.png/small-0a1b2c3d.webp', 'small', 320);
       const got = await urls(id, await addProduct({ id, key: 'open/logo.png', versions: [small] }));
 
       expect(got.source).toBe(`${cdn}/app-80a2eaaf-public-c7156cb19fe3/open/logo.png`);
@@ -376,7 +376,7 @@ describe('file-reference column URLs', () => {
          VALUES ($1, 'team/plan.png', 'team/plan.png', 'image/png', 'plan.png', 'uploaded') RETURNING id`,
         [secondBucketId]
       );
-      const small = version('team/plan.png.versions/small-0a1b2c3d.webp', 'small', 320);
+      const small = version('derived/team/plan.png/small-0a1b2c3d.webp', 'small', 320);
       const got = await product(alice, await addProduct({ id: rows[0].id, key: 'team/plan.png', versions: [small] }), 300);
 
       expect(pathOf(got.source)).toContain('team-80a2eaaf-private-0123456789ab/team/plan.png');
@@ -402,7 +402,7 @@ describe('file-reference column URLs', () => {
       const id = await addFile(key);
       await pg.query(`INSERT INTO ${schema}.products (title, photo) VALUES ($1, $2::jsonb)`, [
         title,
-        JSON.stringify({ id, key, versions: [version(`${key}.versions/small-0a1b2c3d.webp`, 'small', 320)] })
+        JSON.stringify({ id, key, versions: [version(`derived/${key}/small-0a1b2c3d.webp`, 'small', 320)] })
       ]);
     }
 

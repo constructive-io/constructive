@@ -38,8 +38,7 @@ export function validateCustomKey(key: string): string | null {
   if (key.includes('\0')) {
     return 'INVALID_KEY: null bytes not allowed';
   }
-  // `<key>.versions/` is where a file's rendered versions are stored, and they
-  // are served to whoever can read that file: no file of its own may live there.
+  // Preserve the existing logical-key syntax restriction on the legacy suffix.
   if (key.includes('.versions/')) {
     return 'INVALID_KEY: ".versions/" is reserved for a file\'s rendered versions';
   }
