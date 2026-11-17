@@ -217,7 +217,7 @@ describe('createFlushMiddleware', () => {
 
   // A host evicted by a flush is rebuilt from the settings loaders. If their
   // cached copy survived the flush, the rebuilt host would keep the old CORS
-  // list for as long as it stays cached (constructive-planning#2539).
+  // list for as long as it stays cached.
   it.each(['notification', 'authenticated HTTP', 'listener reconnect'])(
     'makes the next host build read the CORS origins again through the %s flush path',
     async (path) => {
