@@ -492,12 +492,11 @@ describe('POST /v1/usage', () => {
 // ─── Health & Providers ───────────────────────────────────────────────────
 
 describe('GET /healthz', () => {
-  it('returns provider status', async () => {
+  it('reports liveness', async () => {
     const res = await fetch(`http://localhost:${agenticPort}/healthz`);
     expect(res.status).toBe(200);
     const data = (await res.json()) as any;
-    expect(data.status).toBe('ok');
-    expect(data.provider).toBe('ollama');
+    expect(data).toEqual({ status: 'ok' });
   });
 });
 
