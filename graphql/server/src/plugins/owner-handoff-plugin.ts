@@ -78,10 +78,10 @@ function fail(code: string, message: string): never {
   throw error;
 }
 
-// The auth module's own row names the private schema, so this works for a
-// tenant that enabled auth but no identity provider — `identity_providers_module`
-// is optional in a few presets, `user_auth_module` is not. Only the tenant row
-// is read here: it belongs to the caller's org, so the request role sees it.
+// The auth module's own row names the private schema. The identity-provider
+// module is separate and need not be present; auth is the module that owns the
+// schema. Only the tenant row is read here: it belongs to the caller's org, so
+// the request role sees it.
 const authPrivateSchemaSql = `
   SELECT auth_private.schema_name
     FROM metaschema_modules_public.user_auth_module uam
@@ -103,10 +103,10 @@ const platformAuthSchemaSql = `
 `;
 
 /**
- * The SQL half, kept separate from the GraphQL wiring so it can be exercised
- * against a real database. Runs as the request role, with the request's claims
- * already applied: the evidence policy scopes reads to the caller, and the
- * tenant procedures are granted to `authenticated`.
+ * The SQL half, kept separate from the GraphQL wiring so the orchestration is
+ * testable without the GraphQL layer. Runs as the request role, with the
+ * request's claims already applied: the evidence policy scopes reads to the
+ * caller, and the tenant procedures are granted to `authenticated`.
  */
 export const mintTenantOwnerHandoff = async (
   tx: PgClient,
@@ -138,11 +138,11 @@ export const mintTenantOwnerHandoff = async (
   }
 
   // Delete-on-consume: one DELETE spends the newest proof for this session, so
-  // a retry deletes nothing and is refused. No row lock is taken; it would
-  // require an UPDATE grant that this table deliberately does not have. The
-  // row is bound to the session, not the credential that recorded it, because
-  // the browser hand-off rotates that credential in place and only the session
-  // id survives.
+  // a retry deletes nothing and is refused. The DELETE takes its own row lock;
+  // a `SELECT ... FOR UPDATE` is deliberately not used, because that would
+  // require an UPDATE grant this table does not have. The row is bound to the
+  // session, not the credential that recorded it, because the browser hand-off
+  // rotates that credential in place and only the session id survives.
   const evidenceTable = QuoteUtils.quoteQualifiedIdentifier(evidenceSchemaName, 'sign_in_evidence');
   const evidence = await tx.query({
     text: `
@@ -181,7 +181,7 @@ export const mintTenantOwnerHandoff = async (
   // Co-location assumption: the evidence read and the tenant session share one
   // transaction, so the tenant auth schema has to live in this server's
   // database. A tenant on its own physical database would otherwise fail with
-  // 42883 deep inside the procedure call.
+  // 3F000 (missing schema) or 42883 (missing function) inside the call.
   const served = await tx.query({
     text: 'SELECT 1 FROM pg_namespace WHERE nspname = $1',
     values: [tenantAuthSchema]

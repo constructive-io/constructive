@@ -375,8 +375,9 @@ export const registry = {
     http: 403,
     message: 'Additional verification is required to continue.'
   }),
-  // Passwordless owner hand-off (planning#2511). These are expected refusals
-  // from the platform mutation, not internal errors.
+  // Passwordless owner hand-off (planning#2511). Expected refusals from the
+  // platform mutation; the public entries are safe to surface, the two
+  // deployment-state entries are internal on purpose.
   NOT_DATABASE_OWNER: defineError({
     code: 'NOT_DATABASE_OWNER',
     class: 'public',
