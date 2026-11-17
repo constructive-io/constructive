@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.28](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.27...@agentic-kit/db-tools@0.12.28) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
 ## [0.12.27](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.26...@agentic-kit/db-tools@0.12.27) (2026-11-17)
 
 **Note:** Version bump only for package @agentic-kit/db-tools

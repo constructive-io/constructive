@@ -1,6 +1,6 @@
 {
   "name": "@constructive-sdk/cli",
-  "version": "1.22.33",
+  "version": "1.22.34",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI SDK - Auto-generated GraphQL CLI with ORM client, context management, and interactive prompts",
   "main": "index.js",

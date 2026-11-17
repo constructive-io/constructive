@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.3...agentic-server@0.31.0) (2026-11-17)
+
+### Features
+
+- **agentic-server:** GET /v1/models lists served models by id and name; /healthz reports liveness only ([#2013](https://github.com/constructive-io/constructive/issues/2013)) ([31c4aaf](https://github.com/constructive-io/constructive/commit/31c4aaf1abf1720e422d2b9712ab7a38998f752a))
+
 ## [0.30.3](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.2...agentic-server@0.30.3) (2026-11-16)
 
 ### Bug Fixes
