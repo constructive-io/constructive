@@ -1,3 +1,4 @@
+import { corsLoader } from '@constructive-io/express-context';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { svcCache } from '@pgpmjs/server-utils';
 import { EventEmitter } from 'events';
@@ -11,7 +12,7 @@ import {
 import type { PoolClient } from 'pg';
 
 import { Server } from '../../server';
-import { createFlushMiddleware } from '../flush';
+import { createFlushMiddleware, flushAllServices } from '../flush';
 
 const mockRoutingQuery = jest.fn();
 jest.mock('pg-cache', () => ({
@@ -213,6 +214,57 @@ describe('createFlushMiddleware', () => {
       expect(other.query).toHaveBeenCalledTimes(1);
     }
   );
+
+  // A host evicted by a flush is rebuilt from the settings loaders. If their
+  // cached copy survived the flush, the rebuilt host would keep the old CORS
+  // list for as long as it stays cached (constructive-planning#2539).
+  it.each(['notification', 'authenticated HTTP', 'listener reconnect'])(
+    'makes the next host build read the CORS origins again through the %s flush path',
+    async (path) => {
+      let origins = ['https://preview.example.com'];
+      const routingPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: origins }] })) };
+      const otherPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: ['https://other.example.com'] }] })) };
+      const ctx = (databaseId: string, pool: typeof routingPool) =>
+        ({ routingPool: pool, tenantPool: pool, databaseId, apiId: 'auth-api' }) as any;
+      corsLoader.invalidate();
+      await corsLoader.resolve(ctx(DATABASE_ID, routingPool));
+      await corsLoader.resolve(ctx('other-database', otherPool));
+      origins = ['https://preview.example.com', 'https://site.example.com'];
+
+      if (path === 'notification') {
+        const server = Object.create(Server.prototype) as Server;
+        Object.assign(server, { opts: { api: { isPublic: true } } });
+        await server.flush(DATABASE_ID);
+      } else if (path === 'authenticated HTTP') {
+        await createFlushMiddleware(opts(TOKEN))(
+          makeReq('/flush', `Bearer ${TOKEN}`),
+          makeRes(),
+          next
+        );
+      } else {
+        flushAllServices();
+      }
+
+      expect(await corsLoader.resolve(ctx(DATABASE_ID, routingPool))).toEqual(origins);
+      expect(routingPool.query).toHaveBeenCalledTimes(2);
+      await corsLoader.resolve(ctx('other-database', otherPool));
+      expect(otherPool.query).toHaveBeenCalledTimes(path === 'listener reconnect' ? 2 : 1);
+    }
+  );
+
+  it('does not let an unauthenticated flush invalidate the settings loaders', async () => {
+    const routingPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: ['https://preview.example.com'] }] })) };
+    const ctx = { routingPool, tenantPool: routingPool, databaseId: DATABASE_ID, apiId: 'auth-api' } as any;
+    corsLoader.invalidate();
+    await corsLoader.resolve(ctx);
+    await createFlushMiddleware(opts(TOKEN))(
+      makeReq('/flush', 'Bearer wrong'),
+      makeRes(),
+      next
+    );
+    await corsLoader.resolve(ctx);
+    expect(routingPool.query).toHaveBeenCalledTimes(1);
+  });
 
   it('does not let an unauthenticated flush invalidate storage discovery', async () => {
     const client = {
