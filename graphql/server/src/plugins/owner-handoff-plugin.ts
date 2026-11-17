@@ -12,21 +12,20 @@ import { extendSchema, gql } from 'graphile-utils';
  * code has no password, so it cannot satisfy the tenant's `sign_in`. The
  * platform realm's sign-in procedures already recorded what that sign-in
  * proved in `sign_in_evidence` (method + a proven identifier, bound to the
- * session and the credential it minted). This mutation turns that evidence
- * into the owner's tenant session:
+ * session). This mutation turns that evidence into the owner's tenant session:
  *
  *   1. the caller must own the target database (never a client-supplied id);
  *   2. the evidence row must belong to this caller and to the platform session
- *      this request belongs to (`jwt.claims.session_id`), and be
- *      unexpired/unconsumed — the browser hand-off rotates the credential, so
- *      the session is what survives to bind the proof;
+ *      this request belongs to (`jwt.claims.session_id`), and be unexpired. The
+ *      browser hand-off rotates the credential, so the session is what survives
+ *      to bind the proof;
  *   3. the tenant's own `sign_in_platform_identity` resolves the owner from the
  *      identifier and applies the tenant's MFA / device policy;
  *   4. the tenant mints a one-time, PKCE-bound hand-off code that the desktop
  *      exchanges for the session.
  *
- * The row is consumed by the same statement that reads it, so a retry after a
- * crash cannot replay a proof.
+ * The statement that reads the proof also deletes it, so a retry after a crash
+ * cannot replay it.
  */
 
 interface PgClient {
@@ -50,6 +49,8 @@ export interface OwnerHandoffInput {
   databaseId: string;
   /** S256 challenge the desktop will present at the exchange. */
   codeChallenge: string;
+  /** Token for a device awaiting approval, so a retry finds the approved row. */
+  deviceToken?: string;
 }
 
 export interface OwnerHandoffResult {
@@ -70,8 +71,10 @@ const isUuid = (value: unknown): value is string =>
 const S256_CHALLENGE = /^[-_A-Za-z0-9]{43}$/;
 
 function fail(code: string, message: string): never {
-  const error = new Error(`${code}: ${message}`) as Error & { code: string };
-  error.code = code;
+  // `extensions.code` is what formatError lifts onto the response; without it
+  // the refusal reads as INTERNAL_SERVER_ERROR.
+  const error = new Error(`${code}: ${message}`) as Error & { extensions?: Record<string, unknown> };
+  error.extensions = { code };
   throw error;
 }
 
@@ -131,32 +134,27 @@ export const mintTenantOwnerHandoff = async (
   // cannot see the platform realm's module row (see `platformAuthSchemaSql`).
   const evidenceSchemaName = input.platformAuthSchema;
   if (typeof evidenceSchemaName !== 'string' || !evidenceSchemaName) {
-    fail('TENANT_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
+    fail('PLATFORM_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
   }
 
-  // Consume and read in one statement: the subselect locks the row, and the
-  // outer UPDATE stamps it, so two concurrent calls cannot both spend it.
-  //
-  // The proof is bound to the *session*, not the credential that wrote it: the
-  // browser hand-off rotates that credential in place (`exchange_native_handoff`
-  // and `refresh_access_token` each mint a new id for the same session), so the
-  // credential id the desktop presents is never the one the sign-in wrote. The
-  // session id survives the rotation and still names exactly one sign-in.
+  // Delete-on-consume: one DELETE spends the newest proof for this session, so
+  // a retry deletes nothing and is refused. No row lock is taken; it would
+  // require an UPDATE grant that this table deliberately does not have. The
+  // row is bound to the session, not the credential that recorded it, because
+  // the browser hand-off rotates that credential in place and only the session
+  // id survives.
   const evidenceTable = QuoteUtils.quoteQualifiedIdentifier(evidenceSchemaName, 'sign_in_evidence');
   const evidence = await tx.query({
     text: `
-      UPDATE ${evidenceTable} AS evidence
-         SET consumed_at = now()
+      DELETE FROM ${evidenceTable} AS evidence
        WHERE evidence.id = (
                SELECT candidate.id
                  FROM ${evidenceTable} AS candidate
                 WHERE candidate.user_id = $1
                   AND candidate.session_id = jwt_private.current_session_id()
-                  AND candidate.consumed_at IS NULL
                   AND candidate.expires_at > now()
                 ORDER BY candidate.auth_time DESC
                 LIMIT 1
-                FOR UPDATE SKIP LOCKED
              )
       RETURNING evidence.method, evidence.identifier, evidence.user_id::text AS user_id
     `,
@@ -180,10 +178,26 @@ export const mintTenantOwnerHandoff = async (
     fail('TENANT_AUTH_NOT_PROVISIONED', 'the target database has no auth module');
   }
 
+  // Co-location assumption: the evidence read and the tenant session share one
+  // transaction, so the tenant auth schema has to live in this server's
+  // database. A tenant on its own physical database would otherwise fail with
+  // 42883 deep inside the procedure call.
+  const served = await tx.query({
+    text: 'SELECT 1 FROM pg_namespace WHERE nspname = $1',
+    values: [tenantAuthSchema]
+  });
+  if (served.rows.length === 0) {
+    fail('TENANT_AUTH_NOT_IN_SERVED_DATABASE', 'the tenant auth schema is not in this server\'s database');
+  }
+
   const signIn = QuoteUtils.quoteQualifiedIdentifier(tenantAuthSchema, 'sign_in_platform_identity');
+  // The tenant procedure defaults credential_kind to 'bearer' and remember_me to
+  // false. Both are spelled out only to reach the device token in fifth place:
+  // a retry after the user approves the device must find the approved row
+  // instead of minting a new device.
   const session = await tx.query({
-    text: `SELECT * FROM ${signIn}($1, $2)`,
-    values: [proven.method, proven.identifier]
+    text: `SELECT * FROM ${signIn}($1, $2, 'bearer', false, $3)`,
+    values: [proven.method, proven.identifier, input.deviceToken ?? null]
   });
   const row = session.rows[0];
   if (!row) fail('TENANT_SIGN_IN_FAILED', 'sign_in_platform_identity returned no row');
@@ -200,12 +214,15 @@ export const mintTenantOwnerHandoff = async (
     deviceToken: typeof row.out_device_token === 'string' ? row.out_device_token : null
   };
 
-  // A challenged owner finishes on the tenant's existing MFA/device path; no
-  // hand-off code exists until the session does.
-  if (result.mfaRequired || result.deviceApprovalRequired) return result;
+  // The check runs before the challenge early return: a challenge minted for
+  // another tenant user must not hand back that user's tokens.
   if (result.userId !== input.userId) {
     fail('OWNER_MISMATCH', 'the tenant session belongs to a different user');
   }
+
+  // A challenged owner finishes on the tenant's existing MFA/device path; no
+  // hand-off code exists until the session does.
+  if (result.mfaRequired || result.deviceApprovalRequired) return result;
 
   const accessToken = row.access_token;
   if (typeof accessToken !== 'string' || !accessToken) {
@@ -227,7 +244,7 @@ export const mintTenantOwnerHandoff = async (
 };
 
 interface ResolvedArgs {
-  input: { databaseId?: unknown; codeChallenge?: unknown } | null;
+  input: { databaseId?: unknown; codeChallenge?: unknown; deviceToken?: unknown } | null;
   withPgClient: WithPgClient;
   pgSettings: Record<string, string> | null;
 }
@@ -270,6 +287,8 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
         databaseId: UUID!
         """S256 PKCE challenge the desktop will present at the exchange."""
         codeChallenge: String!
+        """Device token from a pending-approval result, so the retry finds the approved device."""
+        deviceToken: String
       }
 
       type MintTenantOwnerHandoffPayload {
@@ -312,6 +331,7 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
 
             const databaseId = input?.databaseId;
             const codeChallenge = input?.codeChallenge;
+            const deviceToken = input?.deviceToken;
             if (typeof databaseId !== 'string' || typeof codeChallenge !== 'string') {
               fail('BAD_REQUEST', 'databaseId and codeChallenge are required');
             }
@@ -325,7 +345,7 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
               platformDatabaseId
             );
             if (!platformAuthSchema) {
-              fail('TENANT_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
+              fail('PLATFORM_AUTH_NOT_PROVISIONED', 'the platform realm has no auth module');
             }
 
             return withPgClient(pgSettings, (tx) =>
@@ -333,7 +353,8 @@ export const OwnerHandoffPlugin: GraphileConfig.Plugin = {
                 userId,
                 platformAuthSchema,
                 databaseId,
-                codeChallenge
+                codeChallenge,
+                deviceToken: typeof deviceToken === 'string' && deviceToken ? deviceToken : undefined
               })
             );
           });

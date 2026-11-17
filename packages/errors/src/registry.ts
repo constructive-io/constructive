@@ -375,6 +375,45 @@ export const registry = {
     http: 403,
     message: 'Additional verification is required to continue.'
   }),
+  // Passwordless owner hand-off (planning#2511). These are expected refusals
+  // from the platform mutation, not internal errors.
+  NOT_DATABASE_OWNER: defineError({
+    code: 'NOT_DATABASE_OWNER',
+    class: 'public',
+    http: 403,
+    message: 'Only the owner of this database can sign in to its app session.'
+  }),
+  OWNER_MISMATCH: defineError({
+    code: 'OWNER_MISMATCH',
+    class: 'public',
+    http: 403,
+    message: 'The identity the platform proved does not belong to this account.'
+  }),
+  TENANT_AUTH_NOT_PROVISIONED: defineError({
+    code: 'TENANT_AUTH_NOT_PROVISIONED',
+    class: 'public',
+    http: 409,
+    message: 'This app database has no sign-in module yet.'
+  }),
+  TENANT_SIGN_IN_FAILED: defineError({
+    code: 'TENANT_SIGN_IN_FAILED',
+    class: 'public',
+    http: 400,
+    message: 'The app database could not sign in this account. Try again.'
+  }),
+  PLATFORM_AUTH_NOT_PROVISIONED: defineError({
+    code: 'PLATFORM_AUTH_NOT_PROVISIONED',
+    class: 'internal',
+    http: 503,
+    message: 'The platform auth realm is not provisioned.'
+  }),
+  TENANT_AUTH_NOT_IN_SERVED_DATABASE: defineError({
+    code: 'TENANT_AUTH_NOT_IN_SERVED_DATABASE',
+    class: 'internal',
+    http: 503,
+    message:
+      'The app database is not served by this server. The deployment must serve both from the same Postgres instance.'
+  }),
   MFA_REQUIRED: defineError({
     code: 'MFA_REQUIRED',
     class: 'public',
