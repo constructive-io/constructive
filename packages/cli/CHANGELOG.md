@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.23.37](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.36...@constructive-io/cli@8.23.37) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [8.23.36](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.35...@constructive-io/cli@8.23.36) (2026-11-17)
 
 **Note:** Version bump only for package @constructive-io/cli

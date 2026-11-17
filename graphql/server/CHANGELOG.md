@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.21](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.20...@constructive-io/graphql-server@5.35.21) (2026-11-17)
+
+### Bug Fixes
+
+- **errors:** register the codes constructive-db main raises, including ones handed to raise helpers ([#2017](https://github.com/constructive-io/constructive/issues/2017)) ([d92dd40](https://github.com/constructive-io/constructive/commit/d92dd40765cbedf00ba8e031ffca926cccf78020))
+
 ## [5.35.20](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.19...@constructive-io/graphql-server@5.35.20) (2026-11-17)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

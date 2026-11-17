@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.11](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@2.19.10...graphile-connection-filter@2.19.11) (2026-11-17)
+
+**Note:** Version bump only for package graphile-connection-filter
+
 ## [2.19.10](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@2.19.9...graphile-connection-filter@2.19.10) (2026-11-14)
 
 **Note:** Version bump only for package graphile-connection-filter
