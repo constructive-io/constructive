@@ -871,15 +871,15 @@ export async function generateMulti(
     }
 
     // Remove generated skills of targets that no longer exist. A configured
-    // target that failed (e.g. a schema without tables) did not rewrite its
-    // skills, so those are kept rather than treated as stale.
+    // target that did not rewrite its skills (it failed, e.g. a schema without
+    // tables, or has skills disabled) keeps them: only a target that is no
+    // longer configured is stale.
     if (cleanStaleTargets && !dryRun) {
-      const failedNames = results.filter((r) => !r.result.success).map((r) => r.name);
       for (const [skillsDir, skillNames] of skillNamesByDir) {
         const removedSkills = removeStaleGeneratedSkills(
           skillsDir,
           Array.from(skillNames),
-          failedNames,
+          names,
         );
         if (verbose) {
           for (const skillName of removedSkills) {
