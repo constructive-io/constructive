@@ -44,15 +44,29 @@ beforeAll(async () => {
       data: [
         { id: 'gpt-4o', object: 'model', owned_by: 'openai' },
         // A family the router would otherwise send to the Ollama entry.
-        { id: 'llama-hosted', object: 'model', owned_by: 'someone' }
+        { id: 'llama-hosted', object: 'model', owned_by: 'someone' },
+        // An upstream id whose own first segment is the dialect the router strips.
+        { id: 'openai/gpt-oss-120b', object: 'model', owned_by: 'someone' }
       ]
     });
   });
   openai = await listen(openaiApp);
 
   const anthropicApp = express();
-  anthropicApp.get('/v1/models', (_req, res) => {
-    res.json({ data: [{ id: 'claude-sonnet-4-5', display_name: 'Claude Sonnet 4.5', type: 'model' }] });
+  anthropicApp.get('/v1/models', (req, res) => {
+    if (req.query.after_id === 'claude-sonnet-4-5') {
+      res.json({
+        data: [{ id: 'claude-haiku-4-5', display_name: 'Claude Haiku 4.5', type: 'model' }],
+        has_more: false,
+        last_id: 'claude-haiku-4-5'
+      });
+      return;
+    }
+    res.json({
+      data: [{ id: 'claude-sonnet-4-5', display_name: 'Claude Sonnet 4.5', type: 'model' }],
+      has_more: true,
+      last_id: 'claude-sonnet-4-5'
+    });
   });
   anthropic = await listen(anthropicApp);
 
@@ -97,7 +111,11 @@ describe('GET /v1/models', () => {
         { id: 'gpt-4o', name: 'gpt-4o' },
         // Bare, this id would route to another entry; the prefix is what reaches it.
         { id: 'hosted/llama-hosted', name: 'llama-hosted' },
-        { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5' }
+        // Bare, the gateway would strip `openai/` before the upstream saw it.
+        { id: 'hosted/openai/gpt-oss-120b', name: 'openai/gpt-oss-120b' },
+        // Both pages of a paged listing.
+        { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5' },
+        { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5' }
       ]
     });
   });
