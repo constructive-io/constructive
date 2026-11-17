@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.35](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.34...@agentic-kit/cli@0.19.35) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
+## [0.19.34](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.33...@agentic-kit/cli@0.19.34) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
+## [0.19.33](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.32...@agentic-kit/cli@0.19.33) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
+## [0.19.32](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.31...@agentic-kit/cli@0.19.32) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
+## [0.19.31](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.30...@agentic-kit/cli@0.19.31) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
+## [0.19.30](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.29...@agentic-kit/cli@0.19.30) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/cli
+
 ## [0.19.29](https://github.com/constructive-io/constructive/compare/@agentic-kit/cli@0.19.28...@agentic-kit/cli@0.19.29) (2026-11-14)
 
 **Note:** Version bump only for package @agentic-kit/cli

@@ -2,7 +2,7 @@
  * LlmTextMutationPlugin
  *
  * Adds `{columnName}Text: String` companion fields on create/update mutation
- * inputs for every vector column. When the client provides a text string in
+ * inputs that carry the vector column's own field. When the client provides a text string in
  * the companion field, the plugin embeds it server-side and injects the
  * resulting vector into the actual column.
  *
@@ -144,7 +144,10 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
             }
 
             const vectorField = newFields[fieldName];
-            const required = !!vectorField && isNonNullType(vectorField.type);
+            if (!vectorField) {
+              continue;
+            }
+            const required = isNonNullType(vectorField.type);
             if (required) {
               newFields = {
                 ...newFields,
@@ -152,11 +155,26 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
               };
             }
 
+            const attributes = pgCodec.attributes as Record<string, any>;
+            const model = attributes[columnName].extensions?.tags?.embeddingModel;
+            const modelColumn = Object.keys(attributes).find(
+              (name) => attributes[name].extensions?.tags?.embeddingModelOf === columnName
+            );
+            const modelField = modelColumn
+              ? build.inflection.attribute({ codec: pgCodec, attributeName: modelColumn })
+              : undefined;
+
             newFields = build.extend(
               newFields,
               {
                 [textFieldName]: embedField(
-                  { kind: 'companion', into: fieldName, required },
+                  {
+                    kind: 'companion',
+                    into: fieldName,
+                    required,
+                    ...(typeof model === 'string' && model && { model }),
+                    ...(modelField && modelField in newFields && { modelField })
+                  },
                   {
                     type: GraphQLString,
                     description:

@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreatePlatformResourceDeclaredCapacityInput,
   PlatformResourceDeclaredCapacityPatch,
   PlatformResourceDeclaredCapacitySelect,
   PlatformResourceDeclaredCapacityFilter,
@@ -49,7 +48,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -66,8 +65,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -143,145 +140,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'cpuLimitMillicores',
-        message: 'cpuLimitMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'cpuRequestMillicores',
-        message: 'cpuRequestMillicores',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'installationId',
-        message: 'installationId',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isTransient',
-        message: 'isTransient',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'kind',
-        message: 'kind',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryLimitBytes',
-        message: 'memoryLimitBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'memoryRequestBytes',
-        message: 'memoryRequestBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'namespaceId',
-        message: 'namespaceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'podCountMax',
-        message: 'podCountMax',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'podCountMin',
-        message: 'podCountMin',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'source',
-        message: 'source',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'sourceId',
-        message: 'sourceId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storageSizeBytes',
-        message: 'storageSizeBytes',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'storageTotalBytes',
-        message: 'storageTotalBytes',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreatePlatformResourceDeclaredCapacityInput['platformResourceDeclaredCapacity'];
-    const client = getClient();
-    const result = await client.platformResourceDeclaredCapacity
-      .create({
-        data: {
-          cpuLimitMillicores: cleanedData.cpuLimitMillicores,
-          cpuRequestMillicores: cleanedData.cpuRequestMillicores,
-          installationId: cleanedData.installationId,
-          isTransient: cleanedData.isTransient,
-          kind: cleanedData.kind,
-          memoryLimitBytes: cleanedData.memoryLimitBytes,
-          memoryRequestBytes: cleanedData.memoryRequestBytes,
-          namespaceId: cleanedData.namespaceId,
-          podCountMax: cleanedData.podCountMax,
-          podCountMin: cleanedData.podCountMin,
-          source: cleanedData.source,
-          sourceId: cleanedData.sourceId,
-          storageSizeBytes: cleanedData.storageSizeBytes,
-          storageTotalBytes: cleanedData.storageTotalBytes,
-        },
-        select: {
-          cpuLimitMillicores: true,
-          cpuRequestMillicores: true,
-          installationId: true,
-          isTransient: true,
-          kind: true,
-          memoryLimitBytes: true,
-          memoryRequestBytes: true,
-          namespaceId: true,
-          podCountMax: true,
-          podCountMin: true,
-          source: true,
-          sourceId: true,
-          storageSizeBytes: true,
-          storageTotalBytes: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

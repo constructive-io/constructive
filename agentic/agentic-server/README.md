@@ -43,8 +43,9 @@ app.listen(3001, () => {
 | POST | `/v1/chat/completions` | OpenAI-compatible chat completion (multi-provider) |
 | POST | `/v1/embeddings` | OpenAI-compatible embeddings (multi-provider) |
 | POST | `/v1/usage` | Submit an external usage report to the metering sink |
-| GET | `/v1/providers` | List configured providers |
-| GET | `/healthz` | Health check |
+| GET | `/v1/models` | Models a caller can run: `{ object: 'list', data: [{ id, name }] }`. Requires `X-Database-Id`. `id` is what to send as `model`; nothing about the providers is returned |
+| GET | `/v1/providers` | List configured providers (operator) |
+| GET | `/healthz` | Liveness: `{ status: 'ok' }` |
 
 ## Streaming
 

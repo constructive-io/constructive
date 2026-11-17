@@ -93,6 +93,20 @@ function extractEnumMeta(
   };
 }
 
+/** A declared limit the gather phase read from the column's type modifier. */
+function readDeclaredLimit(
+  attr: PgAttribute | null | undefined,
+  key: 'maxLength' | 'precision' | 'scale',
+): number | null {
+  const value = attr?.extensions?.[key];
+  return typeof value === 'number' ? value : null;
+}
+
+/** Whether the gather phase found the database always computes the column. */
+export function readIsComputed(attr: PgAttribute | null | undefined): boolean {
+  return attr?.extensions?.computedValue === true;
+}
+
 /** The allowed values the gather phase recorded on a column, if any. */
 export function readAllowedValues(attr: PgAttribute | null | undefined): string[] | null {
   const values = attr?.extensions?.allowedValues;
@@ -126,6 +140,9 @@ export function buildFieldMeta(
       isNotNull,
       hasDefault,
       subtype,
+      maxLength: readDeclaredLimit(attr, 'maxLength'),
+      precision: readDeclaredLimit(attr, 'precision'),
+      scale: readDeclaredLimit(attr, 'scale'),
       encoding: buildScalarEncoding(attr),
     },
     isNotNull,
@@ -139,5 +156,7 @@ export function buildFieldMeta(
     isRequiredOnCreate: null,
     isWritableOnCreate: null,
     isWritableOnUpdate: null,
+    isComputed: null,
+    file: null,
   };
 }

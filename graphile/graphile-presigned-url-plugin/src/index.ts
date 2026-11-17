@@ -28,6 +28,14 @@ export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
 export { buildFileProjection, type FileProjection } from './file-projection';
 export {
+  createFileRefUrlsPlugin,
+  type FileVersion,
+  isVersionKeyOf,
+  ownVersions,
+  pickUrl,
+  type ResolvedFile,
+} from './file-ref-urls';
+export {
   assertBucketReconciled,
   resolveS3ForDatabase,
   StorageBucketNotReconciledError,

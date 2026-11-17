@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.24.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.1...graphile-llm@1.24.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.0...graphile-llm@1.24.1) (2026-11-17)
+
+### Bug Fixes
+
+- **graphile-llm:** add `{col}Text` only to inputs that carry `{col}` ([#2006](https://github.com/constructive-io/constructive/issues/2006)) ([14d3e8d](https://github.com/constructive-io/constructive/commit/14d3e8d8c680d7c28dce748ddf49114a2fb2d95b))
+
+# [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.10...graphile-llm@1.24.0) (2026-11-16)
+
+### Bug Fixes
+
+- **llm:** stamp the model beside a vector embedded on a write; label an embedded text with its own model ([c4f034b](https://github.com/constructive-io/constructive/commit/c4f034be008210d53774587b53b4f2d3db6637cb))
+
+### Features
+
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
+## [1.23.10](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.9...graphile-llm@1.23.10) (2026-11-16)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.8...graphile-llm@1.23.9) (2026-11-16)
+
+### Bug Fixes
+
+- **graphile-search:** unifiedSearch leaves out a vector column of another length than the query vector ([54b4cbd](https://github.com/constructive-io/constructive/commit/54b4cbd877570baff4fa13de553db59bbe421d02))
+
 ## [1.23.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.7...graphile-llm@1.23.8) (2026-11-14)
 
 **Note:** Version bump only for package graphile-llm

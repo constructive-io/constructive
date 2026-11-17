@@ -12,8 +12,8 @@ csdk repository-event list --where.<field>.<op> <value> --orderBy <values>
 csdk repository-event list --limit 10 --after <cursor>
 csdk repository-event find-first --where.<field>.<op> <value>
 csdk repository-event get --id <UUID>
-csdk repository-event create --eventType <String> --repositoryId <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--deliveryId <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--updatedByPrincipal <UUID>]
-csdk repository-event update --id <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--deliveryId <String>] [--eventType <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--repositoryId <UUID>] [--updatedByPrincipal <UUID>]
+csdk repository-event create --databaseId <UUID> --eventType <String> --repositoryId <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--deliveryId <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--updatedByPrincipal <UUID>]
+csdk repository-event update --id <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--deliveryId <String>] [--eventType <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--repositoryId <UUID>] [--updatedByPrincipal <UUID>]
 csdk repository-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk repository-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a repositoryEvent
 
 ```bash
-csdk repository-event create --eventType <String> --repositoryId <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--deliveryId <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--updatedByPrincipal <UUID>]
+csdk repository-event create --databaseId <UUID> --eventType <String> --repositoryId <UUID> [--actorId <UUID>] [--commitSha <String>] [--createdByPrincipal <UUID>] [--deliveryId <String>] [--metadata <JSON>] [--payload <JSON>] [--ref <String>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a repositoryEvent by id

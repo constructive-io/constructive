@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.3...agentic-server@0.31.0) (2026-11-17)
+
+### Features
+
+- **agentic-server:** GET /v1/models lists served models by id and name; /healthz reports liveness only ([#2013](https://github.com/constructive-io/constructive/issues/2013)) ([31c4aaf](https://github.com/constructive-io/constructive/commit/31c4aaf1abf1720e422d2b9712ab7a38998f752a))
+
+## [0.30.3](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.2...agentic-server@0.30.3) (2026-11-16)
+
+### Bug Fixes
+
+- **agentic-server:** accept JSON bodies large enough to carry an image (bodyLimit, default 32mb) ([5cd773e](https://github.com/constructive-io/constructive/commit/5cd773e471f578c2f12e8f47c1807bfae65153bf))
+
+## [0.30.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.1...agentic-server@0.30.2) (2026-11-16)
+
+### Bug Fixes
+
+- **agentic-server:** embed image data urls with parameters or uppercase encoding as images; an ollama embed answer with no embedding throws ([e521ce7](https://github.com/constructive-io/constructive/commit/e521ce79c9c25b68c5d37a8d9528937ca1e77974))
+- **agentic-server:** send data-url embed inputs to ollama as images; pass dimensions through ([440e430](https://github.com/constructive-io/constructive/commit/440e430e70084e9aa814f2747f70a333b75c32d5))
+
 ## [0.30.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.0...agentic-server@0.30.1) (2026-11-09)
 
 ### Bug Fixes

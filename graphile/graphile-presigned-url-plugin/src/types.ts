@@ -216,4 +216,10 @@ export interface StorageCredentials {
  */
 export interface PresignedUrlPluginOptions {
   credentials: StorageCredentials | (() => StorageCredentials);
+  /**
+   * The jsonb domains whose columns hold a file document and get
+   * `<column>Url` / `<column>Versions`. Defaults to `FILE_REF_DOMAINS` of
+   * graphile-storage-registry (`image`, `upload`).
+   */
+  fileRefDomains?: readonly string[];
 }

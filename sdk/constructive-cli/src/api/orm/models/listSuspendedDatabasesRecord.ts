@@ -29,7 +29,6 @@ import type {
   ListSuspendedDatabasesRecordSelect,
   ListSuspendedDatabasesRecordFilter,
   ListSuspendedDatabasesRecordsOrderBy,
-  CreateListSuspendedDatabasesRecordInput,
   UpdateListSuspendedDatabasesRecordInput,
   ListSuspendedDatabasesRecordPatch,
 } from '../input-types';
@@ -158,33 +157,6 @@ export class ListSuspendedDatabasesRecordModel {
       }) => ({
         listSuspendedDatabasesRecord: data.listSuspendedDatabases?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ListSuspendedDatabasesRecordSelect>(
-    args: CreateArgs<S, CreateListSuspendedDatabasesRecordInput['listSuspendedDatabasesRecord']> & {
-      select: S;
-    } & StrictSelect<S, ListSuspendedDatabasesRecordSelect>
-  ): QueryBuilder<{
-    createListSuspendedDatabasesRecord: {
-      listSuspendedDatabasesRecord: InferSelectResult<ListSuspendedDatabasesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ListSuspendedDatabasesRecord',
-      'createListSuspendedDatabasesRecord',
-      'listSuspendedDatabasesRecord',
-      args.select,
-      args.data,
-      'CreateListSuspendedDatabasesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ListSuspendedDatabasesRecord',
-      fieldName: 'createListSuspendedDatabasesRecord',
-      document,
-      variables,
     });
   }
 }

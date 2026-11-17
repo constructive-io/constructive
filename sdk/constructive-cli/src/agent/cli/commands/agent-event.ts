@@ -80,7 +80,9 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
+      databaseId: true,
       entry: true,
       id: true,
       recordedAt: true,
@@ -89,6 +91,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       transcriptFormat: true,
       transcriptVersion: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentEventSelect, AgentEventFilter, AgentEventOrderBy> & {
@@ -109,7 +112,9 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       createdAt: true,
+      databaseId: true,
       entry: true,
       id: true,
       recordedAt: true,
@@ -118,6 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       transcriptFormat: true,
       transcriptVersion: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentEventSelect, AgentEventFilter, AgentEventOrderBy> & {
@@ -150,7 +156,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          actorId: true,
           createdAt: true,
+          databaseId: true,
           entry: true,
           id: true,
           recordedAt: true,
@@ -159,6 +167,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           transcriptFormat: true,
           transcriptVersion: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -226,7 +235,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           transcriptVersion: cleanedData.transcriptVersion,
         },
         select: {
+          actorId: true,
           createdAt: true,
+          databaseId: true,
           entry: true,
           id: true,
           recordedAt: true,
@@ -235,6 +246,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           transcriptFormat: true,
           transcriptVersion: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -255,6 +267,18 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
+      },
+      {
+        type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
       },
       {
         type: 'json',
@@ -293,6 +317,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'transcriptVersion',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentEventPatch;
@@ -303,15 +333,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          actorId: cleanedData.actorId,
+          databaseId: cleanedData.databaseId,
           entry: cleanedData.entry,
           recordedAt: cleanedData.recordedAt,
           runId: cleanedData.runId,
           seq: cleanedData.seq,
           transcriptFormat: cleanedData.transcriptFormat,
           transcriptVersion: cleanedData.transcriptVersion,
+          visibility: cleanedData.visibility,
         },
         select: {
+          actorId: true,
           createdAt: true,
+          databaseId: true,
           entry: true,
           id: true,
           recordedAt: true,
@@ -320,6 +355,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           transcriptFormat: true,
           transcriptVersion: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

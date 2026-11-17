@@ -92,9 +92,26 @@ export function createPgvectorAdapter(
         codec.attributes as Record<string, any>
       )) {
         if (isVectorCodec(attribute.codec)) {
+          const dimensions: number | undefined = attribute.extensions?.vectorDimensions;
+          // `@embeddingModel` on the vector column: the model its definition
+          // names. `@embeddingModelOf <column>` on a sibling: the column that
+          // records, per row, the model that produced the vector.
+          const named = attribute.extensions?.tags?.embeddingModel;
+          const model = typeof named === 'string' && named ? named : undefined;
+          const modelColumn = Object.entries(codec.attributes as Record<string, any>).find(
+            ([, other]) => other.extensions?.tags?.embeddingModelOf === attributeName
+          )?.[0];
           columns.push({
             attributeName,
-            adapterData: chunksInfo ? { chunksInfo } : undefined,
+            adapterData:
+              chunksInfo || dimensions || model || modelColumn
+                ? {
+                  ...(chunksInfo && { chunksInfo }),
+                  ...(dimensions && { dimensions }),
+                  ...(model && { model }),
+                  ...(modelColumn && { modelColumn }),
+                }
+                : undefined,
           });
         }
       }
@@ -154,6 +171,13 @@ export function createPgvectorAdapter(
                   ),
                   description: 'Query vector for similarity search.',
                 },
+                model: {
+                  type: build.graphql.GraphQLString,
+                  description:
+                    'The model that produced `vector`. On a column that records the model of each ' +
+                    'row\'s vector, only rows embedded with this model are compared; vectors of ' +
+                    'two models are not comparable. Filled in server-side when `text` is embedded.',
+                },
                 metric: {
                   type: VectorMetricEnum,
                   description: `Similarity metric to use (default: ${defaultMetric}).`,
@@ -192,7 +216,7 @@ export function createPgvectorAdapter(
     ): FilterApplyResult | null {
       if (filterValue == null) return null;
 
-      const { vector, metric, distance, includeChunks } = filterValue;
+      const { vector, metric, distance, includeChunks, model } = filterValue;
       if (!vector || !Array.isArray(vector) || vector.length === 0) return null;
 
       const resolvedMetric = metric || defaultMetric;
@@ -200,8 +224,21 @@ export function createPgvectorAdapter(
       const vectorExpr = sql`${sql.value(vectorString)}::vector`;
 
       // Check if this column has chunks info and chunk querying is requested
-      const adapterData = column.adapterData as { chunksInfo?: ChunksInfo } | undefined;
+      const adapterData = column.adapterData as { chunksInfo?: ChunksInfo; modelColumn?: string } | undefined;
       const chunksInfo = adapterData?.chunksInfo;
+
+      // A row whose vector another model produced is not a worse match, it is
+      // not a match at all: its distance to this query vector means nothing.
+      const sameModel: SQL | null =
+        adapterData?.modelColumn && typeof model === 'string' && model
+          ? sql`${alias}.${sql.identifier(adapterData.modelColumn)} = ${sql.value(model)}`
+          : null;
+      // Narrows a clause that is there; where there is none, `scorableClause`
+      // carries the model so a search that only ranks (unifiedSearch) is not
+      // turned into one that filters.
+      const both = (a: SQL | null, b: SQL | null): SQL | null => (a && b ? sql`(${a}) AND (${b})` : b);
+      const scored = (distance: SQL): SQL =>
+        sameModel ? sql`CASE WHEN ${sameModel} THEN ${distance} END` : distance;
 
       if (chunksInfo && (includeChunks !== false)) {
         // Chunk-aware query: find the closest chunk for each parent row
@@ -226,7 +263,11 @@ export function createPgvectorAdapter(
 
         // Direct parent distance (NULL when the parent has no embedding)
         const parentColumnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
-        const parentDistanceExpr = buildDistanceExpr(sql, parentColumnExpr, vectorExpr, resolvedMetric);
+        // The model stamp is the parent vector's; a chunk's vector is not the parent's.
+        const parentDistanceExpr = scored(buildDistanceExpr(sql, parentColumnExpr, vectorExpr, resolvedMetric));
+        const parentScorable = sameModel
+          ? sql`(${sameModel} AND ${parentColumnExpr} IS NOT NULL)`
+          : sql`${parentColumnExpr} IS NOT NULL`;
 
         // LEAST skips NULL operands, so this is the closest of parent + chunks
         // and NULL only when neither the parent nor any chunk is embedded.
@@ -234,7 +275,7 @@ export function createPgvectorAdapter(
 
         // Rows with no embedding anywhere have no distance to rank: leave them out.
         // MIN(distance) is NULL exactly when no chunk has an embedding.
-        const scorableClause = sql`(${parentColumnExpr} IS NOT NULL OR ${chunkDistanceSubquery} IS NOT NULL)`;
+        const scorableClause = sql`(${parentScorable} OR ${chunkDistanceSubquery} IS NOT NULL)`;
 
         let whereClause: SQL | null = null;
         if (distance !== undefined && distance !== null) {
@@ -258,10 +299,10 @@ export function createPgvectorAdapter(
       }
 
       return {
-        whereClause,
-        scoreExpression: distanceExpr,
+        whereClause: both(sameModel, whereClause),
+        scoreExpression: scored(distanceExpr),
         // A NULL embedding has no distance to rank: leave the row out.
-        scorableClause: sql`${columnExpr} IS NOT NULL`,
+        scorableClause: both(sameModel, sql`${columnExpr} IS NOT NULL`),
       };
     },
   };

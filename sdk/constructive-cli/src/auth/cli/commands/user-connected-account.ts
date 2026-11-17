@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreateUserConnectedAccountInput,
   UserConnectedAccountPatch,
   UserConnectedAccountSelect,
   UserConnectedAccountFilter,
@@ -43,7 +42,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -60,8 +59,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -125,76 +122,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'json',
-        name: 'details',
-        message: 'details',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'identifier',
-        message: 'identifier',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isVerified',
-        message: 'isVerified',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'service',
-        message: 'service',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(
-      answers,
-      fieldSchema
-    ) as CreateUserConnectedAccountInput['userConnectedAccount'];
-    const client = getClient();
-    const result = await client.userConnectedAccount
-      .create({
-        data: {
-          details: cleanedData.details,
-          identifier: cleanedData.identifier,
-          isVerified: cleanedData.isVerified,
-          ownerId: cleanedData.ownerId,
-          service: cleanedData.service,
-        },
-        select: {
-          createdAt: true,
-          details: true,
-          id: true,
-          identifier: true,
-          isVerified: true,
-          ownerId: true,
-          service: true,
-          updatedAt: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

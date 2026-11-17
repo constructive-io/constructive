@@ -175,6 +175,7 @@ The `.agents/skills/` directory contains tooling-focused skills for this monorep
 | `constructive-testing` | PostgreSQL testing frameworks — pgsql-test, drizzle-orm-test, supabase-test | Writing database tests, testing RLS policies, seeding test data |
 | `constructive-cli` | Generated CLI commands — how the CLI is generated from GraphQL schemas, codegen options, multi-target CLI | Generating CLI tools, running generated CLI, understanding codegen pipeline |
 | `graphile-search` | Unified PostGraphile v5 search plugin — tsvector, BM25, pg_trgm, pgvector adapters, composite searchScore | Adding search to GraphQL, configuring search adapters, querying search via SDK |
+| `graphile-file-urls` | `<col>Url(width)` / `<col>Versions` / `FileVersion` on `image` and `upload` columns (graphile-presigned-url-plugin) | Reading a sized image URL or an uploaded file's URL from a business-table row, adding a file-reference domain |
 
 ## Tips
 

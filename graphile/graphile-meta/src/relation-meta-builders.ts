@@ -15,6 +15,7 @@ import {
 } from './table-resource-utils';
 import type {
   BelongsToRelation,
+  FieldMeta,
   HasRelation,
   ManyToManyRelation,
   PgAttribute,
@@ -90,6 +91,22 @@ function resolveDirectRelationField(
   return findExecutableField(parentType, candidates);
 }
 
+// The relation's columns on the other table, in the order of its local columns:
+// a belongs-to's referenced columns, a has-one/has-many's foreign key columns.
+function remoteKeyFields(
+  relation: PgRelation,
+  remoteCodec: PgCodec | undefined,
+  context: BuildContext,
+): FieldMeta[] {
+  if (!remoteCodec?.attributes) return [];
+  return buildFieldList(
+    relation.remoteAttributes || [],
+    remoteCodec,
+    remoteCodec.attributes,
+    context,
+  );
+}
+
 export function buildBelongsToRelations(
   codec: PgCodec,
   attributes: Record<string, PgAttribute>,
@@ -132,6 +149,7 @@ export function buildBelongsToRelations(
       isUnique,
       type: executable?.typeName ?? remoteCodec?.name ?? null,
       keys: buildFieldList(localAttributes, codec, attributes, context),
+      refKeys: remoteKeyFields(relation, remoteCodec, context),
       references: {
         name: context.schema
           ? remoteTypeName || 'unknown'
@@ -180,6 +198,7 @@ export function buildReverseRelations(
       isUnique,
       type: executable?.typeName ?? remoteCodec?.name ?? null,
       keys: buildFieldList(relation.localAttributes || [], codec, attributes, context),
+      remoteKeys: remoteKeyFields(relation, remoteCodec, context),
       referencedBy: {
         name: context.schema
           ? remoteTypeName || 'unknown'

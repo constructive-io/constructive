@@ -28,7 +28,6 @@ csdk auth set-token <your-token>
 | `config` | Manage config key-value store (per-context) |
 | `build` | build CRUD operations |
 | `build-step` | buildStep CRUD operations |
-| `builder-binding` | builderBinding CRUD operations |
 | `content-preset` | contentPreset CRUD operations |
 | `database-function-graph` | databaseFunctionGraph CRUD operations |
 | `database-function-graph-execution-cancel-request` | databaseFunctionGraphExecutionCancelRequest CRUD operations |
@@ -72,7 +71,6 @@ csdk auth set-token <your-token>
 | `namespace-event` | namespaceEvent CRUD operations |
 | `platform-build` | platformBuild CRUD operations |
 | `platform-build-step` | platformBuildStep CRUD operations |
-| `platform-builder-binding` | platformBuilderBinding CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
@@ -119,6 +117,7 @@ csdk auth set-token <your-token>
 | `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `platform-service-binding` | platformServiceBinding CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `proposal-comment` | proposalComment CRUD operations |
@@ -147,6 +146,7 @@ csdk auth set-token <your-token>
 | `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `service-binding` | serviceBinding CRUD operations |
 | `webhook-endpoint` | webhookEndpoint CRUD operations |
 | `webhook-event` | webhookEvent CRUD operations |
 | `database-read-function-graph` | databaseReadFunctionGraph |
@@ -157,6 +157,7 @@ csdk auth set-token <your-token>
 | `add-node-and-save` | addNodeAndSave |
 | `approve-node` | approveNode |
 | `copy-graph` | copyGraph |
+| `create-function-graph` | createFunctionGraph |
 | `database-add-edge` | databaseAddEdge |
 | `database-add-edge-and-save` | databaseAddEdgeAndSave |
 | `database-add-node` | databaseAddNode |
@@ -290,6 +291,8 @@ CRUD operations for Build records.
 | `imageRef` | String |
 | `jobId` | BigInt |
 | `logs` | Upload |
+| `logsUrl` | String |
+| `logsVersions` | FileVersion |
 | `matrixKey` | String |
 | `metadata` | JSON |
 | `proposalId` | UUID |
@@ -301,7 +304,7 @@ CRUD operations for Build records.
 | `updatedByPrincipal` | UUID |
 | `workflowId` | UUID |
 
-**Required create fields:** `repositoryId`
+**Required create fields:** `databaseId`, `repositoryId`
 **Optional create fields (backend defaults):** `actorId`, `attempt`, `commitSha`, `conclusion`, `createdByPrincipal`, `eventId`, `finishedAt`, `imageRef`, `jobId`, `logs`, `matrixKey`, `metadata`, `proposalId`, `ref`, `startedAt`, `status`, `updatedByPrincipal`, `workflowId`
 
 ### `build-step`
@@ -338,44 +341,8 @@ CRUD operations for BuildStep records.
 | `status` | String |
 | `summary` | JSON |
 
-**Required create fields:** `buildId`, `name`, `seq`
+**Required create fields:** `buildId`, `databaseId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `builder-binding`
-
-CRUD operations for BuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all builderBinding records |
-| `find-first` | Find first matching builderBinding record |
-| `get` | Get a builderBinding by id |
-| `create` | Create a new builderBinding |
-| `update` | Update an existing builderBinding |
-| `delete` | Delete a builderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `databaseId`, `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `content-preset`
 
@@ -418,7 +385,6 @@ CRUD operations for DatabaseFunctionGraph records.
 | `list` | List all databaseFunctionGraph records |
 | `find-first` | Find first matching databaseFunctionGraph record |
 | `get` | Get a databaseFunctionGraph by id |
-| `create` | Create a new databaseFunctionGraph |
 | `update` | Update an existing databaseFunctionGraph |
 | `delete` | Delete a databaseFunctionGraph |
 
@@ -625,7 +591,6 @@ CRUD operations for DatabaseGraphGetAllTreeNodesRecord records.
 | `list` | List all databaseGraphGetAllTreeNodesRecord records |
 | `find-first` | Find first matching databaseGraphGetAllTreeNodesRecord record |
 | `get` | Get a databaseGraphGetAllTreeNodesRecord by id |
-| `create` | Create a new databaseGraphGetAllTreeNodesRecord |
 | `update` | Update an existing databaseGraphGetAllTreeNodesRecord |
 | `delete` | Delete a databaseGraphGetAllTreeNodesRecord |
 
@@ -1021,7 +986,6 @@ CRUD operations for FunctionGraph records.
 | `list` | List all functionGraph records |
 | `find-first` | Find first matching functionGraph record |
 | `get` | Get a functionGraph by id |
-| `create` | Create a new functionGraph |
 | `update` | Update an existing functionGraph |
 | `delete` | Delete a functionGraph |
 
@@ -1393,7 +1357,6 @@ CRUD operations for GetAllTreeNodesRecord records.
 | `list` | List all getAllTreeNodesRecord records |
 | `find-first` | Find first matching getAllTreeNodesRecord record |
 | `get` | Get a getAllTreeNodesRecord by id |
-| `create` | Create a new getAllTreeNodesRecord |
 | `update` | Update an existing getAllTreeNodesRecord |
 | `delete` | Delete a getAllTreeNodesRecord |
 
@@ -1518,7 +1481,6 @@ CRUD operations for InfraGetAllTreeNodesRecord records.
 | `list` | List all infraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching infraGetAllTreeNodesRecord record |
 | `get` | Get a infraGetAllTreeNodesRecord by id |
-| `create` | Create a new infraGetAllTreeNodesRecord |
 | `update` | Update an existing infraGetAllTreeNodesRecord |
 | `delete` | Delete a infraGetAllTreeNodesRecord |
 
@@ -1634,6 +1596,8 @@ CRUD operations for IntegrationProvider records.
 | `icon` | String |
 | `id` | UUID |
 | `logo` | Image |
+| `logoUrl` | String |
+| `logoVersions` | FileVersion |
 | `name` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -1736,6 +1700,8 @@ CRUD operations for PlatformBuild records.
 | `imageRef` | String |
 | `jobId` | BigInt |
 | `logs` | Upload |
+| `logsUrl` | String |
+| `logsVersions` | FileVersion |
 | `matrixKey` | String |
 | `metadata` | JSON |
 | `proposalId` | UUID |
@@ -1785,41 +1751,6 @@ CRUD operations for PlatformBuildStep records.
 
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `platform-builder-binding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformBuilderBinding records |
-| `find-first` | Find first matching platformBuilderBinding record |
-| `get` | Get a platformBuilderBinding by id |
-| `create` | Create a new platformBuilderBinding |
-| `update` | Update an existing platformBuilderBinding |
-| `delete` | Delete a platformBuilderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-function-api-binding`
 
@@ -2275,7 +2206,6 @@ CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
 | `list` | List all platformInfraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
 | `get` | Get a platformInfraGetAllTreeNodesRecord by id |
-| `create` | Create a new platformInfraGetAllTreeNodesRecord |
 | `update` | Update an existing platformInfraGetAllTreeNodesRecord |
 | `delete` | Delete a platformInfraGetAllTreeNodesRecord |
 
@@ -2511,12 +2441,16 @@ CRUD operations for PlatformProposalComment records.
 |-------|------|
 | `actorId` | UUID |
 | `attachments` | Upload |
+| `attachmentsUrl` | String |
+| `attachmentsVersions` | FileVersion |
 | `body` | String |
 | `bodyTrgmSimilarity` | Float |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
 | `createdByPrincipal` | UUID |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -2538,7 +2472,7 @@ CRUD operations for PlatformProposalComment records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -2546,14 +2480,14 @@ CRUD operations for PlatformProposalComment records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk platform-proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk platform-proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -2565,28 +2499,33 @@ EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment update --embedding "new 
 
 *Fuzzy search via trigram similarity (`trgmBody`):*
 ```bash
-csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select body,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select body,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmPath`):*
 ```bash
-csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
+csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select body,pathTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk platform-proposal-comment list --where.search "search query" --select title,tsvRank
+csdk platform-proposal-comment list --where.search "search query" --select body,searchTsvRank
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk platform-proposal-comment list --where.unifiedSearch "search query" --select body,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,searchTsvRank,searchScore
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk platform-proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-proposal-comment search "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk platform-proposal-comment search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -2619,6 +2558,8 @@ CRUD operations for PlatformProposal records.
 | `decidedAt` | Datetime |
 | `dueAt` | Datetime |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -2657,7 +2598,7 @@ CRUD operations for PlatformProposal records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -2692,6 +2633,11 @@ csdk platform-proposal list --where.trgmBody.value "approximate query" --where.t
 csdk platform-proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-proposal list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmKind`):*
 ```bash
 csdk platform-proposal list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
@@ -2714,7 +2660,7 @@ csdk platform-proposal list --where.trgmResolution.value "approximate query" --w
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk platform-proposal list --where.search "search query" --select title,tsvRank
+csdk platform-proposal list --where.search "search query" --select title,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmSourceRef`):*
@@ -2739,7 +2685,7 @@ csdk platform-proposal list --where.trgmTitle.value "approximate query" --where.
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+csdk platform-proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,searchTsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -2848,40 +2794,40 @@ CRUD operations for PlatformProposalReview records.
 
 **Required create fields:** `commitSha`, `proposalId`, `reviewerId`, `verdict`
 **Optional create fields (backend defaults):** `body`, `createdByPrincipal`, `submittedAt`, `updatedByPrincipal`
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `verdictTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `verdictTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
 
 *Fuzzy search via trigram similarity (`trgmBody`):*
 ```bash
-csdk platform-proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk platform-proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select body,bodyTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmCommitSha`):*
 ```bash
-csdk platform-proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select title,commitShaTrgmSimilarity
+csdk platform-proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select body,commitShaTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk platform-proposal-review list --where.search "search query" --select title,tsvRank
+csdk platform-proposal-review list --where.search "search query" --select body,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmVerdict`):*
 ```bash
-csdk platform-proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select title,verdictTrgmSimilarity
+csdk platform-proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select body,verdictTrgmSimilarity
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-proposal-review list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,commitShaTrgmSimilarity,tsvRank,searchScore,verdictTrgmSimilarity
+csdk platform-proposal-review list --where.unifiedSearch "search query" --select body,bodyTrgmSimilarity,commitShaTrgmSimilarity,searchTsvRank,searchScore,verdictTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk platform-proposal-review list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-proposal-review search "query" --limit 10 --select id,title,searchScore
+csdk platform-proposal-review list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk platform-proposal-review search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -2928,14 +2874,14 @@ CRUD operations for PlatformProposalsChunk records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk platform-proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk platform-proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -2947,8 +2893,8 @@ EMBEDDER_PROVIDER=ollama csdk platform-proposals-chunk update --embedding "new t
 
 *Search with pagination and field projection:*
 ```bash
-csdk platform-proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-proposals-chunk search "query" --limit 10 --select id,title,searchScore
+csdk platform-proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk platform-proposals-chunk search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -3088,6 +3034,8 @@ CRUD operations for PlatformRepository records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `externalId` | String |
@@ -3116,7 +3064,7 @@ CRUD operations for PlatformRepository records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -3124,14 +3072,14 @@ CRUD operations for PlatformRepository records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk platform-repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk platform-repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select name,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk platform-repository search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk platform-repository list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-repository search "semantic query" --auto-embed --select name,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk platform-repository list --where.embedding.vector "semantic query" --auto-embed --select name,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -3143,58 +3091,63 @@ EMBEDDER_PROVIDER=ollama csdk platform-repository update --embedding "new text t
 
 *Fuzzy search via trigram similarity (`trgmCloneUrl`):*
 ```bash
-csdk platform-repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select title,cloneUrlTrgmSimilarity
+csdk platform-repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select name,cloneUrlTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmDefaultBranch`):*
 ```bash
-csdk platform-repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select title,defaultBranchTrgmSimilarity
+csdk platform-repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select name,defaultBranchTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmDescription`):*
 ```bash
-csdk platform-repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
+csdk platform-repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select name,descriptionTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-repository list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select name,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmExternalId`):*
 ```bash
-csdk platform-repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
+csdk platform-repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select name,externalIdTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmName`):*
 ```bash
-csdk platform-repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select title,nameTrgmSimilarity
+csdk platform-repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select name,nameTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmProvider`):*
 ```bash
-csdk platform-repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select title,providerTrgmSimilarity
+csdk platform-repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select name,providerTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk platform-repository list --where.search "search query" --select title,tsvRank
+csdk platform-repository list --where.search "search query" --select name,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmSlug`):*
 ```bash
-csdk platform-repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select title,slugTrgmSimilarity
+csdk platform-repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select name,slugTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmVisibility`):*
 ```bash
-csdk platform-repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select title,visibilityTrgmSimilarity
+csdk platform-repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select name,visibilityTrgmSimilarity
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+csdk platform-repository list --where.unifiedSearch "search query" --select name,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,searchTsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk platform-repository list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk platform-repository search "query" --limit 10 --select id,title,searchScore
+csdk platform-repository list --where.unifiedSearch "query" --limit 10 --select id,name,searchScore
+csdk platform-repository search "query" --limit 10 --select id,name,searchScore
 ```
 
 
@@ -3360,7 +3313,6 @@ CRUD operations for PlatformResourceDeclaredCapacity records.
 | `list` | List all platformResourceDeclaredCapacity records |
 | `find-first` | Find first matching platformResourceDeclaredCapacity record |
 | `get` | Get a platformResourceDeclaredCapacity by id |
-| `create` | Create a new platformResourceDeclaredCapacity |
 | `update` | Update an existing platformResourceDeclaredCapacity |
 | `delete` | Delete a platformResourceDeclaredCapacity |
 
@@ -3499,7 +3451,6 @@ CRUD operations for PlatformResourceObservedStorage records.
 | `list` | List all platformResourceObservedStorage records |
 | `find-first` | Find first matching platformResourceObservedStorage record |
 | `get` | Get a platformResourceObservedStorage by id |
-| `create` | Create a new platformResourceObservedStorage |
 | `update` | Update an existing platformResourceObservedStorage |
 | `delete` | Delete a platformResourceObservedStorage |
 
@@ -3625,7 +3576,6 @@ CRUD operations for PlatformResourceUtilization records.
 | `list` | List all platformResourceUtilization records |
 | `find-first` | Find first matching platformResourceUtilization record |
 | `get` | Get a platformResourceUtilization by id |
-| `create` | Create a new platformResourceUtilization |
 | `update` | Update an existing platformResourceUtilization |
 | `delete` | Delete a platformResourceUtilization |
 
@@ -3664,7 +3614,6 @@ CRUD operations for PlatformResourcesHealth records.
 | `list` | List all platformResourcesHealth records |
 | `find-first` | Find first matching platformResourcesHealth record |
 | `get` | Get a platformResourcesHealth by id |
-| `create` | Create a new platformResourcesHealth |
 | `update` | Update an existing platformResourcesHealth |
 | `delete` | Delete a platformResourcesHealth |
 
@@ -3719,7 +3668,6 @@ CRUD operations for PlatformResourcesRequirementsState records.
 | `list` | List all platformResourcesRequirementsState records |
 | `find-first` | Find first matching platformResourcesRequirementsState record |
 | `get` | Get a platformResourcesRequirementsState by id |
-| `create` | Create a new platformResourcesRequirementsState |
 | `update` | Update an existing platformResourcesRequirementsState |
 | `delete` | Delete a platformResourcesRequirementsState |
 
@@ -3746,7 +3694,6 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `list` | List all platformResourcesResolvedRequirement records |
 | `find-first` | Find first matching platformResourcesResolvedRequirement record |
 | `get` | Get a platformResourcesResolvedRequirement by id |
-| `create` | Create a new platformResourcesResolvedRequirement |
 | `update` | Update an existing platformResourcesResolvedRequirement |
 | `delete` | Delete a platformResourcesResolvedRequirement |
 
@@ -3767,6 +3714,43 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `platform-service-binding`
+
+CRUD operations for PlatformServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformServiceBinding records |
+| `find-first` | Find first matching platformServiceBinding record |
+| `get` | Get a platformServiceBinding by id |
+| `create` | Create a new platformServiceBinding |
+| `update` | Update an existing platformServiceBinding |
+| `delete` | Delete a platformServiceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `installationId`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-webhook-endpoint`
 
@@ -3857,6 +3841,8 @@ CRUD operations for ProposalComment records.
 |-------|------|
 | `actorId` | UUID |
 | `attachments` | Upload |
+| `attachmentsUrl` | String |
+| `attachmentsVersions` | FileVersion |
 | `body` | String |
 | `bodyTrgmSimilarity` | Float |
 | `createdAt` | Datetime |
@@ -3864,6 +3850,8 @@ CRUD operations for ProposalComment records.
 | `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -3880,12 +3868,12 @@ CRUD operations for ProposalComment records.
 | `updatedBy` | UUID |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `body`, `proposalId`
+**Required create fields:** `body`, `databaseId`, `proposalId`
 **Optional create fields (backend defaults):** `actorId`, `attachments`, `createdBy`, `createdByPrincipal`, `embedding`, `line`, `outdatedAt`, `path`, `resolvedAt`, `updatedBy`, `updatedByPrincipal`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -3893,14 +3881,14 @@ CRUD operations for ProposalComment records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk proposal-comment list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk proposal-comment search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposal-comment search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposal-comment list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -3912,28 +3900,33 @@ EMBEDDER_PROVIDER=ollama csdk proposal-comment update --embedding "new text to e
 
 *Fuzzy search via trigram similarity (`trgmBody`):*
 ```bash
-csdk proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select body,bodyTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select body,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmPath`):*
 ```bash
-csdk proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
+csdk proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select body,pathTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk proposal-comment list --where.search "search query" --select title,tsvRank
+csdk proposal-comment list --where.search "search query" --select body,searchTsvRank
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk proposal-comment list --where.unifiedSearch "search query" --select body,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,searchTsvRank,searchScore
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk proposal-comment search "query" --limit 10 --select id,title,searchScore
+csdk proposal-comment list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk proposal-comment search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -3967,6 +3960,8 @@ CRUD operations for Proposal records.
 | `decidedAt` | Datetime |
 | `dueAt` | Datetime |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -4000,12 +3995,12 @@ CRUD operations for Proposal records.
 | `updatedBy` | UUID |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `repositoryId`, `title`
+**Required create fields:** `databaseId`, `repositoryId`, `title`
 **Optional create fields (backend defaults):** `actorId`, `body`, `closedReason`, `createdBy`, `createdByPrincipal`, `decidedAt`, `dueAt`, `embedding`, `kind`, `labels`, `mergeCommit`, `mergeMethod`, `mergeRequestedAt`, `mergedAt`, `metadata`, `parentId`, `priority`, `resolution`, `sourceRef`, `status`, `targetRef`, `updatedBy`, `updatedByPrincipal`
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -4040,6 +4035,11 @@ csdk proposal list --where.trgmBody.value "approximate query" --where.trgmBody.t
 csdk proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk proposal list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmKind`):*
 ```bash
 csdk proposal list --where.trgmKind.value "approximate query" --where.trgmKind.threshold 0.3 --select title,kindTrgmSimilarity
@@ -4062,7 +4062,7 @@ csdk proposal list --where.trgmResolution.value "approximate query" --where.trgm
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk proposal list --where.search "search query" --select title,tsvRank
+csdk proposal list --where.search "search query" --select title,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmSourceRef`):*
@@ -4087,7 +4087,7 @@ csdk proposal list --where.trgmTitle.value "approximate query" --where.trgmTitle
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,searchTsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -4126,7 +4126,7 @@ CRUD operations for ProposalFileView records.
 | `updatedByPrincipal` | UUID |
 | `viewedAt` | Datetime |
 
-**Required create fields:** `blobSha`, `path`, `proposalId`, `reviewerId`
+**Required create fields:** `blobSha`, `databaseId`, `path`, `proposalId`, `reviewerId`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `updatedByPrincipal`, `viewedAt`
 
 ### `proposal-reaction`
@@ -4157,7 +4157,7 @@ CRUD operations for ProposalReaction records.
 | `updatedAt` | Datetime |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `actorId`, `emoji`, `proposalId`
+**Required create fields:** `actorId`, `databaseId`, `emoji`, `proposalId`
 **Optional create fields (backend defaults):** `commentId`, `createdByPrincipal`, `updatedByPrincipal`
 
 ### `proposal-review`
@@ -4197,42 +4197,42 @@ CRUD operations for ProposalReview records.
 | `verdict` | String |
 | `verdictTrgmSimilarity` | Float |
 
-**Required create fields:** `commitSha`, `proposalId`, `reviewerId`, `verdict`
+**Required create fields:** `commitSha`, `databaseId`, `proposalId`, `reviewerId`, `verdict`
 **Optional create fields (backend defaults):** `body`, `createdByPrincipal`, `submittedAt`, `updatedByPrincipal`
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `verdictTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `commitShaTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `verdictTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
 
 *Fuzzy search via trigram similarity (`trgmBody`):*
 ```bash
-csdk proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
+csdk proposal-review list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select body,bodyTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmCommitSha`):*
 ```bash
-csdk proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select title,commitShaTrgmSimilarity
+csdk proposal-review list --where.trgmCommitSha.value "approximate query" --where.trgmCommitSha.threshold 0.3 --select body,commitShaTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk proposal-review list --where.search "search query" --select title,tsvRank
+csdk proposal-review list --where.search "search query" --select body,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmVerdict`):*
 ```bash
-csdk proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select title,verdictTrgmSimilarity
+csdk proposal-review list --where.trgmVerdict.value "approximate query" --where.trgmVerdict.threshold 0.3 --select body,verdictTrgmSimilarity
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk proposal-review list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,commitShaTrgmSimilarity,tsvRank,searchScore,verdictTrgmSimilarity
+csdk proposal-review list --where.unifiedSearch "search query" --select body,bodyTrgmSimilarity,commitShaTrgmSimilarity,searchTsvRank,searchScore,verdictTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk proposal-review list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk proposal-review search "query" --limit 10 --select id,title,searchScore
+csdk proposal-review list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk proposal-review search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -4280,14 +4280,14 @@ CRUD operations for ProposalsChunk records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk proposals-chunk list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select body,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk proposals-chunk search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk search "semantic query" --auto-embed --select body,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk proposals-chunk list --where.embedding.vector "semantic query" --auto-embed --select body,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -4299,8 +4299,8 @@ EMBEDDER_PROVIDER=ollama csdk proposals-chunk update --embedding "new text to em
 
 *Search with pagination and field projection:*
 ```bash
-csdk proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk proposals-chunk search "query" --limit 10 --select id,title,searchScore
+csdk proposals-chunk list --where.unifiedSearch "query" --limit 10 --select id,body,searchScore
+csdk proposals-chunk search "query" --limit 10 --select id,body,searchScore
 ```
 
 
@@ -4444,6 +4444,8 @@ CRUD operations for Repository records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `externalId` | String |
@@ -4472,7 +4474,7 @@ CRUD operations for Repository records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -4480,14 +4482,14 @@ CRUD operations for Repository records.
 *Vector similarity search via `embedding` (manual vector):*
 ```bash
 # Pass a pre-computed vector array via dot-notation
-csdk repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select title,embeddingVectorDistance
+csdk repository list --where.embedding.vector '[0.1,0.2,0.3]' --where.embedding.distance 1.0 --select name,embeddingVectorDistance
 ```
 
 *Vector semantic search via `embedding` with --auto-embed:*
 ```bash
 # --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)
-EMBEDDER_PROVIDER=ollama csdk repository search "semantic query" --auto-embed --select title,embeddingVectorDistance
-EMBEDDER_PROVIDER=ollama csdk repository list --where.embedding.vector "semantic query" --auto-embed --select title,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk repository search "semantic query" --auto-embed --select name,embeddingVectorDistance
+EMBEDDER_PROVIDER=ollama csdk repository list --where.embedding.vector "semantic query" --auto-embed --select name,embeddingVectorDistance
 ```
 
 *Create/update with auto-embedded `embedding` via --auto-embed:*
@@ -4499,58 +4501,63 @@ EMBEDDER_PROVIDER=ollama csdk repository update --embedding "new text to embed" 
 
 *Fuzzy search via trigram similarity (`trgmCloneUrl`):*
 ```bash
-csdk repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select title,cloneUrlTrgmSimilarity
+csdk repository list --where.trgmCloneUrl.value "approximate query" --where.trgmCloneUrl.threshold 0.3 --select name,cloneUrlTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmDefaultBranch`):*
 ```bash
-csdk repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select title,defaultBranchTrgmSimilarity
+csdk repository list --where.trgmDefaultBranch.value "approximate query" --where.trgmDefaultBranch.threshold 0.3 --select name,defaultBranchTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmDescription`):*
 ```bash
-csdk repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
+csdk repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select name,descriptionTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk repository list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select name,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmExternalId`):*
 ```bash
-csdk repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
+csdk repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select name,externalIdTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmName`):*
 ```bash
-csdk repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select title,nameTrgmSimilarity
+csdk repository list --where.trgmName.value "approximate query" --where.trgmName.threshold 0.3 --select name,nameTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmProvider`):*
 ```bash
-csdk repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select title,providerTrgmSimilarity
+csdk repository list --where.trgmProvider.value "approximate query" --where.trgmProvider.threshold 0.3 --select name,providerTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`search`):*
 ```bash
-csdk repository list --where.search "search query" --select title,tsvRank
+csdk repository list --where.search "search query" --select name,searchTsvRank
 ```
 
 *Fuzzy search via trigram similarity (`trgmSlug`):*
 ```bash
-csdk repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select title,slugTrgmSimilarity
+csdk repository list --where.trgmSlug.value "approximate query" --where.trgmSlug.threshold 0.3 --select name,slugTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmVisibility`):*
 ```bash
-csdk repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select title,visibilityTrgmSimilarity
+csdk repository list --where.trgmVisibility.value "approximate query" --where.trgmVisibility.threshold 0.3 --select name,visibilityTrgmSimilarity
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+csdk repository list --where.unifiedSearch "search query" --select name,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,searchTsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk repository list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk repository search "query" --limit 10 --select id,title,searchScore
+csdk repository list --where.unifiedSearch "query" --limit 10 --select id,name,searchScore
+csdk repository search "query" --limit 10 --select id,name,searchScore
 ```
 
 
@@ -4586,7 +4593,7 @@ CRUD operations for RepositoryEvent records.
 | `updatedAt` | Datetime |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `eventType`, `repositoryId`
+**Required create fields:** `databaseId`, `eventType`, `repositoryId`
 **Optional create fields (backend defaults):** `actorId`, `commitSha`, `createdByPrincipal`, `deliveryId`, `metadata`, `payload`, `ref`, `updatedByPrincipal`
 
 ### `repository-required-check`
@@ -4652,7 +4659,7 @@ CRUD operations for RepositoryWorkflow records.
 | `updatedBy` | UUID |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `eventType`, `name`, `repositoryId`, `slug`
+**Required create fields:** `databaseId`, `eventType`, `name`, `repositoryId`, `slug`
 **Optional create fields (backend defaults):** `cancelInProgress`, `concurrencyKey`, `createdBy`, `createdByPrincipal`, `graphId`, `inputs`, `isEnabled`, `refPattern`, `requiredSecrets`, `updatedBy`, `updatedByPrincipal`
 
 ### `resource`
@@ -4720,7 +4727,6 @@ CRUD operations for ResourceDeclaredCapacity records.
 | `list` | List all resourceDeclaredCapacity records |
 | `find-first` | Find first matching resourceDeclaredCapacity record |
 | `get` | Get a resourceDeclaredCapacity by id |
-| `create` | Create a new resourceDeclaredCapacity |
 | `update` | Update an existing resourceDeclaredCapacity |
 | `delete` | Delete a resourceDeclaredCapacity |
 
@@ -4862,7 +4868,6 @@ CRUD operations for ResourceObservedStorage records.
 | `list` | List all resourceObservedStorage records |
 | `find-first` | Find first matching resourceObservedStorage record |
 | `get` | Get a resourceObservedStorage by id |
-| `create` | Create a new resourceObservedStorage |
 | `update` | Update an existing resourceObservedStorage |
 | `delete` | Delete a resourceObservedStorage |
 
@@ -4991,7 +4996,6 @@ CRUD operations for ResourceUtilization records.
 | `list` | List all resourceUtilization records |
 | `find-first` | Find first matching resourceUtilization record |
 | `get` | Get a resourceUtilization by id |
-| `create` | Create a new resourceUtilization |
 | `update` | Update an existing resourceUtilization |
 | `delete` | Delete a resourceUtilization |
 
@@ -5030,7 +5034,6 @@ CRUD operations for ResourcesHealth records.
 | `list` | List all resourcesHealth records |
 | `find-first` | Find first matching resourcesHealth record |
 | `get` | Get a resourcesHealth by id |
-| `create` | Create a new resourcesHealth |
 | `update` | Update an existing resourcesHealth |
 | `delete` | Delete a resourcesHealth |
 
@@ -5086,7 +5089,6 @@ CRUD operations for ResourcesRequirementsState records.
 | `list` | List all resourcesRequirementsState records |
 | `find-first` | Find first matching resourcesRequirementsState record |
 | `get` | Get a resourcesRequirementsState by id |
-| `create` | Create a new resourcesRequirementsState |
 | `update` | Update an existing resourcesRequirementsState |
 | `delete` | Delete a resourcesRequirementsState |
 
@@ -5113,7 +5115,6 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `list` | List all resourcesResolvedRequirement records |
 | `find-first` | Find first matching resourcesResolvedRequirement record |
 | `get` | Get a resourcesResolvedRequirement by id |
-| `create` | Create a new resourcesResolvedRequirement |
 | `update` | Update an existing resourcesResolvedRequirement |
 | `delete` | Delete a resourcesResolvedRequirement |
 
@@ -5134,6 +5135,44 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `service-binding`
+
+CRUD operations for ServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all serviceBinding records |
+| `find-first` | Find first matching serviceBinding record |
+| `get` | Get a serviceBinding by id |
+| `create` | Create a new serviceBinding |
+| `update` | Update an existing serviceBinding |
+| `delete` | Delete a serviceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `installationId`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `webhook-endpoint`
 
@@ -5328,6 +5367,23 @@ copyGraph
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.graphId` | UUID |
+  | `--input.name` | String |
+  | `--input.scopeId` | UUID |
+
+### `create-function-graph`
+
+createFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+  | `--input.description` | String |
   | `--input.name` | String |
   | `--input.scopeId` | UUID |
 

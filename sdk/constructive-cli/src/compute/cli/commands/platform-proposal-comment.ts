@@ -18,12 +18,16 @@ import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   actorId: 'uuid',
   attachments: 'string',
+  attachmentsUrl: 'string',
+  attachmentsVersions: 'string',
   body: 'string',
   bodyTrgmSimilarity: 'float',
   createdAt: 'string',
   createdBy: 'uuid',
   createdByPrincipal: 'uuid',
   embedding: 'string',
+  embeddingModel: 'string',
+  embeddingModelTrgmSimilarity: 'float',
   embeddingUpdatedAt: 'string',
   embeddingVectorDistance: 'float',
   id: 'uuid',
@@ -193,6 +197,10 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
         vector: query,
       },
       trgmBody: {
+        value: query,
+        threshold: 0.3,
+      },
+      trgmEmbeddingModel: {
         value: query,
         threshold: 0.3,
       },

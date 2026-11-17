@@ -12,8 +12,8 @@ csdk agent-event list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-event list --limit 10 --after <cursor>
 csdk agent-event find-first --where.<field>.<op> <value>
 csdk agent-event get --id <UUID>
-csdk agent-event create --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> [--transcriptFormat <String>]
-csdk agent-event update --id <UUID> [--entry <JSON>] [--recordedAt <Datetime>] [--runId <UUID>] [--seq <Int>] [--transcriptFormat <String>] [--transcriptVersion <Int>]
+csdk agent-event create --actorId <UUID> --databaseId <UUID> --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> --visibility <String> [--transcriptFormat <String>]
+csdk agent-event update --id <UUID> [--actorId <UUID>] [--databaseId <UUID>] [--entry <JSON>] [--recordedAt <Datetime>] [--runId <UUID>] [--seq <Int>] [--transcriptFormat <String>] [--transcriptVersion <Int>] [--visibility <String>]
 csdk agent-event delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-event list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentEvent
 
 ```bash
-csdk agent-event create --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> [--transcriptFormat <String>]
+csdk agent-event create --actorId <UUID> --databaseId <UUID> --entry <JSON> --recordedAt <Datetime> --runId <UUID> --seq <Int> --transcriptVersion <Int> --visibility <String> [--transcriptFormat <String>]
 ```
 
 ### Get a agentEvent by id

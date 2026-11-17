@@ -553,9 +553,13 @@ export type InferSelectResult<TEntity, TSelect> = TSelect extends undefined
           ? K extends keyof TEntity
             ? NonNullable<TEntity[K]> extends ConnectionResult<infer NodeType>
               ? ConnectionResult<InferSelectResult<NodeType, NestedSelect>>
-              :
-                  | InferSelectResult<NonNullable<TEntity[K]>, NestedSelect>
-                  | (null extends TEntity[K] ? null : never)
+              : NonNullable<TEntity[K]> extends readonly (infer Item)[]
+                ?
+                    | InferSelectResult<NonNullable<Item>, NestedSelect>[]
+                    | (null extends TEntity[K] ? null : never)
+                :
+                    | InferSelectResult<NonNullable<TEntity[K]>, NestedSelect>
+                    | (null extends TEntity[K] ? null : never)
             : never
           : K extends keyof TEntity
             ? TEntity[K]

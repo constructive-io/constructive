@@ -24,3 +24,15 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON upload_columns.products TO administrator
 GRANT USAGE, SELECT ON SEQUENCE upload_columns.products_id_seq TO administrator, authenticated, anonymous;
 
 INSERT INTO upload_columns.products (title) VALUES ('kettle');
+
+-- A column holding a list of images: each element is its own document.
+CREATE TABLE upload_columns.albums (
+  id serial PRIMARY KEY,
+  shots public.image[]
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON upload_columns.albums TO administrator, authenticated, anonymous;
+GRANT USAGE, SELECT ON SEQUENCE upload_columns.albums_id_seq TO administrator, authenticated, anonymous;
+
+-- A column holding a list of uploads.
+ALTER TABLE upload_columns.albums ADD COLUMN papers public.upload[];

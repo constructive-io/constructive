@@ -112,7 +112,6 @@ CRUD operations for AppInternalSecret records.
 | `list` | List all appInternalSecret records |
 | `find-first` | Find first matching appInternalSecret record |
 | `get` | Get a appInternalSecret by id |
-| `create` | Create a new appInternalSecret |
 | `update` | Update an existing appInternalSecret |
 | `delete` | Delete a appInternalSecret |
 
@@ -211,7 +210,6 @@ CRUD operations for InternalSecret records.
 | `list` | List all internalSecret records |
 | `find-first` | Find first matching internalSecret record |
 | `get` | Get a internalSecret by id |
-| `create` | Create a new internalSecret |
 | `update` | Update an existing internalSecret |
 | `delete` | Delete a internalSecret |
 
@@ -309,7 +307,6 @@ CRUD operations for PlatformInternalSecret records.
 | `list` | List all platformInternalSecret records |
 | `find-first` | Find first matching platformInternalSecret record |
 | `get` | Get a platformInternalSecret by id |
-| `create` | Create a new platformInternalSecret |
 | `update` | Update an existing platformInternalSecret |
 | `delete` | Delete a platformInternalSecret |
 
@@ -339,7 +336,6 @@ CRUD operations for PlatformSecret records.
 | `list` | List all platformSecret records |
 | `find-first` | Find first matching platformSecret record |
 | `get` | Get a platformSecret by id |
-| `create` | Create a new platformSecret |
 | `update` | Update an existing platformSecret |
 | `delete` | Delete a platformSecret |
 
@@ -371,7 +367,6 @@ CRUD operations for Secret records.
 | `list` | List all secret records |
 | `find-first` | Find first matching secret record |
 | `get` | Get a secret by id |
-| `create` | Create a new secret |
 | `update` | Update an existing secret |
 | `delete` | Delete a secret |
 

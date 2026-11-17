@@ -55,6 +55,27 @@ function underlyingCodec(codec: PgCodec | null | undefined): PgCodec | null {
   return current;
 }
 
+/**
+ * Whether a tree path column serves dot-separated paths ('a.b'), asked of the
+ * column's own codec. The codec decides the served form: the tree path
+ * support in the Constructive preset rewrites the plain ltree codec to serve
+ * '/a/b', while a list or domain codec keeps the conversion of the codec it
+ * was built from (still 'a.b'). A codec with no conversion serves the stored
+ * text, which is dotted. Null when the codec serves neither form.
+ */
+function servesDotPath(codec: PgCodec): boolean | null {
+  const fromPg = (codec as { fromPg?: (value: string) => unknown }).fromPg;
+  if (typeof fromPg !== 'function') return true;
+  try {
+    const served = fromPg(codec.arrayOfCodec ? '{a.b}' : 'a.b');
+    const path = Array.isArray(served) ? served[0] : served;
+    if (path === 'a.b') return true;
+    return path === '/a/b' ? false : null;
+  } catch {
+    return null;
+  }
+}
+
 /** True when a codec is a composite/record type (has named attributes). */
 function isCompositeCodec(codec: PgCodec | null): boolean {
   return !!codec?.attributes && Object.keys(codec.attributes).length > 0;
@@ -94,7 +115,7 @@ export function buildScalarEncoding(
           typeof ext?.vectorDimensions === 'number' ? ext.vectorDimensions : null
     };
   case 'ltree':
-    return { kind, dotPath: true };
+    return { kind, dotPath: servesDotPath(attr.codec) };
   default:
     return { kind };
   }

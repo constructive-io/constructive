@@ -558,13 +558,6 @@ export interface DeleteCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateGetAllTreeNodesRecordInput {
-  clientMutationId?: string;
-  getAllTreeNodesRecord: {
-    data?: Record<string, unknown>;
-    path?: string[];
-  };
-}
 export interface GetAllTreeNodesRecordPatch {
   data?: Record<string, unknown> | null;
   path?: string[] | null;

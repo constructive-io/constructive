@@ -1,22 +1,22 @@
 {
   "ACCOUNT_DISABLED": {
-    "count": 13,
+    "count": 17,
     "dynamic": false,
     "sample": "ACCOUNT_DISABLED",
     "n_source": 1,
-    "n_generated": 7,
+    "n_generated": 9,
     "class": "public"
   },
   "ACCOUNT_EXISTS": {
     "count": 26,
     "dynamic": false,
     "sample": "ACCOUNT_EXISTS",
-    "n_source": 5,
-    "n_generated": 8,
+    "n_source": 6,
+    "n_generated": 7,
     "class": "public"
   },
   "ACCOUNT_LOCKED_EXCEED_ATTEMPTS": {
-    "count": 25,
+    "count": 31,
     "dynamic": false,
     "sample": "ACCOUNT_LOCKED_EXCEED_ATTEMPTS",
     "n_source": 3,
@@ -62,11 +62,11 @@
     "n_generated": 2
   },
   "API_KEYS_DISABLED": {
-    "count": 4,
+    "count": 8,
     "dynamic": false,
     "sample": "API_KEYS_DISABLED",
-    "n_source": 0,
-    "n_generated": 3,
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "API_KEY_LIMIT_REACHED": {
@@ -85,19 +85,27 @@
     "n_generated": 3,
     "class": "public"
   },
+  "API_PRIVATE_SCHEMA_FORBIDDEN": {
+    "count": 12,
+    "dynamic": false,
+    "sample": "API_PRIVATE_SCHEMA_FORBIDDEN",
+    "n_source": 0,
+    "n_generated": 9,
+    "class": "public"
+  },
   "API_PRIVILEGED_PUBLISH_FORBIDDEN": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "API_PRIVILEGED_PUBLISH_FORBIDDEN: only a platform administrator may publish an API served as a role other than anonymous or authenticated",
-    "n_source": 0,
-    "n_generated": 3
+    "n_source": 1,
+    "n_generated": 4
   },
   "API_PRIVILEGED_ROLE_FORBIDDEN": {
-    "count": 4,
+    "count": 12,
     "dynamic": false,
     "sample": "API_PRIVILEGED_ROLE_FORBIDDEN: only a platform administrator may serve an API as a role other than anonymous or authenticated",
-    "n_source": 0,
-    "n_generated": 3
+    "n_source": 1,
+    "n_generated": 6
   },
   "API_SURFACE_MODULE_REQUIRED": {
     "count": 2,
@@ -153,6 +161,14 @@
     "sample": "ASSIGN_PROFILES_CAPABILITY_REQUIRED",
     "n_source": 2,
     "n_generated": 4
+  },
+  "AST_ACTION_DIRECT_INSERT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "AST_ACTION_DIRECT_INSERT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
   },
   "AST_OPTIONS_NOT_OBJECT": {
     "count": 2,
@@ -290,7 +306,7 @@
     "class": "public"
   },
   "BAD_EXPRESSION": {
-    "count": 575,
+    "count": 579,
     "dynamic": true,
     "sample": "BAD_EXPRESSION % (unrecognized format)",
     "n_source": 2,
@@ -473,6 +489,14 @@
     "n_generated": 2,
     "class": "internal"
   },
+  "BILLING_CONNECTION_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_CONNECTION_INVALID",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
+  },
   "BILLING_DISABLED": {
     "count": 2,
     "dynamic": false,
@@ -482,7 +506,7 @@
     "class": "public"
   },
   "BILLING_DISPUTE_BALANCE_NOT_FOUND": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "BILLING_DISPUTE_BALANCE_NOT_FOUND",
     "n_source": 1,
@@ -577,12 +601,44 @@
     "n_generated": 3,
     "class": "internal"
   },
-  "BILLING_QUOTA_EXCEEDED": {
+  "BILLING_PLANS_NOT_PROVISIONED": {
     "count": 4,
     "dynamic": false,
-    "sample": "BILLING_QUOTA_EXCEEDED",
+    "sample": "BILLING_PLANS_NOT_PROVISIONED",
     "n_source": 1,
     "n_generated": 1,
+    "class": "public"
+  },
+  "BILLING_PLAN_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_PLAN_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "BILLING_PLAN_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_PLAN_REQUIRED",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "public"
+  },
+  "BILLING_PRICE_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "BILLING_PRICE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "BILLING_QUOTA_EXCEEDED": {
+    "count": 11,
+    "dynamic": false,
+    "sample": "BILLING_QUOTA_EXCEEDED",
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "BILLING_RECONCILE_BOUNDS_REQUIRED": {
@@ -666,7 +722,7 @@
     "class": "internal"
   },
   "BOOTSTRAP_OWNER_NOT_ACTIVE": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "BOOTSTRAP_OWNER_NOT_ACTIVE",
     "n_source": 1,
@@ -925,6 +981,22 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "CONSTRUCT_BLUEPRINT_CONSTRUCTION_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "CONSTRUCT_BLUEPRINT_CONSTRUCTION_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
+  "CONSTRUCT_BLUEPRINT_CONSTRUCTION_NOT_PENDING": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "CONSTRUCT_BLUEPRINT_CONSTRUCTION_NOT_PENDING",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "CONSTRUCT_BLUEPRINT_ENTITY_MEMBERSHIP_NOT_FOUND": {
     "count": 2,
     "dynamic": false,
@@ -998,10 +1070,10 @@
     "class": "internal"
   },
   "CONSTRUCT_BLUEPRINT_NOT_FOUND": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "CONSTRUCT_BLUEPRINT_NOT_FOUND",
-    "n_source": 1,
+    "n_source": 2,
     "n_generated": 1,
     "class": "internal"
   },
@@ -1118,10 +1190,10 @@
     "class": "public"
   },
   "COPY_TEMPLATE_TO_BLUEPRINT": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "COPY_TEMPLATE_TO_BLUEPRINT",
-    "n_source": 1,
+    "n_source": 2,
     "n_generated": 1,
     "class": "internal"
   },
@@ -1219,10 +1291,18 @@
     "class": "public"
   },
   "DATABASE_NOT_FOUND": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "DATABASE_NOT_FOUND",
-    "n_source": 2,
+    "n_source": 3,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATABASE_SCOPE_CASCADE_PRIVATE_SCHEMA_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATABASE_SCOPE_CASCADE_PRIVATE_SCHEMA_NOT_FOUND",
+    "n_source": 1,
     "n_generated": 1,
     "class": "public"
   },
@@ -1666,7 +1746,7 @@
     "class": "public"
   },
   "DATA_JOB_TRIGGER": {
-    "count": 10,
+    "count": 12,
     "dynamic": true,
     "sample": "DATA_JOB_TRIGGER: invocations_schema and invocations_table are required when record_invocation is true",
     "n_source": 1,
@@ -1776,6 +1856,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "DATA_JOB_TRIGGER_JOB_KEY_FIELD_NOT_FOUND": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_JOB_TRIGGER_JOB_KEY_FIELD_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "DATA_JOB_TRIGGER_QUEUE_KEY_FIELD_NOT_FOUND": {
     "count": 2,
     "dynamic": false,
@@ -1804,6 +1892,22 @@
     "count": 2,
     "dynamic": false,
     "sample": "DATA_JOB_TRIGGER_UNKNOWN_EVENT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_JOB_TRIGGER_UPDATE_CONDITIONS_CONDITION_FIELD_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_JOB_TRIGGER_UPDATE_CONDITIONS_CONDITION_FIELD_CONFLICT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "DATA_JOB_TRIGGER_UPDATE_CONDITIONS_WATCH_FIELDS_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DATA_JOB_TRIGGER_UPDATE_CONDITIONS_WATCH_FIELDS_CONFLICT",
     "n_source": 1,
     "n_generated": 1,
     "class": "public"
@@ -2239,6 +2343,14 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "DEADLINE_EXCEEDS_RETENTION": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "DEADLINE_EXCEEDS_RETENTION",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "DECLARED_GRANT_DRIFT": {
     "count": 2,
     "dynamic": false,
@@ -2264,11 +2376,11 @@
     "class": "public"
   },
   "DOMAIN_ALREADY_CLAIMED": {
-    "count": 6,
+    "count": 15,
     "dynamic": false,
     "sample": "DOMAIN_ALREADY_CLAIMED",
-    "n_source": 1,
-    "n_generated": 5,
+    "n_source": 3,
+    "n_generated": 7,
     "class": "public"
   },
   "DOMAIN_CHECK_CERT_NOT_ISSUING": {
@@ -2329,6 +2441,14 @@
     "n_source": 0,
     "n_generated": 6
   },
+  "DOMAIN_LIFECYCLE_FIELD_FORBIDDEN": {
+    "count": 106,
+    "dynamic": false,
+    "sample": "DOMAIN_LIFECYCLE_FIELD_FORBIDDEN",
+    "n_source": 1,
+    "n_generated": 9,
+    "class": "public"
+  },
   "DOMAIN_RENEW_NOT_ACTIVE": {
     "count": 6,
     "dynamic": true,
@@ -2351,11 +2471,11 @@
     "n_generated": 6
   },
   "DOMAIN_ROOT_NOT_PUBLISHED": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "DOMAIN_ROOT_NOT_PUBLISHED",
-    "n_source": 0,
-    "n_generated": 4
+    "n_source": 1,
+    "n_generated": 5
   },
   "DOMAIN_VERIFY_BAD_METHOD": {
     "count": 6,
@@ -2363,6 +2483,14 @@
     "sample": "DOMAIN_VERIFY_BAD_METHOD: unsupported verification method %",
     "n_source": 0,
     "n_generated": 6
+  },
+  "DOMAIN_VERIFY_CLAIM_SUPERSEDED": {
+    "count": 17,
+    "dynamic": true,
+    "sample": "DOMAIN_VERIFY_CLAIM_SUPERSEDED: ...",
+    "n_source": 1,
+    "n_generated": 8,
+    "class": "public"
   },
   "DOMAIN_VERIFY_NO_CHALLENGE": {
     "count": 6,
@@ -2380,11 +2508,19 @@
     "class": "internal"
   },
   "EMAIL_NOT_VERIFIED": {
-    "count": 6,
+    "count": 10,
     "dynamic": false,
     "sample": "EMAIL_NOT_VERIFIED",
+    "n_source": 2,
+    "n_generated": 5,
+    "class": "public"
+  },
+  "EMBEDDING_CHUNKS_DATABASE_MISMATCH": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "EMBEDDING_CHUNKS_DATABASE_MISMATCH",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 1,
     "class": "public"
   },
   "ENTITY_CLAIM_REQUIRED": {
@@ -2683,6 +2819,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "EXECUTION_DEADLINE_EXCEEDS_RETENTION": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "EXECUTION_DEADLINE_EXCEEDS_RETENTION",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "EXECUTION_LOG_ENTITY_REQUIRED": {
     "count": 2,
     "dynamic": false,
@@ -2698,7 +2842,7 @@
     "n_generated": 1
   },
   "EXECUTION_NOT_FOUND": {
-    "count": 10,
+    "count": 12,
     "dynamic": false,
     "sample": "EXECUTION_NOT_FOUND",
     "n_source": 1,
@@ -2742,6 +2886,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "FILE_BUCKET_NOT_FOUND": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "FILE_BUCKET_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
   "FILE_FIELD_PAYLOAD": {
     "count": 2,
     "dynamic": false,
@@ -2749,6 +2901,30 @@
     "n_source": 1,
     "n_generated": 1,
     "class": "internal"
+  },
+  "FILE_MIME_NOT_ALLOWED": {
+    "count": 5,
+    "dynamic": false,
+    "sample": "FILE_MIME_NOT_ALLOWED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "FILE_NOT_FOUND": {
+    "count": 11,
+    "dynamic": false,
+    "sample": "FILE_NOT_FOUND",
+    "n_source": 5,
+    "n_generated": 2,
+    "class": "internal"
+  },
+  "FILE_REF_BUCKET_MISMATCH": {
+    "count": 25,
+    "dynamic": false,
+    "sample": "FILE_REF_BUCKET_MISMATCH",
+    "n_source": 1,
+    "n_generated": 13,
+    "class": "public"
   },
   "FILE_REF_FIELD": {
     "count": 4,
@@ -2758,12 +2934,60 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "FILE_REF_FIELD_UNREGISTERED": {
+    "count": 27,
+    "dynamic": false,
+    "sample": "FILE_REF_FIELD_UNREGISTERED",
+    "n_source": 1,
+    "n_generated": 14,
+    "class": "internal"
+  },
+  "FILE_REF_FILE_NOT_FOUND": {
+    "count": 25,
+    "dynamic": false,
+    "sample": "FILE_REF_FILE_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 13,
+    "class": "public"
+  },
+  "FILE_REF_FILE_NOT_LIVE": {
+    "count": 25,
+    "dynamic": false,
+    "sample": "FILE_REF_FILE_NOT_LIVE",
+    "n_source": 1,
+    "n_generated": 13,
+    "class": "public"
+  },
+  "FILE_REF_ID_INVALID": {
+    "count": 25,
+    "dynamic": false,
+    "sample": "FILE_REF_ID_INVALID",
+    "n_source": 1,
+    "n_generated": 13,
+    "class": "public"
+  },
+  "FILE_SIZE_EXCEEDED": {
+    "count": 5,
+    "dynamic": false,
+    "sample": "FILE_SIZE_EXCEEDED",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "public"
+  },
+  "FILE_STATUS_INVALID": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "FILE_STATUS_INVALID",
+    "n_source": 3,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "FORBIDDEN": {
-    "count": 92,
+    "count": 122,
     "dynamic": false,
     "sample": "FORBIDDEN",
-    "n_source": 6,
-    "n_generated": 44,
+    "n_source": 7,
+    "n_generated": 57,
     "class": "public"
   },
   "FOREIGN_KEY_CONSTRAINT_NOT_FOUND": {
@@ -2902,6 +3126,14 @@
     "dynamic": false,
     "sample": "GENERATED_FIELD_TYPE_IMMUTABLE",
     "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "GENERATOR_DIRECT_CALL": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "GENERATOR_DIRECT_CALL",
+    "n_source": 3,
     "n_generated": 1,
     "class": "public"
   },
@@ -3322,11 +3554,11 @@
     "n_generated": 1
   },
   "HOSTNAME_CLAIMED_IN_OTHER_PLANE": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "HOSTNAME_CLAIMED_IN_OTHER_PLANE",
-    "n_source": 0,
-    "n_generated": 4,
+    "n_source": 1,
+    "n_generated": 5,
     "class": "public"
   },
   "IDENTIFIER_CLAIM_LIMIT": {
@@ -3354,7 +3586,7 @@
     "class": "public"
   },
   "IDENTIFIER_VERIFIED_ELSEWHERE": {
-    "count": 44,
+    "count": 46,
     "dynamic": false,
     "sample": "IDENTIFIER_VERIFIED_ELSEWHERE",
     "n_source": 1,
@@ -3512,10 +3744,10 @@
     "class": "public"
   },
   "INTERNAL_ERROR": {
-    "count": 466,
+    "count": 502,
     "dynamic": false,
     "sample": "INTERNAL_ERROR",
-    "n_source": 98,
+    "n_source": 107,
     "n_generated": 4,
     "class": "internal"
   },
@@ -3543,7 +3775,7 @@
     "n_generated": 1
   },
   "INVALID_CODE": {
-    "count": 4,
+    "count": 2,
     "dynamic": false,
     "sample": "INVALID_CODE",
     "n_source": 1,
@@ -3789,7 +4021,7 @@
   "INVOCATION_USAGE": {
     "count": 2,
     "dynamic": false,
-    "sample": "INVOCATION_USAGE: billing_schema and record_usage_fn are required \u2014 the generator must only build this trigger when billing is provisioned",
+    "sample": "INVOCATION_USAGE: billing_schema, record_usage_fn, meters_schema and meters_table are required \u2014 the generator must only build this trigger when billing is provisioned",
     "n_source": 1,
     "n_generated": 1
   },
@@ -3816,6 +4048,30 @@
     "n_source": 0,
     "n_generated": 4,
     "class": "internal"
+  },
+  "JOB_SUBJECT_NOT_FOUND": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "JOB_SUBJECT_NOT_FOUND",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "JOB_TRIGGER_ELEMENT_FIELD_INVALID": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "JOB_TRIGGER_ELEMENT_FIELD_INVALID",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "JOB_TRIGGER_GATE_FUNCTION_INVALID": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "JOB_TRIGGER_GATE_FUNCTION_INVALID",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
   },
   "JSONB_PATH_FIELD": {
     "count": 8,
@@ -4288,11 +4544,11 @@
     "class": "public"
   },
   "MACHINE_ENROLLMENT_FIELDS_FORBIDDEN": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "MACHINE_ENROLLMENT_FIELDS_FORBIDDEN: a machine may not change its own enrollment",
-    "n_source": 0,
-    "n_generated": 2
+    "n_source": 1,
+    "n_generated": 3
   },
   "MAGIC_LINK_SIGN_IN_DISABLED": {
     "count": 4,
@@ -4311,11 +4567,11 @@
     "class": "public"
   },
   "MANAGED_DOMAIN_PUBLISH_FORBIDDEN": {
-    "count": 12,
+    "count": 14,
     "dynamic": false,
     "sample": "MANAGED_DOMAIN_PUBLISH_FORBIDDEN: not authorized to modify column(s): allow_public_usage",
-    "n_source": 0,
-    "n_generated": 7
+    "n_source": 1,
+    "n_generated": 8
   },
   "MEMBERSHIP_NOT_FOUND": {
     "count": 12,
@@ -4362,6 +4618,14 @@
     "sample": "METER_RATE_LIMIT: unknown event %, expected INSERT or UPDATE",
     "n_source": 1,
     "n_generated": 1
+  },
+  "METER_SOURCE_UNSUPPORTED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "METER_SOURCE_UNSUPPORTED",
+    "n_source": 0,
+    "n_generated": 2,
+    "class": "internal"
   },
   "MFA_CHALLENGE_EXPIRED": {
     "count": 8,
@@ -4480,6 +4744,45 @@
     "sample": "MONOTONIC_FIELD",
     "n_source": 0,
     "n_generated": 4
+  },
+  "NAMESPACE_STATUS_NOT_SET": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "NAMESPACE_STATUS_NOT_SET",
+    "n_source": 1,
+    "n_generated": 1
+  },
+  "NATIVE_CODE_CHALLENGE_INVALID": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "NATIVE_CODE_CHALLENGE_INVALID",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "NATIVE_HANDOFF_CREDENTIAL_INVALID": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "NATIVE_HANDOFF_CREDENTIAL_INVALID",
+    "n_source": 1,
+    "n_generated": 3,
+    "class": "internal"
+  },
+  "NATIVE_HANDOFF_INCOMPLETE": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "NATIVE_HANDOFF_INCOMPLETE",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "NATIVE_REDIRECT_URI_NOT_ALLOWED": {
+    "count": 6,
+    "dynamic": false,
+    "sample": "NATIVE_REDIRECT_URI_NOT_ALLOWED",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
   },
   "NODE_NOT_AWAITING_HUMAN": {
     "count": 2,
@@ -4702,6 +5005,14 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "PLATFORM_RESERVED_SUBDOMAINS_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PLATFORM_RESERVED_SUBDOMAINS_REQUIRED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "POLICY_COLUMN_REF_UNRESOLVED": {
     "count": 2,
     "dynamic": false,
@@ -4813,58 +5124,58 @@
     "class": "public"
   },
   "PRINCIPAL_CHILD_TTL_EXCEEDS_PARENT": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "PRINCIPAL_CHILD_TTL_EXCEEDS_PARENT",
-    "n_source": 1,
-    "n_generated": 3,
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_CHILD_WIDENS": {
-    "count": 22,
+    "count": 26,
     "dynamic": false,
     "sample": "PRINCIPAL_CHILD_WIDENS",
-    "n_source": 1,
-    "n_generated": 3,
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_DELEGATION_DISABLED": {
-    "count": 5,
+    "count": 7,
     "dynamic": false,
     "sample": "PRINCIPAL_DELEGATION_DISABLED",
     "n_source": 2,
-    "n_generated": 3,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_DEPTH_EXCEEDED": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "PRINCIPAL_DEPTH_EXCEEDED",
-    "n_source": 1,
-    "n_generated": 3,
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "PRINCIPAL_EXPIRED": {
-    "count": 6,
+    "count": 10,
     "dynamic": false,
     "sample": "PRINCIPAL_EXPIRED",
-    "n_source": 0,
-    "n_generated": 4,
+    "n_source": 2,
+    "n_generated": 5,
     "class": "public"
   },
   "PRINCIPAL_NOT_DESCENDANT": {
-    "count": 6,
+    "count": 12,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_DESCENDANT",
-    "n_source": 0,
-    "n_generated": 4,
+    "n_source": 3,
+    "n_generated": 5,
     "class": "public"
   },
   "PRINCIPAL_NOT_FOUND": {
-    "count": 32,
+    "count": 36,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_FOUND",
-    "n_source": 7,
+    "n_source": 9,
     "n_generated": 11,
     "class": "public"
   },
@@ -4877,10 +5188,10 @@
     "class": "public"
   },
   "PRINCIPAL_NOT_OWNED": {
-    "count": 6,
+    "count": 8,
     "dynamic": false,
     "sample": "PRINCIPAL_NOT_OWNED",
-    "n_source": 1,
+    "n_source": 2,
     "n_generated": 4,
     "class": "public"
   },
@@ -4922,6 +5233,134 @@
     "sample": "PRINCIPAL_REQUIRED",
     "n_source": 0,
     "n_generated": 2,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_INSERT_ON_FILES_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_INSERT_ON_FILES_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_INVOCATION_LEDGER_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_INVOCATION_LEDGER_REQUIRED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_REQUIRES_FILES_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_REQUIRES_FILES_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_RESULT_FIELD_COLLIDES": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_RESULT_FIELD_COLLIDES",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_TASK_IDENTIFIER_REQUIRED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_TASK_IDENTIFIER_REQUIRED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_TASK_NOT_REGISTERED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_TASK_NOT_REGISTERED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_WRITER_CONFLICT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_WRITER_CONFLICT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_CUSTOM_WRITER_NAME_TOO_LONG": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_CUSTOM_WRITER_NAME_TOO_LONG",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_EXTRACTION_ARRAY_TEXT_FIELD_NOT_JSONB": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_EXTRACTION_ARRAY_TEXT_FIELD_NOT_JSONB",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_EXTRACTION_INSERT_ON_FILES_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_EXTRACTION_INSERT_ON_FILES_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_FILE_EMBEDDING_EXTRACTION_BUCKET_UNSUPPORTED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_FILE_EMBEDDING_EXTRACTION_BUCKET_UNSUPPORTED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_FILE_EMBEDDING_INSERT_ON_FILES_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_FILE_EMBEDDING_INSERT_ON_FILES_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_IMAGE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_IMAGE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_IMAGE_EMBEDDING_EXTRACTION_UNSUPPORTED": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_IMAGE_EMBEDDING_EXTRACTION_UNSUPPORTED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "PROCESS_IMAGE_VERSIONS_INSERT_ON_FILES_TABLE": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "PROCESS_IMAGE_VERSIONS_INSERT_ON_FILES_TABLE",
+    "n_source": 1,
+    "n_generated": 1,
     "class": "public"
   },
   "PROFILE_ASSIGNMENT_REQUIRES_EMAIL_INVITE": {
@@ -5002,7 +5441,7 @@
     "class": "public"
   },
   "PROVISION_RELATION": {
-    "count": 18,
+    "count": 22,
     "dynamic": false,
     "sample": "PROVISION_RELATION",
     "n_source": 1,
@@ -5016,6 +5455,14 @@
     "n_source": 1,
     "n_generated": 1,
     "class": "internal"
+  },
+  "PROVISION_TABLE_FIELD_PROCESSING": {
+    "count": 14,
+    "dynamic": false,
+    "sample": "PROVISION_TABLE_FIELD_PROCESSING",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
   },
   "PROVISION_UNIQUE_CONSTRAINT": {
     "count": 4,
@@ -5135,10 +5582,10 @@
     "class": "public"
   },
   "REQUEST_DATABASE_NOT_ORGANIZATION_OWNER": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "REQUEST_DATABASE_NOT_ORGANIZATION_OWNER",
-    "n_source": 1,
+    "n_source": 2,
     "n_generated": 1,
     "class": "public"
   },
@@ -5150,6 +5597,13 @@
     "n_generated": 1,
     "class": "public"
   },
+  "REQUIRED_CAPABILITIES_NOT_HELD": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "REQUIRED_CAPABILITIES_NOT_HELD",
+    "n_source": 1,
+    "n_generated": 1
+  },
   "REQUIRES": {
     "count": 4,
     "dynamic": false,
@@ -5159,7 +5613,7 @@
     "class": "internal"
   },
   "REQUIRES_ONE_OWNER": {
-    "count": 14,
+    "count": 15,
     "dynamic": false,
     "sample": "REQUIRES_ONE_OWNER",
     "n_source": 2,
@@ -5197,6 +5651,22 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "RESOURCE_CPU_CAP_EXCEEDED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "RESOURCE_CPU_CAP_EXCEEDED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "RESOURCE_MEMORY_CAP_EXCEEDED": {
+    "count": 4,
+    "dynamic": false,
+    "sample": "RESOURCE_MEMORY_CAP_EXCEEDED",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "RESOURCE_MODULE": {
     "count": 2,
     "dynamic": false,
@@ -5206,19 +5676,20 @@
     "class": "internal"
   },
   "RESOURCE_STORAGE_CAP_EXCEEDED": {
-    "count": 1,
+    "count": 7,
     "dynamic": false,
     "sample": "RESOURCE_STORAGE_CAP_EXCEEDED",
     "n_source": 1,
-    "n_generated": 0,
+    "n_generated": 1,
     "class": "public"
   },
   "RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED": {
-    "count": 1,
+    "count": 7,
     "dynamic": false,
     "sample": "RESOURCE_STORAGE_TOTAL_CAP_EXCEEDED",
     "n_source": 1,
-    "n_generated": 0
+    "n_generated": 1,
+    "class": "public"
   },
   "RETIRE_UNSERVED_APIS_SCOPE_REQUIRED": {
     "count": 2,
@@ -5242,26 +5713,34 @@
     "n_source": 0,
     "n_generated": 4
   },
+  "ROUTE_PRIORITY_FORBIDDEN": {
+    "count": 10,
+    "dynamic": false,
+    "sample": "ROUTE_PRIORITY_FORBIDDEN",
+    "n_source": 1,
+    "n_generated": 5,
+    "class": "public"
+  },
   "ROUTE_PRIVILEGED_TARGET_FORBIDDEN": {
-    "count": 4,
+    "count": 6,
     "dynamic": false,
     "sample": "ROUTE_PRIVILEGED_TARGET_FORBIDDEN: only a platform administrator may route to an API served as a role other than anonymous or authenticated",
-    "n_source": 0,
-    "n_generated": 3
+    "n_source": 1,
+    "n_generated": 4
   },
   "ROUTE_TARGET_NOT_OWNED": {
-    "count": 36,
+    "count": 38,
     "dynamic": false,
     "sample": "ROUTE_TARGET_NOT_OWNED",
-    "n_source": 0,
-    "n_generated": 6
+    "n_source": 1,
+    "n_generated": 7
   },
   "ROUTE_TARGET_REQUIRED": {
-    "count": 8,
+    "count": 6,
     "dynamic": false,
     "sample": "ROUTE_TARGET_REQUIRED",
-    "n_source": 0,
-    "n_generated": 6
+    "n_source": 1,
+    "n_generated": 5
   },
   "ROUTING_API_TABLES_SCOPE_REQUIRED": {
     "count": 2,
@@ -5365,6 +5844,14 @@
     "sample": "SCHEDULE_RULE_UNSATISFIABLE",
     "n_source": 0,
     "n_generated": 4,
+    "class": "public"
+  },
+  "SCHEMA_PUBLISH_FORBIDDEN": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "SCHEMA_PUBLISH_FORBIDDEN",
+    "n_source": 1,
+    "n_generated": 1,
     "class": "public"
   },
   "SCOPE_TYPE_BACKFILL": {
@@ -5621,6 +6108,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "SECRET_NOT_FOUND": {
+    "count": 26,
+    "dynamic": false,
+    "sample": "SECRET_NOT_FOUND",
+    "n_source": 2,
+    "n_generated": 12,
+    "class": "public"
+  },
   "SECURE_TABLE_PROVISION_TARGET_AMBIGUOUS": {
     "count": 2,
     "dynamic": false,
@@ -5706,19 +6201,19 @@
     "class": "internal"
   },
   "SESSION_CHAIN_EXPIRED": {
-    "count": 4,
+    "count": 8,
     "dynamic": false,
     "sample": "SESSION_CHAIN_EXPIRED",
-    "n_source": 0,
-    "n_generated": 2,
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "SESSION_DEPTH_EXCEEDED": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "SESSION_DEPTH_EXCEEDED",
-    "n_source": 0,
-    "n_generated": 2,
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "SESSION_NOT_DESCENDANT": {
@@ -5730,7 +6225,7 @@
     "class": "public"
   },
   "SESSION_NOT_FOUND": {
-    "count": 7,
+    "count": 9,
     "dynamic": false,
     "sample": "SESSION_NOT_FOUND",
     "n_source": 2,
@@ -5738,11 +6233,11 @@
     "class": "public"
   },
   "SESSION_TTL_EXCEEDS_PARENT": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "SESSION_TTL_EXCEEDS_PARENT",
-    "n_source": 0,
-    "n_generated": 2,
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "SETTINGS_SURFACE_NOT_PROVISIONED": {
@@ -5769,12 +6264,20 @@
     "n_generated": 6,
     "class": "public"
   },
+  "SITE_CONTENT_SCOPE_MISMATCH": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "SITE_CONTENT_SCOPE_MISMATCH",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "SITE_INSTALLATION_MEMBER_NOT_SERVABLE": {
-    "count": 4,
+    "count": 8,
     "dynamic": false,
     "sample": "SITE_INSTALLATION_MEMBER_NOT_SERVABLE",
-    "n_source": 0,
-    "n_generated": 4
+    "n_source": 2,
+    "n_generated": 6
   },
   "SITE_NOT_FOUND": {
     "count": 24,
@@ -5920,7 +6423,7 @@
     "class": "internal"
   },
   "SOURCE_USERS_NOT_FOUND": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "SOURCE_USERS_NOT_FOUND",
     "n_source": 1,
@@ -5943,12 +6446,20 @@
     "n_generated": 3,
     "class": "public"
   },
-  "SSO_LINK_TICKET_INVALID": {
-    "count": 4,
+  "SSO_LINK_TICKET_FORBIDDEN": {
+    "count": 8,
     "dynamic": false,
-    "sample": "SSO_LINK_TICKET_INVALID",
+    "sample": "SSO_LINK_TICKET_FORBIDDEN",
     "n_source": 1,
     "n_generated": 3,
+    "class": "public"
+  },
+  "SSO_LINK_TICKET_INVALID": {
+    "count": 8,
+    "dynamic": false,
+    "sample": "SSO_LINK_TICKET_INVALID",
+    "n_source": 2,
+    "n_generated": 4,
     "class": "public"
   },
   "SSO_LINK_TICKET_TTL_INVALID": {
@@ -6016,19 +6527,19 @@
     "class": "public"
   },
   "STEP_UP_REQUIRED_FRESH_AUTH": {
-    "count": 23,
+    "count": 4,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_FRESH_AUTH",
-    "n_source": 2,
-    "n_generated": 12,
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "STEP_UP_REQUIRED_MFA": {
-    "count": 6,
+    "count": 4,
     "dynamic": false,
     "sample": "STEP_UP_REQUIRED_MFA",
     "n_source": 1,
-    "n_generated": 4,
+    "n_generated": 3,
     "class": "public"
   },
   "STEP_UP_REQUIRED_PASSWORD": {
@@ -6048,11 +6559,11 @@
     "class": "public"
   },
   "STEP_UP_SESSION_INVALID": {
-    "count": 14,
+    "count": 18,
     "dynamic": false,
     "sample": "STEP_UP_SESSION_INVALID",
-    "n_source": 2,
-    "n_generated": 4,
+    "n_source": 3,
+    "n_generated": 5,
     "class": "public"
   },
   "STORAGE_API_NOT_PROVISIONED": {
@@ -6085,14 +6596,6 @@
     "sample": "STORAGE_FILE_KEY_IMMUTABLE",
     "n_source": 1,
     "n_generated": 4,
-    "class": "internal"
-  },
-  "STORAGE_GC_CONTENT_HASH_UNSUPPORTED": {
-    "count": 2,
-    "dynamic": false,
-    "sample": "STORAGE_GC_CONTENT_HASH_UNSUPPORTED",
-    "n_source": 1,
-    "n_generated": 1,
     "class": "internal"
   },
   "STORAGE_GC_FILES_TABLE_MISSING": {
@@ -6159,6 +6662,22 @@
     "n_generated": 1,
     "class": "internal"
   },
+  "STORAGE_KEY_HELD": {
+    "count": 7,
+    "dynamic": false,
+    "sample": "STORAGE_KEY_HELD",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
+  "STORAGE_PHYSICAL_NAME_SYSTEM_ONLY": {
+    "count": 10,
+    "dynamic": false,
+    "sample": "STORAGE_PHYSICAL_NAME_SYSTEM_ONLY",
+    "n_source": 1,
+    "n_generated": 4,
+    "class": "public"
+  },
   "STORAGE_PROMOTION_DESTINATION_MISMATCH": {
     "count": 7,
     "dynamic": false,
@@ -6215,28 +6734,44 @@
     "n_generated": 4,
     "class": "internal"
   },
+  "SUBDOMAINS_LIMIT": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "SUBDOMAINS_LIMIT",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "public"
+  },
   "SUBDOMAIN_APEX_NOT_PUBLISHED": {
-    "count": 6,
+    "count": 2,
     "dynamic": false,
     "sample": "SUBDOMAIN_APEX_NOT_PUBLISHED",
     "n_source": 1,
-    "n_generated": 5,
+    "n_generated": 1,
     "class": "public"
   },
   "SUBDOMAIN_LABEL_EXHAUSTED": {
-    "count": 6,
+    "count": 2,
     "dynamic": false,
     "sample": "SUBDOMAIN_LABEL_EXHAUSTED",
     "n_source": 1,
-    "n_generated": 5,
+    "n_generated": 1,
     "class": "public"
   },
   "SUBDOMAIN_LABEL_INVALID": {
-    "count": 6,
+    "count": 2,
     "dynamic": false,
     "sample": "SUBDOMAIN_LABEL_INVALID",
     "n_source": 1,
-    "n_generated": 5,
+    "n_generated": 1,
+    "class": "public"
+  },
+  "SUBDOMAIN_LABEL_RESERVED": {
+    "count": 5,
+    "dynamic": false,
+    "sample": "SUBDOMAIN_LABEL_RESERVED",
+    "n_source": 1,
+    "n_generated": 1,
     "class": "public"
   },
   "SUPER_CONSTRUCTIVE_REQUIRED": {
@@ -6304,7 +6839,7 @@
     "class": "public"
   },
   "TARGET_MEMBERSHIPS_NOT_FOUND": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "TARGET_MEMBERSHIPS_NOT_FOUND",
     "n_source": 1,
@@ -6336,11 +6871,11 @@
     "class": "public"
   },
   "TOO_MANY_REQUESTS": {
-    "count": 61,
+    "count": 67,
     "dynamic": false,
     "sample": "TOO_MANY_REQUESTS",
     "n_source": 2,
-    "n_generated": 28,
+    "n_generated": 31,
     "class": "public"
   },
   "TOTP_ALREADY_ENABLED": {
@@ -6455,11 +6990,11 @@
     "class": "public"
   },
   "UNKNOWN_METER": {
-    "count": 2,
+    "count": 4,
     "dynamic": false,
     "sample": "UNKNOWN_METER",
-    "n_source": 0,
-    "n_generated": 2,
+    "n_source": 1,
+    "n_generated": 3,
     "class": "public"
   },
   "UNKNOWN_POLICY_TYPE": {
@@ -6500,6 +7035,14 @@
     "n_generated": 1,
     "class": "public"
   },
+  "USAGE_PERIOD_READER_UNKNOWN_AGGREGATION": {
+    "count": 2,
+    "dynamic": false,
+    "sample": "USAGE_PERIOD_READER_UNKNOWN_AGGREGATION",
+    "n_source": 1,
+    "n_generated": 1,
+    "class": "internal"
+  },
   "VALIDATE_BLUEPRINT_DEPENDENCY_NOT_MET": {
     "count": 8,
     "dynamic": false,
@@ -6517,7 +7060,7 @@
     "class": "public"
   },
   "VALIDATE_BLUEPRINT_EXPECTED_ARRAY": {
-    "count": 90,
+    "count": 92,
     "dynamic": false,
     "sample": "VALIDATE_BLUEPRINT_EXPECTED_ARRAY",
     "n_source": 1,
@@ -6565,7 +7108,7 @@
     "class": "public"
   },
   "VALIDATE_BLUEPRINT_INVALID": {
-    "count": 30,
+    "count": 36,
     "dynamic": false,
     "sample": "VALIDATE_BLUEPRINT_INVALID",
     "n_source": 1,

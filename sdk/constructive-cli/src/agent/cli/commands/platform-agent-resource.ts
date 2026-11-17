@@ -25,6 +25,8 @@ const fieldSchema: FieldSchema = {
   description: 'string',
   descriptionTrgmSimilarity: 'float',
   embedding: 'string',
+  embeddingModel: 'string',
+  embeddingModelTrgmSimilarity: 'float',
   embeddingUpdatedAt: 'string',
   embeddingVectorDistance: 'float',
   id: 'uuid',
@@ -205,6 +207,10 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
         threshold: 0.3,
       },
       trgmDescription: {
+        value: query,
+        threshold: 0.3,
+      },
+      trgmEmbeddingModel: {
         value: query,
         threshold: 0.3,
       },

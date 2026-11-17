@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.28](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.27...@agentic-kit/db-tools@0.12.28) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
+## [0.12.27](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.26...@agentic-kit/db-tools@0.12.27) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
+## [0.12.26](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.25...@agentic-kit/db-tools@0.12.26) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
+## [0.12.25](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.24...@agentic-kit/db-tools@0.12.25) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
+## [0.12.24](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.23...@agentic-kit/db-tools@0.12.24) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
+## [0.12.23](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.22...@agentic-kit/db-tools@0.12.23) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/db-tools
+
 ## [0.12.22](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.21...@agentic-kit/db-tools@0.12.22) (2026-11-14)
 
 **Note:** Version bump only for package @agentic-kit/db-tools

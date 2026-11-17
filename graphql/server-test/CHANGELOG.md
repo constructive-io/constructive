@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.42.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.2...graphql-server-test@3.42.3) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.1...graphql-server-test@3.42.2) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.0...graphql-server-test@3.42.1) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.42.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.41.0...graphql-server-test@3.42.0) (2026-11-16)
+
+### Features
+
+- **presigned-url:** one URL mechanism for every file-reference column ([a1ba7c6](https://github.com/constructive-io/constructive/commit/a1ba7c6c4c1d049f4eeebc7ce454dbba4faa6cb5))
+- **presigned-url:** URLs for an image column and its own rendered versions ([3f72c41](https://github.com/constructive-io/constructive/commit/3f72c419cd4dc4e6628d69294925dcfdd3df1bde))
+
+# [3.41.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.6...graphql-server-test@3.41.0) (2026-11-16)
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
+## [3.40.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.5...graphql-server-test@3.40.6) (2026-11-16)
+
+**Note:** Version bump only for package graphql-server-test
+
 ## [3.40.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.4...graphql-server-test@3.40.5) (2026-11-14)
 
 ### Bug Fixes

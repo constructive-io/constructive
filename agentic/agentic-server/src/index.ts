@@ -23,6 +23,8 @@
  */
 
 export { BadRequestError } from './errors';
+export type { ServedModel } from './models';
+export { listServedModels, MODEL_LIST_HINT } from './models';
 export { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
 export { createRouter } from './router';
 export type { AgenticServerStartOptions } from './server';

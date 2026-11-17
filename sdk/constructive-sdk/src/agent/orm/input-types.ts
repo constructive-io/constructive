@@ -407,6 +407,9 @@ export interface AgentResource {
   /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
   descriptionTrgmSimilarity?: number | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -758,6 +761,9 @@ export interface PlatformAgentResource {
   /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
   descriptionTrgmSimilarity?: number | null;
   embedding?: number[] | null;
+  embeddingModel?: string | null;
+  /** TRGM similarity when searching `embeddingModel`. Returns null when no trgm search filter is active. */
+  embeddingModelTrgmSimilarity?: number | null;
   embeddingUpdatedAt?: string | null;
   /** VECTOR distance when searching `embedding`. Returns null when no vector search filter is active. */
   embeddingVectorDistance?: number | null;
@@ -1262,6 +1268,8 @@ export type AgentResourceSelect = {
   description?: boolean;
   descriptionTrgmSimilarity?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -1598,6 +1606,8 @@ export type PlatformAgentResourceSelect = {
   description?: boolean;
   descriptionTrgmSimilarity?: boolean;
   embedding?: boolean;
+  embeddingModel?: boolean;
+  embeddingModelTrgmSimilarity?: boolean;
   embeddingUpdatedAt?: boolean;
   embeddingVectorDistance?: boolean;
   id?: boolean;
@@ -2066,6 +2076,8 @@ export interface AgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -2094,6 +2106,8 @@ export interface AgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
@@ -2632,6 +2646,8 @@ export interface PlatformAgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -2664,6 +2680,8 @@ export interface PlatformAgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
@@ -3141,6 +3159,10 @@ export type AgentResourceOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -3561,6 +3583,10 @@ export type PlatformAgentResourceOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -4838,10 +4864,12 @@ export interface VectorNearbyInput {
   includeChunks?: boolean;
   /** Similarity metric to use (default: COSINE). */
   metric?: VectorMetric;
-  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** The model that produced `vector`. On a column that records the model of each row's vector, only rows embedded with this model are compared; vectors of two models are not comparable. Filled in server-side when `text` is embedded. */
+  model?: string;
+  /** Natural language text to embed server-side for similarity search. Provide exactly one of `text` or `vector`; sending both or neither is an error. Blank text on its own counts as not given. Requires the LLM plugin to be configured with an embedding provider. */
   text?: string;
   /** Query vector for similarity search. */
-  vector: number[];
+  vector?: number[];
 }
 /** A filter to be used against many `AgentResourceChunk` object types. All fields are combined with a logical ‘and.’ */
 export interface AgentResourceToManyAgentResourceChunkFilter {
@@ -5266,7 +5294,7 @@ export interface AgentResourceChunkInput {
   /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
   databaseId?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -5286,7 +5314,7 @@ export interface AgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -5581,7 +5609,7 @@ export interface PlatformAgentResourceChunkInput {
   chunkIndex?: number;
   createdAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: Record<string, unknown>;
@@ -5600,7 +5628,7 @@ export interface PlatformAgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -6992,6 +7020,8 @@ export interface AgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -7020,6 +7050,8 @@ export interface AgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
@@ -7181,6 +7213,8 @@ export interface PlatformAgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -7213,6 +7247,8 @@ export interface PlatformAgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */

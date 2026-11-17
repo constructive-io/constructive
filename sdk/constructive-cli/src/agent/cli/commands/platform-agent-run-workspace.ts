@@ -87,6 +87,7 @@ async function handleTableSubcommand(
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       artifacts: true,
       baseBranch: true,
       baseCommit: true,
@@ -104,6 +105,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       runId: true,
       state: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -128,6 +130,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
 async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const defaultSelect = {
+      actorId: true,
       artifacts: true,
       baseBranch: true,
       baseCommit: true,
@@ -145,6 +148,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       runId: true,
       state: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<
@@ -181,6 +185,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
+          actorId: true,
           artifacts: true,
           baseBranch: true,
           baseCommit: true,
@@ -198,6 +203,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           runId: true,
           state: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -332,6 +338,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           state: cleanedData.state,
         },
         select: {
+          actorId: true,
           artifacts: true,
           baseBranch: true,
           baseCommit: true,
@@ -349,6 +356,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           runId: true,
           state: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -369,6 +377,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'text',
+        name: 'actorId',
+        message: 'actorId',
+        required: false,
       },
       {
         type: 'json',
@@ -463,6 +477,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformAgentRunWorkspacePatch;
@@ -473,6 +493,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          actorId: cleanedData.actorId,
           artifacts: cleanedData.artifacts,
           baseBranch: cleanedData.baseBranch,
           baseCommit: cleanedData.baseCommit,
@@ -487,8 +508,10 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           repositoryId: cleanedData.repositoryId,
           runId: cleanedData.runId,
           state: cleanedData.state,
+          visibility: cleanedData.visibility,
         },
         select: {
+          actorId: true,
           artifacts: true,
           baseBranch: true,
           baseCommit: true,
@@ -506,6 +529,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           runId: true,
           state: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
