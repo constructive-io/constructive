@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.24.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.0...graphile-llm@1.24.1) (2026-11-17)
+
+### Bug Fixes
+
+- **graphile-llm:** add `{col}Text` only to inputs that carry `{col}` ([#2006](https://github.com/constructive-io/constructive/issues/2006)) ([14d3e8d](https://github.com/constructive-io/constructive/commit/14d3e8d8c680d7c28dce748ddf49114a2fb2d95b))
+
 # [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.10...graphile-llm@1.24.0) (2026-11-16)
 
 ### Bug Fixes

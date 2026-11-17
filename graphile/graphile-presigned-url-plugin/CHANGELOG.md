@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.0...graphile-presigned-url-plugin@1.28.1) (2026-11-17)
+
+### Bug Fixes
+
+- **presigned-url:** a bucket cache hit re-reads the bucket id under the caller's RLS ([#2007](https://github.com/constructive-io/constructive/issues/2007)) ([af63b90](https://github.com/constructive-io/constructive/commit/af63b90ea9946f62891901b417a5f238cb0fc8c5))
+
 # [1.28.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.2...graphile-presigned-url-plugin@1.28.0) (2026-11-16)
 
 ### Bug Fixes
