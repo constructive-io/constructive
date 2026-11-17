@@ -50,16 +50,14 @@ function input() {
 describe('recordManagedFile', () => {
   it('calls the generated recorder with only base object facts', async () => {
     const query = jest.fn().mockResolvedValue({
-      rows: [{ id: '33333333-3333-3333-3333-333333333333' }],
+      rows: [{ id: '33333333-3333-3333-3333-333333333333', key: 'originals/server-generated' }],
     });
 
-    await expect(recordManagedFile({ query }, storageConfig(), input())).resolves.toBe(
-      '33333333-3333-3333-3333-333333333333',
-    );
+    await expect(recordManagedFile({ query }, storageConfig(), input())).resolves.toEqual({ id: '33333333-3333-3333-3333-333333333333', key: 'originals/server-generated' });
 
     expect(query).toHaveBeenCalledWith({
       text: expect.stringContaining(
-        'SELECT id FROM storage_private.app_files_record_file(bucket_id := $1::uuid, key := $2::text',
+        'SELECT id, key FROM storage_private.app_files_record_file(bucket_id := $1::uuid, key := $2::text',
       ),
       values: [
         input().bucketId,
