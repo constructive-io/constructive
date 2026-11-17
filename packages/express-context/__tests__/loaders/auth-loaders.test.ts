@@ -62,6 +62,17 @@ describe('authSettingsLoader', () => {
     expect(settings).toMatchObject({ cookieSecure: true, cookieSamesite: 'lax' });
   });
 
+  it('quotes the discovered coordinates as identifiers, never as SQL', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'x"; DROP SCHEMA y; --', table_name: 't" UNION SELECT "1' }] },
+      { rows: [] }
+    ]);
+
+    await authSettingsLoader.resolve(ctx(pool));
+
+    expect(calls[1].text).toContain('FROM "x""; DROP SCHEMA y; --"."t"" UNION SELECT ""1"');
+  });
+
   it('is undefined when the tenant provisions no sessions module', async () => {
     const { pool } = fakePool([{ rows: [] }]);
     await expect(authSettingsLoader.resolve(ctx(pool))).resolves.toBeUndefined();
@@ -159,6 +170,19 @@ describe('identityProvidersLoader', () => {
       clientSecret: 'shh',
       issuerUrl: 'https://accounts.google.com'
     });
+  });
+
+  it('quotes the discovered coordinates as identifiers, never as SQL', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'p"."x', table_name: 'idp" --' }] },
+      { rows: [{ schema_name: 's"."x', table_name: 'sec"(' }] },
+      { rows: [] }
+    ]);
+
+    await identityProvidersLoader.resolve(ctx(pool));
+
+    expect(calls[2].text).toContain('FROM "p"".""x"."idp"" --" p');
+    expect(calls[2].text).toContain('ELSE "s"".""x"."sec""(_get"(');
   });
 
   it('defaults an unset nonce/PKCE policy to the safe side', async () => {
