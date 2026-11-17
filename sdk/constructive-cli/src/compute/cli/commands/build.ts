@@ -29,6 +29,8 @@ const fieldSchema: FieldSchema = {
   imageRef: 'string',
   jobId: 'int',
   logs: 'string',
+  logsUrl: 'string',
+  logsVersions: 'string',
   matrixKey: 'string',
   metadata: 'json',
   proposalId: 'uuid',

@@ -29,7 +29,6 @@ import type {
   PlatformFileSelect,
   PlatformFileFilter,
   PlatformFileOrderBy,
-  CreatePlatformFileInput,
   UpdatePlatformFileInput,
   PlatformFilePatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class PlatformFileModel {
       }) => ({
         platformFile: data.platformFiles?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformFileSelect>(
-    args: CreateArgs<S, CreatePlatformFileInput['platformFile']> & {
-      select: S;
-    } & StrictSelect<S, PlatformFileSelect>
-  ): QueryBuilder<{
-    createPlatformFile: {
-      platformFile: InferSelectResult<PlatformFileWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformFile',
-      'createPlatformFile',
-      'platformFile',
-      args.select,
-      args.data,
-      'CreatePlatformFileInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformFile',
-      fieldName: 'createPlatformFile',
-      document,
-      variables,
     });
   }
   update<S extends PlatformFileSelect>(

@@ -9,7 +9,7 @@ SEO and social sharing metadata for a site surface
 ```typescript
 db.siteMetadatum.findMany({ select: { id: true } }).execute()
 db.siteMetadatum.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.siteMetadatum.create({ data: { appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
+db.siteMetadatum.create({ data: { appleTouchIcon: '<Image>', appleTouchIconUrl: '<String>', appleTouchIconVersions: '<FileVersion>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', faviconUrl: '<String>', faviconVersions: '<FileVersion>', logo: '<Image>', logoUrl: '<String>', logoVersions: '<FileVersion>', ogImage: '<Image>', ogImageUrl: '<String>', ogImageVersions: '<FileVersion>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' }, select: { id: true } }).execute()
 db.siteMetadatum.update({ where: { id: '<UUID>' }, data: { appleTouchIcon: '<Image>' }, select: { id: true } }).execute()
 db.siteMetadatum.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.siteMetadatum.findMany({
 
 ```typescript
 const item = await db.siteMetadatum.create({
-  data: { appleTouchIcon: '<Image>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', logo: '<Image>', ogImage: '<Image>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' },
+  data: { appleTouchIcon: '<Image>', appleTouchIconUrl: '<String>', appleTouchIconVersions: '<FileVersion>', canonicalUrl: '<String>', commitId: '<UUID>', databaseId: '<UUID>', description: '<String>', favicon: '<Image>', faviconUrl: '<String>', faviconVersions: '<FileVersion>', logo: '<Image>', logoUrl: '<String>', logoVersions: '<FileVersion>', ogImage: '<Image>', ogImageUrl: '<String>', ogImageVersions: '<FileVersion>', robots: '<String>', robotsSeededFrom: '<JSON>', siteId: '<UUID>', storeId: '<UUID>', title: '<String>' },
   select: { id: true }
 }).execute();
 ```

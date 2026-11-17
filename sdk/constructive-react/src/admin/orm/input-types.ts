@@ -233,6 +233,7 @@ export interface UUIDListFilter {
 // ============ Custom Scalar Types ============
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
+export type FileVersion = unknown;
 /** Records of admin role grants and revocations between members */
 // ============ Entity Types ============
 export interface AppAdminGrant {
@@ -576,6 +577,10 @@ export interface OrgMemberProfile {
   membershipId?: string | null;
   /** Profile picture visible to other entity members */
   profilePicture?: ConstructiveInternalTypeImage | null;
+  /** URL to fetch `profilePicture`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  profilePictureUrl?: string | null;
+  /** The versions rendered beside `profilePicture`, narrowest first, each with a URL. Empty when there are none. */
+  profilePictureVersions?: FileVersion[] | null;
   /** Job title or role description visible to other entity members */
   title?: string | null;
   updatedAt?: string | null;
@@ -987,6 +992,13 @@ export type OrgMemberProfileSelect = {
   id?: boolean;
   membershipId?: boolean;
   profilePicture?: boolean;
+  profilePictureUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  profilePictureVersions?: boolean;
   title?: boolean;
   updatedAt?: boolean;
   membership?: {
@@ -2582,14 +2594,6 @@ export interface DeleteMembershipTypeInput {
   clientMutationId?: string;
   id: number;
 }
-export interface CreateMyPendingAppInvitesRecordInput {
-  clientMutationId?: string;
-  myPendingAppInvitesRecord: {
-    channel?: string;
-    expiresAt?: string;
-    senderId: string;
-  };
-}
 export interface MyPendingAppInvitesRecordPatch {
   channel?: string | null;
   expiresAt?: string | null;
@@ -2603,15 +2607,6 @@ export interface UpdateMyPendingAppInvitesRecordInput {
 export interface DeleteMyPendingAppInvitesRecordInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateMyPendingOrgInvitesRecordInput {
-  clientMutationId?: string;
-  myPendingOrgInvitesRecord: {
-    channel?: string;
-    entityId: string;
-    expiresAt?: string;
-    senderId: string;
-  };
 }
 export interface MyPendingOrgInvitesRecordPatch {
   channel?: string | null;
@@ -2776,13 +2771,6 @@ export interface DeleteOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateOrgGetManagersRecordInput {
-  clientMutationId?: string;
-  orgGetManagersRecord: {
-    depth?: number;
-    userId: string;
-  };
-}
 export interface OrgGetManagersRecordPatch {
   depth?: number | null;
   userId?: string | null;
@@ -2795,13 +2783,6 @@ export interface UpdateOrgGetManagersRecordInput {
 export interface DeleteOrgGetManagersRecordInput {
   clientMutationId?: string;
   id: string;
-}
-export interface CreateOrgGetSubordinatesRecordInput {
-  clientMutationId?: string;
-  orgGetSubordinatesRecord: {
-    depth?: number;
-    userId: string;
-  };
 }
 export interface OrgGetSubordinatesRecordPatch {
   depth?: number | null;
@@ -2931,7 +2912,6 @@ export interface OrgMemberProfilePatch {
   entityId?: string | null;
   membershipId?: string | null;
   profilePicture?: ConstructiveInternalTypeImage | null;
-  profilePictureUpload?: File | null;
   title?: string | null;
 }
 export interface UpdateOrgMemberProfileInput {

@@ -23,15 +23,14 @@ const db = createClient({
 |-------|------------|
 | `build` | findMany, findOne, create, update, delete |
 | `buildStep` | findMany, findOne, create, update, delete |
-| `builderBinding` | findMany, findOne, create, update, delete |
 | `contentPreset` | findMany, findOne, create, update, delete |
-| `databaseFunctionGraph` | findMany, findOne, create, update, delete |
+| `databaseFunctionGraph` | findMany, findOne, update, delete |
 | `databaseFunctionGraphExecutionCancelRequest` | findMany, findOne, create, update, delete |
 | `databaseFunctionGraphExecution` | findMany, findOne, create, update, delete |
 | `databaseFunctionGraphExecutionNodeState` | findMany, findOne, create, update, delete |
 | `databaseFunctionGraphExecutionOutput` | findMany, findOne, create, update, delete |
 | `databaseGraphCommit` | findMany, findOne, create, update, delete |
-| `databaseGraphGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `databaseGraphGetAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `databaseGraphObject` | findMany, findOne, create, update, delete |
 | `databaseGraphRef` | findMany, findOne, create, update, delete |
 | `databaseGraphStore` | findMany, findOne, create, update, delete |
@@ -43,7 +42,7 @@ const db = createClient({
 | `functionDeploymentEvent` | findMany, findOne, create, update, delete |
 | `functionExecutionLog` | findMany, findOne, create, update, delete |
 | `functionGraphCommit` | findMany, findOne, create, update, delete |
-| `functionGraph` | findMany, findOne, create, update, delete |
+| `functionGraph` | findMany, findOne, update, delete |
 | `functionGraphExecutionCancelRequest` | findMany, findOne, create, update, delete |
 | `functionGraphExecution` | findMany, findOne, create, update, delete |
 | `functionGraphExecutionNodeState` | findMany, findOne, create, update, delete |
@@ -54,11 +53,11 @@ const db = createClient({
 | `functionInvocationAttempt` | findMany, findOne, create, update, delete |
 | `functionInvocation` | findMany, findOne, create, update, delete |
 | `functionSchedule` | findMany, findOne, create, update, delete |
-| `getAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `getAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `image` | findMany, findOne, create, update, delete |
 | `imageGrant` | findMany, findOne, create, update, delete |
 | `infraCommit` | findMany, findOne, create, update, delete |
-| `infraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `infraGetAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `infraObject` | findMany, findOne, create, update, delete |
 | `infraRef` | findMany, findOne, create, update, delete |
 | `infraStore` | findMany, findOne, create, update, delete |
@@ -67,7 +66,6 @@ const db = createClient({
 | `namespaceEvent` | findMany, findOne, create, update, delete |
 | `platformBuild` | findMany, findOne, create, update, delete |
 | `platformBuildStep` | findMany, findOne, create, update, delete |
-| `platformBuilderBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionApiBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionCapabilityBinding` | findMany, findOne, create, update, delete |
 | `platformFunctionDefinition` | findMany, findOne, create, update, delete |
@@ -80,7 +78,7 @@ const db = createClient({
 | `platformImage` | findMany, findOne, create, update, delete |
 | `platformImageGrant` | findMany, findOne, create, update, delete |
 | `platformInfraCommit` | findMany, findOne, create, update, delete |
-| `platformInfraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `platformInfraGetAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `platformInfraObject` | findMany, findOne, create, update, delete |
 | `platformInfraRef` | findMany, findOne, create, update, delete |
 | `platformInfraStore` | findMany, findOne, create, update, delete |
@@ -102,18 +100,19 @@ const db = createClient({
 | `platformRepositoryRequiredCheck` | findMany, findOne, create, update, delete |
 | `platformRepositoryWorkflow` | findMany, findOne, create, update, delete |
 | `platformResource` | findMany, findOne, create, update, delete |
-| `platformResourceDeclaredCapacity` | findMany, findOne, create, update, delete |
+| `platformResourceDeclaredCapacity` | findMany, findOne, update, delete |
 | `platformResourceDefinition` | findMany, findOne, create, update, delete |
 | `platformResourceEvent` | findMany, findOne, create, update, delete |
 | `platformResourceInstallation` | findMany, findOne, create, update, delete |
-| `platformResourceObservedStorage` | findMany, findOne, create, update, delete |
+| `platformResourceObservedStorage` | findMany, findOne, update, delete |
 | `platformResourceStatusCheck` | findMany, findOne, create, update, delete |
 | `platformResourceUsageLog` | findMany, findOne, create, update, delete |
 | `platformResourceUsageSummary` | findMany, findOne, create, update, delete |
-| `platformResourceUtilization` | findMany, findOne, create, update, delete |
-| `platformResourcesHealth` | findMany, findOne, create, update, delete |
-| `platformResourcesRequirementsState` | findMany, findOne, create, update, delete |
-| `platformResourcesResolvedRequirement` | findMany, findOne, create, update, delete |
+| `platformResourceUtilization` | findMany, findOne, update, delete |
+| `platformResourcesHealth` | findMany, findOne, update, delete |
+| `platformResourcesRequirementsState` | findMany, findOne, update, delete |
+| `platformResourcesResolvedRequirement` | findMany, findOne, update, delete |
+| `platformServiceBinding` | findMany, findOne, create, update, delete |
 | `platformWebhookEndpoint` | findMany, findOne, create, update, delete |
 | `platformWebhookEvent` | findMany, findOne, create, update, delete |
 | `proposalComment` | findMany, findOne, create, update, delete |
@@ -130,18 +129,19 @@ const db = createClient({
 | `repositoryRequiredCheck` | findMany, findOne, create, update, delete |
 | `repositoryWorkflow` | findMany, findOne, create, update, delete |
 | `resource` | findMany, findOne, create, update, delete |
-| `resourceDeclaredCapacity` | findMany, findOne, create, update, delete |
+| `resourceDeclaredCapacity` | findMany, findOne, update, delete |
 | `resourceDefinition` | findMany, findOne, create, update, delete |
 | `resourceEvent` | findMany, findOne, create, update, delete |
 | `resourceInstallation` | findMany, findOne, create, update, delete |
-| `resourceObservedStorage` | findMany, findOne, create, update, delete |
+| `resourceObservedStorage` | findMany, findOne, update, delete |
 | `resourceStatusCheck` | findMany, findOne, create, update, delete |
 | `resourceUsageLog` | findMany, findOne, create, update, delete |
 | `resourceUsageSummary` | findMany, findOne, create, update, delete |
-| `resourceUtilization` | findMany, findOne, create, update, delete |
-| `resourcesHealth` | findMany, findOne, create, update, delete |
-| `resourcesRequirementsState` | findMany, findOne, create, update, delete |
-| `resourcesResolvedRequirement` | findMany, findOne, create, update, delete |
+| `resourceUtilization` | findMany, findOne, update, delete |
+| `resourcesHealth` | findMany, findOne, update, delete |
+| `resourcesRequirementsState` | findMany, findOne, update, delete |
+| `resourcesResolvedRequirement` | findMany, findOne, update, delete |
+| `serviceBinding` | findMany, findOne, create, update, delete |
 | `webhookEndpoint` | findMany, findOne, create, update, delete |
 | `webhookEvent` | findMany, findOne, create, update, delete |
 
@@ -168,6 +168,8 @@ CRUD operations for Build records.
 | `imageRef` | String | Yes |
 | `jobId` | BigInt | Yes |
 | `logs` | ConstructiveInternalTypeUpload | Yes |
+| `logsUrl` | String | Yes |
+| `logsVersions` | FileVersion | Yes |
 | `matrixKey` | String | Yes |
 | `metadata` | JSON | Yes |
 | `proposalId` | UUID | Yes |
@@ -183,13 +185,13 @@ CRUD operations for Build records.
 
 ```typescript
 // List all build records
-const items = await db.build.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+const items = await db.build.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, logsUrl: true, logsVersions: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
 
 // Get one by id
-const item = await db.build.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+const item = await db.build.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, databaseId: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, logsUrl: true, logsVersions: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
 
 // Create
-const created = await db.build.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.build.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', logsUrl: '<String>', logsVersions: '<FileVersion>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.build.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -240,49 +242,6 @@ const updated = await db.buildStep.update({ where: { id: '<UUID>' }, data: { bui
 
 // Delete
 const deleted = await db.buildStep.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.builderBinding`
-
-CRUD operations for BuilderBinding records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `createdBy` | UUID | Yes |
-| `createdByPrincipal` | UUID | Yes |
-| `databaseId` | UUID | Yes |
-| `id` | UUID | No |
-| `installationId` | UUID | Yes |
-| `lastError` | String | Yes |
-| `metadata` | JSON | Yes |
-| `namespaceId` | UUID | Yes |
-| `observedHost` | String | Yes |
-| `realm` | String | Yes |
-| `status` | String | Yes |
-| `updatedAt` | Datetime | No |
-| `updatedBy` | UUID | Yes |
-| `updatedByPrincipal` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all builderBinding records
-const items = await db.builderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Get one by id
-const item = await db.builderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Create
-const created = await db.builderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.builderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.builderBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.contentPreset`
@@ -353,9 +312,6 @@ const items = await db.databaseFunctionGraph.findMany({ select: { context: true,
 
 // Get one by id
 const item = await db.databaseFunctionGraph.findOne({ id: '<UUID>', select: { context: true, createdAt: true, createdBy: true, databaseId: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, storeId: true, updatedAt: true, validationErrors: true } }).execute();
-
-// Create
-const created = await db.databaseFunctionGraph.create({ data: { context: '<String>', createdBy: '<UUID>', databaseId: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', storeId: '<UUID>', validationErrors: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.databaseFunctionGraph.update({ where: { id: '<UUID>' }, data: { context: '<String>' }, select: { id: true } }).execute();
@@ -594,9 +550,6 @@ const items = await db.databaseGraphGetAllTreeNodesRecord.findMany({ select: { d
 
 // Get one by id
 const item = await db.databaseGraphGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
-
-// Create
-const created = await db.databaseGraphGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.databaseGraphGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
@@ -1086,9 +1039,6 @@ const items = await db.functionGraph.findMany({ select: { context: true, created
 // Get one by id
 const item = await db.functionGraph.findOne({ id: '<UUID>', select: { context: true, createdAt: true, createdBy: true, definitionsCommitId: true, description: true, id: true, isValid: true, name: true, scopeId: true, storeId: true, updatedAt: true, validationErrors: true } }).execute();
 
-// Create
-const created = await db.functionGraph.create({ data: { context: '<String>', createdBy: '<UUID>', definitionsCommitId: '<UUID>', description: '<String>', isValid: '<Boolean>', name: '<String>', scopeId: '<UUID>', storeId: '<UUID>', validationErrors: '<JSON>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.functionGraph.update({ where: { id: '<UUID>' }, data: { context: '<String>' }, select: { id: true } }).execute();
 
@@ -1527,9 +1477,6 @@ const items = await db.getAllTreeNodesRecord.findMany({ select: { data: true, pa
 // Get one by id
 const item = await db.getAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
 
-// Create
-const created = await db.getAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.getAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
@@ -1681,9 +1628,6 @@ const items = await db.infraGetAllTreeNodesRecord.findMany({ select: { data: tru
 // Get one by id
 const item = await db.infraGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
 
-// Create
-const created = await db.infraGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.infraGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
@@ -1806,6 +1750,8 @@ CRUD operations for IntegrationProvider records.
 | `icon` | String | Yes |
 | `id` | UUID | No |
 | `logo` | ConstructiveInternalTypeImage | Yes |
+| `logoUrl` | String | Yes |
+| `logoVersions` | FileVersion | Yes |
 | `name` | String | Yes |
 | `requiredConfigs` | ResourceRequirement | Yes |
 | `requiredSecrets` | ResourceRequirement | Yes |
@@ -1816,13 +1762,13 @@ CRUD operations for IntegrationProvider records.
 
 ```typescript
 // List all integrationProvider records
-const items = await db.integrationProvider.findMany({ select: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } }).execute();
+const items = await db.integrationProvider.findMany({ select: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, logoUrl: true, logoVersions: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.integrationProvider.findOne({ id: '<UUID>', select: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } }).execute();
+const item = await db.integrationProvider.findOne({ id: '<UUID>', select: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, logoUrl: true, logoVersions: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.integrationProvider.create({ data: { brand: '<JSON>', category: '<String>', description: '<String>', icon: '<String>', logo: '<Image>', name: '<String>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>' }, select: { id: true } }).execute();
+const created = await db.integrationProvider.create({ data: { brand: '<JSON>', category: '<String>', description: '<String>', icon: '<String>', logo: '<Image>', logoUrl: '<String>', logoVersions: '<FileVersion>', name: '<String>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', slug: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.integrationProvider.update({ where: { id: '<UUID>' }, data: { brand: '<JSON>' }, select: { id: true } }).execute();
@@ -1929,6 +1875,8 @@ CRUD operations for PlatformBuild records.
 | `imageRef` | String | Yes |
 | `jobId` | BigInt | Yes |
 | `logs` | ConstructiveInternalTypeUpload | Yes |
+| `logsUrl` | String | Yes |
+| `logsVersions` | FileVersion | Yes |
 | `matrixKey` | String | Yes |
 | `metadata` | JSON | Yes |
 | `proposalId` | UUID | Yes |
@@ -1944,13 +1892,13 @@ CRUD operations for PlatformBuild records.
 
 ```typescript
 // List all platformBuild records
-const items = await db.platformBuild.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+const items = await db.platformBuild.findMany({ select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, logsUrl: true, logsVersions: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
 
 // Get one by id
-const item = await db.platformBuild.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
+const item = await db.platformBuild.findOne({ id: '<UUID>', select: { actorId: true, attempt: true, commitSha: true, conclusion: true, createdAt: true, createdByPrincipal: true, eventId: true, finishedAt: true, id: true, imageRef: true, jobId: true, logs: true, logsUrl: true, logsVersions: true, matrixKey: true, metadata: true, proposalId: true, ref: true, repositoryId: true, startedAt: true, status: true, updatedAt: true, updatedByPrincipal: true, workflowId: true } }).execute();
 
 // Create
-const created = await db.platformBuild.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformBuild.create({ data: { actorId: '<UUID>', attempt: '<Int>', commitSha: '<String>', conclusion: '<String>', createdByPrincipal: '<UUID>', eventId: '<UUID>', finishedAt: '<Datetime>', imageRef: '<String>', jobId: '<BigInt>', logs: '<Upload>', logsUrl: '<String>', logsVersions: '<FileVersion>', matrixKey: '<String>', metadata: '<JSON>', proposalId: '<UUID>', ref: '<String>', repositoryId: '<UUID>', startedAt: '<Datetime>', status: '<String>', updatedByPrincipal: '<UUID>', workflowId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformBuild.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -2000,48 +1948,6 @@ const updated = await db.platformBuildStep.update({ where: { id: '<UUID>' }, dat
 
 // Delete
 const deleted = await db.platformBuildStep.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.platformBuilderBinding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `createdAt` | Datetime | No |
-| `createdBy` | UUID | Yes |
-| `createdByPrincipal` | UUID | Yes |
-| `id` | UUID | No |
-| `installationId` | UUID | Yes |
-| `lastError` | String | Yes |
-| `metadata` | JSON | Yes |
-| `namespaceId` | UUID | Yes |
-| `observedHost` | String | Yes |
-| `realm` | String | Yes |
-| `status` | String | Yes |
-| `updatedAt` | Datetime | No |
-| `updatedBy` | UUID | Yes |
-| `updatedByPrincipal` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all platformBuilderBinding records
-const items = await db.platformBuilderBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Get one by id
-const item = await db.platformBuilderBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
-
-// Create
-const created = await db.platformBuilderBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.platformBuilderBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.platformBuilderBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformFunctionApiBinding`
@@ -2593,9 +2499,6 @@ const items = await db.platformInfraGetAllTreeNodesRecord.findMany({ select: { d
 // Get one by id
 const item = await db.platformInfraGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
 
-// Create
-const created = await db.platformInfraGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformInfraGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
@@ -2865,12 +2768,16 @@ CRUD operations for PlatformProposalComment records.
 |-------|------|----------|
 | `actorId` | UUID | Yes |
 | `attachments` | ConstructiveInternalTypeUpload | Yes |
+| `attachmentsUrl` | String | Yes |
+| `attachmentsVersions` | FileVersion | Yes |
 | `body` | String | Yes |
 | `bodyTrgmSimilarity` | Float | Yes |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `createdByPrincipal` | UUID | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `id` | UUID | No |
@@ -2891,13 +2798,13 @@ CRUD operations for PlatformProposalComment records.
 
 ```typescript
 // List all platformProposalComment records
-const items = await db.platformProposalComment.findMany({ select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.platformProposalComment.findMany({ select: { actorId: true, attachments: true, attachmentsUrl: true, attachmentsVersions: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformProposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.platformProposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, attachmentsUrl: true, attachmentsVersions: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformProposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformProposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', attachmentsUrl: '<String>', attachmentsVersions: '<FileVersion>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformProposalComment.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -2931,6 +2838,8 @@ CRUD operations for PlatformProposal records.
 | `decidedAt` | Datetime | Yes |
 | `dueAt` | Datetime | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `id` | UUID | No |
@@ -2968,13 +2877,13 @@ CRUD operations for PlatformProposal records.
 
 ```typescript
 // List all platformProposal records
-const items = await db.platformProposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.platformProposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformProposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.platformProposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, decidedAt: true, dueAt: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformProposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformProposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformProposal.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -3301,6 +3210,8 @@ CRUD operations for PlatformRepository records.
 | `description` | String | Yes |
 | `descriptionTrgmSimilarity` | Float | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `externalId` | String | Yes |
@@ -3328,13 +3239,13 @@ CRUD operations for PlatformRepository records.
 
 ```typescript
 // List all platformRepository records
-const items = await db.platformRepository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+const items = await db.platformRepository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
 
 // Get one by id
-const item = await db.platformRepository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+const item = await db.platformRepository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
 
 // Create
-const created = await db.platformRepository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+const created = await db.platformRepository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformRepository.update({ where: { id: '<UUID>' }, data: { cloneUrl: '<String>' }, select: { id: true } }).execute();
@@ -3563,9 +3474,6 @@ const items = await db.platformResourceDeclaredCapacity.findMany({ select: { cpu
 // Get one by id
 const item = await db.platformResourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
-// Create
-const created = await db.platformResourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformResourceDeclaredCapacity.update({ where: { id: '<UUID>' }, data: { cpuLimitMillicores: '<BigInt>' }, select: { id: true } }).execute();
 
@@ -3735,9 +3643,6 @@ const items = await db.platformResourceObservedStorage.findMany({ select: { capa
 // Get one by id
 const item = await db.platformResourceObservedStorage.findOne({ id: '<UUID>', select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
 
-// Create
-const created = await db.platformResourceObservedStorage.create({ data: { capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformResourceObservedStorage.update({ where: { id: '<UUID>' }, data: { capacity: '<String>' }, select: { id: true } }).execute();
 
@@ -3891,9 +3796,6 @@ const items = await db.platformResourceUtilization.findMany({ select: { avgMemor
 // Get one by id
 const item = await db.platformResourceUtilization.findOne({ id: '<UUID>', select: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } }).execute();
 
-// Create
-const created = await db.platformResourceUtilization.create({ data: { avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformResourceUtilization.update({ where: { id: '<UUID>' }, data: { avgMemoryBytes: '<BigInt>' }, select: { id: true } }).execute();
 
@@ -3954,9 +3856,6 @@ const items = await db.platformResourcesHealth.findMany({ select: { annotations:
 // Get one by id
 const item = await db.platformResourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
-// Create
-const created = await db.platformResourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformResourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
@@ -3988,9 +3887,6 @@ const items = await db.platformResourcesRequirementsState.findMany({ select: { c
 
 // Get one by id
 const item = await db.platformResourcesRequirementsState.findOne({ id: '<UUID>', select: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } }).execute();
-
-// Create
-const created = await db.platformResourcesRequirementsState.create({ data: { configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformResourcesRequirementsState.update({ where: { id: '<UUID>' }, data: { configHash: '<String>' }, select: { id: true } }).execute();
@@ -4028,14 +3924,55 @@ const items = await db.platformResourcesResolvedRequirement.findMany({ select: {
 // Get one by id
 const item = await db.platformResourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
-// Create
-const created = await db.platformResourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.platformResourcesResolvedRequirement.update({ where: { id: '<UUID>' }, data: { atomId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.platformResourcesResolvedRequirement.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.platformServiceBinding`
+
+CRUD operations for PlatformServiceBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `installationScope` | String | Yes |
+| `kind` | String | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all platformServiceBinding records
+const items = await db.platformServiceBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.platformServiceBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.platformServiceBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.platformServiceBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.platformServiceBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.platformWebhookEndpoint`
@@ -4131,6 +4068,8 @@ CRUD operations for ProposalComment records.
 |-------|------|----------|
 | `actorId` | UUID | Yes |
 | `attachments` | ConstructiveInternalTypeUpload | Yes |
+| `attachmentsUrl` | String | Yes |
+| `attachmentsVersions` | FileVersion | Yes |
 | `body` | String | Yes |
 | `bodyTrgmSimilarity` | Float | Yes |
 | `createdAt` | Datetime | No |
@@ -4138,6 +4077,8 @@ CRUD operations for ProposalComment records.
 | `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `id` | UUID | No |
@@ -4158,13 +4099,13 @@ CRUD operations for ProposalComment records.
 
 ```typescript
 // List all proposalComment records
-const items = await db.proposalComment.findMany({ select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.proposalComment.findMany({ select: { actorId: true, attachments: true, attachmentsUrl: true, attachmentsVersions: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.proposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.proposalComment.findOne({ id: '<UUID>', select: { actorId: true, attachments: true, attachmentsUrl: true, attachmentsVersions: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, line: true, outdatedAt: true, path: true, pathTrgmSimilarity: true, proposalId: true, resolvedAt: true, search: true, searchScore: true, searchTsvRank: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.proposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.proposalComment.create({ data: { actorId: '<UUID>', attachments: '<Upload>', attachmentsUrl: '<String>', attachmentsVersions: '<FileVersion>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', line: '<Int>', outdatedAt: '<Datetime>', path: '<String>', pathTrgmSimilarity: '<Float>', proposalId: '<UUID>', resolvedAt: '<Datetime>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.proposalComment.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -4199,6 +4140,8 @@ CRUD operations for Proposal records.
 | `decidedAt` | Datetime | Yes |
 | `dueAt` | Datetime | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `id` | UUID | No |
@@ -4236,13 +4179,13 @@ CRUD operations for Proposal records.
 
 ```typescript
 // List all proposal records
-const items = await db.proposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.proposal.findMany({ select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.proposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.proposal.findOne({ id: '<UUID>', select: { actorId: true, body: true, bodyTrgmSimilarity: true, closedReason: true, closedReasonTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, decidedAt: true, dueAt: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, kind: true, kindTrgmSimilarity: true, labels: true, mergeCommit: true, mergeCommitTrgmSimilarity: true, mergeMethod: true, mergeMethodTrgmSimilarity: true, mergeRequestedAt: true, mergedAt: true, metadata: true, parentId: true, priority: true, repositoryId: true, resolution: true, resolutionTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, sourceRef: true, sourceRefTrgmSimilarity: true, status: true, statusTrgmSimilarity: true, targetRef: true, targetRefTrgmSimilarity: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.proposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.proposal.create({ data: { actorId: '<UUID>', body: '<String>', bodyTrgmSimilarity: '<Float>', closedReason: '<String>', closedReasonTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', decidedAt: '<Datetime>', dueAt: '<Datetime>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', kind: '<String>', kindTrgmSimilarity: '<Float>', labels: '<String>', mergeCommit: '<String>', mergeCommitTrgmSimilarity: '<Float>', mergeMethod: '<String>', mergeMethodTrgmSimilarity: '<Float>', mergeRequestedAt: '<Datetime>', mergedAt: '<Datetime>', metadata: '<JSON>', parentId: '<UUID>', priority: '<BigFloat>', repositoryId: '<UUID>', resolution: '<String>', resolutionTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', sourceRef: '<String>', sourceRefTrgmSimilarity: '<Float>', status: '<String>', statusTrgmSimilarity: '<Float>', targetRef: '<String>', targetRefTrgmSimilarity: '<Float>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.proposal.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute();
@@ -4577,6 +4520,8 @@ CRUD operations for Repository records.
 | `description` | String | Yes |
 | `descriptionTrgmSimilarity` | Float | Yes |
 | `embedding` | Vector | Yes |
+| `embeddingModel` | String | Yes |
+| `embeddingModelTrgmSimilarity` | Float | Yes |
 | `embeddingUpdatedAt` | Datetime | Yes |
 | `embeddingVectorDistance` | Float | Yes |
 | `externalId` | String | Yes |
@@ -4604,13 +4549,13 @@ CRUD operations for Repository records.
 
 ```typescript
 // List all repository records
-const items = await db.repository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+const items = await db.repository.findMany({ select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
 
 // Get one by id
-const item = await db.repository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
+const item = await db.repository.findOne({ id: '<UUID>', select: { cloneUrl: true, cloneUrlTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultBranch: true, defaultBranchTrgmSimilarity: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, externalId: true, externalIdTrgmSimilarity: true, id: true, isArchived: true, metadata: true, name: true, nameTrgmSimilarity: true, ownerId: true, provider: true, providerTrgmSimilarity: true, search: true, searchScore: true, searchTsvRank: true, slug: true, slugTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true, visibility: true, visibilityTrgmSimilarity: true } }).execute();
 
 // Create
-const created = await db.repository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
+const created = await db.repository.create({ data: { cloneUrl: '<String>', cloneUrlTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', defaultBranch: '<String>', defaultBranchTrgmSimilarity: '<Float>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingModel: '<String>', embeddingModelTrgmSimilarity: '<Float>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', externalId: '<String>', externalIdTrgmSimilarity: '<Float>', isArchived: '<Boolean>', metadata: '<JSON>', name: '<String>', nameTrgmSimilarity: '<Float>', ownerId: '<UUID>', provider: '<String>', providerTrgmSimilarity: '<Float>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', slugTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>', visibility: '<String>', visibilityTrgmSimilarity: '<Float>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.repository.update({ where: { id: '<UUID>' }, data: { cloneUrl: '<String>' }, select: { id: true } }).execute();
@@ -4843,9 +4788,6 @@ const items = await db.resourceDeclaredCapacity.findMany({ select: { cpuLimitMil
 // Get one by id
 const item = await db.resourceDeclaredCapacity.findOne({ id: '<UUID>', select: { cpuLimitMillicores: true, cpuRequestMillicores: true, installationId: true, isTransient: true, kind: true, memoryLimitBytes: true, memoryRequestBytes: true, namespaceId: true, podCountMax: true, podCountMin: true, source: true, sourceId: true, storageSizeBytes: true, storageTotalBytes: true } }).execute();
 
-// Create
-const created = await db.resourceDeclaredCapacity.create({ data: { cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', installationId: '<UUID>', isTransient: '<Boolean>', kind: '<String>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', namespaceId: '<UUID>', podCountMax: '<Int>', podCountMin: '<Int>', source: '<String>', sourceId: '<UUID>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.resourceDeclaredCapacity.update({ where: { id: '<UUID>' }, data: { cpuLimitMillicores: '<BigInt>' }, select: { id: true } }).execute();
 
@@ -5018,9 +4960,6 @@ const items = await db.resourceObservedStorage.findMany({ select: { capacity: tr
 // Get one by id
 const item = await db.resourceObservedStorage.findOne({ id: '<UUID>', select: { capacity: true, capacityBytes: true, claimName: true, declaredStorageClass: true, declaredStorageSizeBytes: true, declaredStorageTotalBytes: true, installationId: true, isBound: true, kind: true, namespaceId: true, phase: true, requested: true, requestedBytes: true, resourceId: true, resourceStatus: true, slug: true, storageClass: true, storageName: true } }).execute();
 
-// Create
-const created = await db.resourceObservedStorage.create({ data: { capacity: '<String>', capacityBytes: '<BigInt>', claimName: '<String>', declaredStorageClass: '<String>', declaredStorageSizeBytes: '<BigInt>', declaredStorageTotalBytes: '<BigInt>', installationId: '<UUID>', isBound: '<Boolean>', kind: '<String>', namespaceId: '<UUID>', phase: '<String>', requested: '<String>', requestedBytes: '<BigInt>', resourceId: '<UUID>', resourceStatus: '<String>', slug: '<String>', storageClass: '<String>', storageName: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.resourceObservedStorage.update({ where: { id: '<UUID>' }, data: { capacity: '<String>' }, select: { id: true } }).execute();
 
@@ -5177,9 +5116,6 @@ const items = await db.resourceUtilization.findMany({ select: { avgMemoryBytes: 
 // Get one by id
 const item = await db.resourceUtilization.findOne({ id: '<UUID>', select: { avgMemoryBytes: true, cpuLimitMillicores: true, cpuPeakUtilization: true, cpuRequestHeadroomMillicores: true, cpuRequestMillicores: true, date: true, gbSeconds: true, kind: true, maxCpuMillicores: true, maxMemoryBytes: true, memoryLimitBytes: true, memoryPeakUtilization: true, memoryRequestBytes: true, memoryRequestHeadroomBytes: true, namespaceId: true, replicas: true, resourceId: true, runtimeSeconds: true, sampleCount: true } }).execute();
 
-// Create
-const created = await db.resourceUtilization.create({ data: { avgMemoryBytes: '<BigInt>', cpuLimitMillicores: '<BigInt>', cpuPeakUtilization: '<BigFloat>', cpuRequestHeadroomMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', date: '<Date>', gbSeconds: '<BigFloat>', kind: '<String>', maxCpuMillicores: '<BigInt>', maxMemoryBytes: '<BigInt>', memoryLimitBytes: '<BigInt>', memoryPeakUtilization: '<BigFloat>', memoryRequestBytes: '<BigInt>', memoryRequestHeadroomBytes: '<BigInt>', namespaceId: '<UUID>', replicas: '<Int>', resourceId: '<UUID>', runtimeSeconds: '<BigInt>', sampleCount: '<Int>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.resourceUtilization.update({ where: { id: '<UUID>' }, data: { avgMemoryBytes: '<BigInt>' }, select: { id: true } }).execute();
 
@@ -5241,9 +5177,6 @@ const items = await db.resourcesHealth.findMany({ select: { annotations: true, c
 // Get one by id
 const item = await db.resourcesHealth.findOne({ id: '<UUID>', select: { annotations: true, cpuLimitMillicores: true, cpuRequestMillicores: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, errorCount: true, id: true, imageRef: true, installationId: true, integrations: true, kind: true, labels: true, lastError: true, lastHeartbeatAt: true, memoryLimitBytes: true, memoryRequestBytes: true, name: true, namespaceId: true, realm: true, replicas: true, requiredConfigs: true, requiredSecrets: true, resourceDefinitionId: true, slug: true, spec: true, status: true, statusDetail: true, statusObserved: true, storageClass: true, storageSizeBytes: true, storageTotalBytes: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
-// Create
-const created = await db.resourcesHealth.create({ data: { annotations: '<JSON>', cpuLimitMillicores: '<BigInt>', cpuRequestMillicores: '<BigInt>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', errorCount: '<Int>', imageRef: '<String>', installationId: '<UUID>', integrations: '<String>', kind: '<String>', labels: '<JSON>', lastError: '<String>', lastHeartbeatAt: '<Datetime>', memoryLimitBytes: '<BigInt>', memoryRequestBytes: '<BigInt>', name: '<String>', namespaceId: '<UUID>', realm: '<String>', replicas: '<Int>', requiredConfigs: '<ResourceRequirement>', requiredSecrets: '<ResourceRequirement>', resourceDefinitionId: '<UUID>', slug: '<String>', spec: '<JSON>', status: '<String>', statusDetail: '<String>', statusObserved: '<JSON>', storageClass: '<String>', storageSizeBytes: '<BigInt>', storageTotalBytes: '<BigInt>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.resourcesHealth.update({ where: { id: '<UUID>' }, data: { annotations: '<JSON>' }, select: { id: true } }).execute();
 
@@ -5275,9 +5208,6 @@ const items = await db.resourcesRequirementsState.findMany({ select: { configHas
 
 // Get one by id
 const item = await db.resourcesRequirementsState.findOne({ id: '<UUID>', select: { configHash: true, configObjectName: true, requirementsHash: true, resourceId: true, secretsHash: true, secretsObjectName: true, slug: true } }).execute();
-
-// Create
-const created = await db.resourcesRequirementsState.create({ data: { configHash: '<String>', configObjectName: '<String>', requirementsHash: '<String>', resourceId: '<UUID>', secretsHash: '<String>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.resourcesRequirementsState.update({ where: { id: '<UUID>' }, data: { configHash: '<String>' }, select: { id: true } }).execute();
@@ -5315,14 +5245,56 @@ const items = await db.resourcesResolvedRequirement.findMany({ select: { atomId:
 // Get one by id
 const item = await db.resourcesResolvedRequirement.findOne({ id: '<UUID>', select: { atomId: true, configObjectName: true, name: true, namespaceId: true, present: true, realm: true, required: true, requirementKind: true, resourceId: true, secretsObjectName: true, slug: true } }).execute();
 
-// Create
-const created = await db.resourcesResolvedRequirement.create({ data: { atomId: '<UUID>', configObjectName: '<String>', name: '<String>', namespaceId: '<UUID>', present: '<Boolean>', realm: '<String>', required: '<Boolean>', requirementKind: '<String>', resourceId: '<UUID>', secretsObjectName: '<String>', slug: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.resourcesResolvedRequirement.update({ where: { id: '<UUID>' }, data: { atomId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.resourcesResolvedRequirement.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.serviceBinding`
+
+CRUD operations for ServiceBinding records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createdAt` | Datetime | No |
+| `createdBy` | UUID | Yes |
+| `createdByPrincipal` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `id` | UUID | No |
+| `installationId` | UUID | Yes |
+| `installationScope` | String | Yes |
+| `kind` | String | Yes |
+| `lastError` | String | Yes |
+| `metadata` | JSON | Yes |
+| `namespaceId` | UUID | Yes |
+| `observedHost` | String | Yes |
+| `realm` | String | Yes |
+| `status` | String | Yes |
+| `updatedAt` | Datetime | No |
+| `updatedBy` | UUID | Yes |
+| `updatedByPrincipal` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all serviceBinding records
+const items = await db.serviceBinding.findMany({ select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Get one by id
+const item = await db.serviceBinding.findOne({ id: '<UUID>', select: { createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, id: true, installationId: true, installationScope: true, kind: true, lastError: true, metadata: true, namespaceId: true, observedHost: true, realm: true, status: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+
+// Create
+const created = await db.serviceBinding.create({ data: { createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', installationId: '<UUID>', installationScope: '<String>', kind: '<String>', lastError: '<String>', metadata: '<JSON>', namespaceId: '<UUID>', observedHost: '<String>', realm: '<String>', status: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.serviceBinding.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.serviceBinding.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.webhookEndpoint`
@@ -5530,6 +5502,21 @@ copyGraph
 
 ```typescript
 const result = await db.mutation.copyGraph({ input: { graphId: '<UUID>', name: '<String>', scopeId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.createFunctionGraph`
+
+createFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateFunctionGraphInput (required) |
+
+```typescript
+const result = await db.mutation.createFunctionGraph({ input: '<CreateFunctionGraphInput>' }).execute();
 ```
 
 ### `db.mutation.databaseAddEdge`

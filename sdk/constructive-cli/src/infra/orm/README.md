@@ -26,7 +26,7 @@ const db = createClient({
 | `namespace` | findMany, findOne, create, update, delete |
 | `namespaceEvent` | findMany, findOne, create, update, delete |
 | `platformInfraCommit` | findMany, findOne, create, update, delete |
-| `platformInfraGetAllTreeNodesRecord` | findMany, findOne, create, update, delete |
+| `platformInfraGetAllTreeNodesRecord` | findMany, findOne, update, delete |
 | `platformInfraObject` | findMany, findOne, create, update, delete |
 | `platformInfraRef` | findMany, findOne, create, update, delete |
 | `platformInfraStore` | findMany, findOne, create, update, delete |
@@ -247,9 +247,6 @@ const items = await db.platformInfraGetAllTreeNodesRecord.findMany({ select: { d
 
 // Get one by id
 const item = await db.platformInfraGetAllTreeNodesRecord.findOne({ id: '<UUID>', select: { data: true, path: true } }).execute();
-
-// Create
-const created = await db.platformInfraGetAllTreeNodesRecord.create({ data: { data: '<JSON>', path: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformInfraGetAllTreeNodesRecord.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();

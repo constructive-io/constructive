@@ -12,7 +12,7 @@ Fields provided by the Unified Search plugin. Includes full-text search (tsvecto
 ```typescript
 db.user.findMany({ select: { id: true } }).execute()
 db.user.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.user.create({ data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' }, select: { id: true } }).execute()
+db.user.create({ data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', profilePictureUrl: '<String>', profilePictureVersions: '<FileVersion>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' }, select: { id: true } }).execute()
 db.user.update({ where: { id: '<UUID>' }, data: { displayName: '<String>' }, select: { id: true } }).execute()
 db.user.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -31,7 +31,7 @@ const items = await db.user.findMany({
 
 ```typescript
 const item = await db.user.create({
-  data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' },
+  data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', profilePictureUrl: '<String>', profilePictureVersions: '<FileVersion>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' },
   select: { id: true }
 }).execute();
 ```

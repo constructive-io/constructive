@@ -6,7 +6,6 @@
 export * from './useCreateCommitMutation';
 export * from './useUpdateCommitMutation';
 export * from './useDeleteCommitMutation';
-export * from './useCreateGetAllTreeNodesRecordMutation';
 export * from './useCreateObjectMutation';
 export * from './useUpdateObjectMutation';
 export * from './useDeleteObjectMutation';

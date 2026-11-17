@@ -12,7 +12,6 @@ csdk list-suspended-databases-record list --where.<field>.<op> <value> --orderBy
 csdk list-suspended-databases-record list --limit 10 --after <cursor>
 csdk list-suspended-databases-record find-first --where.<field>.<op> <value>
 csdk list-suspended-databases-record get --id <UUID>
-csdk list-suspended-databases-record create --name <String> --ownerId <UUID> --suspendedAt <Datetime> --suspendedReason <String>
 csdk list-suspended-databases-record update --id <UUID> [--name <String>] [--ownerId <UUID>] [--suspendedAt <Datetime>] [--suspendedReason <String>]
 csdk list-suspended-databases-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk list-suspended-databases-record list --select id,id
 
 ```bash
 csdk list-suspended-databases-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a listSuspendedDatabasesRecord
-
-```bash
-csdk list-suspended-databases-record create --name <String> --ownerId <UUID> --suspendedAt <Datetime> --suspendedReason <String>
 ```
 
 ### Get a listSuspendedDatabasesRecord by id

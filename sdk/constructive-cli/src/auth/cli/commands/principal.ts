@@ -8,7 +8,6 @@ import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
-  CreatePrincipalInput,
   PrincipalPatch,
   PrincipalSelect,
   PrincipalFilter,
@@ -49,7 +48,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'find-first', 'create'],
+        options: ['list', 'find-first'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -66,8 +65,6 @@ async function handleTableSubcommand(
       return handleList(argv, prompter);
     case 'find-first':
       return handleFindFirst(argv, prompter);
-    case 'create':
-      return handleCreate(argv, prompter);
     default:
       console.log(usage);
       process.exit(1);
@@ -135,121 +132,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to find record.');
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-    process.exit(1);
-  }
-}
-async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
-  try {
-    const rawAnswers = await prompter.prompt(argv, [
-      {
-        type: 'text',
-        name: 'apiKeyMaxDuration',
-        message: 'apiKeyMaxDuration',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'bypassStepUp',
-        message: 'bypassStepUp',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'createdBySessionId',
-        message: 'createdBySessionId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'depth',
-        message: 'depth',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'expiresAt',
-        message: 'expiresAt',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'isReadOnly',
-        message: 'isReadOnly',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'name',
-        message: 'name',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'ownerId',
-        message: 'ownerId',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'parentPrincipalId',
-        message: 'parentPrincipalId',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'useAdminOwner',
-        message: 'useAdminOwner',
-        required: true,
-      },
-      {
-        type: 'text',
-        name: 'userId',
-        message: 'userId',
-        required: true,
-      },
-    ]);
-    const answers = coerceAnswers(rawAnswers, fieldSchema);
-    const cleanedData = stripUndefined(answers, fieldSchema) as CreatePrincipalInput['principal'];
-    const client = getClient();
-    const result = await client.principal
-      .create({
-        data: {
-          apiKeyMaxDuration: cleanedData.apiKeyMaxDuration,
-          bypassStepUp: cleanedData.bypassStepUp,
-          createdBySessionId: cleanedData.createdBySessionId,
-          depth: cleanedData.depth,
-          expiresAt: cleanedData.expiresAt,
-          isReadOnly: cleanedData.isReadOnly,
-          name: cleanedData.name,
-          ownerId: cleanedData.ownerId,
-          parentPrincipalId: cleanedData.parentPrincipalId,
-          useAdminOwner: cleanedData.useAdminOwner,
-          userId: cleanedData.userId,
-        },
-        select: {
-          apiKeyMaxDuration: true,
-          bypassStepUp: true,
-          createdAt: true,
-          createdBySessionId: true,
-          depth: true,
-          expiresAt: true,
-          id: true,
-          isReadOnly: true,
-          name: true,
-          ownerId: true,
-          parentPrincipalId: true,
-          updatedAt: true,
-          useAdminOwner: true,
-          userId: true,
-        },
-      })
-      .execute();
-    console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('Failed to create record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

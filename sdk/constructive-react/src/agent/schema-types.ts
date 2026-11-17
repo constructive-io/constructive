@@ -276,6 +276,10 @@ export type AgentResourceOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -708,6 +712,10 @@ export type PlatformAgentResourceOrderBy =
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_ASC'
   | 'EMBEDDING_DESC'
+  | 'EMBEDDING_MODEL_ASC'
+  | 'EMBEDDING_MODEL_DESC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_ASC'
+  | 'EMBEDDING_MODEL_TRGM_SIMILARITY_DESC'
   | 'EMBEDDING_UPDATED_AT_ASC'
   | 'EMBEDDING_UPDATED_AT_DESC'
   | 'EMBEDDING_VECTOR_DISTANCE_ASC'
@@ -1510,7 +1518,7 @@ export interface AgentResourceChunkInput {
   /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
   databaseId?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: unknown;
@@ -1525,7 +1533,7 @@ export interface AgentResourceChunkPatch {
   /** Policy-required field derived from source table (used by AuthzRelatedEntityMembership) */
   databaseId?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: unknown;
@@ -1555,6 +1563,8 @@ export interface AgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -1583,6 +1593,8 @@ export interface AgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
@@ -1620,7 +1632,7 @@ export interface AgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -1655,7 +1667,7 @@ export interface AgentResourcePatch {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -3091,7 +3103,7 @@ export interface PlatformAgentResourceChunkInput {
   chunkIndex?: number;
   createdAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: unknown;
@@ -3104,7 +3116,7 @@ export interface PlatformAgentResourceChunkPatch {
   chunkIndex?: number;
   createdAt?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   metadata?: unknown;
@@ -3129,6 +3141,8 @@ export interface PlatformAgentResourceFilter {
   description?: StringTrgmFilter;
   /** Filter by the object’s `embedding` field. */
   embedding?: VectorFilter;
+  /** Filter by the object’s `embeddingModel` field. */
+  embeddingModel?: StringTrgmFilter;
   /** Filter by the object’s `embeddingUpdatedAt` field. */
   embeddingUpdatedAt?: DatetimeFilter;
   /** Filter by the object’s `id` field. */
@@ -3161,6 +3175,8 @@ export interface PlatformAgentResourceFilter {
   trgmBody?: TrgmSearchInput;
   /** TRGM search on the `description` column. */
   trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `embedding_model` column. */
+  trgmEmbeddingModel?: TrgmSearchInput;
   /** TRGM search on the `kind` column. */
   trgmKind?: TrgmSearchInput;
   /** TRGM search on the `title` column. */
@@ -3196,7 +3212,7 @@ export interface PlatformAgentResourceInput {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -3229,7 +3245,7 @@ export interface PlatformAgentResourcePatch {
   /** Brief description of this resource */
   description?: string;
   embedding?: number[];
-  /** Natural language text to embed server-side into the `embedding` vector column. Mutually exclusive with `embedding` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** Natural language text to embed server-side into the `embedding` vector column. Provide exactly one of `embedding` or `embeddingText`; sending both is an error. Requires the LLM plugin to be configured with an embedding provider. */
   embeddingText?: string;
   id?: string;
   /** Whether this resource is active and retrievable */
@@ -4134,10 +4150,12 @@ export interface VectorNearbyInput {
   includeChunks?: boolean;
   /** Similarity metric to use (default: COSINE). */
   metric?: VectorMetric;
-  /** Natural language text to embed server-side for similarity search. Mutually exclusive with `vector` — provide one or the other. Requires the LLM plugin to be configured with an embedding provider. */
+  /** The model that produced `vector`. On a column that records the model of each row's vector, only rows embedded with this model are compared; vectors of two models are not comparable. Filled in server-side when `text` is embedded. */
+  model?: string;
+  /** Natural language text to embed server-side for similarity search. Provide exactly one of `text` or `vector`; sending both or neither is an error. Blank text on its own counts as not given. Requires the LLM plugin to be configured with an embedding provider. */
   text?: string;
   /** Query vector for similarity search. */
-  vector: number[];
+  vector?: number[];
 }
 /** Root meta schema type */
 export interface MetaSchema {
@@ -4755,21 +4773,27 @@ export interface UpdatePlatformAgentThreadPayload {
 /** Information about a database table */
 export interface MetaTable {
   constraints: MetaConstraints;
+  /** Description written for this table, or null */
+  description?: string | null;
   fields: MetaField[];
   foreignKeyConstraints: MetaForeignKeyConstraint[];
-  /** i18n metadata (null if no @i18n tag) */
+  /** i18n metadata (null if the table is not translatable) */
   i18n?: MetaI18n | null;
   indexes: MetaIndex[];
   inflection: MetaInflection;
+  /** Whether this table only links rows of two other tables; the link appears in their manyToMany relations */
+  isJunction: boolean;
+  /** 'table' when rows are stored in this table, 'view' when they come from a view of other tables */
+  kind: string;
   /** Final GraphQL output type name */
   name: string;
   primaryKeyConstraints: MetaPrimaryKeyConstraint[];
   query: MetaQuery;
-  /** Realtime metadata (null if no @realtime tag) */
+  /** Realtime metadata (null if the table has no change subscriptions) */
   realtime?: MetaRealtime | null;
   relations: MetaRelations;
   schemaName: string;
-  /** Provisioning scope metadata (null if no @scope tag) */
+  /** Provisioning scope metadata (null if the table has no scope) */
   scope?: MetaScope | null;
   /** Search metadata (null if no search configured) */
   search?: MetaSearch | null;
@@ -4942,15 +4966,27 @@ export interface MetaConstraints {
 }
 /** Information about a table field/column */
 export interface MetaField {
+  /** Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only. */
+  allowedValues?: string[] | null;
   /** PostgreSQL column name */
   columnName: string;
   description?: string | null;
   /** Enum metadata if this field has an enum type */
   enumValues?: MetaEnum | null;
+  /** Set when the field holds files; null otherwise. Set on a table's own fields only. */
+  file?: MetaFileField | null;
   hasDefault: boolean;
+  /** Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only. */
+  isComputed?: boolean | null;
   isForeignKey: boolean;
   isNotNull: boolean;
   isPrimaryKey: boolean;
+  /** Whether a create must provide this field. Set on a table's own fields only. */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether a create may set this field. Set on a table's own fields only. */
+  isWritableOnCreate?: boolean | null;
+  /** Whether an update may change this field. Set on a table's own fields only. */
+  isWritableOnUpdate?: boolean | null;
   /** Final GraphQL field name */
   name: string;
   type: MetaType;
@@ -4964,7 +5000,7 @@ export interface MetaForeignKeyConstraint {
   referencedFields: string[];
   referencedTable: string;
 }
-/** i18n metadata for a table with @i18n tag */
+/** i18n metadata for a translatable table */
 export interface MetaI18n {
   /** Fields that are translatable */
   translatableFields: MetaI18nField[];
@@ -4979,7 +5015,7 @@ export interface MetaIndex {
   isUnique: boolean;
   name: string;
 }
-/** Table inflection names */
+/** Type and field names generated for this table */
 export interface MetaInflection {
   allRows: string;
   conditionType: string;
@@ -5007,7 +5043,7 @@ export interface MetaQuery {
   one?: string | null;
   update?: string | null;
 }
-/** Realtime metadata for a table with @realtime tag */
+/** Realtime metadata for a table with change subscriptions */
 export interface MetaRealtime {
   /** The generated subscription field name (e.g. onPostChanged) */
   subscriptionFieldName: string;
@@ -5022,13 +5058,13 @@ export interface MetaRelations {
 }
 /** Provisioning scope metadata for a table */
 export interface MetaScope {
-  /** SQL name of the entity table for entity scopes, else null */
+  /** Name of the entity table for entity scopes, else null */
   entityTable?: string | null;
-  /** Inflected scope key column (e.g. databaseId, orgId), null for global tiers */
+  /** Field name of the scope key (e.g. databaseId, orgId), null for global tiers */
   keyColumn?: string | null;
   /** Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org') */
   scope: string;
-  /** Provenance of the scope metadata (always 'smartTag') */
+  /** Where this scope metadata comes from */
   source: string;
   /** Coarse bucket: 'global', 'database', or 'entity' */
   tier: string;
@@ -5046,17 +5082,17 @@ export interface MetaSearch {
 }
 /** Storage metadata for a table */
 export interface MetaStorage {
-  /** GraphQL type name of the plane's buckets table */
+  /** GraphQL type name of the paired buckets table */
   bucketsType: string;
   /** Computed download-URL field on the files type; null on the buckets side */
   downloadUrlField?: string | null;
-  /** GraphQL type name of the plane's files table */
+  /** GraphQL type name of the paired files table */
   filesType: string;
   /** Whether this table is a storage buckets table */
   isBucketsTable: boolean;
   /** Whether this table is a storage files table */
   isFilesTable: boolean;
-  /** The plane's GraphQL upload surface */
+  /** Upload mutations and types for this storage */
   upload: MetaStorageUpload;
 }
 /** Information about a unique constraint */
@@ -5071,6 +5107,15 @@ export interface MetaEnum {
   /** Allowed values for this enum */
   values: string[];
 }
+/** How a field holds files */
+export interface MetaFileField {
+  /** GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise */
+  filesType?: string | null;
+  /** Whether the field holds a list of files */
+  isMultiple: boolean;
+  /** image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file. */
+  kind: string;
+}
 /** Information about a PostgreSQL type */
 export interface MetaType {
   /** Scalar serialization contract (null for plain scalars) */
@@ -5079,7 +5124,13 @@ export interface MetaType {
   hasDefault?: boolean | null;
   isArray: boolean;
   isNotNull?: boolean | null;
+  /** Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded. */
+  maxLength?: number | null;
   pgType: string;
+  /** Most significant digits a decimal number may hold. Null when unbounded. */
+  precision?: number | null;
+  /** Digits a decimal number keeps after the decimal point. Null when unbounded. */
+  scale?: number | null;
   subtype?: string | null;
 }
 /** Reference to a related table */
@@ -5098,6 +5149,8 @@ export interface MetaBelongsToRelation {
   fieldName?: string | null;
   isUnique: boolean;
   keys: MetaField[];
+  /** Fields on the referenced table that keys point at, in the same order as keys */
+  refKeys: MetaField[];
   references: MetaRefTable;
   type?: string | null;
 }
@@ -5107,6 +5160,8 @@ export interface MetaHasRelation {
   isUnique: boolean;
   keys: MetaField[];
   referencedBy: MetaRefTable;
+  /** Fields on the related table that point at this table, in the same order as keys */
+  remoteKeys: MetaField[];
   type?: string | null;
 }
 /** A many-to-many relation via junction table */
@@ -5129,7 +5184,7 @@ export interface MetaSearchColumn {
   /** Column name (camelCase) */
   name: string;
 }
-/** Per-table search configuration from @searchConfig smart tag */
+/** Per-table search configuration */
 export interface MetaSearchConfig {
   /** Exponential decay factor per day */
   boostRecencyDecay?: number | null;
@@ -5140,7 +5195,7 @@ export interface MetaSearchConfig {
   /** JSON-encoded per-adapter score weights */
   weights?: string | null;
 }
-/** The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from */
+/** The upload mutations and types for a storage table pair */
 export interface MetaStorageUpload {
   /** Per-file input type inside the bulk input */
   bulkFileInputType: string;
@@ -5158,14 +5213,14 @@ export interface MetaStorageUpload {
   mutation: string;
   /** Payload type of the single upload mutation */
   payloadType: string;
-  /** Whether the upload input requires ownerId (entity-keyed plane) */
+  /** Whether the upload input requires ownerId */
   requiresOwnerId: boolean;
 }
-/** How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType. */
+/** How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType. */
 export interface MetaScalarEncoding {
   /** For 'vector': declared length, else null. */
   dimensions?: number | null;
-  /** For 'ltree': values are dot-separated path strings. */
+  /** For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c'). */
   dotPath?: boolean | null;
   /** For 'vector': element scalar (e.g. 'float'). */
   elementType?: string | null;

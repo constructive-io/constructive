@@ -28,7 +28,6 @@ csdk auth set-token <your-token>
 | `config` | Manage config key-value store (per-context) |
 | `build` | build CRUD operations |
 | `build-step` | buildStep CRUD operations |
-| `builder-binding` | builderBinding CRUD operations |
 | `content-preset` | contentPreset CRUD operations |
 | `database-function-graph` | databaseFunctionGraph CRUD operations |
 | `database-function-graph-execution-cancel-request` | databaseFunctionGraphExecutionCancelRequest CRUD operations |
@@ -72,7 +71,6 @@ csdk auth set-token <your-token>
 | `namespace-event` | namespaceEvent CRUD operations |
 | `platform-build` | platformBuild CRUD operations |
 | `platform-build-step` | platformBuildStep CRUD operations |
-| `platform-builder-binding` | platformBuilderBinding CRUD operations |
 | `platform-function-api-binding` | platformFunctionApiBinding CRUD operations |
 | `platform-function-capability-binding` | platformFunctionCapabilityBinding CRUD operations |
 | `platform-function-definition` | platformFunctionDefinition CRUD operations |
@@ -119,6 +117,7 @@ csdk auth set-token <your-token>
 | `platform-resources-health` | platformResourcesHealth CRUD operations |
 | `platform-resources-requirements-state` | platformResourcesRequirementsState CRUD operations |
 | `platform-resources-resolved-requirement` | platformResourcesResolvedRequirement CRUD operations |
+| `platform-service-binding` | platformServiceBinding CRUD operations |
 | `platform-webhook-endpoint` | platformWebhookEndpoint CRUD operations |
 | `platform-webhook-event` | platformWebhookEvent CRUD operations |
 | `proposal-comment` | proposalComment CRUD operations |
@@ -147,6 +146,7 @@ csdk auth set-token <your-token>
 | `resources-health` | resourcesHealth CRUD operations |
 | `resources-requirements-state` | resourcesRequirementsState CRUD operations |
 | `resources-resolved-requirement` | resourcesResolvedRequirement CRUD operations |
+| `service-binding` | serviceBinding CRUD operations |
 | `webhook-endpoint` | webhookEndpoint CRUD operations |
 | `webhook-event` | webhookEvent CRUD operations |
 | `database-read-function-graph` | databaseReadFunctionGraph |
@@ -157,6 +157,7 @@ csdk auth set-token <your-token>
 | `add-node-and-save` | addNodeAndSave |
 | `approve-node` | approveNode |
 | `copy-graph` | copyGraph |
+| `create-function-graph` | createFunctionGraph |
 | `database-add-edge` | databaseAddEdge |
 | `database-add-edge-and-save` | databaseAddEdgeAndSave |
 | `database-add-node` | databaseAddNode |
@@ -290,6 +291,8 @@ CRUD operations for Build records.
 | `imageRef` | String |
 | `jobId` | BigInt |
 | `logs` | Upload |
+| `logsUrl` | String |
+| `logsVersions` | FileVersion |
 | `matrixKey` | String |
 | `metadata` | JSON |
 | `proposalId` | UUID |
@@ -341,42 +344,6 @@ CRUD operations for BuildStep records.
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
 
-### `builder-binding`
-
-CRUD operations for BuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all builderBinding records |
-| `find-first` | Find first matching builderBinding record |
-| `get` | Get a builderBinding by id |
-| `create` | Create a new builderBinding |
-| `update` | Update an existing builderBinding |
-| `delete` | Delete a builderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `databaseId` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `databaseId`, `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
-
 ### `content-preset`
 
 CRUD operations for ContentPreset records.
@@ -418,7 +385,6 @@ CRUD operations for DatabaseFunctionGraph records.
 | `list` | List all databaseFunctionGraph records |
 | `find-first` | Find first matching databaseFunctionGraph record |
 | `get` | Get a databaseFunctionGraph by id |
-| `create` | Create a new databaseFunctionGraph |
 | `update` | Update an existing databaseFunctionGraph |
 | `delete` | Delete a databaseFunctionGraph |
 
@@ -625,7 +591,6 @@ CRUD operations for DatabaseGraphGetAllTreeNodesRecord records.
 | `list` | List all databaseGraphGetAllTreeNodesRecord records |
 | `find-first` | Find first matching databaseGraphGetAllTreeNodesRecord record |
 | `get` | Get a databaseGraphGetAllTreeNodesRecord by id |
-| `create` | Create a new databaseGraphGetAllTreeNodesRecord |
 | `update` | Update an existing databaseGraphGetAllTreeNodesRecord |
 | `delete` | Delete a databaseGraphGetAllTreeNodesRecord |
 
@@ -1021,7 +986,6 @@ CRUD operations for FunctionGraph records.
 | `list` | List all functionGraph records |
 | `find-first` | Find first matching functionGraph record |
 | `get` | Get a functionGraph by id |
-| `create` | Create a new functionGraph |
 | `update` | Update an existing functionGraph |
 | `delete` | Delete a functionGraph |
 
@@ -1393,7 +1357,6 @@ CRUD operations for GetAllTreeNodesRecord records.
 | `list` | List all getAllTreeNodesRecord records |
 | `find-first` | Find first matching getAllTreeNodesRecord record |
 | `get` | Get a getAllTreeNodesRecord by id |
-| `create` | Create a new getAllTreeNodesRecord |
 | `update` | Update an existing getAllTreeNodesRecord |
 | `delete` | Delete a getAllTreeNodesRecord |
 
@@ -1518,7 +1481,6 @@ CRUD operations for InfraGetAllTreeNodesRecord records.
 | `list` | List all infraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching infraGetAllTreeNodesRecord record |
 | `get` | Get a infraGetAllTreeNodesRecord by id |
-| `create` | Create a new infraGetAllTreeNodesRecord |
 | `update` | Update an existing infraGetAllTreeNodesRecord |
 | `delete` | Delete a infraGetAllTreeNodesRecord |
 
@@ -1634,6 +1596,8 @@ CRUD operations for IntegrationProvider records.
 | `icon` | String |
 | `id` | UUID |
 | `logo` | Image |
+| `logoUrl` | String |
+| `logoVersions` | FileVersion |
 | `name` | String |
 | `requiredConfigs` | ResourceRequirement |
 | `requiredSecrets` | ResourceRequirement |
@@ -1736,6 +1700,8 @@ CRUD operations for PlatformBuild records.
 | `imageRef` | String |
 | `jobId` | BigInt |
 | `logs` | Upload |
+| `logsUrl` | String |
+| `logsVersions` | FileVersion |
 | `matrixKey` | String |
 | `metadata` | JSON |
 | `proposalId` | UUID |
@@ -1785,41 +1751,6 @@ CRUD operations for PlatformBuildStep records.
 
 **Required create fields:** `buildId`, `name`, `seq`
 **Optional create fields (backend defaults):** `createdByPrincipal`, `exitCode`, `finishedAt`, `kind`, `logBytes`, `logOffset`, `parentSeq`, `recordedAt`, `startedAt`, `status`, `summary`
-
-### `platform-builder-binding`
-
-CRUD operations for PlatformBuilderBinding records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all platformBuilderBinding records |
-| `find-first` | Find first matching platformBuilderBinding record |
-| `get` | Get a platformBuilderBinding by id |
-| `create` | Create a new platformBuilderBinding |
-| `update` | Update an existing platformBuilderBinding |
-| `delete` | Delete a platformBuilderBinding |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `createdAt` | Datetime |
-| `createdBy` | UUID |
-| `createdByPrincipal` | UUID |
-| `id` | UUID |
-| `installationId` | UUID |
-| `lastError` | String |
-| `metadata` | JSON |
-| `namespaceId` | UUID |
-| `observedHost` | String |
-| `realm` | String |
-| `status` | String |
-| `updatedAt` | Datetime |
-| `updatedBy` | UUID |
-| `updatedByPrincipal` | UUID |
-
-**Required create fields:** `installationId`, `namespaceId`
-**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-function-api-binding`
 
@@ -2275,7 +2206,6 @@ CRUD operations for PlatformInfraGetAllTreeNodesRecord records.
 | `list` | List all platformInfraGetAllTreeNodesRecord records |
 | `find-first` | Find first matching platformInfraGetAllTreeNodesRecord record |
 | `get` | Get a platformInfraGetAllTreeNodesRecord by id |
-| `create` | Create a new platformInfraGetAllTreeNodesRecord |
 | `update` | Update an existing platformInfraGetAllTreeNodesRecord |
 | `delete` | Delete a platformInfraGetAllTreeNodesRecord |
 
@@ -2511,12 +2441,16 @@ CRUD operations for PlatformProposalComment records.
 |-------|------|
 | `actorId` | UUID |
 | `attachments` | Upload |
+| `attachmentsUrl` | String |
+| `attachmentsVersions` | FileVersion |
 | `body` | String |
 | `bodyTrgmSimilarity` | Float |
 | `createdAt` | Datetime |
 | `createdBy` | UUID |
 | `createdByPrincipal` | UUID |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -2538,7 +2472,7 @@ CRUD operations for PlatformProposalComment records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -2568,6 +2502,11 @@ EMBEDDER_PROVIDER=ollama csdk platform-proposal-comment update --embedding "new 
 csdk platform-proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmPath`):*
 ```bash
 csdk platform-proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
@@ -2580,7 +2519,7 @@ csdk platform-proposal-comment list --where.search "search query" --select title
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk platform-proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
 ```
 
 *Search with pagination and field projection:*
@@ -2619,6 +2558,8 @@ CRUD operations for PlatformProposal records.
 | `decidedAt` | Datetime |
 | `dueAt` | Datetime |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -2657,7 +2598,7 @@ CRUD operations for PlatformProposal records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -2690,6 +2631,11 @@ csdk platform-proposal list --where.trgmBody.value "approximate query" --where.t
 *Fuzzy search via trigram similarity (`trgmClosedReason`):*
 ```bash
 csdk platform-proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-proposal list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmKind`):*
@@ -2739,7 +2685,7 @@ csdk platform-proposal list --where.trgmTitle.value "approximate query" --where.
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+csdk platform-proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -3088,6 +3034,8 @@ CRUD operations for PlatformRepository records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `externalId` | String |
@@ -3116,7 +3064,7 @@ CRUD operations for PlatformRepository records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -3156,6 +3104,11 @@ csdk platform-repository list --where.trgmDefaultBranch.value "approximate query
 csdk platform-repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk platform-repository list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmExternalId`):*
 ```bash
 csdk platform-repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
@@ -3188,7 +3141,7 @@ csdk platform-repository list --where.trgmVisibility.value "approximate query" -
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk platform-repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+csdk platform-repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -3360,7 +3313,6 @@ CRUD operations for PlatformResourceDeclaredCapacity records.
 | `list` | List all platformResourceDeclaredCapacity records |
 | `find-first` | Find first matching platformResourceDeclaredCapacity record |
 | `get` | Get a platformResourceDeclaredCapacity by id |
-| `create` | Create a new platformResourceDeclaredCapacity |
 | `update` | Update an existing platformResourceDeclaredCapacity |
 | `delete` | Delete a platformResourceDeclaredCapacity |
 
@@ -3499,7 +3451,6 @@ CRUD operations for PlatformResourceObservedStorage records.
 | `list` | List all platformResourceObservedStorage records |
 | `find-first` | Find first matching platformResourceObservedStorage record |
 | `get` | Get a platformResourceObservedStorage by id |
-| `create` | Create a new platformResourceObservedStorage |
 | `update` | Update an existing platformResourceObservedStorage |
 | `delete` | Delete a platformResourceObservedStorage |
 
@@ -3625,7 +3576,6 @@ CRUD operations for PlatformResourceUtilization records.
 | `list` | List all platformResourceUtilization records |
 | `find-first` | Find first matching platformResourceUtilization record |
 | `get` | Get a platformResourceUtilization by id |
-| `create` | Create a new platformResourceUtilization |
 | `update` | Update an existing platformResourceUtilization |
 | `delete` | Delete a platformResourceUtilization |
 
@@ -3664,7 +3614,6 @@ CRUD operations for PlatformResourcesHealth records.
 | `list` | List all platformResourcesHealth records |
 | `find-first` | Find first matching platformResourcesHealth record |
 | `get` | Get a platformResourcesHealth by id |
-| `create` | Create a new platformResourcesHealth |
 | `update` | Update an existing platformResourcesHealth |
 | `delete` | Delete a platformResourcesHealth |
 
@@ -3719,7 +3668,6 @@ CRUD operations for PlatformResourcesRequirementsState records.
 | `list` | List all platformResourcesRequirementsState records |
 | `find-first` | Find first matching platformResourcesRequirementsState record |
 | `get` | Get a platformResourcesRequirementsState by id |
-| `create` | Create a new platformResourcesRequirementsState |
 | `update` | Update an existing platformResourcesRequirementsState |
 | `delete` | Delete a platformResourcesRequirementsState |
 
@@ -3746,7 +3694,6 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `list` | List all platformResourcesResolvedRequirement records |
 | `find-first` | Find first matching platformResourcesResolvedRequirement record |
 | `get` | Get a platformResourcesResolvedRequirement by id |
-| `create` | Create a new platformResourcesResolvedRequirement |
 | `update` | Update an existing platformResourcesResolvedRequirement |
 | `delete` | Delete a platformResourcesResolvedRequirement |
 
@@ -3767,6 +3714,43 @@ CRUD operations for PlatformResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `platform-service-binding`
+
+CRUD operations for PlatformServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all platformServiceBinding records |
+| `find-first` | Find first matching platformServiceBinding record |
+| `get` | Get a platformServiceBinding by id |
+| `create` | Create a new platformServiceBinding |
+| `update` | Update an existing platformServiceBinding |
+| `delete` | Delete a platformServiceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `platform-webhook-endpoint`
 
@@ -3857,6 +3841,8 @@ CRUD operations for ProposalComment records.
 |-------|------|
 | `actorId` | UUID |
 | `attachments` | Upload |
+| `attachmentsUrl` | String |
+| `attachmentsVersions` | FileVersion |
 | `body` | String |
 | `bodyTrgmSimilarity` | Float |
 | `createdAt` | Datetime |
@@ -3864,6 +3850,8 @@ CRUD operations for ProposalComment records.
 | `createdByPrincipal` | UUID |
 | `databaseId` | UUID |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -3885,7 +3873,7 @@ CRUD operations for ProposalComment records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -3915,6 +3903,11 @@ EMBEDDER_PROVIDER=ollama csdk proposal-comment update --embedding "new text to e
 csdk proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmPath`):*
 ```bash
 csdk proposal-comment list --where.trgmPath.value "approximate query" --where.trgmPath.threshold 0.3 --select title,pathTrgmSimilarity
@@ -3927,7 +3920,7 @@ csdk proposal-comment list --where.search "search query" --select title,tsvRank
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
 ```
 
 *Search with pagination and field projection:*
@@ -3967,6 +3960,8 @@ CRUD operations for Proposal records.
 | `decidedAt` | Datetime |
 | `dueAt` | Datetime |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `id` | UUID |
@@ -4005,7 +4000,7 @@ CRUD operations for Proposal records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
+> **Unified Search API fields:** `bodyTrgmSimilarity`, `closedReasonTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `mergeCommitTrgmSimilarity`, `mergeMethodTrgmSimilarity`, `resolutionTrgmSimilarity`, `search`, `searchScore`, `sourceRefTrgmSimilarity`, `statusTrgmSimilarity`, `targetRefTrgmSimilarity`, `titleTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -4038,6 +4033,11 @@ csdk proposal list --where.trgmBody.value "approximate query" --where.trgmBody.t
 *Fuzzy search via trigram similarity (`trgmClosedReason`):*
 ```bash
 csdk proposal list --where.trgmClosedReason.value "approximate query" --where.trgmClosedReason.threshold 0.3 --select title,closedReasonTrgmSimilarity
+```
+
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk proposal list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
 ```
 
 *Fuzzy search via trigram similarity (`trgmKind`):*
@@ -4087,7 +4087,7 @@ csdk proposal list --where.trgmTitle.value "approximate query" --where.trgmTitle
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
+csdk proposal list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,closedReasonTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,mergeCommitTrgmSimilarity,mergeMethodTrgmSimilarity,resolutionTrgmSimilarity,tsvRank,searchScore,sourceRefTrgmSimilarity,statusTrgmSimilarity,targetRefTrgmSimilarity,titleTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -4444,6 +4444,8 @@ CRUD operations for Repository records.
 | `description` | String |
 | `descriptionTrgmSimilarity` | Float |
 | `embedding` | Vector |
+| `embeddingModel` | String |
+| `embeddingModelTrgmSimilarity` | Float |
 | `embeddingUpdatedAt` | Datetime |
 | `embeddingVectorDistance` | Float |
 | `externalId` | String |
@@ -4472,7 +4474,7 @@ CRUD operations for Repository records.
 > **pgvector embedding fields:** `embedding`
 > High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
+> **Unified Search API fields:** `cloneUrlTrgmSimilarity`, `defaultBranchTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `externalIdTrgmSimilarity`, `nameTrgmSimilarity`, `providerTrgmSimilarity`, `search`, `searchScore`, `slugTrgmSimilarity`, `visibilityTrgmSimilarity`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
@@ -4512,6 +4514,11 @@ csdk repository list --where.trgmDefaultBranch.value "approximate query" --where
 csdk repository list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
+*Fuzzy search via trigram similarity (`trgmEmbeddingModel`):*
+```bash
+csdk repository list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 *Fuzzy search via trigram similarity (`trgmExternalId`):*
 ```bash
 csdk repository list --where.trgmExternalId.value "approximate query" --where.trgmExternalId.threshold 0.3 --select title,externalIdTrgmSimilarity
@@ -4544,7 +4551,7 @@ csdk repository list --where.trgmVisibility.value "approximate query" --where.tr
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
+csdk repository list --where.unifiedSearch "search query" --select title,cloneUrlTrgmSimilarity,defaultBranchTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,externalIdTrgmSimilarity,nameTrgmSimilarity,providerTrgmSimilarity,tsvRank,searchScore,slugTrgmSimilarity,visibilityTrgmSimilarity
 ```
 
 *Search with pagination and field projection:*
@@ -4720,7 +4727,6 @@ CRUD operations for ResourceDeclaredCapacity records.
 | `list` | List all resourceDeclaredCapacity records |
 | `find-first` | Find first matching resourceDeclaredCapacity record |
 | `get` | Get a resourceDeclaredCapacity by id |
-| `create` | Create a new resourceDeclaredCapacity |
 | `update` | Update an existing resourceDeclaredCapacity |
 | `delete` | Delete a resourceDeclaredCapacity |
 
@@ -4862,7 +4868,6 @@ CRUD operations for ResourceObservedStorage records.
 | `list` | List all resourceObservedStorage records |
 | `find-first` | Find first matching resourceObservedStorage record |
 | `get` | Get a resourceObservedStorage by id |
-| `create` | Create a new resourceObservedStorage |
 | `update` | Update an existing resourceObservedStorage |
 | `delete` | Delete a resourceObservedStorage |
 
@@ -4991,7 +4996,6 @@ CRUD operations for ResourceUtilization records.
 | `list` | List all resourceUtilization records |
 | `find-first` | Find first matching resourceUtilization record |
 | `get` | Get a resourceUtilization by id |
-| `create` | Create a new resourceUtilization |
 | `update` | Update an existing resourceUtilization |
 | `delete` | Delete a resourceUtilization |
 
@@ -5030,7 +5034,6 @@ CRUD operations for ResourcesHealth records.
 | `list` | List all resourcesHealth records |
 | `find-first` | Find first matching resourcesHealth record |
 | `get` | Get a resourcesHealth by id |
-| `create` | Create a new resourcesHealth |
 | `update` | Update an existing resourcesHealth |
 | `delete` | Delete a resourcesHealth |
 
@@ -5086,7 +5089,6 @@ CRUD operations for ResourcesRequirementsState records.
 | `list` | List all resourcesRequirementsState records |
 | `find-first` | Find first matching resourcesRequirementsState record |
 | `get` | Get a resourcesRequirementsState by id |
-| `create` | Create a new resourcesRequirementsState |
 | `update` | Update an existing resourcesRequirementsState |
 | `delete` | Delete a resourcesRequirementsState |
 
@@ -5113,7 +5115,6 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `list` | List all resourcesResolvedRequirement records |
 | `find-first` | Find first matching resourcesResolvedRequirement record |
 | `get` | Get a resourcesResolvedRequirement by id |
-| `create` | Create a new resourcesResolvedRequirement |
 | `update` | Update an existing resourcesResolvedRequirement |
 | `delete` | Delete a resourcesResolvedRequirement |
 
@@ -5134,6 +5135,44 @@ CRUD operations for ResourcesResolvedRequirement records.
 | `slug` | String |
 
 **Required create fields:** `atomId`, `configObjectName`, `name`, `namespaceId`, `present`, `realm`, `required`, `requirementKind`, `resourceId`, `secretsObjectName`, `slug`
+
+### `service-binding`
+
+CRUD operations for ServiceBinding records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all serviceBinding records |
+| `find-first` | Find first matching serviceBinding record |
+| `get` | Get a serviceBinding by id |
+| `create` | Create a new serviceBinding |
+| `update` | Update an existing serviceBinding |
+| `delete` | Delete a serviceBinding |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createdAt` | Datetime |
+| `createdBy` | UUID |
+| `createdByPrincipal` | UUID |
+| `databaseId` | UUID |
+| `id` | UUID |
+| `installationId` | UUID |
+| `installationScope` | String |
+| `kind` | String |
+| `lastError` | String |
+| `metadata` | JSON |
+| `namespaceId` | UUID |
+| `observedHost` | String |
+| `realm` | String |
+| `status` | String |
+| `updatedAt` | Datetime |
+| `updatedBy` | UUID |
+| `updatedByPrincipal` | UUID |
+
+**Required create fields:** `databaseId`, `installationId`, `installationScope`, `kind`, `namespaceId`
+**Optional create fields (backend defaults):** `createdBy`, `createdByPrincipal`, `lastError`, `metadata`, `observedHost`, `realm`, `status`, `updatedBy`, `updatedByPrincipal`
 
 ### `webhook-endpoint`
 
@@ -5328,6 +5367,23 @@ copyGraph
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.graphId` | UUID |
+  | `--input.name` | String |
+  | `--input.scopeId` | UUID |
+
+### `create-function-graph`
+
+createFunctionGraph
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.context` | String |
+  | `--input.createdBy` | UUID |
+  | `--input.definitionsCommitId` | UUID |
+  | `--input.description` | String |
   | `--input.name` | String |
   | `--input.scopeId` | UUID |
 

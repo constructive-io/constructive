@@ -7,7 +7,7 @@ CRUD operations for ProposalComment records via csdk CLI
 **pgvector embedding fields:** `embedding`
 High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-**Unified Search API fields:** `bodyTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
+**Unified Search API fields:** `bodyTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `pathTrgmSimilarity`, `search`, `searchScore`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -91,6 +91,12 @@ EMBEDDER_PROVIDER=ollama csdk proposal-comment update --embedding "new text to e
 csdk proposal-comment list --where.trgmBody.value "approximate query" --where.trgmBody.threshold 0.3 --select title,bodyTrgmSimilarity
 ```
 
+### Fuzzy search via trigram similarity (`trgmEmbeddingModel`)
+
+```bash
+csdk proposal-comment list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 ### Fuzzy search via trigram similarity (`trgmPath`)
 
 ```bash
@@ -106,7 +112,7 @@ csdk proposal-comment list --where.search "search query" --select title,tsvRank
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
+csdk proposal-comment list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,embeddingModelTrgmSimilarity,pathTrgmSimilarity,tsvRank,searchScore
 ```
 
 ### Search with pagination and field projection

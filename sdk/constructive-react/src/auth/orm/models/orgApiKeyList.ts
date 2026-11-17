@@ -29,7 +29,6 @@ import type {
   OrgApiKeyListSelect,
   OrgApiKeyListFilter,
   OrgApiKeyListOrderBy,
-  CreateOrgApiKeyListInput,
   UpdateOrgApiKeyListInput,
   OrgApiKeyListPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class OrgApiKeyListModel {
       }) => ({
         orgApiKeyList: data.orgApiKeyLists?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends OrgApiKeyListSelect>(
-    args: CreateArgs<S, CreateOrgApiKeyListInput['orgApiKeyList']> & {
-      select: S;
-    } & StrictSelect<S, OrgApiKeyListSelect>
-  ): QueryBuilder<{
-    createOrgApiKeyList: {
-      orgApiKeyList: InferSelectResult<OrgApiKeyListWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'OrgApiKeyList',
-      'createOrgApiKeyList',
-      'orgApiKeyList',
-      args.select,
-      args.data,
-      'CreateOrgApiKeyListInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'OrgApiKeyList',
-      fieldName: 'createOrgApiKeyList',
-      document,
-      variables,
     });
   }
 }

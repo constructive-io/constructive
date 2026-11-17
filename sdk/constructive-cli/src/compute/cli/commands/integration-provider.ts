@@ -23,6 +23,8 @@ const fieldSchema: FieldSchema = {
   icon: 'string',
   id: 'uuid',
   logo: 'string',
+  logoUrl: 'string',
+  logoVersions: 'string',
   name: 'string',
   requiredConfigs: 'string',
   requiredSecrets: 'string',

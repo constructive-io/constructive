@@ -7,8 +7,8 @@ Per-membership profile information visible to other entity members (display name
 ## Usage
 
 ```typescript
-useOrgMemberProfilesQuery({ selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, title: true, updatedAt: true } } })
-useOrgMemberProfileQuery({ id: '<UUID>', selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, title: true, updatedAt: true } } })
+useOrgMemberProfilesQuery({ selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, profilePictureUrl: true, profilePictureVersions: true, title: true, updatedAt: true } } })
+useOrgMemberProfileQuery({ id: '<UUID>', selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, profilePictureUrl: true, profilePictureVersions: true, title: true, updatedAt: true } } })
 useCreateOrgMemberProfileMutation({ selection: { fields: { id: true } } })
 useUpdateOrgMemberProfileMutation({ selection: { fields: { id: true } } })
 useDeleteOrgMemberProfileMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgMemberProfileMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgMemberProfilesQuery({
-  selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, title: true, updatedAt: true } },
+  selection: { fields: { actorId: true, bio: true, createdAt: true, displayName: true, email: true, entityId: true, id: true, membershipId: true, profilePicture: true, profilePictureUrl: true, profilePictureVersions: true, title: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgMemberProfilesQuery({
 const { mutate } = useCreateOrgMemberProfileMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', bio: '<String>', displayName: '<String>', email: '<String>', entityId: '<UUID>', membershipId: '<UUID>', profilePicture: '<Image>', title: '<String>' });
+mutate({ actorId: '<UUID>', bio: '<String>', displayName: '<String>', email: '<String>', entityId: '<UUID>', membershipId: '<UUID>', profilePicture: '<Image>', profilePictureUrl: '<String>', profilePictureVersions: '<FileVersion>', title: '<String>' });
 ```

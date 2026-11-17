@@ -6,6 +6,7 @@
 export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
+export type FileVersion = unknown;
 export type ResourceRequirement = unknown;
 export interface Build {
   actorId: string | null;
@@ -21,6 +22,8 @@ export interface Build {
   imageRef: string | null;
   jobId: string | null;
   logs: ConstructiveInternalTypeUpload | null;
+  logsUrl: string | null;
+  logsVersions: FileVersion[] | null;
   matrixKey: string | null;
   metadata: unknown | null;
   proposalId: string | null;
@@ -49,23 +52,6 @@ export interface BuildStep {
   startedAt: string | null;
   status: string | null;
   summary: unknown | null;
-}
-export interface BuilderBinding {
-  createdAt: string | null;
-  createdBy: string | null;
-  createdByPrincipal: string | null;
-  databaseId: string | null;
-  id: string | null;
-  installationId: string | null;
-  lastError: string | null;
-  metadata: unknown | null;
-  namespaceId: string | null;
-  observedHost: string | null;
-  realm: string | null;
-  status: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  updatedByPrincipal: string | null;
 }
 export interface ContentPreset {
   active: boolean | null;
@@ -593,6 +579,8 @@ export interface IntegrationProvider {
   icon: string | null;
   id: string | null;
   logo: ConstructiveInternalTypeImage | null;
+  logoUrl: string | null;
+  logoVersions: FileVersion[] | null;
   name: string | null;
   requiredConfigs: ResourceRequirement[] | null;
   requiredSecrets: ResourceRequirement[] | null;
@@ -638,6 +626,8 @@ export interface PlatformBuild {
   imageRef: string | null;
   jobId: string | null;
   logs: ConstructiveInternalTypeUpload | null;
+  logsUrl: string | null;
+  logsVersions: FileVersion[] | null;
   matrixKey: string | null;
   metadata: unknown | null;
   proposalId: string | null;
@@ -665,22 +655,6 @@ export interface PlatformBuildStep {
   startedAt: string | null;
   status: string | null;
   summary: unknown | null;
-}
-export interface PlatformBuilderBinding {
-  createdAt: string | null;
-  createdBy: string | null;
-  createdByPrincipal: string | null;
-  id: string | null;
-  installationId: string | null;
-  lastError: string | null;
-  metadata: unknown | null;
-  namespaceId: string | null;
-  observedHost: string | null;
-  realm: string | null;
-  status: string | null;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  updatedByPrincipal: string | null;
 }
 export interface PlatformFunctionApiBinding {
   alias: string | null;
@@ -976,12 +950,16 @@ export interface PlatformNamespaceEvent {
 export interface PlatformProposalComment {
   actorId: string | null;
   attachments: ConstructiveInternalTypeUpload[] | null;
+  attachmentsUrl: string[] | null;
+  attachmentsVersions: FileVersion[] | null;
   body: string | null;
   bodyTrgmSimilarity: number | null;
   createdAt: string | null;
   createdBy: string | null;
   createdByPrincipal: string | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -1010,6 +988,8 @@ export interface PlatformProposal {
   decidedAt: string | null;
   dueAt: string | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -1160,6 +1140,8 @@ export interface PlatformRepository {
   description: string | null;
   descriptionTrgmSimilarity: number | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   externalId: string | null;
@@ -1456,6 +1438,24 @@ export interface PlatformResourcesResolvedRequirement {
   secretsObjectName: string | null;
   slug: string | null;
 }
+export interface PlatformServiceBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  installationId: string | null;
+  installationScope: string | null;
+  kind: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformWebhookEndpoint {
   active: boolean | null;
   createdAt: string | null;
@@ -1490,6 +1490,8 @@ export interface PlatformWebhookEvent {
 export interface ProposalComment {
   actorId: string | null;
   attachments: ConstructiveInternalTypeUpload[] | null;
+  attachmentsUrl: string[] | null;
+  attachmentsVersions: FileVersion[] | null;
   body: string | null;
   bodyTrgmSimilarity: number | null;
   createdAt: string | null;
@@ -1497,6 +1499,8 @@ export interface ProposalComment {
   createdByPrincipal: string | null;
   databaseId: string | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -1526,6 +1530,8 @@ export interface Proposal {
   decidedAt: string | null;
   dueAt: string | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -1684,6 +1690,8 @@ export interface Repository {
   description: string | null;
   descriptionTrgmSimilarity: number | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   externalId: string | null;
@@ -1990,6 +1998,25 @@ export interface ResourcesResolvedRequirement {
   resourceId: string | null;
   secretsObjectName: string | null;
   slug: string | null;
+}
+export interface ServiceBinding {
+  createdAt: string | null;
+  createdBy: string | null;
+  createdByPrincipal: string | null;
+  databaseId: string | null;
+  id: string | null;
+  installationId: string | null;
+  installationScope: string | null;
+  kind: string | null;
+  lastError: string | null;
+  metadata: unknown | null;
+  namespaceId: string | null;
+  observedHost: string | null;
+  realm: string | null;
+  status: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  updatedByPrincipal: string | null;
 }
 export interface WebhookEndpoint {
   active: boolean | null;
