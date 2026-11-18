@@ -253,12 +253,24 @@ export interface FastAppHost {
   progress?: ProgressWatch;
   /** The blocks registry search_blocks reads in place of the one the app names. */
   blocksRegistryUrl?(): string | undefined;
+  /**
+   * Whether the host's UI can open the app's dev server. Default true. A
+   * headless host sets false: the pipeline then leaves `previewUrl` out of the
+   * card details and the tool results, because nobody can open a pod's dev
+   * server.
+   */
+  preview?: boolean;
 }
 
 let current: FastAppHost | null = null;
 
 export function configureFastAppHost(host: FastAppHost): void {
   current = host;
+}
+
+/** Whether the host can open the app's dev server (`FastAppHost.preview`, true unless it says false). */
+export function hostPreviews(): boolean {
+  return getFastAppHost().preview !== false;
 }
 
 export function getFastAppHost(): FastAppHost {
