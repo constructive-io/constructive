@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.24.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.3...graphile-llm@1.24.4) (2026-11-18)
+
+### Bug Fixes
+
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+
 ## [1.24.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.2...graphile-llm@1.24.3) (2026-11-17)
 
 **Note:** Version bump only for package graphile-llm

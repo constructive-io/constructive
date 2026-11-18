@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.35.22](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.21...@constructive-io/graphql-server@5.35.22) (2026-11-18)
+
+### Bug Fixes
+
+- **graphql-server:** a flush makes rebuilt hosts read their settings again ([#2018](https://github.com/constructive-io/constructive/issues/2018)) ([278e12c](https://github.com/constructive-io/constructive/commit/278e12c2c32180583cd46cf8bb94c00ff7d3822c)), closes [constructive-planning#2539](https://github.com/constructive-planning/issues/2539)
+- **server:** a refused credential on a REST route answers its HTTP status with a JSON error ([#2028](https://github.com/constructive-io/constructive/issues/2028)) ([29b71f0](https://github.com/constructive-io/constructive/commit/29b71f0a25bf160da98c056ca712ed49f8d2fcbb))
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+- **server:** chat routes resolve an entity to the agent module of its own scope ([#2027](https://github.com/constructive-io/constructive/issues/2027)) ([eae302c](https://github.com/constructive-io/constructive/commit/eae302cb7aec48c74a387c470ae7c67d79d40f03))
+- **server:** gate captcha on the mutation fields that execute ([#2022](https://github.com/constructive-io/constructive/issues/2022)) ([d32d3ab](https://github.com/constructive-io/constructive/commit/d32d3ab97c95162764d3e83a7e2aef9c2bfed0b1))
+- **server:** return document-gate refusals with their registered error code ([#2025](https://github.com/constructive-io/constructive/issues/2025)) ([bbe2567](https://github.com/constructive-io/constructive/commit/bbe2567e0f249b03a2bb671563def01278e7c2e9))
+
 ## [5.35.21](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.20...@constructive-io/graphql-server@5.35.21) (2026-11-17)
 
 ### Bug Fixes
