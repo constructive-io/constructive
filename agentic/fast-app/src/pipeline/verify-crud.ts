@@ -4,6 +4,7 @@
 
 import { readFile, rm, writeFile } from 'node:fs/promises';
 
+import { redactInStep } from './activity';
 import { outputTail, runCommand } from './command';
 import { type CrudSkip, planCrudSmoke } from './crud-plan';
 import { lastJsonObject } from './gen';
@@ -103,12 +104,19 @@ export async function checkCrud(
     if (onHeld) await serveHold(files, run, onHeld);
     const result = await run;
     const output = lastJsonObject(result.output) as SmokeOutput | null;
+    // The smoke runs the app's code with the owner's token in its environment:
+    // what it printed is redacted before it reaches the result.
     if (!output) {
       return ended([
-        { check: 'setup', message: `The CRUD smoke crashed:\n${outputTail(result.output, 15)}` },
+        {
+          check: 'setup',
+          message: `The CRUD smoke crashed:\n${redactInStep(outputTail(result.output, 15))}`,
+        },
       ]);
     }
-    if (output.setupError) return ended([{ check: 'setup', message: output.setupError }]);
+    if (output.setupError) {
+      return ended([{ check: 'setup', message: redactInStep(output.setupError) }]);
+    }
     const failures = (output.results ?? [])
       .filter((r) => !r.ok)
       .map(

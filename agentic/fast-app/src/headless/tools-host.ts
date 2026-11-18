@@ -20,6 +20,9 @@ const SIGN_IN_HINT =
  * The run's project values, for its work tree only. `ACCESS_TOKEN` is the
  * data-plane key of a db-tools context; db-tools only checks it is there and
  * sends the control plane the account's own key, so the owner key goes in.
+ * `ACCOUNT_API_KEY` is no project value, and nothing reads it as one: it is
+ * here so the pipeline's `envSecrets` takes both keys out of every step log,
+ * as the desktop's `.env` key is.
  */
 export function runContext(run: RunIdentity): Record<string, string | undefined> {
   return {
@@ -28,7 +31,8 @@ export function runContext(run: RunIdentity): Record<string, string | undefined>
     OWNER_ID: run.userId,
     API_ENDPOINT: run.endpoints.api,
     MODULES_ENDPOINT: run.endpoints.modules,
-    ACCESS_TOKEN: run.ownerKey
+    ACCESS_TOKEN: run.ownerKey,
+    ACCOUNT_API_KEY: run.accountKey
   };
 }
 

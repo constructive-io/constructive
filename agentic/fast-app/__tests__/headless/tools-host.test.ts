@@ -14,6 +14,7 @@ import { reprovisionAdvice } from '@agentic-kit/db-tools/host';
 
 import type { RunIdentity } from '../../src/headless/launch';
 import { headlessToolsHost, REBUILD_FROM_DESKTOP } from '../../src/headless/tools-host';
+import { envSecrets } from '../../src/pipeline/project-env';
 
 const DB = '6f1f8a52-7c1e-4a51-9d5b-3c1b2a9e4d10';
 const OTHER_DB = '0b7c5b8e-25c2-4f43-8a4a-9e0e2f1f6c21';
@@ -58,8 +59,14 @@ test("the work tree's project values come from the run, never its .env", async (
     OWNER_ID: 'user-1',
     API_ENDPOINT: 'http://api.localhost/graphql',
     MODULES_ENDPOINT: 'http://modules.localhost/graphql',
-    ACCESS_TOKEN: 'owner-key'
+    ACCESS_TOKEN: 'owner-key',
+    ACCOUNT_API_KEY: 'account-key'
   });
+});
+
+test('the pipeline takes both keys out of its step logs', async () => {
+  const secrets = await envSecrets(tree);
+  assert.ok(secrets.includes('owner-key') && secrets.includes('account-key'));
 });
 
 test('another folder has no project values, and its .env is not read', async () => {
