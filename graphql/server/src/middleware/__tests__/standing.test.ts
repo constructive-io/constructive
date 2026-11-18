@@ -23,8 +23,8 @@ const fakeRes = (captured: Captured): Response =>
     }
   }) as unknown as Response;
 
-const fakeReq = (useModule?: jest.Mock): Request =>
-  ({ constructive: useModule ? { useModule } : undefined }) as unknown as Request;
+const fakeReq = (useModule?: jest.Mock, path = '/graphql'): Request =>
+  ({ path, requestId: 'req-1', constructive: useModule ? { useModule } : undefined }) as unknown as Request;
 
 const run = async (req: Request) => {
   const captured: Captured = {};
@@ -61,6 +61,17 @@ describe('createStandingMiddleware', () => {
     expect(captured.status).toBe(403);
     expect(captured.body.errors[0].extensions.code).toBe('ACCESS_SUSPENDED');
     expect(captured.body.errors[0].extensions.context).toEqual({ reason: 'billing' });
+  });
+
+  it('refuses a suspended database on a REST path with the status and a JSON error', async () => {
+    const useModule = jest.fn().mockResolvedValue(standing({ suspended: true, reason: 'billing' }));
+    const { next, captured } = await run(fakeReq(useModule, '/v1/threads'));
+
+    expect(next).not.toHaveBeenCalled();
+    expect(captured.status).toBe(403);
+    expect(captured.body).toEqual({
+      error: { code: 'ACCESS_SUSPENDED', message: expect.any(String), requestId: 'req-1' }
+    });
   });
 
   it('refuses a database the plane does not know', async () => {

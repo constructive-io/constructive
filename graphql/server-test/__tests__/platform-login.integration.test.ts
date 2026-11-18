@@ -349,6 +349,42 @@ it('rejects an unknown Bearer token as UNAUTHENTICATED', async () => {
   expect(res.body.errors?.[0]?.extensions?.code ?? res.body.error?.code).toBe('UNAUTHENTICATED');
 });
 
+it.each([
+  ['/fn/resize'],
+  ['/v1/threads'],
+  ['/flush']
+])('rejects an unknown Bearer token on %s with 401 and a JSON error', async (route) => {
+  const res = await request.post(route).set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token')
+    .send({ width: 1 });
+
+  expect(res.status).toBe(401);
+  expect(res.body).toEqual({
+    error: { code: 'UNAUTHENTICATED', message: expect.any(String), requestId: expect.any(String) }
+  });
+});
+
+it('keeps answering an unknown Bearer token on /graphql with a 200 GraphQL error', async () => {
+  const res = await request.post('/graphql').set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token')
+    .send({ query: '{ animals { nodes { name } } }' });
+
+  expect(res.status).toBe(200);
+  expect(res.body.data).toBeUndefined();
+  expect(res.body.errors).toEqual([
+    { message: expect.any(String), extensions: { code: 'UNAUTHENTICATED', class: 'public', http: 401 } }
+  ]);
+});
+
+it('answers /healthz the same with or without a credential', async () => {
+  const plain = await request.get('/healthz').set('Host', API_HOST);
+  const withBadToken = await request.get('/healthz').set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token');
+
+  expect(withBadToken.status).toBe(200);
+  expect(withBadToken.text).toBe(plain.text);
+});
+
 it('serves the function REST route with request-role isolation', async () => {
   const create = await request.post('/fn/resize').set('Host', API_HOST).send({ width: 1 });
   expect(create.status).toBe(202);
