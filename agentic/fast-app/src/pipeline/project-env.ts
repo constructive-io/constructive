@@ -20,7 +20,7 @@ import {
   resolveProjectContext
 } from '@agentic-kit/db-tools/context';
 import { PENDING_PROVISION_KEYS } from '@agentic-kit/db-tools/provision-database/env-file';
-import { recordedTicket } from '@agentic-kit/db-tools/provision-database/pending-ticket';
+import { type PendingTicket, recordedTicket } from '@agentic-kit/db-tools/provision-database/pending-ticket';
 
 /** The project's db-tools context, read from its .env (`resolveProjectContext`). */
 export const projectContext: typeof resolveProjectContext = (cwd, options) =>
@@ -93,11 +93,16 @@ export async function envSecrets(cwd: string): Promise<string[]> {
     .map(([, value]) => value as string);
 }
 
-/** The name of a database whose creation .env (or the host) still records as pending; null when there is none. */
-export async function pendingDatabaseName(cwd: string): Promise<string | null> {
+/** The request for a database that .env (or the host) still records as pending: its name, backend and account. */
+export async function pendingTicket(cwd: string): Promise<PendingTicket | null> {
   const hosted = await hostContextSource(cwd);
   const env = hosted
     ? valuesOf(hosted, Object.values(PENDING_PROVISION_KEYS))
     : readEnv(await readFile(path.join(cwd, '.env'), 'utf8').catch(() => ''));
-  return recordedTicket(env)?.databaseName ?? null;
+  return recordedTicket(env) ?? null;
+}
+
+/** The name of a database whose creation .env (or the host) still records as pending; null when there is none. */
+export async function pendingDatabaseName(cwd: string): Promise<string | null> {
+  return (await pendingTicket(cwd))?.databaseName ?? null;
 }
