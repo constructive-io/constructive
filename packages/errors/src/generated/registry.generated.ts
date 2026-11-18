@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (916 distinct codes
+ * Source of truth: the constructive-db error audit (917 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 916 total, 676 public, 240 internal.
+ * Counts: 917 total, 677 public, 240 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -259,6 +259,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'DATA_JOB_TRIGGER_FUNCTION_TARGET_NOT_ALLOWED': defineError({ code: 'DATA_JOB_TRIGGER_FUNCTION_TARGET_NOT_ALLOWED', class: 'public', http: 403, message: 'Data job trigger function target not allowed.' }),
   'DATA_JOB_TRIGGER_INVOCATION_SCOPE_REQUIRED': defineError({ code: 'DATA_JOB_TRIGGER_INVOCATION_SCOPE_REQUIRED', class: 'public', http: 400, message: 'Data job trigger invocation scope required.' }),
   'DATA_JOB_TRIGGER_JOB_KEY_FIELD_NOT_FOUND': defineError({ code: 'DATA_JOB_TRIGGER_JOB_KEY_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Data job trigger job key field not found.' }),
+  'DATA_JOB_TRIGGER_LANE_OWNER_CONFLICT': defineError({ code: 'DATA_JOB_TRIGGER_LANE_OWNER_CONFLICT', class: 'public', http: 400, message: 'Data job trigger lane owner conflict.' }),
   'DATA_JOB_TRIGGER_QUEUE_KEY_FIELD_NOT_FOUND': defineError({ code: 'DATA_JOB_TRIGGER_QUEUE_KEY_FIELD_NOT_FOUND', class: 'public', http: 404, message: 'Data job trigger queue key field not found.' }),
   'DATA_JOB_TRIGGER_TABLE_NOT_FOUND': defineError({ code: 'DATA_JOB_TRIGGER_TABLE_NOT_FOUND', class: 'public', http: 404, message: 'Data job trigger table not found.' }),
   'DATA_JOB_TRIGGER_TASK_IDENTIFIER_REQUIRED': defineError({ code: 'DATA_JOB_TRIGGER_TASK_IDENTIFIER_REQUIRED', class: 'public', http: 400, message: 'Data job trigger task identifier required.' }),
@@ -1179,6 +1180,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'DATA_JOB_TRIGGER_FUNCTION_TARGET_NOT_ALLOWED': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_JOB_TRIGGER_INVOCATION_SCOPE_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_JOB_TRIGGER_JOB_KEY_FIELD_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
+  'DATA_JOB_TRIGGER_LANE_OWNER_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_JOB_TRIGGER_QUEUE_KEY_FIELD_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_JOB_TRIGGER_TABLE_NOT_FOUND': { class: 'public', dynamic: false, generatedOnly: false },
   'DATA_JOB_TRIGGER_TASK_IDENTIFIER_REQUIRED': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1863,4 +1865,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 916;
+export const GENERATED_CODE_COUNT = 917;
