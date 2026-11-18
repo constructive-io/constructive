@@ -38,6 +38,7 @@
 // Types
 export type {
   AgentChatConfig,
+  AgentChatScope,
   ApiConfigResult,
   ApiError,
   ApiStructure,
