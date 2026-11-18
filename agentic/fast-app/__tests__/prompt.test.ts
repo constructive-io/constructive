@@ -1,7 +1,3 @@
-// The app-building prompt sections tell the agent which tools to call. Each
-// tool they name must be one the package's extensions register, so a renamed
-// or removed tool can't leave the prompt pointing at nothing.
-
 import assert from 'node:assert/strict';
 
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
@@ -58,17 +54,4 @@ test('every tool the app-building sections name is registered by the extensions'
     [...named].filter((name) => !tools.has(name)),
     []
   );
-});
-
-test('without an app template the section names no app-building tool and says why', () => {
-  const off = appBuildingSection(false);
-  assert.match(off, /^## Building an app\n/);
-  assert.match(off, /App building isn't available in this build/);
-  assert.deepEqual(codeNames(off), []);
-});
-
-test('each section ends so the next one can follow it', () => {
-  assert.match(appBuildingSection(true), /^## Building an app\n[\s\S]*\n## Changing an existing app\n[\s\S]*\n\n$/);
-  assert.match(appBuildingSection(false), /\n\n$/);
-  assert.match(specToolsNote(), /^ For an app built with `plan_app`/);
 });

@@ -1,6 +1,4 @@
-// verify_app's step logs take both of the run's keys out, as plan_app's do:
-// here the dev server prints them, and the check's details must not carry
-// them. The keys are bare values, which no shape pattern catches.
+// The keys are bare values, which no shape pattern catches: only their values can redact them.
 
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';

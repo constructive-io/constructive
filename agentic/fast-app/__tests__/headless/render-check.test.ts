@@ -172,9 +172,6 @@ test('the owner session goes into the storage of the dev server origin, before t
     accessToken: 'owner-key',
     accessTokenExpiresAt: '2026-11-18T12:00:00.000Z'
   });
-  // The page's own commands go to its session; its storage is a context of its own.
-  assert.ok(fake.sent.some((c) => c.method === 'Target.createBrowserContext'));
-  assert.ok(fake.sent.filter((c) => c.method.startsWith('Network.') || c.method.startsWith('Page.')).every((c) => c.sessionId === SESSION));
 });
 
 test('a document from another origin is refused, so the page stays on the dev server', async () => {

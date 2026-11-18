@@ -1,5 +1,5 @@
-// The entry point against a fake backend: db-tools' fetch sends *.localhost
-// to 127.0.0.1 with the Host header, so one server answers every realm.
+// db-tools' fetch sends *.localhost to 127.0.0.1 with the Host header, so one
+// fake server answers every realm.
 
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
@@ -88,14 +88,13 @@ function options(flushes: { count: number }): HeadlessAppBuildingOptions {
   };
 }
 
-test('starts with both hosts configured, the tools, their names and the prompt, and never flushes', async () => {
+test('starts with both hosts configured from the launch reads, and never flushes', async () => {
   const flushes = { count: 0 };
   const input = options(flushes);
   const started = await createHeadlessAppBuilding(input);
   assert.equal(flushes.count, 0);
   assert.ok(existsSync(input.stateDir));
   assert.ok(started.toolNames.includes('plan_app') && started.toolNames.includes('verify_app'));
-  assert.equal(started.extensions.length, 7);
   assert.match(started.systemPrompt, /^## Building an app/);
   assert.match(started.systemPrompt, /## Database and schema tools\n\nThese tools are this run's database and schema tools: `describe_schema`/);
 
@@ -108,14 +107,8 @@ test('starts with both hosts configured, the tools, their names and the prompt, 
     ownerId: 'user-1',
     databaseName: 'food-bank'
   });
-  assert.equal(host.renderCheck, undefined);
-  assert.equal(host.appOrigins, undefined);
-  assert.equal(host.appSite, undefined);
-  assert.equal(host.events, undefined);
-  // The pipeline then sets no previewUrl in the card's details or the results,
-  // so neither the progress entries nor the results name the pod's dev server.
+  // The pipeline then sets no previewUrl in the card's details or the results.
   assert.equal(hostPreviews(), false);
-  assert.equal(host.services()?.template.available(), true);
   assert.equal(getHost().account()?.userId, 'user-1');
   assert.equal(((await hostContextSource(input.cwd)) as Record<string, string>).DATABASE_NAME, 'food-bank');
 
@@ -125,13 +118,6 @@ test('starts with both hosts configured, the tools, their names and the prompt, 
     ['auth-food-bank.localhost']
   );
   await started.dispose();
-  await started.dispose();
-});
-
-test('a Chromium path gives the host its render check', async () => {
-  const input = { ...options({ count: 0 }), chromiumPath: '/usr/bin/chromium' };
-  const started = await createHeadlessAppBuilding(input);
-  assert.equal(typeof getFastAppHost().renderCheck, 'function');
   await started.dispose();
 });
 

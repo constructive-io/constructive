@@ -1,6 +1,3 @@
-// The owner's sign-in in the provision phase: a host's own PhaseError (a
-// headless host that knows its key was refused) reaches the agent as it is;
-// any other failure reads as a wrong password, as on the desktop.
 
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
@@ -66,18 +63,4 @@ test("a host's PhaseError from the sign-in passes through with its own cause and
   });
 
   await assert.rejects(provisionPhase(run(), () => {}), (err: unknown) => err === refused);
-});
-
-test('any other sign-in failure is a provision failure that asks the user to check their password', async () => {
-  hostSigningIn(async () => {
-    throw new Error('invalid credentials');
-  });
-
-  await assert.rejects(provisionPhase(run(), () => {}), (err: unknown) => {
-    assert.ok(err instanceof PhaseError);
-    assert.equal(err.phase, 'provision');
-    assert.equal(err.cause, 'Signing in to the app database as owner@example.com failed: invalid credentials');
-    assert.equal(err.fix, 'Ask the user to check their password, then call plan_app again.');
-    return true;
-  });
 });

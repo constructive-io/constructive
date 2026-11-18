@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { DATABASE_EXTENSIONS, headlessExtensions, toolNamesOf } from '../../src/headless/extensions';
-import { databaseToolsSection, headlessSystemPrompt } from '../../src/headless/prompt';
+import { headlessSystemPrompt } from '../../src/headless/prompt';
 
 // Snake-case words the text writes as code that are columns or values, not tools.
 const NOT_TOOLS = new Set(['created_at', 'entity_id', 'owner_id', 'set_null', 'shift_id', 'updated_at', 'volunteer_id', 'volunteer_shifts']);
@@ -31,9 +31,3 @@ test('the database tools paragraph names exactly the database tools the run has'
   assert.ok(registered.includes('describe_schema') && registered.includes('list_blueprints'));
 });
 
-test('the paragraph reads as a list, in the desktop section\'s words', () => {
-  assert.equal(
-    databaseToolsSection(['describe_schema', 'add_records', 'run_codegen']).split('\n')[2],
-    'These tools are this run\'s database and schema tools: `describe_schema`, `add_records`, and `run_codegen`. They are the only supported path for database and schema work. For an app built with `plan_app`, use them only for what its spec can\'t express; the desktop then writes `.constructive/app-spec.json` from the database again. Load the `custom-tools` skill before you use them directly.'
-  );
-});

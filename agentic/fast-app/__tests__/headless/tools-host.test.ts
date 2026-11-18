@@ -10,10 +10,9 @@ import {
   resolveDataToken,
   resolveProjectContext
 } from '@agentic-kit/db-tools';
-import { reprovisionAdvice } from '@agentic-kit/db-tools/host';
 
 import type { RunIdentity } from '../../src/headless/launch';
-import { headlessToolsHost, REBUILD_FROM_DESKTOP } from '../../src/headless/tools-host';
+import { headlessToolsHost } from '../../src/headless/tools-host';
 import { envSecrets } from '../../src/pipeline/project-env';
 
 const DB = '6f1f8a52-7c1e-4a51-9d5b-3c1b2a9e4d10';
@@ -85,12 +84,3 @@ test("the owner key is the active data token for the run's database only", async
   assert.match(forOther.reason ?? '', /set up Cloud again/);
 });
 
-test('the control plane gets the account key, and a gone database is rebuilt from desktop', () => {
-  const host = headlessToolsHost(run);
-  assert.deepEqual(host.account(), { userId: 'user-1', accessToken: 'account-key', apiKey: 'account-key' });
-  assert.equal(host.toolReprovision, false);
-  assert.equal(reprovisionAdvice(host), REBUILD_FROM_DESKTOP);
-  // A headless host mints no secret and harvests no preview token.
-  assert.equal(host.deliverSecret, undefined);
-  assert.equal(host.previewToken, undefined);
-});

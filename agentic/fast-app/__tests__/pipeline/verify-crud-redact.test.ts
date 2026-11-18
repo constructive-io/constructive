@@ -1,7 +1,3 @@
-// The CRUD smoke runs the app's code with the owner's token in its
-// environment, so what it printed when it crashed, or why its ORM didn't
-// load, reaches the result only with the step's secrets taken out.
-
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
@@ -14,7 +10,7 @@ import { withStepLog } from '../../src/pipeline/activity';
 import type { VerifyInput } from '../../src/pipeline/verify';
 import { checkCrud } from '../../src/pipeline/verify-crud';
 
-// A bare key: no shape the patterns know, so only its value can take it out.
+// A bare key: no shape the patterns know, so only its value can redact it.
 const TOKEN = 'ownerkeyvalue0123456789abcdefghij';
 
 const TAG: LiveMetaTable = JSON.parse(

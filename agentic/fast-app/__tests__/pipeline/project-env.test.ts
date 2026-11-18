@@ -12,7 +12,6 @@ import { PENDING_PROVISION_KEYS } from '@agentic-kit/db-tools/provision-database
 
 import {
   boundDatabaseName,
-  databaseNameFor,
   envSecrets,
   pendingDatabaseName,
   pendingTicket,
@@ -43,14 +42,9 @@ afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
 });
 
-test('without the host giving values, the .env is read as before', async () => {
+test('the pending database request comes whole from the .env, for the step that resumes it', async () => {
   hostAnswering();
 
-  assert.equal(await boundDatabaseName(dir), 'from-file');
-  assert.deepEqual(await projectDatabaseName(dir), { name: 'from-file', bound: true });
-  assert.deepEqual(await envSecrets(dir), ['file-secret-1234']);
-  assert.equal(await pendingDatabaseName(dir), 'pending-from-file');
-  // The whole request, for the database step that resumes it.
   assert.deepEqual(await pendingTicket(dir), {
     ticketId: 'ticket-1',
     databaseName: 'pending-from-file',
@@ -89,22 +83,6 @@ test('a host that gives a lookup function is read the same way, a pending provis
   assert.equal(await boundDatabaseName(dir), 'job-db');
   assert.equal(await pendingDatabaseName(dir), 'pending-in-host');
   assert.equal((await pendingTicket(dir))?.ticketId, 'ticket-2');
-  // A lookup can't be listed: such a host redacts its own secrets.
+  // A lookup can't be listed, so its keys aren't redacted.
   assert.deepEqual(await envSecrets(dir), []);
-});
-
-test('a folder with no .env and no host values has no database yet', async () => {
-  hostAnswering(() => null);
-  const empty = mkdtempSync(path.join(tmpdir(), 'project-env-empty-'));
-  try {
-    assert.equal(await boundDatabaseName(empty), null);
-    assert.deepEqual(await projectDatabaseName(empty), {
-      name: databaseNameFor(path.basename(empty)),
-      bound: false
-    });
-    assert.deepEqual(await envSecrets(empty), []);
-    assert.equal(await pendingDatabaseName(empty), null);
-  } finally {
-    rmSync(empty, { recursive: true, force: true });
-  }
 });

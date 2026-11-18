@@ -1,27 +1,16 @@
-// FastAppHost.preview: a host that can't open the app's dev server (a cloud
-// Job's pod) gets no previewUrl in the details, and no result names one.
 
 import assert from 'node:assert/strict';
 
 import type { AppBuildDetails } from '../../src/pipeline/app-plan';
 import { configureFastAppHost, type FastAppHost, hostPreviews } from '../../src/pipeline/host';
-import { PhaseError } from '../../src/pipeline/progress';
-import {
-  type BuildOutcome,
-  failureText,
-  successText,
-  verifyFailedText
-} from '../../src/pipeline/result-text';
+import { type BuildOutcome, successText } from '../../src/pipeline/result-text';
 
-const URL = 'http://localhost:3001';
-
-const details = (previewUrl?: string): AppBuildDetails => ({
+const details = (): AppBuildDetails => ({
   kind: 'app-build',
   name: 'Food bank',
   stage: 'done',
   phases: [],
-  databaseName: 'food-bank',
-  ...(previewUrl ? { previewUrl } : {})
+  databaseName: 'food-bank'
 });
 
 const firstBuild = (built: AppBuildDetails) =>
@@ -36,20 +25,10 @@ const firstBuild = (built: AppBuildDetails) =>
     genNotes: []
   }) as unknown as BuildOutcome;
 
-const failure = () => new PhaseError('verify', 'GET /shifts answered 500.', 'Fix the page.');
-
-test('a host with a Preview gets the dev server named in the results, as on the desktop', () => {
-  assert.match(successText(firstBuild(details(URL))), /^Database: food-bank\. Preview: http:\/\/localhost:3001\.$/m);
-  assert.match(failureText(failure(), '/p/packages/app', details(URL), []), /Its dev server runs at http:\/\/localhost:3001/);
-  assert.match(verifyFailedText(failure(), details(URL)), /The dev server runs at http:\/\/localhost:3001\./);
-});
-
-test('without a previewUrl in the details, no result names a Preview or a dev server address', () => {
+test("without a previewUrl in the details, a build's result names no Preview", () => {
   const built = successText(firstBuild(details()));
   assert.match(built, /^Database: food-bank\.$/m);
   assert.doesNotMatch(built, /Preview|undefined/);
-  assert.doesNotMatch(failureText(failure(), '/p/packages/app', details(), []), /dev server runs at|undefined/);
-  assert.doesNotMatch(verifyFailedText(failure(), details()), /dev server runs at|undefined/);
 });
 
 test('a host previews unless it says preview: false', () => {

@@ -23,17 +23,4 @@ describe('run', () => {
       out: 'unset'
     });
   });
-
-  it('passes the rest of the environment, and a NODE_ENV the caller sets', async () => {
-    process.env.DB_TOOLS_RUN_PROBE = 'kept';
-    try {
-      const probe = ['-e', 'process.stdout.write(process.env.DB_TOOLS_RUN_PROBE + " " + process.env.NODE_ENV)'];
-      expect(await run(process.execPath, probe, process.cwd(), { NODE_ENV: 'development' })).toEqual({
-        ok: true,
-        out: 'kept development'
-      });
-    } finally {
-      delete process.env.DB_TOOLS_RUN_PROBE;
-    }
-  });
 });

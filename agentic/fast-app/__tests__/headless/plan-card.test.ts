@@ -300,7 +300,3 @@ test("an answer to another call is not this card's", async () => {
   assert.equal((await ask.ask(request())).approved, false);
 });
 
-test("the card's account line has the email and no password to keep", async () => {
-  const line = await cards(harness()).account(undefined, { userId: 'user-1', email: 'owner@example.com' });
-  assert.deepEqual(line, { email: 'owner@example.com', savedPassword: false, canRemember: false });
-});

@@ -1,6 +1,4 @@
-// The render check in a real Chromium, against a small app and API served
-// here. It runs when a binary is found: CHROMIUM_PATH (the cloud image sets
-// /usr/bin/chromium), else a Chromium or Chrome at its usual place.
+// Runs only when a Chromium binary is found: CHROMIUM_PATH, else the usual places.
 
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
