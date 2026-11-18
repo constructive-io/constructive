@@ -1,15 +1,9 @@
-// The db tools' host for a run with no UI (@agentic-kit/db-tools ToolsHost).
-// The control plane gets the account key, the app's realm gets the owner key,
-// and the run's work tree gets its project values from here, never from a
-// `.env`: the clone has none, because that file would hold a key.
-
 import path from 'node:path';
 
 import type { ContextSource, DataAuthBroker, ToolsHost } from '@agentic-kit/db-tools';
 
 import type { RunIdentity } from './launch';
 
-/** The db tools' advice for a database that is gone or another account's. */
 export const REBUILD_FROM_DESKTOP =
   'A cloud run never makes or replaces a database: ask the user to rebuild the app from Constructive Desktop.';
 
@@ -17,12 +11,9 @@ const SIGN_IN_HINT =
   'This cloud run signs in with the keys that Set up Cloud stored. Ask the user to set up Cloud again from Constructive Desktop.';
 
 /**
- * The run's project values, for its work tree only. `ACCESS_TOKEN` is the
- * data-plane key of a db-tools context; db-tools only checks it is there and
- * sends the control plane the account's own key, so the owner key goes in.
- * `ACCOUNT_API_KEY` is no project value, and nothing reads it as one: it is
- * here so the pipeline's `envSecrets` takes both keys out of every step log,
- * as the desktop's `.env` key is.
+ * `ACCESS_TOKEN` is the owner key: db-tools only checks that it is there, and
+ * gives the control plane the host's account key. `ACCOUNT_API_KEY` is no
+ * project value; it is here so the pipeline's `envSecrets` redacts it.
  */
 export function runContext(run: RunIdentity): Record<string, string | undefined> {
   return {
@@ -36,7 +27,6 @@ export function runContext(run: RunIdentity): Record<string, string | undefined>
   };
 }
 
-// The owner key is the run database's one data-plane session; it never expires here.
 function ownerKeyBroker(run: RunIdentity): DataAuthBroker {
   return {
     getActiveToken: (databaseId) =>
@@ -53,7 +43,7 @@ export function headlessToolsHost(run: RunIdentity): ToolsHost {
   return {
     account: () => ({ userId: run.userId, accessToken: run.accountKey, apiKey: run.accountKey }),
     backendConfig: () => ({ apiEndpoint: run.endpoints.api, modulesEndpoint: run.endpoints.modules }),
-    // Another folder gets no values, never its own .env: only the run's tree has a database.
+    // `{}`, not null: null would make db-tools read the folder's .env.
     contextSource: (cwd): ContextSource => (path.resolve(cwd) === tree ? runContext(run) : {}),
     dataAuthBroker: ownerKeyBroker(run),
     signInHint: SIGN_IN_HINT,

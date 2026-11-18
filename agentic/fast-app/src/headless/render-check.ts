@@ -1,10 +1,7 @@
-// verify_app's render check in a run with no UI: the desktop's check
-// (fast-app-desktop/render-check.ts) in a headless Chromium over the DevTools
-// Protocol. It opens each page as the owner and fails on a GraphQL error in an
-// answer, an uncaught exception, or the app's error screen
-// (`data-app-error="<kind>"`), with the same budgets and lines. The page is
-// the agent's code, so it stays on the dev server's origin, opens no other
-// page, and its storage lives in memory only (an incognito browser context).
+// The desktop's render check (fast-app-desktop/render-check.ts) over the
+// DevTools Protocol, with its budgets and failure lines. The page is the
+// agent's code, so it stays on the dev server's origin, opens no other page,
+// and keeps its storage, the owner's key included, in memory only.
 
 import type { OwnerSession, RenderCheck, RenderCheckResult, RenderFailure } from '../pipeline/host';
 import { PAGE_TIMEOUT_MS, RENDER_SETUP_BUDGET_MS, STEP_TIMEOUT_MS } from '../pipeline/render-budget';
@@ -44,7 +41,6 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const STOPPED = 'the check was stopped';
 
-/** `work`, or a rejection as soon as `signal` aborts. */
 function untilStopped<T>(work: Promise<T>, signal: AbortSignal | undefined): Promise<T> {
   if (!signal) return work;
   return new Promise<T>((resolve, reject) => {
@@ -55,7 +51,6 @@ function untilStopped<T>(work: Promise<T>, signal: AbortSignal | undefined): Pro
   });
 }
 
-/** The page: one target in its own browser context, attached flat. */
 type Page = {
   send<T = any>(method: string, params?: Record<string, unknown>): Promise<T>;
   /** Events of this page only. */
@@ -74,7 +69,6 @@ async function openPage(browser: Browser, origin: string): Promise<Page> {
     url: 'about:blank',
     browserContextId
   });
-  // A page the agent's code opens is closed at once.
   cdp.onEvent(({ method, params }) => {
     const info = params?.targetInfo;
     if (method !== 'Target.targetCreated' || info?.type !== 'page') return;
@@ -92,7 +86,6 @@ async function openPage(browser: Browser, origin: string): Promise<Page> {
     cdp.onEvent((event) => {
       if (event.sessionId === sessionId) listener(event);
     });
-  // A document from another origin is refused: the page stays on the dev server.
   onEvent(({ method, params }) => {
     if (method !== 'Fetch.requestPaused') return;
     const answer = offOrigin(params.request?.url, origin)
@@ -140,10 +133,9 @@ function bodyText(body: { body?: string; base64Encoded?: boolean }): string {
 
 export type RenderCheckOptions = {
   /**
-   * The longest the set-up may take: Chromium's start, the page, the sign-in
-   * page and the session. The CRUD check holds its test rows for the record
-   * pages for this long plus their pages (verify-crud.ts), so a set-up never
-   * outlasts the hold: a slower one skips the check with the reason.
+   * The whole set-up, Chromium's start included. The CRUD check's hold
+   * (verify-crud.ts) counts RENDER_SETUP_BUDGET_MS for it, so a longer set-up
+   * would let the smoke delete its test rows while their pages still load.
    */
   setupMs?: number;
 };
@@ -309,14 +301,12 @@ export async function checkRendering(
   return { failures: unique, pages, opened };
 }
 
-/** The account the page signs in as: the owner's session, for an hour. */
 export const renderAccount = (owner: OwnerSession, now = Date.now()): RenderAccount => ({
   userId: owner.userId,
   token: owner.token,
   expiresAt: now + SESSION_MS
 });
 
-/** The host's render check on a Chromium binary, and the stop for a browser still open. */
 export function chromiumRenderCheck(options: { chromiumPath: string; stateDir: string }): {
   renderCheck: RenderCheck;
   dispose(): Promise<void>;

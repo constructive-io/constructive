@@ -107,11 +107,8 @@ export function exitOf(child: ChildProcess): Promise<void> {
   });
 }
 
-/**
- * Resolves once the process has exited, or after `ms` at the latest. The
- * timer ends with the process, so a wait that the exit ended keeps nothing
- * running after it.
- */
+// The timer must end with the process: one left running holds a caller (a
+// test worker, a Job) up to `ms` after the exit.
 export function exitWithin(child: ChildProcess, ms: number): Promise<void> {
   return new Promise<void>((resolve) => {
     const timer = setTimeout(resolve, ms);

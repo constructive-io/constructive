@@ -1,7 +1,5 @@
-// A headless Chromium for the render check, driven over its debugging pipe
-// (`--remote-debugging-pipe`: commands on fd 3, answers on fd 4, each message
-// ended by a NUL byte). A pipe opens no port, so no other process in the pod
-// can reach the browser, or the owner's session in its page.
+// A pipe, not a debugging port: no other process in the pod can reach the
+// browser, or the owner's key in its page.
 
 import { type ChildProcess, spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -15,15 +13,12 @@ export type Browser = {
   cdp: CdpConnection;
   /** The browser's pid, which is also its process group's id. */
   pid?: number;
-  /** Closes the browser and removes its profile. */
   close(): Promise<void>;
 };
 
 export type LaunchOptions = {
   chromiumPath: string;
-  /** Where the browser's profile folder is made; it is removed on close. */
   stateDir: string;
-  /** How long the browser may take to answer its first command. */
   startTimeoutMs: number;
 };
 
@@ -55,7 +50,7 @@ export const CHROMIUM_FLAGS = [
   '--window-size=1280,800'
 ];
 
-/** The pipe as a CDP transport: one message per NUL-ended chunk. */
+// Chromium ends each message on the pipe with a NUL byte.
 export function pipeTransport(child: ChildProcess, toBrowser: Writable, fromBrowser: Readable): CdpTransport {
   const messages = new Set<(message: string) => void>();
   const closes = new Set<(reason: string) => void>();
@@ -102,7 +97,6 @@ function within<T>(work: Promise<T>, ms: number, what: string): Promise<T> {
   return Promise.race([work, late]).finally(() => clearTimeout(timer));
 }
 
-/** Starts Chromium and resolves once it answers; rejects with why it didn't start. */
 export async function launchChromium(options: LaunchOptions): Promise<Browser> {
   const profile = await mkdtemp(path.join(options.stateDir, 'chromium-'));
   const child = spawn(options.chromiumPath, [...CHROMIUM_FLAGS, `--user-data-dir=${profile}`, 'about:blank'], {
@@ -123,7 +117,13 @@ export async function launchChromium(options: LaunchOptions): Promise<Browser> {
     else child.once('exit', () => resolve());
   });
   const failedToSpawn = new Promise<never>((_, reject) => {
-    child.once('error', (err) => reject(new Error(`Chromium at ${options.chromiumPath} did not start: ${err.message}`)));
+    child.once('error', (err) =>
+      reject(
+        new Error(
+          `Chromium at ${options.chromiumPath} did not start (${err.message}). Check that the image's CHROMIUM_PATH points at a Chromium binary.`
+        )
+      )
+    );
   });
   failedToSpawn.catch(() => {});
   const cdp = new CdpConnection(

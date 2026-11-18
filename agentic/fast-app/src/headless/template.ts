@@ -1,8 +1,5 @@
-// The app template of a run with no UI (FastAppHost services' template). The
-// app is in the clone already: desktop puts the template in packages/app and
-// commits it before a cloud run (brief 4.6). So `materialize` never composes
-// or copies a template; it installs the app's packages, which the clone
-// doesn't carry, and fails with what to do when the app isn't there.
+// Desktop commits the app template in packages/app before a cloud run, so
+// `materialize` only installs: it never composes or copies a template.
 
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -14,7 +11,6 @@ import { appDirOf, COMPOSE_MARKER, installApp, isComposed } from '../pipeline/sn
 const FROM_DESKTOP =
   'A cloud run never composes the app template: open the project in Constructive Desktop, which puts the app in packages/app and commits it, then push and send the message again.';
 
-/** Why the app in `projectDir` can't be built in a cloud run; null when it can. */
 export function missingAppReason(projectDir: string): string | null {
   const appDir = appDirOf(projectDir);
   if (!existsSync(appDir)) return `${appDir} is missing. ${FROM_DESKTOP}`;
@@ -30,14 +26,14 @@ export function cloneTemplate(cwd: string): AppTemplate {
     available: () => true,
     materialize: async (projectDir, signal) => {
       if (path.resolve(projectDir) !== tree) {
-        throw new Error(`This cloud run builds the app in ${tree} only, not in ${projectDir}.`);
+        throw new Error(
+          `The app in ${projectDir} can't be installed: this cloud run builds the app in ${tree} only. Call the tool from that folder.`
+        );
       }
       const missing = missingAppReason(projectDir);
       if (missing) throw new Error(missing);
-      // The desktop's install of a copied template, with the same environment and limits.
       await installApp(projectDir, signal ?? new AbortController().signal);
     },
-    // The app's own copy, which the clone has with the app.
     schemaFile: async () => {
       const own = path.join(appDirOf(tree), APP_SPEC_SCHEMA_FILE);
       return existsSync(own) ? own : null;

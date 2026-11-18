@@ -1,19 +1,12 @@
-// A cloud build's progress (FastAppHost.progress, brief 4.4): at each phase
-// change the running card's details go into the session as a custom entry,
-// and the lane is flushed, so another client sees the card move while the
-// tool still runs. The tool's result replaces the last one.
+// The lane is flushed after each entry: the run log gets a tool's entries only
+// when the tool ends unless the host flushes.
 
 import type { AppBuildDetails } from '../pipeline/app-plan';
 import type { ProgressWatch } from '../pipeline/host';
 
-/** The custom entry a cloud build writes; `data` is `{ toolCallId, details }`. */
+/** The desktop's Cloud UI reads this type, with `data` as `{ toolCallId, details }`. */
 export const APP_BUILD_PROGRESS_TYPE = 'constructive.app-build.progress';
 
-/**
- * The details another client gets: no command output, which can be long and
- * is the pod's. They carry no `previewUrl` either: the host's `preview: false`
- * keeps the pipeline from setting one.
- */
 export function cloudDetails(details: AppBuildDetails): AppBuildDetails {
   return {
     ...details,
@@ -25,12 +18,9 @@ export function cloudDetails(details: AppBuildDetails): AppBuildDetails {
   };
 }
 
-// What makes a new entry: the stage, the name, and each step's status. A note,
-// or a command that started inside a step, waits for the next change.
 const changeKey = (details: AppBuildDetails): string =>
   JSON.stringify([details.stage, details.name, details.phases.map((phase) => phase.status)]);
 
-/** The progress watch: an entry at each phase change, then a flush. */
 export function runLogProgress(flush: () => Promise<void>): ProgressWatch {
   return (toolCallId, append) => {
     let last: string | null = null;

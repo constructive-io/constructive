@@ -87,8 +87,7 @@ export async function runVerifyPipeline(
   const { cwd, services, project, signal } = input;
   const ended = (text: string): VerifyOutcome => ({ text, details: progress.details });
   progress.root = cwd;
-  // As in plan_app, the step logs take out the project's keys: the CRUD
-  // smoke runs the app's code with the owner's token in its environment.
+  // The CRUD smoke runs the app's code with the owner's token in its environment.
   progress.addSecrets(await envSecrets(cwd));
   // Like plan_app: a database that can't be used stops the check before it
   // starts, and one that changed outside the app gets app-spec.json written again.

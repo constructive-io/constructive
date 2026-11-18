@@ -1,7 +1,3 @@
-// The run log as the headless host uses it: the flush of the session's lane,
-// the entry an out-of-band row hangs from, and the answer rows a client writes
-// (brief 4.4). The rows are @agentic-kit/run-log's pi entries.
-
 import {
   APPROVAL_RESOLUTION_TYPE,
   assertPiSessionEntry,
@@ -11,10 +7,9 @@ import {
 } from '@agentic-kit/run-log';
 
 /**
- * Sends the session's entries to the run log, one flush at a time. A flush
- * asked for while one runs goes after it, so it sends what was appended
- * meanwhile; asks that wait together share one flush. A failed flush is
- * reported and never thrown: the entries go with the lane's next drain.
+ * A flush asked for while one runs goes after it, so it also sends what was
+ * appended meanwhile. A failed flush is never thrown: the lane's next drain
+ * sends the entries.
  */
 export function laneFlusher(
   flush: () => Promise<void>,
@@ -27,7 +22,9 @@ export function laneFlusher(
     const next = running.then(() => {
       waiting = null;
       running = flush().catch((err: unknown) => {
-        warn(`[fast-app] flushing the run log failed: ${err instanceof Error ? err.message : String(err)}`);
+        warn(
+          `[fast-app] flushing the run log failed, so other clients see this build's progress late: ${err instanceof Error ? err.message : String(err)}. The lane's next drain sends it.`
+        );
       });
       return running;
     });
@@ -36,10 +33,7 @@ export function laneFlusher(
   };
 }
 
-/**
- * The newest entry id in the log: the parent of a row written beside the
- * session, so a session rebuilt from the log stays one tree.
- */
+/** A row written beside the session hangs from this, so a session rebuilt from the log stays one tree. */
 export function leafIdOf(records: readonly RunEventRecord[]): string | null {
   for (let index = records.length - 1; index >= 0; index -= 1) {
     const id = (records[index].entry as { id?: unknown }).id;
@@ -48,7 +42,6 @@ export function leafIdOf(records: readonly RunEventRecord[]): string | null {
   return null;
 }
 
-/** An answer row, as a client wrote it. `payload` is the plan card's, when it sent one. */
 export type ApprovalAnswer = {
   toolCallId: string;
   approved: boolean;
@@ -59,9 +52,7 @@ export type ApprovalAnswer = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-/** The answer a record carries, or null when it is any other record. */
 export function answerOf(record: RunEventRecord): ApprovalAnswer | null {
-  // A pi session asks, so only a pi entry answers it.
   if (record.transcriptFormat !== PI_TRANSCRIPT_FORMAT) return null;
   let entry;
   try {

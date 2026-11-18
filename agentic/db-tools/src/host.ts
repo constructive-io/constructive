@@ -173,8 +173,8 @@ export interface ToolsHost {
    * The project values for a folder, in place of its `.env`. A headless host
    * (a cloud Job) has no `.env` in its clone, because that file holds the
    * account's API key: it answers the values it was launched with. When it
-   * answers a source, the folder's `.env` is not read. Null or undefined
-   * reads `<cwd>/.env` as before.
+   * answers a source, the folder's `.env` is not read; null or undefined
+   * reads `<cwd>/.env`.
    */
   contextSource?(
     cwd: string

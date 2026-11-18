@@ -1,13 +1,7 @@
-// A Chrome DevTools Protocol connection over any transport that carries one
-// JSON message at a time (Chromium's debugging pipe, or a fake in the tests).
-// Commands get their answer by id; events go to the listeners, with the
-// session they came from when the target was attached flat.
-
 export interface CdpTransport {
   send(message: string): void;
   /** Each message Chromium sends, whole. */
   onMessage(listener: (message: string) => void): void;
-  /** The transport closed: Chromium exited, or `close` was called. */
   onClose(listener: (reason: string) => void): void;
   close(): void;
 }
@@ -36,7 +30,6 @@ export class CdpConnection {
     transport.onClose((reason) => this.end(reason));
   }
 
-  /** Sends a command and resolves with its result; rejects on its error or a closed connection. */
   send<T = any>(method: string, params: Record<string, unknown> = {}, sessionId?: string): Promise<T> {
     if (this.closed) return Promise.reject(new CdpError(method, this.closed));
     const id = this.nextId++;
@@ -51,13 +44,11 @@ export class CdpConnection {
     });
   }
 
-  /** Calls `listener` with each event; the returned function stops it. */
   onEvent(listener: (event: CdpEvent) => void): () => void {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   }
 
-  /** The first event that `match` takes, and a way to stop waiting for it. */
   waitFor(match: (event: CdpEvent) => boolean): { event: Promise<CdpEvent>; cancel: () => void } {
     let off = () => {};
     const event = new Promise<CdpEvent>((resolve) => {

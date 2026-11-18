@@ -1,9 +1,3 @@
-// The FastAppHost of a run with no UI (pipeline/host.ts): one project, the
-// run's work tree and database; the owner key for the app's realm; the plan
-// card and the progress over the run log; dev servers in the pod; Chromium
-// for the render check when the run has one. It has no CORS or site steps,
-// no remembered passwords and no UI to tell (brief 4.2).
-
 import path from 'node:path';
 
 import { DevServerManager } from '../pipeline/dev-server';
@@ -21,7 +15,6 @@ import { cloneTemplate } from './template';
 
 export type HeadlessHost = {
   host: FastAppHost;
-  /** Stops the dev servers and a browser still open. */
   dispose(): Promise<void>;
 };
 
@@ -30,7 +23,7 @@ export function headlessHost(run: RunIdentity, options: CheckedOptions): Headles
   const flush = laneFlusher(runLog.flush);
   const tree = path.resolve(run.cwd);
   const inTree = (cwd: string) => path.resolve(cwd) === tree;
-  // The run's one project; only where its dev server answers changes, in memory.
+  // Only where its dev server answers changes, in memory: a restart keeps the port.
   const project: FastAppProject = {
     id: run.databaseId,
     name: path.basename(tree),

@@ -1,13 +1,5 @@
-/**
- * `@agentic-kit/fast-app/headless`: app building for a process with no UI,
- * such as the cloud Job of a Cloud chat (brief 4.7). One call checks the
- * launch values, reads what the run acts as, configures the db tools' host
- * and the pipeline's host, and returns the extensions, their tool names, the
- * prompt section that matches them, and the stop for what they started.
- *
- * It never calls `runLog.flush`: the run-log lane exists only once the
- * session does, so the flushes happen inside the tools' own runs.
- */
+// Never call runLog.flush here: the run-log lane exists only once the session
+// does, so it throws until then.
 
 import { mkdir } from 'node:fs/promises';
 
@@ -34,10 +26,7 @@ export { APP_BUILD_PROGRESS_TYPE } from './progress-watch';
 export { headlessSystemPrompt } from './prompt';
 
 
-/**
- * Starts app building for one run. Throws HeadlessOptionsError for options it
- * can't use, and LaunchError when the backend refuses a key or can't be asked.
- */
+/** Throws HeadlessOptionsError for options it can't use, LaunchError when a key can't be used. */
 export async function createHeadlessAppBuilding(
   options: HeadlessAppBuildingOptions
 ): Promise<HeadlessAppBuilding> {

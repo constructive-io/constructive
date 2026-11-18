@@ -91,5 +91,6 @@ test('a failed flush is reported, never thrown', async () => {
     throw new Error('lane gone');
   }, (message) => warnings.push(message));
   await flush();
-  assert.deepEqual(warnings, ['[fast-app] flushing the run log failed: lane gone']);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /flushing the run log failed, so other clients see this build's progress late: lane gone/);
 });

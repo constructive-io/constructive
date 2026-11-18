@@ -1,8 +1,5 @@
-// The database step of a cloud build (FastAppHost.ensureDatabase). The run's
-// database exists before the run: desktop makes it in Set up Cloud. So this
-// step only checks that it is alive and the account's own, and never makes,
-// binds or replaces one. A rebuild, which needs a new database, is the
-// desktop's.
+// Desktop makes the run's database in Set up Cloud, so this step never makes,
+// binds or replaces one.
 
 import path from 'node:path';
 
@@ -16,7 +13,6 @@ import type { RunIdentity } from './launch';
 const REBUILD_FIX =
   "A cloud run never makes or replaces a database. Tell the user to open the project in Constructive Desktop and ask for the app there: desktop's plan_app offers to rebuild it in a new database.";
 
-/** The cause and the fix for each way the run's database can't be used. */
 export const DATABASE_TEXT = {
   rebuild: (id: string) => ({
     cause: `The app's database (ID ${id}) is gone, and rebuilding it needs a new database, which a cloud run doesn't make.`,
@@ -44,7 +40,6 @@ export const DATABASE_TEXT = {
 
 type Probe = typeof probeDatabase;
 
-/** Checks the run's database for a build; the name it has. Throws a provision PhaseError otherwise. */
 export async function checkRunDatabase(
   run: RunIdentity,
   request: Pick<DatabaseRequest, 'cwd' | 'plan' | 'note'>,

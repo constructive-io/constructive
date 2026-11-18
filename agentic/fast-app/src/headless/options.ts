@@ -1,6 +1,4 @@
-// What a host with no UI starts the app-building tools with, and the checks on
-// it. The cloud Job passes these values from its launch (brief 4.7). The keys
-// are named in an error, never shown.
+// An error names a key, never shows it.
 
 import { statSync } from 'node:fs';
 import path from 'node:path';
@@ -9,55 +7,51 @@ import type { RunLogStore } from '@agentic-kit/run-log';
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
 export interface HeadlessAppBuildingOptions {
-  /** The git work tree the agent edits: the project root that holds packages/app. */
+  /** The project root that holds packages/app. */
   cwd: string;
-  /** A folder outside the work tree for caches and state. Never inside `cwd`. */
+  /** Never inside `cwd`. */
   stateDir: string;
-  /** The project database: the database of the run. */
   databaseId: string;
   /** The platform account that owns the database. */
   account: { email: string; apiKey: string };
-  /** The owner's personal API key in the app database's realm (data plane). */
+  /** The owner's personal API key of the app database's realm, not a principal's. */
   ownerKey: string;
-  /** Platform endpoints. The per-database hosts are derived from `api`, as db-tools does. */
+  /** The per-database hosts are derived from `api` by swapping its first label. */
   endpoints: { api: string; modules: string };
-  /** The run log: the plan card and the progress rows go through it. */
   runLog: {
     store: RunLogStore;
     runId: string;
-    /** Sends the session entries appended so far to the run log now. */
     flush: () => Promise<void>;
   };
-  /** A Chromium binary for the render check. Absent: the check reports "skipped". */
+  /** Absent: the render check reports "skipped". */
   chromiumPath?: string;
-  /** How long a plan card waits for its answer. Default 30 minutes. */
+  /** Default 30 minutes. */
   approvalTimeoutMs?: number;
 }
 
 export interface HeadlessAppBuilding {
-  /** plan_app, verify_app and the tools the app-building prompt names. Load after the lanes. */
+  /** Load after the lanes. */
   extensions: ExtensionFactory[];
-  /** Every tool name the extensions register. */
   toolNames: string[];
-  /** The app-building section for the system prompt. It matches these tools. */
   systemPrompt: string;
-  /** Stops the dev servers and the browser. Call when the turn ends. */
+  /** Call when the turn ends. */
   dispose(): Promise<void>;
 }
 
 export const DEFAULT_APPROVAL_TIMEOUT_MS = 30 * 60_000;
 
-/** The options once checked: paths resolved, endpoints as URLs, the timeout set. */
 export type CheckedOptions = Omit<HeadlessAppBuildingOptions, 'approvalTimeoutMs'> & {
   approvalTimeoutMs: number;
 };
 
-/** Options a host can't start the tools with; the message lists each problem. */
 export class HeadlessOptionsError extends Error {
   readonly problems: string[];
 
   constructor(problems: string[]) {
-    super(`The app-building tools can't start: ${problems.join('; ')}.`);
+    super(
+      `The app-building tools can't start, because the launch passed values they can't use: ${problems.join('; ')}. ` +
+        'Check the APP_BUILD_* config of the run\'s database (Set up Cloud in Constructive Desktop writes it) and what the Job passes from it.'
+    );
     this.name = 'HeadlessOptionsError';
     this.problems = problems;
   }
@@ -103,7 +97,6 @@ function endpointProblem(name: 'api' | 'modules', label: string, value: unknown)
   return null;
 }
 
-/** Whether `child` is `parent` or a folder under it. */
 export function isWithin(parent: string, child: string): boolean {
   const relative = path.relative(path.resolve(parent), path.resolve(child));
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
@@ -116,7 +109,6 @@ function keyProblem(name: string, value: unknown): string | null {
   return null;
 }
 
-/** Checks the options and returns them resolved; throws HeadlessOptionsError with every problem. */
 export function checkOptions(options: HeadlessAppBuildingOptions): CheckedOptions {
   if (!options || typeof options !== 'object') {
     throw new HeadlessOptionsError(['the options are missing']);

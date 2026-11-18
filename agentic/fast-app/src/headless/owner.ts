@@ -1,10 +1,3 @@
-// The owner's session on the app database (FastAppHost.owner) in a run with
-// no UI: the owner's personal key of the app's realm. The card's answer
-// carries no password, so a build and a check open the same session. Each
-// one checks first that the key still signs in as the account (it can be
-// revoked while a card waits), and a refusal fails the phase with the run's
-// own cause and fix, not the desktop's advice about a password.
-
 import path from 'node:path';
 
 import type { OwnerSession, OwnerSessions } from '../pipeline/host';
@@ -12,13 +5,16 @@ import { ownerDataPlane } from '../pipeline/owner-planes';
 import { PhaseError } from '../pipeline/progress';
 import { checkOwnerKey, LaunchError, type Post, type RunIdentity } from './launch';
 
-/** The session for the run's work tree; it throws for any other folder or an unknown database. */
 export function ownerSessionOf(run: RunIdentity, cwd: string): OwnerSession {
   if (path.resolve(cwd) !== path.resolve(run.cwd)) {
-    throw new Error(`This cloud run builds the app in ${run.cwd} only, not in ${cwd}.`);
+    throw new Error(
+      `No owner session for ${cwd}: this cloud run builds the app in ${run.cwd} only. Call the tool from that folder.`
+    );
   }
   if (!run.databaseName) {
-    throw new Error(`The run's database (ID ${run.databaseId}) was not found when the run started.`);
+    throw new Error(
+      `No owner session: the run's database (ID ${run.databaseId}) was not found when the run started. Send the message again, so a new run checks the database.`
+    );
   }
   return {
     databaseId: run.databaseId,
@@ -34,6 +30,7 @@ type Step = { phase: 'provision' | 'verify'; tool: 'plan_app' | 'verify_app' };
 
 async function checkedSession(run: RunIdentity, cwd: string, step: Step, post: Post): Promise<OwnerSession> {
   const session = ownerSessionOf(run, cwd);
+  // Again at each sign-in: the key can be revoked while a card waits.
   try {
     await checkOwnerKey(run, session.databaseName, post);
   } catch (err) {

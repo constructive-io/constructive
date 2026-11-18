@@ -1,14 +1,8 @@
-// The app-building sections of the agent's system prompt, so a host's prompt
-// always matches the tools this package registers (tools/, extensions/). The
-// desktop's harness prompt and the cloud Job's both take them from here.
-//
-// The text is the desktop's (src/main/harness/system-prompt.ts at the
-// refactor/fast-app-host branch), byte for byte. How the app itself is built
-// (its files, blocks, nav and data access) is the template's
-// `packages/app/AGENTS.md`; these sections only route to it.
+// Each tool these sections name must be one the package registers
+// (prompt.test.ts). How the app itself is built (its files, blocks, nav and
+// data access) is the template's `packages/app/AGENTS.md`; these sections only
+// route to it.
 
-// For a host that can build an app: plan_app, verify_app and the tools they
-// name are registered.
 const APP_BUILDING = `## Building an app
 
 A "build me an app" request goes through one tool call, \`plan_app\` with a complete AppSpec, and one approval card. Don't provision, run codegen, insert records or write screens yourself before it, and don't call \`create_plan\`: the build shows its own progress.
@@ -60,19 +54,12 @@ App building isn't available in this build: it has no app template. If the user 
 // Only where plan_app exists: the end of the database tools section.
 const SPEC_TOOLS_NOTE = ` For an app built with \`plan_app\`, use them only for what its spec can't express; the desktop then writes \`.constructive/app-spec.json\` from the database again.`;
 
-/**
- * The "Building an app" and "Changing an existing app" sections when the host
- * can build an app; else the "Building an app" section that says app building
- * isn't available. Each ends with a blank line.
- */
+/** Each ends with a blank line. */
 export function appBuildingSection(available: boolean): string {
   return available ? APP_BUILDING : APP_BUILDING_OFF;
 }
 
-/**
- * The sentence the database tools section ends with where plan_app exists. It
- * starts with a space: it follows the section's sentence about the tools.
- */
+/** It starts with a space: it follows a sentence about the database tools. */
 export function specToolsNote(): string {
   return SPEC_TOOLS_NOTE;
 }

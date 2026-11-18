@@ -1,10 +1,3 @@
-// The cloud plan card and rebuild card (FastAppHost.card, brief 4.4): the ask
-// is a request row in the run log that carries the card, and the answer is
-// the resolution row a client writes back. There is no password: the owner's
-// session comes from the owner key. The card waits until the answer comes,
-// the call is stopped, or the wait times out; a read of the log that fails
-// meanwhile is tried again. Only an answer after the card's own row counts.
-
 import {
   approvalRequestMessage,
   type PiSessionEntry,
@@ -24,16 +17,13 @@ import { answerOf, type ApprovalAnswer, leafIdOf } from './run-log';
 export const STOPPED_REASON = 'the user stopped the run before answering';
 
 const POLL_MS = 2_000;
-// The longest wait between reads while the log can't be read.
 const MAX_BACKOFF_MS = 30_000;
 
-/** Why a card can't be shown: the run has a request for this tool call already. */
 export const ASKED_ALREADY =
-  'the run already holds an approval request for this tool call, so the plan card could not be shown';
+  'the plan card could not be shown: the run already holds an approval request for this tool call (the gate\'s, or an earlier turn\'s with the same call id). Call plan_app again to ask with a new card';
 
 const entryId = (record: RunEventRecord): unknown => (record.entry as { id?: unknown }).id;
 
-// The request row this host writes: its details carry the card.
 const carriesCard = (record: RunEventRecord): boolean => {
   const details = (record.entry as { message?: { details?: { card?: unknown } } }).message?.details;
   return typeof details?.card === 'object' && details.card !== null;
@@ -42,14 +32,12 @@ const carriesCard = (record: RunEventRecord): boolean => {
 export type RunLogCardsOptions = {
   store: RunLogStore;
   runId: string;
-  /** Sends the session's entries so far to the log, so the call is there before its card. */
   flush: () => Promise<void>;
   timeoutMs: number;
   intervalMs?: number;
   now?: () => Date;
-  /** Waits `ms`, or less when `signal` aborts. */
+  /** Must end early when `signal` aborts. */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
-  /** Where a failed read is reported; console.warn by default. */
   warn?: (message: string) => void;
 };
 
@@ -65,7 +53,6 @@ function wait(ms: number, signal?: AbortSignal): Promise<void> {
   });
 }
 
-/** "30 minutes", "90 seconds": the wait in the decline reason. */
 export function waitText(ms: number): string {
   const minutes = ms / 60_000;
   if (Number.isInteger(minutes)) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
@@ -74,10 +61,8 @@ export function waitText(ms: number): string {
 }
 
 /**
- * The changes the answer ticked, as the desktop's card takes them
- * (plan-approvals.ts): only the ones the card offered count, and each needs
- * the ones it requires. A missing `payload` ticks none. A tick without its
- * requirement is refused: the reason says what to tick together.
+ * As the desktop's card (plan-approvals.ts): only the offered changes count,
+ * and a tick without a change it requires is refused, not guessed.
  */
 export function tickedChanges(
   offered: CardRequest['destructive'],
@@ -107,7 +92,6 @@ function cardAnswer(request: CardRequest, answer: ApprovalAnswer): CardAnswer {
   };
 }
 
-/** The plan card over the run log. */
 export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
   const { store, runId } = options;
   const now = options.now ?? (() => new Date());
@@ -115,7 +99,6 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
   const intervalMs = options.intervalMs ?? POLL_MS;
   const warn = options.warn ?? ((message: string) => console.warn(message));
 
-  // The account row: no password field, so none is kept and none can be.
   const account = async (
     _projectId: string | undefined,
     signedIn: FastAppAccount
@@ -130,13 +113,10 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
     const stopped = (): CardAnswer => ({ approved: false, reason: STOPPED_REASON });
     if (signal?.aborted) return stopped();
     const rowId = approvalEntryId(toolCallId);
-    // The call and the card's approval stage reach the log before the row.
+    // The tool call must reach the log before its card.
     await options.flush();
     const records = await readAll(store, runId);
-    // The ids are the gate's too (approval-<id>, resolution-<id>), and the store
-    // drops an id it has: with a request for this call already in the run (the
-    // gate's, or an earlier turn's with the same call id), no card can be
-    // shown, and no answer in the log is this card's.
+    // The gate writes the same ids, and the store drops an id it has.
     if (records.some((record) => entryId(record) === rowId)) return { approved: false, reason: ASKED_ALREADY };
     const entry = {
       type: 'message',
@@ -153,7 +133,6 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
     } as PiSessionEntry;
     await store.append(runId, [entry]);
 
-    // Only an answer after this card's own row in the log answers it.
     let cursor: RunLogCursor =
       records.length > 0 ? { afterSeq: records[records.length - 1].seq } : START;
     let ownSeq: number | null = null;
@@ -166,8 +145,7 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
         fresh = await readAll(store, runId, cursor);
         failedReads = 0;
       } catch (err) {
-        // A worker restart or a gateway error mid-wait must not lose the
-        // user's answer: only the deadline, a stop or the answer end the wait.
+        // Keep waiting: giving up would lose the user's answer.
         failedReads += 1;
         warn(
           `[fast-app] reading the run log for the plan card of ${toolCallId} failed (${failedReads} in a row); polling again: ${err instanceof Error ? err.message : String(err)}`
@@ -177,7 +155,6 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
       for (const record of fresh) {
         if (ownSeq === null) {
           if (entryId(record) !== rowId) continue;
-          // Another writer's request took this id first: it isn't this card.
           if (!carriesCard(record)) return { approved: false, reason: ASKED_ALREADY };
           ownSeq = record.seq;
           continue;

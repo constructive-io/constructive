@@ -29,11 +29,7 @@ const current = new AsyncLocalStorage<StepLog>();
 export const withStepLog = <T>(log: StepLog, work: () => Promise<T>): Promise<T> =>
   current.run(log, work);
 
-/**
- * `text` as a step's log would keep it: the running step's secrets and
- * anything shaped like one taken out. For text that reaches the result some
- * other way than an activity, such as a failure message.
- */
+/** For text that reaches the result outside an activity, such as a failure message. */
 export const redactInStep = (text: string): string =>
   redact(text, current.getStore()?.secrets() ?? []);
 

@@ -38,7 +38,6 @@ export async function projectEnv(cwd: string): Promise<ContextSource | null> {
   return (await hostContextSource(cwd)) ?? (await fromEnvFile(cwd));
 }
 
-/** The named values a source has, as a record, for a reader of .env records. */
 export function valuesOf(source: ContextSource, names: readonly string[]): Record<string, string> {
   const read = (name: string) => (typeof source === 'function' ? source(name) : source[name]);
   return Object.fromEntries(
@@ -80,8 +79,8 @@ const SECRET_KEY = /TOKEN|SECRET|PASSWORD|PASSWD|API_?KEY|BEARER|CREDENTIAL|PRIV
 
 /**
  * The project's .env values (or the host's) that are credentials, for the
- * build details' redaction; none when they can't be read. A host that gives
- * a lookup function, not a record, has its secrets redacted by itself.
+ * build details' redaction; none when they can't be read. A lookup function
+ * can't be listed, so a host's keys are redacted only when it answers a record.
  */
 export async function envSecrets(cwd: string): Promise<string[]> {
   const source = await projectEnv(cwd).catch((): null => null);

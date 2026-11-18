@@ -268,7 +268,6 @@ export function configureFastAppHost(host: FastAppHost): void {
   current = host;
 }
 
-/** Whether the host can open the app's dev server (`FastAppHost.preview`, true unless it says false). */
 export function hostPreviews(): boolean {
   return getFastAppHost().preview !== false;
 }
