@@ -33,6 +33,7 @@
   "dependencies": {
     "@agentic-kit/db-tools": "workspace:^",
     "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/permissions": "workspace:^",
     "@agentic-kit/pi": "workspace:^",
     "typebox": "1.3.27"
   },
