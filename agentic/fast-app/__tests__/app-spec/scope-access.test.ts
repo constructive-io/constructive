@@ -6,23 +6,19 @@ import { planDelta } from '../../src/app-spec/delta';
 import { liveSpec } from '../../src/app-spec/live-spec';
 import { linkTableName } from '../../src/app-spec/names';
 import { scopeAccessErrors } from '../../src/app-spec/scope-access';
-import { scopeTreeFrom } from '../../src/app-spec/scope-tree';
+import { plannedScopeTree, scopeTreeFrom } from '../../src/app-spec/scope-tree';
 import { specModel } from '../../src/app-spec/spec-model';
 import type { BlueprintTable } from '../../src/app-spec/translate';
 import type { AppSpec, CustomBackend, SpecEntity, SpecLink } from '../../src/app-spec/types';
 import { validateAppSpec } from '../../src/app-spec/validate';
+import { CURATED_BLUEPRINTS } from '../../src/blueprints/curated';
 import { accessFieldHints } from '../../src/pipeline/field-hints';
 import { builtRecord } from '../pipeline/__fixtures__/built-record';
+import { planOn } from '../pipeline/__fixtures__/plan-on';
 import { liveModelOf } from './__fixtures__/live-model-of';
 
 // jest runs this file as CommonJS: its own URL, for the relative reads below.
 const moduleUrl = pathToFileURL(__filename).href;
-
-// Two tests of this file in the desktop run the pipeline's planner on the
-// rendered spec ("the rendered spec keeps each scope access and hides its
-// entity columns, so the same spec plans nothing" and "a curated entity type's
-// added columns stay in app-spec.json, so the same spec plans nothing"). They
-// need build-plan, plan-live and view-sync, so they come with the pipeline.
 
 // A property manager: vendors belong to an organization; units to a property,
 // an entity type manage_entity_types made; leases to a unit, so to its property.
@@ -168,6 +164,19 @@ test('a scope access the database or the keys can’t back is refused, with what
   assert.match(errors[0]!.message, /no "teams" scope/);
   assert.match(errors[1]!.message, /belongsTo to propertiess/);
   assert.deepEqual(scopeAccessErrors(specModel(spec, {}, entityTables), tree), []);
+});
+
+test('the rendered spec keeps each scope access and hides its entity columns, so the same spec plans nothing', () => {
+  const live = liveModelOf(spec, { scopes: tree });
+  const record = builtRecord(spec, live);
+  const view = liveSpec({ model: live, overlay: record.overlay, seeded: {}, fallbackName: 'x' });
+  assert.deepEqual(entity(view.spec, 'vendors'), entity(spec, 'vendors'));
+  assert.deepEqual(entity(view.spec, 'leases').access, { scope: 'properties' });
+  assert.ok(!entity(view.spec, 'leases').fields.some((f) => f.name === 'property_id'));
+
+  const outcome = planOn({ kind: 'ok', record }, view.spec, live, false, { scopes: tree });
+  if (outcome.kind === 'refused') assert.fail(outcome.text);
+  assert.deepEqual(outcome.plan.delta.additions, []);
 });
 
 test("an entity type's table the spec declares keeps its labels and sample rows, so a rebuild can seed them again", () => {
@@ -320,4 +329,27 @@ test("a curated entity type's table takes new columns under extend, and only the
       policies: [],
     },
   ]);
+});
+
+test("a curated entity type's added columns stay in app-spec.json, so the same spec plans nothing", () => {
+  const rooms: AppSpec = {
+    version: 1,
+    name: 'Raise',
+    backend: {
+      kind: 'blueprint',
+      slug: 'fundraise',
+      extend: { fields: { data_rooms: [{ name: 'region', type: 'text' }] } },
+    },
+  };
+  const scopes = plannedScopeTree(CURATED_BLUEPRINTS.fundraise).map((info) =>
+    info.scope === 'data_room' ? { ...info, membershipType: 3 } : info,
+  );
+  const live = liveModelOf(rooms, { blueprints: CURATED_BLUEPRINTS, scopes });
+  const record = builtRecord(rooms, live);
+  const view = liveSpec({ model: live, overlay: record.overlay, seeded: {}, fallbackName: 'x' });
+  const backend = view.spec.backend as Extract<AppSpec['backend'], { kind: 'blueprint' }>;
+  assert.deepEqual(backend.extend?.fields?.data_rooms, [{ name: 'region', type: 'text' }]);
+  const outcome = planOn({ kind: 'ok', record }, view.spec, live, false, { scopes });
+  if (outcome.kind === 'refused') assert.fail(outcome.text);
+  assert.deepEqual(outcome.plan.delta.additions, []);
 });

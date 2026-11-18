@@ -2,14 +2,14 @@ import { landedOf } from '../../app-spec/__fixtures__/live-model-of';
 import type { LiveModel } from '../../../src/app-spec/live-model';
 import { overlayOf } from '../../../src/app-spec/overlay';
 import type { AppSpec } from '../../../src/app-spec/types';
-
-// The steps of a BuildRecord. The record's type comes with the pipeline
-// (`build-record.ts`); until then this fixture is typed by its own shape.
-type BuildSteps = { settled: boolean; codegen: boolean; seeded: boolean; gen: boolean };
-type BuildExpect = { table: string; column?: string; present: boolean };
+import type { BuildRecord } from '../../../src/pipeline/build-record';
 
 /** What a whole build of `spec` leaves in the record on `model`: every step done, every row landed. */
-export function builtRecord(spec: AppSpec, model: LiveModel, steps: Partial<BuildSteps> = {}) {
+export function builtRecord(
+  spec: AppSpec,
+  model: LiveModel,
+  steps: Partial<BuildRecord['steps']> = {},
+): BuildRecord {
   return {
     version: 3,
     kind: 'build',
@@ -23,6 +23,6 @@ export function builtRecord(spec: AppSpec, model: LiveModel, steps: Partial<Buil
     ),
     seeded: landedOf(spec, model),
     steps: { settled: true, codegen: true, seeded: true, gen: true, ...steps },
-    expect: [] as BuildExpect[]
+    expect: [],
   };
 }

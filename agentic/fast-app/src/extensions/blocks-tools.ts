@@ -1,6 +1,7 @@
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { type Static, Type } from 'typebox';
 
+import { getFastAppHost } from '../pipeline/host';
 import {
   appRegistry,
   type BlockMatch,
@@ -35,7 +36,7 @@ export const blocksTools: ExtensionFactory = (pi) => {
     parameters: SearchBlocksSchema,
     async execute(_toolCallId, params: SearchBlocksParams, _signal, _onUpdate, ctx) {
       const registry = appRegistry(ctx.cwd, {
-        registryUrl: process.env.CONSTRUCTIVE_REGISTRY_URL,
+        registryUrl: getFastAppHost().blocksRegistryUrl?.(),
       });
       const items = await readIndex(registry.indexUrl);
       const matches = rankBlocks(items, params.query);
