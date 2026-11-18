@@ -69,7 +69,7 @@ export async function runPipeline(
   };
   // The step details name what ran; none of them may show the password.
   progress.root = cwd;
-  const { password } = input.credential;
+  const password = input.credential.kind === 'platform-identity' ? undefined : input.credential.password;
   progress.addSecrets([...(password ? [password] : []), ...(await envSecrets(cwd))]);
   progress.enter({ stage: 'building', startedAt: started });
   let backendEnd = 0;

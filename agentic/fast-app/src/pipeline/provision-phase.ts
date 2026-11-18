@@ -7,11 +7,12 @@
 import { noteActivity, recordActivity } from './activity';
 import { prewarmDevServer } from './app-phases';
 import { getFastAppHost, type OwnerSession } from './host';
+import { ownerSignInAttempt } from './owner-sign-in';
 import { errorMessage, PhaseError } from './progress';
 import { envSecrets } from './project-env';
 import { type Note, type RunContext } from './run-context';
 import { appDirOf, isComposed } from './snapshot-clone';
-import { isNotReady, retryTransientOnce, STILL_STARTING } from './transient';
+import { isNotReady, STILL_STARTING } from './transient';
 
 /**
  * Readies the app's files and its database, and signs the owner in to it.
@@ -59,30 +60,40 @@ async function placeApp({ cwd, services, signal }: RunContext): Promise<void> {
 
 async function signIn(run: RunContext, databaseName: string, note: Note): Promise<OwnerSession> {
   const { credential } = run;
+  const platformIdentity = credential.kind === 'platform-identity';
+  const args = `${credential.email} on auth-${databaseName}`;
   // The password goes in the arguments only as the mark redaction leaves.
   return recordActivity(
-    {
-      kind: 'call',
-      label: 'signIn',
-      args: `${credential.email} on auth-${databaseName}`,
-      params: { email: credential.email, password: '[redacted]' },
-    },
+    platformIdentity
+      ? { kind: 'call', label: 'mintTenantOwnerHandoff', args, params: { email: credential.email } }
+      : {
+        kind: 'call',
+        label: 'signIn',
+        args,
+        params: { email: credential.email, password: '[redacted]' },
+      },
     () =>
-      retryTransientOnce(() => getFastAppHost().owner.signIn(run.cwd, credential), {
-        note,
-        signal: run.signal,
-      }),
+      ownerSignInAttempt(
+        platformIdentity,
+        () => getFastAppHost().owner.signIn(run.cwd, credential, run.signal),
+        { note, signal: run.signal },
+      ),
   ).catch((err: unknown) => {
     // A host that knows the cause (headless: its own key was refused) says so
-    // with its own fix; anything else reads as a wrong password.
+    // with its own fix; anything else reads as a wrong password, or for a
+    // platform-identity sign-in, as a platform session that no longer holds.
     if (err instanceof PhaseError) throw err;
     const message = errorMessage(err);
     throw new PhaseError(
       'provision',
-      `Signing in to the app database as ${credential.email} failed: ${message}`,
+      platformIdentity
+        ? `Signing in to the app database as ${credential.email} with the platform account failed: ${message}`
+        : `Signing in to the app database as ${credential.email} failed: ${message}`,
       isNotReady(message)
         ? `${STILL_STARTING} Wait a minute, then call plan_app again.`
-        : 'Ask the user to check their password, then call plan_app again.',
+        : platformIdentity
+          ? 'Ask the user to sign in to Constructive again, then call plan_app again. The database was created, and the next call picks it up. This account uses no password.'
+          : 'Ask the user to check their password, then call plan_app again.',
     );
   });
 }

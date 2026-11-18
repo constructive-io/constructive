@@ -98,9 +98,25 @@ export type DatabaseRequest = {
 
 /**
  * What the plan card's answer carries for the owner's sign-in. Desktop: the
- * account email and the password the user typed. Headless: the email alone.
+ * account email and the password the user typed, or, for an account that
+ * signs in without a password, a platform-identity approval of that account.
+ * Headless: the email alone.
  */
-export type OwnerCredential = { email: string; password?: string };
+export type OwnerCredential = PasswordCredential | PlatformIdentityCredential;
+
+export type PasswordCredential = { kind?: 'password'; email: string; password?: string };
+
+/**
+ * The platform proves the account after provisioning and hands its owner the
+ * app database's session. The host's sign-in may prompt the user while it
+ * runs, so the pipeline never repeats it.
+ */
+export type PlatformIdentityCredential = {
+  kind: 'platform-identity';
+  email: string;
+  /** The platform account the owner's session must belong to. */
+  userId: string;
+};
 
 /** The owner's session on the app database's own plane. */
 export type OwnerSession = {
@@ -118,8 +134,11 @@ export type OwnerSession = {
  * sign-in through its data-auth broker. Headless: an API key of that realm.
  */
 export type OwnerSessions = {
-  /** Opens the session for a build, with what the card's answer carried. */
-  signIn(cwd: string, credential: OwnerCredential): Promise<OwnerSession>;
+  /**
+   * Opens the session for a build, with what the card's answer carried. The
+   * build's stop ends a sign-in that waits on the user.
+   */
+  signIn(cwd: string, credential: OwnerCredential, signal?: AbortSignal): Promise<OwnerSession>;
   /**
    * The session without asking the user: one the host holds, else one it can
    * open on its own (desktop: with a password kept for the app). Null when

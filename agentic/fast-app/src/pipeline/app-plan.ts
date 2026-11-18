@@ -2,6 +2,13 @@
 // pipeline builds both; the renderer only draws them (src/types/app-plan.ts
 // re-exports them).
 
+/**
+ * A platform account that signs in without a password. The card names the
+ * action with it, and the owner's session comes from the platform after
+ * provisioning. A password account keeps the typed password.
+ */
+export type AppPlanAuthMethod = 'google' | 'email' | 'phone';
+
 /** What the plan card shows before anything runs. */
 export type AppPlanPrompt = {
   name: string;
@@ -21,6 +28,8 @@ export type AppPlanPrompt = {
   nav: string[];
   account: {
     email: string;
+    /** The method the account signs in with; absent for a password account, or one the host has not seen sign in. */
+    authMethod?: AppPlanAuthMethod;
     /** A remembered password exists, so the field can be left empty. */
     savedPassword: boolean;
     /** OS encryption is available, so "Remember" can be offered. */

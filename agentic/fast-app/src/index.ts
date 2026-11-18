@@ -38,6 +38,7 @@ export { scopeTools } from './extensions/scope-tools';
 export { isStoppedToolDetails, STOPPED_TOOL_NOTE, stoppedToolNote } from './extensions/stopped-tool-result';
 export type {
   AppBuildDetails,
+  AppPlanAuthMethod,
   AppPlanPrompt,
   AppReprovisionPrompt,
   PhaseName
@@ -63,7 +64,9 @@ export {
   type OwnerCredential,
   type OwnerSession,
   type OwnerSessions,
+  type PasswordCredential,
   type PlanCards,
+  type PlatformIdentityCredential,
   type ProgressWatch,
   type ProjectDatabaseState,
   type ProjectRecords,

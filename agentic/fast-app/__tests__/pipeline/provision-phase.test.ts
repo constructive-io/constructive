@@ -64,3 +64,24 @@ test("a host's PhaseError from the sign-in passes through with its own cause and
 
   await assert.rejects(provisionPhase(run(), () => {}), (err: unknown) => err === refused);
 });
+
+test('a platform-identity sign-in that fails is not repeated, and its fix asks for a new platform sign-in', async () => {
+  let attempts = 0;
+  hostSigningIn(async () => {
+    attempts += 1;
+    // The user answered the hand-off's prompt, then the mint failed.
+    throw new Error('fetch failed');
+  });
+  const platformRun = {
+    ...run(),
+    credential: { kind: 'platform-identity', email: 'owner@example.com', userId: 'user-1' }
+  } as RunContext;
+
+  await assert.rejects(provisionPhase(platformRun, () => {}), (err: unknown) => {
+    assert.ok(err instanceof PhaseError);
+    assert.match(err.message, /with the platform account failed: fetch failed/);
+    assert.match(err.fix, /sign in to Constructive again/);
+    return true;
+  });
+  assert.equal(attempts, 1);
+});
