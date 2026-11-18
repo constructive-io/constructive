@@ -146,13 +146,13 @@ describe('authSurfaceLoader', () => {
     });
   });
 
-  it('joins the companion modules within the same tenant', async () => {
+  it('reads the surface through the login-only reader, never the tables', async () => {
     const { pool, calls } = fakePool([{ rows: [] }]);
     await authSurfaceLoader.resolve(ctx(pool));
-    // A join on schema id alone would pair one tenant's providers with
-    // another's connected accounts and still return a plausible row.
-    expect(calls[0].text).toMatch(/connected\.database_id = providers\.database_id/);
-    expect(calls[0].text).toMatch(/emails\.database_id = providers\.database_id/);
+    // The server's own connection is held to row-level security: a plain read
+    // of the registrations answers no rows and the surface would not load.
+    expect(calls[0].text).toMatch(/FROM function_resolution\.auth_surface_entry\(\$1\)/);
+    expect(calls[0].text).not.toMatch(/metaschema_modules_public|metaschema_public/);
   });
 });
 

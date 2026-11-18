@@ -1,8 +1,8 @@
 /**
  * Compute Module Loader
  *
- * Resolves per-database compute (functions) config from
- * metaschema_modules_public.function_module and function_invocation_module.
+ * Resolves per-database compute (functions) config through the database's
+ * login-only reader `function_resolution.compute_entry`.
  * Returns the schema and table names for function definitions, API bindings,
  * and invocations so REST routes can address the generated tables.
  *
@@ -20,19 +20,14 @@ import type { LoaderContext, ModuleLoader } from './types';
 
 const COMPUTE_MODULE_SQL = `
   SELECT
-    fs.schema_name AS functions_schema_name,
-    fm.definitions_table_name,
-    fm.bindings_table_name,
-    ivs.schema_name AS invocations_schema_name,
-    ivm.invocations_table_name,
-    ivm.entity_field AS invocations_entity_field
-  FROM metaschema_modules_public.function_module fm
-  JOIN metaschema_public.schema fs ON fs.id = fm.schema_id
-  JOIN metaschema_modules_public.function_invocation_module ivm
-    ON ivm.database_id = fm.database_id AND ivm.scope = fm.scope
-  JOIN metaschema_public.schema ivs ON ivs.id = ivm.schema_id
-  WHERE fm.database_id = $1
-  ORDER BY fs.schema_name
+    functions_schema_name,
+    definitions_table_name,
+    bindings_table_name,
+    invocations_schema_name,
+    invocations_table_name,
+    invocations_entity_field
+  FROM function_resolution.compute_entry($1)
+  ORDER BY functions_schema_name, definitions_table_name
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
