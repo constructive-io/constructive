@@ -11,27 +11,18 @@ export const APP_BUILD_PROGRESS_TYPE = 'constructive.app-build.progress';
 
 /**
  * The details another client gets: no command output, which can be long and
- * is the pod's, and no `previewUrl`, since a pod's dev server can't be reached
- * from there.
+ * is the pod's. They carry no `previewUrl` either: the host's `preview: false`
+ * keeps the pipeline from setting one.
  */
 export function cloudDetails(details: AppBuildDetails): AppBuildDetails {
-  const sent = withoutPreviewUrl(details);
   return {
-    ...sent,
-    phases: sent.phases.map((phase) =>
+    ...details,
+    phases: details.phases.map((phase) =>
       phase.activity
         ? { ...phase, activity: phase.activity.map(({ output: _output, ...item }) => item) }
         : phase
     )
   };
-}
-
-/** The details without `previewUrl`: the pod's dev server, which no other client can reach. */
-export function withoutPreviewUrl<T extends { previewUrl?: string }>(details: T): T {
-  if (!('previewUrl' in details)) return details;
-  const copy = { ...details };
-  delete copy.previewUrl;
-  return copy;
 }
 
 // What makes a new entry: the stage, the name, and each step's status. A note,

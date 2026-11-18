@@ -9,7 +9,6 @@ function details(patch: Partial<AppBuildDetails> = {}): AppBuildDetails {
     kind: 'app-build',
     name: 'Food bank',
     stage: 'building',
-    previewUrl: 'http://localhost:4100',
     phases: [
       {
         phase: 'provision',
@@ -47,11 +46,10 @@ test('each phase change writes one progress entry, then flushes the lane', () =>
   );
 });
 
-test('an entry has no command output and no previewUrl', () => {
+test('an entry has no command output', () => {
   const { entries, reporter } = watch();
   reporter.update?.(details());
   const sent = entries[0].data.details as AppBuildDetails;
-  assert.equal('previewUrl' in sent, false);
   assert.deepEqual(sent.phases[0].activity, [{ kind: 'command', label: 'pnpm install' }]);
 });
 

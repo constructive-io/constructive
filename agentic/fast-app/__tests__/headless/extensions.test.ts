@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
 import { headlessExtensions, mapTools, toolNamesOf } from '../../src/headless/extensions';
-import { HEADLESS_SYSTEM_PROMPT } from '../../src/headless/index';
 
 type Registered = { name: string; execute: (...args: any[]) => Promise<any> };
 
@@ -32,18 +31,6 @@ test('the tool names are exactly what the extensions register, with no tool that
   assert.equal(new Set(names).size, names.length);
   // The code rules guard every write.
   assert.ok(handlers.includes('tool_call'));
-});
-
-test('every tool the prompt section names is one the extensions register', async () => {
-  const names = new Set(await toolNamesOf(headlessExtensions()));
-  // Snake-case words written as code that are columns or values, not tools.
-  const notTools = new Set(['created_at', 'entity_id', 'owner_id', 'set_null', 'shift_id', 'updated_at', 'volunteer_id', 'volunteer_shifts']);
-  const named = [...HEADLESS_SYSTEM_PROMPT.matchAll(/`([a-z][a-z0-9]*(?:_[a-z0-9]+)+)`/g)]
-    .map((match) => match[1])
-    .filter((name) => !notTools.has(name));
-  assert.ok(named.includes('plan_app'));
-  assert.deepEqual(named.filter((name) => !names.has(name)), []);
-  assert.match(HEADLESS_SYSTEM_PROMPT, /^## Building an app/);
 });
 
 test('a left-out tool is never registered, and the others pass through as they are', async () => {

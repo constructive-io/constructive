@@ -50,11 +50,22 @@ export function mapTools(
     );
 }
 
+/** The database tools with their limits, less the ones a cloud run doesn't get. */
+export const headlessDbTools: ExtensionFactory = mapTools(dbToolsWithLimits, (tool) =>
+  LEFT_OUT_TOOLS.has(tool.name) ? null : tool
+);
+
+/**
+ * The extensions whose tools are the database and schema tools, as the
+ * desktop's prompt groups them: the db tools and the blueprint tools.
+ */
+export const DATABASE_EXTENSIONS: readonly ExtensionFactory[] = [headlessDbTools, blueprintTools];
+
 /** The extensions, in the desktop's order (harness/index.ts). */
 export function headlessExtensions(): ExtensionFactory[] {
   return [
     codeRules,
-    mapTools(dbToolsWithLimits, (tool) => (LEFT_OUT_TOOLS.has(tool.name) ? null : tool)),
+    headlessDbTools,
     blueprintTools,
     scopeTools,
     blocksTools,

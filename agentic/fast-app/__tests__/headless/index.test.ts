@@ -17,7 +17,7 @@ import {
   HeadlessOptionsError,
   LaunchError
 } from '../../src/headless';
-import { getFastAppHost } from '../../src/pipeline/host';
+import { getFastAppHost, hostPreviews } from '../../src/pipeline/host';
 
 const DB = '6f1f8a52-7c1e-4a51-9d5b-3c1b2a9e4d10';
 const ACCOUNT_KEY = 'acct-key-0123456789abcdef';
@@ -97,6 +97,7 @@ test('starts with both hosts configured, the tools, their names and the prompt, 
   assert.ok(started.toolNames.includes('plan_app') && started.toolNames.includes('verify_app'));
   assert.equal(started.extensions.length, 7);
   assert.match(started.systemPrompt, /^## Building an app/);
+  assert.match(started.systemPrompt, /## Database and schema tools\n\nThese tools are this run's database and schema tools: `describe_schema`/);
 
   const host = getFastAppHost();
   assert.deepEqual(host.account(), { userId: 'user-1', email: 'owner@example.com' });
@@ -111,8 +112,9 @@ test('starts with both hosts configured, the tools, their names and the prompt, 
   assert.equal(host.appOrigins, undefined);
   assert.equal(host.appSite, undefined);
   assert.equal(host.events, undefined);
-  // No card or result names the pod's dev server.
-  assert.equal(host.preview, false);
+  // The pipeline then sets no previewUrl in the card's details or the results,
+  // so neither the progress entries nor the results name the pod's dev server.
+  assert.equal(hostPreviews(), false);
   assert.equal(host.services()?.template.available(), true);
   assert.equal(getHost().account()?.userId, 'user-1');
   assert.equal(((await hostContextSource(input.cwd)) as Record<string, string>).DATABASE_NAME, 'food-bank');

@@ -14,11 +14,11 @@ import { mkdir } from 'node:fs/promises';
 import { configureHost } from '@agentic-kit/db-tools';
 
 import { configureFastAppHost } from '../pipeline/host';
-import { appBuildingSection } from '../prompt';
 import { headlessExtensions, toolNamesOf } from './extensions';
 import { headlessHost } from './host';
 import { readRunIdentity } from './launch';
 import { checkOptions, type HeadlessAppBuilding, type HeadlessAppBuildingOptions } from './options';
+import { headlessSystemPrompt } from './prompt';
 import { headlessToolsHost } from './tools-host';
 
 export { LEFT_OUT_TOOLS } from './extensions';
@@ -31,9 +31,8 @@ export {
 } from './options';
 export { STOPPED_REASON } from './plan-card';
 export { APP_BUILD_PROGRESS_TYPE } from './progress-watch';
+export { headlessSystemPrompt } from './prompt';
 
-/** The app-building section of the system prompt: these tools are there, so it is the "on" text. */
-export const HEADLESS_SYSTEM_PROMPT = appBuildingSection(true).trimEnd();
 
 /**
  * Starts app building for one run. Throws HeadlessOptionsError for options it
@@ -52,7 +51,7 @@ export async function createHeadlessAppBuilding(
   return {
     extensions,
     toolNames: await toolNamesOf(extensions),
-    systemPrompt: HEADLESS_SYSTEM_PROMPT,
+    systemPrompt: await headlessSystemPrompt(),
     dispose
   };
 }
