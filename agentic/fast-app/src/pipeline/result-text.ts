@@ -223,13 +223,18 @@ export type BuildOutcome = {
   genNotes: readonly string[];
 };
 
+// The Preview only where the host can open it (FastAppHost.preview): a
+// headless host's details carry no previewUrl.
+const databaseLine = (details: AppBuildDetails) =>
+  `Database: ${details.databaseName}.${details.previewUrl ? ` Preview: ${details.previewUrl}.` : ''}`;
+
 /** A build that passed: a first build asks for the design pass, a follow-up for its own files. */
 export function successText(outcome: BuildOutcome): string {
   const { details, delta, genNotes } = outcome;
   if (outcome.update) {
     return [
       `Updated "${details.name}", verified and committed.`,
-      `Database: ${details.databaseName}. Preview: ${details.previewUrl}.`,
+      databaseLine(details),
       checkedText(details),
       ...followUpLines(delta, outcome.resolved, outcome.outside, outcome.seedSkipped),
       ...warningLines(delta.warnings),
@@ -242,7 +247,7 @@ export function successText(outcome: BuildOutcome): string {
   const { resources } = outcome;
   const lines = [
     `Built "${details.name}": ${resources} resource${resources === 1 ? '' : 's'}, verified and committed.`,
-    `Database: ${details.databaseName}. Preview: ${details.previewUrl}.`,
+    databaseLine(details),
     `Backend ${seconds(details.timings?.backendMs)}, app ${seconds(details.timings?.appMs)}.`,
     checkedText(details),
   ].filter(Boolean);

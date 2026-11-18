@@ -10,7 +10,7 @@ import { codegenPhase, seedPhase } from './backend-phases';
 import { buildCommitMessageFor, commitPhase } from './build-commits';
 import { type BuildPlan, recordKindOf, type ResolvedPlan } from './build-plan';
 import { fieldRules } from './field-hints';
-import { type FastAppServices, getFastAppHost, type OwnerCredential } from './host';
+import { type FastAppServices, getFastAppHost, hostPreviews, type OwnerCredential } from './host';
 import { PIPELINE_PHASES } from './phases';
 import { BuildProgress, type PhaseReporter } from './progress';
 import { envSecrets } from './project-env';
@@ -141,7 +141,7 @@ export async function runPipeline(
       },
       { fix: PHASE_FIX.dev },
     );
-    progress.set({ previewUrl: devUrl });
+    if (hostPreviews()) progress.set({ previewUrl: devUrl });
     const verified = await progress.run(
       'verify',
       (note) =>

@@ -29,6 +29,7 @@ import {
   type FastAppProject,
   type FastAppServices,
   getFastAppHost,
+  hostPreviews,
   type OwnerSession,
 } from './host';
 import { BuildProgress, PhaseError, type PhaseReporter } from './progress';
@@ -118,7 +119,7 @@ export async function runVerifyPipeline(
   const dev = { cwd, services, projectId: project?.id, signal };
   try {
     const devUrl = await progress.run('dev', () => devPhase(dev), { fix: PHASE_FIX.dev });
-    progress.set({ previewUrl: devUrl });
+    if (hostPreviews()) progress.set({ previewUrl: devUrl });
     const result = await progress.run(
       'verify',
       async (note) => {
