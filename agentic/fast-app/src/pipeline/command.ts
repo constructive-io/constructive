@@ -31,12 +31,19 @@ const KILL_GRACE_MS = 5_000;
 
 /**
  * The environment of a build command (install, gen, tsc, the dev server, the
- * CRUD smoke): the desktop's own without anything secret, which keeps the
+ * CRUD smoke): the host process's own without anything secret, which keeps the
  * provider keys and tokens from the user's shell away from the app's code and
  * its dependencies, plus `extra`. An `undefined` in `extra` unsets a variable.
+ * NODE_ENV is left out unless `extra` sets it: the app picks its own mode, and
+ * a host that runs with NODE_ENV=production (a cloud Job) would make
+ * `pnpm install` skip the app's dev dependencies.
  */
 export function childEnv(extra: Record<string, string | undefined> = {}): NodeJS.ProcessEnv {
-  const env: Record<string, string | undefined> = { ...scrubEnv(process.env), ...extra };
+  const env: Record<string, string | undefined> = {
+    ...scrubEnv(process.env),
+    NODE_ENV: undefined,
+    ...extra
+  };
   for (const key of Object.keys(env)) if (env[key] === undefined) delete env[key];
   return env;
 }

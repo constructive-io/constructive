@@ -38,3 +38,25 @@ test('a build command gets no provider key or token from the desktop', async () 
     }
   }
 });
+
+test("a build command never gets the host's NODE_ENV, so pnpm install keeps the dev dependencies", async () => {
+  const saved = process.env.NODE_ENV;
+  // A cloud Job's image runs with NODE_ENV=production.
+  process.env.NODE_ENV = 'production';
+  try {
+    assert.ok(!('NODE_ENV' in childEnv()));
+    assert.ok(!('NODE_ENV' in childEnv({ PORT: '4321' })));
+    // A command that needs a mode says so.
+    assert.equal(childEnv({ NODE_ENV: 'test' }).NODE_ENV, 'test');
+
+    const result = await runCommand(
+      process.execPath,
+      ['-e', 'process.stdout.write(process.env.NODE_ENV ?? "unset")'],
+      { cwd: process.cwd() }
+    );
+    assert.equal(result.output, 'unset');
+  } finally {
+    if (saved === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = saved;
+  }
+});
