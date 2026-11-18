@@ -28,7 +28,11 @@ class FakeChromium implements CdpTransport {
   private paused = new Map<string, (blocked: boolean) => void>();
   private ids = 0;
 
-  constructor(private readonly pages: Record<string, Script>) {}
+  constructor(
+    private readonly pages: Record<string, Script>,
+    /** Commands it never answers, as a browser that stalls under memory pressure. */
+    private readonly stalls: ReadonlySet<string> = new Set()
+  ) {}
 
   onMessage(listener: (message: string) => void): void {
     this.messages.push(listener);
@@ -41,6 +45,7 @@ class FakeChromium implements CdpTransport {
   send(text: string): void {
     const { id, method, params, sessionId } = JSON.parse(text);
     this.sent.push({ method, params, sessionId });
+    if (this.stalls.has(method)) return;
     const reply = (result: unknown): void => void setImmediate(() => this.emit({ id, result }));
     switch (method) {
     case 'Target.createBrowserContext':
@@ -118,12 +123,17 @@ const account: RenderAccount = { userId: 'user-1', token: 'owner-key', expiresAt
 
 function browserOf(fake: FakeChromium) {
   let closes = 0;
-  const open = async (): Promise<Browser> => ({
-    cdp: new CdpConnection(fake),
-    close: async () => {
-      closes += 1;
-    }
-  });
+  const open = async (): Promise<Browser> => {
+    const cdp = new CdpConnection(fake);
+    return {
+      cdp,
+      // As the real one: closing ends every command still waiting.
+      close: async () => {
+        closes += 1;
+        cdp.close();
+      }
+    };
+  };
   return { open, closes: () => closes };
 }
 
@@ -227,3 +237,44 @@ test('no routes: no browser', async () => {
   assert.deepEqual(result, { failures: [], pages: 0 });
   assert.equal(opened, false);
 });
+
+test('a browser that stalls in the set-up skips the check within the set-up budget, and is closed', async () => {
+  const fake = new FakeChromium({ '/': {} }, new Set(['Target.createTarget']));
+  const { open, closes } = browserOf(fake);
+  const started = Date.now();
+  const result = await checkRendering(open, DEV, ['/'], account, undefined, { setupMs: 300 });
+  assert.deepEqual(result, { failures: [], pages: 0, skipped: 'setting up the page took over 0.3 s' });
+  assert.ok(Date.now() - started < 2_000);
+  assert.equal(closes(), 1);
+}, 5_000);
+
+test('a stop ends a stalled set-up at once, as a stopped check', async () => {
+  const fake = new FakeChromium({ '/': {} }, new Set(['Target.attachToTarget']));
+  const { open, closes } = browserOf(fake);
+  const stop = new AbortController();
+  setTimeout(() => stop.abort(), 100);
+  const result = await checkRendering(open, DEV, ['/'], account, stop.signal);
+  assert.deepEqual(result, { failures: [], pages: 0, skipped: 'the check was stopped' });
+  assert.equal(closes(), 1);
+}, 5_000);
+
+test('a browser that starts after the set-up was given up is closed too', async () => {
+  let closed = 0;
+  const late = () =>
+    new Promise<Browser>((resolve) =>
+      setTimeout(
+        () =>
+          resolve({
+            cdp: new CdpConnection(new FakeChromium({})),
+            close: async () => {
+              closed += 1;
+            }
+          }),
+        300
+      )
+    );
+  const result = await checkRendering(late, DEV, ['/'], account, undefined, { setupMs: 50 });
+  assert.equal(result.skipped, 'setting up the page took over 0.05 s');
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  assert.equal(closed, 1);
+}, 5_000);

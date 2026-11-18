@@ -7,7 +7,7 @@
 // page, and its storage lives in memory only (an incognito browser context).
 
 import type { OwnerSession, RenderCheck, RenderCheckResult, RenderFailure } from '../pipeline/host';
-import { PAGE_TIMEOUT_MS, STEP_TIMEOUT_MS } from '../pipeline/render-budget';
+import { PAGE_TIMEOUT_MS, RENDER_SETUP_BUDGET_MS, STEP_TIMEOUT_MS } from '../pipeline/render-budget';
 import { requestFailureMessage } from '../pipeline/request-failure';
 import type { CdpEvent } from './cdp';
 import { type Browser, launchChromium } from './chromium';
@@ -42,6 +42,19 @@ function within<T>(work: Promise<T>, ms: number, what: string): Promise<T> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const STOPPED = 'the check was stopped';
+
+/** `work`, or a rejection as soon as `signal` aborts. */
+function untilStopped<T>(work: Promise<T>, signal: AbortSignal | undefined): Promise<T> {
+  if (!signal) return work;
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new Error(STOPPED));
+    if (signal.aborted) return onAbort();
+    signal.addEventListener('abort', onAbort, { once: true });
+    work.then(resolve, reject).finally(() => signal.removeEventListener('abort', onAbort));
+  });
+}
+
 /** The page: one target in its own browser context, attached flat. */
 type Page = {
   send<T = any>(method: string, params?: Record<string, unknown>): Promise<T>;
@@ -52,10 +65,12 @@ type Page = {
 
 async function openPage(browser: Browser, origin: string): Promise<Page> {
   const { cdp } = browser;
-  const { browserContextId } = await cdp.send<{ browserContextId: string }>('Target.createBrowserContext', {
+  const step = <T = any>(method: string, params: Record<string, unknown>) =>
+    within(cdp.send<T>(method, params), STEP_TIMEOUT_MS, method);
+  const { browserContextId } = await step<{ browserContextId: string }>('Target.createBrowserContext', {
     disposeOnDetach: true
   });
-  const { targetId } = await cdp.send<{ targetId: string }>('Target.createTarget', {
+  const { targetId } = await step<{ targetId: string }>('Target.createTarget', {
     url: 'about:blank',
     browserContextId
   });
@@ -66,8 +81,8 @@ async function openPage(browser: Browser, origin: string): Promise<Page> {
     if (info.browserContextId !== browserContextId || info.targetId === targetId) return;
     cdp.send('Target.closeTarget', { targetId: info.targetId }).catch(() => {});
   });
-  await cdp.send('Target.setDiscoverTargets', { discover: true });
-  const { sessionId } = await cdp.send<{ sessionId: string }>('Target.attachToTarget', {
+  await step('Target.setDiscoverTargets', { discover: true });
+  const { sessionId } = await step<{ sessionId: string }>('Target.attachToTarget', {
     targetId,
     flatten: true
   });
@@ -123,12 +138,23 @@ function bodyText(body: { body?: string; base64Encoded?: boolean }): string {
   return body.base64Encoded ? Buffer.from(body.body, 'base64').toString('utf8') : body.body;
 }
 
+export type RenderCheckOptions = {
+  /**
+   * The longest the set-up may take: Chromium's start, the page, the sign-in
+   * page and the session. The CRUD check holds its test rows for the record
+   * pages for this long plus their pages (verify-crud.ts), so a set-up never
+   * outlasts the hold: a slower one skips the check with the reason.
+   */
+  setupMs?: number;
+};
+
 export async function checkRendering(
   open: () => Promise<Browser>,
   devUrl: string,
   routes: readonly string[],
   account: RenderAccount,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options: RenderCheckOptions = {}
 ): Promise<RenderCheckResult> {
   if (!routes.length) return { failures: [], pages: 0 };
   const origin = new URL(devUrl).origin;
@@ -143,10 +169,16 @@ export async function checkRendering(
   let pages = 0;
   const opened: string[] = [];
   let browser: Browser | null = null;
-  let page: Page;
-  try {
-    browser = await open();
-    page = await openPage(browser, origin);
+  // Set once the set-up is given up: a browser that starts after it is closed.
+  let gaveUp = false;
+  const setUp = async (): Promise<Page> => {
+    const started = await open();
+    if (gaveUp) {
+      await started.close();
+      throw new Error('the set-up was given up');
+    }
+    browser = started;
+    const page = await openPage(started, origin);
     // The app reads its session from storage on load: a page of the origin
     // goes in first, then the session, then the pages under check.
     await page.navigate(new URL('/sign-in', devUrl).toString(), 'sign-in');
@@ -211,10 +243,16 @@ export async function checkRendering(
       'storing the session'
     );
     if (set.exceptionDetails) throw new Error(`storing the session failed: ${set.exceptionDetails.text ?? 'exception'}`);
+    return page;
+  };
+  let page: Page;
+  try {
+    page = await within(untilStopped(setUp(), signal), options.setupMs ?? RENDER_SETUP_BUDGET_MS, 'setting up the page');
   } catch (err) {
+    gaveUp = true;
     // The check can't run without a page and its session; the route and CRUD
     // checks still stand, so verify goes on without it.
-    const reason = (err as Error).message;
+    const reason = signal?.aborted ? STOPPED : (err as Error).message;
     console.warn(`[fast-app] render check skipped: ${reason}`);
     await browser?.close();
     return { failures: [], pages: 0, skipped: reason };
@@ -267,7 +305,7 @@ export async function checkRendering(
     return !seen.has(key) && seen.add(key);
   });
   // A check stopped part way says so: its count is only of the pages it got to.
-  if (signal?.aborted) return { failures: unique, pages, opened, skipped: 'the check was stopped' };
+  if (signal?.aborted) return { failures: unique, pages, opened, skipped: STOPPED };
   return { failures: unique, pages, opened };
 }
 

@@ -9,6 +9,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+import { launchChromium } from '../../src/headless/chromium';
 import { chromiumRenderCheck } from '../../src/headless/render-check';
 import type { OwnerSession } from '../../src/pipeline/host';
 
@@ -83,6 +84,15 @@ describeChromium(`the render check in Chromium (${chromium ?? 'skipped: no Chrom
     await new Promise((resolve) => api.close(resolve));
     rmSync(stateDir, { recursive: true, force: true });
   });
+
+  test('the browser runs in a process group of its own, and close leaves no process of it', async () => {
+    const browser = await launchChromium({ chromiumPath: chromium as string, stateDir, startTimeoutMs: 20_000 });
+    const group = -(browser.pid as number);
+    // Signal 0 only asks whether the group exists.
+    assert.doesNotThrow(() => process.kill(group, 0));
+    await browser.close();
+    assert.throws(() => process.kill(group, 0), /ESRCH/);
+  }, 60_000);
 
   test('opens each page as the owner and reports what failed, then leaves no profile behind', async () => {
     const devUrl = `http://localhost:${portOf(app)}`;

@@ -8,11 +8,13 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
 import type { Readable, Writable } from 'node:stream';
 
-import { childEnv } from '../pipeline/command';
+import { childEnv, killTree } from '../pipeline/command';
 import { CdpConnection, type CdpTransport } from './cdp';
 
 export type Browser = {
   cdp: CdpConnection;
+  /** The browser's pid, which is also its process group's id. */
+  pid?: number;
   /** Closes the browser and removes its profile. */
   close(): Promise<void>;
 };
@@ -106,7 +108,10 @@ export async function launchChromium(options: LaunchOptions): Promise<Browser> {
   const child = spawn(options.chromiumPath, [...CHROMIUM_FLAGS, `--user-data-dir=${profile}`, 'about:blank'], {
     // fd 3 carries commands to Chromium and fd 4 its answers.
     stdio: ['ignore', 'ignore', 'pipe', 'pipe', 'pipe'],
-    env: childEnv()
+    env: childEnv(),
+    // Its own process group, so a kill reaches its zygote, renderer and GPU
+    // helpers too, and none is left in the pod.
+    detached: process.platform !== 'win32'
   });
   let stderr = '';
   child.stderr?.setEncoding('utf8');
@@ -129,7 +134,8 @@ export async function launchChromium(options: LaunchOptions): Promise<Browser> {
     closing ??= (async () => {
       await within(cdp.send('Browser.close'), CLOSE_GRACE_MS, 'closing Chromium').catch(() => {});
       cdp.close();
-      if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+      // The whole group, also after a clean exit: a helper can outlive the browser.
+      killTree(child.pid, 'SIGKILL');
       await within(exited, CLOSE_GRACE_MS, 'Chromium exiting').catch(() => {});
       await rm(profile, { recursive: true, force: true }).catch(() => {});
     })();
@@ -142,5 +148,5 @@ export async function launchChromium(options: LaunchOptions): Promise<Browser> {
     const tail = stderr.trim().split('\n').slice(-3).join('\n');
     throw new Error(`${(err as Error).message}${tail ? `\n${tail}` : ''}`);
   }
-  return { cdp, close };
+  return { cdp, pid: child.pid, close };
 }
