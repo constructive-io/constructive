@@ -1,8 +1,8 @@
 // The pi extensions a run with no UI loads for app building: plan_app and
 // verify_app, and the tools the app-building prompt sends the agent to. They
-// are the desktop's, with two changes for a cloud run: the database tools
-// that would make a database or mint a key are left out, and no result
-// carries the pod's dev server address.
+// are the desktop's, less the database tools that would make a database or
+// mint a key. The host's `preview: false` keeps the pod's dev server address
+// out of plan_app's and verify_app's results.
 
 import type {
   ExtensionAPI,
@@ -17,7 +17,6 @@ import { dbToolsWithLimits } from '../extensions/db-tools/index-extension';
 import { planTools } from '../extensions/plan-tools';
 import { scopeTools } from '../extensions/scope-tools';
 import { fastAppTools } from '../tools';
-import { withoutPreviewUrl } from './progress-watch';
 
 /**
  * The database tools a cloud run doesn't get. provision_database would make a
@@ -51,30 +50,6 @@ export function mapTools(
     );
 }
 
-const cleanResult = <T extends { details?: unknown }>(result: T): T => {
-  const details = result?.details as { previewUrl?: string } | undefined;
-  return details && typeof details === 'object' && 'previewUrl' in details
-    ? { ...result, details: withoutPreviewUrl(details) }
-    : result;
-};
-
-/** A tool whose result and updates leave out `previewUrl`: no other client reaches the pod. */
-export function withoutPreviewUrls(tool: AnyTool): AnyTool {
-  return {
-    ...tool,
-    execute: async (toolCallId, params, signal, onUpdate, ctx) =>
-      cleanResult(
-        await tool.execute(
-          toolCallId,
-          params,
-          signal,
-          onUpdate && ((partial) => onUpdate(cleanResult(partial))),
-          ctx
-        )
-      )
-  };
-}
-
 /** The extensions, in the desktop's order (harness/index.ts). */
 export function headlessExtensions(): ExtensionFactory[] {
   return [
@@ -83,7 +58,7 @@ export function headlessExtensions(): ExtensionFactory[] {
     blueprintTools,
     scopeTools,
     blocksTools,
-    mapTools(fastAppTools, withoutPreviewUrls),
+    fastAppTools,
     planTools
   ];
 }

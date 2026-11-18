@@ -1,13 +1,16 @@
 // The owner's session on the app database (FastAppHost.owner) in a run with
-// no UI: the owner's personal key of the app's realm, which the start checked
-// signs in as the account (launch.ts). The card's answer carries no password,
-// so a build and a check open the same session.
+// no UI: the owner's personal key of the app's realm. The card's answer
+// carries no password, so a build and a check open the same session. Each
+// one checks first that the key still signs in as the account (it can be
+// revoked while a card waits), and a refusal fails the phase with the run's
+// own cause and fix, not the desktop's advice about a password.
 
 import path from 'node:path';
 
 import type { OwnerSession, OwnerSessions } from '../pipeline/host';
 import { ownerDataPlane } from '../pipeline/owner-planes';
-import type { RunIdentity } from './launch';
+import { PhaseError } from '../pipeline/progress';
+import { checkOwnerKey, LaunchError, type Post, type RunIdentity } from './launch';
 
 /** The session for the run's work tree; it throws for any other folder or an unknown database. */
 export function ownerSessionOf(run: RunIdentity, cwd: string): OwnerSession {
@@ -27,9 +30,28 @@ export function ownerSessionOf(run: RunIdentity, cwd: string): OwnerSession {
   };
 }
 
-export function ownerKeySessions(run: RunIdentity): OwnerSessions {
+type Step = { phase: 'provision' | 'verify'; tool: 'plan_app' | 'verify_app' };
+
+async function checkedSession(run: RunIdentity, cwd: string, step: Step, post: Post): Promise<OwnerSession> {
+  const session = ownerSessionOf(run, cwd);
+  try {
+    await checkOwnerKey(run, session.databaseName, post);
+  } catch (err) {
+    if (!(err instanceof LaunchError)) throw err;
+    throw new PhaseError(
+      step.phase,
+      err.reason,
+      err.kind === 'key'
+        ? 'Tell the user that the cloud run\'s owner key was refused: set up Cloud again from Constructive Desktop, then send the message again.'
+        : `The backend may be busy or restarting: wait a minute, then call ${step.tool} again.`
+    );
+  }
+  return session;
+}
+
+export function ownerKeySessions(run: RunIdentity, post?: Post): OwnerSessions {
   return {
-    signIn: async (cwd) => ownerSessionOf(run, cwd),
-    resume: async (cwd) => ownerSessionOf(run, cwd)
+    signIn: (cwd) => checkedSession(run, cwd, { phase: 'provision', tool: 'plan_app' }, post),
+    resume: (cwd) => checkedSession(run, cwd, { phase: 'verify', tool: 'verify_app' }, post)
   };
 }

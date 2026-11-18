@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
-import { headlessExtensions, mapTools, toolNamesOf, withoutPreviewUrls } from '../../src/headless/extensions';
+import { headlessExtensions, mapTools, toolNamesOf } from '../../src/headless/extensions';
 import { HEADLESS_SYSTEM_PROMPT } from '../../src/headless/index';
 
 type Registered = { name: string; execute: (...args: any[]) => Promise<any> };
@@ -44,26 +44,6 @@ test('every tool the prompt section names is one the extensions register', async
   assert.ok(named.includes('plan_app'));
   assert.deepEqual(named.filter((name) => !names.has(name)), []);
   assert.match(HEADLESS_SYSTEM_PROMPT, /^## Building an app/);
-});
-
-test("a tool's result and updates leave out previewUrl, and keep the rest", async () => {
-  const fake: ExtensionFactory = (pi) =>
-    pi.registerTool({
-      name: 'plan_app',
-      label: 'Plan app',
-      description: '',
-      parameters: {} as never,
-      execute: async (_id, _params, _signal, onUpdate) => {
-        onUpdate?.({ content: [], details: { stage: 'building', previewUrl: 'http://localhost:4100' } });
-        return { content: [{ type: 'text', text: 'Built.' }], details: { stage: 'done', previewUrl: 'http://localhost:4100' } };
-      }
-    });
-  const { pi, tools } = recordingPi();
-  await mapTools(fake, withoutPreviewUrls)(pi);
-  const updates: unknown[] = [];
-  const result = await tools[0].execute('call-1', {}, undefined, (partial: unknown) => updates.push(partial), {});
-  assert.deepEqual(result, { content: [{ type: 'text', text: 'Built.' }], details: { stage: 'done' } });
-  assert.deepEqual(updates, [{ content: [], details: { stage: 'building' } }]);
 });
 
 test('a left-out tool is never registered, and the others pass through as they are', async () => {

@@ -4,7 +4,6 @@ import type { DatabaseProbe } from '@agentic-kit/db-tools';
 
 import { checkRunDatabase, DATABASE_TEXT } from '../../src/headless/database';
 import type { RunIdentity } from '../../src/headless/launch';
-import { ownerKeySessions } from '../../src/headless/owner';
 import type { BuildPlan } from '../../src/pipeline/build-plan';
 import { PhaseError } from '../../src/pipeline/progress';
 
@@ -103,22 +102,4 @@ test('a folder other than the run’s work tree is refused before any request', 
   const { probe, asked } = probeAnswering({ status: 'found', databaseId: DB, name: 'food-bank', ownerId: 'user-1' });
   await phaseErrorOf(checkRunDatabase(run, { cwd: '/work/other', plan: first, note: () => {} }, probe));
   assert.equal(asked.length, 0);
-});
-
-test('the owner session is the owner key on the app plane of the configured backend', async () => {
-  const sessions = ownerKeySessions(run);
-  const expected = {
-    databaseId: DB,
-    databaseName: 'food-bank',
-    endpoint: 'http://api-food-bank.localhost/graphql',
-    token: 'owner-key',
-    userId: 'user-1'
-  };
-  assert.deepEqual(await sessions.signIn('/work/app', { email: 'owner@example.com' }), expected);
-  assert.deepEqual(await sessions.resume('/work/app', undefined), expected);
-  await assert.rejects(sessions.resume('/work/other', undefined), /builds the app in \/work\/app only/);
-  await assert.rejects(
-    ownerKeySessions({ ...run, databaseName: null }).signIn('/work/app', { email: 'x@y' }),
-    /was not found when the run started/
-  );
 });

@@ -80,7 +80,9 @@ export function headlessHost(run: RunIdentity, options: CheckedOptions): Headles
       timeoutMs: options.approvalTimeoutMs
     }),
     ...(render ? { renderCheck: render.renderCheck } : {}),
-    progress: runLogProgress(flush)
+    progress: runLogProgress(flush),
+    // Nobody can open a pod's dev server: no card or result names its address.
+    preview: false
   };
 
   let disposed: Promise<void> | null = null;

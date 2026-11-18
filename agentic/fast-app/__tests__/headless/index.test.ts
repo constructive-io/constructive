@@ -111,6 +111,8 @@ test('starts with both hosts configured, the tools, their names and the prompt, 
   assert.equal(host.appOrigins, undefined);
   assert.equal(host.appSite, undefined);
   assert.equal(host.events, undefined);
+  // No card or result names the pod's dev server.
+  assert.equal(host.preview, false);
   assert.equal(host.services()?.template.available(), true);
   assert.equal(getHost().account()?.userId, 'user-1');
   assert.equal(((await hostContextSource(input.cwd)) as Record<string, string>).DATABASE_NAME, 'food-bank');
