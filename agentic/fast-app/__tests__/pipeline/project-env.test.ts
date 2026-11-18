@@ -15,6 +15,7 @@ import {
   databaseNameFor,
   envSecrets,
   pendingDatabaseName,
+  pendingTicket,
   projectDatabaseName
 } from '../../src/pipeline/project-env';
 
@@ -49,6 +50,14 @@ test('without the host giving values, the .env is read as before', async () => {
   assert.deepEqual(await projectDatabaseName(dir), { name: 'from-file', bound: true });
   assert.deepEqual(await envSecrets(dir), ['file-secret-1234']);
   assert.equal(await pendingDatabaseName(dir), 'pending-from-file');
+  // The whole request, for the database step that resumes it.
+  assert.deepEqual(await pendingTicket(dir), {
+    ticketId: 'ticket-1',
+    databaseName: 'pending-from-file',
+    apiEndpoint: '',
+    userId: '',
+    attempts: 0
+  });
 });
 
 test("the host's values for the folder stand in for its .env, which is not read", async () => {
@@ -64,6 +73,7 @@ test("the host's values for the folder stand in for its .env, which is not read"
   assert.deepEqual(await envSecrets(dir), ['job-secret-5678']);
   // The host records no pending provision, whatever the .env says.
   assert.equal(await pendingDatabaseName(dir), null);
+  assert.equal(await pendingTicket(dir), null);
   // Every read asked the host about this folder.
   assert.ok(contextSource.mock.calls.every(([cwd]) => cwd === dir));
 });
@@ -78,6 +88,7 @@ test('a host that gives a lookup function is read the same way, a pending provis
 
   assert.equal(await boundDatabaseName(dir), 'job-db');
   assert.equal(await pendingDatabaseName(dir), 'pending-in-host');
+  assert.equal((await pendingTicket(dir))?.ticketId, 'ticket-2');
   // A lookup can't be listed: such a host redacts its own secrets.
   assert.deepEqual(await envSecrets(dir), []);
 });
