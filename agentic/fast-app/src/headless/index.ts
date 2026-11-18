@@ -34,9 +34,9 @@ export async function createHeadlessAppBuilding(
   await mkdir(checked.stateDir, { recursive: true });
   const run = await readRunIdentity(checked);
   configureHost(headlessToolsHost(run));
-  const { host, dispose } = headlessHost(run, checked);
+  const { host, installed, dispose } = headlessHost(run, checked);
   configureFastAppHost(host);
-  const extensions = headlessExtensions();
+  const extensions = headlessExtensions(installed);
   return {
     extensions,
     toolNames: await toolNamesOf(extensions),

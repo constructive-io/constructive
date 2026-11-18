@@ -49,11 +49,26 @@ export const headlessDbTools: ExtensionFactory = mapTools(dbToolsWithLimits, (to
 /** As the desktop's prompt groups the database and schema tools. */
 export const DATABASE_EXTENSIONS: readonly ExtensionFactory[] = [headlessDbTools, blueprintTools];
 
+// Tools that run the app's own packages besides plan_app and verify_app, which
+// wait in the template and the dev server: run_codegen installs them itself
+// when they are missing, which would race the install that started with the run.
+const NEEDS_INSTALL: ReadonlySet<string> = new Set(['run_codegen']);
+
+export function afterInstall(tool: AnyTool, installed: (signal?: AbortSignal) => Promise<void>): AnyTool {
+  return {
+    ...tool,
+    execute: async (toolCallId, params, signal, onUpdate, ctx) => {
+      await installed(signal);
+      return tool.execute(toolCallId, params, signal, onUpdate, ctx);
+    }
+  };
+}
+
 /** The extensions, in the desktop's order (harness/index.ts). */
-export function headlessExtensions(): ExtensionFactory[] {
+export function headlessExtensions(installed: (signal?: AbortSignal) => Promise<void>): ExtensionFactory[] {
   return [
     codeRules,
-    headlessDbTools,
+    mapTools(headlessDbTools, (tool) => (NEEDS_INSTALL.has(tool.name) ? afterInstall(tool, installed) : tool)),
     blueprintTools,
     scopeTools,
     blocksTools,

@@ -18,7 +18,7 @@ function recordingPi() {
 }
 
 test('the tool names are exactly what the extensions register, with no tool that makes a database or a key', async () => {
-  const extensions = headlessExtensions();
+  const extensions = headlessExtensions(async () => {});
   const names = await toolNamesOf(extensions);
   const { pi, tools, handlers } = recordingPi();
   for (const extension of extensions) await extension(pi);

@@ -11,7 +11,7 @@ const codeNames = (text: string) =>
 
 test('every tool the section names is one the run registers', async () => {
   const prompt = await headlessSystemPrompt();
-  const tools = new Set(await toolNamesOf(headlessExtensions()));
+  const tools = new Set(await toolNamesOf(headlessExtensions(async () => {})));
   assert.match(prompt, /^## Building an app/);
   assert.ok(codeNames(prompt).includes('plan_app'));
   assert.deepEqual(codeNames(prompt).filter((name) => !tools.has(name)), []);

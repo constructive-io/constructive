@@ -2,7 +2,7 @@
 // fake server answers every realm.
 
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
@@ -129,6 +129,30 @@ test('a refused owner key fails the start', async () => {
     assert.ok(!err.message.includes(OWNER_KEY));
     return true;
   });
+});
+
+test("a clone that holds the app starts installing it at once, and the start doesn't wait for it", async () => {
+  const flushes = { count: 0 };
+  const input = options(flushes);
+  // A composed app without node_modules, and a pnpm that takes long and logs its start.
+  const app = path.join(input.cwd, 'packages', 'app');
+  mkdirSync(path.join(app, '.constructive'), { recursive: true });
+  writeFileSync(path.join(app, '.constructive', 'compose.json'), '{}');
+  writeFileSync(path.join(app, 'pnpm-lock.yaml'), "lockfileVersion: '9.0'\n");
+  const bin = path.join(root, 'bin');
+  const started = path.join(root, 'pnpm-started');
+  mkdirSync(bin);
+  writeFileSync(path.join(bin, 'pnpm'), `#!/bin/sh\ntouch "${started}"\nexec sleep 30\n`);
+  chmodSync(path.join(bin, 'pnpm'), 0o755);
+  process.env.PATH = `${bin}${path.delimiter}${process.env.PATH}`;
+
+  const before = Date.now();
+  const building = await createHeadlessAppBuilding(input);
+  assert.ok(Date.now() - before < 5_000);
+  for (let i = 0; i < 50 && !existsSync(started); i += 1) await new Promise((resolve) => setTimeout(resolve, 100));
+  assert.ok(existsSync(started), 'the install started with the run');
+  assert.equal(flushes.count, 0);
+  await building.dispose();
 });
 
 test('options it cannot use fail before any request', async () => {

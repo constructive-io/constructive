@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { DevServerManager } from '../pipeline/dev-server';
+import { DevServerManager, type EnsureOptions } from '../pipeline/dev-server';
 import type { FastAppHost, FastAppProject, FastAppServices } from '../pipeline/host';
 import { ProjectLocks } from '../pipeline/project-lock';
 import { checkRunDatabase } from './database';
@@ -11,12 +11,30 @@ import { runLogPlanCards } from './plan-card';
 import { runLogProgress } from './progress-watch';
 import { chromiumRenderCheck } from './render-check';
 import { laneFlusher } from './run-log';
-import { cloneTemplate } from './template';
+import { cloneTemplate, type HeadlessTemplate } from './template';
 
 export type HeadlessHost = {
   host: FastAppHost;
+  /** The app's install, which the tools that run its packages wait for. */
+  installed: HeadlessTemplate['installed'];
   dispose(): Promise<void>;
 };
+
+// verify_app starts the dev server first, and in a fresh clone the app's
+// packages are still installing.
+class InstalledDevServers extends DevServerManager {
+  private readonly installed: HeadlessTemplate['installed'];
+
+  constructor(pidFile: string, installed: HeadlessTemplate['installed']) {
+    super(pidFile);
+    this.installed = installed;
+  }
+
+  async ensure(appDir: string, options: EnsureOptions = {}) {
+    await this.installed(options.signal);
+    return super.ensure(appDir, options);
+  }
+}
 
 export function headlessHost(run: RunIdentity, options: CheckedOptions): HeadlessHost {
   const { runLog } = options;
@@ -30,14 +48,11 @@ export function headlessHost(run: RunIdentity, options: CheckedOptions): Headles
     cwd: tree,
     databaseId: run.databaseId
   };
-  const devServers = new DevServerManager(path.join(options.stateDir, 'dev-servers.json'));
+  const template = cloneTemplate(tree);
+  const devServers = new InstalledDevServers(path.join(options.stateDir, 'dev-servers.json'), template.installed);
   // A server an earlier start in the same state folder left running.
   devServers.reapOrphans();
-  const services: FastAppServices = {
-    template: cloneTemplate(tree),
-    devServers,
-    locks: new ProjectLocks()
-  };
+  const services: FastAppServices = { template, devServers, locks: new ProjectLocks() };
   const render = options.chromiumPath
     ? chromiumRenderCheck({ chromiumPath: options.chromiumPath, stateDir: options.stateDir })
     : null;
@@ -78,11 +93,16 @@ export function headlessHost(run: RunIdentity, options: CheckedOptions): Headles
     preview: false
   };
 
+  // In the background: the start must not wait for it.
+  template.start();
+
   let disposed: Promise<void> | null = null;
   return {
     host,
+    installed: template.installed,
     dispose: () => {
       disposed ??= (async () => {
+        template.stop();
         devServers.killAll();
         await render?.dispose();
       })();
