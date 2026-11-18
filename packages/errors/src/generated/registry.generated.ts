@@ -2,7 +2,7 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  *
- * Source of truth: the constructive-db error audit (912 distinct codes
+ * Source of truth: the constructive-db error audit (916 distinct codes
  * raised via EXCEPTION/THROW across deploy sources + generated output).
  * Regenerate with `python3 scripts/generate-registry.py` (see README.md).
  *
@@ -10,7 +10,7 @@
  * codes carry their raw message (with %-args rendered as {{argN}}). Curated
  * entries in `registry.ts` override anything here (typed context + refined copy).
  *
- * Counts: 912 total, 672 public, 240 internal.
+ * Counts: 916 total, 676 public, 240 internal.
  */
 import { defineError, type DefinedError } from '../define';
 import type { ErrorContext } from '../types';
@@ -630,6 +630,7 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'NATIVE_HANDOFF_CREDENTIAL_INVALID': defineError({ code: 'NATIVE_HANDOFF_CREDENTIAL_INVALID', class: 'internal', http: 500, message: 'Native handoff credential invalid.' }),
   'NATIVE_HANDOFF_INCOMPLETE': defineError({ code: 'NATIVE_HANDOFF_INCOMPLETE', class: 'public', http: 400, message: 'Native handoff incomplete.' }),
   'NATIVE_REDIRECT_URI_NOT_ALLOWED': defineError({ code: 'NATIVE_REDIRECT_URI_NOT_ALLOWED', class: 'public', http: 403, message: 'Native redirect uri not allowed.' }),
+  'NODE_CALLBACK_STATE_FORBIDDEN': defineError({ code: 'NODE_CALLBACK_STATE_FORBIDDEN', class: 'public', http: 403, message: 'Node callback state forbidden.' }),
   'NODE_NOT_AWAITING_HUMAN': defineError({ code: 'NODE_NOT_AWAITING_HUMAN', class: 'internal', http: 500, message: 'Node not awaiting human.' }),
   'NODE_NOT_FOUND': defineError({ code: 'NODE_NOT_FOUND', class: 'internal', http: 500, message: 'Node not found.' }),
   'NONEXISTENT_TYPE': defineError({ code: 'NONEXISTENT_TYPE', class: 'public', http: 400, message: 'Nonexistent type.' }),
@@ -696,7 +697,10 @@ export const generatedRegistry: Record<string, DefinedError<ErrorContext>> = {
   'PROCESS_CUSTOM_WRITER_CONFLICT': defineError({ code: 'PROCESS_CUSTOM_WRITER_CONFLICT', class: 'public', http: 400, message: 'Process custom writer conflict.' }),
   'PROCESS_CUSTOM_WRITER_NAME_TOO_LONG': defineError({ code: 'PROCESS_CUSTOM_WRITER_NAME_TOO_LONG', class: 'public', http: 400, message: 'Process custom writer name too long.' }),
   'PROCESS_EXTRACTION_ARRAY_TEXT_FIELD_NOT_JSONB': defineError({ code: 'PROCESS_EXTRACTION_ARRAY_TEXT_FIELD_NOT_JSONB', class: 'public', http: 400, message: 'Process extraction array text field not jsonb.' }),
+  'PROCESS_EXTRACTION_DUPLICATE_NODE': defineError({ code: 'PROCESS_EXTRACTION_DUPLICATE_NODE', class: 'public', http: 400, message: 'Process extraction duplicate node.' }),
+  'PROCESS_EXTRACTION_DUPLICATE_ROUTE_TASK': defineError({ code: 'PROCESS_EXTRACTION_DUPLICATE_ROUTE_TASK', class: 'public', http: 400, message: 'Process extraction duplicate route task.' }),
   'PROCESS_EXTRACTION_INSERT_ON_FILES_TABLE': defineError({ code: 'PROCESS_EXTRACTION_INSERT_ON_FILES_TABLE', class: 'public', http: 400, message: 'Process extraction insert on files table.' }),
+  'PROCESS_EXTRACTION_ROUTE_INVALID': defineError({ code: 'PROCESS_EXTRACTION_ROUTE_INVALID', class: 'public', http: 400, message: 'Process extraction route invalid.' }),
   'PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED': defineError({ code: 'PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED', class: 'public', http: 400, message: 'Process file embedding array file field unsupported.' }),
   'PROCESS_FILE_EMBEDDING_EXTRACTION_BUCKET_UNSUPPORTED': defineError({ code: 'PROCESS_FILE_EMBEDDING_EXTRACTION_BUCKET_UNSUPPORTED', class: 'public', http: 400, message: 'Process file embedding extraction bucket unsupported.' }),
   'PROCESS_FILE_EMBEDDING_INSERT_ON_FILES_TABLE': defineError({ code: 'PROCESS_FILE_EMBEDDING_INSERT_ON_FILES_TABLE', class: 'public', http: 400, message: 'Process file embedding insert on files table.' }),
@@ -1546,6 +1550,7 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'NATIVE_HANDOFF_CREDENTIAL_INVALID': { class: 'internal', dynamic: false, generatedOnly: false },
   'NATIVE_HANDOFF_INCOMPLETE': { class: 'public', dynamic: false, generatedOnly: false },
   'NATIVE_REDIRECT_URI_NOT_ALLOWED': { class: 'public', dynamic: false, generatedOnly: false },
+  'NODE_CALLBACK_STATE_FORBIDDEN': { class: 'public', dynamic: false, generatedOnly: false },
   'NODE_NOT_AWAITING_HUMAN': { class: 'internal', dynamic: false, generatedOnly: false },
   'NODE_NOT_FOUND': { class: 'internal', dynamic: false, generatedOnly: false },
   'NONEXISTENT_TYPE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1612,7 +1617,10 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
   'PROCESS_CUSTOM_WRITER_CONFLICT': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_CUSTOM_WRITER_NAME_TOO_LONG': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_EXTRACTION_ARRAY_TEXT_FIELD_NOT_JSONB': { class: 'public', dynamic: false, generatedOnly: false },
+  'PROCESS_EXTRACTION_DUPLICATE_NODE': { class: 'public', dynamic: false, generatedOnly: false },
+  'PROCESS_EXTRACTION_DUPLICATE_ROUTE_TASK': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_EXTRACTION_INSERT_ON_FILES_TABLE': { class: 'public', dynamic: false, generatedOnly: false },
+  'PROCESS_EXTRACTION_ROUTE_INVALID': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_FILE_EMBEDDING_EXTRACTION_BUCKET_UNSUPPORTED': { class: 'public', dynamic: false, generatedOnly: false },
   'PROCESS_FILE_EMBEDDING_INSERT_ON_FILES_TABLE': { class: 'public', dynamic: false, generatedOnly: false },
@@ -1855,4 +1863,4 @@ export const GENERATED_CODE_META: Record<string, GeneratedCodeMeta> = {
 };
 
 /** Total number of codes collected from constructive-db. */
-export const GENERATED_CODE_COUNT = 912;
+export const GENERATED_CODE_COUNT = 916;
