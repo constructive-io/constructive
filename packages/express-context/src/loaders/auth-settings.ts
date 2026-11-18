@@ -16,6 +16,8 @@
  * makes that resolution sticky for its TTL.
  */
 
+import { escapeIdentifier } from 'pg';
+
 import type { AuthSettings } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
@@ -42,7 +44,7 @@ const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
     remember_me_duration,
     enable_captcha,
     captcha_site_key
-  FROM "${schemaName}"."${tableName}"
+  FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}
   LIMIT 1
 `;
 
