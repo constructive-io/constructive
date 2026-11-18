@@ -152,6 +152,29 @@ describe('run_codegen on a composed app', () => {
     ]);
   });
 
+  it("reads the database from the host's values for the folder, never its .env", async () => {
+    composedApp({ nodeModules: true });
+    // A cloud clone has no .env; one left in the folder must not be read.
+    write(path.join(cwd, '.env'), 'DATABASE_NAME=stale\nAPI_ENDPOINT=http://api.stale.test/graphql\n');
+    const contextSource = jest.fn(() => ({ CONSTRUCTIVE_DATABASE_NAME: 'myapp' }));
+    configureHost({
+      account: () => null,
+      backendConfig: () => ({ apiEndpoint: 'http://api.localhost:3000/graphql' }),
+      contextSource,
+    });
+    const { exec, calls } = fakeExec((call) => {
+      if (isCodegen(call)) writeGeneratedSdk();
+      return { ok: true, out: '' };
+    });
+
+    const result = await createRunCodegenTool(exec).execute({}, { cwd });
+
+    expect(contextSource).toHaveBeenCalledWith(cwd);
+    expect(result.details.success).toBe(true);
+    expect(calls.find(isCodegen)?.env).toEqual(CODEGEN_ENV);
+    expect(read(path.join(appDir, '.env.local'))).toBe(ENV_LOCAL);
+  });
+
   it('tolerates a config without an admin target and normalizes only the barrels that exist', async () => {
     composedApp({ nodeModules: true });
     const { exec } = fakeExec((call) => {

@@ -17,6 +17,7 @@ import {
   type RunCommand,
   settlePrewarm,
 } from '../app-workspace';
+import { hostContextSource, readContextValue } from '../context';
 import { classifyBackendErrors, postGraphQL } from '../graphql-http';
 import { getHost } from '../host';
 import { readEnv } from '../provision-database/env-file';
@@ -68,9 +69,18 @@ const REFUSED_RE = /\b403\b|Forbidden|ACCESS_SUSPENDED/;
 // Read the binding provision_database wrote to the project .env. The
 // API_ENDPOINT pin identifies which backend owns the binding — it wins over
 // the app's current backend config, matching context.ts data-plane precedence.
+// A host that answers the folder's values (ToolsHost.contextSource) is read
+// instead, and then the .env is not.
 async function readProjectEnv(
   cwd: string,
 ): Promise<{ databaseName?: string; apiEndpoint?: string }> {
+  const hosted = await hostContextSource(cwd);
+  if (hosted) {
+    return {
+      databaseName: readContextValue(hosted, 'DATABASE_NAME')?.trim() || undefined,
+      apiEndpoint: readContextValue(hosted, 'API_ENDPOINT')?.trim() || undefined,
+    };
+  }
   try {
     const env = readEnv(await readFile(path.join(cwd, '.env'), 'utf8'));
     return {

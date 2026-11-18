@@ -18,7 +18,7 @@ import {
   resolveProjectContext,
 } from '../src/context';
 import { probeDatabase } from '../src/db-probe';
-import { configureHost } from '../src/host';
+import { configureHost, type ToolsHost } from '../src/host';
 
 const mockProbe = probeDatabase as jest.MockedFunction<typeof probeDatabase>;
 const mockCreateClient = api.createClient as jest.Mock;
@@ -131,6 +131,80 @@ describe('resolveProjectContext sources', () => {
 
     expect(resolved.context).toBeNull();
     expect(resolved.code).toBe('missing-credentials');
+  });
+});
+
+describe('resolveProjectContext with a host context source', () => {
+  const hostAnswering = (contextSource: ToolsHost['contextSource']) =>
+    configureHost({
+      account: () => ({ userId: 'u1', accessToken: 'account-bearer' }),
+      backendConfig: () => ({ apiEndpoint: 'http://api.localhost:3000/graphql' }),
+      contextSource,
+    });
+
+  it("uses the host's values for a folder in place of its .env", async () => {
+    writeFileSync(path.join(dir, '.env'), 'ACCESS_TOKEN=file-key\nDATABASE_ID=db-file\n');
+    const contextSource = jest.fn(() => ({
+      [`${CONTEXT_ENV_PREFIX}ACCESS_TOKEN`]: 'job-key',
+      [`${CONTEXT_ENV_PREFIX}DATABASE_ID`]: 'db-1',
+      [`${CONTEXT_ENV_PREFIX}DATABASE_NAME`]: 'myapp',
+    }));
+    hostAnswering(contextSource);
+
+    const resolved = await resolveProjectContext(dir);
+
+    expect(contextSource).toHaveBeenCalledWith(dir);
+    expect(resolved.context).toMatchObject({
+      accessToken: 'job-key',
+      databaseId: 'db-1',
+      dataEndpoint: 'http://api-myapp.localhost:3000/graphql',
+    });
+  });
+
+  it('resolves a folder that has no .env when the host answers, with an async answer', async () => {
+    hostAnswering(async () => (name) =>
+      ({ ACCESS_TOKEN: 'job-key', DATABASE_ID: 'db-1' })[name]
+    );
+
+    const resolved = await resolveProjectContext(dir);
+
+    expect(resolved.context).toMatchObject({ accessToken: 'job-key', databaseId: 'db-1' });
+  });
+
+  it('reads the .env as before when the host answers null or undefined', async () => {
+    writeFileSync(path.join(dir, '.env'), 'ACCESS_TOKEN=file-key\nDATABASE_ID=db-file\n');
+
+    hostAnswering(() => null);
+    expect((await resolveProjectContext(dir)).context).toMatchObject({ accessToken: 'file-key' });
+
+    hostAnswering(async () => undefined);
+    expect((await resolveProjectContext(dir)).context).toMatchObject({ databaseId: 'db-file' });
+  });
+
+  it('still reports no-env for a folder with no .env when the host has no answer', async () => {
+    hostAnswering(() => null);
+
+    const resolved = await resolveProjectContext(dir);
+
+    expect(resolved).toMatchObject({ context: null, code: 'no-env' });
+  });
+
+  it('never asks the host when given values instead of a folder', async () => {
+    const contextSource = jest.fn(() => ({ ACCESS_TOKEN: 'job-key', DATABASE_ID: 'db-job' }));
+    hostAnswering(contextSource);
+
+    const resolved = await resolveProjectContext({ ACCESS_TOKEN: 'given-key', DATABASE_ID: 'db-1' });
+
+    expect(contextSource).not.toHaveBeenCalled();
+    expect(resolved.context?.accessToken).toBe('given-key');
+  });
+
+  it('reports no-env, not a missing host, for a folder read before any host is configured', async () => {
+    await jest.isolateModulesAsync(async () => {
+      const fresh = await import('../src/context');
+
+      expect(await fresh.resolveProjectContext(dir)).toMatchObject({ context: null, code: 'no-env' });
+    });
   });
 });
 

@@ -5,7 +5,7 @@ import { api, auth, modules } from '@constructive-io/sdk';
 import { parseDotenv } from '12factor-env/dotenv';
 
 import { probeDatabase, type UnreachableCause } from './db-probe';
-import { DEFAULT_DATA_TOKEN_SKEW_MS, getHost, reprovisionAdvice } from './host';
+import { DEFAULT_DATA_TOKEN_SKEW_MS, findHost, getHost, reprovisionAdvice } from './host';
 
 const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
@@ -78,7 +78,8 @@ export type ContextSource =
 const lookup = (source: ContextSource): ((name: string) => string | undefined) =>
   typeof source === 'function' ? source : (name) => source[name];
 
-const readContextValue = (source: ContextSource, key: ContextEnvKey): string | undefined => {
+/** One project value from a source: the prefixed name wins, an empty value reads as absent. */
+export const readContextValue = (source: ContextSource, key: ContextEnvKey): string | undefined => {
   const get = lookup(source);
   const value = get(`${CONTEXT_ENV_PREFIX}${key}`) ?? get(key);
   return value ? value : undefined;
@@ -102,6 +103,13 @@ export async function fromEnvFile(cwd: string): Promise<ContextSource | null> {
   }
 }
 
+/** The host's values for a project folder (`ToolsHost.contextSource`), or null
+ *  when there is no host, no hook, or no answer: the caller then reads the
+ *  folder's `.env`. */
+export async function hostContextSource(cwd: string): Promise<ContextSource | null> {
+  return (await findHost()?.contextSource?.(cwd)) ?? null;
+}
+
 export type ResolveOptions = {
   /** Which plane the context is for. Ownership gates the control plane only:
    *  schema editing and provisioning act under the signed-in account, so a
@@ -118,13 +126,18 @@ export type ResolveOptions = {
  * Passing a `cwd` string keeps the original behavior (read `<cwd>/.env`) so
  * existing hosts — Constructive Desktop, the confirm gate — are unchanged.
  * Headless hosts pass values instead: `fromEnvironment()` for a container or
- * Job, an explicit record for anything else.
+ * Job, an explicit record for anything else. A tool only has a `cwd`, so a
+ * headless host answers `ToolsHost.contextSource` for it, and then the `.env`
+ * is not read.
  */
 export async function resolveProjectContext(
   input: string | ContextSource,
   options: ResolveOptions = {},
 ): Promise<ResolveResult> {
-  const source = typeof input === 'string' ? await fromEnvFile(input) : input;
+  const source =
+    typeof input === 'string'
+      ? ((await hostContextSource(input)) ?? (await fromEnvFile(input)))
+      : input;
   if (!source) {
     return {
       context: null,
