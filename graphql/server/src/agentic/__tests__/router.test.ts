@@ -121,6 +121,37 @@ import { createAgenticRouter } from '../index';
 
 jest.setTimeout(15000);
 
+const USER_ID = '00000000-0000-4000-8000-000000000123';
+const ENTITY_ID = '00000000-0000-4000-8000-000000000e01';
+
+/** Two entity scopes, as a database with organizations and one agent-bearing entity type registers. */
+const AGENT_CHAT = {
+  scopes: [
+    {
+      scope: 'org',
+      entityField: 'entity_id',
+      schemaName: 'agent_public',
+      threadTableName: 'org_agent_thread',
+      messageTableName: 'org_agent_message',
+      taskTableName: 'org_agent_task',
+      membershipsSchemaName: 'memberships_public',
+      membershipsTableName: 'org_memberships',
+      membershipsEntityField: 'entity_id'
+    },
+    {
+      scope: 'data_room',
+      entityField: 'entity_id',
+      schemaName: 'agent_public',
+      threadTableName: 'data_room_agent_thread',
+      messageTableName: 'data_room_agent_message',
+      taskTableName: 'data_room_agent_task',
+      membershipsSchemaName: 'memberships_public',
+      membershipsTableName: 'data_room_memberships',
+      membershipsEntityField: 'entity_id'
+    }
+  ]
+};
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function createMockConstructiveContext(overrides: any = {}) {
@@ -129,10 +160,10 @@ function createMockConstructiveContext(overrides: any = {}) {
 
   return {
     api: { schema: ['app_public'], ...overrides.api },
-    token: overrides.token || { user_id: 'user-123' },
-    pgSettings: { role: 'authenticated', 'jwt.claims.user_id': 'user-123' },
+    token: overrides.token || { user_id: USER_ID },
+    pgSettings: { role: 'authenticated', 'jwt.claims.user_id': USER_ID },
     databaseId: overrides.databaseId || 'db-uuid-123',
-    userId: 'userId' in overrides ? overrides.userId : 'user-123',
+    userId: 'userId' in overrides ? overrides.userId : USER_ID,
     requestId: 'req-001',
     pool: {
       query: jest.fn(async () => ({ rows: [] as any[] }))
@@ -140,12 +171,7 @@ function createMockConstructiveContext(overrides: any = {}) {
     useModule: jest.fn(async (name: string) => {
       if (name === 'agentChat') {
         if (modules.agentChat === null) return undefined;
-        return modules.agentChat ?? {
-          schemaName: 'agent_public',
-          threadTableName: 'agent_thread',
-          messageTableName: 'agent_message',
-          taskTableName: 'agent_task'
-        };
+        return modules.agentChat ?? AGENT_CHAT;
       }
       if (name === 'billing') {
         return modules.billing ?? undefined;
@@ -161,6 +187,10 @@ function createMockConstructiveContext(overrides: any = {}) {
       const mockClient = {
         query: jest.fn(async (sql: string, _params?: any[]) => {
           overrides.onQuery?.(sql);
+          // Which scope's memberships table holds the entity
+          if (sql.includes('AS idx')) {
+            return queryResults.entityScope ?? { rows: [{ idx: 0 }] };
+          }
           // Thread lookup
           if (sql.includes('SELECT id, mode, model')) {
             return queryResults.threadLookup ?? {
@@ -393,7 +423,7 @@ describe('agentic-server router', () => {
       const inserts = statements.filter((sql) => sql.includes('INSERT INTO'));
       expect(inserts).toHaveLength(2);
       for (const sql of inserts) {
-        expect(sql).toMatch(/\(thread_id, actor_id, entity_id, author_role, parts/);
+        expect(sql).toMatch(/\(thread_id, actor_id, "entity_id", author_role, parts/);
         expect(sql).not.toMatch(/owner_id/);
       }
     });
@@ -405,7 +435,7 @@ describe('agentic-server router', () => {
       const request = makeRequest(createTestApp(ctx));
 
       const res = await request
-        .post('/v1/orgs/entity-001/threads')
+        .post(`/v1/orgs/${ENTITY_ID}/threads`)
         .send({ title: 'not my org' });
 
       expect(res.status).toBe(403);
@@ -746,6 +776,63 @@ describe('agentic-server router', () => {
     });
   });
 
+  describe('which agent module an entity resolves to', () => {
+    const run = async (overrides: any, path = `/v1/orgs/${ENTITY_ID}/threads`, body: any = { title: 'x' }) => {
+      const statements: string[] = [];
+      const ctx = createMockConstructiveContext({ ...overrides, onQuery: (sql: string) => statements.push(sql) });
+      const res = await makeRequest(createTestApp(ctx)).post(path).send(body);
+      return { res, statements };
+    };
+
+    it('asks every scope\'s memberships table for the entity, as the request', async () => {
+      const { statements } = await run({});
+      const probe = statements.find((sql) => sql.includes('AS idx'));
+      expect(probe).toContain('FROM "memberships_public"."org_memberships" WHERE "entity_id" = $1');
+      expect(probe).toContain('FROM "memberships_public"."data_room_memberships" WHERE "entity_id" = $1');
+      expect(probe).toContain(' UNION ALL ');
+    });
+
+    it('writes the thread to the tables of the scope that holds the entity', async () => {
+      const org = await run({ queryResults: { entityScope: { rows: [{ idx: 0 }] } } });
+      expect(org.res.status).toBe(201);
+      expect(org.statements.find((sql) => sql.includes('INSERT INTO'))).toContain('"agent_public"."org_agent_thread"');
+
+      const room = await run({ queryResults: { entityScope: { rows: [{ idx: 1 }] } } });
+      expect(room.res.status).toBe(201);
+      expect(room.statements.find((sql) => sql.includes('INSERT INTO'))).toContain('"agent_public"."data_room_agent_thread"');
+    });
+
+    it('answers 404 and writes nothing for an entity no scope holds', async () => {
+      const { res, statements } = await run({ queryResults: { entityScope: { rows: [] } } });
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: 'Entity not found' });
+      expect(statements.some((sql) => sql.includes('INSERT INTO'))).toBe(false);
+    });
+
+    it('answers 404 without a query for an entity id that is not a uuid', async () => {
+      const { res, statements } = await run({}, '/v1/orgs/not-a-uuid/threads');
+      expect(res.status).toBe(404);
+      expect(statements).toHaveLength(0);
+    });
+
+    it('refuses an entity two scopes both claim', async () => {
+      const { res, statements } = await run({ queryResults: { entityScope: { rows: [{ idx: 0 }, { idx: 1 }] } } });
+      expect(res.status).toBe(500);
+      expect(statements.some((sql) => sql.includes('INSERT INTO'))).toBe(false);
+    });
+
+    it('looks a thread up under the entity the route names', async () => {
+      const { statements } = await run(
+        { queryResults: { entityScope: { rows: [{ idx: 1 }] } } },
+        `/v1/orgs/${ENTITY_ID}/threads/thread-001/messages`,
+        { messages: [{ role: 'user', content: 'Hello' }], stream: false }
+      );
+      const lookup = statements.find((sql) => sql.includes('SELECT id, mode, model'));
+      expect(lookup).toContain('FROM "agent_public"."data_room_agent_thread"');
+      expect(lookup).toContain('WHERE id = $1 AND "entity_id" = $2');
+    });
+  });
+
   describe('POST /v1/orgs/:entity_id/threads', () => {
     it('creates thread scoped to entity', async () => {
       const ctx = createMockConstructiveContext();
@@ -753,7 +840,7 @@ describe('agentic-server router', () => {
       const request = makeRequest(app);
 
       const res = await request
-        .post('/v1/orgs/org-abc-123/threads')
+        .post(`/v1/orgs/${ENTITY_ID}/threads`)
         .send({ mode: 'ask' });
 
       expect(res.status).toBe(201);

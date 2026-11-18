@@ -231,38 +231,59 @@ it.each([
   for (const loader of ROUTING_LOADERS) loader.invalidate();
 });
 
-/** Registers the agent module at two scopes, then the rest of the transaction runs as the login. */
+/**
+ * Registers what a tenant's blueprint does: memberships at the app, org and
+ * data_room scopes, and an agent module at each. The rest of the transaction
+ * runs as the login.
+ */
 const agentModulesAsLogin = async (extraOrgPrefix?: string): Promise<LoaderContext> => {
   const { rows: [target] } = await pg.query(
     'SELECT database_id FROM routing_public.domains LIMIT 1'
   );
-  const { rows: [schema] } = await pg.query(
+  const schemaRow = async (name: string, schemaName: string): Promise<string> => (await pg.query(
     `INSERT INTO metaschema_public.schema (database_id, name, schema_name, description, is_public)
-     VALUES ($1, 'agent_public', 'tenant-agent-public', 'agent chat', true) RETURNING id`,
-    [target.database_id]
-  );
+     VALUES ($1, $2, $3, 'agent chat', true) RETURNING id`,
+    [target.database_id, name, schemaName]
+  )).rows[0].id;
+  const agentSchema = await schemaRow('agent_public', 'tenant-agent-public');
+  const membershipsSchema = await schemaRow('memberships_public', 'tenant-memberships-public');
   const table = async (name: string): Promise<string> => (await pg.query(
     `INSERT INTO metaschema_public.table (database_id, schema_id, name, description)
      VALUES ($1, $2, $3, 'agent chat') RETURNING id`,
-    [target.database_id, schema.id, name]
+    [target.database_id, agentSchema, name]
   )).rows[0].id;
-  const register = async (scope: string, prefix: string, entityField: string | null) => pg.query(
+  const memberships = async (scope: string, entityField: string | null) => pg.query(
+    `INSERT INTO metaschema_modules_public.memberships_module
+       (database_id, schema_id, private_schema_id, scope, prefix, entity_field, memberships_table_name)
+     VALUES ($1, $2, $2, $3, $3, $4, $5)`,
+    [target.database_id, membershipsSchema, scope, entityField, `${scope}_memberships`]
+  );
+  const agents = async (scope: string, prefix: string, entityField: string | null) => pg.query(
     `INSERT INTO metaschema_modules_public.agent_module
        (database_id, schema_id, private_schema_id, scope, prefix, entity_field,
         thread_table_id, message_table_id, task_table_id, prompts_table_id)
      VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9)`,
     [
-      target.database_id, schema.id, scope, prefix, entityField,
-      await table(`${prefix}agent_thread`), await table(`${prefix}agent_message`), await table(`${prefix}agent_task`),
-      await table(`${prefix}agent_prompt`)
+      target.database_id, agentSchema, scope, prefix, entityField,
+      await table(`${prefix}_agent_thread`), await table(`${prefix}_agent_message`), await table(`${prefix}_agent_task`),
+      await table(`${prefix}_agent_prompt`)
     ]
   );
-  await register('app', 'app_', null);
-  await register('org', 'org_', 'entity_id');
-  if (extraOrgPrefix) await register('org', extraOrgPrefix, 'entity_id');
+  await pg.query('SET LOCAL session_replication_role TO replica');
+  await memberships('app', null);
+  await memberships('org', 'entity_id');
+  await memberships('data_room', 'entity_id');
+  await agents('app', 'app', null);
+  await agents('org', 'org', 'entity_id');
+  await agents('data_room', 'data_room', 'entity_id');
+  if (extraOrgPrefix) await agents('org', extraOrgPrefix, 'entity_id');
+  await pg.query('SET LOCAL session_replication_role TO DEFAULT');
   // Production layers member policies over the registry; with RLS on and no
   // policy, the login sees none of its rows.
-  await pg.query('ALTER TABLE metaschema_modules_public.agent_module ENABLE ROW LEVEL SECURITY');
+  await pg.query(`
+    ALTER TABLE metaschema_modules_public.agent_module ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE metaschema_modules_public.memberships_module ENABLE ROW LEVEL SECURITY;
+  `);
 
   await pg.query(`SET LOCAL ROLE "${LOGIN}"`);
   const pool = { query: (text: string, values?: unknown[]) => pg.query(text, values) } as unknown as Pool;
@@ -270,23 +291,31 @@ const agentModulesAsLogin = async (extraOrgPrefix?: string): Promise<LoaderConte
   return { routingPool: pool, tenantPool: pool, databaseId: target.database_id };
 };
 
-it('resolves the agent chat loader as the login, at the org scope its routes write to', async () => {
+it('resolves the agent chat loader as the login: every entity scope with its memberships table, and no global scope', async () => {
   const ctx = await agentModulesAsLogin();
-  const hidden = await pg.query('SELECT count(*)::int AS n FROM metaschema_modules_public.agent_module');
-  expect(hidden.rows[0].n).toBe(0);
+  const hidden = await pg.query(`SELECT
+    (SELECT count(*)::int FROM metaschema_modules_public.agent_module) AS agents,
+    (SELECT count(*)::int FROM metaschema_modules_public.memberships_module) AS memberships`);
+  expect(hidden.rows[0]).toEqual({ agents: 0, memberships: 0 });
 
-  expect(await agentChatLoader.resolve(ctx)).toEqual({
+  const scope = (name: string) => ({
+    scope: name,
+    entityField: 'entity_id',
     schemaName: 'tenant-agent-public',
-    threadTableName: 'org_agent_thread',
-    messageTableName: 'org_agent_message',
-    taskTableName: 'org_agent_task'
+    threadTableName: `${name}_agent_thread`,
+    messageTableName: `${name}_agent_message`,
+    taskTableName: `${name}_agent_task`,
+    membershipsSchemaName: 'tenant-memberships-public',
+    membershipsTableName: `${name}_memberships`,
+    membershipsEntityField: 'entity_id'
   });
+  expect(await agentChatLoader.resolve(ctx)).toEqual({ scopes: [scope('data_room'), scope('org')] });
   agentChatLoader.invalidate();
 });
 
-it('refuses to pick between two org-scope agent modules', async () => {
-  const ctx = await agentModulesAsLogin('team_');
-  await expect(agentChatLoader.resolve(ctx)).rejects.toThrow(/registers 2 agent modules at the org scope/);
+it('refuses two agent modules at one entity scope', async () => {
+  const ctx = await agentModulesAsLogin('org_support');
+  await expect(agentChatLoader.resolve(ctx)).rejects.toThrow(/more than one agent or memberships module at the org scope/);
   agentChatLoader.invalidate();
 });
 

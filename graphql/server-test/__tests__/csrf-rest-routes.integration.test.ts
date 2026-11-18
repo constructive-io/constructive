@@ -232,3 +232,48 @@ describe('anonymous request (no credentials)', () => {
     expect(await invocationActor(res.body.invocationId)).toBeNull();
   });
 });
+
+describe('the agent module an entity\'s threads land in', () => {
+  const bearer = { Authorization: 'Bearer session-token' };
+  const json: Body = { type: 'application/json', body: JSON.stringify({ title: 'scoped' }) };
+  const MY_ROOM = 'cccccccc-0000-4000-8000-000000000001';
+  const SOMEONE_ELSES_ROOM = 'cccccccc-0000-4000-8000-000000000002';
+
+  const rowIn = async (table: string, id: string) => {
+    const { rows } = await pg.query(
+      `SELECT entity_id, owner_id FROM "simple-pets-agent-public".${table} WHERE id = $1`,
+      [id]
+    );
+    return rows[0] ?? null;
+  };
+
+  it('writes a room\'s thread to the room scope\'s table, not the org scope\'s', async () => {
+    const res = await post(`/v1/orgs/${MY_ROOM}/threads`, bearer, json);
+
+    expect(res.status).toBe(201);
+    expect(await rowIn('room_threads', res.body.id)).toEqual({ entity_id: MY_ROOM, owner_id: USER_ID });
+    expect(await rowIn('threads', res.body.id)).toBeNull();
+  });
+
+  it('writes a personal thread to the org scope\'s table', async () => {
+    const res = await post('/v1/threads', bearer, json);
+
+    expect(res.status).toBe(201);
+    expect(await rowIn('threads', res.body.id)).toEqual({ entity_id: USER_ID, owner_id: USER_ID });
+    expect(await rowIn('room_threads', res.body.id)).toBeNull();
+  });
+
+  it('answers 404 for an entity the caller is not a member of, and writes nothing', async () => {
+    const count = async () => Number((await pg.query(
+      `SELECT (SELECT count(*) FROM "simple-pets-agent-public".threads)
+            + (SELECT count(*) FROM "simple-pets-agent-public".room_threads) AS n`
+    )).rows[0].n);
+    const before = await count();
+
+    const res = await post(`/v1/orgs/${SOMEONE_ELSES_ROOM}/threads`, bearer, json);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'Entity not found' });
+    expect(await count()).toBe(before);
+  });
+});
