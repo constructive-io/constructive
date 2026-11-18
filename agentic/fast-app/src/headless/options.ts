@@ -88,6 +88,21 @@ const isHttpUrl = (value: unknown): boolean => {
   }
 };
 
+/**
+ * Why an endpoint can't be used, or null. The keys go to hosts made from the
+ * api endpoint by swapping its first label (`auth.`, `auth-<db>.`,
+ * `api-<db>.`), so that label must be the plane's own, under a domain of at
+ * least one more label: then a derived host stays in the backend's domain.
+ */
+function endpointProblem(name: 'api' | 'modules', label: string, value: unknown): string | null {
+  if (!isHttpUrl(value)) return `endpoints.${name} must be an http or https URL`;
+  const labels = new URL(value as string).hostname.split('.');
+  if (labels.length < 2 || labels[0] !== label || labels.some((part) => !part)) {
+    return `endpoints.${name} must be on a ${label}.<domain> host, such as https://${label}.example.com/graphql`;
+  }
+  return null;
+}
+
 /** Whether `child` is `parent` or a folder under it. */
 export function isWithin(parent: string, child: string): boolean {
   const relative = path.relative(path.resolve(parent), path.resolve(child));
@@ -138,8 +153,10 @@ export function checkOptions(options: HeadlessAppBuildingOptions): CheckedOption
   if (!endpoints || typeof endpoints !== 'object') {
     problems.push('endpoints are missing');
   } else {
-    if (!isHttpUrl(endpoints.api)) problems.push('endpoints.api must be an http or https URL');
-    if (!isHttpUrl(endpoints.modules)) problems.push('endpoints.modules must be an http or https URL');
+    for (const [name, label] of [['api', 'api'], ['modules', 'modules']] as const) {
+      const problem = endpointProblem(name, label, endpoints[name]);
+      if (problem) problems.push(problem);
+    }
   }
 
   if (!runLog || typeof runLog !== 'object') {

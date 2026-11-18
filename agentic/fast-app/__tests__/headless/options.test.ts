@@ -99,6 +99,21 @@ test('the account key given as the owner key is refused: it does not work on the
   ]);
 });
 
+test("an endpoint whose first host label isn't its plane's is refused, so no derived host leaves the domain", () => {
+  const endpoints = (api: string, modules = 'http://modules.localhost/graphql') => options({ endpoints: { api, modules } });
+  // auth.com and auth-<db>.com would be someone else's.
+  assert.deepEqual(problemsOf(endpoints('https://example.com/graphql')), [
+    'endpoints.api must be on a api.<domain> host, such as https://api.example.com/graphql'
+  ]);
+  // A bare `auth` host could resolve to any service the pod's DNS search finds.
+  assert.equal(problemsOf(endpoints('http://localhost:3000/graphql')).length, 1);
+  assert.equal(problemsOf(endpoints('https://api/graphql')).length, 1);
+  assert.deepEqual(problemsOf(endpoints('https://api.example.com/graphql', 'https://api.example.com/graphql')), [
+    'endpoints.modules must be on a modules.<domain> host, such as https://modules.example.com/graphql'
+  ]);
+  assert.deepEqual(problemsOf(endpoints('https://api.launchql.dev/graphql', 'https://modules.launchql.dev/graphql')), []);
+});
+
 test('a cwd that is not a folder is refused', () => {
   assert.deepEqual(problemsOf(options({ cwd: path.join(root, 'missing') })), [
     `cwd ${path.join(root, 'missing')} is not a folder`
