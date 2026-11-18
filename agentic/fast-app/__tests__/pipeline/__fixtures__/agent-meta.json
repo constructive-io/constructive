@@ -1,0 +1,762 @@
+{
+  "tables": [
+    {
+      "name": "AgentTask",
+      "tableName": "agent_task",
+      "schemaName": "pool-d98de6b2-b26180de-app-public",
+      "storage": null,
+      "search": null,
+      "query": {
+        "all": "agentTasks",
+        "one": null,
+        "create": "createAgentTask",
+        "update": "updateAgentTask",
+        "delete": "deleteAgentTask"
+      },
+      "inflection": {
+        "tableType": "AgentTask",
+        "allRows": "agentTasks",
+        "connection": "AgentTaskConnection",
+        "edge": "AgentTaskEdge",
+        "filterType": "AgentTaskFilter",
+        "orderByType": "AgentTaskOrderBy",
+        "conditionType": "AgentTaskCondition",
+        "patchType": "AgentTaskPatch",
+        "createInputType": "CreateAgentTaskInput",
+        "createPayloadType": "CreateAgentTaskPayload",
+        "updatePayloadType": "UpdateAgentTaskPayload",
+        "deletePayloadType": "DeleteAgentTaskPayload"
+      },
+      "fields": [
+        {
+          "name": "threadId",
+          "columnName": "thread_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": true,
+          "description": "Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "entityId",
+          "columnName": "entity_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly.",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "description",
+          "columnName": "description",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Natural-language description of the work to do. Required.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "source",
+          "columnName": "source",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "error",
+          "columnName": "error",
+          "enumValues": null,
+          "isNotNull": false,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": false,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "id",
+          "columnName": "id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": true,
+          "isForeignKey": false,
+          "description": null,
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was created",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was last updated",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "ownerId",
+          "columnName": "owner_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "User who owns this record",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Current status of this record",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        }
+      ],
+      "relations": {
+        "belongsTo": [
+          {
+            "fieldName": "thread",
+            "isUnique": false,
+            "type": "AgentThread",
+            "keys": [
+              {
+                "name": "threadId"
+              }
+            ],
+            "references": {
+              "name": "AgentThread"
+            }
+          }
+        ],
+        "hasMany": [],
+        "hasOne": [],
+        "manyToMany": []
+      },
+      "constraints": {
+        "primaryKey": {
+          "name": "agentTask_pkey",
+          "fields": [
+            {
+              "name": "id"
+            }
+          ]
+        },
+        "unique": [],
+        "foreignKey": [
+          {
+            "name": "agentThreadByMyThreadId",
+            "fields": [
+              {
+                "name": "threadId"
+              }
+            ],
+            "refTable": {
+              "name": "agentThread"
+            },
+            "refFields": [
+              {
+                "name": "id"
+              }
+            ]
+          }
+        ]
+      },
+      "scope": {
+        "scope": "app",
+        "tier": "global",
+        "keyColumn": null,
+        "entityTable": null,
+        "source": "smartTag"
+      }
+    },
+    {
+      "name": "AgentThread",
+      "tableName": "agent_thread",
+      "schemaName": "pool-d98de6b2-b26180de-app-public",
+      "storage": null,
+      "search": null,
+      "query": {
+        "all": "agentThreads",
+        "one": null,
+        "create": "createAgentThread",
+        "update": "updateAgentThread",
+        "delete": "deleteAgentThread"
+      },
+      "inflection": {
+        "tableType": "AgentThread",
+        "allRows": "agentThreads",
+        "connection": "AgentThreadConnection",
+        "edge": "AgentThreadEdge",
+        "filterType": "AgentThreadFilter",
+        "orderByType": "AgentThreadOrderBy",
+        "conditionType": "AgentThreadCondition",
+        "patchType": "AgentThreadPatch",
+        "createInputType": "CreateAgentThreadInput",
+        "createPayloadType": "CreateAgentThreadPayload",
+        "updatePayloadType": "UpdateAgentThreadPayload",
+        "deletePayloadType": "DeleteAgentThreadPayload"
+      },
+      "fields": [
+        {
+          "name": "title",
+          "columnName": "title",
+          "enumValues": null,
+          "isNotNull": false,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": false,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "mode",
+          "columnName": "mode",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "model",
+          "columnName": "model",
+          "enumValues": null,
+          "isNotNull": false,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": false,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "systemPrompt",
+          "columnName": "system_prompt",
+          "enumValues": null,
+          "isNotNull": false,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": false,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "id",
+          "columnName": "id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": true,
+          "isForeignKey": false,
+          "description": null,
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was created",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was last updated",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "ownerId",
+          "columnName": "owner_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "User who owns this record within the entity",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "entityId",
+          "columnName": "entity_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Entity this record belongs to",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Current status of this record",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        }
+      ],
+      "relations": {
+        "belongsTo": [],
+        "hasMany": [
+          {
+            "fieldName": "agentMessagesByThreadId",
+            "isUnique": false,
+            "type": "AgentMessageConnection",
+            "keys": [
+              {
+                "name": "id"
+              }
+            ],
+            "referencedBy": {
+              "name": "AgentMessage"
+            }
+          },
+          {
+            "fieldName": "agentTasksByThreadId",
+            "isUnique": false,
+            "type": "AgentTaskConnection",
+            "keys": [
+              {
+                "name": "id"
+              }
+            ],
+            "referencedBy": {
+              "name": "AgentTask"
+            }
+          }
+        ],
+        "hasOne": [],
+        "manyToMany": []
+      },
+      "constraints": {
+        "primaryKey": {
+          "name": "agentThread_pkey",
+          "fields": [
+            {
+              "name": "id"
+            }
+          ]
+        },
+        "unique": [],
+        "foreignKey": []
+      },
+      "scope": {
+        "scope": "app",
+        "tier": "global",
+        "keyColumn": null,
+        "entityTable": null,
+        "source": "smartTag"
+      }
+    },
+    {
+      "name": "AgentMessage",
+      "tableName": "agent_message",
+      "schemaName": "pool-d98de6b2-b26180de-app-public",
+      "storage": null,
+      "search": null,
+      "query": {
+        "all": "agentMessages",
+        "one": null,
+        "create": "createAgentMessage",
+        "update": "updateAgentMessage",
+        "delete": "deleteAgentMessage"
+      },
+      "inflection": {
+        "tableType": "AgentMessage",
+        "allRows": "agentMessages",
+        "connection": "AgentMessageConnection",
+        "edge": "AgentMessageEdge",
+        "filterType": "AgentMessageFilter",
+        "orderByType": "AgentMessageOrderBy",
+        "conditionType": "AgentMessageCondition",
+        "patchType": "AgentMessagePatch",
+        "createInputType": "CreateAgentMessageInput",
+        "createPayloadType": "CreateAgentMessagePayload",
+        "updatePayloadType": "UpdateAgentMessagePayload",
+        "deletePayloadType": "DeleteAgentMessagePayload"
+      },
+      "fields": [
+        {
+          "name": "threadId",
+          "columnName": "thread_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": true,
+          "description": "Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger.",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "entityId",
+          "columnName": "entity_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only.",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "authorRole",
+          "columnName": "author_role",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": false,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array.",
+          "type": {
+            "gqlType": "String",
+            "isArray": false,
+            "pgType": "text",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": false
+          }
+        },
+        {
+          "name": "id",
+          "columnName": "id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": true,
+          "isForeignKey": false,
+          "description": null,
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was created",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "Timestamp when this record was last updated",
+          "type": {
+            "gqlType": "Datetime",
+            "isArray": false,
+            "pgType": "timestamptz",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "ownerId",
+          "columnName": "owner_id",
+          "enumValues": null,
+          "isNotNull": true,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "User who owns this record",
+          "type": {
+            "gqlType": "UUID",
+            "isArray": false,
+            "pgType": "uuid",
+            "subtype": null,
+            "isNotNull": true,
+            "hasDefault": true
+          }
+        },
+        {
+          "name": "parts",
+          "columnName": "parts",
+          "enumValues": null,
+          "isNotNull": false,
+          "hasDefault": true,
+          "isPrimaryKey": false,
+          "isForeignKey": false,
+          "description": "JSON metadata for extensible key-value storage",
+          "type": {
+            "gqlType": "JSON",
+            "isArray": false,
+            "pgType": "jsonb",
+            "subtype": null,
+            "isNotNull": false,
+            "hasDefault": true
+          }
+        }
+      ],
+      "relations": {
+        "belongsTo": [
+          {
+            "fieldName": "thread",
+            "isUnique": false,
+            "type": "AgentThread",
+            "keys": [
+              {
+                "name": "threadId"
+              }
+            ],
+            "references": {
+              "name": "AgentThread"
+            }
+          }
+        ],
+        "hasMany": [],
+        "hasOne": [],
+        "manyToMany": []
+      },
+      "constraints": {
+        "primaryKey": {
+          "name": "agentMessage_pkey",
+          "fields": [
+            {
+              "name": "id"
+            }
+          ]
+        },
+        "unique": [],
+        "foreignKey": [
+          {
+            "name": "agentThreadByMyThreadId",
+            "fields": [
+              {
+                "name": "threadId"
+              }
+            ],
+            "refTable": {
+              "name": "agentThread"
+            },
+            "refFields": [
+              {
+                "name": "id"
+              }
+            ]
+          }
+        ]
+      },
+      "scope": {
+        "scope": "app",
+        "tier": "global",
+        "keyColumn": null,
+        "entityTable": null,
+        "source": "smartTag"
+      }
+    }
+  ]
+}

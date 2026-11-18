@@ -3,6 +3,7 @@
 // look (`.constructive/view.json`) only to tell the agent and the user what
 // changed outside the app; the planner never reads it.
 
+import type { OutsideChange } from '../pipeline/app-plan';
 import {
   columnKey,
   type EntityTypeDefinition,
@@ -11,23 +12,7 @@ import {
 } from './live-model';
 import { quoted } from './vocabulary';
 
-// The desktop's plan card types (`src/types/app-plan.ts`) use this type. It is
-// defined here, beside the diff that makes it.
-/** A change made to the database outside the app, by name, so a rename reads as a rename. */
-export type OutsideChange =
-  | { kind: 'table_added' | 'table_removed'; table: string }
-  | { kind: 'table_renamed'; from: string; to: string }
-  | { kind: 'column_added' | 'column_removed'; table: string; column: string; viaSql?: true }
-  | { kind: 'column_renamed'; table: string; from: string; to: string }
-  | {
-      kind: 'column_changed';
-      table: string;
-      column: string;
-      what: 'type' | 'required' | 'default' | 'values' | 'key';
-      from: string;
-      to: string;
-    }
-  | { kind: 'access_changed'; table: string; from: string; to: string };
+export type { OutsideChange };
 
 export type ColumnSnapshot = {
   name: string;

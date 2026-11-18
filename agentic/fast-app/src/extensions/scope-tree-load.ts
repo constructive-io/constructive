@@ -3,13 +3,12 @@
 // table and the column that names its parent. Nothing is keyed to a
 // blueprint, so a custom one reads the same way.
 
-import { resolveProjectContext } from '@agentic-kit/db-tools/context';
-
 import { type ScopeInfo, scopeTreeFrom } from '../app-spec/scope-tree';
+import { projectContext } from '../pipeline/project-env';
 
 const asString = (value: unknown) => (typeof value === 'string' && value ? value : null);
 
-type ProjectContext = NonNullable<Awaited<ReturnType<typeof resolveProjectContext>>['context']>;
+type ProjectContext = NonNullable<Awaited<ReturnType<typeof projectContext>>['context']>;
 
 // Each memberships module names its entity table's owner column by field id.
 async function fieldNames(context: ProjectContext, ids: string[]): Promise<Map<string, string>> {
@@ -34,7 +33,7 @@ export class DatabaseUnusable extends Error {}
 
 /** The tree, or null when the project has no database yet; a database that can't be read throws. */
 export async function loadScopeTree(cwd: string): Promise<ScopeInfo[] | null> {
-  const { context, code, reason } = await resolveProjectContext(cwd);
+  const { context, code, reason } = await projectContext(cwd);
   if (!context) {
     // No .env, or one with no database in it: the project has none yet.
     if (code === 'no-env' || code === 'missing-credentials') return null;

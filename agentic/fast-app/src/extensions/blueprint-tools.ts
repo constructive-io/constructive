@@ -1,9 +1,10 @@
 import { readConstructionFailure } from '@agentic-kit/db-tools/blueprint-construction';
-import { type ProjectContext, resolveProjectContext } from '@agentic-kit/pi';
+import type { ProjectContext } from '@agentic-kit/pi';
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { type Static, Type } from 'typebox';
 
 import { CURATED_BLUEPRINTS } from '../blueprints/curated';
+import { projectContext } from '../pipeline/project-env';
 import { BLUEPRINT_LEGEND, describeBlueprint } from './blueprint-summary';
 import {
   type BlueprintPort,
@@ -117,7 +118,7 @@ export async function applyCuratedBlueprint(
       `Unknown blueprint "${slug}". Blueprints: ${Object.keys(CURATED_BLUEPRINTS).join(', ')}.`,
     );
   }
-  const resolved = await resolveProjectContext(options.cwd);
+  const resolved = await projectContext(options.cwd);
   if (!resolved.context) {
     throw new Error(
       resolved.reason ?? 'The project has no database yet; run provision_database first.',

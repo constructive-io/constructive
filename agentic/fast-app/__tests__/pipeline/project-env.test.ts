@@ -1,0 +1,99 @@
+// The project's values as the pipeline reads them without a request: the
+// database name, the secrets the build details redact, a pending provision.
+// A host with no .env in the project (the cloud Job) gives them instead.
+
+import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+
+import { configureHost, type ToolsHost } from '@agentic-kit/db-tools';
+import { PENDING_PROVISION_KEYS } from '@agentic-kit/db-tools/provision-database/env-file';
+
+import {
+  boundDatabaseName,
+  databaseNameFor,
+  envSecrets,
+  pendingDatabaseName,
+  projectDatabaseName
+} from '../../src/pipeline/project-env';
+
+const hostAnswering = (contextSource?: ToolsHost['contextSource']) =>
+  configureHost({ account: () => null, backendConfig: () => null, contextSource });
+
+let dir: string;
+
+beforeEach(() => {
+  dir = mkdtempSync(path.join(tmpdir(), 'project-env-'));
+  // A .env as provisioning writes it, with a provision still pending.
+  writeFileSync(
+    path.join(dir, '.env'),
+    [
+      'DATABASE_NAME=from-file',
+      'ACCESS_TOKEN=file-secret-1234',
+      `${PENDING_PROVISION_KEYS.ticketId}=ticket-1`,
+      `${PENDING_PROVISION_KEYS.databaseName}=pending-from-file`
+    ].join('\n')
+  );
+});
+
+afterEach(() => {
+  hostAnswering();
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('without the host giving values, the .env is read as before', async () => {
+  hostAnswering();
+
+  assert.equal(await boundDatabaseName(dir), 'from-file');
+  assert.deepEqual(await projectDatabaseName(dir), { name: 'from-file', bound: true });
+  assert.deepEqual(await envSecrets(dir), ['file-secret-1234']);
+  assert.equal(await pendingDatabaseName(dir), 'pending-from-file');
+});
+
+test("the host's values for the folder stand in for its .env, which is not read", async () => {
+  const contextSource = jest.fn((_cwd: string) => ({
+    CONSTRUCTIVE_DATABASE_NAME: 'job-db',
+    CONSTRUCTIVE_ACCESS_TOKEN: 'job-secret-5678'
+  }));
+  hostAnswering(contextSource);
+
+  assert.equal(await boundDatabaseName(dir), 'job-db');
+  assert.deepEqual(await projectDatabaseName(dir), { name: 'job-db', bound: true });
+  // Only the host's secrets: the .env's are not the run's.
+  assert.deepEqual(await envSecrets(dir), ['job-secret-5678']);
+  // The host records no pending provision, whatever the .env says.
+  assert.equal(await pendingDatabaseName(dir), null);
+  // Every read asked the host about this folder.
+  assert.ok(contextSource.mock.calls.every(([cwd]) => cwd === dir));
+});
+
+test('a host that gives a lookup function is read the same way, a pending provision included', async () => {
+  const values: Record<string, string> = {
+    DATABASE_NAME: 'job-db',
+    [PENDING_PROVISION_KEYS.ticketId]: 'ticket-2',
+    [PENDING_PROVISION_KEYS.databaseName]: 'pending-in-host'
+  };
+  hostAnswering(async () => (name: string) => values[name]);
+
+  assert.equal(await boundDatabaseName(dir), 'job-db');
+  assert.equal(await pendingDatabaseName(dir), 'pending-in-host');
+  // A lookup can't be listed: such a host redacts its own secrets.
+  assert.deepEqual(await envSecrets(dir), []);
+});
+
+test('a folder with no .env and no host values has no database yet', async () => {
+  hostAnswering(() => null);
+  const empty = mkdtempSync(path.join(tmpdir(), 'project-env-empty-'));
+  try {
+    assert.equal(await boundDatabaseName(empty), null);
+    assert.deepEqual(await projectDatabaseName(empty), {
+      name: databaseNameFor(path.basename(empty)),
+      bound: false
+    });
+    assert.deepEqual(await envSecrets(empty), []);
+    assert.equal(await pendingDatabaseName(empty), null);
+  } finally {
+    rmSync(empty, { recursive: true, force: true });
+  }
+});
