@@ -1,4 +1,5 @@
 import {
+  agentChatLoader,
   corsLoader,
   databaseSettingsLoader,
   type LoaderContext,
@@ -222,6 +223,65 @@ it.each([
 ])('resolves the %s loader as the login instead of falling back to the defaults RLS hides', async (_name, check) => {
   await check(await routingSettingsAsLogin());
   for (const loader of ROUTING_LOADERS) loader.invalidate();
+});
+
+/** Registers the agent module at two scopes, then the rest of the transaction runs as the login. */
+const agentModulesAsLogin = async (extraOrgPrefix?: string): Promise<LoaderContext> => {
+  const { rows: [target] } = await pg.query(
+    'SELECT database_id FROM routing_public.domains LIMIT 1'
+  );
+  const { rows: [schema] } = await pg.query(
+    `INSERT INTO metaschema_public.schema (database_id, name, schema_name, description, is_public)
+     VALUES ($1, 'agent_public', 'tenant-agent-public', 'agent chat', true) RETURNING id`,
+    [target.database_id]
+  );
+  const table = async (name: string): Promise<string> => (await pg.query(
+    `INSERT INTO metaschema_public.table (database_id, schema_id, name, description)
+     VALUES ($1, $2, $3, 'agent chat') RETURNING id`,
+    [target.database_id, schema.id, name]
+  )).rows[0].id;
+  const register = async (scope: string, prefix: string, entityField: string | null) => pg.query(
+    `INSERT INTO metaschema_modules_public.agent_module
+       (database_id, schema_id, private_schema_id, scope, prefix, entity_field,
+        thread_table_id, message_table_id, task_table_id, prompts_table_id)
+     VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [
+      target.database_id, schema.id, scope, prefix, entityField,
+      await table(`${prefix}agent_thread`), await table(`${prefix}agent_message`), await table(`${prefix}agent_task`),
+      await table(`${prefix}agent_prompt`)
+    ]
+  );
+  await register('app', 'app_', null);
+  await register('org', 'org_', 'entity_id');
+  if (extraOrgPrefix) await register('org', extraOrgPrefix, 'entity_id');
+  // Production layers member policies over the registry; with RLS on and no
+  // policy, the login sees none of its rows.
+  await pg.query('ALTER TABLE metaschema_modules_public.agent_module ENABLE ROW LEVEL SECURITY');
+
+  await pg.query(`SET LOCAL ROLE "${LOGIN}"`);
+  const pool = { query: (text: string, values?: unknown[]) => pg.query(text, values) } as unknown as Pool;
+  agentChatLoader.invalidate();
+  return { routingPool: pool, tenantPool: pool, databaseId: target.database_id };
+};
+
+it('resolves the agent chat loader as the login, at the org scope its routes write to', async () => {
+  const ctx = await agentModulesAsLogin();
+  const hidden = await pg.query('SELECT count(*)::int AS n FROM metaschema_modules_public.agent_module');
+  expect(hidden.rows[0].n).toBe(0);
+
+  expect(await agentChatLoader.resolve(ctx)).toEqual({
+    schemaName: 'tenant-agent-public',
+    threadTableName: 'org_agent_thread',
+    messageTableName: 'org_agent_message',
+    taskTableName: 'org_agent_task'
+  });
+  agentChatLoader.invalidate();
+});
+
+it('refuses to pick between two org-scope agent modules', async () => {
+  const ctx = await agentModulesAsLogin('team_');
+  await expect(agentChatLoader.resolve(ctx)).rejects.toThrow(/registers 2 agent modules at the org scope/);
+  agentChatLoader.invalidate();
 });
 
 it('resolves routes and serves GraphQL using the reconciled password', async () => {

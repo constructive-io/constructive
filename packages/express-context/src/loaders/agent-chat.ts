@@ -1,12 +1,16 @@
 /**
  * Agent Chat Module Loader
  *
- * Resolves per-database agent chat config from metaschema_modules_public.agent_chat_module.
- * Returns the schema and table names for threads, messages, and tasks.
+ * Resolves the schema and table names of a database's org-scoped agent
+ * threads, messages and tasks.
  *
- * Keyed by `database_id` like every other module lookup: one serving database
- * holds several tenants' schemas, so an unkeyed discovery resolves a
- * neighbouring tenant's tables instead of failing.
+ * Read through `function_resolution.agent_module_registrations`: the server
+ * resolves this on its own connection, as a login row-level security holds to
+ * nothing, so a plain read of the registrations answers no rows.
+ *
+ * A database registers the agent module once per scope. The chat routes write
+ * an `entity_id` on every thread (`/v1/orgs/:entity_id/threads`), which only
+ * the org scope's tables carry, so that is the registration resolved here.
  */
 
 import type { AgentChatConfig } from '../types';
@@ -16,16 +20,16 @@ import { requireDatabaseId } from './types';
 
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
+const AGENT_CHAT_SCOPE = 'org';
+
 const AGENT_CHAT_MODULE_SQL = `
   SELECT
-    s.schema_name,
-    acm.thread_table_name,
-    acm.message_table_name,
-    acm.task_table_name
-  FROM metaschema_modules_public.agent_chat_module acm
-  JOIN metaschema_public.schema s ON s.id = acm.schema_id
-  WHERE acm.database_id = $1
-  LIMIT 1
+    public_schema AS schema_name,
+    thread_table_name,
+    message_table_name,
+    task_table_name
+  FROM function_resolution.agent_module_registrations($1)
+  WHERE scope = $2
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
@@ -48,8 +52,13 @@ export const agentChatLoader: ModuleLoader<AgentChatConfig> = createModuleLoader
 
     const result = await tenantPool.query<AgentChatModuleRow>(
       AGENT_CHAT_MODULE_SQL,
-      [databaseId],
+      [databaseId, AGENT_CHAT_SCOPE],
     );
+    if (result.rows.length > 1) {
+      throw new Error(
+        `agentChat: database ${databaseId} registers ${result.rows.length} agent modules at the ${AGENT_CHAT_SCOPE} scope`
+      );
+    }
     const row = result.rows[0];
     if (!row) return undefined;
 
