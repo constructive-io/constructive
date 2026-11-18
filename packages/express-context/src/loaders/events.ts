@@ -1,8 +1,8 @@
 /**
  * Events Module Loader
  *
- * Resolves the tenant's app-scoped events module from
- * metaschema_modules_public.events_module: the private schema and the names of
+ * Resolves the tenant's app-scoped events module through the database's
+ * login-only reader `function_resolution.events_entry`: the private schema and the names of
  * its `record_event` and `record_error` functions, so the server can record
  * events without hard-coding the generated schema or function names.
  */
@@ -14,15 +14,8 @@ import type { LoaderContext, ModuleLoader } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const EVENTS_MODULE_SQL = `
-  SELECT
-    s.schema_name AS private_schema_name,
-    em.record_event,
-    em.record_error
-  FROM metaschema_modules_public.events_module em
-  JOIN metaschema_public.schema s ON s.id = em.private_schema_id
-  WHERE em.database_id = $1
-    AND em.scope = 'app'
-  LIMIT 1
+  SELECT private_schema_name, record_event, record_error
+  FROM function_resolution.events_entry($1)
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
