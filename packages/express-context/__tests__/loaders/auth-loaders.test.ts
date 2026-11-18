@@ -49,17 +49,49 @@ describe('authSettingsLoader', () => {
   it('discovers the settings table for the context database only', async () => {
     const { pool, calls } = fakePool([
       { rows: [{ schema_name: 'tenant_a_auth', table_name: 'auth_settings' }] },
-      { rows: [{ cookie_secure: true, cookie_samesite: 'lax', cookie_path: '/' }] }
+      {
+        rows: [
+          {
+            policy: {
+              cookie_secure: true,
+              cookie_samesite: 'lax',
+              cookie_path: '/',
+              cookie_max_age_seconds: 3600,
+              remember_me_duration_seconds: null
+            }
+          }
+        ]
+      }
     ]);
 
     const settings = await authSettingsLoader.resolve(ctx(pool, 'db-a'));
 
     expect(calls[0].values).toEqual(['db-a']);
-    expect(calls[0].text).toMatch(/WHERE sm\.database_id = \$1/);
+    expect(calls[0].text).toMatch(/FROM function_resolution\.sessions_module_registrations\(\$1\)/);
     // Step 2 reads out of the schema step 1 resolved — which is precisely why
     // step 1 being keyed matters.
-    expect(calls[1].text).toContain('"tenant_a_auth"."auth_settings"');
-    expect(settings).toMatchObject({ cookieSecure: true, cookieSamesite: 'lax' });
+    expect(calls[1].text).toContain('"tenant_a_auth"."auth_settings_request_policy"()');
+    expect(settings).toMatchObject({
+      cookieSecure: true,
+      cookieSamesite: 'lax',
+      cookieMaxAge: '3600',
+      rememberMeDuration: null
+    });
+  });
+
+  it('reads neither the registration nor the settings row with a plain table read', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'tenant_a_auth', table_name: 'auth_settings' }] },
+      { rows: [{ policy: null }] }
+    ]);
+
+    await expect(authSettingsLoader.resolve(ctx(pool))).resolves.toBeUndefined();
+
+    // The server's own connection is held to row-level security, so a plain
+    // read answers no rows and the tenant's settings would silently not load.
+    for (const { text } of calls) {
+      expect(text).not.toMatch(/FROM\s+(metaschema_modules_public|metaschema_public|"tenant_a_auth"\."auth_settings"\s)/);
+    }
   });
 
   it('quotes the discovered coordinates as identifiers, never as SQL', async () => {
@@ -70,7 +102,7 @@ describe('authSettingsLoader', () => {
 
     await authSettingsLoader.resolve(ctx(pool));
 
-    expect(calls[1].text).toContain('FROM "x""; DROP SCHEMA y; --"."t"" UNION SELECT ""1"');
+    expect(calls[1].text).toContain('SELECT "x""; DROP SCHEMA y; --"."t"" UNION SELECT ""1_request_policy"()');
   });
 
   it('is undefined when the tenant provisions no sessions module', async () => {

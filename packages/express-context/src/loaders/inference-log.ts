@@ -1,7 +1,8 @@
 /**
  * Inference Log Module Loader
  *
- * Resolves per-database inference log config from metaschema_modules_public.inference_log_module.
+ * Resolves per-database inference log config through the database's
+ * login-only reader `function_resolution.inference_log_module_registrations`.
  * Returns the schema and table name for logging LLM inference usage.
  */
 
@@ -12,12 +13,8 @@ import type { LoaderContext, ModuleLoader } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const INFERENCE_LOG_MODULE_SQL = `
-  SELECT
-    s.schema_name AS schema,
-    ilm.inference_log_table_name AS table_name
-  FROM metaschema_modules_public.inference_log_module ilm
-  JOIN metaschema_public.schema s ON ilm.schema_id = s.id
-  WHERE ilm.database_id = $1
+  SELECT public_schema AS schema, inference_log_table_name AS table_name
+  FROM function_resolution.inference_log_module_registrations($1)
   LIMIT 1
 `;
 
