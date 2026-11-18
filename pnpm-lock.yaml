@@ -255,6 +255,12 @@ importers:
       '@agentic-kit/pi':
         specifier: workspace:^
         version: link:../pi/dist
+      '@agentic-kit/run-log':
+        specifier: workspace:^
+        version: link:../run-log/dist
+      '@agentic-kit/run-log-gate':
+        specifier: workspace:^
+        version: link:../run-log-gate/dist
       typebox:
         specifier: 1.3.27
         version: 1.3.27

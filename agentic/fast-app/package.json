@@ -35,6 +35,8 @@
     "@agentic-kit/harness": "workspace:^",
     "@agentic-kit/permissions": "workspace:^",
     "@agentic-kit/pi": "workspace:^",
+    "@agentic-kit/run-log": "workspace:^",
+    "@agentic-kit/run-log-gate": "workspace:^",
     "typebox": "1.3.27"
   },
   "peerDependencies": {
