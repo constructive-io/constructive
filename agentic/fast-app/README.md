@@ -17,7 +17,10 @@ Constructive's app-building layer: the AppSpec, the curated blueprints, and the 
 - **Constructive Desktop** runs it in a Local chat, in the Electron main process.
 - **A headless host** runs it in a process with no UI: the cloud Job of a Cloud chat (later a machine or a CLI).
 
-The package doesn't read a host's state itself. The database tools get the account, the endpoints and the project's database from the `@agentic-kit/db-tools` host (`configureHost`). A host without a project `.env`, such as the cloud Job, answers `contextSource(cwd)` there with the values it was launched with.
+The package doesn't read a host's state itself. It asks two hosts, each set once at startup:
+
+- **The app pipeline's host** (`configureFastAppHost`, the `FastAppHost` contract in `pipeline/host.ts`): the account, the project records and their database, the owner's session on the app database, the plan card, the app template, the dev servers and the build lock, and optional parts a host without a UI leaves out (the render check, CORS origins and the app site, remembered passwords, UI events, progress).
+- **The database tools' host** (`configureHost` in `@agentic-kit/db-tools`): the account bearer and the endpoints. A host without a project `.env`, such as the cloud Job, answers `contextSource(cwd)` there with the values it was launched with, and the pipeline reads those in place of the `.env` too.
 
 ```bash
 npm install @agentic-kit/fast-app
@@ -28,20 +31,35 @@ npm install @agentic-kit/fast-app
 - **`app-spec/`** — the pure spec layer. `validateAppSpec` checks a spec against the template's JSON Schema and against the tables it names. `specModel` resolves a spec into its tables. `planDelta` is the difference between two specs as db-tools calls. `seedPlan` orders the seed rows. `liveSpec` renders a live database as a spec. `contract/` is the template's own AppSpec types and schema.
 - **`blueprints/`** — the curated blueprints (agent, agentic CRM, data room, fundraise) and the one reader of their tables.
 - **`extensions/`** — pi extensions: `list_blueprints` and `provision_template`, `describe_scopes`, `search_blocks`, `create_plan`, the code rules, the note on a stopped call, and `db-tools/` (the database tools with time limits, the owner columns `add_records` fills, and `describe_live_schema`).
-- **`pipeline/`** — the build and verify pipeline. So far only the field hints and the spec file names are here; the rest follows.
+- **`pipeline/`** — the build and verify pipeline: the plan and its card, provisioning through the host, the schema, codegen, the seed, the screen generator, the dev server, the checks of `verify_app`, the build record and the commits. `host.ts` is the `FastAppHost` contract. Its commands get the host's environment without secrets and without `NODE_ENV`.
+- **`tools/`** — `plan_app` and `verify_app`, bound to pi (`fastAppTools`).
+- **`prompt.ts`** — the app-building sections of the system prompt (`appBuildingSection`, `specToolsNote`), so a host's prompt always names the tools this package registers.
 
-Later parts: `tools/` (`plan_app`, `verify_app`), `host.ts` (the `FastAppHost` contract), `headless/` (the host for a process with no UI) and `prompt.ts` (the app-building system prompt).
+A later part adds `headless/`, the host for a process with no UI.
 
-The root exports the extensions and the AppSpec layer. Everything else is a deep import, for example `@agentic-kit/fast-app/extensions/provision-template`.
+The root exports what a host needs: the host contract and the services it is built from (`DevServerManager`, `ProjectLocks`), the extensions, the prompt sections and the AppSpec layer. Everything else is a deep import from `dist`, for example `@agentic-kit/fast-app/pipeline/build-record`.
 
 ```ts
 import { configureHost } from '@agentic-kit/db-tools';
-import { blueprintTools, dbToolsWithLimits, scopeTools } from '@agentic-kit/fast-app';
+import {
+  appBuildingSection,
+  blocksTools,
+  blueprintTools,
+  configureFastAppHost,
+  dbToolsWithLimits,
+  fastAppTools,
+  planTools,
+  scopeTools
+} from '@agentic-kit/fast-app';
 
-configureHost(host);
+configureHost(toolsHost);
+configureFastAppHost(fastAppHost);
 // pass the factories to pi's resource loader as extension factories
-const extensionFactories = [dbToolsWithLimits, blueprintTools, scopeTools];
+const extensionFactories = [dbToolsWithLimits, fastAppTools, blueprintTools, scopeTools, blocksTools, planTools];
+const systemSection = appBuildingSection(true);
 ```
+
+`node dist/pipeline/timing-cli.js <session.jsonl> [--json]` prints the timing of a build from a pi session file.
 
 ## Synced files
 
@@ -54,8 +72,12 @@ Each folder's `SOURCE.md` names the commit it was synced from.
 
 ## Tests
 
-`pnpm test` runs jest. The jest config does three things the code needs:
+`pnpm test` runs jest. The tests were written for `node:test`, and the jest config does what they need:
 
 - It compiles typebox and pi-ai, which ship only ES modules, to CommonJS.
 - It sets `TZ=Asia/Bangkok` for every test, because the seed time tests need a zone with an offset and a test file can't change it.
-- `jest.setup.js` rebuilds what `structuredClone` returns in the test file's own realm, so `node:assert`'s strict deep equality compares values, not realms.
+- It runs git with no global or system config and no author from the environment, as on a CI runner, for the same reason: a test file can't set the environment of the git it starts.
+- It gives each test 60 s, as `node:test` has no default timeout and a few tests run real processes.
+- `jest.setup.js` rebuilds what `structuredClone` returns in the test file's own realm, so `node:assert`'s strict deep equality compares values, not realms. A test that compares what a Node API returns (such as `readdirSync`) copies it first, for the same reason.
+
+`package-boundary.test.ts` keeps the package host-neutral: every file imports only Node, the dependencies `package.json` declares and the package itself, pi only as types, and no file reads `import.meta` or a host setting from `process.env`.
