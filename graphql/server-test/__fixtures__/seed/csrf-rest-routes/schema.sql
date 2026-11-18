@@ -24,6 +24,15 @@ CREATE TABLE "simple-pets-agent-public".threads (
 );
 GRANT SELECT, INSERT ON "simple-pets-agent-public".threads TO authenticated;
 
+-- The generated agent tables admit a row by the acting principal
+-- (jwt_public.current_principal_id()), not by jwt.claims.user_id: a request
+-- that carries no principal claim is refused by row-level security.
+ALTER TABLE "simple-pets-agent-public".threads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY threads_principal ON "simple-pets-agent-public".threads
+  FOR ALL TO authenticated
+  USING (owner_id = nullif(current_setting('jwt.claims.principal_id', true), '')::uuid)
+  WITH CHECK (owner_id = nullif(current_setting('jwt.claims.principal_id', true), '')::uuid);
+
 SET session_replication_role TO replica;
 
 INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, is_public)

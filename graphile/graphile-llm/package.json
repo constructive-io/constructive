@@ -30,8 +30,7 @@
   },
   "dependencies": {
     "@agentic-kit/metering": "workspace:^",
-    "@constructive-io/llm-env": "workspace:^",
-    "graphile-cache": "workspace:^"
+    "@constructive-io/llm-env": "workspace:^"
   },
   "peerDependencies": {
     "@dataplan/pg": "^1.1.1",

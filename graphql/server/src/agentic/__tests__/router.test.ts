@@ -13,6 +13,9 @@ import express, { NextFunction,Request, Response } from 'express';
 import http from 'http';
 import supertest from 'supertest';
 
+/** Every context the router handed the chat adapter, in call order. */
+const mockStreamContexts: any[] = [];
+
 // Mock OllamaAdapter before importing router
 jest.mock('@agentic-kit/ollama', () => {
   class MockOllamaAdapter {
@@ -42,6 +45,7 @@ jest.mock('@agentic-kit/ollama', () => {
     }
 
     stream(_model: any, _context: any, _options?: any) {
+      mockStreamContexts.push(_context);
       const events: any[] = [];
       let resultResolve: (val: any) => void;
       const resultPromise = new Promise((resolve) => { resultResolve = resolve; });
@@ -142,6 +146,7 @@ function createMockConstructiveContext(overrides: any = {}) {
     withPgClient: jest.fn(async (fn: any) => {
       const mockClient = {
         query: jest.fn(async (sql: string, _params?: any[]) => {
+          overrides.onQuery?.(sql);
           // Thread lookup
           if (sql.includes('SELECT id, mode, model')) {
             return queryResults.threadLookup ?? {
@@ -160,6 +165,7 @@ function createMockConstructiveContext(overrides: any = {}) {
           }
           // INSERT (thread creation, message persistence)
           if (sql.includes('INSERT INTO')) {
+            if (overrides.insertError) throw overrides.insertError;
             return queryResults.insert ?? {
               rows: [{
                 id: 'thread-new-001',
@@ -328,6 +334,68 @@ describe('agentic-server router', () => {
       } finally {
         server.close();
       }
+    });
+
+    it.each([
+      ['batch', false],
+      ['streaming', true]
+    ])('hands the adapter an earlier assistant turn as content blocks (%s)', async (_name, stream) => {
+      mockStreamContexts.length = 0;
+      const ctx = createMockConstructiveContext({
+        queryResults: {
+          messageHistory: {
+            rows: [
+              { author_role: 'user', parts: [{ type: 'text', text: 'Hello' }] },
+              { author_role: 'assistant', parts: [{ type: 'text', text: 'Hi there' }] },
+              { author_role: 'user', parts: [{ type: 'text', text: 'Again' }] }
+            ]
+          }
+        }
+      });
+      const request = makeRequest(createTestApp(ctx));
+
+      const res = await request
+        .post('/v1/threads/thread-001/messages')
+        .send({ messages: [{ role: 'user', content: 'Again' }], stream });
+
+      expect(res.status).toBe(200);
+      expect(mockStreamContexts[0].messages.map((m: any) => [m.role, m.content])).toEqual([
+        ['user', 'Hello'],
+        ['assistant', [{ type: 'text', text: 'Hi there' }]],
+        ['user', 'Again']
+      ]);
+    });
+
+    it('writes each message under actor_id, the column the generated message table carries', async () => {
+      const statements: string[] = [];
+      const ctx = createMockConstructiveContext({ onQuery: (sql: string) => statements.push(sql) });
+      const request = makeRequest(createTestApp(ctx));
+
+      const res = await request
+        .post('/v1/threads/thread-001/messages')
+        .send({ messages: [{ role: 'user', content: 'Hello' }], stream: false });
+
+      expect(res.status).toBe(200);
+      const inserts = statements.filter((sql) => sql.includes('INSERT INTO'));
+      expect(inserts).toHaveLength(2);
+      for (const sql of inserts) {
+        expect(sql).toMatch(/\(thread_id, actor_id, entity_id, author_role, parts/);
+        expect(sql).not.toMatch(/owner_id/);
+      }
+    });
+
+    it('answers 403 when row-level security refuses the write', async () => {
+      const ctx = createMockConstructiveContext({
+        insertError: Object.assign(new Error('new row violates row-level security policy'), { code: '42501' })
+      });
+      const request = makeRequest(createTestApp(ctx));
+
+      const res = await request
+        .post('/v1/orgs/entity-001/threads')
+        .send({ title: 'not my org' });
+
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: 'Forbidden' });
     });
 
     it('returns 429 when billing quota exceeded', async () => {

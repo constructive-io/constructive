@@ -48,10 +48,6 @@ export { createLlmTextSearchPlugin, embedTextInWhere } from './plugins/text-sear
 export type { EmbedRule } from './embed-inputs';
 export { embedField, planTimeEmbedding } from './embed-inputs';
 
-// Agent discovery (queries agent_chat_module config table at runtime)
-export type { AgentDiscovery,AgentTableInfo } from './plugins/agent-discovery-plugin';
-export { clearAgentDiscoveryCache,getAgentDiscovery } from './plugins/agent-discovery-plugin';
-
 // Embedder utilities
 export type { LlmRequestScope } from './embedder';
 export {
