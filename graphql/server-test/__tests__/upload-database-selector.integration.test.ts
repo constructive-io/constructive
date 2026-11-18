@@ -22,11 +22,6 @@ import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 jest.setTimeout(120000);
 
 const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
@@ -76,7 +71,7 @@ describe('uploadFile databaseId selector', () => {
         authRole: 'anonymous',
         server: { useRouting: true, api: { isPublic: false, metaSchemas: ['catalog_private', 'routing_public', 'apps_public', 'metaschema_public', 'metaschema_modules_public'] } }
       },
-      [seed.pgpm(pgpmWorkspace), seed.sqlfile([entryReadersSeed,sql('schema.sql'), sql('test-data.sql')])]
+      [seed.pgpm(pgpmWorkspace), seed.sqlfile([sql('schema.sql'), sql('test-data.sql')])]
     ));
     contentHash = await hashContent('logo');
   });

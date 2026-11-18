@@ -18,11 +18,6 @@ import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 jest.setTimeout(120000);
 
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
@@ -95,7 +90,6 @@ describe('image / upload / attachment columns', () => {
       [
         seed.pgpm(pgpmWorkspace),
         seed.sqlfile([
-          entryReadersSeed,
           path.join(localSeedRoot, 'simple-seed-storage', 'schema.sql'),
           path.join(localSeedRoot, 'simple-seed-storage', 'test-data.sql'),
           path.join(localSeedRoot, 'upload-columns', 'schema.sql')

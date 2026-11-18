@@ -6,11 +6,6 @@ import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 jest.setTimeout(60000);
 
 const fixtureRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
@@ -48,7 +43,6 @@ describe('schema listener recovery against PostgreSQL', () => {
     }, [
       seed.pgpm(path.join(fixtureRoot, '..', '..')),
       seed.sqlfile([
-        entryReadersSeed,
         path.join(fixtureRoot, 'app-schemas', 'simple-pets', 'schema.sql'),
         path.join(fixtureRoot, 'scoped', 'test-data.sql'),
         path.join(fixtureRoot, 'app-schemas', 'simple-pets', 'test-data.sql')
