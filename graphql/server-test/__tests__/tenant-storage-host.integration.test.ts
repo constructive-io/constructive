@@ -32,11 +32,6 @@ import supertest from 'supertest';
 import { createTestServer, seed } from '../src';
 import type { ServerInfo } from '../src/types';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 jest.setTimeout(120000);
 
 const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
@@ -95,7 +90,6 @@ beforeAll(async () => {
   ({ pg, db, teardown } = await getConnections({}, [
     seed.pgpm(pgpmWorkspace),
     seed.sqlfile([
-      entryReadersSeed,
       sql('db-scope-storage', 'schema.sql'),
       sql('db-scope-storage', 'test-data.sql'),
       sql('tenant-routing-planes', 'test-data.sql')

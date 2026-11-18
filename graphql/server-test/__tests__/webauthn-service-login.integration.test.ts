@@ -18,11 +18,6 @@ import { createTestServer, seed } from '../src';
 import type { ServerInfo } from '../src/types';
 import { createSoftwareAuthenticator } from './webauthn-authenticator';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 jest.setTimeout(120000);
 
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
@@ -81,7 +76,6 @@ beforeAll(async () => {
   ({ pg, db, teardown } = await getConnections({}, [
     seed.pgpm(pgpmWorkspace),
     seed.sqlfile([
-      entryReadersSeed,
       path.join(sharedSeedRoot, 'app-schemas', 'simple-pets', 'schema.sql'),
       path.join(sharedSeedRoot, 'scoped', 'test-data.sql'),
       path.join(localSeedRoot, 'auth-cookie', 'schema.sql'),

@@ -15,11 +15,6 @@ import path from 'path';
 
 import { getConnectionsWithServer, seed } from '../src';
 
-// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
-const entryReadersSeed = path.join(
-  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
-);
-
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const shared = (...segments: string[]) => path.join(sharedSeedRoot, ...segments);
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
@@ -36,7 +31,6 @@ const scopedMetaSchemas = [
 const scopedSeedAdapters = () => [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
-    entryReadersSeed,
     shared('app-schemas', 'simple-pets', 'schema.sql'),
     shared('scoped', 'test-data.sql'),
     shared('app-schemas', 'simple-pets', 'test-data.sql')
