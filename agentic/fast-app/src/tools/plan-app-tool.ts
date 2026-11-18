@@ -52,7 +52,7 @@ import { specScopeErrors, specScopeTree } from './scope-check';
 // schema would break every chat opened again after the template changed. The
 // schema itself is a file in each project's app.
 const DESCRIPTION = [
-  'Build a working CRUD app from an AppSpec in one call: the user approves one card (and types their password), then the desktop provisions the database, builds the schema (a curated blueprint or your custom entities), generates the SDK, seeds the rows, generates every screen, starts the dev server in the Preview, verifies (types, every route, create/edit/delete on every table) and commits.',
+  'Build a working CRUD app from an AppSpec in one call: the user approves one card, then the desktop provisions the database, builds the schema (a curated blueprint or your custom entities), generates the SDK, seeds the rows, generates every screen, starts the dev server in the Preview, verifies (types, every route, create/edit/delete on every table) and commits.',
   `The parameters are one AppSpec. Read ${APP_SPEC_SCHEMA_FILE_IN_PROJECT} first: it is the exact AppSpec JSON Schema (draft 2020-12), with what each field means. Errors come back as "<path>: <what to change>".`,
   'Call it once, after you understood what the user wants. Do not provision, apply blueprints, run codegen or insert records yourself on this path.',
   'When people will work together in the app (teams, organizations, shared rooms), call describe_scopes first and opt into the screens it lists in `ui`; a single-user app needs none.',
