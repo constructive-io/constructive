@@ -14,7 +14,8 @@ import { extendSchema, gql } from 'graphile-utils';
  * proved in `sign_in_evidence` (method + a proven identifier, bound to the
  * session). This mutation turns that evidence into the owner's tenant session:
  *
- *   1. the caller must own the target database (never a client-supplied id);
+ *   1. the caller must own the target database; the id comes from the request,
+ *      and the ownership comparison is server-derived;
  *   2. the evidence row must belong to this caller and to the platform session
  *      this request belongs to (`jwt.claims.session_id`), and be unexpired. The
  *      browser hand-off rotates the credential, so the session is what survives
@@ -191,12 +192,11 @@ export const mintTenantOwnerHandoff = async (
   }
 
   const signIn = QuoteUtils.quoteQualifiedIdentifier(tenantAuthSchema, 'sign_in_platform_identity');
-  // The tenant procedure defaults credential_kind to 'bearer' and remember_me to
-  // false. Both are spelled out only to reach the device token in fifth place:
-  // a retry after the user approves the device must find the approved row
+  // Name the device token so the call does not depend on the parameter order.
+  // A retry after the user approves the device must find the approved row
   // instead of minting a new device.
   const session = await tx.query({
-    text: `SELECT * FROM ${signIn}($1, $2, 'bearer', false, $3)`,
+    text: `SELECT * FROM ${signIn}($1, $2, device_token => $3)`,
     values: [proven.method, proven.identifier, input.deviceToken ?? null]
   });
   const row = session.rows[0];

@@ -169,7 +169,7 @@ describe('mintTenantOwnerHandoff', () => {
 
     const signIn = findStatement(withToken.statements, 'sign_in_platform_identity');
     expect(signIn.text).toBe(
-      'SELECT * FROM constructive_auth_private.sign_in_platform_identity($1, $2, \'bearer\', false, $3)'
+      'SELECT * FROM constructive_auth_private.sign_in_platform_identity($1, $2, device_token => $3)'
     );
     expect(signIn.values).toEqual(['email', 'owner@example.com', 'approved-device-token']);
 
