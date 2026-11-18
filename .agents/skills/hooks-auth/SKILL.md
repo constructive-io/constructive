@@ -1,13 +1,13 @@
 ---
 name: hooks-auth
-description: React Query hooks for the auth API — provides typed query and mutation hooks for 15 tables and 66 custom operations
+description: React Query hooks for the auth API — provides typed query and mutation hooks for 15 tables and 68 custom operations
 ---
 
 # hooks-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the auth API — provides typed query and mutation hooks for 15 tables and 66 custom operations
+React Query hooks for the auth API — provides typed query and mutation hooks for 15 tables and 68 custom operations
 
 ## Usage
 
@@ -61,6 +61,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [require-step-up](references/require-step-up.md)
 - [sign-in-options](references/sign-in-options.md)
 - [approve-device](references/approve-device.md)
+- [cancel-sign-up-handoff](references/cancel-sign-up-handoff.md)
 - [check-password](references/check-password.md)
 - [complete-mfa-challenge](references/complete-mfa-challenge.md)
 - [confirm-delete-account](references/confirm-delete-account.md)
@@ -115,6 +116,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [sign-up-sms](references/sign-up-sms.md)
 - [update-principal](references/update-principal.md)
 - [verify-email](references/verify-email.md)
+- [verify-email-handoff](references/verify-email-handoff.md)
 - [verify-password](references/verify-password.md)
 - [verify-phone](references/verify-phone.md)
 - [verify-step-up-code](references/verify-step-up-code.md)

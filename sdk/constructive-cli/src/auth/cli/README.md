@@ -49,6 +49,7 @@ csdk auth set-token <your-token>
 | `require-step-up` | requireStepUp |
 | `sign-in-options` | signInOptions |
 | `approve-device` | approveDevice |
+| `cancel-sign-up-handoff` | cancelSignUpHandoff |
 | `check-password` | checkPassword |
 | `complete-mfa-challenge` | completeMfaChallenge |
 | `confirm-delete-account` | confirmDeleteAccount |
@@ -108,6 +109,7 @@ errors. |
 | `sign-up-sms` | signUpSms |
 | `update-principal` | updatePrincipal |
 | `verify-email` | verifyEmail |
+| `verify-email-handoff` | verifyEmailHandoff |
 | `verify-password` | verifyPassword |
 | `verify-phone` | verifyPhone |
 | `verify-step-up-code` | verifyStepUpCode |
@@ -676,6 +678,19 @@ approveDevice
   |----------|------|
   | `--input.approvalToken` | String (required) |
   | `--input.clientMutationId` | String |
+
+### `cancel-sign-up-handoff`
+
+cancelSignUpHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.codeChallenge` | String |
+  | `--input.email` | String |
 
 ### `check-password`
 
@@ -1344,9 +1359,11 @@ signUp
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
+  | `--input.codeChallenge` | String |
   | `--input.csrfToken` | String |
   | `--input.email` | String |
   | `--input.inviteToken` | String |
+  | `--input.nativeRedirectUri` | String |
   | `--input.password` | String |
 
 ### `sign-up-magic-link`
@@ -1402,6 +1419,20 @@ updatePrincipal
 ### `verify-email`
 
 verifyEmail
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.password` | String |
+  | `--input.token` | String |
+
+### `verify-email-handoff`
+
+verifyEmailHandoff
 
 - **Type:** mutation
 - **Arguments:**

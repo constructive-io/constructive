@@ -162,6 +162,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'approveDevice', identifier] as const)
       : (['mutation', 'approveDevice'] as const),
+  /** Mutation key for cancelSignUpHandoff */ cancelSignUpHandoff: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'cancelSignUpHandoff', identifier] as const)
+      : (['mutation', 'cancelSignUpHandoff'] as const),
   /** Mutation key for checkPassword */ checkPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'checkPassword', identifier] as const)
@@ -380,6 +384,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'verifyEmail', identifier] as const)
       : (['mutation', 'verifyEmail'] as const),
+  /** Mutation key for verifyEmailHandoff */ verifyEmailHandoff: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'verifyEmailHandoff', identifier] as const)
+      : (['mutation', 'verifyEmailHandoff'] as const),
   /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'verifyPassword', identifier] as const)

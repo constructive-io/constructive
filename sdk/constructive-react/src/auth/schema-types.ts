@@ -459,6 +459,11 @@ export interface Base64EncodedBinaryFilter {
   /** Not included in the specified list. */
   notIn?: Base64EncodedBinary[];
 }
+export interface CancelSignUpHandoffInput {
+  clientMutationId?: string;
+  codeChallenge?: string;
+  email?: string;
+}
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
@@ -1432,9 +1437,11 @@ export interface SignOutInput {
 }
 export interface SignUpInput {
   clientMutationId?: string;
+  codeChallenge?: string;
   csrfToken?: string;
   email?: string;
   inviteToken?: string;
+  nativeRedirectUri?: string;
   password?: string;
 }
 export interface SignUpMagicLinkInput {
@@ -1892,6 +1899,12 @@ export interface UserToManyWebauthnCredentialFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: WebauthnCredentialFilter;
 }
+export interface VerifyEmailHandoffInput {
+  clientMutationId?: string;
+  emailId?: string;
+  password?: string;
+  token?: string;
+}
 export interface VerifyEmailInput {
   clientMutationId?: string;
   emailId?: string;
@@ -2105,6 +2118,7 @@ export interface SignInOptionsRecord {
   allowWebauthnUsernameless?: boolean | null;
   enableCaptcha?: boolean | null;
   identityProviders?: unknown | null;
+  nativeSignUpHandoff?: boolean | null;
   requireMfa?: boolean | null;
   signUpRequiresInvite?: boolean | null;
 }
@@ -2146,6 +2160,9 @@ export interface WebauthnCredentialConnection {
 export interface ApproveDevicePayload {
   clientMutationId?: string | null;
   result?: boolean | null;
+}
+export interface CancelSignUpHandoffPayload {
+  clientMutationId?: string | null;
 }
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
@@ -2525,6 +2542,10 @@ export interface VerifyEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
+export interface VerifyEmailHandoffPayload {
+  clientMutationId?: string | null;
+  result?: VerifyEmailHandoffRecord | null;
+}
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -2777,6 +2798,12 @@ export interface SignUpSmsRecord {
   accessTokenExpiresAt?: string | null;
   outDeviceToken?: string | null;
   userId?: string | null;
+}
+export interface VerifyEmailHandoffRecord {
+  codeChallenge?: string | null;
+  email?: string | null;
+  nativeRedirectUri?: string | null;
+  result?: boolean | null;
 }
 /** Table constraints */
 export interface MetaConstraints {

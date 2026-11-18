@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.1...@constructive-io/errors@0.25.2) (2026-11-17)
+
+### Bug Fixes
+
+- **errors:** register the codes constructive-db main raises, including ones handed to raise helpers ([#2017](https://github.com/constructive-io/constructive/issues/2017)) ([d92dd40](https://github.com/constructive-io/constructive/commit/d92dd40765cbedf00ba8e031ffca926cccf78020))
+
 ## [0.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.0...@constructive-io/errors@0.25.1) (2026-11-09)
 
 ### Bug Fixes
