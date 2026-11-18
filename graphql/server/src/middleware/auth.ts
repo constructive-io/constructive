@@ -7,7 +7,7 @@ import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import pgQueryContext from 'pg-query-context';
 
-import { respondWithGraphQLError } from '../errors/graphql-response';
+import { respondWithError } from '../errors/graphql-response';
 
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';
@@ -68,7 +68,7 @@ export const createAuthenticateMiddleware = (
       !(rlsModule?.authenticateStrict && rlsModule.privateSchema?.schemaName)
     ) {
       log.error(`[auth] strictAuth is on but API ${api.apiId ?? 'unknown'} has no authenticateStrict; refusing`);
-      respondWithGraphQLError(res, errors.STRICT_AUTH_UNAVAILABLE(), { status: 503 });
+      respondWithError(req, res, errors.STRICT_AUTH_UNAVAILABLE(), { status: 503 });
       return;
     }
 
@@ -129,7 +129,7 @@ export const createAuthenticateMiddleware = (
 
           if (result?.rowCount === 0) {
             log.info('[auth] No rows returned, returning UNAUTHENTICATED');
-            respondWithGraphQLError(res, errors.UNAUTHENTICATED());
+            respondWithError(req, res, errors.UNAUTHENTICATED());
             return;
           }
 
@@ -137,7 +137,8 @@ export const createAuthenticateMiddleware = (
           log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
         } catch (e: any) {
           log.error('[auth] Auth error:', e.message);
-          respondWithGraphQLError(
+          respondWithError(
+            req,
             res,
             errors.INTERNAL_FAILURE({
               details: isDev() ? e.message : 'authentication failed',
