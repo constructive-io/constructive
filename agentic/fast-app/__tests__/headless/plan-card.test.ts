@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 
 import {
   APPROVAL_REQUEST_TYPE,
+  approvalRequestMessage,
   approvalResolutionMessage,
   MemoryRunLogStore,
-  type PiSessionEntry
+  type PiSessionEntry,
+  type RunLogStore
 } from '@agentic-kit/run-log';
 
-import { runLogPlanCards, STOPPED_REASON } from '../../src/headless/plan-card';
+import { ASKED_ALREADY, runLogPlanCards, STOPPED_REASON } from '../../src/headless/plan-card';
 import type { AppPlanPrompt } from '../../src/pipeline/app-plan';
 import type { CardRequest } from '../../src/pipeline/host';
 
@@ -52,14 +54,24 @@ function answer(id: string, details: Record<string, unknown>): PiSessionEntry {
   } as PiSessionEntry;
 }
 
-type Harness = { store: MemoryRunLogStore; flushes: number; clock: { t: number } };
+type Harness = {
+  store: MemoryRunLogStore;
+  flushes: number;
+  clock: { t: number };
+  /** How long each wait between reads was. */
+  waits: number[];
+  warnings: string[];
+};
 
 // A card on a memory store, with a fake clock: each sleep moves time on and,
 // on its `at`-th call, lets `onSleep` write what a client would.
-function cards(h: Harness, options: { timeoutMs?: number; onSleep?: (n: number) => Promise<void> } = {}) {
+function cards(
+  h: Harness,
+  options: { timeoutMs?: number; onSleep?: (n: number) => Promise<void>; store?: RunLogStore } = {}
+) {
   let sleeps = 0;
   return runLogPlanCards({
-    store: h.store,
+    store: options.store ?? h.store,
     runId: RUN,
     flush: async () => {
       h.flushes += 1;
@@ -69,13 +81,31 @@ function cards(h: Harness, options: { timeoutMs?: number; onSleep?: (n: number) 
     now: () => new Date(h.clock.t),
     sleep: async (ms) => {
       sleeps += 1;
+      h.waits.push(ms);
       h.clock.t += ms;
       await options.onSleep?.(sleeps);
-    }
+    },
+    warn: (message) => void h.warnings.push(message)
   });
 }
 
-const harness = (): Harness => ({ store: new MemoryRunLogStore(), flushes: 0, clock: { t: 1_000_000 } });
+const harness = (): Harness => ({
+  store: new MemoryRunLogStore(),
+  flushes: 0,
+  clock: { t: 1_000_000 },
+  waits: [],
+  warnings: []
+});
+
+// A request row as the gate writes it: the same id, no card.
+const gateRequest = (): PiSessionEntry =>
+  ({
+    type: 'message',
+    id: 'approval-call-1',
+    parentId: null,
+    timestamp: new Date().toISOString(),
+    message: { ...approvalRequestMessage({ toolCallId: 'call-1', prompt: 'plan_app needs approval' }) }
+  }) as PiSessionEntry;
 
 function requestRows(store: MemoryRunLogStore) {
   return store
@@ -194,14 +224,69 @@ test('the first answer stands: a second one from another client is dropped', asy
   assert.deepEqual(await ask.ask(request()), { approved: false, reason: 'first' });
 });
 
-test('a retried call writes no second request, and takes the answer the log already has', async () => {
+test('a call whose id the run has asked about already shows no card, and no old answer approves it', async () => {
+  // An earlier turn with the same tool call id, answered.
   const h = harness();
   await cards(h, {
     onSleep: async () => void (await h.store.append(RUN, [answer('resolution-call-1', { decision: 'approved' })]))
   }).ask(request());
-  const again = await cards(h).ask(request());
-  assert.equal(again.approved, true);
+  assert.deepEqual(await cards(h).ask(request()), { approved: false, reason: ASKED_ALREADY });
   assert.equal(requestRows(h.store).length, 1);
+  // The gate's request and its answer for this call.
+  const gated = harness();
+  await gated.store.append(RUN, [gateRequest(), answer('resolution-call-1', { decision: 'approved' })]);
+  assert.deepEqual(await cards(gated).ask(request()), { approved: false, reason: ASKED_ALREADY });
+});
+
+test("an answer in the log before the card's own row is not its answer", async () => {
+  const h = harness();
+  await h.store.append(RUN, [answer('resolution-call-1-old', { decision: 'approved' })]);
+  const ask = cards(h, {
+    onSleep: async (n) =>
+      void (n === 2 && (await h.store.append(RUN, [answer('resolution-call-1', { decision: 'rejected', reason: 'no' })])))
+  });
+  assert.deepEqual(await ask.ask(request()), { approved: false, reason: 'no' });
+  assert.equal(h.waits.length, 2);
+});
+
+test("another writer's request that takes the id first means no card, whatever answers it", async () => {
+  const h = harness();
+  // The gate's row lands between the card's read and its own append, which the store then drops.
+  const racing: RunLogStore = {
+    read: (...args) => h.store.read(...args),
+    append: async (runId, entries) => {
+      await h.store.append(runId, [gateRequest()]);
+      return h.store.append(runId, entries);
+    }
+  };
+  const ask = cards(h, {
+    store: racing,
+    onSleep: async () => void (await h.store.append(RUN, [answer('resolution-call-1', { decision: 'approved' })]))
+  });
+  assert.deepEqual(await ask.ask(request()), { approved: false, reason: ASKED_ALREADY });
+});
+
+test('a failed read while the card waits is tried again, with a growing wait, until the answer comes', async () => {
+  const h = harness();
+  // Once the card's row is in, the next four reads fail like a restarting worker.
+  let readsAfterRow = 0;
+  const flaky: RunLogStore = {
+    append: (...args) => h.store.append(...args),
+    read: async (...args) => {
+      if (requestRows(h.store).length > 0 && ++readsAfterRow <= 4) {
+        throw new Error('run-log read failed: HTTP 502');
+      }
+      return h.store.read(...args);
+    }
+  };
+  const ask = cards(h, {
+    store: flaky,
+    onSleep: async (n) => void (n === 4 && (await h.store.append(RUN, [answer('resolution-call-1', { decision: 'approved' })])))
+  });
+  assert.equal((await ask.ask(request())).approved, true);
+  assert.equal(h.warnings.length, 4);
+  assert.match(h.warnings[0], /reading the run log for the plan card of call-1 failed \(1 in a row\); polling again: run-log read failed: HTTP 502/);
+  assert.deepEqual(h.waits, [2_000, 4_000, 8_000, 16_000]);
 });
 
 test("an answer to another call is not this card's", async () => {

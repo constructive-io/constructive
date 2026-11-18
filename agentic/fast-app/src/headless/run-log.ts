@@ -81,15 +81,3 @@ export function answerOf(record: RunEventRecord): ApprovalAnswer | null {
     ...('payload' in details ? { payload: details.payload } : {})
   };
 }
-
-/** The first answer to `toolCallId` among the records: a later one, from any client, is dropped. */
-export function firstAnswer(
-  records: readonly RunEventRecord[],
-  toolCallId: string
-): ApprovalAnswer | null {
-  for (const record of records) {
-    const answer = answerOf(record);
-    if (answer?.toolCallId === toolCallId) return answer;
-  }
-  return null;
-}

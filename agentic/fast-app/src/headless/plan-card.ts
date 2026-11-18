@@ -2,12 +2,14 @@
 // is a request row in the run log that carries the card, and the answer is
 // the resolution row a client writes back. There is no password: the owner's
 // session comes from the owner key. The card waits until the answer comes,
-// the call is stopped, or the wait times out.
+// the call is stopped, or the wait times out; a read of the log that fails
+// meanwhile is tried again. Only an answer after the card's own row counts.
 
 import {
   approvalRequestMessage,
   type PiSessionEntry,
   readAll,
+  type RunEventRecord,
   type RunLogCursor,
   type RunLogStore,
   START
@@ -16,12 +18,26 @@ import { approvalEntryId } from '@agentic-kit/run-log-gate';
 
 import type { AppPlanPrompt } from '../pipeline/app-plan';
 import type { CardAnswer, CardRequest, FastAppAccount, PlanCards } from '../pipeline/host';
-import { type ApprovalAnswer, firstAnswer, leafIdOf } from './run-log';
+import { answerOf, type ApprovalAnswer, leafIdOf } from './run-log';
 
 /** The desktop's words for a card a stop answered (session/confirm-bridge.ts). */
 export const STOPPED_REASON = 'the user stopped the run before answering';
 
 const POLL_MS = 2_000;
+// The longest wait between reads while the log can't be read.
+const MAX_BACKOFF_MS = 30_000;
+
+/** Why a card can't be shown: the run has a request for this tool call already. */
+export const ASKED_ALREADY =
+  'the run already holds an approval request for this tool call, so the plan card could not be shown';
+
+const entryId = (record: RunEventRecord): unknown => (record.entry as { id?: unknown }).id;
+
+// The request row this host writes: its details carry the card.
+const carriesCard = (record: RunEventRecord): boolean => {
+  const details = (record.entry as { message?: { details?: { card?: unknown } } }).message?.details;
+  return typeof details?.card === 'object' && details.card !== null;
+};
 
 export type RunLogCardsOptions = {
   store: RunLogStore;
@@ -33,6 +49,8 @@ export type RunLogCardsOptions = {
   now?: () => Date;
   /** Waits `ms`, or less when `signal` aborts. */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
+  /** Where a failed read is reported; console.warn by default. */
+  warn?: (message: string) => void;
 };
 
 function wait(ms: number, signal?: AbortSignal): Promise<void> {
@@ -95,6 +113,7 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
   const now = options.now ?? (() => new Date());
   const sleep = options.sleep ?? wait;
   const intervalMs = options.intervalMs ?? POLL_MS;
+  const warn = options.warn ?? ((message: string) => console.warn(message));
 
   // The account row: no password field, so none is kept and none can be.
   const account = async (
@@ -110,15 +129,18 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
     const { signal, toolCallId } = request;
     const stopped = (): CardAnswer => ({ approved: false, reason: STOPPED_REASON });
     if (signal?.aborted) return stopped();
+    const rowId = approvalEntryId(toolCallId);
     // The call and the card's approval stage reach the log before the row.
     await options.flush();
     const records = await readAll(store, runId);
-    // A retried call asks with the same row; an answer it already has stands.
-    const earlier = firstAnswer(records, toolCallId);
-    if (earlier) return cardAnswer(request, earlier);
+    // The ids are the gate's too (approval-<id>, resolution-<id>), and the store
+    // drops an id it has: with a request for this call already in the run (the
+    // gate's, or an earlier turn's with the same call id), no card can be
+    // shown, and no answer in the log is this card's.
+    if (records.some((record) => entryId(record) === rowId)) return { approved: false, reason: ASKED_ALREADY };
     const entry = {
       type: 'message',
-      id: approvalEntryId(toolCallId),
+      id: rowId,
       parentId: leafIdOf(records),
       timestamp: now().toISOString(),
       message: {
@@ -129,18 +151,40 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
         }
       }
     } as PiSessionEntry;
-    // The store drops an entry id it has, so a retry never asks twice.
     await store.append(runId, [entry]);
 
+    // Only an answer after this card's own row in the log answers it.
     let cursor: RunLogCursor =
       records.length > 0 ? { afterSeq: records[records.length - 1].seq } : START;
+    let ownSeq: number | null = null;
+    let failedReads = 0;
     const deadline = now().getTime() + options.timeoutMs;
     for (;;) {
       if (signal?.aborted) return stopped();
-      const fresh = await readAll(store, runId, cursor);
+      let fresh: RunEventRecord[] = [];
+      try {
+        fresh = await readAll(store, runId, cursor);
+        failedReads = 0;
+      } catch (err) {
+        // A worker restart or a gateway error mid-wait must not lose the
+        // user's answer: only the deadline, a stop or the answer end the wait.
+        failedReads += 1;
+        warn(
+          `[fast-app] reading the run log for the plan card of ${toolCallId} failed (${failedReads} in a row); polling again: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
       if (fresh.length > 0) cursor = { afterSeq: fresh[fresh.length - 1].seq };
-      const answer = firstAnswer(fresh, toolCallId);
-      if (answer) return cardAnswer(request, answer);
+      for (const record of fresh) {
+        if (ownSeq === null) {
+          if (entryId(record) !== rowId) continue;
+          // Another writer's request took this id first: it isn't this card.
+          if (!carriesCard(record)) return { approved: false, reason: ASKED_ALREADY };
+          ownSeq = record.seq;
+          continue;
+        }
+        const answer = answerOf(record);
+        if (answer?.toolCallId === toolCallId) return cardAnswer(request, answer);
+      }
       const left = deadline - now().getTime();
       if (left <= 0) {
         return {
@@ -148,7 +192,8 @@ export function runLogPlanCards(options: RunLogCardsOptions): PlanCards {
           reason: `nobody answered the plan card within ${waitText(options.timeoutMs)}`
         };
       }
-      await sleep(Math.min(intervalMs, left), signal);
+      const delay = failedReads ? Math.min(intervalMs * 2 ** failedReads, MAX_BACKOFF_MS) : intervalMs;
+      await sleep(Math.min(delay, left), signal);
     }
   };
 
