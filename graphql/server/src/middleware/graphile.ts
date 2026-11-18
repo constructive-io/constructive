@@ -25,6 +25,7 @@ import errorPage404Message from '../errors/404-message';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { CaptchaPlugin } from '../plugins/captcha-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
@@ -114,6 +115,7 @@ const buildPreset = (
       ...(configuredPreset.plugins ?? []),
       AuthCookiePlugin,
       RequestProtectionPlugin,
+      CaptchaPlugin,
       createErrorEventsPlugin(pool),
       // Only when the tenant provisioned the WebAuthn module; the policy
       // itself is read per request from `req.api.webauthnSettings`.
