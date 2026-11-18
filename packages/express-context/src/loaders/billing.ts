@@ -1,7 +1,8 @@
 /**
  * Billing Module Loader
  *
- * Resolves per-database billing config from metaschema_modules_public.billing_module.
+ * Resolves per-database billing config through the database's login-only
+ * reader `function_resolution.billing_module_registrations`.
  * Returns schema names and function names needed for quota checks and usage recording.
  */
 
@@ -12,14 +13,8 @@ import type { LoaderContext, ModuleLoader } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const BILLING_MODULE_SQL = `
-  SELECT
-    s.schema_name AS public_schema,
-    ps.schema_name AS private_schema,
-    bm.record_usage_function
-  FROM metaschema_modules_public.billing_module bm
-  JOIN metaschema_public.schema s ON bm.schema_id = s.id
-  JOIN metaschema_public.schema ps ON bm.private_schema_id = ps.id
-  WHERE bm.database_id = $1
+  SELECT public_schema, private_schema, record_usage_function
+  FROM function_resolution.billing_module_registrations($1)
   LIMIT 1
 `;
 

@@ -1,19 +1,21 @@
 /**
  * Auth Settings Loader (Tier 2 — tenant DB)
  *
- * Two-step discovery:
- *   1. Query metaschema_modules_public.sessions_module to find the
- *      schema name and table name for auth settings
- *   2. Query the discovered <schema>.<table> in the tenant DB
+ * Two steps, both through login-only readers:
+ *   1. `function_resolution.sessions_module_registrations` names the schema
+ *      and table holding the database's auth settings
+ *   2. `<schema>.<table>_request_policy()`, generated beside that table,
+ *      returns the cookie and captcha columns of its one row
  *
- * This is the pattern for any module whose config lives in the tenant
- * database rather than the routing database.
+ * The server resolves this on its own connection, as a login row-level
+ * security holds to nothing. A plain read of the registration or of the
+ * settings row answers no rows, which would silently serve the built-in
+ * cookie defaults and skip captcha for a tenant that configured both.
  *
- * Discovery is keyed by `ctx.databaseId`. One serving database holds several
- * tenants' schemas in the normal schema-per-tenant topology, so an unfiltered
- * discovery returns whichever row the planner reaches first and step 2 then
- * reads a *neighbouring tenant's* cookie/captcha policy — and the loader cache
- * makes that resolution sticky for its TTL.
+ * Step 1 is keyed by `ctx.databaseId`. One serving database holds several
+ * tenants' schemas in the normal schema-per-tenant topology, so an unkeyed
+ * discovery would read a *neighbouring tenant's* cookie/captcha policy — and
+ * the loader cache makes that resolution sticky for its TTL.
  */
 
 import { escapeIdentifier } from 'pg';
@@ -26,41 +28,31 @@ import { requireDatabaseId } from './types';
 // ─── SQL ────────────────────────────────────────────────────────────────────
 
 const AUTH_SETTINGS_DISCOVERY_SQL = `
-  SELECT s.schema_name, sm.auth_settings_table_name AS table_name
-  FROM metaschema_modules_public.sessions_module sm
-  JOIN metaschema_public.schema s ON s.id = sm.schema_id
-  WHERE sm.database_id = $1
+  SELECT private_schema AS schema_name, auth_settings_table_name AS table_name
+  FROM function_resolution.sessions_module_registrations($1)
   LIMIT 1
 `;
 
 const buildAuthSettingsQuery = (schemaName: string, tableName: string) => `
-  SELECT
-    cookie_secure,
-    cookie_samesite,
-    cookie_domain,
-    cookie_httponly,
-    cookie_max_age,
-    cookie_path,
-    remember_me_duration,
-    enable_captcha,
-    captcha_site_key
-  FROM ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}
-  LIMIT 1
+  SELECT ${escapeIdentifier(schemaName)}.${escapeIdentifier(`${tableName}_request_policy`)}() AS policy
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────
 
-interface AuthSettingsRow {
+/** Durations arrive as whole seconds; the consumer parses them as such. */
+interface AuthSettingsPolicy {
   cookie_secure: boolean;
   cookie_samesite: string;
   cookie_domain: string | null;
   cookie_httponly: boolean;
-  cookie_max_age: string | null;
+  cookie_max_age_seconds: number | null;
   cookie_path: string;
-  remember_me_duration: string | null;
+  remember_me_duration_seconds: number | null;
   enable_captcha: boolean;
   captcha_site_key: string | null;
 }
+
+const seconds = (value: number | null): string | null => (value == null ? null : String(value));
 
 // ─── Loader ─────────────────────────────────────────────────────────────────
 
@@ -71,19 +63,19 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
     const { tenantPool, databaseId } = ctx;
     requireDatabaseId(databaseId, 'authSettings');
 
-    // Step 1: Discover schema + table from sessions_module
-    const discovery = await tenantPool.query<{ schema_name: string; table_name: string }>(
+    // Step 1: which schema and table hold this database's auth settings
+    const discovery = await tenantPool.query<{ schema_name: string | null; table_name: string | null }>(
       AUTH_SETTINGS_DISCOVERY_SQL,
       [databaseId]
     );
     const resolved = discovery.rows[0];
-    if (!resolved) return undefined;
+    if (!resolved?.schema_name || !resolved.table_name) return undefined;
 
-    // Step 2: Query the actual auth settings table
-    const result = await tenantPool.query<AuthSettingsRow>(
+    // Step 2: the row's cookie and captcha columns, through its reader
+    const result = await tenantPool.query<{ policy: AuthSettingsPolicy | null }>(
       buildAuthSettingsQuery(resolved.schema_name, resolved.table_name)
     );
-    const row = result.rows[0];
+    const row = result.rows[0]?.policy;
     if (!row) return undefined;
 
     return {
@@ -91,9 +83,9 @@ export const authSettingsLoader: ModuleLoader<AuthSettings> = createModuleLoader
       cookieSamesite: row.cookie_samesite,
       cookieDomain: row.cookie_domain,
       cookieHttponly: row.cookie_httponly,
-      cookieMaxAge: row.cookie_max_age,
+      cookieMaxAge: seconds(row.cookie_max_age_seconds),
       cookiePath: row.cookie_path,
-      rememberMeDuration: row.remember_me_duration,
+      rememberMeDuration: seconds(row.remember_me_duration_seconds),
       enableCaptcha: row.enable_captcha,
       captchaSiteKey: row.captcha_site_key
     };
