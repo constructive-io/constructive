@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { configureHost } from '@agentic-kit/db-tools';
+
 import { type LiveModel, mergeLiveModel, type SchemaColumnInput } from '../../src/app-spec/live-model';
 import { liveSpec } from '../../src/app-spec/live-spec';
 import type { BlueprintTable } from '../../src/app-spec/translate';
@@ -190,6 +192,39 @@ test('the SDK is regenerated when the database moved since codegen or the app en
   // A worktree sharing the database, whose app env codegen wrote for another one.
   appEnv('food-bank-2');
   assert.equal(await sdkStep(stamped), 'again');
+});
+
+test("the app env check reads the database from the host's values when the project has no .env", async () => {
+  // A cloud Job's clone: no .env, the host gives the run's database.
+  const dir = mkdtempSync(path.join(tmpdir(), 'live-plan-hosted-'));
+  const record = { ...builtRecord(built, model), sdk: { hash: model.hash, meta: 'm0' } };
+  await BuildLedger.open(dir, record);
+  mkdirSync(path.join(dir, 'packages', 'app'), { recursive: true });
+  const appEnv = (name: string) =>
+    writeFileSync(path.join(dir, 'packages', 'app', '.env.local'), `NEXT_PUBLIC_DB_NAME=${name}\n`);
+  configureHost({
+    account: () => null,
+    backendConfig: () => null,
+    contextSource: (cwd) => (cwd === dir ? { CONSTRUCTIVE_DATABASE_NAME: 'food-bank' } : null)
+  });
+  try {
+    const stamped = { ...model, metaDigest: 'm0' };
+    const keeps = async () => {
+      const { view } = startOn({ kind: 'ok', record }, stamped, { fallbackName: 'food-bank' }) as FollowUp;
+      const spec = structuredClone(view.spec);
+      entity(spec, 'locations').label = 'Sites';
+      const outcome = await planBuild(dir, spec, await basisOn(dir, stamped));
+      if (outcome.kind === 'refused') assert.fail(outcome.text);
+      return keepsSdk(outcome.plan);
+    };
+
+    appEnv('food-bank');
+    assert.equal(await keeps(), true);
+    appEnv('food-bank-2');
+    assert.equal(await keeps(), false);
+  } finally {
+    configureHost({ account: () => null, backendConfig: () => null });
+  }
 });
 
 test("a spec entity on an entity type's table adds only the columns it lacks, with no owner or access of its own", () => {

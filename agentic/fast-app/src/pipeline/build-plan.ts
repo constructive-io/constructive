@@ -9,6 +9,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseEnv } from 'node:util';
 
+import { hostContextSource } from '@agentic-kit/db-tools/context';
+
 import { planDelta } from '../app-spec/delta';
 import type {
   AppSpecDelta,
@@ -34,6 +36,7 @@ import type { AppPlanChanges } from './app-plan';
 import { buildCommitOwed, readBuildHistory } from './build-commits';
 import { type BuildRecord, idsOf, unsettledExpect } from './build-record';
 import { type BuildStart, sdkCurrent } from './plan-live';
+import { valuesOf } from './project-env';
 import { refusalText } from './result-text';
 import { expectedSchema, type SchemaExpectation } from './schema-settle';
 import { resourceUi } from './spec-ui';
@@ -199,11 +202,16 @@ export async function planBuild(
 }
 
 // Codegen writes packages/app/.env.local, which git ignores, for the database
-// the project's .env names; the SDK beside it was made for that one.
+// the project's .env names (or the host's values, which stand in for it); the
+// SDK beside it was made for that one.
 async function appEnvBound(cwd: string): Promise<boolean> {
   const read = (file: string) =>
     readFile(path.join(cwd, file), 'utf8').then(parseEnv, () => ({}) as Record<string, string>);
-  const [env, app] = await Promise.all([read('.env'), read('packages/app/.env.local')]);
+  const hosted = await hostContextSource(cwd);
+  const [env, app] = await Promise.all([
+    hosted ? valuesOf(hosted, ['CONSTRUCTIVE_DATABASE_NAME', 'DATABASE_NAME']) : read('.env'),
+    read('packages/app/.env.local')
+  ]);
   const bound = env.CONSTRUCTIVE_DATABASE_NAME || env.DATABASE_NAME;
   return Boolean(bound) && app.NEXT_PUBLIC_DB_NAME === bound;
 }
