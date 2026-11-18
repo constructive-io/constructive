@@ -119,6 +119,12 @@ const toAdapterMessage = (m: { role: string; content: string }): any =>
     ? { role: 'user', content: m.content, timestamp: Date.now() }
     : { role: 'assistant', content: [{ type: 'text', text: m.content }], timestamp: Date.now() };
 
+/** The provider's own failure, which the adapter reports on the result instead of throwing. */
+const providerFailure = (result: { stopReason?: string; errorMessage?: string }): string | null =>
+  result.stopReason === 'error' || result.stopReason === 'aborted'
+    ? result.errorMessage ?? result.stopReason
+    : null;
+
 /** Row-level security refusing the write is the caller's answer, not a server fault. */
 const sendRouteError = (res: Response, err: any): void => {
   if (res.headersSent) return;
@@ -374,6 +380,15 @@ async function handleStreamingResponse(
     }
 
     const result = await stream.result();
+    const failure = providerFailure(result);
+    if (failure) {
+      // Headers are sent: the failure travels as an event, and no reply is stored.
+      log.error('Model provider failed:', failure);
+      res.write(`data: ${JSON.stringify({ id: messageId, error: { message: 'Model provider failed' } })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
+    }
     const content = streamedContent;
     const latencyMs = Date.now() - startTime;
     const usage: UsageResult = {
@@ -447,6 +462,12 @@ async function handleBatchResponse(
   });
 
   const result = await stream.result();
+  const failure = providerFailure(result);
+  if (failure) {
+    log.error('Model provider failed:', failure);
+    res.status(502).json({ error: 'Model provider failed' });
+    return;
+  }
   const content = result.content
     .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
     .map((block) => block.text)

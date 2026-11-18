@@ -15,6 +15,8 @@ import supertest from 'supertest';
 
 /** Every context the router handed the chat adapter, in call order. */
 const mockStreamContexts: any[] = [];
+/** When set, the mock adapter reports this provider failure instead of a reply. */
+const mockStreamFailure: { message: string | null } = { message: null };
 
 // Mock OllamaAdapter before importing router
 jest.mock('@agentic-kit/ollama', () => {
@@ -51,7 +53,9 @@ jest.mock('@agentic-kit/ollama', () => {
       const resultPromise = new Promise((resolve) => { resultResolve = resolve; });
 
       // Simulate streaming events
+      const failure = mockStreamFailure.message;
       setTimeout(() => {
+        if (failure) return;
         events.push({ type: 'text_delta', delta: 'Hello', contentIndex: 0 });
         events.push({ type: 'text_delta', delta: ' world', contentIndex: 0 });
       }, 0);
@@ -71,6 +75,16 @@ jest.mock('@agentic-kit/ollama', () => {
           };
         },
         async result() {
+          if (failure) {
+            return {
+              role: 'assistant' as const,
+              content: [] as any[],
+              usage: { input: 0, output: 0, reasoning: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0 },
+              stopReason: 'error' as const,
+              errorMessage: failure,
+              timestamp: Date.now()
+            };
+          }
           return {
             role: 'assistant' as const,
             content: [{ type: 'text' as const, text: 'Hello world' }],
@@ -396,6 +410,40 @@ describe('agentic-server router', () => {
 
       expect(res.status).toBe(403);
       expect(res.body).toEqual({ error: 'Forbidden' });
+    });
+
+    describe('when the model provider fails', () => {
+      beforeEach(() => { mockStreamFailure.message = 'fetch failed'; });
+      afterEach(() => { mockStreamFailure.message = null; });
+
+      it('answers 502 and stores no assistant reply (batch)', async () => {
+        const statements: string[] = [];
+        const ctx = createMockConstructiveContext({ onQuery: (sql: string) => statements.push(sql) });
+        const request = makeRequest(createTestApp(ctx));
+
+        const res = await request
+          .post('/v1/threads/thread-001/messages')
+          .send({ messages: [{ role: 'user', content: 'Hello' }], stream: false });
+
+        expect(res.status).toBe(502);
+        expect(res.body).toEqual({ error: 'Model provider failed' });
+        // Only the user's own message was written.
+        expect(statements.filter((sql) => sql.includes('INSERT INTO'))).toHaveLength(1);
+      });
+
+      it('reports the failure as an event and stores no assistant reply (streaming)', async () => {
+        const statements: string[] = [];
+        const ctx = createMockConstructiveContext({ onQuery: (sql: string) => statements.push(sql) });
+        const request = makeRequest(createTestApp(ctx));
+
+        const res = await request
+          .post('/v1/threads/thread-001/messages')
+          .send({ messages: [{ role: 'user', content: 'Hello' }] });
+
+        expect(res.text).toContain('"error":{"message":"Model provider failed"}');
+        expect(res.text).toContain('[DONE]');
+        expect(statements.filter((sql) => sql.includes('INSERT INTO'))).toHaveLength(1);
+      });
     });
 
     it('returns 429 when billing quota exceeded', async () => {
