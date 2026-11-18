@@ -70,6 +70,16 @@ export type RunCommand = (
   env?: Record<string, string>,
 ) => Promise<{ ok: boolean; out: string }>;
 
+// A command's environment: this process's, without NODE_ENV, plus `env`. The
+// app picks its own mode, and a process that runs with NODE_ENV=production (a
+// cloud Job) would make `pnpm install` skip the app's dev dependencies, the
+// codegen CLI among them.
+function commandEnv(env?: Record<string, string>): NodeJS.ProcessEnv {
+  const base: NodeJS.ProcessEnv = { ...process.env };
+  delete base.NODE_ENV;
+  return { ...base, ...env };
+}
+
 export async function run(
   cmd: string,
   args: string[],
@@ -82,7 +92,7 @@ export async function run(
       timeout: 5 * 60_000,
       encoding: 'utf-8',
       maxBuffer: 32 * 1024 * 1024,
-      env: env ? { ...process.env, ...env } : process.env,
+      env: commandEnv(env),
     });
     return { ok: true, out: `${stdout}${stderr}`.trim() };
   } catch (err) {
