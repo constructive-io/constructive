@@ -4,6 +4,11 @@ import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
 
+// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
+const entryReadersSeed = path.join(
+  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
+);
+
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
 const localSeedRoot = path.join(__dirname, '..', '__fixtures__', 'seed', 'error-events');
 const pgpmWorkspace = path.join(sharedSeedRoot, '..', '..');
@@ -36,6 +41,7 @@ export const connect = ({ withEventsModule }: { withEventsModule: boolean }) =>
     [
       seed.pgpm(pgpmWorkspace),
       seed.sqlfile([
+        entryReadersSeed,
         path.join(sharedSeedRoot, 'app-schemas', 'simple-pets', 'schema.sql'),
         path.join(sharedSeedRoot, 'scoped', 'test-data.sql'),
         path.join(localSeedRoot, 'schema.sql'),

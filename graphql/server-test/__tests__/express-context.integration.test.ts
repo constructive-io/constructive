@@ -21,6 +21,11 @@ import type supertest from 'supertest';
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
 
+// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
+const entryReadersSeed = path.join(
+  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
+);
+
 jest.setTimeout(30000);
 
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
@@ -39,6 +44,7 @@ const metaSchemas = [
 const seedAdapters = [
   seed.pgpm(pgpmWorkspace),
   seed.sqlfile([
+    entryReadersSeed,
     shared('app-schemas', 'simple-pets', 'schema.sql'),
     shared('scoped', 'test-data.sql'),
     shared('app-schemas', 'simple-pets', 'test-data.sql')

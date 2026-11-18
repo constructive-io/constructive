@@ -14,6 +14,11 @@ import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
 
+// Temporary: delete with the seed when @pgpm/function-resolution > 0.47.9 is pinned.
+const entryReadersSeed = path.join(
+  __dirname, '..', '..', '..', '__fixtures__', 'seed', 'function-resolution-entry-readers', 'setup.sql'
+);
+
 jest.setTimeout(60000);
 
 const sharedSeedRoot = path.join(__dirname, '..', '..', '..', '__fixtures__', 'seed');
@@ -89,6 +94,7 @@ describe('captcha gate', () => {
       [
         seed.pgpm(pgpmWorkspace),
         seed.sqlfile([
+          entryReadersSeed,
           path.join(sharedSeedRoot, 'app-schemas', 'simple-pets', 'schema.sql'),
           path.join(sharedSeedRoot, 'scoped', 'test-data.sql'),
           path.join(localSeeds, 'auth-cookie', 'schema.sql'),
