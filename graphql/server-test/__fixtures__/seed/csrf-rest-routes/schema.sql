@@ -6,18 +6,8 @@
 ALTER TABLE compute_public.function_invocations
   ADD COLUMN actor_id uuid DEFAULT nullif(current_setting('jwt.claims.user_id', true), '')::uuid;
 
--- A minimal agent-chat module so POST /v1/threads can create a thread; the
+-- An org-scope agent module so POST /v1/threads can create a thread; the
 -- thread's owner_id is the user the request authenticated as.
-CREATE TABLE IF NOT EXISTS metaschema_modules_public.agent_chat_module (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  database_id uuid NOT NULL,
-  schema_id uuid NOT NULL,
-  thread_table_name text,
-  message_table_name text,
-  task_table_name text
-);
-GRANT SELECT ON metaschema_modules_public.agent_chat_module TO administrator, authenticated, anonymous;
-
 CREATE SCHEMA "simple-pets-agent-public";
 GRANT USAGE ON SCHEMA "simple-pets-agent-public" TO administrator, authenticated, anonymous;
 
@@ -41,9 +31,18 @@ VALUES
   ('6dba0101-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'agent_public', 'simple-pets-agent-public', true)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO metaschema_modules_public.agent_chat_module (id, database_id, schema_id, thread_table_name, message_table_name)
+INSERT INTO metaschema_public.table (id, database_id, schema_id, name)
 VALUES
-  ('6dba0102-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0101-0000-4000-8000-000000000001', 'threads', 'messages')
+  ('6dba0103-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0101-0000-4000-8000-000000000001', 'threads'),
+  ('6dba0103-0000-4000-8000-000000000002', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0101-0000-4000-8000-000000000001', 'messages')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO metaschema_modules_public.agent_module
+  (id, database_id, schema_id, private_schema_id, scope, entity_field, thread_table_id, message_table_id)
+VALUES
+  ('6dba0102-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0101-0000-4000-8000-000000000001',
+   '6dba0101-0000-4000-8000-000000000001', 'org', 'entity_id',
+   '6dba0103-0000-4000-8000-000000000001', '6dba0103-0000-4000-8000-000000000002')
 ON CONFLICT (id) DO NOTHING;
 
 SET session_replication_role TO DEFAULT;
