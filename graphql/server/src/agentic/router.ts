@@ -108,6 +108,33 @@ function resolveEmbeddingAdapter(llm: LlmConfig | null): ResolvedEmbeddingAdapte
   return null;
 }
 
+/**
+ * A stored turn in the shape the chat adapter takes: a user turn is plain
+ * text, an assistant turn is a list of content blocks. Handing the adapter an
+ * assistant turn as a string throws inside its detached stream, which takes
+ * the process down on the second turn of any thread.
+ */
+const toAdapterMessage = (m: { role: string; content: string }): any =>
+  m.role === 'user'
+    ? { role: 'user', content: m.content, timestamp: Date.now() }
+    : { role: 'assistant', content: [{ type: 'text', text: m.content }], timestamp: Date.now() };
+
+/** The provider's own failure, which the adapter reports on the result instead of throwing. */
+const providerFailure = (result: { stopReason?: string; errorMessage?: string }): string | null =>
+  result.stopReason === 'error' || result.stopReason === 'aborted'
+    ? result.errorMessage ?? result.stopReason
+    : null;
+
+/** Row-level security refusing the write is the caller's answer, not a server fault. */
+const sendRouteError = (res: Response, err: any): void => {
+  if (res.headersSent) return;
+  if (err?.code === '42501') {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
+  }
+  res.status(500).json({ error: 'Internal server error' });
+};
+
 // ─── Route Handlers ─────────────────────────────────────────────────────────
 
 async function handleCreateThread(
@@ -232,7 +259,7 @@ async function handleSendMessage(
       if (msg.role === 'user') {
         await client.query(
           `INSERT INTO "${schemaName}"."${messageTableName}"
-           (thread_id, owner_id, entity_id, author_role, parts)
+           (thread_id, actor_id, entity_id, author_role, parts)
            VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4)`,
           [threadId, userId, 'user', JSON.stringify([{ type: 'text', text: msg.content }])]
         );
@@ -329,11 +356,7 @@ async function handleStreamingResponse(
     const modelDesc = chatAdapter.adapter.createModel(model, { maxOutputTokens: undefined });
     const context = {
       systemPrompt: systemMsg?.content,
-      messages: nonSystem.map((m) => ({
-        role: m.role as 'user',
-        content: m.content,
-        timestamp: Date.now()
-      }))
+      messages: nonSystem.map(toAdapterMessage)
     };
     const stream = chatAdapter.adapter.stream(modelDesc, context, {
       temperature: body.temperature
@@ -357,6 +380,15 @@ async function handleStreamingResponse(
     }
 
     const result = await stream.result();
+    const failure = providerFailure(result);
+    if (failure) {
+      // Headers are sent: the failure travels as an event, and no reply is stored.
+      log.error('Model provider failed:', failure);
+      res.write(`data: ${JSON.stringify({ id: messageId, error: { message: 'Model provider failed' } })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
+    }
     const content = streamedContent;
     const latencyMs = Date.now() - startTime;
     const usage: UsageResult = {
@@ -376,7 +408,7 @@ async function handleStreamingResponse(
       ctx.withPgClient(async (client) => {
         await client.query(
           `INSERT INTO "${schemaName}"."${messageTableName}"
-           (thread_id, owner_id, entity_id, author_role, parts, model)
+           (thread_id, actor_id, entity_id, author_role, parts, model)
            VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
           [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
         );
@@ -423,17 +455,19 @@ async function handleBatchResponse(
   const modelDesc = chatAdapter.adapter.createModel(model, { maxOutputTokens: undefined });
   const context = {
     systemPrompt: systemMsg?.content,
-    messages: nonSystem.map((m) => ({
-      role: m.role as 'user',
-      content: m.content,
-      timestamp: Date.now()
-    }))
+    messages: nonSystem.map(toAdapterMessage)
   };
   const stream = chatAdapter.adapter.stream(modelDesc, context, {
     temperature: body.temperature
   });
 
   const result = await stream.result();
+  const failure = providerFailure(result);
+  if (failure) {
+    log.error('Model provider failed:', failure);
+    res.status(502).json({ error: 'Model provider failed' });
+    return;
+  }
   const content = result.content
     .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
     .map((block) => block.text)
@@ -452,7 +486,7 @@ async function handleBatchResponse(
   await ctx.withPgClient(async (client) => {
     await client.query(
       `INSERT INTO "${schemaName}"."${messageTableName}"
-       (thread_id, owner_id, entity_id, author_role, parts, model)
+       (thread_id, actor_id, entity_id, author_role, parts, model)
        VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
       [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
     );
@@ -597,7 +631,7 @@ export function createAgenticRouter(): Router {
       await handleCreateThread(req, res, req.params.entity_id);
     } catch (err: any) {
       log.error('Error creating thread:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -606,7 +640,7 @@ export function createAgenticRouter(): Router {
       await handleSendMessage(req, res, req.params.entity_id);
     } catch (err: any) {
       log.error('Error in messages endpoint:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -621,7 +655,7 @@ export function createAgenticRouter(): Router {
       await handleCreateThread(req, res, userId);
     } catch (err: any) {
       log.error('Error creating thread:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -635,7 +669,7 @@ export function createAgenticRouter(): Router {
       await handleSendMessage(req, res, userId);
     } catch (err: any) {
       log.error('Error in messages endpoint:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
