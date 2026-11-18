@@ -7,15 +7,9 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { ensureComposedInstall, type RunCommand } from '@agentic-kit/db-tools/app-workspace';
-
 import { APP_SPEC_SCHEMA_FILE } from '../app-spec';
-import { outputTail, runCommand } from '../pipeline/command';
 import type { AppTemplate } from '../pipeline/host';
-import { appDirOf, COMPOSE_MARKER, isComposed } from '../pipeline/snapshot-clone';
-
-// As the desktop's install of a copied template (snapshot-clone.ts).
-const INSTALL_TIMEOUT_MS = 5 * 60_000;
+import { appDirOf, COMPOSE_MARKER, installApp, isComposed } from '../pipeline/snapshot-clone';
 
 const FROM_DESKTOP =
   'A cloud run never composes the app template: open the project in Constructive Desktop, which puts the app in packages/app and commits it, then push and send the message again.';
@@ -30,28 +24,6 @@ export function missingAppReason(projectDir: string): string | null {
   return null;
 }
 
-/**
- * db-tools' composed install, the one run_codegen runs too, through the
- * pipeline's runCommand: the scrubbed environment without NODE_ENV, and a
- * stop or a timeout ends pnpm's whole process group.
- */
-async function installApp(projectDir: string, signal: AbortSignal | undefined): Promise<void> {
-  const exec: RunCommand = async (command, args, cwd, env) => {
-    const result = await runCommand(command, args, {
-      cwd,
-      env: { CI: 'true', ...env },
-      signal,
-      timeoutMs: INSTALL_TIMEOUT_MS
-    });
-    return { ok: result.ok, out: result.output };
-  };
-  const install = await ensureComposedInstall(projectDir, exec);
-  signal?.throwIfAborted();
-  if (!install.ok) {
-    throw new Error(`pnpm install failed in ${appDirOf(projectDir)}:\n${outputTail(install.out)}`);
-  }
-}
-
 export function cloneTemplate(cwd: string): AppTemplate {
   const tree = path.resolve(cwd);
   return {
@@ -62,7 +34,8 @@ export function cloneTemplate(cwd: string): AppTemplate {
       }
       const missing = missingAppReason(projectDir);
       if (missing) throw new Error(missing);
-      await installApp(projectDir, signal);
+      // The desktop's install of a copied template, with the same environment and limits.
+      await installApp(projectDir, signal ?? new AbortController().signal);
     },
     // The app's own copy, which the clone has with the app.
     schemaFile: async () => {

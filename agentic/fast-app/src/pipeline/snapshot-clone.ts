@@ -142,10 +142,13 @@ async function cloneTree(from: string, to: string, signal: AbortSignal): Promise
   }
 }
 
-// db-tools' composed install, the one run_codegen runs too, through
-// runCommand: build commands get the scrubbed environment, and a stop or a
-// timeout ends pnpm's whole process group.
-async function installApp(projectDir: string, signal: AbortSignal): Promise<void> {
+/**
+ * db-tools' composed install, the one run_codegen runs too, through
+ * runCommand: build commands get the scrubbed environment, and a stop or a
+ * timeout ends pnpm's whole process group. A headless host, whose clone has
+ * the app already, runs only this (headless/template.ts).
+ */
+export async function installApp(projectDir: string, signal: AbortSignal): Promise<void> {
   const exec: RunCommand = async (command, args, cwd, env) => {
     const result = await runCommand(command, args, {
       cwd,
