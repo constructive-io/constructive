@@ -3,9 +3,15 @@
 // deleted or the app quits.
 
 import { killTree } from './command';
-import { type DevProcess, exitOf, reapGroups, startDevProcess, writePids } from './dev-process';
+import {
+  type DevProcess,
+  exitOf,
+  exitWithin,
+  reapGroups,
+  startDevProcess,
+  writePids,
+} from './dev-process';
 import { freePort } from './dev-server-port';
-import { sleep } from './transient';
 
 const KILL_GRACE_MS = 3_000;
 const PORT_RELEASE_WAIT_MS = 5_000;
@@ -164,7 +170,7 @@ export class DevServerManager {
       // A fresh start keeps the old server's port, which its children can hold
       // a moment after the kill; anything else takes another port at once.
       if (old) {
-        await Promise.race([exitOf(old.child), sleep(KILL_GRACE_MS)]);
+        await exitWithin(old.child, KILL_GRACE_MS);
         preferredPort = old.port;
         portWaitMs = PORT_RELEASE_WAIT_MS;
       }

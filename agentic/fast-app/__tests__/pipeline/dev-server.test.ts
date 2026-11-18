@@ -8,11 +8,14 @@ import { DevServerManager, DevServerStopped } from '../../src/pipeline/dev-serve
 import { freePort } from '../../src/pipeline/dev-server-port';
 
 // A stand-in for `next dev`: it counts its starts, prints Next's ready lines
-// for the port it was given, and stays up.
+// for the port it was given, and stays up. It is one process from start to
+// end, as `next dev` is: the sleep replaces the shell instead of forking after
+// the ready lines. A kill of the group that lands during such a fork misses
+// the new child on macOS, and that orphan would hold the test's pipes for 30 s.
 function fakeApp(): { dir: string; starts: string } {
   const dir = mkdtempSync(path.join(tmpdir(), 'dev-server-test-'));
   const starts = path.join(dir, 'starts.log');
-  const script = `echo start >> ${starts}; echo "  - Local:        http://localhost:$PORT"; echo " ✓ Ready in 1ms"; sleep 30`;
+  const script = `sh -c 'echo start >> ${starts}; echo "  - Local:        http://localhost:$PORT"; echo " ✓ Ready in 1ms"; exec sleep 30'`;
   writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ scripts: { dev: script } }));
   return { dir, starts };
 }
@@ -122,6 +125,21 @@ test('a start that fails keeps what the server printed, for the agent to read', 
     await assert.rejects(servers.ensure(dir));
     assert.equal(servers.status(dir).state, 'stopped');
     assert.match(servers.log(dir), /Cannot resolve \.\/missing/);
+  } finally {
+    servers.killAll();
+  }
+});
+
+const timers = () => process.getActiveResourcesInfo().filter((kind) => kind === 'Timeout').length;
+
+test('a fresh restart keeps no timer running once the old server has exited', async () => {
+  const { dir } = fakeApp();
+  const servers = new DevServerManager();
+  try {
+    await servers.ensure(dir);
+    const before = timers();
+    await servers.ensure(dir, { fresh: true });
+    assert.equal(timers(), before);
   } finally {
     servers.killAll();
   }

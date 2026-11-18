@@ -107,6 +107,21 @@ export function exitOf(child: ChildProcess): Promise<void> {
   });
 }
 
+/**
+ * Resolves once the process has exited, or after `ms` at the latest. The
+ * timer ends with the process, so a wait that the exit ended keeps nothing
+ * running after it.
+ */
+export function exitWithin(child: ChildProcess, ms: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    void exitOf(child).then(() => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
 // A dev server outlives a desktop that was killed instead of quit (a crash, a
 // forced restart), so each one's process group is written to a pid file and
 // the next start stops whatever is left. A group is only killed while one of
