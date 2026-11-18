@@ -1,0 +1,411 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "urn:constructive:app-spec:v1",
+	"title": "AppSpec",
+	"description": "What to build: the app's name, its backend (a curated blueprint or custom entities), seed rows and UI hints. Table and field names are snake_case; the generator matches them to the database's _meta.",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["version", "name", "backend"],
+	"properties": {
+		"version": { "const": 1 },
+		"name": { "type": "string", "minLength": 1, "maxLength": 80 },
+		"tagline": { "type": "string", "maxLength": 160 },
+		"backend": {
+			"type": "object",
+			"required": ["kind"],
+			"properties": { "kind": { "enum": ["blueprint", "custom"] } },
+			"if": { "properties": { "kind": { "const": "custom" } } },
+			"then": { "$ref": "#/$defs/customBackend" },
+			"else": { "$ref": "#/$defs/blueprintBackend" }
+		},
+		"seed": {
+			"description": "Rows to insert after the schema exists, keyed by table. A foreign-key value may be \"@<table>[<index>]\" to point at another seeded row.",
+			"type": "object",
+			"propertyNames": { "$ref": "#/$defs/snakeName" },
+			"additionalProperties": {
+				"type": "array",
+				"maxItems": 200,
+				"items": {
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/snakeName" },
+					"additionalProperties": { "$ref": "#/$defs/seedValue" }
+				}
+			}
+		},
+		"ui": { "$ref": "#/$defs/ui" }
+	},
+	"$defs": {
+		"snakeName": {
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9_]*$",
+			"maxLength": 63
+		},
+		"scopeName": {
+			"description": "A membership scope as membershipTypes.scope names it: app, org, or an entity type such as data_room.",
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$",
+			"maxLength": 63
+		},
+		"resourceKey": {
+			"description": "A table: its snake_case name or its resource (route) name.",
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9_-]*$",
+			"maxLength": 63
+		},
+		"fieldKey": {
+			"description": "A field: its snake_case column name or its camelCase API name.",
+			"type": "string",
+			"pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+			"maxLength": 63
+		},
+		"label": { "type": "string", "minLength": 1, "maxLength": 60 },
+		"scalar": {
+			"anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }]
+		},
+		"seedValue": {
+			"description": "A column value, or a foreign-key reference \"@<table>[<index>]\". An array or object is a value for a JSON or array column; the seed step does not create a nested related row.",
+			"anyOf": [
+				{ "$ref": "#/$defs/scalar" },
+				{ "type": "array" },
+				{ "type": "object" }
+			]
+		},
+		"blueprintBackend": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["kind", "slug"],
+			"properties": {
+				"kind": { "const": "blueprint" },
+				"slug": { "$ref": "#/$defs/snakeName" },
+				"extend": { "$ref": "#/$defs/backendExtend" }
+			}
+		},
+		"backendExtend": {
+			"description": "Additions to a curated blueprint, for follow-up changes: new tables, new columns and foreign keys on its tables, and many-to-many links. New names must not reuse a blueprint table or column, including the columns its nodes add (id, owner_id, entity_id, created_at, updated_at and inherited columns).",
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"entities": {
+					"description": "New tables, shaped like a custom backend's entities. A name must not reuse a blueprint table.",
+					"type": "array",
+					"items": { "$ref": "#/$defs/entity" }
+				},
+				"fields": {
+					"description": "New columns, by existing table. The table may already have rows, so each column must be optional (no required: true) or have a default. A name must not reuse a blueprint column.",
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/snakeName" },
+					"additionalProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/field" } }
+				},
+				"belongsTo": {
+					"description": "New foreign keys, by existing table. They are always created optional, since the table may already have rows; onDelete set_null fits best.",
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/snakeName" },
+					"additionalProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/belongsTo" } }
+				},
+				"links": {
+					"description": "Many-to-many links; each becomes a junction table, named as for a custom backend's links.",
+					"type": "array",
+					"items": { "$ref": "#/$defs/link" }
+				}
+			}
+		},
+		"customBackend": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["kind", "entities"],
+			"properties": {
+				"kind": { "const": "custom" },
+				"entities": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 30,
+					"items": { "$ref": "#/$defs/entity" }
+				},
+				"links": {
+					"description": "Many-to-many links; each becomes a junction table between the two entities.",
+					"type": "array",
+					"items": { "$ref": "#/$defs/link" }
+				}
+			}
+		},
+		"link": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["between"],
+			"properties": {
+				"name": { "$ref": "#/$defs/snakeName" },
+				"between": {
+					"type": "array",
+					"prefixItems": [{ "$ref": "#/$defs/snakeName" }, { "$ref": "#/$defs/snakeName" }],
+					"items": false,
+					"minItems": 2
+				}
+			}
+		},
+		"entity": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["name", "fields"],
+			"properties": {
+				"name": {
+					"description": "Table name, snake_case plural (e.g. volunteer_shifts).",
+					"$ref": "#/$defs/snakeName"
+				},
+				"label": { "$ref": "#/$defs/label" },
+				"access": {
+					"description": "shared: every signed-in user sees every row. private: each user sees only their own rows. { \"scope\": \"<scope>\" }: each row belongs to one entity of that membership scope, and only its members see it. \"org\" puts a row in an organization (the active workspace); an entity type such as \"properties\" needs a key to its table, or to a table with the same access, which the row's entity is copied from.",
+					"default": "shared",
+					"oneOf": [
+						{ "enum": ["shared", "private"] },
+						{
+							"type": "object",
+							"required": ["scope"],
+							"additionalProperties": false,
+							"properties": { "scope": { "$ref": "#/$defs/scopeName" } }
+						}
+					]
+				},
+				"fields": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 40,
+					"items": { "$ref": "#/$defs/field" }
+				},
+				"belongsTo": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/belongsTo" }
+				}
+			}
+		},
+		"field": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["name", "type"],
+			"properties": {
+				"name": { "$ref": "#/$defs/snakeName" },
+				"type": {
+					"enum": [
+						"text",
+						"long_text",
+						"integer",
+						"decimal",
+						"money",
+						"boolean",
+						"date",
+						"timestamp",
+						"email",
+						"url",
+						"uuid",
+						"json"
+					]
+				},
+				"required": { "type": "boolean" },
+				"default": { "$ref": "#/$defs/seedValue" },
+				"enum": {
+					"description": "Allowed values; the field becomes a select.",
+					"type": "array",
+					"minItems": 1,
+					"uniqueItems": true,
+					"items": { "type": "string", "minLength": 1, "maxLength": 63 }
+				},
+				"label": { "$ref": "#/$defs/label" }
+			}
+		},
+		"belongsTo": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["field", "to"],
+			"properties": {
+				"field": {
+					"description": "The foreign-key column, e.g. location_id.",
+					"$ref": "#/$defs/snakeName"
+				},
+				"to": {
+					"description": "The entity the key points at.",
+					"$ref": "#/$defs/snakeName"
+				},
+				"onDelete": { "enum": ["cascade", "set_null", "restrict"] },
+				"label": { "$ref": "#/$defs/label" }
+			}
+		},
+		"ui": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"nav": {
+					"description": "Sidebar order, by table name. Tables left out follow in schema order.",
+					"type": "array",
+					"uniqueItems": true,
+					"items": { "$ref": "#/$defs/resourceKey" }
+				},
+				"resources": {
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/resourceKey" },
+					"additionalProperties": { "$ref": "#/$defs/resourceUi" }
+				},
+				"dashboard": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["tiles"],
+					"properties": {
+						"tiles": {
+							"type": "array",
+							"maxItems": 12,
+							"items": { "$ref": "#/$defs/tile" }
+						}
+					}
+				},
+				"workspace": {
+					"description": "A switcher between the user's personal workspace and their organizations. Records whose key defaults to \"$scope:<scope>\" are created in, and listed from, the active one.",
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["scope"],
+					"properties": { "scope": { "$ref": "#/$defs/scopeName" } }
+				},
+				"access": {
+					"description": "Membership scopes that get an access page (members, invitations, profiles, capabilities). \"app\" manages the app's members; \"org\" the active organization's.",
+					"type": "array",
+					"uniqueItems": true,
+					"items": { "$ref": "#/$defs/scopeName" }
+				}
+			}
+		},
+		"resourceUi": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"label": { "$ref": "#/$defs/label" },
+				"singular": { "$ref": "#/$defs/label" },
+				"icon": {
+					"description": "A lucide icon name, e.g. calendar-clock.",
+					"type": "string",
+					"pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+				},
+				"titleField": { "$ref": "#/$defs/fieldKey" },
+				"columns": {
+					"type": "array",
+					"minItems": 1,
+					"uniqueItems": true,
+					"items": { "$ref": "#/$defs/fieldKey" }
+				},
+				"formFields": {
+					"type": "array",
+					"minItems": 1,
+					"uniqueItems": true,
+					"items": { "$ref": "#/$defs/fieldKey" }
+				},
+				"hidden": {
+					"description": "Leave the table out of the sidebar. Its pages and relations still work.",
+					"type": "boolean"
+				},
+				"fields": {
+					"description": "Per-field hints. They override what the generator reads from the database.",
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/fieldKey" },
+					"additionalProperties": { "$ref": "#/$defs/fieldUi" }
+				},
+				"panels": {
+					"description": "For an entity type's table: what its record page shows of the entity's membership scope.",
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["scope", "show"],
+					"properties": {
+						"scope": { "$ref": "#/$defs/scopeName" },
+						"show": {
+							"type": "array",
+							"minItems": 1,
+							"uniqueItems": true,
+							"items": { "enum": ["members", "files"] }
+						}
+					}
+				}
+			}
+		},
+		"fieldUi": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"label": { "$ref": "#/$defs/label" },
+				"description": {
+					"description": "Help text under the input in forms.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 200
+				},
+				"options": {
+					"description": "Allowed values; the field becomes a select.",
+					"type": "array",
+					"minItems": 1,
+					"uniqueItems": true,
+					"items": { "type": "string", "minLength": 1, "maxLength": 63 }
+				},
+				"hidden": {
+					"description": "Never shown in lists, forms or the detail view.",
+					"type": "boolean"
+				},
+				"input": {
+					"enum": [
+						"text",
+						"textarea",
+						"email",
+						"url",
+						"number",
+						"integer",
+						"currency",
+						"boolean",
+						"date",
+						"datetime",
+						"time",
+						"select",
+						"relation",
+						"json",
+						"uuid"
+					]
+				},
+				"required": {
+					"description": "Overrides the database; false for a column a trigger fills.",
+					"type": "boolean"
+				},
+				"default": {
+					"description": "Sent on create when the form has no value. \"$currentUserId\" is the signed-in user's id; \"$scope:<scope>\" is the id of the active entity of that membership scope (\"$scope:org\": the selected organization, else the user's own id). Both hide the field.",
+					"$ref": "#/$defs/scalar"
+				}
+			}
+		},
+		"tile": {
+			"type": "object",
+			"required": ["kind"],
+			"properties": { "kind": { "enum": ["count", "recent"] } },
+			"if": { "properties": { "kind": { "const": "recent" } } },
+			"then": { "$ref": "#/$defs/recentTile" },
+			"else": { "$ref": "#/$defs/countTile" }
+		},
+		"countTile": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["kind", "resource"],
+			"properties": {
+				"kind": { "const": "count" },
+				"resource": { "$ref": "#/$defs/resourceKey" },
+				"label": { "$ref": "#/$defs/label" },
+				"filters": {
+					"description": "Equality filters on the counted rows, e.g. { \"status\": \"open\" }.",
+					"type": "object",
+					"propertyNames": { "$ref": "#/$defs/fieldKey" },
+					"additionalProperties": { "$ref": "#/$defs/scalar" }
+				}
+			}
+		},
+		"recentTile": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["kind", "resource"],
+			"properties": {
+				"kind": { "const": "recent" },
+				"resource": { "$ref": "#/$defs/resourceKey" },
+				"label": { "$ref": "#/$defs/label" },
+				"limit": { "type": "integer", "minimum": 1, "maximum": 20 }
+			}
+		}
+	}
+}

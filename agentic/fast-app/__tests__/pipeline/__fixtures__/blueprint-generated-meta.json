@@ -1,0 +1,245 @@
+[
+  {
+    "name": "CompaniesChunk",
+    "tableName": "companies_chunks",
+    "query": {
+      "all": "companiesChunks",
+      "one": null,
+      "create": "createCompaniesChunk",
+      "update": "updateCompaniesChunk",
+      "delete": "deleteCompaniesChunk"
+    },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "companiesId", "columnName": "companies_id" },
+      { "name": "content", "columnName": "content" },
+      { "name": "chunkIndex", "columnName": "chunk_index" },
+      { "name": "embedding", "columnName": "embedding" },
+      { "name": "metadata", "columnName": "metadata" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "companiesChunks_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "companiesByMyCompaniesId",
+          "fields": [{ "name": "companiesId" }],
+          "refTable": { "name": "companies" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  },
+  {
+    "name": "Company",
+    "tableName": "companies",
+    "query": {
+      "all": "companies",
+      "one": null,
+      "create": "createCompany",
+      "update": "updateCompany",
+      "delete": "deleteCompany"
+    },
+    "fields": [
+      { "name": "name", "columnName": "name" },
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "embedding", "columnName": "embedding" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "companies_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": []
+    }
+  },
+  {
+    "name": "DataRoom",
+    "tableName": "data_rooms",
+    "query": {
+      "all": "dataRooms",
+      "one": null,
+      "create": "createDataRoom",
+      "update": "updateDataRoom",
+      "delete": "deleteDataRoom"
+    },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "name", "columnName": "name" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRooms_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": []
+    }
+  },
+  {
+    "name": "DataRoomBucket",
+    "tableName": "data_room_buckets",
+    "query": {
+      "all": "dataRoomBuckets",
+      "one": null,
+      "create": "createDataRoomBucket",
+      "update": "updateDataRoomBucket",
+      "delete": "deleteDataRoomBucket"
+    },
+    "storage": { "isFilesTable": false, "isBucketsTable": true },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "ownerId", "columnName": "owner_id" },
+      { "name": "destinationBucketId", "columnName": "destination_bucket_id" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRoomBuckets_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "dataRoomBucketsByMyDestinationBucketId",
+          "fields": [{ "name": "destinationBucketId" }],
+          "refTable": { "name": "dataRoomBuckets" },
+          "refFields": [{ "name": "id" }]
+        },
+        {
+          "name": "dataRoomsByMyOwnerId",
+          "fields": [{ "name": "ownerId" }],
+          "refTable": { "name": "dataRooms" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  },
+  {
+    "name": "DataRoomFile",
+    "tableName": "data_room_files",
+    "query": {
+      "all": "dataRoomFiles",
+      "one": null,
+      "create": "createDataRoomFile",
+      "update": "updateDataRoomFile",
+      "delete": "deleteDataRoomFile"
+    },
+    "storage": { "isFilesTable": true, "isBucketsTable": false },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "bucketId", "columnName": "bucket_id" },
+      { "name": "ownerId", "columnName": "owner_id" },
+      { "name": "previousVersionId", "columnName": "previous_version_id" },
+      { "name": "embedding", "columnName": "embedding" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRoomFiles_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "dataRoomBucketsByMyBucketId",
+          "fields": [{ "name": "bucketId" }],
+          "refTable": { "name": "dataRoomBuckets" },
+          "refFields": [{ "name": "id" }]
+        },
+        {
+          "name": "dataRoomsByMyOwnerId",
+          "fields": [{ "name": "ownerId" }],
+          "refTable": { "name": "dataRooms" },
+          "refFields": [{ "name": "id" }]
+        },
+        {
+          "name": "dataRoomFilesByMyPreviousVersionId",
+          "fields": [{ "name": "previousVersionId" }],
+          "refTable": { "name": "dataRoomFiles" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  },
+  {
+    "name": "DataRoomFileEvent",
+    "tableName": "data_room_file_events",
+    "query": {
+      "all": "dataRoomFileEvents",
+      "one": null,
+      "create": "createDataRoomFileEvent",
+      "update": null,
+      "delete": null
+    },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "fileId", "columnName": "file_id" },
+      { "name": "bucketId", "columnName": "bucket_id" },
+      { "name": "metadata", "columnName": "metadata" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRoomFileEvents_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "dataRoomBucketsByMyBucketId",
+          "fields": [{ "name": "bucketId" }],
+          "refTable": { "name": "dataRoomBuckets" },
+          "refFields": [{ "name": "id" }]
+        },
+        {
+          "name": "dataRoomFilesByMyFileId",
+          "fields": [{ "name": "fileId" }],
+          "refTable": { "name": "dataRoomFiles" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  },
+  {
+    "name": "DataRoomFilePathShare",
+    "tableName": "data_room_file_path_shares",
+    "query": {
+      "all": "dataRoomFilePathShares",
+      "one": null,
+      "create": "createDataRoomFilePathShare",
+      "update": "updateDataRoomFilePathShare",
+      "delete": "deleteDataRoomFilePathShare"
+    },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "bucketId", "columnName": "bucket_id" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRoomFilePathShares_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "dataRoomBucketsByMyBucketId",
+          "fields": [{ "name": "bucketId" }],
+          "refTable": { "name": "dataRoomBuckets" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  },
+  {
+    "name": "DataRoomFilesChunk",
+    "tableName": "data_room_files_chunks",
+    "query": {
+      "all": "dataRoomFilesChunks",
+      "one": null,
+      "create": "createDataRoomFilesChunk",
+      "update": null,
+      "delete": "deleteDataRoomFilesChunk"
+    },
+    "fields": [
+      { "name": "id", "columnName": "id", "isPrimaryKey": true },
+      { "name": "dataRoomFilesId", "columnName": "data_room_files_id" },
+      { "name": "content", "columnName": "content" },
+      { "name": "chunkIndex", "columnName": "chunk_index" },
+      { "name": "embedding", "columnName": "embedding" },
+      { "name": "metadata", "columnName": "metadata" }
+    ],
+    "constraints": {
+      "primaryKey": { "name": "dataRoomFilesChunks_pkey", "fields": [{ "name": "id" }] },
+      "unique": [],
+      "foreignKey": [
+        {
+          "name": "dataRoomFilesByMyDataRoomFilesId",
+          "fields": [{ "name": "dataRoomFilesId" }],
+          "refTable": { "name": "dataRoomFiles" },
+          "refFields": [{ "name": "id" }]
+        }
+      ]
+    }
+  }
+]

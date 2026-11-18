@@ -1,0 +1,52 @@
+{
+  "name": "@agentic-kit/fast-app",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Constructive's app-building layer — the AppSpec, the curated blueprints and the pi tools around them — shared by the desktop app and a headless host",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "sync:app-spec": "node scripts/sync-app-spec.mjs",
+    "sync:blueprints": "node scripts/sync-blueprints.mjs"
+  },
+  "dependencies": {
+    "@agentic-kit/db-tools": "workspace:^",
+    "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/pi": "workspace:^",
+    "typebox": "1.3.27"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.79.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "1.4.0",
+    "@earendil-works/pi-coding-agent": "1.4.0"
+  },
+  "keywords": [
+    "agentic-kit",
+    "app-building",
+    "pi",
+    "constructive"
+  ]
+}

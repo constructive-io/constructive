@@ -1,0 +1,93 @@
+{
+  "$schema": "https://constructive.io/schemas/blueprint.json",
+  "name": "data_room",
+  "display_name": "Data Room",
+  "description": "Granular-access data rooms under an org: per-room membership, capability-gated reads, folder/file path shares to outside collaborators, invites, quotas, versioning and audit log.",
+  "categories": [
+    "storage",
+    "collaboration"
+  ],
+  "tags": [
+    "data-room",
+    "diligence",
+    "files",
+    "path-shares",
+    "fundraising"
+  ],
+  "complexity": "moderate",
+  "tables": [
+    {
+      "module": {
+        "type": "storage",
+        "scope": "data_room",
+        "table": "files"
+      },
+      "nodes": [
+        {
+          "$type": "ProcessExtraction",
+          "data": {
+            "mime_patterns": [
+              "application/pdf",
+              "text/%",
+              "application/json",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.%",
+              "application/vnd.ms-excel",
+              "application/vnd.ms-powerpoint"
+            ]
+          }
+        },
+        {
+          "$type": "SearchVector",
+          "data": {
+            "field_name": "embedding",
+            "source_fields": [
+              "extracted_text"
+            ],
+            "chunks": {
+              "chunk_size": 1000,
+              "chunk_overlap": 200,
+              "chunk_strategy": "paragraph"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "entity_types": [
+    {
+      "name": "Data Room",
+      "prefix": "data_room",
+      "description": "A private document room owned by an org. Only direct members can see the room or its files.",
+      "parent_entity": "org",
+      "is_visible": false,
+      "has_limits": true,
+      "has_profiles": true,
+      "has_invites": true,
+      "storage": [
+        {
+          "key": "default",
+          "buckets": [
+            {
+              "name": "documents",
+              "is_public": false,
+              "description": "Room documents; the extraction worker resolves this bucket by its documents tag",
+              "tags": [
+                "documents",
+                "default"
+              ]
+            }
+          ],
+          "restrict_reads": true,
+          "has_path_shares": true,
+          "has_versioning": true,
+          "has_audit_log": true,
+          "has_content_hash": true,
+          "upload_url_expiry_seconds": 600,
+          "download_url_expiry_seconds": 1200,
+          "default_max_file_size": 1073741824
+        }
+      ]
+    }
+  ]
+}
