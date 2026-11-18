@@ -28,7 +28,6 @@ import { createAdmissionControlMiddleware } from './middleware/admission-control
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware, getBearerToken } from './middleware/auth';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
-import { createCaptchaMiddleware } from './middleware/captcha';
 import { clientIpMiddleware } from './middleware/client-ip';
 import { parseCookieValue, rejectInvalidSessionCookieHeader, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
@@ -187,7 +186,6 @@ class Server {
     // sit in the budget for the life of the stream. The other lanes need
     // their own bound sized for streaming, not this one.
     app.use('/graphql', createAdmissionControlMiddleware());
-    app.use(createCaptchaMiddleware());
 
     // CSRF protection for cookie-authenticated requests
     // Skip CSRF for Bearer token auth (not vulnerable to CSRF) and anonymous requests
