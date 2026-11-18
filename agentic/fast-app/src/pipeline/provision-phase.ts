@@ -73,6 +73,9 @@ async function signIn(run: RunContext, databaseName: string, note: Note): Promis
         signal: run.signal,
       }),
   ).catch((err: unknown) => {
+    // A host that knows the cause (headless: its own key was refused) says so
+    // with its own fix; anything else reads as a wrong password.
+    if (err instanceof PhaseError) throw err;
     const message = errorMessage(err);
     throw new PhaseError(
       'provision',
