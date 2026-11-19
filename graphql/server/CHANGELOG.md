@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.36.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.22...@constructive-io/graphql-server@5.36.0) (2026-11-19)
+
+### Features
+
+- **server:** mintTenantOwnerHandoff for passwordless owner builds (planning[#2511](https://github.com/constructive-io/constructive/issues/2511)) ([#1997](https://github.com/constructive-io/constructive/issues/1997)) ([784f1aa](https://github.com/constructive-io/constructive/commit/784f1aacf5bfc8106cb65604dd043598ae66e380)), closes [constructive-db#4356](https://github.com/constructive-db/issues/4356)
+
 ## [5.35.22](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.21...@constructive-io/graphql-server@5.35.22) (2026-11-18)
 
 ### Bug Fixes

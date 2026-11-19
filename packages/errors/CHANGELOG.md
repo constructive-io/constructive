@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.2...@constructive-io/errors@0.26.0) (2026-11-19)
+
+### Bug Fixes
+
+- **errors:** register DATA_JOB_TRIGGER_LANE_OWNER_CONFLICT ([#2032](https://github.com/constructive-io/constructive/issues/2032)) ([bf88646](https://github.com/constructive-io/constructive/commit/bf886467342ce1053035c3d98ea68a76d55b5904))
+- **errors:** register the ProcessExtraction routes refusals constructive-db main raises ([#2031](https://github.com/constructive-io/constructive/issues/2031)) ([8624c22](https://github.com/constructive-io/constructive/commit/8624c220a25f4ab89ec0faede73b73ea2f599546))
+
+### Features
+
+- **server:** mintTenantOwnerHandoff for passwordless owner builds (planning[#2511](https://github.com/constructive-io/constructive/issues/2511)) ([#1997](https://github.com/constructive-io/constructive/issues/1997)) ([784f1aa](https://github.com/constructive-io/constructive/commit/784f1aacf5bfc8106cb65604dd043598ae66e380)), closes [constructive-db#4356](https://github.com/constructive-db/issues/4356)
+
 ## [0.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.1...@constructive-io/errors@0.25.2) (2026-11-17)
 
 ### Bug Fixes

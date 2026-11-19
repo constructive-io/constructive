@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.38](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.37...@agentic-kit/pi-host@0.7.38) (2026-11-19)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
 ## [0.7.37](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.36...@agentic-kit/pi-host@0.7.37) (2026-11-18)
 
 **Note:** Version bump only for package @agentic-kit/pi-host
