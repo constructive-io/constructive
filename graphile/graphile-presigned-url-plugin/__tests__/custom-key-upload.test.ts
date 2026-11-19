@@ -69,19 +69,19 @@ describe('custom upload key reservations', () => {
     ['rejected', hash],
   ])('rejects an occupied key (%s) without recording a replacement', async (status, content_hash) => {
     const tx = fakeTx({ status, content_hash });
-    await expect(upload(tx)).rejects.toMatchObject({ code: 'UPLOAD_KEY_CONFLICT' });
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
     expect(tx.query.mock.calls.some(([q]) => q.text.includes('record_file('))).toBe(false);
   });
 
   it('does not issue a reservation while a concurrent transaction holds the key', async () => {
     const tx = fakeTx(undefined, false);
-    await expect(upload(tx)).rejects.toMatchObject({ code: 'UPLOAD_KEY_CONFLICT' });
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
     expect(tx.query).toHaveBeenCalledTimes(1);
   });
 
   it('does not allocate a content-addressed key for other bytes', async () => {
     const tx = fakeTx();
-    await expect(upload(tx, 'a'.repeat(64))).rejects.toMatchObject({ code: 'UPLOAD_KEY_CONFLICT' });
+    await expect(upload(tx, 'a'.repeat(64))).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
     expect(tx.query).not.toHaveBeenCalled();
   });
 
@@ -94,7 +94,7 @@ describe('custom upload key reservations', () => {
   it('rejects an occupied object even without a visible file record', async () => {
     jest.mocked(headObject).mockResolvedValueOnce({ contentLength: 16 });
     const tx = fakeTx();
-    await expect(upload(tx)).rejects.toMatchObject({ code: 'UPLOAD_KEY_CONFLICT' });
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
     expect(tx.query.mock.calls.some(([q]) => q.text.includes('record_file('))).toBe(false);
   });
 

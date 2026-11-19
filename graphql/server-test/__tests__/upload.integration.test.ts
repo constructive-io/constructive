@@ -501,13 +501,17 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         const wins = results.filter((res) => res.body.data?.uploadAppFile?.uploadUrl);
         expect(wins).toHaveLength(1);
         const conflict = results.find((res) => res !== wins[0]);
-        expect(conflict?.body.errors?.[0].extensions.code).toBe('UPLOAD_KEY_CONFLICT');
+        expect(conflict?.body.errors?.[0].extensions.code).toBe('FILE_NOT_REPLACEABLE');
         const file = expectSuccess(wins[0]).uploadAppFile;
         const put = await putToPresignedUrl(file.uploadUrl, body, 'text/plain', { headers: file.uploadHeaders });
         expect(put.ok).toBe(true);
         await confirmUploaded(contentHash);
         const other = await send(await hashContent('other file'));
-        expect(other.body.errors?.[0].extensions.code).toBe('UPLOAD_KEY_CONFLICT');
+        const refusal = other.body.errors?.[0];
+        expect(refusal.message).toBe('The upload key is unavailable.');
+        expect(refusal.extensions.code).toBe('FILE_NOT_REPLACEABLE');
+        expect(refusal.extensions.context).toBeUndefined();
+        expect(conflict?.body.errors?.[0].message).toBe(refusal.message);
         expect(expectSuccess(await send(contentHash)).uploadAppFile).toMatchObject({
           fileId: file.fileId, deduplicated: true, uploadUrl: null,
         });

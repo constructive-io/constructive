@@ -24,7 +24,7 @@ Presigned URL upload plugin for PostGraphile v5.
 
 ## Custom upload keys
 
-A custom key names an object in a bucket that allows custom keys. A visible, confirmed file at that key with the same SHA-256 is reused without a PUT. A different digest or an outstanding reservation returns `UPLOAD_KEY_CONFLICT` without a write URL. A rejected reservation also blocks reuse until it is removed. A 64-character lowercase SHA-256 key cannot be used for other content. For a new revision, upload under a new key and update the business reference after confirmation.
+A custom key names an object in a bucket that allows custom keys. A visible, confirmed file at that key with the same SHA-256 is reused without a PUT. A different digest or an outstanding reservation returns `FILE_NOT_REPLACEABLE` without a write URL. A rejected reservation also blocks reuse until it is removed. A 64-character lowercase SHA-256 key cannot be used for other content. For a new revision, upload under a new key and update the business reference after confirmation.
 
 Single and bulk uploads take the same transaction-scoped lock for the physical bucket and object key, including when a custom key equals a default content hash. Before signing a new named upload, CNC also checks that the object does not already exist. These checks do not change bucket CORS or require new PUT headers.
 

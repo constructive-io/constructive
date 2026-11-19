@@ -28,7 +28,7 @@ import { checkTypeAgreement } from 'mime-bytes';
 import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
 import { isLiveFileRow } from './file-lifecycle';
-import { fileNotReplaceable, uploadKeyConflict } from './file-not-replaceable';
+import { fileNotReplaceable } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedPutUrl, headObject, presignedPutHeaders } from './s3-signer';
@@ -584,7 +584,7 @@ export async function processSingleFile(
 
   // The hash identifies the bytes; occupancy must be checked independently of it.
   // A hash-shaped custom key shares the namespace of default uploads.
-  if (isCustomKey && isValidSha256(s3Key) && s3Key !== contentHash) throw uploadKeyConflict();
+  if (isCustomKey && isValidSha256(s3Key) && s3Key !== contentHash) throw fileNotReplaceable();
 
   // processSingleFile runs in the request transaction (including bulk calls).
   // Try, rather than wait: bulk calls can acquire keys in different orders.
@@ -592,7 +592,7 @@ export async function processSingleFile(
     text: 'SELECT pg_try_advisory_xact_lock(hashtextextended($1, 0)) AS acquired',
     values: [JSON.stringify([s3ForDb.bucket, s3Key])],
   });
-  if (!lock.rows[0]?.acquired) throw uploadKeyConflict();
+  if (!lock.rows[0]?.acquired) throw fileNotReplaceable();
 
   // Older clients could leave a pending replacement beside a confirmed row.
   // Always resolve the confirmed object before considering a retry.
@@ -606,7 +606,7 @@ export async function processSingleFile(
   });
   const row = existing.rows[0];
   if (row) {
-    if (row.content_hash !== contentHash) throw uploadKeyConflict();
+    if (row.content_hash !== contentHash) throw fileNotReplaceable();
     if (isLiveFileRow(row)) {
       return {
         uploadUrl: null as string | null,
@@ -620,7 +620,7 @@ export async function processSingleFile(
     }
     // Never retire a named reservation on a new request. The previous URL
     // may still be valid. Default content-addressed retries retain their policy.
-    if (isCustomKey) throw uploadKeyConflict();
+    if (isCustomKey) throw fileNotReplaceable();
     const staleFileId = row.id as string;
     // The DELETE runs under the request role, so RLS decides whether this caller
     // may drop the row. A row the caller can see but not delete stays, and the
@@ -630,13 +630,13 @@ export async function processSingleFile(
       values: [staleFileId, row.status],
     });
     if (deleted.rows.length === 0) {
-      throw fileNotReplaceable(staleFileId, s3Key);
+      throw fileNotReplaceable();
     }
   }
 
   // A data row can be invisible under RLS, or the store may contain an
   // untracked object. A HEAD is only an occupancy check, never a dedup grant.
-  if (isCustomKey && await headObject(s3ForDb, s3Key)) throw uploadKeyConflict();
+  if (isCustomKey && await headObject(s3ForDb, s3Key)) throw fileNotReplaceable();
 
   // Auto-derive ltree path from custom key directory (only when has_path_shares)
   const derivedPath = isCustomKey && storageConfig.hasPathShares ? derivePathFromKey(s3Key) : null;

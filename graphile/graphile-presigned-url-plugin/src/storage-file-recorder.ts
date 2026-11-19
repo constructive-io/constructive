@@ -1,3 +1,6 @@
+import { parse } from '@constructive-io/errors';
+
+import { fileNotReplaceable } from './file-not-replaceable';
 import type { StorageModuleConfig } from './types';
 
 interface RecordManagedFileInput {
@@ -62,9 +65,15 @@ export async function recordManagedFile(
     values.push(input.path);
   }
 
-  const result = await pgClient.query({
-    text: `SELECT id FROM ${storageConfig.recorderQualifiedName}(${args.join(', ')})`,
-    values,
-  });
-  return (result.rows[0] as { id: string }).id;
+  try {
+    const result = await pgClient.query({
+      text: `SELECT id FROM ${storageConfig.recorderQualifiedName}(${args.join(', ')})`,
+      values,
+    });
+    return (result.rows[0] as { id: string }).id;
+  } catch (error) {
+    // The recorder can see an occupied key hidden from the request's RLS probe.
+    if (parse(error).code === 'STORAGE_KEY_HELD') throw fileNotReplaceable();
+    throw error;
+  }
 }
