@@ -28,6 +28,7 @@
  *   pnpm test -- --testPathPattern=upload.integration
  */
 
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import { createS3Bucket, createS3Client } from '@constructive-io/s3-utils';
 import { hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
 import path from 'path';
@@ -294,12 +295,13 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     );
   };
   let teardown: () => Promise<void>;
+  const storageCredentials = getEnvOptions().storage;
   const s3Client = createS3Client({
     provider: 'minio',
     region: 'us-east-1',
     endpoint: 'http://localhost:9000',
-    accessKeyId: 'constructive',
-    secretAccessKey: 'constructive-dev-secret'
+    accessKeyId: storageCredentials?.accessKeyId,
+    secretAccessKey: storageCredentials?.secretAccessKey
   });
 
   const ensureS3Buckets = async (bucketNames: string[]): Promise<void> => {
@@ -489,6 +491,28 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
     });
 
     describe('Deduplication', () => {
+      it('reserves a named upload once, then reuses only its confirmed content', async () => {
+        const key = `named/${crypto.randomUUID()}.txt`;
+        const body = 'named file';
+        const contentHash = await hashContent(body);
+        const input = { key, contentHash, bucketKey: 'public', filename: 'named.txt', contentType: 'text/plain', size: body.length };
+        const send = (hash: string) => postGraphQL({ query: UPLOAD_APP_FILE, variables: { input: { ...input, contentHash: hash } } });
+        const results = await Promise.all([send(contentHash), send(contentHash)]);
+        const wins = results.filter((res) => res.body.data?.uploadAppFile?.uploadUrl);
+        expect(wins).toHaveLength(1);
+        const conflict = results.find((res) => res !== wins[0]);
+        expect(conflict?.body.errors?.[0].extensions.code).toBe('UPLOAD_KEY_CONFLICT');
+        const file = expectSuccess(wins[0]).uploadAppFile;
+        const put = await putToPresignedUrl(file.uploadUrl, body, 'text/plain', { headers: file.uploadHeaders });
+        expect(put.ok).toBe(true);
+        await confirmUploaded(contentHash);
+        const other = await send(await hashContent('other file'));
+        expect(other.body.errors?.[0].extensions.code).toBe('UPLOAD_KEY_CONFLICT');
+        expect(expectSuccess(await send(contentHash)).uploadAppFile).toMatchObject({
+          fileId: file.fileId, deduplicated: true, uploadUrl: null,
+        });
+      });
+
       it('should return deduplicated=true for an existing content hash', async () => {
         const fileContent = 'Hello, public world!';
         const contentHash = await hashContent(fileContent);

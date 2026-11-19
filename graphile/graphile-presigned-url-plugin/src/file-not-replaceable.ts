@@ -14,3 +14,13 @@ export function fileNotReplaceable(fileId: string, key: string): ConstructiveErr
     context: { fileId, key },
   });
 }
+
+/** Do not disclose the identity, checksum, or owner of an occupying file. */
+export function uploadKeyConflict(): ConstructiveError {
+  return new ConstructiveError({
+    code: 'UPLOAD_KEY_CONFLICT',
+    message: 'The upload key is unavailable.',
+    errorClass: 'public',
+    http: 409,
+  });
+}

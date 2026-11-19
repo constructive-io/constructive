@@ -88,7 +88,7 @@ function fakeTx(rowKey: string, status: string) {
       queries.push(opts);
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       if (/^SELECT id/.test(opts.text)) {
-        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status }] : [] };
+        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status, content_hash: HASH }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -108,7 +108,6 @@ const upload = (txClient: unknown, s3: S3Config, key?: string) =>
 
 describe.each([
   ['content-addressed key', undefined, HASH],
-  ['custom key', SITE_KEY, SITE_KEY],
 ])('presigned retry of a never-completed upload (%s)', (_label, customKey, rowKey) => {
   it.each(['requested', 'rejected', 'expired'])(
     'issues a fresh upload URL when the row is %s, without probing S3',
@@ -125,7 +124,7 @@ describe.each([
       });
       expect(heads(s3)).toEqual([]);
       const del = queries.find((q) => /^DELETE/.test(q.text));
-      expect(del?.values).toEqual([OLD_FILE_ID]);
+      expect(del?.values).toEqual([OLD_FILE_ID, status]);
     },
   );
 
@@ -143,9 +142,7 @@ describe.each([
 });
 
 describe('content-addressed upload whose hash a custom-key row carries', () => {
-  // A custom-key row carrying the hash holds the bytes at a key whose next
-  // upload replaces them, so it is no dedup target: the probe is by the hash's
-  // own key, and a fresh upload is recorded there.
+  // A row at another key does not establish occupancy at the hash's own key.
   it('does not deduplicate against it', async () => {
     const s3 = fakeS3();
     const { txClient, queries } = fakeTx(SITE_KEY, 'uploaded');

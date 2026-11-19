@@ -22,6 +22,12 @@ Presigned URL upload plugin for PostGraphile v5.
 - Content-hash based S3 keys (SHA-256) with automatic deduplication — only against rows whose bytes are in S3, so a retry of a never-completed upload gets a fresh URL
 - Per-bucket MIME type and file size validation
 
+## Custom upload keys
+
+A custom key names an object in a bucket that allows custom keys. A visible, confirmed file at that key with the same SHA-256 is reused without a PUT. A different digest or an outstanding reservation returns `UPLOAD_KEY_CONFLICT` without a write URL. A rejected reservation also blocks reuse until it is removed. A 64-character lowercase SHA-256 key cannot be used for other content. For a new revision, upload under a new key and update the business reference after confirmation.
+
+CNC takes a transaction-scoped advisory lock while checking and recording a named upload. This handles competing CNC transactions; row-level security still applies, so an outstanding request hidden from the next caller may not be detected at reservation time. Clients must forward the returned `uploadHeaders` unchanged: named PUTs sign `If-None-Match: *` as well as the checksum and upload ID. On a store supporting conditional PUT this prevents a second write to an existing object, including a retry after a successful PUT. On a precondition failure, re-request the upload to check whether the file is confirmed. Browser CORS must allow the returned headers. Previously issued URLs and other writers are not retroactively constrained; expiration and deletion do not permanently reserve a key.
+
 ## Usage
 
 ```typescript

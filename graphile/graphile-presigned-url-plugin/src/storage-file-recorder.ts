@@ -17,8 +17,8 @@ interface RecordManagedFileInput {
  * attribution run at the database boundary. Optional arguments are only named
  * when the generated function supports them and the caller has a value. A
  * version's previous_version_id is not an argument: a version chain is written
- * only by a platform writer, and a custom key has none — a re-upload at a key
- * replaces the row at it.
+ * only by a platform writer. The upload resolver handles reuse and conflicts
+ * before calling the recorder.
  */
 export async function recordManagedFile(
   pgClient: { query: (opts: { text: string; values: unknown[] }) => Promise<{ rows: unknown[] }> },

@@ -47,9 +47,11 @@ export function presignedPutHeaders(
   contentType: string,
   contentHash?: string,
   uploadId?: string,
+  createOnly = false,
 ): Record<string, string> {
   return {
     'Content-Type': contentType,
+    ...(createOnly ? { 'If-None-Match': '*' } : {}),
     ...(contentHash ? { [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(contentHash) } : {}),
     ...(uploadId ? { [UPLOAD_ID_HEADER]: uploadId } : {}),
   };
@@ -90,12 +92,14 @@ export async function generatePresignedPutUrl(
   expiresIn: number = 900,
   contentHash?: string,
   uploadId?: string,
+  createOnly = false,
 ): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: s3Config.bucket,
     Key: key,
     ContentType: contentType,
     ContentLength: contentLength,
+    ...(createOnly ? { IfNoneMatch: '*' } : {}),
     ...(contentHash ? { ChecksumSHA256: checksumSha256Base64(contentHash) } : {}),
     ...(uploadId ? { Metadata: { [UPLOAD_ID_METADATA_KEY]: uploadId } } : {}),
   });
@@ -108,6 +112,7 @@ export async function generatePresignedPutUrl(
   try {
     url = await getSignedUrl(s3Config.client as any, command, {
       expiresIn,
+      ...(createOnly ? { signableHeaders: new Set(['if-none-match']) } : {}),
       ...(unhoistableHeaders.size > 0 ? { unhoistableHeaders } : {}),
     });
   } catch (err) {
