@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+reviews:
+  profile: chill
+  high_level_summary: true
+  review_status: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!**/dist/**"
+    - "!**/__snapshots__/**"
+    - "!**/__generated__/**"
+    - "!**/generated/**"
+    - "!sdk/**"
+    - "!**/*.bundle.tar.gz"
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: >-
+        Follow AGENTS.md and CLAUDE.md. Config must come from the unified env
+        system (getEnvOptions / getPgEnvOptions), not process.env. Tests must use
+        getConnections() from the matching test framework with beforeEach/afterEach
+        hooks; flag new pg.Pool/pg.Client in tests.
+    - path: "**/*.sql"
+      instructions: >-
+        Review for Row-Level Security correctness and tenant isolation; RLS is the
+        primary authorization layer.
+chat:
+  art: false
