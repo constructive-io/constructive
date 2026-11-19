@@ -48,6 +48,19 @@ function input() {
 }
 
 describe('recordManagedFile', () => {
+  it('redacts the database key-occupancy error without masking unrelated failures', async () => {
+    const held = Object.assign(new Error('STORAGE_KEY_HELD'), {
+      code: 'P0001',
+      detail: JSON.stringify({ code: 'STORAGE_KEY_HELD', class: 'public', context: { key: input().key } }),
+    });
+    const unrelated = new Error('connection lost');
+    const query = jest.fn().mockRejectedValueOnce(held).mockRejectedValueOnce(unrelated);
+    await expect(recordManagedFile({ query }, storageConfig(), input())).rejects.toMatchObject({
+      code: 'FILE_NOT_REPLACEABLE', message: 'The upload key is unavailable.', context: undefined,
+    });
+    await expect(recordManagedFile({ query }, storageConfig(), input())).rejects.toBe(unrelated);
+  });
+
   it('calls the generated recorder with only base object facts', async () => {
     const query = jest.fn().mockResolvedValue({
       rows: [{ id: '33333333-3333-3333-3333-333333333333' }],

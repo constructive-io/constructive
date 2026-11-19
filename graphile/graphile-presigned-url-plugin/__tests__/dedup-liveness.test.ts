@@ -86,9 +86,10 @@ function fakeTx(rowKey: string, status: string) {
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
+      if (opts.text.includes('pg_try_advisory_xact_lock')) return { rows: [{ acquired: true }] };
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       if (/^SELECT id/.test(opts.text)) {
-        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status }] : [] };
+        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status, content_hash: HASH }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -108,7 +109,6 @@ const upload = (txClient: unknown, s3: S3Config, key?: string) =>
 
 describe.each([
   ['content-addressed key', undefined, HASH],
-  ['custom key', SITE_KEY, SITE_KEY],
 ])('presigned retry of a never-completed upload (%s)', (_label, customKey, rowKey) => {
   it.each(['requested', 'rejected', 'expired'])(
     'issues a fresh upload URL when the row is %s, without probing S3',
@@ -125,7 +125,7 @@ describe.each([
       });
       expect(heads(s3)).toEqual([]);
       const del = queries.find((q) => /^DELETE/.test(q.text));
-      expect(del?.values).toEqual([OLD_FILE_ID]);
+      expect(del?.values).toEqual([OLD_FILE_ID, status]);
     },
   );
 
@@ -137,15 +137,13 @@ describe.each([
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
     expect(heads(s3)).toEqual([]);
-    expect(queries).toHaveLength(1);
-    expect(queries[0].text).toContain('status');
+    expect(queries).toHaveLength(2);
+    expect(queries[1].text).toContain('status');
   });
 });
 
 describe('content-addressed upload whose hash a custom-key row carries', () => {
-  // A custom-key row carrying the hash holds the bytes at a key whose next
-  // upload replaces them, so it is no dedup target: the probe is by the hash's
-  // own key, and a fresh upload is recorded there.
+  // A row at another key does not establish occupancy at the hash's own key.
   it('does not deduplicate against it', async () => {
     const s3 = fakeS3();
     const { txClient, queries } = fakeTx(SITE_KEY, 'uploaded');
@@ -153,7 +151,7 @@ describe('content-addressed upload whose hash a custom-key row carries', () => {
     const result = await upload(txClient, s3);
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
-    expect(queries[0].values).toEqual([HASH, BUCKET_ID]);
+    expect(queries[1].values).toEqual([HASH, BUCKET_ID]);
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
   });
 });

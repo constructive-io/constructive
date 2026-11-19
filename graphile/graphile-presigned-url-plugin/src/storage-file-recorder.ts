@@ -1,3 +1,6 @@
+import { parse } from '@constructive-io/errors';
+
+import { uploadKeyUnavailable } from './custom-key';
 import type { StorageModuleConfig } from './types';
 
 interface RecordManagedFileInput {
@@ -17,8 +20,8 @@ interface RecordManagedFileInput {
  * attribution run at the database boundary. Optional arguments are only named
  * when the generated function supports them and the caller has a value. A
  * version's previous_version_id is not an argument: a version chain is written
- * only by a platform writer, and a custom key has none — a re-upload at a key
- * replaces the row at it.
+ * only by a platform writer. The upload resolver handles reuse and conflicts
+ * before calling the recorder.
  */
 export async function recordManagedFile(
   pgClient: { query: (opts: { text: string; values: unknown[] }) => Promise<{ rows: unknown[] }> },
@@ -62,9 +65,15 @@ export async function recordManagedFile(
     values.push(input.path);
   }
 
-  const result = await pgClient.query({
-    text: `SELECT id FROM ${storageConfig.recorderQualifiedName}(${args.join(', ')})`,
-    values,
-  });
-  return (result.rows[0] as { id: string }).id;
+  try {
+    const result = await pgClient.query({
+      text: `SELECT id FROM ${storageConfig.recorderQualifiedName}(${args.join(', ')})`,
+      values,
+    });
+    return (result.rows[0] as { id: string }).id;
+  } catch (error) {
+    // The recorder can see an occupied key hidden from the request's RLS probe.
+    if (parse(error).code === 'STORAGE_KEY_HELD') throw uploadKeyUnavailable();
+    throw error;
+  }
 }

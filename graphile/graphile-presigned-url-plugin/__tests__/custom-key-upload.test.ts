@@ -1,19 +1,10 @@
-/**
- * Re-uploading changed bytes under a custom key.
- *
- * A custom key is one object with no version chain: the new row is recorded
- * beside the current one and the database replaces the current row when the
- * upload is confirmed, whatever the module's versioning or content-hash flags.
- * The resolver deletes nothing and links nothing. The database is faked at the
- * query boundary and presigning is stubbed, so these pin which statements the
- * resolver issues.
- */
-
 import { processSingleFile } from '../src/plugin';
+import { headObject } from '../src/s3-signer';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from '../src/types';
 
 jest.mock('../src/s3-signer', () => ({
   ...jest.requireActual('../src/s3-signer'),
+  headObject: jest.fn().mockResolvedValue(null),
   generatePresignedPutUrl: jest.fn().mockResolvedValue('https://s3.example.com/put'),
 }));
 
@@ -55,90 +46,61 @@ const bucket = {
 const s3 = { client: { send: jest.fn().mockResolvedValue({}) }, bucket: 'site-bucket', region: 'us-east-1' } as unknown as S3Config;
 const options: PresignedUrlPluginOptions = { credentials: { accessKeyId: 'test', secretAccessKey: 'test' } };
 
-function fakeTx(existingHash: string, deletable = true, existingStatus = 'uploaded') {
-  const queries: Array<{ text: string; values: unknown[] }> = [];
-  const txClient = {
-    async query(opts: { text: string; values: unknown[] }) {
-      queries.push(opts);
-      if (/^SELECT id, status/.test(opts.text)) {
-        // The probe is by (key, bucket, hash): a row carrying other bytes is not seen.
-        const probedHash = opts.values[2];
-        return { rows: probedHash === existingHash ? [{ id: OLD_FILE_ID, status: existingStatus }] : [] };
-      }
-      if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
-        return { rows: deletable ? [{ id: OLD_FILE_ID }] : [] };
-      }
-      if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
-      throw new Error(`unexpected query: ${opts.text}`);
-    },
-  };
-  return { txClient, queries };
+function fakeTx(row?: { content_hash: string; status: string }, acquired = true) {
+  const query = jest.fn(async (opts: { text: string; values: unknown[] }) => {
+    if (opts.text.includes('pg_try_advisory_xact_lock')) return { rows: [{ acquired }] };
+    if (opts.text.startsWith('SELECT id, status')) return { rows: row ? [{ id: OLD_FILE_ID, ...row }] : [] };
+    if (opts.text.includes('record_file(')) return { rows: [{ id: NEW_FILE_ID }] };
+    throw new Error(`unexpected query: ${opts.text}`);
+  });
+  return { query };
 }
 
-const upload = (storage: StorageModuleConfig, txClient: unknown) =>
-  processSingleFile(options, txClient, storage, 'db', bucket, s3, {
-    contentHash: 'b'.repeat(64),
-    contentType: 'text/html',
-    size: 16,
-    filename: KEY,
-    key: KEY,
+const hash = 'b'.repeat(64);
+const upload = (txClient: unknown, key = KEY) =>
+  processSingleFile(options, txClient, storageConfig(), 'db', bucket, s3, {
+    contentHash: hash, contentType: 'text/html', size: 16, filename: KEY, key,
   });
 
-describe('custom-key upload of changed bytes', () => {
+describe('custom upload key reservations', () => {
   it.each([
-    ['no versioning, no content hash', {}],
-    ['content-addressed without versioning', { hasContentHash: true }],
-    ['versioned', { hasVersioning: true, hasContentHash: true }],
-  ])('records the new row beside the current one and leaves the replacement to the database (%s)', async (_shape, flags) => {
-    const { txClient, queries } = fakeTx('a'.repeat(64));
+    ['uploaded', 'a'.repeat(64)],
+    ['requested', hash],
+    ['rejected', hash],
+  ])('rejects an occupied key (%s) without recording a replacement', async (status, content_hash) => {
+    const tx = fakeTx({ status, content_hash });
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
+    expect(tx.query.mock.calls.some(([q]) => q.text.includes('record_file('))).toBe(false);
+  });
 
-    const result = await upload(storageConfig(flags), txClient);
+  it('does not issue a reservation while a concurrent transaction holds the key', async () => {
+    const tx = fakeTx(undefined, false);
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
+    expect(tx.query).toHaveBeenCalledTimes(1);
+  });
 
-    expect(result).toMatchObject({
-      fileId: NEW_FILE_ID,
-      key: KEY,
-      deduplicated: false,
-      uploadUrl: 'https://s3.example.com/put',
+  it('does not allocate a content-addressed key for other bytes', async () => {
+    const tx = fakeTx();
+    await expect(upload(tx, 'a'.repeat(64))).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
+    expect(tx.query).not.toHaveBeenCalled();
+  });
+
+  it('reuses a visible confirmed match without issuing write credentials', async () => {
+    await expect(upload(fakeTx({ status: 'processed', content_hash: hash }))).resolves.toMatchObject({
+      fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null, uploadHeaders: null,
     });
-    expect(result).not.toHaveProperty('previousVersionId');
-    expect(queries.map((q) => q.text.trim().split(/\s+/)[0])).toEqual(['SELECT', 'SELECT']);
-    expect(queries[0].values).toEqual([KEY, BUCKET_ID, 'b'.repeat(64)]);
-    const record = queries[1];
-    expect(record.text).toContain('record_file(');
-    expect(record.text).not.toContain('previous_version_id');
-    expect(record.values).toContain(KEY);
-    expect(record.values).not.toContain(OLD_FILE_ID);
   });
 
-  it('restarts an upload whose identical bytes never landed', async () => {
-    const { txClient, queries } = fakeTx('b'.repeat(64), true, 'requested');
-
-    const result = await upload(storageConfig(), txClient);
-
-    expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false });
-    expect(queries.map((q) => q.text.trim().split(/\s+/)[0])).toEqual(['SELECT', 'DELETE', 'SELECT']);
-    expect(queries[1].values).toEqual([OLD_FILE_ID]);
+  it('rejects an occupied object even without a visible file record', async () => {
+    jest.mocked(headObject).mockResolvedValueOnce({ contentLength: 16 });
+    const tx = fakeTx();
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE' });
+    expect(tx.query.mock.calls.some(([q]) => q.text.includes('record_file('))).toBe(false);
   });
 
-  it('refuses to restart a row the caller cannot delete', async () => {
-    const { txClient, queries } = fakeTx('b'.repeat(64), false, 'requested');
-
-    const refused = upload(storageConfig(), txClient);
-    await expect(refused).rejects.toThrow(
-      `FILE_NOT_REPLACEABLE: file ${OLD_FILE_ID} at key ${KEY}`,
-    );
-    // A named error carries its code, so the server passes it through
-    // instead of masking it as INTERNAL_SERVER_ERROR.
-    await expect(refused).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE', errorClass: 'public' });
-    expect(queries.some((q) => /record_file\(/.test(q.text))).toBe(false);
-  });
-
-  it('deduplicates identical bytes at the key without touching the row', async () => {
-    const { txClient, queries } = fakeTx('b'.repeat(64));
-
-    const result = await upload(storageConfig(), txClient);
-
-    expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
-    expect(queries).toHaveLength(1);
+  it('issues upload credentials for an available key', async () => {
+    await expect(upload(fakeTx())).resolves.toMatchObject({
+      fileId: NEW_FILE_ID, deduplicated: false, uploadHeaders: { 'x-amz-meta-upload-id': NEW_FILE_ID },
+    });
   });
 });

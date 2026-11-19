@@ -136,7 +136,7 @@ export interface RequestUploadUrlInput {
   /**
    * Custom S3 key for the file (only allowed when bucket has allow_custom_keys=true).
    * When omitted, key defaults to contentHash (content-addressed dedup).
-   * When provided, the file is stored at this key; dedup is bypassed.
+   * An occupied custom key can only be reused for confirmed, identical content.
    * Max 1024 chars. Must not contain path traversal (.. or leading /).
    */
   key?: string;

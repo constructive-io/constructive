@@ -117,10 +117,10 @@ VALUES (
 -- ALICE BUCKET SEED DATA
 -- =====================================================
 
-INSERT INTO "simple-storage-public".app_buckets (id, key, type, is_public, physical_name)
+INSERT INTO "simple-storage-public".app_buckets (id, key, type, is_public, physical_name, allow_custom_keys)
 VALUES
-  ('d0000001-0000-0000-0000-000000000001', 'public', 'public', true, 'app-80a2eaaf-public-c7156cb19fe3'),
-  ('d0000001-0000-0000-0000-000000000002', 'private', 'private', false, 'app-80a2eaaf-private-cc079c527e7d')
+  ('d0000001-0000-0000-0000-000000000001', 'public', 'public', true, 'app-80a2eaaf-public-c7156cb19fe3', true),
+  ('d0000001-0000-0000-0000-000000000002', 'private', 'private', false, 'app-80a2eaaf-private-cc079c527e7d', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
