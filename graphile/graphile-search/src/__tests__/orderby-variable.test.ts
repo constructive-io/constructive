@@ -91,7 +91,7 @@ describe('search orderBy passed as a GraphQL variable', () => {
     await teardown?.();
   });
 
-  async function nodesFor(q: string, variables: Record<string, unknown>) {
+  async function nodesFor(q: string, variables: Record<string, unknown> = {}) {
     const result = await query<Result>(q, variables);
     expect(result.errors).toBeUndefined();
     return result.data!.allDocuments.nodes;
@@ -110,6 +110,16 @@ describe('search orderBy passed as a GraphQL variable', () => {
     expect(variable.length).toBeGreaterThan(2);
     expectSortedBy(variable, field, direction);
     expect(variable.map((n) => n.rowId)).toEqual(literal.map((n) => n.rowId));
+  });
+
+  it.each([
+    ['EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC', [4, 1, 5, 2, 3]],
+    ['ROW_ID_ASC, EMBEDDING_VECTOR_DISTANCE_ASC', [1, 2, 3, 4, 5]],
+  ])('honours the order of the literal orderBy [%s]', async (orderBy, expected) => {
+    const nodes = await nodesFor(
+      `{ allDocuments(where: { vectorEmbedding: { vector: [1, 0.5, 0.2], metric: COSINE } }, orderBy: [${orderBy}]) { ${NODES} } }`,
+    );
+    expect(nodes.map((n) => n.rowId)).toEqual(expected);
   });
 
   it('honours the order of a composite orderBy variable', async () => {

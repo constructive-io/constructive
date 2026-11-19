@@ -106,6 +106,17 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
       expect(ids(asc)).toEqual([...ids(desc)].reverse());
     });
 
+    it('keeps a literal composite score order ahead of a column without selecting the score', async () => {
+      const expected = await nodesFor(
+        `{ allDocuments(where: { unifiedSearch: "learning" }, orderBy: [SEARCH_SCORE_DESC]) { ${NODES} } }`,
+      );
+      const mixed = await nodesFor(
+        `{ allDocuments(where: { unifiedSearch: "learning" }, orderBy: [SEARCH_SCORE_DESC, ROW_ID_ASC]) { nodes { rowId } } }`,
+      );
+      expect(ids(expected)).not.toEqual([...ids(expected)].sort((a, b) => a - b));
+      expect(ids(mixed)).toEqual(ids(expected));
+    });
+
     it('first: N returns the N best rows by searchScore', async () => {
       const all = await nodesFor(
         `query($w: DocumentFilter) { allDocuments(where: $w, orderBy: [SEARCH_SCORE_DESC]) { ${NODES} } }`,
