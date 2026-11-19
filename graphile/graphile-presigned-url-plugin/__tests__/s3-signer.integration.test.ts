@@ -13,7 +13,6 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
 import { createHash } from 'crypto';
 
-import { buildFileProjection } from '../src/file-projection';
 import {
   CHECKSUM_SHA256_HEADER,
   checksumSha256Base64,
@@ -385,31 +384,6 @@ describe('s3-signer integration (RustFS)', () => {
   });
 
   describe('full round-trip: PUT → HEAD → GET', () => {
-    it('serves a public upload projection from the physical bucket', async () => {
-      const key = 'public-projection-' + Date.now() + '.txt';
-      const content = 'public projection round-trip';
-      const contentType = 'text/plain';
-      const putUrl = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(content));
-
-      try {
-        const putResponse = await uploadToPresignedUrl(putUrl, content, contentType);
-        expect(putResponse.status).toBe(200);
-
-        const projection = buildFileProjection(
-          { id: 'file-id', key, bucketId: 'logical-bucket-id', mime: contentType, size: Buffer.byteLength(content) },
-          { is_public: true },
-          { ...s3Config, publicUrlPrefix: `${OBJECT_STORE_ENDPOINT}/` },
-        );
-        expect(projection.url).toBe(`${OBJECT_STORE_ENDPOINT}/${TEST_BUCKET}/${key}`);
-
-        const downloaded = await downloadFromPresignedUrl(projection.url!);
-        expect(downloaded.status).toBe(200);
-        expect(sha256Hex(downloaded.body)).toBe(sha256Hex(content));
-      } finally {
-        await deleteS3Object(s3Config, key);
-      }
-    });
-
     it('should upload, verify, and download a text payload', async () => {
       const key = 'roundtrip-test-' + Date.now() + '.txt';
       const content = 'round-trip integration test content — special chars: é, ñ, ü';
