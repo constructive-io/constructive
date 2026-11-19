@@ -1,6 +1,6 @@
 import { parse } from '@constructive-io/errors';
 
-import { fileNotReplaceable } from './file-not-replaceable';
+import { uploadKeyUnavailable } from './custom-key';
 import type { StorageModuleConfig } from './types';
 
 interface RecordManagedFileInput {
@@ -73,7 +73,7 @@ export async function recordManagedFile(
     return (result.rows[0] as { id: string }).id;
   } catch (error) {
     // The recorder can see an occupied key hidden from the request's RLS probe.
-    if (parse(error).code === 'STORAGE_KEY_HELD') throw fileNotReplaceable();
+    if (parse(error).code === 'STORAGE_KEY_HELD') throw uploadKeyUnavailable();
     throw error;
   }
 }

@@ -6,6 +6,18 @@
  * and mean the same thing to S3 as it does to the gateway that later serves it.
  */
 
+import { ConstructiveError } from '@constructive-io/errors';
+
+/** A public upload refusal must not identify an occupying file. */
+export function uploadKeyUnavailable(): ConstructiveError {
+  return new ConstructiveError({
+    code: 'FILE_NOT_REPLACEABLE',
+    message: 'The upload key is unavailable.',
+    errorClass: 'public',
+    http: 409,
+  });
+}
+
 const MAX_CUSTOM_KEY_LENGTH = 1024;
 
 /**
