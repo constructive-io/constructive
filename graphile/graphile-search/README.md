@@ -66,7 +66,7 @@ A search orderBy sorts by the score its filter computes, so it needs that filter
 
 When a column is scored by both its own filter (e.g. `bm25Body`) and `unifiedSearch`, the explicit filter's score is the one displayed and ordered by; the column is scored once per query.
 
-Limitation: in a *literal* `orderBy` list, plain column terms are planned before search-score terms, so `[EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC]` sorts by `ROW_ID` first. Pass `orderBy` as a GraphQL variable to keep the requested order, or do not mix search terms with column terms in a literal list.
+Mixed column and search terms are applied in list order, whether `orderBy` is a literal or a GraphQL variable. For example, `[EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC]` sorts by distance first and breaks ties by row ID.
 
 ## Architecture
 
