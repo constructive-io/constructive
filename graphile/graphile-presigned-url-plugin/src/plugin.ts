@@ -31,7 +31,7 @@ import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable, uploadKeyConflict } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
-import { generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
+import { generatePresignedPutUrl, headObject, presignedPutHeaders } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
 import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
@@ -586,15 +586,13 @@ export async function processSingleFile(
   // A hash-shaped custom key shares the namespace of default uploads.
   if (isCustomKey && isValidSha256(s3Key) && s3Key !== contentHash) throw uploadKeyConflict();
 
-  if (isCustomKey) {
-    // processSingleFile runs in the request transaction (including bulk calls).
-    // Try, rather than wait: bulk calls can acquire keys in different orders.
-    const lock = await txClient.query({
-      text: 'SELECT pg_try_advisory_xact_lock(hashtextextended($1, 0)) AS acquired',
-      values: [JSON.stringify([s3ForDb.bucket, s3Key])],
-    });
-    if (!lock.rows[0]?.acquired) throw uploadKeyConflict();
-  }
+  // processSingleFile runs in the request transaction (including bulk calls).
+  // Try, rather than wait: bulk calls can acquire keys in different orders.
+  const lock = await txClient.query({
+    text: 'SELECT pg_try_advisory_xact_lock(hashtextextended($1, 0)) AS acquired',
+    values: [JSON.stringify([s3ForDb.bucket, s3Key])],
+  });
+  if (!lock.rows[0]?.acquired) throw uploadKeyConflict();
 
   // Older clients could leave a pending replacement beside a confirmed row.
   // Always resolve the confirmed object before considering a retry.
@@ -636,6 +634,10 @@ export async function processSingleFile(
     }
   }
 
+  // A data row can be invisible under RLS, or the store may contain an
+  // untracked object. A HEAD is only an occupancy check, never a dedup grant.
+  if (isCustomKey && await headObject(s3ForDb, s3Key)) throw uploadKeyConflict();
+
   // Auto-derive ltree path from custom key directory (only when has_path_shares)
   const derivedPath = isCustomKey && storageConfig.hasPathShares ? derivePathFromKey(s3Key) : null;
 
@@ -660,9 +662,8 @@ export async function processSingleFile(
     storageConfig.uploadUrlExpirySeconds,
     contentHash,
     fileId,
-    isCustomKey,
   );
-  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId, isCustomKey);
+  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId);
 
   const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 

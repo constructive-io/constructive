@@ -262,19 +262,6 @@ describe('s3-signer integration (RustFS)', () => {
     });
   });
 
-  it('binds named uploads to a create-only PUT and preserves the first object', async () => {
-    const key = `create-only/${Date.now()}`;
-    const put = async (body: string, id: string) => {
-      const digest = createHash('sha256').update(body).digest('hex');
-      const url = await generatePresignedPutUrl(s3Config, key, 'text/plain', body.length, 60, digest, id, true);
-      expect(new URL(url).searchParams.get('X-Amz-SignedHeaders')?.split(';')).toContain('if-none-match');
-      return fetch(url, { method: 'PUT', headers: presignedPutHeaders('text/plain', digest, id, true), body });
-    };
-    expect((await put('first', 'first-upload')).status).toBe(200);
-    expect((await put('next', 'later-upload')).status).toBe(412);
-    expect(await headObject(s3Config, key)).toMatchObject({ uploadId: 'first-upload' });
-  });
-
   describe('headObject', () => {
     const HEAD_KEY = 'test-head-object.json';
     const HEAD_CONTENT = JSON.stringify({ test: true });

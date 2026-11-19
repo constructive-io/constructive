@@ -1,8 +1,10 @@
 import { processSingleFile } from '../src/plugin';
+import { headObject } from '../src/s3-signer';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from '../src/types';
 
 jest.mock('../src/s3-signer', () => ({
   ...jest.requireActual('../src/s3-signer'),
+  headObject: jest.fn().mockResolvedValue(null),
   generatePresignedPutUrl: jest.fn().mockResolvedValue('https://s3.example.com/put'),
 }));
 
@@ -89,9 +91,16 @@ describe('custom upload key reservations', () => {
     });
   });
 
-  it('returns create-only credentials for an available key', async () => {
+  it('rejects an occupied object even without a visible file record', async () => {
+    jest.mocked(headObject).mockResolvedValueOnce({ contentLength: 16 });
+    const tx = fakeTx();
+    await expect(upload(tx)).rejects.toMatchObject({ code: 'UPLOAD_KEY_CONFLICT' });
+    expect(tx.query.mock.calls.some(([q]) => q.text.includes('record_file('))).toBe(false);
+  });
+
+  it('issues upload credentials for an available key', async () => {
     await expect(upload(fakeTx())).resolves.toMatchObject({
-      fileId: NEW_FILE_ID, deduplicated: false, uploadHeaders: { 'If-None-Match': '*' },
+      fileId: NEW_FILE_ID, deduplicated: false, uploadHeaders: { 'x-amz-meta-upload-id': NEW_FILE_ID },
     });
   });
 });

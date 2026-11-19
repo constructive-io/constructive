@@ -86,6 +86,7 @@ function fakeTx(rowKey: string, status: string) {
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
+      if (opts.text.includes('pg_try_advisory_xact_lock')) return { rows: [{ acquired: true }] };
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       if (/^SELECT id/.test(opts.text)) {
         return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status, content_hash: HASH }] : [] };
@@ -136,8 +137,8 @@ describe.each([
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
     expect(heads(s3)).toEqual([]);
-    expect(queries).toHaveLength(1);
-    expect(queries[0].text).toContain('status');
+    expect(queries).toHaveLength(2);
+    expect(queries[1].text).toContain('status');
   });
 });
 
@@ -150,7 +151,7 @@ describe('content-addressed upload whose hash a custom-key row carries', () => {
     const result = await upload(txClient, s3);
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
-    expect(queries[0].values).toEqual([HASH, BUCKET_ID]);
+    expect(queries[1].values).toEqual([HASH, BUCKET_ID]);
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
   });
 });

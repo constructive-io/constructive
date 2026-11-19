@@ -26,7 +26,9 @@ Presigned URL upload plugin for PostGraphile v5.
 
 A custom key names an object in a bucket that allows custom keys. A visible, confirmed file at that key with the same SHA-256 is reused without a PUT. A different digest or an outstanding reservation returns `UPLOAD_KEY_CONFLICT` without a write URL. A rejected reservation also blocks reuse until it is removed. A 64-character lowercase SHA-256 key cannot be used for other content. For a new revision, upload under a new key and update the business reference after confirmation.
 
-CNC takes a transaction-scoped advisory lock while checking and recording a named upload. This handles competing CNC transactions; row-level security still applies, so an outstanding request hidden from the next caller may not be detected at reservation time. Clients must forward the returned `uploadHeaders` unchanged: named PUTs sign `If-None-Match: *` as well as the checksum and upload ID. On a store supporting conditional PUT this prevents a second write to an existing object, including a retry after a successful PUT. On a precondition failure, re-request the upload to check whether the file is confirmed. Browser CORS must allow the returned headers. Previously issued URLs and other writers are not retroactively constrained; expiration and deletion do not permanently reserve a key.
+Single and bulk uploads take the same transaction-scoped lock for the physical bucket and object key, including when a custom key equals a default content hash. Before signing a new named upload, CNC also checks that the object does not already exist. These checks do not change bucket CORS or require new PUT headers.
+
+The lock covers the database transaction, not the lifetime of the signed URL. Row-level security can hide another caller's pending reservation, and an object-store check is not an atomic reservation: two requests may still receive URLs when no bytes have landed yet. Other writers and previously issued URLs can also race a later upload. A conflict does not disclose a file ID, hash, or owner.
 
 ## Usage
 
