@@ -43,6 +43,7 @@ const log = new Logger('graphile-presigned-url:plugin');
 const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
+const CUSTOM_KEY_DESCRIPTION = 'Optional object key for a bucket that allows custom keys. Reuses confirmed identical content or rejects an occupied key.';
 
 // --- Helpers ---
 
@@ -201,7 +202,7 @@ export function createPresignedUrlPlugin(
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
                 size: { type: new GraphQLNonNull(GraphQLInt), description: 'File size in bytes' },
                 filename: { type: GraphQLString, description: 'Original filename (optional)' },
-                key: { type: GraphQLString, description: 'Custom S3 key (only when bucket has allow_custom_keys=true)' },
+                key: { type: GraphQLString, description: CUSTOM_KEY_DESCRIPTION },
               },
             });
 
@@ -337,7 +338,7 @@ export function createPresignedUrlPlugin(
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
                 size: { type: new GraphQLNonNull(GraphQLInt), description: 'File size in bytes' },
                 filename: { type: GraphQLString, description: 'Original filename (optional)' },
-                key: { type: GraphQLString, description: 'Custom S3 key (only when bucket has allow_custom_keys=true)' },
+                key: { type: GraphQLString, description: CUSTOM_KEY_DESCRIPTION },
               },
             });
 
@@ -595,11 +596,13 @@ export async function processSingleFile(
     if (!lock.rows[0]?.acquired) throw uploadKeyConflict();
   }
 
+  // Older clients could leave a pending replacement beside a confirmed row.
+  // Always resolve the confirmed object before considering a retry.
   const existing = await txClient.query({
     text: `SELECT id, status, content_hash
        FROM ${storageConfig.filesQualifiedName}
        WHERE key = $1 AND bucket_id = $2
-       ORDER BY created_at DESC
+       ORDER BY (status IN ('uploaded', 'processed')) DESC, created_at DESC
        LIMIT 1`,
     values: [s3Key, bucket.id],
   });
