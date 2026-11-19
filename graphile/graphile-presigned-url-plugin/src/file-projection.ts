@@ -7,7 +7,6 @@
  * address rather than a credential with an expiry.
  */
 
-import { buildPublicFileUrl } from './public-file-url';
 import type { FileProjection, S3Config } from './types';
 
 /**
@@ -42,7 +41,7 @@ export function buildFileProjection(
   if (file.filename) projection.filename = file.filename;
 
   if (bucket.is_public && s3.publicUrlPrefix) {
-    projection.url = buildPublicFileUrl(s3.publicUrlPrefix, s3.bucket, file.key);
+    projection.url = `${s3.publicUrlPrefix.replace(/\/+$/, '')}/${s3.bucket}/${file.key}`;
   }
 
   return projection;
