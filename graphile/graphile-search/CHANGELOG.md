@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.3](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.2...graphile-search@2.20.3) (2026-11-19)
+
+### Bug Fixes
+
+- **graphile-search:** preserve mixed literal orderBy ordering ([#2034](https://github.com/constructive-io/constructive/issues/2034)) ([b749333](https://github.com/constructive-io/constructive/commit/b74933377334027c40370e38bb2ff4e2d2f0479d))
+
 ## [2.20.2](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.1...graphile-search@2.20.2) (2026-11-19)
 
 **Note:** Version bump only for package graphile-search
