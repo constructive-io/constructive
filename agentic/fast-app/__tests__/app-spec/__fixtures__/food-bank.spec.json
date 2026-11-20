@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "name": "Food Bank Shifts",
+  "tagline": "Volunteer scheduling for the food bank",
+  "backend": {
+    "kind": "custom",
+    "entities": [
+      {
+        "name": "locations",
+        "fields": [
+          { "name": "name", "type": "text", "required": true },
+          { "name": "address", "type": "long_text" },
+          { "name": "capacity", "type": "integer", "default": 10 }
+        ]
+      },
+      {
+        "name": "volunteers",
+        "fields": [
+          { "name": "full_name", "type": "text", "required": true },
+          { "name": "email", "type": "email", "required": true },
+          { "name": "phone", "type": "text" }
+        ]
+      },
+      {
+        "name": "shifts",
+        "fields": [
+          { "name": "starts_at", "type": "timestamp", "required": true },
+          { "name": "ends_at", "type": "timestamp", "required": true },
+          { "name": "status", "type": "text", "enum": ["open", "full", "cancelled"], "default": "open" },
+          { "name": "notes", "type": "long_text" }
+        ],
+        "belongsTo": [{ "field": "location_id", "to": "locations", "onDelete": "cascade" }]
+      },
+      {
+        "name": "availability_notes",
+        "access": "private",
+        "fields": [
+          { "name": "note", "type": "long_text", "required": true },
+          { "name": "week_of", "type": "date" }
+        ],
+        "belongsTo": [{ "field": "volunteer_id", "to": "volunteers", "onDelete": "set_null" }]
+      }
+    ],
+    "links": [{ "between": ["volunteers", "shifts"] }]
+  },
+  "seed": {
+    "volunteer_shifts": [
+      { "volunteers": "@volunteers[1]", "shifts": "@shifts[0]" },
+      { "volunteer_id": "@volunteers[0]", "shift_id": "@shifts[1]" }
+    ],
+    "shifts": [
+      { "starts_at": "2026-10-20T09:00:00Z", "ends_at": "2026-10-20T13:00:00Z", "location_id": "@locations[0]" },
+      { "starts_at": "2026-10-21T09:00:00Z", "ends_at": "2026-10-21T13:00:00Z", "location_id": "@locations[1]", "status": "full" }
+    ],
+    "volunteers": [
+      { "full_name": "Ana Lima", "email": "ana@example.com" },
+      { "full_name": "Ben Okafor", "email": "ben@example.com", "phone": "555-0102" }
+    ],
+    "locations": [{ "name": "North Pantry", "capacity": 12 }, { "name": "Riverside Hall" }]
+  },
+  "ui": { "nav": ["shifts", "volunteers", "locations"] }
+}

@@ -1,0 +1,356 @@
+{
+  "$schema": "https://constructive.io/schemas/blueprint.json",
+  "name": "agent",
+  "display_name": "Agent",
+  "description": "Minimal v1 primitives for AI/LLM agents: agent_thread (Conversation), agent_message (Message with TextPart + ToolPart in jsonb parts), and agent_task (Task). Tool state and approvals live inside ToolPart on the message; embeddings, runs/steps, annotations, tool-call rows and tool-approval rows are intentionally deferred. Entity-scoped via DataOwnershipInEntity on agent_thread; descendants inherit entity_id via DataInheritFromParent.",
+  "tables": [
+    {
+      "table_name": "agent_thread",
+      "smart_tags": {
+        "agentThread": true
+      },
+      "description": "Top-level AI/LLM conversation. Owns the chat-mode + model + system-prompt snapshot for the lifetime of the conversation, and is the entity-scoping anchor — descendants (agent_message, agent_task) inherit entity_id from this row via DataInheritFromParent. RLS is owner-only (AuthzDirectOwner); entity_id is a grouping dimension, not a security dimension.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity"
+        },
+        {
+          "$type": "DataStatusField",
+          "data": {
+            "field_name": "status",
+            "default_value": {
+              "value": "active"
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "title",
+          "type": {
+            "name": "text"
+          },
+          "description": "Human-readable conversation title. Typically auto-generated from the first user message and editable by the user. NULL until a title has been computed."
+        },
+        {
+          "name": "mode",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "default": {
+            "value": "ask"
+          },
+          "description": "Conversation mode: 'ask' for plain Q&A (no tool execution) or 'agent' for tool-enabled execution. Stored as free-text (no CHECK) so new modes can be added without migration."
+        },
+        {
+          "name": "model",
+          "type": {
+            "name": "text"
+          },
+          "description": "Snapshot of the LLM model id this thread is bound to (e.g. 'gpt-5', 'claude-sonnet-4'). Captured on creation so a resumed conversation stays on the same model even if app defaults change. NULL means use the app default at request time."
+        },
+        {
+          "name": "system_prompt",
+          "type": {
+            "name": "text"
+          },
+          "description": "Snapshot of the system prompt active for this thread. Stored on the thread (rather than referenced from a registry) so the conversation remains reproducible even if a future system_prompt registry changes its canonical text. NULL means use the app default at request time."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "policies": [
+        {
+          "$type": "AuthzDirectOwner",
+          "data": {
+            "entity_field": "owner_id"
+          },
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "agent_message",
+      "smart_tags": {
+        "agentMessage": true
+      },
+      "description": "A single message in an agent_thread. The full client-rendered content (TextPart and ToolPart, including the ToolPart state machine and inline approval object) lives in the `parts` jsonb column — there is no separate agent_tool_call or agent_tool_approval table in v1. Cascade-deleted with the parent thread; RLS is owner-only.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataDirectOwner",
+          "data": {
+            "owner_field_name": "owner_id"
+          }
+        },
+        {
+          "$type": "DataInheritFromParent",
+          "data": {
+            "parent_fk_field": "thread_id",
+            "parent_table": "agent_thread",
+            "fields": [
+              "entity_id"
+            ]
+          }
+        },
+        {
+          "$type": "DataJsonb",
+          "data": {
+            "field_name": "parts"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "thread_id",
+          "type": {
+            "name": "uuid"
+          },
+          "is_required": true,
+          "description": "Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger."
+        },
+        {
+          "name": "entity_id",
+          "type": {
+            "name": "uuid"
+          },
+          "is_required": true,
+          "description": "Entity (org/group/personal-org id) this message is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger, which copies it from agent_thread.entity_id via thread_id; the application never sets this column directly. Used for org-scoped grouping queries (e.g. 'all my messages in org X'), NOT for RLS — RLS is owner-only."
+        },
+        {
+          "name": "author_role",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "description": "Who authored this message: 'user' or 'assistant'. Stored as free-text (no CHECK) so additional roles can be introduced without migration. Tool inputs/outputs do NOT get their own role — they appear as ToolPart entries inside the assistant message's `parts` array."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "policies": [
+        {
+          "$type": "AuthzDirectOwner",
+          "data": {
+            "entity_field": "owner_id"
+          },
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "permissive": true
+        }
+      ],
+      "indexes": [
+        {
+          "column": "entity_id",
+          "access_method": "btree"
+        }
+      ]
+    },
+    {
+      "table_name": "agent_task",
+      "smart_tags": {
+        "agentTask": true
+      },
+      "description": "An agent- or user-authored todo item attached to an agent_thread. Captures the planning surface for agent-mode conversations: each row is a single discrete unit of work with a status lifecycle (pending → in-progress → done|failed). Cascade-deleted with the parent thread; RLS is owner-only.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataDirectOwner",
+          "data": {
+            "owner_field_name": "owner_id"
+          }
+        },
+        {
+          "$type": "DataInheritFromParent",
+          "data": {
+            "parent_fk_field": "thread_id",
+            "parent_table": "agent_thread",
+            "fields": [
+              "entity_id"
+            ]
+          }
+        },
+        {
+          "$type": "DataStatusField",
+          "data": {
+            "field_name": "status",
+            "default_value": {
+              "value": "pending"
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "thread_id",
+          "type": {
+            "name": "uuid"
+          },
+          "is_required": true,
+          "description": "Foreign key to agent_thread. Required; the FK constraint and cascade-delete behaviour are declared in the blueprint's relations[]. Declared explicitly in fields[] (rather than left for RelationBelongsTo to create) so that the DataInheritFromParent generator can validate this field exists when it provisions the entity_id-inheritance trigger."
+        },
+        {
+          "name": "entity_id",
+          "type": {
+            "name": "uuid"
+          },
+          "is_required": true,
+          "description": "Entity (org/group/personal-org id) this task is filed under. Populated automatically by the DataInheritFromParent BEFORE INSERT trigger from agent_thread.entity_id via thread_id; the application never sets this column directly."
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "description": "Natural-language description of the work to do. Required."
+        },
+        {
+          "name": "source",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "default": {
+            "value": "agent"
+          },
+          "description": "Who created the task: 'agent' (added by the LLM during planning) or 'user' (added manually by the human). Stored as free-text (no CHECK) so additional sources can be introduced later."
+        },
+        {
+          "name": "error",
+          "type": {
+            "name": "text"
+          },
+          "description": "Error message captured when the task transitioned to 'failed'. NULL while the task is still pending/in-progress, or when it completed successfully."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "policies": [
+        {
+          "$type": "AuthzDirectOwner",
+          "data": {
+            "entity_field": "owner_id"
+          },
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "permissive": true
+        }
+      ],
+      "indexes": [
+        {
+          "column": "entity_id",
+          "access_method": "btree"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "agent_message",
+      "target_table": "agent_thread",
+      "field_name": "thread_id",
+      "is_required": true,
+      "delete_action": "c"
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "agent_task",
+      "target_table": "agent_thread",
+      "field_name": "thread_id",
+      "is_required": true,
+      "delete_action": "c"
+    }
+  ],
+  "unique_constraints": []
+}

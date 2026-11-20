@@ -1,0 +1,307 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "constructive",
+  "homepage": "https://constructive-io.github.io/blocks",
+  "items": [
+    {
+      "name": "constructive-theme",
+      "type": "registry:theme",
+      "title": "Constructive Theme",
+      "description": "Constructive design system theme \u2014 OKLCH colors, z-index layers, shadow utilities, and animations."
+    },
+    {
+      "name": "use-debounce",
+      "type": "registry:hook",
+      "title": "useDebounce",
+      "description": "Hook for debouncing values.",
+      "categories": [
+        "hook"
+      ],
+      "docs": "Import: `import { useDebounce } from '@/hooks/use-debounce'`"
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "A button component with multiple variants and sizes.",
+      "categories": [
+        "primitive"
+      ],
+      "docs": "Import: `import { Button } from '@/components/ui/button'`",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/slot",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "A table component with header, body, and cell primitives.",
+      "categories": [
+        "data-display"
+      ],
+      "docs": "Import: `import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table'`. Group rows: give each group its own `TableBody` and start it with `<TableGroupRow colSpan={n}>`.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "calendar-rac",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "A calendar component using React Aria Components.",
+      "categories": [
+        "input"
+      ],
+      "docs": "Import: `import { Calendar } from '@/components/ui/calendar-rac'`",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "org-chart",
+      "type": "registry:block",
+      "title": "Org Chart",
+      "description": "An interactive organization chart on the workspace canvas: automatic top-down layout, pan and zoom, folding teams, a details panel, drag-to-reassign with a live preview wire, and a searchable change-manager dialog for keyboard users.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { OrgChart } from '@/components/ui/org-chart'`. Pass controlled `edges` or `defaultEdges` (flat `{ id, parentId }` reporting lines) and persist moves in `onReparent`. Tab into the chart and use the arrow keys to move between people; Enter opens their details.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/avatar",
+        "@constructive/button",
+        "@constructive/command",
+        "@constructive/dialog",
+        "@constructive/dropdown-menu",
+        "@constructive/initials",
+        "@constructive/tooltip",
+        "@constructive/workspace-kit",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "storage-browser",
+      "type": "registry:block",
+      "title": "Storage Browser",
+      "description": "A storage workspace on the shared workspace shell: buckets in the sidebar, a file list with type-tinted glyphs, search, sort, drag-and-drop upload, a floating selection bar, detail and bucket sheets, and distinct empty states.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { StorageBrowser } from '@/components/ui/storage'`",
+      "registryDependencies": [
+        "@constructive/storage",
+        "@constructive/storage-bucket-rail",
+        "@constructive/storage-object-table",
+        "@constructive/storage-upload-dropzone",
+        "@constructive/storage-object-detail-sheet",
+        "@constructive/storage-bucket-config-sheet",
+        "@constructive/storage-empty-state",
+        "@constructive/cn",
+        "@constructive/button",
+        "@constructive/workspace-kit",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "workspace-kit",
+      "type": "registry:block",
+      "title": "Workspace Kit",
+      "description": "The shared workspace shell behind the application templates: a collapsible sidebar rail with a mobile drawer, nav rows and sections, 48px view headers and scrolling view frames, filter pills, segmented controls, surfaces that keep their edge in dark mode (panels, table surfaces, stat tiles, key-value lists, empty states), a pan-and-zoom canvas with double-framed nodes and bezier wires, and a React ViewTransition wrapper with a reduced-motion fallback.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { WorkspaceShell, SidebarFrame, NavSection, NavRow, ViewFrame, Panel, CanvasSurface, useCanvasViewport } from '@/components/ui/workspace-kit'`. Render your sidebar through the `sidebar` render prop (it is called once for the rail and once for the drawer) and your views as children; `ViewFrame` and `NavMenuButton` open the drawer below the `3xl` container width.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/tooltip",
+        "@constructive/sheet",
+        "@constructive/dropdown-menu",
+        "@constructive/initials",
+        "@constructive/intl",
+        "@constructive/use-scroll-fade",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "agents-builder",
+      "type": "registry:block",
+      "title": "Agents Builder",
+      "description": "A complete agent workspace template: chat with scripted agent replies, an integrations directory with a two-step connect flow, a skills library, and an agent detail view with a live run panel and pannable canvas.",
+      "categories": [
+        "block",
+        "application",
+        "ai"
+      ],
+      "docs": "Import: `import { AgentsBuilder, AGENTS_BUILDER_DEMO } from '@/components/ui/agents-builder'`. Pass your own `data` and handle side effects through `onAction`, `onConnectIntegration`, and `onAuthorizeIntegration`.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/use-controllable-state",
+        "@constructive/ai",
+        "@constructive/button",
+        "@constructive/dialog",
+        "@constructive/dropdown-menu",
+        "@constructive/popover",
+        "@constructive/command",
+        "@constructive/tooltip",
+        "@constructive/kbd",
+        "@constructive/switch",
+        "@constructive/avatar",
+        "@constructive/initials",
+        "@constructive/spinner",
+        "@constructive/workspace-kit",
+        "@constructive/intl",
+        "@constructive/use-scroll-fade",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "data-rooms",
+      "type": "registry:block",
+      "title": "Data Rooms",
+      "description": "Secure document rooms for an organization and its sub-organizations: access that carries down the hierarchy, expiring folder shares, agreements before entry, view-only and watermarked documents, Q&A, reading insights, an access map, and a room assistant that only cites what the reader can open.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { DataRooms, DATA_ROOMS_DEMO } from '@/components/ui/data-rooms'`. Pass your workspace as `data`, apply every change through `onCommand` (reject to keep a dialog open), and handle downloads and view logging through `onAction`. `effectiveAccess` explains who can do what; your server still decides every request.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/use-controllable-state",
+        "@constructive/ai",
+        "@constructive/button",
+        "@constructive/checkbox",
+        "@constructive/dialog",
+        "@constructive/initials",
+        "@constructive/dropdown-menu",
+        "@constructive/input",
+        "@constructive/select",
+        "@constructive/sheet",
+        "@constructive/switch",
+        "@constructive/textarea",
+        "@constructive/tooltip",
+        "@constructive/workspace-kit",
+        "@constructive/intl",
+        "@constructive/use-scroll-fade",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "resource-kit",
+      "type": "registry:block",
+      "title": "Resource Kit",
+      "description": "List, detail, and form screens generated from resource definitions: a view with search, sort, pagination, and empty and error states; a table that formats cells by field, shows option badges and relation labels, and folds columns in narrow panes; a create and edit sheet with validation, async relation pickers, and many-to-many links; a record view with has-many lists; and delete confirmation. Backend-neutral: data goes through an injected source, routing through an injected router.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { ResourceKitProvider, ResourcePage, RecordDetail, defineResource } from '@/components/ui/resource-kit'`. Describe each table with `defineResource({ name, label, singular, primaryKey, titleField, columns, formFields, fields, source })`, where `source` implements `list`, `get`, `create`, `update`, `remove`, and optionally `link` and `linked` for many-to-many fields. Wrap the app once in `<ResourceKitProvider router={{ Link, navigate, listHref, detailHref }} resources={[...]} icons={{ users: Users }}>` (it reuses an enclosing QueryClient or makes its own), then render `<ResourcePage resource=\"contacts\" />` on the list route and `<RecordDetail resource=\"contacts\" id={id} />` on the detail route. Writes invalidate the resource and every related one. `DataTable`, `EntityFormSheet`, `RelationPicker`, `DeleteDialog`, `ResourceNav`, and `createMemorySource` are exported for custom screens and prototypes.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/intl",
+        "@constructive/use-debounce",
+        "@constructive/alert",
+        "@constructive/alert-dialog",
+        "@constructive/button",
+        "@constructive/combobox",
+        "@constructive/dropdown-menu",
+        "@constructive/field",
+        "@constructive/input",
+        "@constructive/input-group",
+        "@constructive/select",
+        "@constructive/sheet",
+        "@constructive/spinner",
+        "@constructive/switch",
+        "@constructive/textarea",
+        "@constructive/workspace-kit",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "dashboard-tiles",
+      "type": "registry:block",
+      "title": "Dashboard Tiles",
+      "description": "Dashboard pieces for a resource-kit app: a stat tile on its own card that can link to its source, a count tile that reads a resource total (optionally filtered), the latest records of a resource, and a grid that lays them out by its own width.",
+      "categories": [
+        "block",
+        "application"
+      ],
+      "docs": "Import: `import { DashboardGrid, ResourceCountTile, RecentRecords, StatTile } from '@/components/ui/dashboard-tiles'`. Render inside `ResourceKitProvider`: `<DashboardGrid><ResourceCountTile resource=\"deals\" label=\"Open deals\" filters={{ status: 'open' }} /><StatTile label=\"Revenue\" value=\"$48,210\" hint=\"This month\" href=\"/invoices\" /><RecentRecords resource=\"contacts\" limit={5} /></DashboardGrid>`. Count tiles read `totalCount` from one-row `list` calls; `RecentRecords` follows the resource's `defaultSort` (or `createdAt` descending when there is none); pass `sort` to choose. `StatTile` also works without the provider.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/intl",
+        "@constructive/resource-kit",
+        "@constructive/workspace-kit",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "ai",
+      "type": "registry:block",
+      "title": "AI Kit",
+      "description": "Presentational primitives for AI and agentic chat UIs: composer, messages, reasoning, tools, HITL approval, plan tracking, and streaming surfaces.",
+      "categories": [
+        "block",
+        "ai"
+      ],
+      "docs": "Import PromptInput, Message, Tool, Reasoning, and PlanTracker from the installed ai directory under your configured shadcn ui alias.",
+      "registryDependencies": [
+        "@constructive/cn",
+        "@constructive/button",
+        "@constructive/avatar",
+        "@constructive/tooltip",
+        "@constructive/alert",
+        "@constructive/collapsible",
+        "@constructive/badge",
+        "@constructive/spinner",
+        "@constructive/command",
+        "@constructive/popover",
+        "@constructive/kbd",
+        "@constructive/constructive-theme"
+      ]
+    },
+    {
+      "name": "sheets",
+      "type": "registry:block",
+      "title": "Sheets",
+      "description": "A metadata-driven, spreadsheet-grade CRUD grid with accessible DOM cells and adapter-owned data access.",
+      "docs": "Install the complete source-owned grid with `pnpm dlx shadcn@latest add @constructive/sheets`, then import `Sheets`, `SheetsProvider`, and the adapter contracts from `@/components/ui/sheets`. The copied source depends on `@constructive-io/data` for the current `_meta` contract and runtime GraphQL operations; your host remains responsible for its endpoint, session, and RLS-aware execution boundary.",
+      "categories": [
+        "blocks",
+        "data"
+      ],
+      "registryDependencies": [
+        "@constructive/alert-dialog",
+        "@constructive/badge",
+        "@constructive/button",
+        "@constructive/calendar-rac",
+        "@constructive/card",
+        "@constructive/checkbox",
+        "@constructive/collapsible",
+        "@constructive/dropdown-menu",
+        "@constructive/form-control",
+        "@constructive/input",
+        "@constructive/input-group",
+        "@constructive/label",
+        "@constructive/pagination",
+        "@constructive/popover",
+        "@constructive/progressive-blur",
+        "@constructive/scroll-area",
+        "@constructive/select",
+        "@constructive/skeleton",
+        "@constructive/tabs",
+        "@constructive/textarea",
+        "@constructive/toast",
+        "@constructive/tooltip",
+        "@constructive/constructive-theme"
+      ]
+    }
+  ]
+}

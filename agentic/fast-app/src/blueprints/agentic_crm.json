@@ -1,0 +1,1968 @@
+{
+  "$schema": "https://constructive.io/schemas/blueprint.json",
+  "name": "agentic_crm",
+  "display_name": "Agentic CRM",
+  "description": "Org-scoped CRM ported from agentic-db: contacts, companies, deals, interactions, notes, tags and their link tables. Every row carries owner_id + entity_id (DataOwnershipInEntity) and is readable/writable by any member of the owning org (AuthzEntityMembership on entity_id). Full-text + trigram search on people, companies, deals, interactions and notes.",
+  "categories": [
+    "crm",
+    "sales"
+  ],
+  "tags": [
+    "crm",
+    "contacts",
+    "deals",
+    "pipeline",
+    "agentic-db",
+    "fundraising",
+    "projects"
+  ],
+  "complexity": "moderate",
+  "storage": [
+    {
+      "scope": "org",
+      "buckets": [
+        {
+          "name": "images",
+          "is_public": true,
+          "tags": [
+            "images",
+            "default-public"
+          ],
+          "description": "Public, CDN-servable images referenced from record columns (contacts.avatar, companies.logo)",
+          "allowed_mime_types": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml"
+          ]
+        },
+        {
+          "name": "attachments",
+          "is_public": false,
+          "tags": [
+            "attachments",
+            "documents",
+            "default"
+          ],
+          "description": "Private files linked to CRM records through the attachments table; tagged documents so the extraction worker can read them"
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "table_name": "contacts",
+      "description": "A person. Denormalized primary email/phone live here for fast display and search; the full lists are contact_emails / contact_phones. avatar is an image reference into the org images bucket.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "DataFileRef",
+          "data": {
+            "field": "avatar",
+            "storage": {
+              "scope": "org"
+            },
+            "bucket": "images"
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "first_name",
+                  "weight": "A"
+                },
+                {
+                  "field": "last_name",
+                  "weight": "A"
+                },
+                {
+                  "field": "headline",
+                  "weight": "B"
+                },
+                {
+                  "field": "bio",
+                  "weight": "C"
+                }
+              ]
+            },
+            "trgm_fields": [
+              "first_name",
+              "last_name"
+            ],
+            "source_fields": [
+              "first_name",
+              "last_name",
+              "headline",
+              "bio",
+              "location",
+              "how_we_met"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "first_name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "last_name",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "email",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "phone",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "headline",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "bio",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "location",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "birthday",
+          "type": {
+            "name": "date"
+          }
+        },
+        {
+          "name": "how_we_met",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "relationship_types",
+          "type": {
+            "name": "text"
+          },
+          "array_dimensions": 1
+        },
+        {
+          "name": "avatar",
+          "type": {
+            "name": "image"
+          },
+          "description": "Profile photo: a projection of an org_files row in the public images bucket (id, key, mime, bucket_id, size, filename)."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "companies",
+      "description": "An organization a contact belongs to or a deal is with (fund, firm, portfolio company). logo is an image reference into the org images bucket.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "DataFileRef",
+          "data": {
+            "field": "logo",
+            "storage": {
+              "scope": "org"
+            },
+            "bucket": "images"
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "name",
+                  "weight": "A"
+                },
+                {
+                  "field": "description",
+                  "weight": "B"
+                },
+                {
+                  "field": "industry",
+                  "weight": "C"
+                }
+              ]
+            },
+            "trgm_fields": [
+              "name"
+            ],
+            "source_fields": [
+              "name",
+              "industry",
+              "description"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "domain",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "industry",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "logo",
+          "type": {
+            "name": "image"
+          },
+          "description": "Company logo: a projection of an org_files row in the public images bucket."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "deals",
+      "description": "A pipeline item (e.g. an investor conversation). stage is free text so pipelines can be renamed without migration.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "DataStatusField",
+          "data": {
+            "field_name": "stage",
+            "default_value": {
+              "value": "lead"
+            },
+            "allowed_values": [
+              "lead",
+              "contacted",
+              "meeting",
+              "diligence",
+              "term_sheet",
+              "committed",
+              "closed",
+              "passed"
+            ]
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "name",
+                  "weight": "A"
+                },
+                {
+                  "field": "notes_text",
+                  "weight": "B"
+                }
+              ]
+            },
+            "trgm_fields": [
+              "name"
+            ],
+            "source_fields": [
+              "name",
+              "notes_text"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "value",
+          "type": {
+            "name": "numeric"
+          }
+        },
+        {
+          "name": "currency",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "default": {
+            "value": "USD"
+          }
+        },
+        {
+          "name": "expected_close_date",
+          "type": {
+            "name": "date"
+          }
+        },
+        {
+          "name": "notes_text",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "interactions",
+      "description": "A logged touchpoint with a contact: call, email, meeting, intro. Optionally pinned to a deal.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "summary",
+                  "weight": "A"
+                },
+                {
+                  "field": "type",
+                  "weight": "C"
+                }
+              ]
+            },
+            "trgm_fields": [],
+            "source_fields": [
+              "type",
+              "summary"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "occurred_at",
+          "type": {
+            "name": "timestamptz"
+          },
+          "is_required": true
+        },
+        {
+          "name": "summary",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "sentiment",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "direction",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "channel",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "notes",
+      "description": "Free-form note attached to at most one of contact / company / deal.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "abstract",
+                  "weight": "A"
+                },
+                {
+                  "field": "content",
+                  "weight": "B"
+                }
+              ]
+            },
+            "trgm_fields": [],
+            "source_fields": [
+              "abstract",
+              "content"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "content",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "abstract",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "attachments",
+      "description": "Generic file attachment on any CRM record: record_type names the table (contacts, companies, deals, interactions, notes, ...) and record_id the row. file is an attachment reference into the private org attachments bucket; text-like files are extracted and embedded so the org agent can retrieve them.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "DataFileRef",
+          "data": {
+            "field": "file",
+            "storage": {
+              "scope": "org"
+            },
+            "bucket": "attachments"
+          }
+        },
+        {
+          "$type": "ProcessExtraction",
+          "data": {
+            "file_field": "file",
+            "events": [
+              "INSERT",
+              "UPDATE"
+            ],
+            "mime_patterns": [
+              "application/pdf",
+              "text/%",
+              "application/json",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.%",
+              "application/vnd.ms-excel",
+              "application/vnd.ms-powerpoint"
+            ]
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "title",
+                  "weight": "A"
+                },
+                {
+                  "field": "description",
+                  "weight": "B"
+                },
+                {
+                  "field": "extracted_text",
+                  "weight": "C"
+                }
+              ]
+            },
+            "trgm_fields": [
+              "title"
+            ],
+            "source_fields": [
+              "title",
+              "description",
+              "extracted_text"
+            ],
+            "embedding": {
+              "field_name": "embedding",
+              "chunks": {
+                "chunk_size": 1000,
+                "chunk_overlap": 200,
+                "chunk_strategy": "paragraph"
+              }
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "record_type",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "record_id",
+          "type": {
+            "name": "uuid"
+          },
+          "is_required": true
+        },
+        {
+          "name": "title",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "file",
+          "type": {
+            "name": "upload"
+          },
+          "is_required": true,
+          "description": "Projection of an org_files row in the private attachments bucket."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "record_type",
+            "record_id"
+          ],
+          "access_method": "btree"
+        }
+      ]
+    },
+    {
+      "table_name": "tags",
+      "description": "Org-wide tag vocabulary.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "color",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "category",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "contact_emails",
+      "description": "All email addresses for a contact.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "email",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "email_type",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "is_primary",
+          "type": {
+            "name": "boolean"
+          },
+          "is_required": true,
+          "default": {
+            "value": false
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "contact_phones",
+      "description": "All phone numbers for a contact.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "phone",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "phone_type",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "is_primary",
+          "type": {
+            "name": "boolean"
+          },
+          "is_required": true,
+          "default": {
+            "value": false
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "contact_companies",
+      "description": "Contact <-> company with role (e.g. Partner, CFO).",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "role",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "is_current",
+          "type": {
+            "name": "boolean"
+          },
+          "is_required": true,
+          "default": {
+            "value": true
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "deal_contacts",
+      "description": "Deal <-> contact with role (lead, champion, blocker).",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "role",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "tag_links",
+      "description": "Polymorphic tag attachment: exactly one of contact_id / company_id / deal_id is set.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "projects",
+      "description": "A body of work tracked as a board, e.g. a fundraise round. Each project has its own ordered stages (project_stages); contacts move through them as project_contacts.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        },
+        {
+          "$type": "DataStatusField",
+          "data": {
+            "field_name": "status",
+            "default_value": {
+              "value": "active"
+            },
+            "allowed_values": [
+              "active",
+              "paused",
+              "completed",
+              "archived"
+            ]
+          }
+        },
+        {
+          "$type": "SearchUnified",
+          "data": {
+            "full_text_search": {
+              "field_name": "search_tsv",
+              "source_fields": [
+                {
+                  "field": "name",
+                  "weight": "A"
+                },
+                {
+                  "field": "description",
+                  "weight": "B"
+                }
+              ]
+            },
+            "trgm_fields": [
+              "name"
+            ]
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "kind",
+          "type": {
+            "name": "text"
+          },
+          "description": "Free-text project type, e.g. fundraise, hiring, partnerships."
+        },
+        {
+          "name": "target_amount",
+          "type": {
+            "name": "numeric"
+          },
+          "description": "Optional goal, e.g. the round size."
+        },
+        {
+          "name": "currency",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true,
+          "default": {
+            "value": "USD"
+          }
+        },
+        {
+          "name": "starts_on",
+          "type": {
+            "name": "date"
+          }
+        },
+        {
+          "name": "ends_on",
+          "type": {
+            "name": "date"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "project_stages",
+      "description": "An ordered column on a project's board (introduced, pitched, diligence, committed, passed, ...). Stages belong to one project so every board defines its own pipeline.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "text"
+          },
+          "is_required": true
+        },
+        {
+          "name": "position",
+          "type": {
+            "name": "integer"
+          },
+          "is_required": true,
+          "default": {
+            "value": 0
+          },
+          "description": "Column order on the board, ascending."
+        },
+        {
+          "name": "color",
+          "type": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "is_closed",
+          "type": {
+            "name": "boolean"
+          },
+          "is_required": true,
+          "default": {
+            "value": false
+          },
+          "description": "Marks an end stage (won or lost) so open work can be filtered out."
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "table_name": "project_contacts",
+      "description": "A contact's card on a project board: which stage it is in, its order within the stage, and an optional company and amount. One contact can be on many projects at different stages.",
+      "nodes": [
+        "DataId",
+        "DataTimestamps",
+        {
+          "$type": "DataOwnershipInEntity",
+          "data": {
+            "entity_field": "entity_id"
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "position",
+          "type": {
+            "name": "numeric"
+          },
+          "is_required": true,
+          "default": {
+            "value": 0
+          },
+          "description": "Card order within its stage, ascending; fractional so a card can be dropped between two others."
+        },
+        {
+          "name": "role",
+          "type": {
+            "name": "text"
+          },
+          "description": "The contact's part in the project, e.g. lead investor."
+        },
+        {
+          "name": "amount",
+          "type": {
+            "name": "numeric"
+          },
+          "description": "e.g. the amount an investor is considering or committed."
+        },
+        {
+          "name": "notes_text",
+          "type": {
+            "name": "text"
+          }
+        }
+      ],
+      "grants": [
+        {
+          "roles": [
+            "authenticated"
+          ],
+          "privileges": [
+            [
+              "select",
+              "*"
+            ],
+            [
+              "insert",
+              "*"
+            ],
+            [
+              "update",
+              "*"
+            ],
+            [
+              "delete",
+              "*"
+            ]
+          ]
+        }
+      ],
+      "use_rls": true,
+      "policies": [
+        {
+          "$type": "AuthzEntityMembership",
+          "privileges": [
+            "select",
+            "insert",
+            "update",
+            "delete"
+          ],
+          "data": {
+            "entity_field": "entity_id",
+            "entity_type": "org"
+          },
+          "permissive": true
+        }
+      ],
+      "indexes": []
+    }
+  ],
+  "relations": [
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "deals",
+      "target_table": "companies",
+      "field_name": "company_id",
+      "is_required": false,
+      "delete_action": "n",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "interactions",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "interactions",
+      "target_table": "deals",
+      "field_name": "deal_id",
+      "is_required": false,
+      "delete_action": "n",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "notes",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "notes",
+      "target_table": "companies",
+      "field_name": "company_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "notes",
+      "target_table": "deals",
+      "field_name": "deal_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "contact_emails",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "contact_phones",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "contact_companies",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "contact_companies",
+      "target_table": "companies",
+      "field_name": "company_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "deal_contacts",
+      "target_table": "deals",
+      "field_name": "deal_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "deal_contacts",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "tag_links",
+      "target_table": "tags",
+      "field_name": "tag_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "tag_links",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "tag_links",
+      "target_table": "companies",
+      "field_name": "company_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "tag_links",
+      "target_table": "deals",
+      "field_name": "deal_id",
+      "is_required": false,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "project_stages",
+      "target_table": "projects",
+      "field_name": "project_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "project_contacts",
+      "target_table": "projects",
+      "field_name": "project_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "project_contacts",
+      "target_table": "contacts",
+      "field_name": "contact_id",
+      "is_required": true,
+      "delete_action": "c",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "project_contacts",
+      "target_table": "companies",
+      "field_name": "company_id",
+      "is_required": false,
+      "delete_action": "n",
+      "scope_fields": [
+        "entity_id"
+      ]
+    },
+    {
+      "$type": "RelationBelongsTo",
+      "source_table": "project_contacts",
+      "target_table": "project_stages",
+      "field_name": "stage_id",
+      "is_required": false,
+      "delete_action": "n",
+      "scope_fields": [
+        "project_id"
+      ]
+    }
+  ],
+  "unique_constraints": [
+    {
+      "table_name": "contact_companies",
+      "columns": [
+        "contact_id",
+        "company_id"
+      ]
+    },
+    {
+      "table_name": "deal_contacts",
+      "columns": [
+        "deal_id",
+        "contact_id"
+      ]
+    },
+    {
+      "table_name": "tags",
+      "columns": [
+        "entity_id",
+        "name"
+      ]
+    },
+    {
+      "table_name": "project_stages",
+      "columns": [
+        "project_id",
+        "name"
+      ]
+    },
+    {
+      "table_name": "project_contacts",
+      "columns": [
+        "project_id",
+        "contact_id"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "scope": "org",
+      "has_agents": true,
+      "has_resources": true,
+      "has_runs": true
+    }
+  ]
+}
