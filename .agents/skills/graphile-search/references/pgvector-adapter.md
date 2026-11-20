@@ -6,7 +6,7 @@ Semantic similarity search using the `pgvector` extension. Supports cosine, L2, 
 
 The pgvector adapter:
 1. **Detects** `vector(N)` columns on tables (via `VectorCodecPlugin` codec registration)
-2. **Registers** `VectorSearchInput` type (`{ query: [Float!]!, metric: VectorMetric }`)
+2. **Registers** `VectorNearbyInput` type (`{ vector: [Float!]!, model: String, metric: VectorMetric, distance: Float, includeChunks: Boolean }`)
 3. **Generates** distance score as a computed field and orderBy enum
 
 ## Adapter Configuration

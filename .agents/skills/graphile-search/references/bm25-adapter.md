@@ -7,7 +7,7 @@ Relevance-ranked search using BM25 scoring via the `pg_textsearch` extension. Be
 The BM25 adapter:
 1. **Gathers** BM25 index information during the Graphile gather phase (via `Bm25CodecPlugin`)
 2. **Detects** text columns that have a BM25 index (stored in the `bm25IndexStore`)
-3. **Registers** a `Bm25SearchInput` type (`{ query: String!, indexName: String }`)
+3. **Registers** a `Bm25SearchInput` type (`{ query: String!, threshold: Float }`)
 4. **Generates** BM25 score as a computed field and orderBy enum
 
 ## Adapter Configuration
@@ -53,6 +53,12 @@ enum DocumentsOrderBy {
   CONTENT_BM25_SCORE_DESC  # least relevant first
 }
 ```
+
+## Filter Semantics
+
+- A BM25 score is negative for a row the query matches and `0` for a row it does not. The filter keeps negative scores only, so without `threshold` the connection holds exactly the matching rows and `totalCount` equals that count (with or without a BM25 `orderBy`, and through `unifiedSearch`).
+- `threshold` is a maximum score and inclusive: `{ query, threshold: -1.5 }` keeps rows scoring `<= -1.5`; a row scoring exactly the threshold is kept.
+- `CONTENT_BM25_SCORE_ASC/DESC` requires `bm25Content` (or `unifiedSearch`) in `where`; without it the query errors and names the filter to add. This check also applies when `orderBy` is passed as a variable, and a variable `orderBy` keeps the requested order of a composite list.
 
 ## Score Semantics
 

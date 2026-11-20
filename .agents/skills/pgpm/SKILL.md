@@ -358,6 +358,7 @@ Consult these reference files for detailed documentation on specific topics:
 | Reference | Topic | Consult When |
 |-----------|-------|--------------|
 | [references/cli.md](references/cli.md) | Complete CLI command reference | Looking up command flags, options, or less common commands |
+| `pgpm-projections` skill | `pgpm import` / `pgpm transform` / `pgpm diff` (semantic schema diff, emitted migration modules, `--append-module`, `--verify`) | Diffing two schema sources or generating a migration from a diff |
 | [references/workspace.md](references/workspace.md) | Creating and managing workspaces | Setting up a new project, understanding workspace structure |
 | [references/changes.md](references/changes.md) | Authoring database changes | Writing deploy/revert/verify scripts, using `pgpm add` |
 | [references/sql-conventions.md](references/sql-conventions.md) | SQL file format and conventions | Writing SQL files, naming conventions, header format |
