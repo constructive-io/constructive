@@ -28,7 +28,14 @@ const log = new Logger('cursor-tracker');
 const DEFAULT_POLL_INTERVAL_MS = 5000;
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 30000;
 const DEFAULT_BATCH_LIMIT = 500;
-const DEFAULT_SCHEMA = 'realtime_public';
+const DEFAULT_SCHEMA = 'realtime_private';
+
+interface RuntimeSource {
+  source_schema: string;
+  source_table: string;
+  fanout_function: string;
+  cleanup_function: string;
+}
 
 export class CursorTracker {
   readonly nodeId: string;
@@ -120,7 +127,23 @@ export class CursorTracker {
         sql,
         [this.nodeId, this.batchLimit],
       );
-      const entries = result.rows.map((row) => row.drain_changes);
+      const pending = result.rows.map((row) => row.drain_changes);
+      const entries: ChangeLogEntry[] = [];
+      if (pending.length > 0) {
+        for (const source of await this.runtimeSources()) {
+          const changes = pending.filter(change => change.source_schema === source.source_schema && change.source_table === source.source_table);
+          if (changes.length === 0) continue;
+          const fanout = await this.pool.query<{ entry: ChangeLogEntry }>(
+            `SELECT ${this.quoteIdent(this.schema)}.${this.quoteIdent(source.fanout_function)}($1, $2) AS entry`,
+            [this.nodeId, JSON.stringify(changes)],
+          );
+          entries.push(...fanout.rows.map(row => row.entry));
+        }
+        await this.pool.query(
+          `SELECT ${this.quoteIdent(this.schema)}.advance_cursor($1, $2)`,
+          [this.nodeId, pending[pending.length - 1].occurred_at],
+        );
+      }
 
       if (entries.length > 0) {
         log.info(`Drained ${entries.length} change(s) for node=${this.nodeId}`);
@@ -146,12 +169,25 @@ export class CursorTracker {
 
   async cleanupEphemeral(): Promise<void> {
     try {
+      for (const source of await this.runtimeSources()) {
+        await this.pool.query(
+          `SELECT ${this.quoteIdent(this.schema)}.${this.quoteIdent(source.cleanup_function)}($1)`,
+          [this.nodeId],
+        );
+      }
       const sql = `SELECT ${this.quoteIdent(this.schema)}.cleanup_ephemeral($1)`;
       await this.pool.query(sql, [this.nodeId]);
       log.info(`Cleaned up ephemeral subscriptions for node=${this.nodeId}`);
     } catch (err) {
       throw err instanceof Error ? err : new Error(String(err));
     }
+  }
+
+  private async runtimeSources(): Promise<RuntimeSource[]> {
+    const result = await this.pool.query<{ runtime_sources: RuntimeSource }>(
+      `SELECT * FROM ${this.quoteIdent(this.schema)}.runtime_sources()`,
+    );
+    return result.rows.map(row => row.runtime_sources);
   }
 
   get isRunning(): boolean {

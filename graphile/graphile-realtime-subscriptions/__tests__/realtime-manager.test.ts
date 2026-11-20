@@ -203,10 +203,15 @@ describe('RealtimeManager', () => {
         makeEntry({ operation: 'UPDATE', payload_after: { id: 'row-b' } }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -235,10 +240,15 @@ describe('RealtimeManager', () => {
         }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -272,10 +282,15 @@ describe('RealtimeManager', () => {
         }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -318,10 +333,15 @@ describe('RealtimeManager', () => {
         makeEntry({ operation: 'INSERT', payload_after: { id: 'row-x' } }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 

@@ -56,10 +56,10 @@ export interface CursorTrackerOptions {
   nodeId?: string;
 
   /**
-   * The realtime_public schema name where drain_changes(),
+   * The private realtime schema name where drain_changes(),
    * touch_listener(), and cleanup_ephemeral() live.
    *
-   * Default: 'realtime_public'
+   * Default: 'realtime_private'
    */
   schema?: string;
 
@@ -131,10 +131,10 @@ export interface RealtimeManagerOptions {
   nodeId?: string;
 
   /**
-   * The realtime_public schema name where drain_changes(),
+   * The private realtime schema name where drain_changes(),
    * touch_listener(), and cleanup_ephemeral() live.
    *
-   * Default: 'realtime_public'
+   * Default: 'realtime_private'
    */
   schema?: string;
 
