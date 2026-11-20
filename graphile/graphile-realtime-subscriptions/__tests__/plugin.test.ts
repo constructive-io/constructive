@@ -5,7 +5,7 @@
  * - Table discovery via @realtime smart tag
  * - Subscription field generation (onXxxChanged)
  * - Payload type generation (XxxSubscriptionPayload) with rowId and overflow fields
- * - NOTIFY channel naming (realtime:{schema}.{table})
+ * - Bounded NOTIFY channel naming
  * - Tables without @realtime tag are excluded
  * - Empty registry produces no fields
  * - Multiple realtime tables produce multiple fields
@@ -357,7 +357,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
   });
 
   describe('NOTIFY channel naming', () => {
-    it('uses realtime:{schema}.{table} format', () => {
+    it('uses the bounded deterministic channel format', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('projects', {
@@ -377,7 +377,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onProjectsChanged'].subscribePlan(null, mockArgs);
 
-      expect(mockConstant).toHaveBeenCalledWith('realtime:app_public.projects');
+      expect(mockConstant).toHaveBeenCalledWith('realtime:82e4cc86e360dca4f9342e08ca91489d');
     });
 
     it('handles different schema names', () => {
@@ -396,7 +396,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onItemsChanged'].subscribePlan(null, mockArgs);
 
-      expect(mockConstant).toHaveBeenCalledWith('realtime:inventory_public.items');
+      expect(mockConstant).toHaveBeenCalledWith('realtime:e66af24f0e368ab1c28a95c1cd4fd830');
     });
   });
 

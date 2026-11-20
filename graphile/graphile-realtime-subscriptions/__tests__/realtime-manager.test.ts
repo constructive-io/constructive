@@ -98,12 +98,12 @@ describe('entryToNotifyPayload', () => {
 describe('entryToChannel', () => {
   it('builds channel from source_schema and source_table', () => {
     const entry = makeEntry({ source_schema: 'public', source_table: 'contact' });
-    expect(entryToChannel(entry)).toBe('realtime:public.contact');
+    expect(entryToChannel(entry)).toBe('realtime:9db2575819580f0b822621ba62a1976e');
   });
 
   it('handles custom schema names', () => {
     const entry = makeEntry({ source_schema: 'tenant_42', source_table: 'invoice' });
-    expect(entryToChannel(entry)).toBe('realtime:tenant_42.invoice');
+    expect(entryToChannel(entry)).toBe('realtime:6b8caecbaac87c42d4553ef6ea8709fb');
   });
 });
 
@@ -193,8 +193,8 @@ describe('RealtimeManager', () => {
   describe('event dispatching', () => {
     it('emits cursor-tracked events on PgSubscriber eventEmitter', async () => {
       const emitted: { channel: string; payload: string }[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (payload: string) => {
-        emitted.push({ channel: 'realtime:public.contact', payload });
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (payload: string) => {
+        emitted.push({ channel: 'realtime:9db2575819580f0b822621ba62a1976e', payload });
       });
 
       // Mock drain_changes to return entries
@@ -228,7 +228,7 @@ describe('RealtimeManager', () => {
 
     it('handles DELETE events with payload_before', async () => {
       const emitted: string[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (payload: string) => {
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (payload: string) => {
         emitted.push(payload);
       });
 
@@ -264,8 +264,8 @@ describe('RealtimeManager', () => {
     it('dispatches to correct channels for different tables', async () => {
       const contactEvents: string[] = [];
       const invoiceEvents: string[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (p: string) => contactEvents.push(p));
-      mockSubscriber.eventEmitter.on('realtime:billing.invoice', (p: string) => invoiceEvents.push(p));
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (p: string) => contactEvents.push(p));
+      mockSubscriber.eventEmitter.on('realtime:2e0654a46337baffc614fed360153337', (p: string) => invoiceEvents.push(p));
 
       const entries: ChangeLogEntry[] = [
         makeEntry({

@@ -133,6 +133,36 @@ describe('RLS-gated public tenant WebSocket events', () => {
     await teardown?.();
   });
 
+  it('delivers long realtime channel INSERT, UPDATE and DELETE over the authenticated tenant socket', async () => {
+    const longWrite = async (id: string, operation: string) => {
+      const result = await http(alice, `mutation($id: UUID!, $op: String!) {
+        writeLongRealtimeNote(input: {noteId: $id, operation: $op}) { result }
+      }`, { id, op: operation });
+      expect(result.writeLongRealtimeNote.result).toBe(id);
+    };
+    const probe = randomUUID();
+    await longWrite(probe, 'INSERT');
+    const stream = open(alice, undefined, `subscription {
+      onLongRealtimeNotificationLifecycleNoteChanged {
+        event rowId longRealtimeNotificationLifecycleNote { id title }
+      }
+    }`);
+    for (let i = 0; i < 50 && payloads(stream).length === 0; i++) {
+      await longWrite(probe, 'UPDATE');
+      await pause(30);
+    }
+    await delivered(stream, probe, 'UPDATE');
+    const id = randomUUID();
+    for (const operation of ['INSERT', 'UPDATE', 'DELETE']) {
+      await longWrite(id, operation);
+      await delivered(stream, id, operation);
+    }
+    const events = payloads(stream).filter(payload => payload.rowId === id);
+    expect(events.map(payload => payload.event)).toEqual(['INSERT', 'UPDATE', 'DELETE']);
+    expect(events[0].longRealtimeNotificationLifecycleNote).toMatchObject({ id, title: 'long channel contents' });
+    expect(events[2].longRealtimeNotificationLifecycleNote).toBeNull();
+  });
+
   it.each(['INSERT', 'UPDATE', 'DELETE'])('suppresses every frame for a private %s, not just the row object', async operation => {
     const a = open(alice);
     const b = open(bob);

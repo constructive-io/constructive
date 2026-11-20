@@ -50,6 +50,7 @@ import type { GraphQLSchema } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
 
+import { realtimeChannel } from './channel';
 import type { ParsedPayload } from './event-gate';
 import { createGatedSubscriber } from './event-gate';
 import { filterInaccessibleEvents, realtimeResponseNames } from './subscription-filter';
@@ -92,7 +93,7 @@ function discoverRealtimeTables(build: any): RealtimeTableInfo[] {
 
     const pgSchema = codec.extensions?.pg?.schemaName ?? 'public';
     const pgTable = codec.extensions?.pg?.name ?? codec.name;
-    const notifyChannel = `realtime:${pgSchema}.${pgTable}`;
+    const notifyChannel = realtimeChannel(pgSchema, pgTable);
 
     result.push({
       resource: r,

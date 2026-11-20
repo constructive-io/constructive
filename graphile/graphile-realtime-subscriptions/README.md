@@ -25,7 +25,7 @@ const preset = {
 ## How It Works
 
 1. A row is inserted/updated/deleted on a `@realtime`-tagged table
-2. The `emit_change` trigger fires `pg_notify('realtime:{schema}.{table}', TG_OP)`
+2. The `emit_change` trigger notifies `realtime:` plus the lowercase MD5 of `<UTF-8 schema byte length>:<schema><table>` (41 bytes total). The length prefix keeps dotted identifiers unambiguous. Trigger generation, subscription plans and durable dispatch use this same encoding; deploy both server and database changes together.
 3. PostGraphile's `pgSubscriber` receives the NOTIFY
 4. The subscription re-queries the source table with RLS enforced
 5. The client receives `{ event, row }` where `row` reflects the current state

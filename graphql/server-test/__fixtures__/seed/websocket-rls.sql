@@ -26,7 +26,7 @@ CREATE POLICY delete_notes ON "simple-pets-public".rls_notes FOR DELETE TO authe
 
 CREATE FUNCTION "simple-pets-private".notify_rls_note() RETURNS trigger AS $$
 BEGIN
-  PERFORM pg_notify('realtime:simple-pets-public.rls_notes',
+  PERFORM pg_notify('realtime:' || md5(octet_length(TG_TABLE_SCHEMA)::text || ':' || TG_TABLE_SCHEMA || TG_TABLE_NAME),
     TG_OP || ':' || string_agg(id::text, ',' ORDER BY id))
     FROM changed_rows HAVING count(*) > 0;
   RETURN NULL;
@@ -80,7 +80,7 @@ GRANT EXECUTE ON FUNCTION "simple-pets-public".rls_note_visible(uuid) TO authent
 
 CREATE FUNCTION "simple-pets-public".rls_overflow() RETURNS boolean AS $$
 BEGIN
-  PERFORM pg_notify('realtime:simple-pets-public.rls_notes', 'INVALIDATE');
+  PERFORM pg_notify('realtime:' || md5(octet_length('simple-pets-public')::text || ':simple-pets-publicrls_notes'), 'INVALIDATE');
   RETURN true;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
@@ -88,3 +88,46 @@ GRANT EXECUTE ON FUNCTION "simple-pets-public".rls_overflow() TO authenticated;
 
 UPDATE routing_public.database_settings SET max_concurrent_requests = 8
 WHERE database_id = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
+
+CREATE TABLE "simple-pets-public".long_realtime_notification_lifecycle_notes (
+  id uuid PRIMARY KEY,
+  owner_id uuid NOT NULL,
+  title text NOT NULL DEFAULT 'long channel contents'
+);
+COMMENT ON TABLE "simple-pets-public".long_realtime_notification_lifecycle_notes IS E'@realtime';
+ALTER TABLE "simple-pets-public".long_realtime_notification_lifecycle_notes ENABLE ROW LEVEL SECURITY;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "simple-pets-public".long_realtime_notification_lifecycle_notes TO authenticated;
+CREATE POLICY own_long_notes ON "simple-pets-public".long_realtime_notification_lifecycle_notes TO authenticated
+  USING (owner_id = nullif(current_setting('jwt.claims.user_id', true), '')::uuid)
+  WITH CHECK (owner_id = nullif(current_setting('jwt.claims.user_id', true), '')::uuid);
+
+CREATE FUNCTION "simple-pets-private".notify_long_realtime_note() RETURNS trigger AS $$
+BEGIN
+  PERFORM pg_notify('realtime:' || md5(octet_length(TG_TABLE_SCHEMA)::text || ':' || TG_TABLE_SCHEMA || TG_TABLE_NAME),
+    TG_OP || ':' || string_agg(id::text, ',' ORDER BY id)) FROM changed_rows HAVING count(*) > 0;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER long_note_insert AFTER INSERT ON "simple-pets-public".long_realtime_notification_lifecycle_notes
+  REFERENCING NEW TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_long_realtime_note();
+CREATE TRIGGER long_note_update AFTER UPDATE ON "simple-pets-public".long_realtime_notification_lifecycle_notes
+  REFERENCING NEW TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_long_realtime_note();
+CREATE TRIGGER long_note_delete AFTER DELETE ON "simple-pets-public".long_realtime_notification_lifecycle_notes
+  REFERENCING OLD TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_long_realtime_note();
+
+CREATE FUNCTION "simple-pets-public".write_long_realtime_note(note_id uuid, operation text) RETURNS uuid AS $$
+BEGIN
+  IF operation = 'INSERT' THEN
+    INSERT INTO "simple-pets-public".long_realtime_notification_lifecycle_notes (id, owner_id)
+    VALUES (note_id, current_setting('jwt.claims.user_id')::uuid);
+  ELSIF operation = 'UPDATE' THEN
+    UPDATE "simple-pets-public".long_realtime_notification_lifecycle_notes SET title = title || '!' WHERE id = note_id;
+  ELSIF operation = 'DELETE' THEN
+    DELETE FROM "simple-pets-public".long_realtime_notification_lifecycle_notes WHERE id = note_id;
+  ELSE
+    RAISE EXCEPTION 'Unknown test operation';
+  END IF;
+  RETURN note_id;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+GRANT EXECUTE ON FUNCTION "simple-pets-public".write_long_realtime_note(uuid, text) TO authenticated;
