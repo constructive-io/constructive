@@ -128,7 +128,13 @@ const buildPreset = (
         grafserv: {
           middleware: {
             onSubscribe(next, event) {
-              const operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+              let operation;
+              try {
+                operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+              } catch (error) {
+                if (error instanceof GraphQLError) return [error];
+                throw error;
+              }
               if (operation?.operation !== 'subscription') {
                 return [new GraphQLError('WebSocket transport only accepts subscriptions')];
               }

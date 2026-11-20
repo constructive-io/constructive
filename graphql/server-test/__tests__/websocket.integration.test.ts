@@ -15,10 +15,21 @@ const HOST = 'app.test.constructive.io';
 const ACTOR = 'bbbbbbbb-0000-4000-8000-000000000002';
 const DATABASE = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const shared = path.join(__dirname, '../../../__fixtures__/seed');
+let releasePulse: () => void;
 const probe = makeExtendSchemaPlugin({
-  typeDefs: 'extend type Subscription { identity: String! }',
+  typeDefs: 'extend type Subscription { identity: String! pulse: Int! }',
   plans: {
     Subscription: {
+      pulse: {
+        subscribePlan() {
+          return lambda(context(), async function* () {
+            yield 0;
+            await new Promise<void>((resolve) => { releasePulse = resolve; });
+            yield 1;
+          });
+        },
+        plan: ($event) => $event
+      },
       identity: {
         subscribePlan() {
           return lambda(context(), async function* (ctx) {
@@ -66,19 +77,23 @@ describe('public tenant WebSocket subscriptions', () => {
   beforeEach(async () => { await pg.beforeEach(); await db.beforeEach(); });
   afterEach(async () => { await db.afterEach(); await pg.afterEach(); });
 
-  async function subscribe(params?: Record<string, unknown>, headers: Record<string, string> = {}, query = 'subscription { identity }', host = HOST): Promise<any> {
+  function socketClient(params?: Record<string, unknown>, headers: Record<string, string> = {}, host = HOST) {
     class Socket extends WebSocket {
       constructor(address: string, protocols: string[]) {
         super(address, protocols, { headers: { Host: host, ...headers } });
       }
     }
-    const client = createClient({
+    return createClient({
       url: server.graphqlUrl.replace('http:', 'ws:'),
       webSocketImpl: Socket,
       connectionParams: params,
       retryAttempts: 0,
       connectionAckWaitTimeout: 3000
     });
+  }
+
+  async function subscribe(params?: Record<string, unknown>, headers: Record<string, string> = {}, query = 'subscription { identity }', host = HOST): Promise<any> {
+    const client = socketClient(params, headers, host);
     let unsubscribe = () => {};
     try {
       return await new Promise((resolve, reject) => {
@@ -109,6 +124,41 @@ describe('public tenant WebSocket subscriptions', () => {
   it('accepts a bearer header without connection parameters', async () => {
     const result = await subscribe(undefined, { Authorization: `Bearer ${token}` });
     expect(JSON.parse(result.data.identity)['jwt.claims.user_id']).toBe(ACTOR);
+  });
+
+  it('keeps another subscription alive when an operation has malformed GraphQL', async () => {
+    const client = socketClient({ Authorization: `Bearer ${token}` });
+    const values: number[] = [];
+    let first: () => void;
+    const started = new Promise<void>((resolve) => { first = resolve; });
+    let stop = () => {};
+    try {
+      const finished = new Promise<void>((resolve, reject) => {
+        stop = client.subscribe({ query: 'subscription { pulse }' }, {
+          next: (result) => { values.push(result.data.pulse as number); first(); },
+          error: reject,
+          complete: resolve
+        });
+      });
+      await started;
+      const malformed = await new Promise((resolve) => {
+        client.subscribe({ query: 'subscription {' }, {
+          next: resolve,
+          error: resolve,
+          complete: () => resolve('unexpected completion')
+        });
+      });
+      expect(malformed).toEqual(expect.arrayContaining([
+        expect.objectContaining({ message: expect.stringContaining('Syntax Error') })
+      ]));
+      releasePulse();
+      await finished;
+      expect(values).toEqual([0, 1]);
+    } finally {
+      releasePulse?.();
+      stop();
+      await client.dispose();
+    }
   });
 
   it.each([undefined, { Authorization: 'Bearer garbage' }])('refuses missing or invalid bearer credentials: %j', async (params) => {
