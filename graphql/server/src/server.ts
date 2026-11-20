@@ -182,10 +182,6 @@ class Server {
     // Resolve the tenant's protection bounds before anything can spend budget
     // on the request (and before the GraphQL handler reads them for pgSettings).
     app.use(createRequestProtectionMiddleware());
-    const graphileMiddleware = graphile(effectiveOpts);
-    app.use((req, res, next) => isWebSocketUpgrade(req)
-      ? graphileMiddleware(req, res, next)
-      : next());
     // Spend the width and rate bounds the line above resolved, before a
     // request can take a pool connection. Scoped to /graphql rather than
     // mounted globally because a concurrency slot is held for as long as the
@@ -193,6 +189,10 @@ class Server {
     // sit in the budget for the life of the stream. The other lanes need
     // their own bound sized for streaming, not this one.
     app.use('/graphql', createAdmissionControlMiddleware());
+    const graphileMiddleware = graphile(effectiveOpts);
+    app.use((req, res, next) => isWebSocketUpgrade(req)
+      ? graphileMiddleware(req, res, next)
+      : next());
 
     // CSRF protection for cookie-authenticated requests
     // Skip CSRF for Bearer token auth (not vulnerable to CSRF) and anonymous requests

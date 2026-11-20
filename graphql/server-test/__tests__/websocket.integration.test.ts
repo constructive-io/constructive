@@ -126,6 +126,42 @@ describe('public tenant WebSocket subscriptions', () => {
     expect(JSON.parse(result.data.identity)['jwt.claims.user_id']).toBe(ACTOR);
   });
 
+  it('refuses upgrades before the handshake when open sockets exhaust the shared HTTP budget', async () => {
+    const sockets: WebSocket[] = [];
+    try {
+      for (let i = 0; i < 2; i++) {
+        await new Promise<void>((resolve, reject) => {
+          const socket = new WebSocket(server.graphqlUrl.replace('http:', 'ws:'), 'graphql-transport-ws', { headers: { Host: HOST } });
+          sockets.push(socket);
+          socket.once('open', resolve);
+          socket.once('error', reject);
+        });
+      }
+      const status = await new Promise<number>((resolve, reject) => {
+        const socket = new WebSocket(server.graphqlUrl.replace('http:', 'ws:'), 'graphql-transport-ws', { headers: { Host: HOST } });
+        socket.on('error', () => {});
+        socket.once('unexpected-response', (_req, response) => {
+          response.resume();
+          socket.terminate();
+          resolve(response.statusCode);
+        });
+        socket.once('open', () => { socket.close(); reject(new Error('Upgrade bypassed admission')); });
+      });
+      expect(status).toBe(429);
+      const refused = await request.post('/graphql').set('Host', HOST).send({ query: '{ __typename }' });
+      expect(refused.status).toBe(429);
+      expect(refused.body.errors[0].extensions.code).toBe('CONCURRENCY_LIMIT_REACHED');
+    } finally {
+      await Promise.all(sockets.map((socket) => new Promise<void>((resolve) => {
+        socket.once('close', resolve);
+        socket.close();
+      })));
+    }
+    const accepted = await request.post('/graphql').set('Host', HOST).send({ query: '{ __typename }' });
+    expect(accepted.status).toBe(200);
+    expect(accepted.body.errors).toBeUndefined();
+  });
+
   it('keeps another subscription alive when an operation has malformed GraphQL', async () => {
     const client = socketClient({ Authorization: `Bearer ${token}` });
     const values: number[] = [];
