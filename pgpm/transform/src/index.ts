@@ -12,6 +12,7 @@ export {
   makeNamespaceValidator,
   makeSchemaTranspiler,
 } from './bundle-driver';
+export { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 export type { CatalogQueryable, CatalogSnapshot } from './catalog-check';
 export { diffCatalogSnapshots, snapshotCatalog, withoutColumnOrder } from './catalog-check';
 export type {
