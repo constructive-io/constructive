@@ -200,10 +200,10 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                         const allPkRows: Record<string, unknown>[] = [];
 
                         for (const batch of batches) {
-                          const result = await pgClient.query(
-                            batch.text,
-                            batch.values
-                          );
+                          const result = await pgClient.query({
+                            text: batch.text,
+                            values: batch.values
+                          });
                           totalAffected += result.rowCount ?? 0;
                           if (result.rows) {
                             allPkRows.push(...result.rows);
@@ -259,10 +259,10 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                               );
 
                               for (const batch of childBatches) {
-                                const result = await pgClient.query(
-                                  batch.text,
-                                  batch.values
-                                );
+                                const result = await pgClient.query({
+                                  text: batch.text,
+                                  values: batch.values
+                                });
                                 totalAffected += result.rowCount ?? 0;
                               }
                             }
@@ -282,10 +282,10 @@ export const BulkInsertPlugin: GraphileConfig.Plugin = {
                           const selectParams = allPkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
-                            `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
-                            selectParams
-                          );
+                          const selectResult = await pgClient.query({
+                            text: `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
+                            values: selectParams
+                          });
                           returning = selectResult.rows || [];
                         }
 

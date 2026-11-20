@@ -212,7 +212,7 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
 
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         const text = `UPDATE ${compiledFrom}\nSET ${setClauses.join(', ')}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await pgClient.query({ text, values });
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // Follow-up SELECT using PKs to respect column-level grants
@@ -229,10 +229,10 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                           const selectParams = pkRows.flatMap((pkRow) =>
                             pkColumns.map((col) => pkRow[col])
                           );
-                          const selectResult = await pgClient.query(
-                            `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
-                            selectParams
-                          );
+                          const selectResult = await pgClient.query({
+                            text: `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
+                            values: selectParams
+                          });
                           returning = selectResult.rows || [];
                         }
 

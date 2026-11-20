@@ -194,7 +194,7 @@ export const BulkDeletePlugin: GraphileConfig.Plugin = {
                         // Use RETURNING <pk_columns> instead of RETURNING *
                         // For delete, we capture PKs before rows are gone
                         const text = `DELETE FROM ${compiledFrom}\nWHERE ${whereStr}\nRETURNING ${pkReturning}`;
-                        const mutationResult = await pgClient.query(text, values);
+                        const mutationResult = await pgClient.query({ text, values });
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // For delete, rows no longer exist so we can't do a
