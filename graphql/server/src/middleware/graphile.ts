@@ -19,6 +19,8 @@ import {
   createConstructivePreset,
   createGrafastCacheLimitsPreset
 } from 'graphile-settings';
+import { getOperationAST, GraphQLError, parse } from 'graphql';
+import type { IncomingMessage } from 'http';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import errorPage404Message from '../errors/404-message';
@@ -36,6 +38,7 @@ import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import { authenticatedWebSocketRequest, forwardWebSocketUpgrade } from './websocket';
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
@@ -93,7 +96,8 @@ const buildPreset = (
   apiId?: string,
   compute?: ComputeConfig,
   webauthn?: boolean,
-  platform?: boolean
+  platform?: boolean,
+  serverOptions: ConstructiveOptions = {}
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -118,6 +122,21 @@ const buildPreset = (
       RequestProtectionPlugin,
       CaptchaPlugin,
       createErrorEventsPlugin(pool),
+      {
+        name: 'WebSocketSubscriptionOnlyPlugin',
+        version: '0.0.0',
+        grafserv: {
+          middleware: {
+            onSubscribe(next, event) {
+              const operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+              if (operation?.operation !== 'subscription') {
+                return [new GraphQLError('WebSocket transport only accepts subscriptions')];
+              }
+              return next();
+            }
+          }
+        }
+      },
       // Only when the tenant provisioned the WebAuthn module; the policy
       // itself is read per request from `req.api.webauthnSettings`.
       ...(webauthn ? [WebauthnPlugin] : []),
@@ -151,6 +170,7 @@ const buildPreset = (
       pgScopedIntrospection: introspection.pgScopedIntrospection
     },
     grafserv: {
+      websockets: databaseSettings?.enableRealtime === true,
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
       graphiql: true,
@@ -159,9 +179,13 @@ const buildPreset = (
     },
     grafast: {
       explain: graphileOptions?.explain === true,
-      context: (requestContext: Partial<Grafast.RequestContext>) => {
+      context: async (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        const ws = (requestContext as { ws?: { request: IncomingMessage; normalizedConnectionParams?: Record<string, unknown> } }).ws;
+        const req = ws
+          ? await authenticatedWebSocketRequest(ws.request, ws.normalizedConnectionParams, serverOptions)
+          : (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        if (ws && req) ws.request = req;
         const context: Record<string, string> = {};
 
         // Timeouts travel with the transaction as GUCs, so they bound the work
@@ -420,7 +444,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         api.apiId,
         compute,
         Boolean(api.webauthnSettings),
-        platform?.platform
+        platform?.platform,
+        opts
       );
       const instance = await observeGraphileBuild(
         {
@@ -525,6 +550,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           api = resolved;
           continue;
         }
+        if (forwardWebSocketUpgrade(req, res, instance)) return;
         return instance.handler(req, res, next);
       }
     } catch (e: any) {

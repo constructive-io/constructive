@@ -13,6 +13,7 @@ import { closeAllCaches,graphileCache } from 'graphile-cache';
 import type { Server as HttpServer } from 'http';
 import { Notification, Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
+import type { Duplex } from 'stream';
 
 import { createAgenticRouter } from './agentic';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
@@ -42,6 +43,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { createStandingMiddleware } from './middleware/standing';
+import { isWebSocketUpgrade, routeWebSocketUpgrade } from './middleware/websocket';
 import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
 const log = new Logger('server');
@@ -89,6 +91,7 @@ class Server {
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
+  private webSockets = new Set<Duplex>();
   private debugSampler: DebugSamplerHandle | null = null;
   private refusalRecorder: RefusalRecorder | null = null;
 
@@ -168,7 +171,7 @@ class Server {
     app.use(corsForRoutedApi);
     app.use(api);
     app.use(corsForRoutedApi);
-    app.use(authenticate);
+    app.use((req, res, next) => isWebSocketUpgrade(req) ? next() : authenticate(req, res, next));
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
       loaders: createDefaultRegistry()
@@ -179,6 +182,10 @@ class Server {
     // Resolve the tenant's protection bounds before anything can spend budget
     // on the request (and before the GraphQL handler reads them for pgSettings).
     app.use(createRequestProtectionMiddleware());
+    const graphileMiddleware = graphile(effectiveOpts);
+    app.use((req, res, next) => isWebSocketUpgrade(req)
+      ? graphileMiddleware(req, res, next)
+      : next());
     // Spend the width and rate bounds the line above resolved, before a
     // request can take a pool connection. Scoped to /graphql rather than
     // mounted globally because a concurrency slot is held for as long as the
@@ -227,7 +234,7 @@ class Server {
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
 
-    app.use(graphile(effectiveOpts));
+    app.use(graphileMiddleware);
     app.use(createFlushMiddleware(effectiveOpts));
 
     // Error handling - MUST be LAST
@@ -249,6 +256,12 @@ class Server {
     const httpServer = this.app.listen(server?.port, server?.host, () =>
       log.info(`listening at http://${server?.host}:${server?.port}`)
     );
+
+    httpServer.on('upgrade', (req, socket, head) => {
+      this.webSockets.add(socket);
+      socket.once('close', () => this.webSockets.delete(socket));
+      routeWebSocketUpgrade(this.app, req, socket, head);
+    });
 
     httpServer.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
@@ -409,6 +422,7 @@ class Server {
       this.debugSampler = null;
     }
     if (this.httpServer?.listening) {
+      for (const socket of this.webSockets) socket.destroy();
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
     await closeDebugDatabasePools();

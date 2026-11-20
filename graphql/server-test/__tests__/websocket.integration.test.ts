@@ -1,0 +1,141 @@
+import { context, lambda } from 'grafast';
+import { makeExtendSchemaPlugin } from 'graphile-utils';
+import { createClient } from 'graphql-ws';
+import path from 'path';
+import type { PgTestClient } from 'pgsql-test/test-client';
+import type supertest from 'supertest';
+import WebSocket from 'ws';
+
+import { getConnections, seed } from '../src';
+import type { ServerInfo } from '../src/types';
+
+jest.setTimeout(60000);
+
+const HOST = 'app.test.constructive.io';
+const ACTOR = 'bbbbbbbb-0000-4000-8000-000000000002';
+const DATABASE = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
+const shared = path.join(__dirname, '../../../__fixtures__/seed');
+const probe = makeExtendSchemaPlugin({
+  typeDefs: 'extend type Subscription { identity: String! }',
+  plans: {
+    Subscription: {
+      identity: {
+        subscribePlan() {
+          return lambda(context(), async function* (ctx) {
+            yield JSON.stringify((ctx as { pgSettings: Record<string, string> }).pgSettings);
+          });
+        },
+        plan: ($event) => $event
+      }
+    }
+  }
+});
+
+describe('public tenant WebSocket subscriptions', () => {
+  let pg: PgTestClient;
+  let db: PgTestClient;
+  let server: ServerInfo;
+  let request: supertest.Agent;
+  let teardown: () => Promise<void>;
+  let token: string;
+
+  beforeAll(async () => {
+    ({ pg, db, server, request, teardown } = await getConnections({
+      schemas: ['simple-pets-public', 'simple-pets-pets-public'],
+      graphile: { preset: { plugins: [probe] } },
+      server: { useRouting: true, api: { isPublic: true, metaSchemas: [
+        'catalog_private', 'routing_public', 'apps_public', 'metaschema_public', 'metaschema_modules_public'
+      ] } }
+    }, [
+      seed.pgpm(path.join(shared, '../..')),
+      seed.sqlfile([
+        path.join(shared, 'app-schemas/simple-pets/schema.sql'),
+        path.join(shared, 'scoped/test-data.sql'),
+        path.join(__dirname, '../__fixtures__/seed/websocket.sql')
+      ])
+    ]));
+    const response = await request.post('/graphql').set('Host', HOST).send({
+      query: 'mutation($actor: UUID!) { issueSession(input: {actor: $actor}) { result } }',
+      variables: { actor: ACTOR }
+    });
+    expect(response.body.errors).toBeUndefined();
+    token = response.body.data.issueSession.result;
+    expect(typeof token).toBe('string');
+  });
+  afterAll(async () => { await teardown?.(); });
+  beforeEach(async () => { await pg.beforeEach(); await db.beforeEach(); });
+  afterEach(async () => { await db.afterEach(); await pg.afterEach(); });
+
+  async function subscribe(params?: Record<string, unknown>, headers: Record<string, string> = {}, query = 'subscription { identity }', host = HOST): Promise<any> {
+    class Socket extends WebSocket {
+      constructor(address: string, protocols: string[]) {
+        super(address, protocols, { headers: { Host: host, ...headers } });
+      }
+    }
+    const client = createClient({
+      url: server.graphqlUrl.replace('http:', 'ws:'),
+      webSocketImpl: Socket,
+      connectionParams: params,
+      retryAttempts: 0,
+      connectionAckWaitTimeout: 3000
+    });
+    let unsubscribe = () => {};
+    try {
+      return await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('No WebSocket result')), 5000);
+        unsubscribe = client.subscribe({ query }, {
+          next: (value) => { clearTimeout(timeout); resolve(value); },
+          error: (error) => { clearTimeout(timeout); reject(error); },
+          complete: () => { clearTimeout(timeout); }
+        });
+      });
+    } finally {
+      unsubscribe();
+      await client.dispose();
+    }
+  }
+
+  it('delivers a real subscription using connectionParams-only authentication and tenant pgSettings', async () => {
+    const result = await subscribe({ Authorization: `Bearer ${token}` });
+    expect(result.errors).toBeUndefined();
+    expect(JSON.parse(result.data.identity)).toMatchObject({
+      role: 'authenticated',
+      'jwt.claims.user_id': ACTOR,
+      'jwt.claims.database_id': DATABASE,
+      'jwt.claims.api_id': '6c9997a4-591b-4cb3-9313-4ef45d6f134e'
+    });
+  });
+
+  it('accepts a bearer header without connection parameters', async () => {
+    const result = await subscribe(undefined, { Authorization: `Bearer ${token}` });
+    expect(JSON.parse(result.data.identity)['jwt.claims.user_id']).toBe(ACTOR);
+  });
+
+  it.each([undefined, { Authorization: 'Bearer garbage' }])('refuses missing or invalid bearer credentials: %j', async (params) => {
+    await expect(subscribe(params)).rejects.toEqual(expect.arrayContaining([
+      expect.objectContaining({ extensions: expect.objectContaining({ code: 'UNAUTHENTICATED' }) })
+    ]));
+  });
+
+  it('does not fall back to a valid handshake bearer when connectionParams are invalid', async () => {
+    await expect(subscribe({ Authorization: 'Bearer garbage' }, { Authorization: `Bearer ${token}` })).rejects.toEqual(expect.arrayContaining([
+      expect.objectContaining({ extensions: expect.objectContaining({ code: 'UNAUTHENTICATED' }) })
+    ]));
+  });
+
+  it('does not use ambient session cookies as WebSocket credentials', async () => {
+    await expect(subscribe(undefined, { Cookie: `constructive_session=${token}` })).rejects.toEqual(expect.arrayContaining([
+      expect.objectContaining({ extensions: expect.objectContaining({ code: 'UNAUTHENTICATED' }) })
+    ]));
+  });
+
+  it('refuses mutations on the subscription-only transport', async () => {
+    await expect(subscribe({ Authorization: `Bearer ${token}` }, {}, 'mutation { issueSession(input: {actor: "' + ACTOR + '"}) { result } }')).rejects.toEqual(expect.arrayContaining([
+      expect.objectContaining({ message: 'WebSocket transport only accepts subscriptions' })
+    ]));
+  });
+
+  it('does not route unknown hosts to another tenant', async () => {
+    await expect(subscribe({ Authorization: `Bearer ${token}` }, {}, 'subscription { identity }', 'absent.test.constructive.io')).rejects.toMatchObject({ message: expect.stringMatching(/404/) });
+  });
+});
