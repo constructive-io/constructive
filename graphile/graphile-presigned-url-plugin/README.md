@@ -22,14 +22,6 @@ Presigned URL upload plugin for PostGraphile v5.
 - Content-hash based S3 keys (SHA-256) with automatic deduplication — only against rows whose bytes are in S3, so a retry of a never-completed upload gets a fresh URL
 - Per-bucket MIME type and file size validation
 
-## Downloading an uploaded file
-
-Store the returned `file` projection in the image or upload column. To display
-or download the file, use its `id` to query the file row's `downloadUrl`.
-For a public bucket with a public URL prefix, this resolves to
-`<public_url_prefix>/<physical_bucket>/<object_key>`. Other downloads use a
-time-limited signed URL.
-
 ## Usage
 
 ```typescript

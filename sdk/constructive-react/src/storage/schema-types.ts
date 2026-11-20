@@ -1116,7 +1116,7 @@ export interface UploadFilePayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. */
+  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. After the upload is confirmed, use `file.id` to query the file row's `downloadUrl`. */
   file?: unknown | null;
   /** The file ID (UUID) */
   fileId: string;
@@ -1133,7 +1133,7 @@ export interface UploadPlatformFilePayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. */
+  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. After the upload is confirmed, use `file.id` to query the file row's `downloadUrl`. */
   file?: unknown | null;
   /** The file ID (UUID) */
   fileId: string;

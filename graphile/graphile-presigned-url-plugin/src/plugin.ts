@@ -231,7 +231,8 @@ export function createPresignedUrlPlugin(
                       description:
                           'The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. ' +
                           'Store this verbatim in an image/upload column — its `id` is what keeps the object from being ' +
-                          'garbage collected while the column still references it.',
+                          'garbage collected while the column still references it. ' +
+                          'After the upload is confirmed, use `file.id` to query the file row\'s `downloadUrl`.',
                     },
                   }
                   : {}),
