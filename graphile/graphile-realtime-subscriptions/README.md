@@ -30,6 +30,14 @@ const preset = {
 4. The subscription re-queries the source table with RLS enforced
 5. The client receives `{ event, row }` where `row` reflects the current state
 
+### Authorization
+
+INSERT and UPDATE emit no frame when the RLS-scoped row lookup is null, including metadata-only selections. An `ids` filter never grants access.
+
+DELETE is delivered only for IDs previously seen as visible by that same subscription. An invisible UPDATE clears that history. History retains at most 10,000 recently visible IDs; eviction conservatively suppresses subsequent DELETE events for forgotten IDs.
+
+Unscoped INVALIDATE signals, including throttle overflow, are suppressed because their visibility cannot be established.
+
 ## Subscription Modes
 
 ### Phase 3a (current)

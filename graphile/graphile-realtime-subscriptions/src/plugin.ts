@@ -39,23 +39,22 @@
  * Security / RLS enforcement:
  *   - Row data is always fetched via resource.get() which runs through the
  *     authenticated user's connection with their JWT role and pgSettings applied.
- *   - For INSERT/UPDATE events, if RLS denies access (resource.get returns null),
- *     the rowId is masked (set to null) to prevent metadata leaks.
- *   - For DELETE events, row is naturally null (the row no longer exists).
- *   - For INVALIDATE (overflow), the client should refetch via a normal query
- *     which is also RLS-gated.
- *   - When ids are provided, only events for those specific rows are delivered,
- *     preventing cross-tenant event leaks.
+ *   - Invisible INSERT/UPDATE events are inhibited and removed from the stream.
+ *   - DELETE is delivered only for IDs this subscription previously saw as visible.
+ *   - Unscoped INVALIDATE signals are suppressed because they cannot be authorized.
  */
 
 import { Logger } from '@pgpmjs/logger';
-import { constant, context as grafastContext, lambda,listen, object } from 'grafast';
+import { constant, context as grafastContext, inhibitIf, lambda, listen, object, sideEffect } from 'grafast';
+import type { GraphQLSchema } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
 
 import type { ParsedPayload } from './event-gate';
 import { createGatedSubscriber } from './event-gate';
+import { filterInaccessibleEvents, realtimeResponseNames } from './subscription-filter';
 import type { RealtimeSubscriptionsPluginOptions } from './types';
+import { SubscriptionVisibility } from './visibility';
 
 const log = new Logger('graphile-realtime-subscriptions');
 
@@ -127,7 +126,7 @@ function buildTypeDefs(tables: RealtimeTableInfo[]): string {
       `  event: String!\n` +
       `  """The current state of the row (null for DELETE, INVALIDATE, or if RLS denies access)."""\n` +
       `  ${rowFieldName}: ${typeName}\n` +
-      `  """The ID of the changed row (null for INVALIDATE, or masked when RLS denies access)."""\n` +
+      `  """The ID of a change visible to this subscription."""\n` +
       `  rowId: UUID\n` +
       `  """True when too many changes occurred and the client should refetch."""\n` +
       `  overflow: Boolean!\n` +
@@ -175,19 +174,22 @@ function buildPlans(
         const $pgSubscriber = (grafastContext() as any).get('pgSubscriber');
         const $topic = constant(notifyChannel);
         const $ids = args.getRaw('ids');
+        const $visibility = lambda([$pgSubscriber, $ids], () => new SubscriptionVisibility());
 
-        // Parsing, throttling and sparse-set filtering all happen in the gate,
-        // built once per subscription, so the stream below yields only events
-        // that should reach this client — every step after it is total.
         const $subscriber = lambda([$pgSubscriber, $ids], (pair: unknown) => {
           const [pgSubscriber, ids] = pair as readonly [any, string[] | null | undefined];
           return createGatedSubscriber(pgSubscriber, { ids, threshold: overflowThreshold });
         });
 
-        return listen($subscriber, $topic, ($payload: any) => object({ parsed: $payload }));
+        return listen($subscriber, $topic, ($payload: any) => object({ parsed: $payload, visibility: $visibility }));
       },
       plan($event: any) {
-        return $event;
+        const $parsed = $event.get('parsed');
+        const $rowId = lambda($parsed, (p: unknown) => reportedRowId(requirePayload(p)));
+        const $row = resource.get({ id: $rowId });
+        const $hidden = sideEffect([$parsed, $row, $event.get('visibility')], ([payload, row, visibility]: any) =>
+          !visibility.allow(requirePayload(payload), row != null));
+        return object({ parsed: inhibitIf($parsed, $hidden), row: $row });
       },
     };
 
@@ -202,11 +204,7 @@ function buildPlans(
         return lambda($parent.get('parsed'), (p: unknown) => requirePayload(p).overflow);
       },
       [rowFieldName]($parent: any) {
-        const $rowId = lambda($parent.get('parsed'), (p: unknown) =>
-          reportedRowId(requirePayload(p)),
-        );
-
-        return resource.get({ id: $rowId });
+        return $parent.get('row');
       },
     };
   }
@@ -219,8 +217,9 @@ export function createRealtimeSubscriptionsPlugin(
   options: RealtimeSubscriptionsPluginOptions = {},
 ): GraphileConfig.Plugin {
   const overflowThreshold = options.overflowThreshold ?? DEFAULT_OVERFLOW_THRESHOLD;
+  const fieldsBySchema = new WeakMap<GraphQLSchema, ReadonlySet<string>>();
 
-  return extendSchema(
+  const plugin = extendSchema(
     (build) => {
       const tables = discoverRealtimeTables(build);
 
@@ -239,6 +238,23 @@ export function createRealtimeSubscriptionsPlugin(
     },
     'RealtimeSubscriptionsPlugin',
   );
+  plugin.schema!.hooks!.finalize = (schema, build) => {
+    fieldsBySchema.set(schema, new Set(discoverRealtimeTables(build).map(table => table.fieldName)));
+    return schema;
+  };
+  plugin.grafast = {
+    middleware: {
+      async subscribe(next, { args }) {
+        const result = await next();
+        const fields = fieldsBySchema.get(args.schema);
+        if (!fields) throw new Error('Realtime authorization metadata is missing for this schema.');
+        if (!fields.size || !(Symbol.asyncIterator in result)) return result;
+        const names = realtimeResponseNames(args.document, args.operationName, fields);
+        return names.length ? filterInaccessibleEvents(result, names) : result;
+      }
+    }
+  };
+  return plugin;
 }
 
 export { createRealtimeSubscriptionsPlugin as RealtimeSubscriptionsPlugin };

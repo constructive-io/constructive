@@ -38,6 +38,8 @@ jest.mock('grafast', () => ({
   object: mockObject,
   constant: mockConstant,
   lambda: mockLambda,
+  sideEffect: jest.fn((input: any, fn: Function) => fn(input)),
+  inhibitIf: jest.fn((input: any, hidden: boolean) => hidden ? null : input),
 }));
 
 let capturedFactory: Function | null = null;
@@ -54,6 +56,7 @@ jest.mock('graphile-utils', () => ({
 }));
 
 import type { EventGateOptions } from '../src/event-gate';
+import { SubscriptionVisibility } from '../src/visibility';
 import {
   createGatedSubscriber,
   createRealtimeSubscriptionsPlugin,
@@ -336,7 +339,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.typeDefs).toContain('documents: Documents');
       expect(result.typeDefs).toContain('rowId: UUID');
       expect(result.typeDefs).toContain('overflow: Boolean!');
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('visible to this subscription');
     });
 
     it('extends Subscription type', () => {
@@ -430,19 +433,20 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(mockListen).toHaveBeenCalled();
     });
 
-    it('plan function returns event as-is', () => {
+    it('plan function authorizes the row before exposing metadata', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
-      const build = createMockBuild({
-        tasks: createMockResource('tasks', codec),
-      });
-
-      const result = capturedFactory!(build);
-      const mockEvent = { get: jest.fn() };
-
-      const planResult = result.plans['Subscription']['onTasksChanged'].plan(mockEvent);
-      expect(planResult).toBe(mockEvent);
+      const row = { id: 'row-uuid' };
+      const resource = { ...createMockResource('tasks', codec), get: jest.fn(() => row) };
+      const result = capturedFactory!(createMockBuild({ tasks: resource }));
+      const parsed = { event: 'INSERT', rowIds: ['row-uuid'], overflow: false };
+      const visibility = new SubscriptionVisibility();
+      const mockEvent = { get: (key: string) => ({ parsed, visibility }[key]) };
+      expect(result.plans['Subscription']['onTasksChanged'].plan(mockEvent)).toEqual({ parsed, row });
+      expect(resource.get).toHaveBeenCalledWith({ id: 'row-uuid' });
+      resource.get.mockReturnValue(null);
+      expect(result.plans['Subscription']['onTasksChanged'].plan(mockEvent)).toEqual({ parsed: null, row: null });
     });
 
     it('generates payload type plans with event, row, rowId, and overflow resolvers', () => {
@@ -479,7 +483,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(mockParent.get).toHaveBeenCalledWith('parsed');
     });
 
-    it('payload row resolver uses parsed rowId for full collection mode', () => {
+    it('payload row resolver reuses the authorized row', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
@@ -495,11 +499,9 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockParent = { get: jest.fn(() => ({ event: 'INSERT', rowIds: ['row-uuid'], overflow: false })) };
 
       result.plans['TasksSubscriptionPayload'].tasks(mockParent);
-      // The gate already narrowed rowIds to the subscription's ids, so the
-      // resolver reads nothing but 'parsed'.
-      expect(mockParent.get).toHaveBeenCalledWith('parsed');
+      expect(mockParent.get).toHaveBeenCalledWith('row');
       expect(mockParent.get).not.toHaveBeenCalledWith('subscribedIds');
-      expect(mockResource.get).toHaveBeenCalled();
+      expect(mockResource.get).not.toHaveBeenCalled();
     });
   });
 
@@ -642,16 +644,15 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       expect(mockArgs.getRaw).toHaveBeenCalledWith('ids');
 
-      // 'parsed' is the whole payload now — nothing downstream needs the ids.
       const listenCallback = mockListen.mock.calls[mockListen.mock.calls.length - 1][2];
       listenCallback({ event: 'INSERT', rowIds: ['id-a'], overflow: false });
       const objectArg = mockObject.mock.calls[mockObject.mock.calls.length - 1][0];
-      expect(Object.keys(objectArg)).toEqual(['parsed']);
+      expect(Object.keys(objectArg)).toEqual(['parsed', 'visibility']);
     });
   });
 
   describe('RLS-aware event delivery', () => {
-    it('rowId doc comment mentions RLS masking', () => {
+    it('rowId documentation describes authorized delivery', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('items', { realtime: true });
@@ -660,7 +661,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('visible to this subscription');
     });
 
     it('type defs include sparse set ids argument', () => {

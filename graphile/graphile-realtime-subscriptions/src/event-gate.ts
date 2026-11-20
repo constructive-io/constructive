@@ -1,14 +1,8 @@
 /**
  * The gate between PostgreSQL's NOTIFY stream and a GraphQL subscription.
  *
- * Everything that can decide "this event should not reach the client" lives
- * here, upstream of grafast, because grafast's `listen` maps each event to a
- * step and offers no way to suppress one. Deciding downstream forced the
- * plugin to represent "dropped" as a null payload, which the field resolvers
- * then had to coalesce (`p?.event ?? 'UNKNOWN'`) — so a filtered event still
- * reached the client, carrying an invented event name. Filtering here means
- * the stream only ever yields events that should exist, and every resolver
- * downstream is total.
+ * Parsing, ID filtering and throttling happen before Grafast plans each event.
+ * The plugin then authorizes the row through its RLS-scoped resource lookup.
  *
  * The gate also owns parsing and the overflow throttle, so a payload the
  * trigger and the plugin disagree about fails loudly instead of arriving as
@@ -16,6 +10,8 @@
  */
 
 import type { GrafastSubscriber } from 'grafast';
+
+import { filterMapIterator } from './async-iterator';
 
 /** Operations `emit_change` is allowed to report. */
 const KNOWN_OPERATIONS = new Set(['INSERT', 'UPDATE', 'DELETE']);
@@ -124,8 +120,7 @@ export interface EventGateOptions {
 /**
  * Apply the gate to one raw NOTIFY payload.
  *
- * Returns the payload to deliver, or `null` meaning *do not emit* — a decision
- * only this layer is allowed to make, because only this layer can act on it.
+ * Returns the payload to authorize, or `null` meaning *do not emit*.
  */
 function gate(raw: string, ids: readonly string[] | null, throttle: EventThrottle): ParsedPayload | null {
   const parsed = parseNotifyPayload(raw);
@@ -163,12 +158,9 @@ export function createGatedSubscriber(
   const throttle = new EventThrottle(threshold);
 
   return {
-    async *subscribe(topic: string) {
+    async subscribe(topic: string) {
       const source = await inner.subscribe(topic);
-      for await (const raw of source) {
-        const payload = gate(String(raw), subscribedIds, throttle);
-        if (payload !== null) yield payload;
-      }
+      return filterMapIterator(source, raw => gate(String(raw), subscribedIds, throttle));
     }
     // Deliberately no release(): `inner` is the shared pgSubscriber from the
     // request context and is not ours to tear down. Ending iteration returns
