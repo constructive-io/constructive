@@ -123,7 +123,7 @@ export class CursorTracker {
 
     try {
       const sql = `SELECT * FROM ${this.quoteIdent(this.schema)}.drain_changes($1, $2)`;
-      const result = await this.pool.query<{ drain_changes: ChangeLogEntry }>(
+      const result = await this.pool.query<{ drain_changes: Omit<ChangeLogEntry, 'subscriber_ids'> }>(
         sql,
         [this.nodeId, this.batchLimit],
       );
