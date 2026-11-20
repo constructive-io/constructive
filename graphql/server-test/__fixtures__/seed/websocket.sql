@@ -26,6 +26,6 @@ INSERT INTO metaschema_public.function (id, database_id, schema_id, name)
 VALUES ('6dba0002-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0001-0000-4000-8000-000000000001', 'authenticate');
 INSERT INTO routing_public.rls_settings (database_id, authenticate_schema_id, authenticate_function_id, authenticate_strict_function_id)
 VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0001-0000-4000-8000-000000000001', '6dba0002-0000-4000-8000-000000000001', '6dba0002-0000-4000-8000-000000000001');
-INSERT INTO routing_public.database_settings (database_id, enable_realtime, max_concurrent_requests, max_queue_wait_ms)
-VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', true, 2, 0);
+INSERT INTO routing_public.database_settings (database_id, enable_realtime, max_concurrent_requests, max_queue_wait_ms, max_request_bytes)
+VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', true, 2, 0, 1024);
 SET session_replication_role TO DEFAULT;

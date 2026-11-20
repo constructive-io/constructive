@@ -126,6 +126,29 @@ describe('public tenant WebSocket subscriptions', () => {
     expect(JSON.parse(result.data.identity)['jwt.claims.user_id']).toBe(ACTOR);
   });
 
+  it.each([
+    { query: `subscription { identity } #${'é'.repeat(600)}` },
+    { query: 'subscription { identity }', variables: { value: 'é'.repeat(600) } }
+  ])('refuses oversized subscription payloads in UTF-8 bytes: %#', async (payload) => {
+    expect(JSON.stringify(payload).length).toBeLessThan(1024);
+    expect(Buffer.byteLength(JSON.stringify(payload))).toBeGreaterThan(1024);
+    const client = socketClient({ Authorization: `Bearer ${token}` });
+    try {
+      const result = await new Promise((resolve) => {
+        client.subscribe(payload, {
+          next: resolve,
+          error: resolve,
+          complete: () => resolve('unexpected completion')
+        });
+      });
+      expect(result).toEqual(expect.arrayContaining([
+        expect.objectContaining({ extensions: expect.objectContaining({ code: 'REQUEST_TOO_LARGE' }) })
+      ]));
+    } finally {
+      await client.dispose();
+    }
+  });
+
   it('refuses upgrades before the handshake when open sockets exhaust the shared HTTP budget', async () => {
     const sockets: WebSocket[] = [];
     try {

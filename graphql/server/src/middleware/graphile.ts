@@ -31,6 +31,7 @@ import { CaptchaPlugin } from '../plugins/captcha-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { OwnerHandoffPlugin } from '../plugins/owner-handoff-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
+import { recordRefusal } from '../refusals/recorder';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
 import type { ApiOptions, DatabaseSettings } from '../types';
 import { getApiConfig, isApiError } from './api';
@@ -128,6 +129,14 @@ const buildPreset = (
         grafserv: {
           middleware: {
             onSubscribe(next, event) {
+              const req = (event.ctx.extra as { request: Request }).request;
+              const limit = (req.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+              const bytes = Buffer.byteLength(JSON.stringify(event.message.payload), 'utf8');
+              if (bytes > limit) {
+                recordRefusal(req, 'request_too_large');
+                const error = errors.REQUEST_TOO_LARGE({ bytes, limit });
+                return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+              }
               let operation;
               try {
                 operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
