@@ -610,6 +610,27 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       ]);
     });
 
+    it('counts individual rows in a batch against the throttle', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:a,b,c', 'UPDATE:d'), {
+        ids: null,
+        threshold: 1,
+      });
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'UPDATE', rowIds: ['a'], overflow: false },
+        { event: 'INVALIDATE', rowIds: [], overflow: true },
+      ]);
+    });
+
+    it('does not charge the row budget for IDs excluded by the subscription', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:excluded', 'UPDATE:a'), {
+        ids: ['a'],
+        threshold: 1,
+      });
+      await expect(collect(gated)).resolves.toEqual([
+        { event: 'UPDATE', rowIds: ['a'], overflow: false },
+      ]);
+    });
+
     it('throttles each subscription independently', async () => {
       const opts: EventGateOptions = { ids: null, threshold: 1 };
       const noisy = createGatedSubscriber(subscriberEmitting('INSERT:a', 'INSERT:b'), opts);

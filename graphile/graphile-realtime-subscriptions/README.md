@@ -36,6 +36,8 @@ INSERT and UPDATE emit no frame when the RLS-scoped row lookup is null, includin
 
 Multi-row notifications are split into individual row events before authorization, so an invisible row cannot suppress visible rows later in the batch.
 
+The throttle counts individual matching row events, not NOTIFY batches. IDs excluded by the subscription do not consume the row budget.
+
 DELETE is delivered only for IDs previously seen as visible by that same subscription. An invisible UPDATE clears that history. History retains at most 10,000 recently visible IDs; eviction conservatively suppresses subsequent DELETE events for forgotten IDs.
 
 Unscoped INVALIDATE signals, including throttle overflow, are suppressed because their visibility cannot be established.

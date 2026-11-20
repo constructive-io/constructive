@@ -11,7 +11,7 @@
 
 import type { GrafastSubscriber } from 'grafast';
 
-import { flatMapIterator } from './async-iterator';
+import { filterMapIterator, flatMapIterator } from './async-iterator';
 
 /** Operations `emit_change` is allowed to report. */
 const KNOWN_OPERATIONS = new Set(['INSERT', 'UPDATE', 'DELETE']);
@@ -122,18 +122,12 @@ export interface EventGateOptions {
  *
  * Returns the payload to authorize, or `null` meaning *do not emit*.
  */
-function gate(raw: string, ids: readonly string[] | null, throttle: EventThrottle): ParsedPayload | null {
+function gate(raw: string, ids: readonly string[] | null): ParsedPayload | null {
   const parsed = parseNotifyPayload(raw);
 
   // An INVALIDATE is the overflow signal itself; throttling it would drop the
   // one event telling the client to refetch.
   if (parsed.overflow) return parsed;
-
-  const action = throttle.check();
-  if (action === 'drop') return null;
-  if (action === 'overflow') {
-    return { event: 'INVALIDATE', rowIds: [], overflow: true };
-  }
 
   if (!ids || ids.length === 0) return parsed;
 
@@ -160,11 +154,18 @@ export function createGatedSubscriber(
   return {
     async subscribe(topic: string) {
       const source = await inner.subscribe(topic);
-      return flatMapIterator(source, raw => {
-        const payload = gate(String(raw), subscribedIds, throttle);
+      const rows = flatMapIterator(source, raw => {
+        const payload = gate(String(raw), subscribedIds);
         if (!payload) return [];
         if (payload.overflow) return [payload];
         return payload.rowIds.map(id => ({ ...payload, rowIds: [id] }));
+      });
+      return filterMapIterator(rows, payload => {
+        if (payload.overflow) return payload;
+        const action = throttle.check();
+        if (action === 'drop') return null;
+        if (action === 'overflow') return { event: 'INVALIDATE', rowIds: [], overflow: true };
+        return payload;
       });
     }
     // Deliberately no release(): `inner` is the shared pgSubscriber from the
