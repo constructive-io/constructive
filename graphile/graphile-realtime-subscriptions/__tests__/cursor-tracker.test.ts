@@ -292,7 +292,7 @@ describe('CursorTracker.drain()', () => {
     expect(onChanges).not.toHaveBeenCalled();
   });
 
-  it('returns empty array on error and calls onError', async () => {
+  it('propagates drain failures to the caller', async () => {
     const failingPool: Queryable = {
       query: jest.fn().mockRejectedValue(new Error('connection lost')),
     };
@@ -303,12 +303,8 @@ describe('CursorTracker.drain()', () => {
       onError,
     });
 
-    const result = await tracker.drain();
-
-    expect(result).toEqual([]);
-    expect(onError).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'connection lost',
-    }));
+    await expect(tracker.drain()).rejects.toThrow('connection lost');
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it('prevents concurrent drains', async () => {
@@ -447,7 +443,7 @@ describe('CursorTracker error handling', () => {
     jest.useRealTimers();
   });
 
-  it('touch_listener error calls onError without throwing', async () => {
+  it('propagates touch_listener failures', async () => {
     const failingPool: Queryable = {
       query: jest.fn().mockRejectedValue(new Error('touch failed')),
     };
@@ -458,14 +454,11 @@ describe('CursorTracker error handling', () => {
       onError,
     });
 
-    await tracker.touchListener();
-
-    expect(onError).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'touch failed',
-    }));
+    await expect(tracker.touchListener()).rejects.toThrow('touch failed');
+    expect(onError).not.toHaveBeenCalled();
   });
 
-  it('cleanup_ephemeral error calls onError without throwing', async () => {
+  it('propagates cleanup_ephemeral failures', async () => {
     const failingPool: Queryable = {
       query: jest.fn().mockRejectedValue(new Error('cleanup failed')),
     };
@@ -476,11 +469,8 @@ describe('CursorTracker error handling', () => {
       onError,
     });
 
-    await tracker.cleanupEphemeral();
-
-    expect(onError).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'cleanup failed',
-    }));
+    await expect(tracker.cleanupEphemeral()).rejects.toThrow('cleanup failed');
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it('wraps non-Error objects in Error', async () => {
@@ -494,9 +484,38 @@ describe('CursorTracker error handling', () => {
       onError,
     });
 
-    await tracker.drain();
+    await expect(tracker.drain()).rejects.toThrow('string error');
+    expect(onError).not.toHaveBeenCalled();
+  });
 
-    expect(onError).toHaveBeenCalledWith(expect.any(Error));
-    expect(onError.mock.calls[0][0].message).toBe('string error');
+  it('rejects failed initial drain, cleans registration, and leaves no timers', async () => {
+    const pool = createMockPool();
+    pool.query.mockResolvedValueOnce({ rows: [] }).mockRejectedValueOnce(new Error('initial drain failed'));
+    const tracker = new CursorTracker({ pool, schema: 'physical_rt' });
+    await expect(tracker.start()).rejects.toThrow('initial drain failed');
+    expect(pool.query).toHaveBeenLastCalledWith('SELECT physical_rt.cleanup_ephemeral($1)', [tracker.nodeId]);
+    expect(tracker.isRunning).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('rejects failed registration without installing timers', async () => {
+    const pool = createMockPool();
+    pool.query.mockRejectedValueOnce(new Error('registration failed'));
+    const tracker = new CursorTracker({ pool });
+    await expect(tracker.start()).rejects.toThrow('registration failed');
+    expect(pool.query).toHaveBeenCalledTimes(1);
+    expect(tracker.isRunning).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('preserves a startup failure when registration cleanup also fails', async () => {
+    const pool = createMockPool();
+    const error = new Error('drain failed');
+    const cleanup = new Error('cleanup failed');
+    pool.query.mockResolvedValueOnce({ rows: [] }).mockRejectedValueOnce(error).mockRejectedValueOnce(cleanup);
+    const tracker = new CursorTracker({ pool });
+    await expect(tracker.start()).rejects.toMatchObject({ errors: [error, cleanup] });
+    expect(tracker.isRunning).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
   });
 });

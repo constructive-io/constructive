@@ -290,7 +290,7 @@ describe('RealtimeManager', () => {
   });
 
   describe('error handling', () => {
-    it('calls onError when drain fails', async () => {
+    it('propagates an initial drain failure and resets its started state', async () => {
       const errors: Error[] = [];
 
       mockPool.query.mockImplementation(async (sql: string) => {
@@ -301,10 +301,14 @@ describe('RealtimeManager', () => {
       });
 
       const manager = createManager({ onError: (err: Error) => errors.push(err) });
-      await manager.start();
+      await expect(manager.start()).rejects.toThrow('drain failed');
+      expect(manager.isRunning).toBe(false);
+      expect(errors).toEqual([]);
+      expect(jest.getTimerCount()).toBe(0);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].message).toBe('drain failed');
+      mockPool.query.mockResolvedValue({ rows: [] });
+      await manager.start();
+      expect(manager.isRunning).toBe(true);
 
       await manager.stop();
     });

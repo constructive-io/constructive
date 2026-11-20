@@ -103,7 +103,12 @@ export class RealtimeManager {
     this.started = true;
 
     log.info(`Starting RealtimeManager: node=${this.nodeId}`);
-    await this.cursorTracker.start();
+    try {
+      await this.cursorTracker.start();
+    } catch (error) {
+      this.started = false;
+      throw error;
+    }
   }
 
   async stop(): Promise<void> {

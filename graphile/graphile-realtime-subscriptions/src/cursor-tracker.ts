@@ -65,17 +65,29 @@ export class CursorTracker {
 
     log.info(`Starting cursor tracker: node=${this.nodeId}, schema=${this.schema}`);
 
-    await this.touchListener();
-
-    // Initial drain immediately after registration
-    await this.drain();
+    let registered = false;
+    try {
+      await this.touchListener();
+      registered = true;
+      await this.drain();
+    } catch (error) {
+      this.running = false;
+      if (registered) {
+        try {
+          await this.cleanupEphemeral();
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], `Cursor startup and cleanup failed for node=${this.nodeId}`);
+        }
+      }
+      throw error;
+    }
 
     this.pollTimer = setInterval(() => {
-      void this.drain();
+      void this.drain().catch(this.onError);
     }, this.pollIntervalMs);
 
     this.heartbeatTimer = setInterval(() => {
-      void this.touchListener();
+      void this.touchListener().catch(this.onError);
     }, this.heartbeatIntervalMs);
   }
 
@@ -117,8 +129,7 @@ export class CursorTracker {
 
       return entries;
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
-      return [];
+      throw err instanceof Error ? err : new Error(String(err));
     } finally {
       this.draining = false;
     }
@@ -129,7 +140,7 @@ export class CursorTracker {
       const sql = `SELECT ${this.quoteIdent(this.schema)}.touch_listener($1)`;
       await this.pool.query(sql, [this.nodeId]);
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
+      throw err instanceof Error ? err : new Error(String(err));
     }
   }
 
@@ -139,7 +150,7 @@ export class CursorTracker {
       await this.pool.query(sql, [this.nodeId]);
       log.info(`Cleaned up ephemeral subscriptions for node=${this.nodeId}`);
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
+      throw err instanceof Error ? err : new Error(String(err));
     }
   }
 

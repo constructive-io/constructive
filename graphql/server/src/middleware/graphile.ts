@@ -471,6 +471,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         () => createGraphileInstance({
           preset,
           cacheKey: key,
+          realtimeSchema: api.realtimeModule?.schemaName,
           enableRealtime: api.databaseSettings?.enableRealtime
         }),
         { enabled: observabilityEnabled }
