@@ -110,7 +110,6 @@ export interface SubscriptionEvent<T> {
   operation: SubscriptionOperation;
   data: T | null;
   previousValues?: Partial<T>;
-  timestamp: string;
 }
 
 export interface SubscriptionFieldMeta {

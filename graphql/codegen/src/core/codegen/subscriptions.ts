@@ -101,7 +101,6 @@ export function generateSubscriptionHook(
   ${subscriptionFieldName} {
     event
     ${singularName} { __typename }
-    timestamp
   }
 }`;
   const docDecl = constDecl(
