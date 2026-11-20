@@ -27,12 +27,32 @@ CREATE POLICY delete_notes ON "simple-pets-public".rls_notes FOR DELETE TO authe
 CREATE FUNCTION "simple-pets-private".notify_rls_note() RETURNS trigger AS $$
 BEGIN
   PERFORM pg_notify('realtime:simple-pets-public.rls_notes',
-    TG_OP || ':' || CASE WHEN TG_OP = 'DELETE' THEN OLD.id ELSE NEW.id END::text);
+    TG_OP || ':' || string_agg(id::text, ',' ORDER BY id))
+    FROM changed_rows HAVING count(*) > 0;
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TRIGGER notify_rls_note AFTER INSERT OR UPDATE OR DELETE ON "simple-pets-public".rls_notes
-  FOR EACH ROW EXECUTE FUNCTION "simple-pets-private".notify_rls_note();
+CREATE TRIGGER notify_rls_note_insert AFTER INSERT ON "simple-pets-public".rls_notes
+  REFERENCING NEW TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_rls_note();
+CREATE TRIGGER notify_rls_note_update AFTER UPDATE ON "simple-pets-public".rls_notes
+  REFERENCING NEW TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_rls_note();
+CREATE TRIGGER notify_rls_note_delete AFTER DELETE ON "simple-pets-public".rls_notes
+  REFERENCING OLD TABLE AS changed_rows FOR EACH STATEMENT EXECUTE FUNCTION "simple-pets-private".notify_rls_note();
+
+CREATE FUNCTION "simple-pets-public".bulk_write_rls_notes(note_ids uuid[], operation text)
+RETURNS boolean AS $$
+BEGIN
+  IF operation = 'UPDATE' THEN
+    UPDATE "simple-pets-public".rls_notes AS n SET title = n.title || '!' WHERE n.id = ANY(note_ids);
+  ELSIF operation = 'DELETE' THEN
+    DELETE FROM "simple-pets-public".rls_notes WHERE id = ANY(note_ids);
+  ELSE
+    RAISE EXCEPTION 'Unknown test operation';
+  END IF;
+  RETURN true;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+GRANT EXECUTE ON FUNCTION "simple-pets-public".bulk_write_rls_notes(uuid[], text) TO authenticated;
 
 CREATE FUNCTION "simple-pets-public".write_rls_note(note_id uuid, operation text, shared boolean DEFAULT NULL)
 RETURNS uuid AS $$

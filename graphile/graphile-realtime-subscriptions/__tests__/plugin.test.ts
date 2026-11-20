@@ -562,14 +562,15 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       await expect(collect(gated)).resolves.toEqual([]);
     });
 
-    it('narrows rowIds to the subscribed set so no consumer re-intersects', async () => {
+    it('narrows to the subscribed IDs and authorizes each row independently', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-b,id-a'), {
         ids: ['id-a', 'id-b'],
         threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([
-        { event: 'UPDATE', rowIds: ['id-b', 'id-a'], overflow: false },
+        { event: 'UPDATE', rowIds: ['id-b'], overflow: false },
+        { event: 'UPDATE', rowIds: ['id-a'], overflow: false },
       ]);
     });
 

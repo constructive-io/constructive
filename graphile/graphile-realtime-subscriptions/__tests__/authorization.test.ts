@@ -1,11 +1,39 @@
 import { type ExecutionResult, GraphQLError, parse } from 'graphql';
 
-import { filterMapIterator } from '../src/async-iterator';
-import type { ParsedPayload } from '../src/event-gate';
+import { filterMapIterator, flatMapIterator } from '../src/async-iterator';
+import { createGatedSubscriber, type ParsedPayload } from '../src/event-gate';
 import { filterInaccessibleEvents, realtimeResponseNames } from '../src/subscription-filter';
 import { SubscriptionVisibility } from '../src/visibility';
 
 const payload = (event: string, id = 'id'): ParsedPayload => ({ event, rowIds: [id], overflow: false });
+
+describe('per-row batch authorization', () => {
+  it('rejects an unexpanded batch rather than silently authorizing only its first row', () => {
+    const state = new SubscriptionVisibility();
+    expect(() => state.allow({ event: 'UPDATE', rowIds: ['a', 'b'], overflow: false }, true)).toThrow('single-row events');
+    expect(state.allow(payload('DELETE', 'a'), false)).toBe(false);
+  });
+  it.each(['INSERT', 'UPDATE', 'DELETE'])('splits every %s batch before applying visibility', async event => {
+    const state = new SubscriptionVisibility();
+    if (event === 'DELETE') state.allow(payload('INSERT', 'visible'), true);
+    const gate = createGatedSubscriber({ async *subscribe() { yield `${event}:hidden,visible`; } }, { threshold: 50 });
+    const accepted = [];
+    for await (const row of await gate.subscribe('topic')) {
+      expect(row.rowIds).toHaveLength(1);
+      if (state.allow(row, row.rowIds[0] === 'visible')) accepted.push(row);
+    }
+    expect(accepted).toEqual([payload(event, 'visible')]);
+  });
+  it('does not yield buffered rows after cancellation', async () => {
+    let closed = false;
+    async function* source() { try { yield [1, 2, 3]; } finally { closed = true; } }
+    const expanded = flatMapIterator(source(), values => values);
+    expect(await expanded.next()).toEqual({ done: false, value: 1 });
+    await expanded.return();
+    expect(closed).toBe(true);
+    expect(await expanded.next()).toEqual({ done: true, value: undefined });
+  });
+});
 
 describe('per-subscription visibility', () => {
   it.each(['INSERT', 'UPDATE'])('drops invisible %s and subsequent DELETE', event => {

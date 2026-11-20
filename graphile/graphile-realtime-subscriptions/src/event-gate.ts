@@ -11,7 +11,7 @@
 
 import type { GrafastSubscriber } from 'grafast';
 
-import { filterMapIterator } from './async-iterator';
+import { flatMapIterator } from './async-iterator';
 
 /** Operations `emit_change` is allowed to report. */
 const KNOWN_OPERATIONS = new Set(['INSERT', 'UPDATE', 'DELETE']);
@@ -160,7 +160,12 @@ export function createGatedSubscriber(
   return {
     async subscribe(topic: string) {
       const source = await inner.subscribe(topic);
-      return filterMapIterator(source, raw => gate(String(raw), subscribedIds, throttle));
+      return flatMapIterator(source, raw => {
+        const payload = gate(String(raw), subscribedIds, throttle);
+        if (!payload) return [];
+        if (payload.overflow) return [payload];
+        return payload.rowIds.map(id => ({ ...payload, rowIds: [id] }));
+      });
     }
     // Deliberately no release(): `inner` is the shared pgSubscriber from the
     // request context and is not ours to tear down. Ending iteration returns

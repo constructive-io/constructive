@@ -164,6 +164,46 @@ describe('RLS-gated public tenant WebSocket events', () => {
     await silent(filtered);
   });
 
+  it.each(['UPDATE', 'DELETE'])('authorizes each row of a mixed-visibility bulk %s with an invisible ID first', async operation => {
+    const [privateId, ...sharedIds] = [randomUUID(), randomUUID(), randomUUID()].sort();
+    const owner = open(alice);
+    const observer = open(bob);
+    const filtered = open(bob, [privateId, sharedIds[1]],
+      'subscription($ids: [UUID!]) { change: onRlsNoteChanged(ids: $ids) { event rowId } }', observer.client);
+    await ready(owner, observer);
+    await write(privateId, 'INSERT');
+    await delivered(owner, privateId, 'INSERT');
+    for (const id of sharedIds) {
+      await write(id, 'INSERT', true);
+      await delivered(owner, id, 'INSERT');
+      await delivered(observer, id, 'INSERT');
+    }
+    await delivered(filtered, sharedIds[1], 'INSERT');
+    await visible(bob, privateId, false);
+    for (const id of sharedIds) await visible(bob, id, true);
+    await pause(100);
+    for (const stream of streams) stream.frames.length = 0;
+    const ids = [privateId, ...sharedIds];
+    const result = await http(alice, 'mutation($ids: [UUID]!, $op: String!) { bulkWriteRlsNotes(input: {noteIds: $ids, operation: $op}) { result } }', { ids, op: operation });
+    expect(result.bulkWriteRlsNotes.result).toBe(true);
+    await Promise.all([
+      ...ids.map(id => delivered(owner, id, operation)),
+      ...sharedIds.map(id => delivered(observer, id, operation)),
+      delivered(filtered, sharedIds[1], operation)
+    ]);
+    await pause(100);
+    for (const [stream, expectedIds] of [[owner, ids], [observer, sharedIds], [filtered, [sharedIds[1]]]] as const) {
+      expect(stream.errors).toEqual([]);
+      expect(stream.frames.flatMap(frame => frame.errors ?? [])).toEqual([]);
+      expect(payloads(stream).map(payload => payload.rowId).sort()).toEqual([...expectedIds].sort());
+      expect(payloads(stream).map(payload => payload.event)).toEqual(expectedIds.map(() => operation));
+    }
+    for (const payload of payloads(observer)) {
+      if (operation === 'DELETE') expect(payload.rlsNote).toBeNull();
+      else expect(payload.rlsNote).toMatchObject({ id: payload.rowId });
+    }
+  });
+
   it('forgets visibility when an UPDATE moves the row out of scope, including later DELETE', async () => {
     const a = open(alice);
     const b = open(bob);
