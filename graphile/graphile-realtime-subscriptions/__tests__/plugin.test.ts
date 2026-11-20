@@ -259,7 +259,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 
@@ -272,7 +272,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 
@@ -282,7 +282,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const build = createMockBuild({});
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 

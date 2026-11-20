@@ -226,7 +226,7 @@ export function createRealtimeSubscriptionsPlugin(
 
       if (tables.length === 0) {
         log.info('No tables with @realtime tag found — skipping subscription generation');
-        return { typeDefs: '', plans: {} };
+        return { typeDefs: [], plans: {} };
       }
 
       log.info(`Generating subscription fields for ${tables.length} realtime table(s)`);
