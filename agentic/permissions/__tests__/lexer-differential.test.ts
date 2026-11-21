@@ -56,6 +56,17 @@ const rows: Row[] = [
   ["echo -i >/dev/null; declare $_ x='a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["echo -n >/dev/null; declare $_ r='a[$(touch /tmp/pwned)]'; echo $r", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["echo -v; printf $_ 'a[$(touch /tmp/pwned)]' x", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // git options that run a program their value names, in every spelling git accepts
+  ["git fetch --upload-pack='cat ~/.ssh/id_rsa > k;' .", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git grep -O'touch x;' foo", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git rebase -x 'touch x' HEAD~1", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git rebase -ix 'touch x' HEAD~1", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git fetch --upl='touch x' .", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git fetch {--upload-pack='touch x',.}", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ['git fetch "$OPT" .', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git push --receive-pack='touch x' origin", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git clone -u 'touch x' https://example.invalid/r.git", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["PAGER_CMD='touch x' git --config-env=core.pager=PAGER_CMD log", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],

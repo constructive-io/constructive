@@ -7,12 +7,41 @@ import * as path from 'node:path';
 
 import { isSecretFile } from '../secret-files';
 import type { Arg } from './analyze';
-import { type CommandContext, generic, has, longSpellings, parse, type Parsed, valuesOf } from './args';
+import { type CommandContext, generic, has, longSpellings, optionMatches, parse, type Parsed, valuesOf } from './args';
 import { isRemoteSpec, isUrl } from './words';
 
 /** `git -c` keys that make git run a program. */
 const GIT_EXEC_CONFIG =
   /^(alias\.|core\.(sshcommand|pager|editor|fsmonitor|hookspath|askpass|gitproxy)|diff\.|credential\.|sequence\.editor|gpg\.|filter\.|uploadpack\.|protocol\.|include\.|includeif\.|remote\..*\.(uploadpack|receivepack))/i;
+
+/** Options with which a git subcommand runs a program their value names. */
+const RUNS_PROGRAM: ReadonlyMap<string, readonly string[]> = new Map([
+  ['fetch', ['--upload-pack']],
+  ['pull', ['--upload-pack']],
+  ['clone', ['-u', '--upload-pack']],
+  ['ls-remote', ['-u', '--upload-pack']],
+  ['archive', ['--exec']],
+  ['push', ['--receive-pack', '--exec']],
+  ['rebase', ['-x', '--exec']],
+  ['grep', ['-O', '--open-files-in-pager']]
+]);
+
+/**
+ * A subcommand option that runs a program, in any spelling git reads: past
+ * `--` (git can take `--` as another option's value), clustered and
+ * abbreviated; and an argument from a variable, which may be such an option.
+ */
+function runsProgram(ctx: CommandContext, sub: string | undefined, args: readonly Arg[]): void {
+  const denied = sub === undefined ? undefined : RUNS_PROGRAM.get(sub);
+  if (!denied) return;
+  const hit = args.find((a) => a.unknown || denied.some((d) => optionMatches(a.text, d)));
+  if (!hit) return;
+  ctx.analyzer.dynamic(
+    hit.unknown
+      ? `it passes git ${sub} ${hit.raw}, a value from a variable that may be an option that runs a program`
+      : `it runs git ${sub} ${hit.raw}, which runs a program the command names`
+  );
+}
 
 /** `--output` and its abbreviations: git writes what it prints to that file. */
 const OUTPUT = longSpellings('--output');
@@ -80,6 +109,9 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
       if (repointed) analyzer.gitRemotes.add(repointed[1]);
     } else if (/^--(git-dir|work-tree)=/.test(t)) {
       analyzer.addPath({ ...rest[k], text: t.slice(t.indexOf('=') + 1) }, 'read', true);
+    } else if (t === '--config-env' || t.startsWith('--config-env=')) {
+      const kv = t === '--config-env' ? rest[++k]?.text : t.slice('--config-env='.length);
+      if (kv && GIT_EXEC_CONFIG.test(kv)) analyzer.dynamic(`git --config-env ${kv} makes git run a program from the environment`);
     } else if (t.startsWith('--exec-path')) {
       analyzer.dynamic('git --exec-path changes which programs git runs');
     } else if (!t.startsWith('-')) {
@@ -88,6 +120,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   }
   const sub = rest[k]?.text;
   const args = rest.slice(k + 1);
+  runsProgram(ctx, sub, args);
   const saved = analyzer.base;
   analyzer.base = base;
   try {
