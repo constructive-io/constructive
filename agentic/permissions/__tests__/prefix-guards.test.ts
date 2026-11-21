@@ -16,6 +16,7 @@ const projectMatch = async (command: string) => asAsk(await sb.bash(command, 'as
 // matches its leading words. In Ask mode it must still ask.
 // prettier-ignore
 const bypasses: [command: string, prefixes: string[]][] = [
+  ['rg --pre sh . s.sh', ['rg']],
   ["git grep -O'touch x;' foo", ['git grep']],
   ["git fetch --upload-pack='touch x;' .", ['git fetch']],
   ["git rebase -x 'touch x' HEAD~1", ['git rebase']],
@@ -71,5 +72,52 @@ describe('a prefix never covers a part that writes a file or runs another progra
     for (const command of ['touch src/a.ts', 'git log --output=notes.txt', "git fetch --upload-pack='touch x' .", 'echo a\rb']) {
       expect((await projectMatch(command)).type).toBe('command');
     }
+  });
+});
+
+// Each card offered a prefix that covers any code or remote action its arguments name.
+// prettier-ignore
+const broad: string[] = [
+  "gh api graphql -f query='{viewer{login}}'",
+  'npm init -y',
+  'npm x cowsay hi',
+  'npm exec cowsay',
+  'npm run-script build',
+  'npm install left-pad',
+  'npx jest',
+  'pnpm create vite',
+  'pnpm dlx create-foo',
+  'pnpm exec jest',
+  'pnpm add left-pad',
+  'yarn dlx create-foo',
+  'yarn create foo',
+  'bun x cowsay',
+  'bun create foo',
+  'bunx cowsay',
+  'deno run main.ts',
+  'go run .',
+  'cargo run',
+  'docker run --rm hello-world',
+  'python -m pytest -q',
+  'make test',
+  'printf %s x',
+  'rg foo',
+  'sort README.md',
+  'git bisect run make',
+  'git submodule foreach ls',
+  'git config user.name x',
+  'git remote add x https://x.example'
+];
+
+describe('the arity table offers a prefix only for an action that runs no code from its arguments', () => {
+  it.each(broad)('%j gets the exact command', async (command) => {
+    expect(await projectMatch(command)).toEqual({ type: 'command', command });
+  });
+
+  it('ignores a held prefix for a program the table does not list', async () => {
+    const mutation = "gh api graphql -f query='mutation{deleteRepository(input:{repositoryId:\"x\"}){clientMutationId}}'";
+    expect((await sb.bash(mutation, 'ask', [prefix('gh api graphql')])).decision).toBe('ask');
+    expect((await sb.bash('git bisect run rm -rf src', 'ask', [prefix('git')])).decision).toBe('ask');
+    expect((await sb.bash('npm test', 'ask', [prefix('npm')])).decision).toBe('ask');
   });
 });
