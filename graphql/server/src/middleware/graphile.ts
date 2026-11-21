@@ -128,7 +128,7 @@ const buildPreset = (
         version: '0.0.0',
         grafserv: {
           middleware: {
-            onSubscribe(next, event) {
+            async onSubscribe(next, event) {
               const req = (event.ctx.extra as { request: Request }).request;
               const limit = (req.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
               const bytes = Buffer.byteLength(JSON.stringify(event.message.payload), 'utf8');
@@ -147,7 +147,17 @@ const buildPreset = (
               if (operation?.operation !== 'subscription') {
                 return [new GraphQLError('WebSocket transport only accepts subscriptions')];
               }
-              return next();
+              const result = await next();
+              if (result && !Array.isArray(result)) {
+                const refreshed = (result as { requestContext?: { ws?: { request?: Request } } }).requestContext?.ws?.request;
+                const refreshedLimit = (refreshed?.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+                if (refreshed && bytes > refreshedLimit) {
+                  recordRefusal(refreshed, 'request_too_large');
+                  const error = errors.REQUEST_TOO_LARGE({ bytes, limit: refreshedLimit });
+                  return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+                }
+              }
+              return result;
             }
           }
         }

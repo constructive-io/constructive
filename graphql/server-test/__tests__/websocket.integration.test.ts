@@ -1,3 +1,4 @@
+import { requestProtectionLoader } from '@constructive-io/express-context';
 import { context, lambda } from 'grafast';
 import { makeExtendSchemaPlugin } from 'graphile-utils';
 import { createClient } from 'graphql-ws';
@@ -147,6 +148,56 @@ describe('public tenant WebSocket subscriptions', () => {
       ]));
     } finally {
       await client.dispose();
+    }
+  });
+
+  it('rechecks payload bytes after refreshing protection on an existing socket', async () => {
+    const saved = await pg.one('SELECT max_request_bytes FROM routing_public.database_settings WHERE database_id = $1', [DATABASE]);
+    const client = socketClient({ Authorization: `Bearer ${token}` });
+    const frames: any[] = [];
+    const failures: unknown[] = [];
+    let first!: () => void;
+    let complete!: () => void;
+    const started = new Promise<void>(resolve => { first = resolve; });
+    const finished = new Promise<void>(resolve => { complete = resolve; });
+    let stop = () => {};
+    try {
+      await pg.query('UPDATE routing_public.database_settings SET max_request_bytes = 8192 WHERE database_id = $1', [DATABASE]);
+      await pg.publish();
+      requestProtectionLoader.invalidate(DATABASE);
+      stop = client.subscribe({ query: 'subscription { pulse }' }, {
+        next: value => { frames.push(value); first(); },
+        error: error => { failures.push(error); first(); complete(); },
+        complete
+      });
+      await started;
+      expect(failures).toEqual([]);
+      expect(frames[0].data.pulse).toBe(0);
+      await pg.query('UPDATE routing_public.database_settings SET max_request_bytes = 1024 WHERE database_id = $1', [DATABASE]);
+      await pg.publish();
+      requestProtectionLoader.invalidate(DATABASE);
+      const payload = { query: `subscription { identity } #${'a'.repeat(2048)}` };
+      const bytes = Buffer.byteLength(JSON.stringify(payload));
+      expect(bytes).toBeGreaterThan(1024);
+      expect(bytes).toBeLessThan(8192);
+      const result = await new Promise(resolve => {
+        client.subscribe(payload, { next: resolve, error: resolve, complete: () => resolve('unexpected completion') });
+      });
+      expect(result).toEqual(expect.arrayContaining([
+        expect.objectContaining({ extensions: expect.objectContaining({ code: 'REQUEST_TOO_LARGE' }) })
+      ]));
+      releasePulse();
+      await finished;
+      expect(failures).toEqual([]);
+      expect(frames.flatMap(frame => frame.errors ?? [])).toEqual([]);
+      expect(frames.map(frame => frame.data.pulse)).toEqual([0, 1]);
+    } finally {
+      releasePulse?.();
+      stop();
+      await client.dispose();
+      await pg.query('UPDATE routing_public.database_settings SET max_request_bytes = $1 WHERE database_id = $2', [saved.max_request_bytes, DATABASE]);
+      await pg.publish();
+      requestProtectionLoader.invalidate(DATABASE);
     }
   });
 
