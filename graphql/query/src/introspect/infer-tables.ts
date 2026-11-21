@@ -168,13 +168,13 @@ export function inferTablesFromIntrospection(
     const subscription = subscriptionFields.find(
       (field) => field.name === `on${entityName}Changed`,
     );
-    if (subscription) {
+    if (subscription && !isList(subscription.type)) {
       const payload = getTypeFields(typeMap.get(getBaseTypeName(subscription.type)));
       const hasEvent = payload.some(
-        (field) => field.name === 'event' && getBaseTypeName(field.type) === 'String',
+        (field) => field.name === 'event' && !isList(field.type) && getBaseTypeName(field.type) === 'String',
       );
       const hasRow = payload.some(
-        (field) => field.name === lcFirst(entityName) && getBaseTypeName(field.type) === entityName,
+        (field) => field.name === lcFirst(entityName) && !isList(field.type) && getBaseTypeName(field.type) === entityName,
       );
       if (hasEvent && hasRow) {
         table.smartTags = { '@realtime': true, ...table.smartTags };
