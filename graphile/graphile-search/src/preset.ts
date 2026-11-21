@@ -124,7 +124,7 @@ export function UnifiedSearchPreset(
 
   if (tsvector) {
     const opts = typeof tsvector === 'object' ? tsvector : {};
-    adapters.push(createTsvectorAdapter({ ...(tsConfig !== undefined && { tsConfig }), ...opts }));
+    adapters.push(createTsvectorAdapter({ ...opts, tsConfig: opts.tsConfig ?? tsConfig }));
   }
 
   if (bm25) {

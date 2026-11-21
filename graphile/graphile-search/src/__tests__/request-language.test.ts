@@ -10,7 +10,8 @@ import { requestTsConfig } from '../ts-config';
 const filters = ['tsvTsv', 'unifiedSearch', 'matches'] as const;
 type Filter = typeof filters[number];
 
-describe.each([false, true])('request search language (explicit adapter config: %s)', (explicit) => {
+describe.each(['none', 'adapter', 'preset'])('request search language (explicit config: %s)', (configuration) => {
+  const explicit = configuration !== 'none';
   let db: PgTestClient;
   let pg: PgTestClient;
   let teardown: () => Promise<void>;
@@ -22,7 +23,8 @@ describe.each([false, true])('request search language (explicit adapter config: 
       preset: { extends: [
         ConnectionFilterPreset(),
         UnifiedSearchPreset({ bm25: false, trgm: false, pgvector: false,
-          ...(explicit && { tsConfig: 'french', tsvector: { tsConfig: 'english' } }) }),
+          ...(configuration === 'adapter' && { tsConfig: 'french', tsvector: { tsConfig: 'english' } }),
+          ...(configuration === 'preset' && { tsConfig: 'english', tsvector: { tsConfig: undefined } }) }),
       ] },
       useRoot: true,
       authRole: 'postgres',
