@@ -170,7 +170,7 @@ export function createConstructivePreset(
 
   if (opts.enableSearch) {
     presets.push(
-      UnifiedSearchPreset({ fullTextScalarName: 'FullText', tsConfig: 'english' })
+      UnifiedSearchPreset({ fullTextScalarName: 'FullText' })
     );
   }
 

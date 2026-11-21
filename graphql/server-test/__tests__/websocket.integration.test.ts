@@ -161,6 +161,21 @@ describe('public tenant WebSocket subscriptions', () => {
     expect(JSON.parse(result.body.data.requestLanguages)).toEqual(expected);
   });
 
+  it.each(['tsvFulltext', 'unifiedSearch'])('uses HTTP Accept-Language for %s stemming on cached handlers', async (filter) => {
+    for (const language of ['fr', 'en', 'fr-CA', 'zz-Unknown']) {
+      const result = await request.post('/graphql').set('Host', HOST)
+        .set('Authorization', `Bearer ${token}`).set('Accept-Language', language)
+        .send({ query: `query($where: SearchLanguageDocumentFilter) {
+          searchLanguageDocuments(where: $where) { nodes { title } }
+        }`, variables: { where: { [filter]: 'chevaux' } } });
+      expect(result.status).toBe(200);
+      expect(result.body.errors).toBeUndefined();
+      expect(result.body.data.searchLanguageDocuments.nodes).toEqual(
+        language.startsWith('fr') ? [{ title: 'opaque' }] : []
+      );
+    }
+  });
+
   it('keeps HTTP request languages independent across cached handler executions', async () => {
     for (const language of ['en', 'fr', 'en', 'fr']) {
       const result = await request.post('/graphql').set('Host', HOST)

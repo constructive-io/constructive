@@ -116,7 +116,7 @@ export function UnifiedSearchPreset(
     enableUnifiedSearch = true,
     searchScoreWeights,
     fullTextScalarName = 'FullText',
-    tsConfig = 'english',
+    tsConfig,
     rrfK,
   } = options;
 
@@ -124,7 +124,7 @@ export function UnifiedSearchPreset(
 
   if (tsvector) {
     const opts = typeof tsvector === 'object' ? tsvector : {};
-    adapters.push(createTsvectorAdapter(opts));
+    adapters.push(createTsvectorAdapter({ ...(tsConfig !== undefined && { tsConfig }), ...opts }));
   }
 
   if (bm25) {
@@ -158,7 +158,7 @@ export function UnifiedSearchPreset(
 
   // Collect operator factories for connection filter integration
   const operatorFactories = [];
-  if (tsvector) operatorFactories.push(createMatchesOperatorFactory(fullTextScalarName, tsConfig));
+  if (tsvector) operatorFactories.push(createMatchesOperatorFactory(fullTextScalarName, typeof tsvector === 'object' ? tsvector.tsConfig ?? tsConfig : tsConfig));
   if (trgm) operatorFactories.push(createTrgmOperatorFactories());
 
   return {
