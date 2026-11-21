@@ -36,7 +36,7 @@ export interface PutToPresignedUrlOptions {
    */
   contentHash?: string;
   /**
-   * The exact headers to send, as `requestUploadUrl` returned them in
+   * The exact headers to send, as the per-files-table upload mutation returned them in
    * `uploadHeaders`. When given they are sent as-is (they already carry
    * `Content-Type`, the checksum and the upload id the URL is signed over) and
    * `contentHash` is not needed.

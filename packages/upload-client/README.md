@@ -19,15 +19,18 @@ No Node.js-only dependencies — all APIs use Web standards (fetch, Web Crypto).
 ## Usage
 
 ```typescript
-import { uploadFile, hashFile, hashContent, putToPresignedUrl, fetchFromUrl } from '@constructive-io/upload-client';
+import { createStorageClient } from '@constructive-io/graphql-query';
+import { storageTransport, hashFile, hashContent, putToPresignedUrl, fetchFromUrl } from '@constructive-io/upload-client';
 
 // Full orchestrated upload
-const result = await uploadFile({
-  file: selectedFile,
-  bucketKey: 'avatars',
+const storage = createStorageClient({
   execute: myGraphQLExecutor,
-  onProgress: (pct) => console.log(`${pct}%`),
+  transport: storageTransport,
 });
+const result = await storage.upload(
+  { filesType: 'AppFile' },
+  { file: selectedFile, bucketKey: 'avatars' },
+);
 
 // Atomic functions for custom flows
 const hash = await hashFile(myFile);
@@ -38,9 +41,16 @@ const response = await fetchFromUrl(downloadUrl);
 
 ## API
 
-### `uploadFile(options)`
+### Upload orchestration
 
-Orchestrates the full presigned URL upload flow: hash → requestUploadUrl → PUT to S3.
+Use `createStorageClient` from `@constructive-io/graphql-query` with
+`storageTransport` from this package for the full upload flow: hash → per-files-table
+`upload<FilesType>` mutation → PUT to S3. The client discovers the upload surface
+from the server's `_meta`; select a storage plane by its files type or table.
+Replace `AppFile` in the example with your plane's GraphQL files type.
+
+This package provides the byte-level hashing, presigned PUT/GET helpers, and
+`storageTransport` adapter, not a GraphQL upload orchestrator.
 
 ### `hashFile(file)`
 
