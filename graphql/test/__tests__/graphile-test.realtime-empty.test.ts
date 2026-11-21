@@ -1,14 +1,19 @@
 import { createConstructivePreset } from 'graphile-settings';
-import { GraphQLTest } from 'graphile-test';
+import { getConnections } from 'graphile-test';
 import { parse } from 'graphql';
 import { join } from 'path';
-import { getConnections, seed } from 'pgsql-test';
+import { seed } from 'pgsql-test';
 
 let connections: Awaited<ReturnType<typeof getConnections>>;
 
 beforeAll(async () => {
   connections = await getConnections(
-    { useRoot: true },
+    {
+      useRoot: true,
+      schemas: ['app_public'],
+      authRole: 'postgres',
+      preset: { extends: [createConstructivePreset({ enableRealtime: true })] }
+    },
     [seed.sqlfile([join(__dirname, '../sql/test.sql')])]
   );
 });
@@ -26,21 +31,8 @@ afterEach(async () => {
 afterAll(async () => connections.teardown());
 
 it('builds a realtime-enabled API with no realtime-tagged tables', async () => {
-  const context = GraphQLTest({
-    schemas: ['app_public'],
-    authRole: 'postgres',
-    preset: { extends: [createConstructivePreset({ enableRealtime: true })] }
-  }, connections);
-
-  try {
-    await context.setup();
-    const result = await context.query({
-      query: parse('{ __schema { queryType { name } subscriptionType { name } } }')
-    });
-    expect(result).toEqual({
-      data: { __schema: { queryType: { name: 'Query' }, subscriptionType: null } }
-    });
-  } finally {
-    await context.teardown();
-  }
+  const result = await connections.query(parse('{ __schema { queryType { name } subscriptionType { name } } }'));
+  expect(result).toEqual({
+    data: { __schema: { queryType: { name: 'Query' }, subscriptionType: null } }
+  });
 });
