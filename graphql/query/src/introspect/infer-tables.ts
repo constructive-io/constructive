@@ -168,7 +168,9 @@ export function inferTablesFromIntrospection(
     const subscription = subscriptionFields.find(
       (field) => field.name === `on${entityName}Changed`,
     );
-    if (subscription && !isList(subscription.type)) {
+    if (subscription && !isList(subscription.type) && !subscription.args.some(
+      argument => isNonNull(argument.type) && argument.defaultValue == null,
+    )) {
       const payload = getTypeFields(typeMap.get(getBaseTypeName(subscription.type)));
       const hasEvent = payload.some(
         (field) => field.name === 'event' && !isList(field.type) && getBaseTypeName(field.type) === 'String',
