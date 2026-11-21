@@ -34,9 +34,15 @@ export function isGrantable(request: PermissionRequest): boolean {
   return !request.signals.some((s) => NEVER_GRANTED.includes(s));
 }
 
-/** The parts a prefix may cover: a bash call's, when it raises no signal at all. */
+/**
+ * The parts grants may cover one by one: a bash call's, when it raises no
+ * signal and writes no file the analysis sees (`touch`, `sort -o`, `git log
+ * --output`). Ask mode asks before a file change, so only an exact grant of
+ * the whole command covers a call that writes one.
+ */
 function prefixableParts(request: PermissionRequest): CommandPart[] | undefined {
-  return request.toolName === 'bash' && request.signals.length === 0 ? request.parts : undefined;
+  if (request.toolName !== 'bash' || request.signals.length > 0) return undefined;
+  return request.targets.some((t) => t.access === 'write') ? undefined : request.parts;
 }
 
 /** `match` covers one part of a call that raises no signal. */

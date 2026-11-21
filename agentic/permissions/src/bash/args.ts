@@ -116,6 +116,11 @@ export function leadingOptions(
   return { options, next: k };
 }
 
+/** A long option and every abbreviation git and getopt accept for it: `--o`, `--ou`, …, `--output`. */
+export function longSpellings(option: string): string[] {
+  return Array.from({ length: option.length - 2 }, (_, k) => option.slice(0, k + 3));
+}
+
 export const has = (p: Parsed, ...keys: string[]) => keys.some((key) => p.flags.has(key));
 export const valuesOf = (p: Parsed, ...keys: string[]) => keys.flatMap((key) => p.values.get(key) ?? []);
 

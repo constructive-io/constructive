@@ -1,12 +1,14 @@
 /**
  * The simple commands of a bash call, for grants that match one command at a
  * time. Only a plain list or pipeline has parts. A keyword (`if`, `for`,
- * `{ … }`), a function, a substitution or a lexer error leaves it with none,
- * so only an exact grant of the whole command covers it.
+ * `{ … }`), a function, a substitution, a heredoc or here-string, a `\r` or a
+ * lexer error leaves it with none, so only an exact grant of the whole
+ * command covers it.
  */
 
 import type { CommandPart } from '../types';
-import type { Lexed, Redirect } from './tokenize';
+import { expandBraces } from './braces';
+import type { Lexed, Redirect, Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
 /** Words that open a compound command. */
@@ -29,8 +31,49 @@ export function isShellSyntax(word: string | undefined): boolean {
   return word !== undefined && (SHELL_KEYWORDS.has(word) || COMPOUND_OPENERS.has(word));
 }
 
-export function commandParts(lexed: Lexed): CommandPart[] | null {
-  if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0) return null;
-  const parts = lexed.commands.map((cmd) => ({ words: cmd.words.map((w) => w.raw), writesFile: cmd.redirects.some(writesFile) }));
-  return parts.some((p) => isShellSyntax(p.words[0])) ? null : parts;
+/** A word's text after quote removal, with the mask of characters brace expansion may act on. */
+function literalText(word: Word): { text: string; mask: boolean[] } {
+  let text = '';
+  const mask: boolean[] = [];
+  for (const part of word.parts) {
+    const piece = part.kind === 'lit' ? part.text : '~';
+    text += piece;
+    for (let k = 0; k < piece.length; k++) mask.push(part.kind === 'lit' && !part.quoted);
+  }
+  return { text, mask };
+}
+
+/**
+ * The options a part passes, after quote removal and brace expansion, up to
+ * `--`. `null` when a word may be an option it cannot read: one that starts
+ * with a variable, or whose known start is an option or a brace.
+ */
+function optionsOf(words: readonly Word[]): string[] | null {
+  const options: string[] = [];
+  for (const word of words) {
+    const open = word.parts.findIndex((p) => p.kind === 'var' || p.kind === 'unknown');
+    if (open >= 0) {
+      const lead = literalText({ ...word, parts: word.parts.slice(0, open) }).text;
+      if (lead === '' || lead.startsWith('-') || lead.includes('{')) return null;
+      continue;
+    }
+    const { text, mask } = literalText(word);
+    const expanded: { text: string; mask: boolean[] }[] = [];
+    expandBraces(text, mask, expanded);
+    for (const e of expanded) {
+      if (e.text === '--') return options;
+      if (e.text.startsWith('-')) options.push(e.text);
+    }
+  }
+  return options;
+}
+
+export function commandParts(command: string, lexed: Lexed): CommandPart[] | null {
+  if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0 || command.includes('\r')) return null;
+  if (lexed.commands.some((cmd) => cmd.stdinDoc || isShellSyntax(cmd.words[0]?.raw))) return null;
+  return lexed.commands.map((cmd) => ({
+    words: cmd.words.map((w) => w.raw),
+    writesFile: cmd.redirects.some(writesFile),
+    options: optionsOf(cmd.words)
+  }));
 }

@@ -9,7 +9,7 @@
 import * as path from 'node:path';
 
 import type { Arg } from './analyze';
-import { type CommandContext, files, generic, leadingOptions, parse, valuesOf } from './args';
+import { type CommandContext, files, generic, leadingOptions, longSpellings, parse, type Parsed, valuesOf } from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
@@ -62,13 +62,20 @@ const READERS = new Map<string, ReadonlySet<string>>([
   ...['cat', 'less', 'more', 'bat', 'wc', 'nl', 'strings', 'file', 'stat', 'cmp', 'diff'].map((n) => [n, new Set<string>()] as const),
   ['head', new Set(['-n', '-c'])],
   ['tail', new Set(['-n', '-c', '-b'])],
-  ['sort', new Set(['-k', '-t', '-o', '-S', '-T'])],
+  ['sort', new Set(['-k', '-t', '-o', '-S', '-T', ...longSpellings('--output')])],
   ['uniq', new Set(['-f', '-s'])],
   ['base64', new Set(['-b', '-i', '-o', '-w'])],
   ['xxd', new Set(['-c', '-g', '-l', '-s', '-o'])],
   ['od', new Set(['-A', '-j', '-N', '-t'])],
   ['hexdump', new Set(['-e', '-f', '-n', '-s'])]
 ]);
+
+/** Where a reader writes instead of stdout: `sort -o FILE`, `uniq IN OUT`. */
+function readerOutputs(name: string, p: Parsed): Arg[] {
+  if (name === 'sort') return valuesOf(p, '-o', ...longSpellings('--output'));
+  if (name === 'uniq') return p.positionals.slice(1, 2);
+  return [];
+}
 
 /** The test commands: `[` and `[[` are names here, not globs. */
 export const TESTS = new Set(['test', '[', '[[']);
@@ -243,7 +250,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   if (TESTS.has(name)) return test(name, ctx, rest);
   const readerValues = READERS.get(name);
   if (readerValues) {
-    for (const v of parse(rest, readerValues).positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
+    const p = parse(rest, readerValues);
+    for (const v of p.positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
+    files(ctx, readerOutputs(name, p), 'write');
     return generic(ctx, rest);
   }
   if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
@@ -333,6 +342,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return files(ctx, parse(rest, new Set(['-m', '--mode', '-s', '--size', '-r', '--reference', '-t', '-d'])).positionals, 'write');
   case 'tee':
     return tee(ctx, rest);
+  case 'tree':
+    files(ctx, valuesOf(parse(rest, new Set(['-o', '-L', '-P', '-I', '-H', '-T'])), '-o'), 'write');
+    return generic(ctx, rest);
   case 'cp':
   case 'mv':
   case 'ln':

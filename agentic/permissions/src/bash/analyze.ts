@@ -470,7 +470,7 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
     flows: analyzer.tracker.flows,
     envRefs: [...analyzer.envRefs],
     dotglob: DOTGLOB_RE.test(command),
-    parts: lexed ? commandParts(lexed) : null
+    parts: lexed ? commandParts(command, lexed) : null
   };
 }
 
