@@ -40,9 +40,9 @@ describe('parseCommandPattern', () => {
     ['git status *,', 'Remove the extra comma.'],
     ['*', 'Add the command before `*`, as in `git status *`.'],
     ['git * status *', 'A `*` can only end a prefix, as in `git status *`. Remove the other `*` in `git * status *`.'],
-    ['git -C src status *', 'A prefix can\'t hold an option such as `-C`. End the prefix before it, or save the exact command instead.'],
-    ['git "status" *', 'A prefix can only hold plain words, and `"status"` isn\'t one. Remove it, or save the exact command instead.'],
-    ['npm run $SCRIPT *', 'A prefix can only hold plain words, and `$SCRIPT` isn\'t one. Remove it, or save the exact command instead.'],
+    ['git -C src status *', 'A prefix can\'t hold an option such as `-C`, because options can change what the command runs. Save the exact command instead.'],
+    ['git "status" *', 'A prefix can only hold plain words, and `"status"` isn\'t one. Write the word without quotes or `$`, or save the exact command instead.'],
+    ['npm run $SCRIPT *', 'A prefix can only hold plain words, and `$SCRIPT` isn\'t one. Write the word without quotes or `$`, or save the exact command instead.'],
     ['git log "x *', '`git log "x *` holds shell code a rule can\'t match. Use plain words, or save the exact command instead.'],
     ['echo $(whoami) *', '`echo $(whoami) *` holds shell code a rule can\'t match. Use plain words, or save the exact command instead.'],
     ['echo x > out.txt *', 'A prefix can\'t hold a redirection. Remove it from `echo x > out.txt *`.'],
@@ -55,7 +55,7 @@ describe('parseCommandPattern', () => {
     ['./scripts/deploy.sh *', '`./scripts/deploy.sh *` isn\'t on the prefix list, so a rule can\'t cover its later runs. Use a listed prefix, such as `git status *` or `npm run test *`, or save the exact command instead.'],
     ['npm run *', '`npm run *` is too broad. Add the script name after `npm run`.'],
     ['node *', '`node *` is too broad. Add the script name after `node`.'],
-    ['python -m pytest *', 'A prefix can\'t hold an option such as `-m`. End the prefix before it, or save the exact command instead.']
+    ['python -m pytest *', 'A prefix can\'t hold an option such as `-m`, because options can change what the command runs. Save the exact command instead.']
   ];
   it.each(refused)('refuses %j', (text, reason) => {
     expect(parseCommandPattern(text)).toEqual({ ok: false, reason });

@@ -58,10 +58,13 @@ function readPrefix(piece: string): PrefixResult {
   if (bad.startsWith('-')) {
     return {
       ok: false,
-      reason: `A prefix can't hold an option such as \`${bad}\`. End the prefix before it, or save the exact command instead.`
+      reason: `A prefix can't hold an option such as \`${bad}\`, because options can change what the command runs. Save the exact command instead.`
     };
   }
-  return { ok: false, reason: `A prefix can only hold plain words, and \`${bad}\` isn't one. Remove it, or save the exact command instead.` };
+  return {
+    ok: false,
+    reason: `A prefix can only hold plain words, and \`${bad}\` isn't one. Write the word without quotes or \`$\`, or save the exact command instead.`
+  };
 }
 
 /** A refusal when the table does not list the prefix, or `null`. */
