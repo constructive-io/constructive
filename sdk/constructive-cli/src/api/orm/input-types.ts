@@ -483,6 +483,7 @@ export interface DefaultPrivilege {
 }
 export interface Derive {
   createdAt?: string | null;
+  data?: Record<string, unknown> | null;
   databaseId?: string | null;
   id: string;
   includeGrants?: boolean | null;
@@ -3006,6 +3007,7 @@ export type DefaultPrivilegeSelect = {
 };
 export type DeriveSelect = {
   createdAt?: boolean;
+  data?: boolean;
   databaseId?: boolean;
   id?: boolean;
   includeGrants?: boolean;
@@ -5611,6 +5613,8 @@ export interface DeriveFilter {
   and?: DeriveFilter[];
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -9122,6 +9126,8 @@ export type DeriveOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'INCLUDE_GRANTS_ASC'
@@ -11685,6 +11691,7 @@ export interface DeleteDefaultPrivilegeInput {
 export interface CreateDeriveInput {
   clientMutationId?: string;
   derive: {
+    data?: Record<string, unknown>;
     databaseId?: string;
     includeGrants?: boolean;
     includeMutations?: boolean;
@@ -11695,6 +11702,7 @@ export interface CreateDeriveInput {
   };
 }
 export interface DerivePatch {
+  data?: Record<string, unknown> | null;
   databaseId?: string | null;
   includeGrants?: boolean | null;
   includeMutations?: boolean | null;
@@ -15950,6 +15958,7 @@ export interface DefaultPrivilegeInput {
 /** An input for mutations affecting `Derive` */
 export interface DeriveInput {
   createdAt?: string;
+  data?: Record<string, unknown>;
   databaseId?: string;
   id?: string;
   includeGrants?: boolean;
@@ -17640,6 +17649,8 @@ export interface DeriveFilter {
   and?: DeriveFilter[];
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */

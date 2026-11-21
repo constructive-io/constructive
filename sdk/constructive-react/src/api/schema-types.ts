@@ -475,6 +475,8 @@ export type DeriveOrderBy =
   | 'CREATED_AT_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'INCLUDE_GRANTS_ASC'
@@ -4914,6 +4916,8 @@ export interface DeriveFilter {
   and?: DeriveFilter[];
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `databaseId` field. */
@@ -4946,6 +4950,7 @@ export interface DeriveFilter {
 /** An input for mutations affecting `Derive` */
 export interface DeriveInput {
   createdAt?: string;
+  data?: unknown;
   databaseId?: string;
   id?: string;
   includeGrants?: boolean;
@@ -4959,6 +4964,7 @@ export interface DeriveInput {
 /** Represents an update to a `Derive`. Fields that are set will be updated. */
 export interface DerivePatch {
   createdAt?: string;
+  data?: unknown;
   databaseId?: string;
   id?: string;
   includeGrants?: boolean;

@@ -181,6 +181,7 @@ export interface DefaultPrivilege {
 }
 export interface Derive {
   createdAt: string | null;
+  data: unknown | null;
   databaseId: string | null;
   id: string | null;
   includeGrants: boolean | null;
