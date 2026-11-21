@@ -112,7 +112,7 @@ const PREFIX_WORD = /^[\w@%+=:,./][\w@%+=:,./-]*$/;
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
 export function prefixFor(part: CommandPart): string | null {
-  if (part.redirected) return null;
+  if (part.writesFile) return null;
   const { words } = part;
   for (let k = Math.min(words.length, LONGEST_KEY); k > 0; k--) {
     const arity = ARITY.get(words.slice(0, k).join(' '));
@@ -125,19 +125,19 @@ export function prefixFor(part: CommandPart): string | null {
 }
 
 /**
- * The part starts with the prefix's words, word by word, and has no
- * redirection: a redirection can write a file, which Ask mode asks about, so
- * only an exact grant of the whole command covers a part with one.
+ * The part starts with the prefix's words, word by word, and writes no file:
+ * Ask mode asks before a file change, so only an exact grant of the whole
+ * command covers a part that writes one.
  */
 export function prefixCovers(prefix: string, part: CommandPart): boolean {
-  if (part.redirected) return false;
+  if (part.writesFile) return false;
   const words = prefix.split(' ');
   return words.length <= part.words.length && words.every((w, i) => part.words[i] === w);
 }
 
-/** The part is exactly `command`, with no redirection: an exact grant's share of a longer command. */
+/** The part is exactly `command` and writes no file: an exact grant's share of a longer command. */
 export function partIs(command: string, part: CommandPart): boolean {
-  return !part.redirected && normalizeCommand(part.words.join(' ')) === command;
+  return !part.writesFile && normalizeCommand(part.words.join(' ')) === command;
 }
 
 /** A prefix as the user reads it: `git status *`. */

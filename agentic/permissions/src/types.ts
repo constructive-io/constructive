@@ -96,8 +96,11 @@ export type Signal =
 export interface CommandPart {
   /** The words as written, quotes kept; redirections are not words. */
   words: string[];
-  /** It has a redirection, a heredoc or a here-string. */
-  redirected: boolean;
+  /**
+   * An output redirection opens a file: anything but a copy of a descriptor
+   * (`2>&1`), input (`<`, a heredoc, a here-string) or the exact path `/dev/null`.
+   */
+  writesFile: boolean;
 }
 
 /** One tool call, classified. */
@@ -128,7 +131,7 @@ export type CommandMatch = { type: 'command'; command: string };
 
 /**
  * Bash commands by their leading words. Each prefix is words joined by one
- * space (`git status`) and covers a part with no redirection that starts with
+ * space (`git status`) and covers a part that writes no file and starts with
  * those words. A call is covered only when it raises no signal and every part
  * is covered.
  */

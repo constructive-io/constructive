@@ -145,11 +145,29 @@ describe('command prefix grants', () => {
     expect((await sb.bash(upload, 'workspace', [exactGrant(upload)])).decision).toBe('allow');
   });
 
-  it('never covers a part with a redirection, so Ask mode still asks before it writes a file', async () => {
+  it('covers a part whose redirections cannot change a file', async () => {
+    const first = asAsk(await sb.bash('npm test 2>&1 | tail -20', 'ask'));
+    expect(first.grantOptions.map((o) => o.pattern)).toEqual(['npm test *, tail *', 'npm test *, tail *']);
+    const grant = projectGrant(first);
+    expect((await sb.bash('npm test -- --watch 2>&1 | tail -50', 'ask', [grant])).decision).toBe('allow');
+
     const echo = prefixGrant('echo');
-    expect((await sb.bash('echo x', 'ask', [echo])).decision).toBe('allow');
-    expect((await sb.bash('echo x > out.txt', 'ask', [echo])).decision).toBe('ask');
+    const cat = prefixGrant('cat');
+    expect((await sb.bash('echo x 2>/dev/null', 'ask', [echo])).decision).toBe('allow');
+    expect((await sb.bash('echo x >&2', 'ask', [echo])).decision).toBe('allow');
+    expect((await sb.bash('cat < src/config.ts', 'ask', [cat])).decision).toBe('allow');
+    expect((await sb.bash('cat <<EOF\nhi\nEOF', 'ask', [cat])).decision).toBe('allow');
+  });
+
+  it('never covers a part that writes a file, so Ask mode still asks before the change', async () => {
+    const echo = prefixGrant('echo');
+    for (const command of ['echo x > out.txt', 'echo x 2> err.log', 'echo x &> all.log', 'echo x > /dev/stdout']) {
+      expect((await sb.bash(command, 'ask', [echo])).decision).toBe('ask');
+    }
     expect((await sb.bash('git status && echo x >> out.txt', 'ask', [echo, prefixGrant('git status')])).decision).toBe('ask');
+    expect((await sb.bash('echo x > out.txt && npm test', 'ask', [exactGrant('echo x'), prefixGrant('npm test')])).decision).toBe(
+      'ask'
+    );
     const options = asAsk(await sb.bash('echo x > out.txt', 'ask')).grantOptions;
     expect(options.map((o) => o.match)).toEqual([
       { type: 'command', command: 'echo x > out.txt' },
@@ -173,9 +191,9 @@ describe('command prefix grants', () => {
   });
 
   it('splits only a plain list or pipeline into parts', async () => {
-    expect((await sb.bash('git status 2>&1 | head -5', 'ask')).request.parts).toEqual([
-      { words: ['git', 'status'], redirected: true },
-      { words: ['head', '-5'], redirected: false }
+    expect((await sb.bash('git status 2>&1 | head -5 > out.txt', 'ask')).request.parts).toEqual([
+      { words: ['git', 'status'], writesFile: false },
+      { words: ['head', '-5'], writesFile: true }
     ]);
     for (const command of ['if true; then npm test; fi', 'for f in a b; do echo $f; done', '{ npm test; }']) {
       expect((await sb.bash(command, 'ask')).request.parts).toBeUndefined();
