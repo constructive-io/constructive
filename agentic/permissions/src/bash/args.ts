@@ -121,6 +121,16 @@ export function longSpellings(option: string): string[] {
   return Array.from({ length: option.length - 2 }, (_, k) => option.slice(0, k + 3));
 }
 
+/**
+ * `option` is `denied` as git and getopt read it: a short one also inside a
+ * cluster (`-ix` holds `-x`), a long one also by an abbreviation (`--upl`).
+ */
+export function optionMatches(option: string, denied: string): boolean {
+  if (!denied.startsWith('--')) return /^-[^-]/.test(option) && option.slice(1).includes(denied.slice(1));
+  const name = option.split('=')[0];
+  return option.startsWith('--') && name.length > 2 && (denied.startsWith(name) || name.startsWith(denied));
+}
+
 /** An argument whose value is not known and does not start with a literal, so it may be an option. */
 export function mayBeOption(arg: Arg): boolean {
   return arg.unknown && !/^[\w./]/.test(arg.raw);

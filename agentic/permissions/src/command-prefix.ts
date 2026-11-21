@@ -6,6 +6,7 @@
  */
 
 import { normalizeCommand } from './bash/analyze';
+import { optionMatches } from './bash/args';
 import type { CommandPart } from './types';
 
 /**
@@ -154,12 +155,6 @@ const RISKY_OPTIONS: ReadonlyMap<string, readonly string[]> = new Map<string, re
   ['yarn', PACKAGE_MANAGER_RISKY],
   ['bun', ['--preload', '-r', '--require', '--config', '-c', '--cwd']]
 ]);
-
-function optionMatches(option: string, denied: string): boolean {
-  if (!denied.startsWith('--')) return !option.startsWith('--') && option.slice(1).includes(denied.slice(1));
-  const name = option.split('=')[0];
-  return option.startsWith('--') && name.length > 2 && (denied.startsWith(name) || name.startsWith(denied));
-}
 
 /** The part passes a risky option, or an option it cannot read. */
 function passesRiskyOption(part: CommandPart): boolean {
