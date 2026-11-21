@@ -139,15 +139,14 @@ export class CursorTracker {
           );
           entries.push(...fanout.rows.map(row => row.entry));
         }
+        if (entries.length > 0) {
+          log.info(`Drained ${entries.length} change(s) for node=${this.nodeId}`);
+          await this.onChanges(entries);
+        }
         await this.pool.query(
           `SELECT ${this.quoteIdent(this.schema)}.advance_cursor($1, $2)`,
           [this.nodeId, pending[pending.length - 1].occurred_at],
         );
-      }
-
-      if (entries.length > 0) {
-        log.info(`Drained ${entries.length} change(s) for node=${this.nodeId}`);
-        this.onChanges(entries);
       }
 
       return entries;

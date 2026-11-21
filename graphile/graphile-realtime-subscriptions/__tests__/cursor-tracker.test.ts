@@ -287,6 +287,38 @@ describe('CursorTracker.drain()', () => {
     expect(onChanges).toHaveBeenCalledWith([entry]);
   });
 
+  it.each([false, true])('does not advance when onChanges fails (async: %s), and retries', async asynchronous => {
+    const entry = createChangeLogEntry();
+    const pool = createMockPool({ rows: [{ drain_changes: entry }] });
+    const failure = new Error('dispatch failed');
+    const onChanges = jest.fn().mockImplementationOnce(() => {
+      if (asynchronous) return Promise.reject(failure);
+      throw failure;
+    }).mockImplementationOnce(() => {
+      expect(pool.query.mock.calls.some(([sql]) => sql.includes('advance_cursor'))).toBe(false);
+    });
+    const tracker = new CursorTracker({ pool, onChanges });
+    await expect(tracker.drain()).rejects.toBe(failure);
+    expect(pool.query.mock.calls.some(([sql]) => sql.includes('advance_cursor'))).toBe(false);
+    await expect(tracker.drain()).resolves.toEqual([entry]);
+    expect(onChanges).toHaveBeenCalledTimes(2);
+    expect(pool.query).toHaveBeenLastCalledWith(expect.stringContaining('advance_cursor'), [tracker.nodeId, entry.occurred_at]);
+  });
+
+  it('waits for asynchronous dispatch before advancing', async () => {
+    const entry = createChangeLogEntry();
+    const pool = createMockPool({ rows: [{ drain_changes: entry }] });
+    let complete!: () => void;
+    const onChanges = jest.fn(() => new Promise<void>(resolve => { complete = resolve; }));
+    const tracker = new CursorTracker({ pool, onChanges });
+    const pending = tracker.drain();
+    while (!onChanges.mock.calls.length) await Promise.resolve();
+    expect(pool.query.mock.calls.some(([sql]) => sql.includes('advance_cursor'))).toBe(false);
+    complete();
+    await expect(pending).resolves.toEqual([entry]);
+    expect(pool.query).toHaveBeenLastCalledWith(expect.stringContaining('advance_cursor'), [tracker.nodeId, entry.occurred_at]);
+  });
+
   it('does not call onChanges when no entries', async () => {
     const onChanges = jest.fn();
 
