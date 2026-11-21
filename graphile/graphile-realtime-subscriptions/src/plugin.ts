@@ -11,15 +11,14 @@
  *
  * NOTIFY payload format (from emit_change trigger):
  *   - Normal: "INSERT:uuid1,uuid2,..."  or "UPDATE:uuid1" or "DELETE:uuid1"
- *   - Overflow: "INVALIDATE" (when a single statement affects > 50 rows)
+ *   - Ephemeral small batches: JSON with op and rows (only their IDs are used)
  *
  * Event flow:
  *   1. A row is inserted/updated/deleted
- *   2. The emit_change trigger fires pg_notify with TG_OP:row_ids or INVALIDATE
+ *   2. The emit_change trigger fires byte-bounded pg_notify payloads
  *   3. PostGraphile's pgSubscriber receives the NOTIFY
- *   4. The gate (see event-gate.ts) parses, throttles and filters it — a
- *      payload this subscription should not see never becomes an event
- *   5. The plugin fetches the changed row(s)
+ *   4. The gate (see event-gate.ts) parses, filters IDs and splits each row
+ *   5. The plugin authorizes the row before counting it against the throttle
  *   6. The client receives { event, row, rowId, overflow }
  *
  * Cursor tracking (at-least-once delivery):
@@ -32,16 +31,16 @@
  *   This enables at-least-once semantics by tracking cursor position.
  *
  * Overflow protection:
- *   - Database-side: statements affecting > 50 rows send INVALIDATE
- *   - Plugin-side: per-subscription throttle (default 50 events/second/table)
- *     drops individual events and sends a single INVALIDATE when exceeded
+ *   - Database-side: large statements send byte-bounded ID chunks
+ *   - Plugin-side: per-subscription throttle (default 50 visible rows/second)
+ *     sends one id-less overflow frame when exceeded
  *
  * Security / RLS enforcement:
  *   - Row data is always fetched via resource.get() which runs through the
  *     authenticated user's connection with their JWT role and pgSettings applied.
  *   - Invisible INSERT/UPDATE events are inhibited and removed from the stream.
  *   - DELETE is delivered only for IDs this subscription previously saw as visible.
- *   - Unscoped INVALIDATE signals are suppressed because they cannot be authorized.
+ *   - Invisible rows cannot consume the throttle budget or cause overflow.
  */
 
 import { Logger } from '@pgpmjs/logger';
@@ -123,9 +122,9 @@ function buildTypeDefs(tables: RealtimeTableInfo[]): string {
     .map(({ payloadTypeName, typeName, rowFieldName }) =>
       `"""Payload delivered when a ${typeName} row changes."""\n` +
       `type ${payloadTypeName} {\n` +
-      `  """The DML operation: INSERT, UPDATE, DELETE, or INVALIDATE."""\n` +
+      `  """The DML operation: INSERT, UPDATE, or DELETE, including the visible change that caused overflow."""\n` +
       `  event: String!\n` +
-      `  """The current state of the row (null for DELETE, INVALIDATE, or if RLS denies access)."""\n` +
+      `  """The current state of the authorized row (null for DELETE or overflow)."""\n` +
       `  ${rowFieldName}: ${typeName}\n` +
       `  """The ID of a change visible to this subscription."""\n` +
       `  rowId: UUID\n` +
@@ -154,7 +153,7 @@ function requirePayload(payload: unknown): ParsedPayload {
 
 /**
  * The row this event reports. `rowIds` is already narrowed to the
- * subscription's `ids`, so the first entry is the one to surface; INVALIDATE
+ * subscription's `ids`, so the first entry is the one to surface; overflow
  * carries none, which is a genuine absence rather than a suppressed error.
  */
 function reportedRowId(payload: ParsedPayload): string | null {
