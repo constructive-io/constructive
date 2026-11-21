@@ -110,7 +110,7 @@ A path that goes through a dangling symlink, a link loop or an entry that cannot
 
 1. A hard-deny target, or a write to a protected target: **deny**. No grant changes this.
 2. A user deny rule: **deny** (reserved; no rule editor in v1).
-3. A chat grant, then a project grant, that covers the call: **allow**.
+3. Chat grants, then project grants, that cover the call (one grant alone, or part by part for a plain bash chain with no signal): **allow**.
 4. A user allow rule: **allow** (reserved).
 5. The mode default:
 
@@ -132,7 +132,16 @@ Every `ask` and `deny` reason starts with `permissions: ` and names the path or 
 ### Grants
 
 - **Path grants** (`{ type: 'path', access, pathPrefix }`) cover a file-tool call when every target is inside `pathPrefix` with the same access. The prefix is the canonical parent dir of the target (the common parent of several). Label: `Always allow reads in ~/work/lib/`.
-- **Command grants** (`{ type: 'command', command }`) cover a bash call whose command, with whitespace collapsed, is identical. Label: `Always allow <the command>`. No wildcards.
+- **Command grants** (`{ type: 'command', command }`) cover a bash call whose command, with whitespace collapsed, is identical. Label: `Always allow <the command>`. No wildcards. In a plain chain with no signal (see below), one also covers a part that is exactly its command with no redirection.
+- **Command-prefix grants** (`{ type: 'command-prefix', prefixes: ['git status', 'npm run test'] }`) cover a bash call part by part. Each prefix is leading words joined by one space. A call is covered only when it raises no signal at all, is a plain list or pipeline (no `if`, `for`, `while`, `case`, `{ … }`, function or substitution), and every simple command in it either starts with a prefix, word by word, from this grant or another one, or is exactly an exact grant's command. So `git status *` covers `git status --short`, not `git log` or `git statusx`, and `git status && npm test` needs both parts covered. Redirections are not words: a prefix covers a part whatever it redirects to, because a redirection that matters (outside the project, a secret file, a protected or ask-write file) raises a signal. Label: `Always allow git status *, npm run test *`; `describeGrant` gives `bash: git status *, npm run test *`; `sameMatch` compares the prefixes as a set.
+- **The safety rule.** A prefix never covers a call that raises a signal, informational ones (`secret-file`) included. Such a call is covered only by an exact grant of the whole command, and its card offers only the exact command. Code the analyzer cannot see (`node -e`, `bash -c`, `$(…)`, `eval`) and uploads, `sudo` or destructive forms therefore never get a prefix, and a prefix covers only what Workspace mode runs without asking. It mainly saves prompts in Ask mode.
+- **What "allow again" offers on bash.** For a plain call with no signal, both options save one prefix for each part that no held grant covers yet (the project option counts only project grants, so it still holds in the next chat), at most 5. The option is the exact command instead when any part's program has no prefix (below), a part is shorter than its arity or has an option or a non-literal word (quote, `$`, glob, `~`) inside its prefix (`git -C src status`), or the chain needs more than 5 prefixes.
+- **The arity table** (how many leading words a prefix keeps; the longest key wins):
+  - 1 word: readers and filters (`cat`, `head`, `tail`, `less`, `wc`, `ls`, `tree`, `grep`, `rg`, `sort`, `uniq`, `cut`, `diff`, `jq`, `stat`, `du`, `df`, …), `echo`, `printf`, `pwd`, `which`, `date`, `sleep`, `mkdir`, `touch`, `cd`, and `jest`, `vitest`, `pytest`, `tsc`, `eslint`, `prettier`.
+  - 2 words (program and subcommand, or interpreter and script): `git`, `npm`, `npx`, `pnpm`, `yarn`, `bun`, `bunx`, `deno`, `docker`, `podman`, `kubectl`, `helm`, `cargo`, `go`, `make`, `pip`, `pip3`, `uv`, `poetry`, `brew`, and `node`, `python`, `python3`, `ruby`, `bash`, `sh`, `zsh`, `tsx`, `ts-node` (`node scripts/build.js *`).
+  - 3 words: `npm run`, `npm exec`, `pnpm run`, `pnpm exec`, `pnpm dlx`, `yarn run`, `bun run`, `deno task`, `uv run`, `poetry run`, `docker compose`, `python -m`, `python3 -m`, and `gh` (`gh pr list *`).
+  - Any other program gets no prefix: its grant is the exact command, as before. An unknown CLI can hide very different actions behind one name (`gh *` would cover `gh repo delete`), and programs left out on purpose (`rm`, `mv`, `cp`, `sed`, `awk`, `find`, `xargs`, the wrappers `env`, `timeout`, `nohup`) would cover far more than the run the user saw. A leading assignment (`NODE_ENV=test npm test`) is a word of its own, so a call with one gets the exact command too.
+- Deny and allow rules (`RuleMatch`) take path and exact command matches only.
 - A grant never matches on a tool name, a path grant never covers bash, and a command grant never covers a file tool.
 - No grant is offered for, or covers, a call with `unresolvable-path`, `placeholder-in-command` or `secret-into-plain-file`: each one needs its own yes.
 - No path grant is offered for, or covers, a target with an unexpanded glob outside the project: a folder cannot say where the glob expands to.

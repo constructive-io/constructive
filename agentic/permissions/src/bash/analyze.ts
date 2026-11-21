@@ -12,12 +12,13 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
-import type { Access, Signal } from '../types';
+import type { Access, CommandPart, Signal } from '../types';
 import { expandBraces } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
-import { type SimpleCommand, tokenize, type Word } from './tokenize';
-import { isPathLike, isUrl } from './words';
+import { commandParts } from './parts';
+import { type Lexed, type SimpleCommand, tokenize, type Word } from './tokenize';
+import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
 
 /** One argument after the expansions the analyzer can do. */
@@ -67,6 +68,8 @@ export interface BashAnalysis {
   envRefs: string[];
   /** The command may turn on globs that match dotfiles (`shopt -s dotglob`). */
   dotglob: boolean;
+  /** The simple commands of a plain list or pipeline; `null` for any other syntax. */
+  parts: CommandPart[] | null;
 }
 
 export interface AnalyzeContext {
@@ -114,8 +117,6 @@ const DANGEROUS_VARS = new RegExp(
     'NODE_OPTIONS|NODE_PATH|PYTHONPATH|PYTHONSTARTUP|PYTHONHOME|PYTHONINSPECT|PERL5OPT|PERL5LIB|PERLLIB|RUBYOPT|RUBYLIB|JAVA_TOOL_OPTIONS|_JAVA_OPTIONS'
   ].join('|')})$`
 );
-
-const RESERVED = new Set(['!', '{', '}', 'if', 'then', 'else', 'elif', 'fi', 'do', 'done', 'while', 'until', 'esac', 'coproc']);
 
 /** The oh-my-pi critical list (`tools/bash.ts`), matched on the raw command. */
 const CRITICAL_PATTERNS: readonly RegExp[] = [
@@ -197,19 +198,21 @@ class Analyzer {
     return this.vars.has('CDPATH') && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
   }
 
-  analyzeString(command: string): void {
+  /** Analyze one shell string. Returns what it lexed to, or `null` when it was not lexed. */
+  analyzeString(command: string): Lexed | null {
     if (this.depth > MAX_NESTING) {
       this.dynamic('the command nests shell strings too deeply to check');
-      return;
+      return null;
     }
     if (command.length > MAX_COMMAND_LENGTH) {
       this.dynamic('the command is too long to check');
-      return;
+      return null;
     }
     const lexed = tokenize(command);
     if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);
+    return lexed;
   }
 
   /** A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own scope. */
@@ -392,7 +395,7 @@ class Analyzer {
         i++;
         continue;
       }
-      if (arg.raw === arg.text && RESERVED.has(arg.text)) {
+      if (arg.raw === arg.text && SHELL_KEYWORDS.has(arg.text)) {
         i++;
         continue;
       }
@@ -446,7 +449,7 @@ class Analyzer {
  */
 export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Findings): BashAnalysis {
   const analyzer = new Analyzer(ctx, findings);
-  analyzer.analyzeString(command);
+  const lexed = analyzer.analyzeString(command);
   for (const pattern of CRITICAL_PATTERNS) {
     if (pattern.test(command)) {
       analyzer.flag('destructive', 'it matches a known destructive pattern');
@@ -461,7 +464,8 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
     destructiveChecks: analyzer.checks,
     flows: analyzer.tracker.flows,
     envRefs: [...analyzer.envRefs],
-    dotglob: DOTGLOB_RE.test(command)
+    dotglob: DOTGLOB_RE.test(command),
+    parts: lexed ? commandParts(lexed) : null
   };
 }
 
