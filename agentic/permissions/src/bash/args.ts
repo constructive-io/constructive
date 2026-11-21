@@ -40,7 +40,7 @@ export function parse(rest: readonly Arg[], withValue: ReadonlySet<string> = new
     const arg = rest[k];
     const t = arg.text;
     if (t === '--') {
-      positionals.push(...rest.slice(k + 1));
+      for (const arg of rest.slice(k + 1)) positionals.push(arg);
       break;
     }
     if (t.startsWith('--')) {
