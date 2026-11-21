@@ -103,6 +103,9 @@ export function normalizeCommand(command: string): string {
 }
 
 const MAX_NESTING = 4;
+
+/** The most names brace expansion may add to one command for the checks; past it the command asks. */
+const MAX_BRACE_NAMES = 8192;
 /** The longest command the analysis reads; a longer one is `shell-dynamic`. */
 export const MAX_COMMAND_LENGTH = 64 * 1024;
 
@@ -201,6 +204,8 @@ class Analyzer {
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
   base: string | null;
+  /** Names brace expansion has added to this command so far. */
+  private braceNames = 0;
   /** A word in the command names IFS, so it may set it (`IFS=:`, `read IFS`, `mapfile -t IFS`, `for IFS in`). */
   ifsSet = false;
   /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
@@ -324,7 +329,7 @@ class Analyzer {
       this.unresolvable(`a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`);
     }
     const braced = text[0] === '{' && mask[0];
-    return expanded.map((e) => {
+    return this.withinNameBudget(expanded).map((e) => {
       const result = braced ? this.alternativeTilde(e) : e;
       return {
         text: result.text,
@@ -333,6 +338,23 @@ class Analyzer {
         glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
       };
     });
+  }
+
+  /**
+   * The expansions this word may add to the command's checks. Past
+   * `MAX_BRACE_NAMES` the rest go unchecked, so the command raises
+   * `unresolvable-path`; the word keeps its first name so later words keep
+   * their positions as operands.
+   */
+  private withinNameBudget<T>(expanded: T[]): T[] {
+    if (expanded.length <= 1) return expanded;
+    const room = MAX_BRACE_NAMES - this.braceNames;
+    const kept = expanded.length > room ? expanded.slice(0, Math.max(1, room)) : expanded;
+    if (kept.length < expanded.length) {
+      this.unresolvable(`the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`);
+    }
+    this.braceNames += kept.length;
+    return kept;
   }
 
   /**
