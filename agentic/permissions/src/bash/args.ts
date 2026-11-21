@@ -121,6 +121,20 @@ export function longSpellings(option: string): string[] {
   return Array.from({ length: option.length - 2 }, (_, k) => option.slice(0, k + 3));
 }
 
+/** An argument whose value is not known and does not start with a literal, so it may be an option. */
+export function mayBeOption(arg: Arg): boolean {
+  return arg.unknown && !/^[\w./]/.test(arg.raw);
+}
+
+/** The first argument before the operands that may be an option the analysis cannot read, or `undefined`. */
+export function hiddenLeadingOption(rest: readonly Arg[]): Arg | undefined {
+  for (const arg of rest) {
+    if (mayBeOption(arg)) return arg;
+    if (arg.text === '--' || !/^[-+]/.test(arg.text)) return undefined;
+  }
+  return undefined;
+}
+
 export const has = (p: Parsed, ...keys: string[]) => keys.some((key) => p.flags.has(key));
 export const valuesOf = (p: Parsed, ...keys: string[]) => keys.flatMap((key) => p.values.get(key) ?? []);
 

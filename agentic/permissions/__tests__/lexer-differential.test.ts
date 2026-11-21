@@ -52,6 +52,10 @@ const rows: Row[] = [
   // a name reference reads its target as a subscript, which runs code
   ["declare -n r='a[$(touch /tmp/pwned)]'; echo $r", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["local -rn r='a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // an option a builtin takes from a variable (`$_` after `echo -i`) can be `-i`, `-n` or `-v`
+  ["echo -i >/dev/null; declare $_ x='a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo -n >/dev/null; declare $_ r='a[$(touch /tmp/pwned)]'; echo $r", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo -v; printf $_ 'a[$(touch /tmp/pwned)]' x", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],

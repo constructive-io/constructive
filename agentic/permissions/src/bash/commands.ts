@@ -9,7 +9,17 @@
 import * as path from 'node:path';
 
 import type { Arg } from './analyze';
-import { type CommandContext, files, generic, leadingOptions, longSpellings, parse, type Parsed, valuesOf } from './args';
+import {
+  type CommandContext,
+  files,
+  generic,
+  hiddenLeadingOption,
+  leadingOptions,
+  longSpellings,
+  parse,
+  type Parsed,
+  valuesOf
+} from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
@@ -95,6 +105,9 @@ function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   if (evaluates) ctx.analyzer.dynamic(`it runs ${name} with an operator that evaluates expressions`);
   generic(ctx, operands);
 }
+
+/** Builtins whose options (`-i`, `-n`, `-v`) make them read a value as a subscript or arithmetic. */
+const EVALUATING_BUILTINS: ReadonlySet<string> = new Set(['declare', 'local', 'typeset', 'printf', 'read']);
 
 /** The variables a builtin assigns by name: `printf -v NAME`, `read NAME…`, `unset NAME…`. */
 function namedVariables(name: string, rest: readonly Arg[]): Arg[] {
@@ -256,6 +269,8 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return generic(ctx, rest);
   }
   if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
+  const hidden = EVALUATING_BUILTINS.has(name) ? hiddenLeadingOption(rest) : undefined;
+  if (hidden) analyzer.dynamic(`it runs ${name} with ${hidden.raw}, which may be an option such as -i, -n or -v`);
   for (const variable of namedVariables(name, rest)) assignNamed(ctx, name, variable);
   if (NO_OPERANDS.has(name)) return;
   switch (name) {
