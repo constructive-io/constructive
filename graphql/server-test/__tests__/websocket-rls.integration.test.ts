@@ -292,7 +292,8 @@ describe('RLS-gated public tenant WebSocket events', () => {
     const id = randomUUID();
     await write(id, 'INSERT');
     await delivered(original, id, 'INSERT');
-    const fresh = open(alice);
+    const fresh = open(alice, undefined, document, original.client);
+    expect(fresh.client).toBe(original.client);
     await ready(original, fresh);
     await visible(alice, id, true);
     await write(id, 'DELETE');
