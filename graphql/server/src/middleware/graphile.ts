@@ -5,6 +5,7 @@ import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
+import { parse as parseAcceptLanguage } from 'accept-language-parser';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
   cacheGraphileInstance,
@@ -77,6 +78,20 @@ export function clearInFlightMap(): void {
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
+
+const requestLanguages = (header: string | string[] | undefined): string[] | undefined => {
+  const preferences = parseAcceptLanguage(Array.isArray(header) ? header.join(',') : header ?? '');
+  const languages = preferences
+    .filter(({ code, quality }) => code !== '*' && quality > 0 && quality <= 1)
+    .map(({ code, script, region }) => [
+      code.toLowerCase(),
+      script && script[0].toUpperCase() + script.slice(1).toLowerCase(),
+      region && (region.length === 4 ? region[0].toUpperCase() + region.slice(1).toLowerCase() : region.toUpperCase())
+    ].filter(Boolean).join('-'));
+  if (languages.length) return [...new Set(languages)];
+  return preferences.length && !preferences.some(({ code, quality }) => code === '*' && quality > 0)
+    ? [] : undefined;
+};
 
 /**
  * Build a PostGraphile v5 preset for a tenant.
@@ -211,6 +226,7 @@ const buildPreset = (
           ? await authenticatedWebSocketRequest(ws.request, ws.normalizedConnectionParams, serverOptions)
           : (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
         if (ws && req) ws.request = req;
+        const langCodes = requestLanguages(req?.headers?.['accept-language']);
         const context: Record<string, string> = {};
 
         // Timeouts travel with the transaction as GUCs, so they bound the work
@@ -286,7 +302,7 @@ const buildPreset = (
               pgSettings['request.id'] = req.requestId;
             }
 
-            return { pgSettings };
+            return { pgSettings, langCodes };
           }
 
           // Private (in-cluster) surface: there is no token — identity
@@ -322,7 +338,7 @@ const buildPreset = (
             if (req.requestId) {
               pgSettings['request.id'] = req.requestId;
             }
-            return { pgSettings };
+            return { pgSettings, langCodes };
           }
         }
 
@@ -345,7 +361,8 @@ const buildPreset = (
         }
 
         return {
-          pgSettings: anonSettings
+          pgSettings: anonSettings,
+          langCodes
         };
       }
     }

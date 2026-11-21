@@ -18,9 +18,21 @@ const DATABASE = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 const shared = path.join(__dirname, '../../../__fixtures__/seed');
 let releasePulse: () => void;
 const probe = makeExtendSchemaPlugin({
-  typeDefs: 'extend type Subscription { identity: String! pulse: Int! }',
+  typeDefs: `extend type Query { requestLanguages: String! }
+    extend type Subscription { identity: String! pulse: Int! requestLanguages: String! }`,
   plans: {
+    Query: {
+      requestLanguages: () => lambda(context(), (ctx: { langCodes?: string[] }) => JSON.stringify(ctx.langCodes ?? null))
+    },
     Subscription: {
+      requestLanguages: {
+        subscribePlan() {
+          return lambda(context(), async function* (ctx: { langCodes?: string[] }) {
+            yield JSON.stringify(ctx.langCodes ?? null);
+          });
+        },
+        plan: ($event) => $event
+      },
       pulse: {
         subscribePlan() {
           return lambda(context(), async function* () {
@@ -125,6 +137,56 @@ describe('public tenant WebSocket subscriptions', () => {
   it('accepts a bearer header without connection parameters', async () => {
     const result = await subscribe(undefined, { Authorization: `Bearer ${token}` });
     expect(JSON.parse(result.data.identity)['jwt.claims.user_id']).toBe(ACTOR);
+  });
+
+  it.each([
+    [undefined, null],
+    ['', null],
+    [';;;', null],
+    ['*;q=1, fr;q=0', null],
+    ['en;q=0', []],
+    ['zh-hant, zh-Hant-TW;q=0.9', ['zh-Hant', 'zh-Hant-TW']],
+    ['fr;q=0.8, en;q=1, fr-CA;q=0.9', ['en', 'fr-CA', 'fr']],
+    ['FR-ca, fr;q=0.9, fr;q=0.8', ['fr-CA', 'fr']]
+  ])('parses HTTP request languages %p', async (header, expected) => {
+    const req = request.post('/graphql').set('Host', HOST).set('Authorization', `Bearer ${token}`);
+    if (header !== undefined) req.set('Accept-Language', header as string);
+    const result = await req.send({ query: '{ requestLanguages }' });
+    expect(result.status).toBe(200);
+    expect(result.body.errors).toBeUndefined();
+    expect(JSON.parse(result.body.data.requestLanguages)).toEqual(expected);
+  });
+
+  it('keeps HTTP request languages independent across cached handler executions', async () => {
+    for (const language of ['en', 'fr', 'en', 'fr']) {
+      const result = await request.post('/graphql').set('Host', HOST)
+        .set('Authorization', `Bearer ${token}`).set('Accept-Language', language)
+        .send({ query: '{ requestLanguages }' });
+      expect(result.body.errors).toBeUndefined();
+      expect(JSON.parse(result.body.data.requestLanguages)).toEqual([language]);
+    }
+  });
+
+  it.each([
+    [{}, { 'Accept-Language': 'fr' }, ['fr']],
+    [{ 'Accept-Language': 'fr-CA, fr;q=0.8, en;q=0.5' }, {}, ['fr-CA', 'fr', 'en']],
+    [{ 'aCcEpT-LaNgUaGe': 'en' }, { 'Accept-Language': 'fr' }, ['en']],
+    [{}, {}, null]
+  ])('parses WebSocket request languages from parameters or upgrade headers %#', async (params, headers, expected) => {
+    const result = await subscribe({ Authorization: `Bearer ${token}`, ...params }, headers,
+      'subscription { requestLanguages }');
+    expect(result.errors).toBeUndefined();
+    expect(JSON.parse(result.data.requestLanguages)).toEqual(expected);
+  });
+
+  it.each([
+    { 'Accept-Language': ['fr'] },
+    { 'Accept-Language': 'fr', 'accept-language': 'en' }
+  ])('rejects malformed WebSocket request languages %p', async (params) => {
+    await expect(subscribe({ Authorization: `Bearer ${token}`, ...params }, {},
+      'subscription { requestLanguages }')).rejects.toEqual(expect.arrayContaining([
+      expect.objectContaining({ message: 'Invalid Accept-Language', extensions: expect.objectContaining({ code: 'BAD_USER_INPUT' }) })
+    ]));
   });
 
   it.each([
