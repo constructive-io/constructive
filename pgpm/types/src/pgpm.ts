@@ -50,6 +50,8 @@ export interface PgTestConnectionOptions {
     connections?: TestUserCredentials;
     /** Role mapping configuration */
     roles?: RoleMapping;
+    /** Existing external roles that inherit a mapped anonymous or authenticated role. */
+    roleBridges?: Record<string, 'anonymous' | 'authenticated'>;
     /** Default authentication options for db connections */
     auth?: AuthOptions;
     /** Use advisory locks for role/user creation (for concurrency safety) */
