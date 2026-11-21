@@ -580,6 +580,7 @@ CRUD operations for Derive records.
 | Field | Type | Editable |
 |-------|------|----------|
 | `createdAt` | Datetime | No |
+| `data` | JSON | Yes |
 | `databaseId` | UUID | Yes |
 | `id` | UUID | No |
 | `includeGrants` | Boolean | Yes |
@@ -594,16 +595,16 @@ CRUD operations for Derive records.
 
 ```typescript
 // List all derive records
-const items = await db.derive.findMany({ select: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } }).execute();
+const items = await db.derive.findMany({ select: { createdAt: true, data: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.derive.findOne({ id: '<UUID>', select: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } }).execute();
+const item = await db.derive.findOne({ id: '<UUID>', select: { createdAt: true, data: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.derive.create({ data: { databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.derive.create({ data: { data: '<JSON>', databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.derive.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+const updated = await db.derive.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.derive.delete({ where: { id: '<UUID>' } }).execute();

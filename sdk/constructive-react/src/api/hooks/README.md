@@ -767,20 +767,20 @@ create({ databaseId: '<UUID>', granteeName: '<String>', isGrant: '<Boolean>', ob
 ```typescript
 // List all derives
 const { data, isLoading } = useDerivesQuery({
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Get one derive
 const { data: item } = useDeriveQuery({
   id: '<UUID>',
-  selection: { fields: { createdAt: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
+  selection: { fields: { createdAt: true, data: true, databaseId: true, id: true, includeGrants: true, includeMutations: true, kind: true, policyPrefix: true, sourceTableId: true, tableId: true, updatedAt: true } },
 });
 
 // Create a derive
 const { mutate: create } = useCreateDeriveMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
+create({ data: '<JSON>', databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' });
 ```
 
 ### Domain

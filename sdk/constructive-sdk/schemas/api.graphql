@@ -10639,6 +10639,7 @@ type DeleteWebauthnSettingPayload {
 
 type Derive {
   createdAt: Datetime
+  data: JSON!
 
   """Reads a single `Database` that is related to this `Derive`."""
   database: Database
@@ -10695,6 +10696,9 @@ input DeriveFilter {
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `data` field."""
+  data: JSONFilter
+
   """Filter by the object’s `database` relation."""
   database: DatabaseFilter
 
@@ -10741,6 +10745,7 @@ input DeriveFilter {
 """An input for mutations affecting `Derive`"""
 input DeriveInput {
   createdAt: Datetime
+  data: JSON
   databaseId: UUID
   id: UUID
   includeGrants: Boolean
@@ -10758,6 +10763,8 @@ enum DeriveOrderBy {
   CREATED_AT_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
+  DATA_ASC
+  DATA_DESC
   ID_ASC
   ID_DESC
   INCLUDE_GRANTS_ASC
@@ -10784,6 +10791,7 @@ Represents an update to a `Derive`. Fields that are set will be updated.
 """
 input DerivePatch {
   createdAt: Datetime
+  data: JSON
   databaseId: UUID
   id: UUID
   includeGrants: Boolean
