@@ -92,6 +92,14 @@ export type Signal =
   /** The command expands a variable whose name looks secret, or that the host marked secret. */
   | 'secret-env-expansion';
 
+/** One simple command of a bash call (`git status` in `git status && npm test`). */
+export interface CommandPart {
+  /** The words as written, quotes kept; redirections are not words. */
+  words: string[];
+  /** It has a redirection, a heredoc or a here-string. */
+  redirected: boolean;
+}
+
 /** One tool call, classified. */
 export interface PermissionRequest {
   toolCallId: string;
@@ -100,6 +108,12 @@ export interface PermissionRequest {
   targets: Target[];
   /** bash only: the command with whitespace collapsed (the grant key). */
   command?: string;
+  /**
+   * bash only: the simple commands of a plain list or pipeline, in order.
+   * Absent when the command uses other shell syntax (`if`, `for`, `{ … }`, a
+   * function, a substitution) or does not parse: only an exact grant covers it.
+   */
+  parts?: CommandPart[];
   signals: Signal[];
   /** One specific sentence for each signal ("it uploads data: curl -d @.env sends a file's contents"). */
   signalReasons: Partial<Record<Signal, string>>;
@@ -107,10 +121,20 @@ export interface PermissionRequest {
 
 export type PermissionVerdict = 'allow' | 'ask' | 'deny';
 
+export type PathMatch = { type: 'path'; access: Access; pathPrefix: string };
+
+/** A bash command, with whitespace collapsed. */
+export type CommandMatch = { type: 'command'; command: string };
+
+/**
+ * Bash commands by their leading words. Each prefix is words joined by one
+ * space (`git status`) and covers a part that starts with those words. A call
+ * is covered only when it raises no signal and every part is covered.
+ */
+export type CommandPrefixMatch = { type: 'command-prefix'; prefixes: string[] };
+
 /** What a grant matches. Never a tool name alone. */
-export type GrantMatch =
-  | { type: 'path'; access: Access; pathPrefix: string }
-  | { type: 'command'; command: string };
+export type GrantMatch = PathMatch | CommandMatch | CommandPrefixMatch;
 
 export type GrantScope = 'chat' | 'project';
 
@@ -123,9 +147,9 @@ export interface Grant {
 /** A scope the user can pick on an ASK, with the exact pattern it would save. */
 export interface GrantOption {
   scope: GrantScope;
-  /** "Allow in this chat", "Always: reads in ~/work/lib/". */
+  /** "Allow in this chat", "Always allow reads in ~/work/lib/". */
   label: string;
-  /** The human-readable pattern ("~/work/lib/", "pnpm dlx shadcn add button"). */
+  /** The human-readable pattern ("~/work/lib/", "pnpm dlx shadcn add button", "git status *, npm run test *"). */
   pattern: string;
   match: GrantMatch;
 }
