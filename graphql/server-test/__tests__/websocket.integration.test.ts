@@ -208,7 +208,11 @@ describe('public tenant WebSocket subscriptions', () => {
         await new Promise<void>((resolve, reject) => {
           const socket = new WebSocket(server.graphqlUrl.replace('http:', 'ws:'), 'graphql-transport-ws', { headers: { Host: HOST } });
           sockets.push(socket);
-          socket.once('open', resolve);
+          socket.once('open', () => socket.send(JSON.stringify({ type: 'connection_init', payload: { Authorization: `Bearer ${token}` } })));
+          socket.once('message', data => {
+            if (JSON.parse(data.toString()).type === 'connection_ack') resolve();
+            else reject(new Error('Expected connection_ack'));
+          });
           socket.once('error', reject);
         });
       }
@@ -226,10 +230,16 @@ describe('public tenant WebSocket subscriptions', () => {
       const refused = await request.post('/graphql').set('Host', HOST).send({ query: '{ __typename }' });
       expect(refused.status).toBe(429);
       expect(refused.body.errors[0].extensions.code).toBe('CONCURRENCY_LIMIT_REACHED');
+      await new Promise<void>(resolve => {
+        sockets[0].once('close', resolve);
+        sockets[0].close();
+      });
     } finally {
       await Promise.all(sockets.map((socket) => new Promise<void>((resolve) => {
+        if (socket.readyState === WebSocket.CLOSED) return resolve();
         socket.once('close', resolve);
-        socket.close();
+        if (socket.readyState === WebSocket.CONNECTING) socket.terminate();
+        else socket.close();
       })));
     }
     const accepted = await request.post('/graphql').set('Host', HOST).send({ query: '{ __typename }' });
