@@ -15,9 +15,11 @@
 import {
   decodeAnsiC,
   findAnsiClose,
+  heredocDelimiter,
   LexError,
   matchBacktick,
   matchBrace,
+  matchBracket,
   matchParen,
   stripQuotes,
   unescapeBackticks
@@ -104,7 +106,7 @@ class Lexer {
     const { s } = this;
     while (this.i < s.length) {
       const ch = s[this.i];
-      if (ch === ' ' || ch === '\t' || ch === '\r') {
+      if (ch === ' ' || ch === '\t') {
         this.i++;
       } else if (ch === '\\' && s[this.i + 1] === '\n') {
         this.i += 2;
@@ -166,6 +168,7 @@ class Lexer {
       this.endCommand(true);
     } else {
       // `;`, `&`, `(`, `)`
+      if (ch === '(' && s[this.i + 1] === '(') this.dynamic.push('an arithmetic command ((…))');
       if (ch === '(' && s[this.i + 1] === ')') {
         // `name()`: a function definition hides a body that runs later.
         this.dynamic.push('defines a shell function');
@@ -199,8 +202,7 @@ class Lexer {
     const target: Word = { parts, raw: s.slice(start, this.i) };
     const cmd = this.current;
     if (op === '<<' || op === '<<-') {
-      const quoted = parts.some((p) => p.kind === 'lit' && p.quoted);
-      const delim = parts.map((p) => (p.kind === 'lit' ? p.text : '')).join('');
+      const { delim, quoted } = heredocDelimiter(target.raw);
       this.pending.push({ delim, quoted, stripTabs: op === '<<-', command: cmd });
       cmd.stdinDoc = true;
       cmd.redirects.push({ op, fd, target: null });
@@ -219,15 +221,28 @@ class Lexer {
     cmd.redirects.push({ op, fd, target });
   }
 
+  /** The next line of input, without its newline. */
+  private nextLine(): string {
+    const { s } = this;
+    const nl = s.indexOf('\n', this.i);
+    const line = s.slice(this.i, nl < 0 ? s.length : nl);
+    this.i = nl < 0 ? s.length : nl + 1;
+    return line;
+  }
+
+  /**
+   * Read the pending heredoc bodies. An unquoted body joins a line that ends
+   * in an odd run of backslashes to the next one before it looks for the
+   * delimiter, as bash does; a quoted body stays literal.
+   */
   private readHeredocs(): void {
     const { s } = this;
     for (const doc of this.pending) {
       let body = '';
       let found = false;
       while (this.i < s.length) {
-        const nl = s.indexOf('\n', this.i);
-        const line = s.slice(this.i, nl < 0 ? s.length : nl);
-        this.i = nl < 0 ? s.length : nl + 1;
+        let line = this.nextLine();
+        while (!doc.quoted && /(^|[^\\])(\\\\)*\\$/.test(line) && this.i < s.length) line = line.slice(0, -1) + this.nextLine();
         const check = doc.stripTabs ? line.replace(/^\t+/, '') : line;
         if (check === doc.delim) {
           found = true;
@@ -280,7 +295,7 @@ class Lexer {
     const wordStart = this.i;
     while (this.i < s.length) {
       const ch = s[this.i];
-      if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') break;
+      if (ch === ' ' || ch === '\t' || ch === '\n') break;
       if ((ch === '<' || ch === '>') && s[this.i + 1] === '(') {
         const end = matchParen(s, this.i + 1);
         this.substitute(s.slice(this.i + 2, end), 'process substitution');
@@ -401,9 +416,11 @@ class Lexer {
   private readDollar(parts: Part[], lit: (text: string, quoted: boolean) => void, quoted: boolean): void {
     const { s } = this;
     const next = s[this.i + 1];
-    if (next === '(' && s[this.i + 2] === '(') {
-      const end = matchParen(s, this.i + 1);
-      const inner = s.slice(this.i + 3, end - 1);
+    if ((next === '(' && s[this.i + 2] === '(') || next === '[') {
+      // Arithmetic reads a variable's value as an expression, and a subscript in it runs code.
+      const end = next === '[' ? matchBracket(s, this.i + 1) : matchParen(s, this.i + 1);
+      const inner = s.slice(this.i + 2, end);
+      this.dynamic.push(next === '[' ? 'arithmetic expansion $[…]' : 'arithmetic expansion $((…))');
       if (/\$\(|`/.test(inner)) this.substitute(inner.replace(/^[^$`]*/, ''), 'command substitution in arithmetic');
       parts.push({ kind: 'unknown' });
       this.i = end + 1;
