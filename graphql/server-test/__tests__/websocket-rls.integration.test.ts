@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { graphileCache } from 'graphile-cache';
-import { createClient, type Client } from 'graphql-ws';
+import { type Client,createClient } from 'graphql-ws';
 import path from 'path';
 import type { PgTestClient } from 'pgsql-test/test-client';
 import type supertest from 'supertest';
