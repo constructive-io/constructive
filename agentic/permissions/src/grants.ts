@@ -9,16 +9,26 @@
  * command. Nothing ever matches on a tool name alone.
  */
 
-import { partIs, prefixCovers, prefixFor, showPrefix } from './command-prefix';
+import { commandPattern } from './command-pattern';
+import { MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
 import { commonParent, contains, displayDir } from './paths';
 import { SIGNAL_RULES } from './signals';
-import type { Access, CommandPart, Grant, GrantMatch, GrantOption, GrantScope, PermissionRequest, Signal, Target } from './types';
+import type {
+  Access,
+  CommandMatch,
+  CommandPart,
+  CommandPrefixMatch,
+  Grant,
+  GrantMatch,
+  GrantOption,
+  GrantScope,
+  PermissionRequest,
+  Signal,
+  Target
+} from './types';
 
 /** Signals a grant must never cover: each such call needs its own yes. */
 export const NEVER_GRANTED: readonly Signal[] = (Object.keys(SIGNAL_RULES) as Signal[]).filter((s) => !SIGNAL_RULES[s].grantable);
-
-/** The most prefixes one "allow again" answer saves; a longer chain gets the exact command. */
-const MAX_PREFIXES = 5;
 
 export function isGrantable(request: PermissionRequest): boolean {
   return !request.signals.some((s) => NEVER_GRANTED.includes(s));
@@ -94,9 +104,8 @@ export const ACCESS_VERB: Readonly<Record<Access, string>> = { read: 'reads', wr
 export function describeGrant(match: GrantMatch, homeDir: string): string {
   switch (match.type) {
   case 'command':
-    return `bash: ${match.command}`;
   case 'command-prefix':
-    return `bash: ${match.prefixes.map(showPrefix).join(', ')}`;
+    return `bash: ${commandPattern(match)}`;
   case 'path':
     return `${ACCESS_VERB[match.access]} in ${displayDir(match.pathPrefix, homeDir)}`;
   }
@@ -128,8 +137,10 @@ function newPrefixes(request: PermissionRequest, held: readonly Grant[]): string
 function commandOption(scope: GrantScope, request: PermissionRequest, grants: readonly Grant[]): GrantOption {
   const held = scope === 'chat' ? grants : grants.filter((g) => g.scope === 'project');
   const prefixes = newPrefixes(request, held);
-  const match: GrantMatch = prefixes ? { type: 'command-prefix', prefixes } : { type: 'command', command: request.command };
-  const pattern = prefixes ? prefixes.map(showPrefix).join(', ') : request.command;
+  const match: CommandMatch | CommandPrefixMatch = prefixes
+    ? { type: 'command-prefix', prefixes }
+    : { type: 'command', command: request.command };
+  const pattern = commandPattern(match);
   return { scope, label: scope === 'chat' ? 'Allow in this chat' : `Always allow ${pattern}`, pattern, match };
 }
 

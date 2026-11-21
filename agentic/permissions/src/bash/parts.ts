@@ -24,12 +24,13 @@ function writesFile(r: Redirect): boolean {
   return !INPUT_OPS.has(r.op) && r.target !== null && r.target.raw !== '/dev/null';
 }
 
-function isSyntax(word: string | undefined): boolean {
+/** The word is a shell keyword or opens a compound command, so it is syntax and not a program. */
+export function isShellSyntax(word: string | undefined): boolean {
   return word !== undefined && (SHELL_KEYWORDS.has(word) || COMPOUND_OPENERS.has(word));
 }
 
 export function commandParts(lexed: Lexed): CommandPart[] | null {
   if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0) return null;
   const parts = lexed.commands.map((cmd) => ({ words: cmd.words.map((w) => w.raw), writesFile: cmd.redirects.some(writesFile) }));
-  return parts.some((p) => isSyntax(p.words[0])) ? null : parts;
+  return parts.some((p) => isShellSyntax(p.words[0])) ? null : parts;
 }

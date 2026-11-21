@@ -107,21 +107,33 @@ const ARITY: ReadonlyMap<string, number> = new Map([
 
 const LONGEST_KEY = Math.max(...[...ARITY.keys()].map((key) => key.split(' ').length));
 
+/** The most prefixes one grant holds: a card offers the exact command for a longer chain. */
+export const MAX_PREFIXES = 5;
+
 /** A word a prefix may keep past its key: plain text, not an option, quote, expansion or glob. */
 const PREFIX_WORD = /^[\w@%+=:,./][\w@%+=:,./-]*$/;
+
+/** The table entry the leading words name, longest key first. */
+function arityKey(words: readonly string[]): { length: number; arity: number } | null {
+  for (let k = Math.min(words.length, LONGEST_KEY); k > 0; k--) {
+    const arity = ARITY.get(words.slice(0, k).join(' '));
+    if (arity !== undefined) return { length: k, arity };
+  }
+  return null;
+}
+
+/** The first word a prefix may not hold, or `undefined`. A table key's own words count as plain (`python -m`). */
+export function firstNonPrefixWord(words: readonly string[]): string | undefined {
+  return words.slice(arityKey(words)?.length ?? 0).find((w) => !PREFIX_WORD.test(w));
+}
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
 export function prefixFor(part: CommandPart): string | null {
   if (part.writesFile) return null;
-  const { words } = part;
-  for (let k = Math.min(words.length, LONGEST_KEY); k > 0; k--) {
-    const arity = ARITY.get(words.slice(0, k).join(' '));
-    if (arity === undefined) continue;
-    if (words.length < arity) return null;
-    const kept = words.slice(0, arity);
-    return kept.slice(k).every((w) => PREFIX_WORD.test(w)) ? kept.join(' ') : null;
-  }
-  return null;
+  const key = arityKey(part.words);
+  if (!key || part.words.length < key.arity) return null;
+  const kept = part.words.slice(0, key.arity);
+  return firstNonPrefixWord(kept) === undefined ? kept.join(' ') : null;
 }
 
 /**
@@ -138,9 +150,4 @@ export function prefixCovers(prefix: string, part: CommandPart): boolean {
 /** The part is exactly `command` and writes no file: an exact grant's share of a longer command. */
 export function partIs(command: string, part: CommandPart): boolean {
   return !part.writesFile && normalizeCommand(part.words.join(' ')) === command;
-}
-
-/** A prefix as the user reads it: `git status *`. */
-export function showPrefix(prefix: string): string {
-  return `${prefix} *`;
 }

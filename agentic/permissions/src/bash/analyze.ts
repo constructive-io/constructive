@@ -146,6 +146,11 @@ const CRITICAL_PATTERNS: readonly RegExp[] = [
 
 const PLACEHOLDER_RE = /«secret:[^»]*»/;
 
+/** The command holds a `«secret:…»` placeholder, which raises `placeholder-in-command`. */
+export function hasPlaceholder(command: string): boolean {
+  return PLACEHOLDER_RE.test(command);
+}
+
 /** Shell options that make `*` match dotfiles. */
 const DOTGLOB_RE = /dotglob|glob_?dots|GLOBIGNORE/i;
 
@@ -456,7 +461,7 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
       break;
     }
   }
-  if (PLACEHOLDER_RE.test(command)) {
+  if (hasPlaceholder(command)) {
     analyzer.flag('placeholder-in-command', 'it contains a «secret:…» placeholder');
   }
   return {
