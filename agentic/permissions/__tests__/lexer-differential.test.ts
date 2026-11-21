@@ -43,6 +43,12 @@ const rows: Row[] = [
   ['sleep $((2*3))', 'ask', 'allow', 'allow', []],
   ['echo $[1+2]', 'ask', 'allow', 'allow', []],
   ['((1+2))', 'ask', 'allow', 'allow', []],
+  // `$((` whose second paren closes early is a command substitution of a subshell, and it runs
+  ['echo $((1) | /???/?? ~/*/*/* 1 )', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['echo $((1) >2 )', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // a program named by a glob or a variable still touches the files it is given
+  ['/???/cat ~/.ssh/id_rsa', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['$CAT ~/.ssh/id_rsa', 'deny', 'deny', 'deny', ['hard-deny']],
   // a name reference reads its target as a subscript, which runs code
   ["declare -n r='a[$(touch /tmp/pwned)]'; echo $r", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["local -rn r='a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],

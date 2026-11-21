@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
 import { expandBraces, MAX_BRACE_RESULTS } from './braces';
+import { generic } from './args';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
@@ -460,12 +461,11 @@ class Analyzer {
     if (i >= args.length) return null;
 
     const argv0 = args[i];
-    if (argv0.unknown) {
-      this.dynamic(`the command name ${argv0.raw} comes from a variable or substitution`);
-      return null;
-    }
-    if (argv0.glob && !TESTS.has(argv0.text)) {
-      this.dynamic(`the command name ${argv0.raw} is a glob`);
+    const unknownProgram = argv0.unknown || (argv0.glob && !TESTS.has(argv0.text));
+    if (unknownProgram) {
+      this.dynamic(`the command name ${argv0.raw} ${argv0.unknown ? 'comes from a variable or substitution' : 'is a glob'}`);
+      // Whatever it turns out to be, its operands are files it may touch.
+      generic({ analyzer: this, stdinFed, xargs: scope.xargs !== null }, args.slice(i + 1));
       return null;
     }
     if (argv0.text.includes('/')) {

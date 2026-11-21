@@ -183,6 +183,15 @@ class Lexer {
     }
   }
 
+  /**
+   * `$((` at `this.i` is arithmetic only when the paren its second `(` opens
+   * closes right before the final `)`. Otherwise bash reads it as a command
+   * substitution of a subshell (`$((1) | cmd )`) and runs it.
+   */
+  private isArithmetic(): boolean {
+    return matchParen(this.s, this.i + 2) === matchParen(this.s, this.i + 1) - 1;
+  }
+
   /** `((…))` at `this.i` holds only numbers and operators. */
   private plainArithmeticCommand(): boolean {
     try {
@@ -429,7 +438,7 @@ class Lexer {
   private readDollar(parts: Part[], lit: (text: string, quoted: boolean) => void, quoted: boolean): void {
     const { s } = this;
     const next = s[this.i + 1];
-    if ((next === '(' && s[this.i + 2] === '(') || next === '[') {
+    if (next === '[' || (next === '(' && s[this.i + 2] === '(' && this.isArithmetic())) {
       // Arithmetic reads a variable's value as an expression, and a subscript in it runs code.
       const end = next === '[' ? matchBracket(s, this.i + 1) : matchParen(s, this.i + 1);
       const inner = s.slice(this.i + 2, end);
