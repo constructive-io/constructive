@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
 import { generic } from './args';
-import { expandBraces, expandsToPlainNames, MAX_BRACE_RESULTS } from './braces';
+import { expandWord, MAX_PLAIN_NAME_RESULTS } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
@@ -307,8 +307,8 @@ class Analyzer {
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (!expandBraces(text, mask, expanded) && (unknown || !expandsToPlainNames(text))) {
-      this.unresolvable(`a brace expansion has more than ${MAX_BRACE_RESULTS} results, so not every word could be checked`);
+    if (!expandWord(text, mask, expanded)) {
+      this.unresolvable(`a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`);
     }
     const braced = text[0] === '{' && mask[0];
     return expanded.map((e) => {
