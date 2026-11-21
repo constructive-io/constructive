@@ -73,6 +73,9 @@ export interface Lexed {
 }
 
 const MAX_DEPTH = 6;
+
+/** Arithmetic with no name, substitution or quote in it: it reads no variable, so it runs no code. */
+const PLAIN_ARITHMETIC = /^[\d\s+\-*/%()<>=!&|^~?:,]*$/;
 const OPERATOR_CHARS = new Set([';', '&', '|', '(', ')', '<', '>']);
 const NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const SPECIAL_PARAMS = new Set(['?', '$', '!', '#', '@', '*', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
@@ -168,7 +171,7 @@ class Lexer {
       this.endCommand(true);
     } else {
       // `;`, `&`, `(`, `)`
-      if (ch === '(' && s[this.i + 1] === '(') this.dynamic.push('an arithmetic command ((…))');
+      if (ch === '(' && s[this.i + 1] === '(' && !this.plainArithmeticCommand()) this.dynamic.push('an arithmetic command ((…))');
       if (ch === '(' && s[this.i + 1] === ')') {
         // `name()`: a function definition hides a body that runs later.
         this.dynamic.push('defines a shell function');
@@ -177,6 +180,16 @@ class Lexer {
       }
       this.i++;
       this.endCommand(false);
+    }
+  }
+
+  /** `((…))` at `this.i` holds only numbers and operators. */
+  private plainArithmeticCommand(): boolean {
+    try {
+      return PLAIN_ARITHMETIC.test(this.s.slice(this.i + 1, matchParen(this.s, this.i)));
+    } catch (error) {
+      if (error instanceof LexError) return false;
+      throw error;
     }
   }
 
@@ -420,7 +433,7 @@ class Lexer {
       // Arithmetic reads a variable's value as an expression, and a subscript in it runs code.
       const end = next === '[' ? matchBracket(s, this.i + 1) : matchParen(s, this.i + 1);
       const inner = s.slice(this.i + 2, end);
-      this.dynamic.push(next === '[' ? 'arithmetic expansion $[…]' : 'arithmetic expansion $((…))');
+      if (!PLAIN_ARITHMETIC.test(inner)) this.dynamic.push(next === '[' ? 'arithmetic expansion $[…]' : 'arithmetic expansion $((…))');
       if (/\$\(|`/.test(inner)) this.substitute(inner.replace(/^[^$`]*/, ''), 'command substitution in arithmetic');
       parts.push({ kind: 'unknown' });
       this.i = end + 1;

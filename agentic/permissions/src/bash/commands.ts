@@ -283,6 +283,10 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'readonly':
   case 'typeset':
     if (rest.some((a) => /^-[A-Za-z]*i/.test(a.text))) analyzer.dynamic(`it runs ${name} -i, which reads every value it assigns as arithmetic`);
+    // `export -n` takes the export flag off; only declare, local and typeset make a reference.
+    if (name !== 'export' && name !== 'readonly' && rest.some((a) => /^-[A-Za-z]*n/.test(a.text))) {
+      analyzer.dynamic(`it runs ${name} -n, which makes a name reference whose target is read as a subscript that can run code`);
+    }
     for (const arg of rest) {
       if (/^[^=-][^=]*\[/.test(arg.text)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
       const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(arg.text);
