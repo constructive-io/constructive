@@ -9,6 +9,7 @@
  * `redactResult` after. Classification, the policy and the vault stay internal.
  */
 
+export { commandPattern, type CommandPatternResult, parseCommandPattern } from './command-pattern';
 export {
   createPermissionEngine,
   type EvaluateContext,
