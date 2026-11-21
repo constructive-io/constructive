@@ -115,7 +115,7 @@ export interface PermissionRequest {
   toolName: BuiltinTool;
   kind: RequestKind;
   targets: Target[];
-  /** bash only: the command with whitespace collapsed (the grant key). */
+  /** bash only: the command with runs of spaces and tabs made one space (the exact-grant key, see `normalizeCommand`). */
   command?: string;
   /**
    * bash only: the simple commands of a plain list or pipeline, in order.
@@ -132,7 +132,7 @@ export type PermissionVerdict = 'allow' | 'ask' | 'deny';
 
 export type PathMatch = { type: 'path'; access: Access; pathPrefix: string };
 
-/** A bash command, with whitespace collapsed. */
+/** A bash command, as its exact-grant key (`normalizeCommand`). */
 export type CommandMatch = { type: 'command'; command: string };
 
 /**

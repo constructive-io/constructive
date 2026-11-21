@@ -83,8 +83,22 @@ export interface Run {
   rest: Arg[];
 }
 
+/** The text without the spaces and tabs at its ends; any other character there stays. */
+export function trimBlanks(text: string): string {
+  return text.replace(/^[ \t]+|[ \t]+$/g, '');
+}
+
+/**
+ * The exact-grant key: the ends trimmed of spaces and tabs, and every run of
+ * them made one space. Any other character stays, newline, `\r` and NBSP
+ * included, because bash reads each of them differently from a space. A
+ * command with a quote, a backslash or a heredoc keeps its spacing as
+ * written: there a space or tab can be text, and changing it can move where
+ * a heredoc ends.
+ */
 export function normalizeCommand(command: string): string {
-  return command.trim().replace(/\s+/g, ' ');
+  const trimmed = trimBlanks(command);
+  return /['"\\]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
 }
 
 const MAX_NESTING = 4;
