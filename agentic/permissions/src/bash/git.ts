@@ -14,16 +14,32 @@ import { isRemoteSpec, isUrl } from './words';
 const GIT_EXEC_CONFIG =
   /^(alias\.|core\.(sshcommand|pager|editor|fsmonitor|hookspath|askpass|gitproxy)|diff\.|credential\.|sequence\.editor|gpg\.|filter\.|uploadpack\.|protocol\.|include\.|includeif\.|remote\..*\.(uploadpack|receivepack))/i;
 
-/** Options with which a git subcommand runs a program their value names. */
+/**
+ * Options with which a git subcommand runs a program their value names (a
+ * clone template's hooks run on checkout). Best effort: git has more, and
+ * its config can name programs too.
+ */
 const RUNS_PROGRAM: ReadonlyMap<string, readonly string[]> = new Map([
   ['fetch', ['--upload-pack']],
   ['pull', ['--upload-pack']],
-  ['clone', ['-u', '--upload-pack']],
+  ['clone', ['-u', '--upload-pack', '--template']],
   ['ls-remote', ['-u', '--upload-pack']],
   ['archive', ['--exec']],
   ['push', ['--receive-pack', '--exec']],
   ['rebase', ['-x', '--exec']],
-  ['grep', ['-O', '--open-files-in-pager']]
+  ['grep', ['-O', '--open-files-in-pager']],
+  ['difftool', ['-x', '--extcmd']],
+  [
+    'filter-branch',
+    ['--setup', '--env-filter', '--tree-filter', '--index-filter', '--parent-filter', '--msg-filter', '--commit-filter', '--tag-name-filter']
+  ],
+  ['send-email', ['--to-cmd', '--cc-cmd', '--header-cmd', '--sendmail-cmd']]
+]);
+
+/** Subcommands whose action word runs the command after it: `git bisect run`, `git submodule foreach`. */
+const RUNS_COMMAND: ReadonlyMap<string, string> = new Map([
+  ['bisect', 'run'],
+  ['submodule', 'foreach']
 ]);
 
 /**
@@ -32,7 +48,16 @@ const RUNS_PROGRAM: ReadonlyMap<string, readonly string[]> = new Map([
  * abbreviated; and an argument from a variable, which may be such an option.
  */
 function runsProgram(ctx: CommandContext, sub: string | undefined, args: readonly Arg[]): void {
-  const denied = sub === undefined ? undefined : RUNS_PROGRAM.get(sub);
+  if (sub === undefined) return;
+  const action = RUNS_COMMAND.get(sub);
+  if (action && args.find((a) => !a.text.startsWith('-'))?.text === action) {
+    return ctx.analyzer.dynamic(`it runs git ${sub} ${action}, which runs the command after it`);
+  }
+  if (sub === 'clone') {
+    const config = valuesOf(parse(args, new Set(['-c', '--config'])), '-c', '--config').find((kv) => GIT_EXEC_CONFIG.test(kv.text));
+    if (config) return ctx.analyzer.dynamic(`git clone -c ${config.text} makes git run a program`);
+  }
+  const denied = RUNS_PROGRAM.get(sub);
   if (!denied) return;
   const hit = args.find((a) => a.unknown || denied.some((d) => optionMatches(a.text, d)));
   if (!hit) return;
@@ -121,6 +146,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   const sub = rest[k]?.text;
   const args = rest.slice(k + 1);
   runsProgram(ctx, sub, args);
+  if (sub === 'send-email') analyzer.flag('upload', 'it uploads data: git send-email mails patches from this repo');
   const saved = analyzer.base;
   analyzer.base = base;
   try {
