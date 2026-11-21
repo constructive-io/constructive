@@ -51,11 +51,11 @@ import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
 
 import { realtimeChannel } from './channel';
+import { SubscriptionDelivery } from './delivery';
 import type { ParsedPayload } from './event-gate';
 import { createGatedSubscriber } from './event-gate';
 import { filterInaccessibleEvents, realtimeResponseNames } from './subscription-filter';
 import type { RealtimeSubscriptionsPluginOptions } from './types';
-import { SubscriptionVisibility } from './visibility';
 
 const log = new Logger('graphile-realtime-subscriptions');
 
@@ -175,11 +175,11 @@ function buildPlans(
         const $pgSubscriber = (grafastContext() as any).get('pgSubscriber');
         const $topic = constant(notifyChannel);
         const $ids = args.getRaw('ids');
-        const $visibility = lambda([$pgSubscriber, $ids], () => new SubscriptionVisibility());
+        const $visibility = lambda([$pgSubscriber, $ids], () => new SubscriptionDelivery(overflowThreshold));
 
         const $subscriber = lambda([$pgSubscriber, $ids], (pair: unknown) => {
           const [pgSubscriber, ids] = pair as readonly [any, string[] | null | undefined];
-          return createGatedSubscriber(pgSubscriber, { ids, threshold: overflowThreshold });
+          return createGatedSubscriber(pgSubscriber, { ids });
         });
 
         return listen($subscriber, $topic, ($payload: any) => object({ parsed: $payload, visibility: $visibility }));
@@ -188,9 +188,13 @@ function buildPlans(
         const $parsed = $event.get('parsed');
         const $rowId = lambda($parsed, (p: unknown) => reportedRowId(requirePayload(p)));
         const $row = resource.get({ id: $rowId });
-        const $hidden = sideEffect([$parsed, $row, $event.get('visibility')], ([payload, row, visibility]: any) =>
-          !visibility.allow(requirePayload(payload), row != null));
-        return object({ parsed: inhibitIf($parsed, $hidden), row: $row });
+        const $projected = sideEffect([$parsed, $row, $event.get('visibility')], ([payload, row, delivery]: any) =>
+          delivery.project(requirePayload(payload), row != null));
+        const $hidden = lambda($projected, (payload: unknown) => payload == null);
+        const $reportedRowId = lambda($projected, (payload: ParsedPayload | null) =>
+          payload && !payload.overflow ? reportedRowId(payload) : null);
+        const $reportedRow = resource.get({ id: $reportedRowId });
+        return object({ parsed: inhibitIf($projected, $hidden), row: $reportedRow });
       },
     };
 

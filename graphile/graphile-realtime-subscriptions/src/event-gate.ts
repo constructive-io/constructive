@@ -1,17 +1,15 @@
 /**
  * The gate between PostgreSQL's NOTIFY stream and a GraphQL subscription.
  *
- * Parsing, ID filtering and throttling happen before Grafast plans each event.
- * The plugin then authorizes the row through its RLS-scoped resource lookup.
- *
- * The gate also owns parsing and the overflow throttle, so a payload the
- * trigger and the plugin disagree about fails loudly instead of arriving as
+ * Parsing and ID filtering happen before Grafast plans each event.
+ * The plugin authorizes each row before applying its visible-row throttle.
+ * A payload the trigger and the plugin disagree about fails loudly instead of arriving as
  * an `UNKNOWN`-shaped record.
  */
 
 import type { GrafastSubscriber } from 'grafast';
 
-import { filterMapIterator, flatMapIterator } from './async-iterator';
+import { flatMapIterator } from './async-iterator';
 
 /** Operations `emit_change` is allowed to report. */
 const KNOWN_OPERATIONS = new Set(['INSERT', 'UPDATE', 'DELETE']);
@@ -20,8 +18,8 @@ export interface ParsedPayload {
   event: string;
   /**
    * Row ids being reported. Already narrowed to the subscription's `ids` when
-   * it supplied any, so no consumer needs to re-intersect. Empty for
-   * INVALIDATE.
+   * it supplied any, so no consumer needs to re-intersect. Empty only for
+   * an authorized overflow produced after row lookup.
    */
   rowIds: string[];
   overflow: boolean;
@@ -30,8 +28,8 @@ export interface ParsedPayload {
 export class MalformedNotifyPayloadError extends Error {
   constructor(raw: string, reason: string) {
     super(
-      `Malformed realtime NOTIFY payload ${JSON.stringify(raw)}: ${reason}. ` +
-        'Expected "INVALIDATE" or "<INSERT|UPDATE|DELETE>:<uuid>[,<uuid>...]" ' +
+      `Malformed realtime NOTIFY payload ${JSON.stringify(raw.startsWith('{') ? '[ephemeral rows]' : raw)}: ${reason}. ` +
+        'Expected "<INSERT|UPDATE|DELETE>:<uuid>[,<uuid>...]" or ephemeral row JSON ' +
         'as emitted by the emit_change trigger.'
     );
     this.name = 'MalformedNotifyPayloadError';
@@ -40,15 +38,22 @@ export class MalformedNotifyPayloadError extends Error {
 
 /**
  * Parse the NOTIFY payload from `emit_change`.
- * Format: `"TG_OP:id1,id2,..."` or `"INVALIDATE"`.
+ * Format: `"TG_OP:id1,id2,..."` or ephemeral `{"op":"TG_OP","rows":[{"id":"uuid"}]}`.
  *
  * Throws on anything else: a payload this cannot read means the trigger and
  * this plugin have diverged, and inventing an event name for it hides a
  * deployment fault behind data the client will act on.
  */
 export function parseNotifyPayload(raw: string): ParsedPayload {
-  if (raw === 'INVALIDATE') {
-    return { event: 'INVALIDATE', rowIds: [], overflow: true };
+  if (raw.startsWith('{')) {
+    let value: any;
+    try { value = JSON.parse(raw); }
+    catch { throw new MalformedNotifyPayloadError(raw, 'invalid ephemeral JSON'); }
+    if (!KNOWN_OPERATIONS.has(value?.op) || !Array.isArray(value.rows) || value.rows.length === 0 ||
+      value.rows.some((row: any) => !row || typeof row.id !== 'string' || row.id.length === 0)) {
+      throw new MalformedNotifyPayloadError(raw, 'ephemeral payload requires an operation and row ids');
+    }
+    return { event: value.op, rowIds: value.rows.map((row: { id: string }) => row.id), overflow: false };
   }
 
   const colonIdx = raw.indexOf(':');
@@ -63,7 +68,7 @@ export function parseNotifyPayload(raw: string): ParsedPayload {
 
   const idsPart = raw.substring(colonIdx + 1);
   const rowIds = idsPart.length > 0 ? idsPart.split(',') : [];
-  if (rowIds.length === 0) {
+  if (rowIds.length === 0 || rowIds.some(id => id.length === 0)) {
     throw new MalformedNotifyPayloadError(raw, `${event} carries no row ids`);
   }
 
@@ -113,8 +118,6 @@ export class EventThrottle {
 export interface EventGateOptions {
   /** Sparse-set subscription: deliver only events touching these row ids. */
   ids?: readonly string[] | null;
-  /** Events per second before the gate collapses the stream to one INVALIDATE. */
-  threshold: number;
 }
 
 /**
@@ -124,10 +127,6 @@ export interface EventGateOptions {
  */
 function gate(raw: string, ids: readonly string[] | null): ParsedPayload | null {
   const parsed = parseNotifyPayload(raw);
-
-  // An INVALIDATE is the overflow signal itself; throttling it would drop the
-  // one event telling the client to refetch.
-  if (parsed.overflow) return parsed;
 
   if (!ids || ids.length === 0) return parsed;
 
@@ -140,32 +139,22 @@ function gate(raw: string, ids: readonly string[] | null): ParsedPayload | null 
 /**
  * Wrap a `GrafastSubscriber` so its stream yields parsed, gated payloads.
  *
- * Built per subscription (the throttle and `ids` are per-subscriber state), so
- * one noisy client can no longer throttle every other subscriber to the same
- * table — which a single build-time throttle instance did.
+ * Built per subscription so each sparse ID set is independent. Row visibility
+ * and rate accounting are applied by the event plan, after its scoped lookup.
  */
 export function createGatedSubscriber(
   inner: GrafastSubscriber<Record<string, string>>,
-  { ids, threshold }: EventGateOptions
+  { ids }: EventGateOptions
 ): GrafastSubscriber<Record<string, ParsedPayload>> {
   const subscribedIds = ids && ids.length > 0 ? ids : null;
-  const throttle = new EventThrottle(threshold);
 
   return {
     async subscribe(topic: string) {
       const source = await inner.subscribe(topic);
-      const rows = flatMapIterator(source, raw => {
+      return flatMapIterator(source, raw => {
         const payload = gate(String(raw), subscribedIds);
         if (!payload) return [];
-        if (payload.overflow) return [payload];
         return payload.rowIds.map(id => ({ ...payload, rowIds: [id] }));
-      });
-      return filterMapIterator(rows, payload => {
-        if (payload.overflow) return payload;
-        const action = throttle.check();
-        if (action === 'drop') return null;
-        if (action === 'overflow') return { event: 'INVALIDATE', rowIds: [], overflow: true };
-        return payload;
       });
     }
     // Deliberately no release(): `inner` is the shared pgSubscriber from the

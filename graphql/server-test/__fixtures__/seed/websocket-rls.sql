@@ -1,7 +1,8 @@
 CREATE TABLE "simple-pets-public".realtime_users (id uuid PRIMARY KEY, name text NOT NULL);
 INSERT INTO "simple-pets-public".realtime_users VALUES
   ('bbbbbbbb-0000-4000-8000-000000000002', 'Alice'),
-  ('bbbbbbbb-0000-4000-8000-000000000003', 'Bob');
+  ('bbbbbbbb-0000-4000-8000-000000000003', 'Bob'),
+  ('bbbbbbbb-0000-4000-8000-000000000004', 'Charlie');
 ALTER TABLE "simple-pets-auth-private".sessions ADD FOREIGN KEY (user_id)
   REFERENCES "simple-pets-public".realtime_users(id);
 
@@ -78,15 +79,18 @@ CREATE FUNCTION "simple-pets-public".rls_note_visible(note_id uuid) RETURNS bool
 $$ LANGUAGE sql STABLE;
 GRANT EXECUTE ON FUNCTION "simple-pets-public".rls_note_visible(uuid) TO authenticated;
 
-CREATE FUNCTION "simple-pets-public".rls_overflow() RETURNS boolean AS $$
-BEGIN
-  PERFORM pg_notify('realtime:' || md5(octet_length('simple-pets-public')::text || ':simple-pets-publicrls_notes'), 'INVALIDATE');
-  RETURN true;
-END;
-$$ LANGUAGE plpgsql VOLATILE;
-GRANT EXECUTE ON FUNCTION "simple-pets-public".rls_overflow() TO authenticated;
+CREATE FUNCTION "simple-pets-public".bulk_create_rls_notes(note_ids uuid[], shared_ids uuid[])
+RETURNS uuid[] AS $$
+  WITH added AS (
+    INSERT INTO "simple-pets-public".rls_notes (id, owner_id, shared)
+    SELECT id, current_setting('jwt.claims.user_id')::uuid, id = ANY(shared_ids)
+    FROM unnest(note_ids) AS n(id)
+    RETURNING id
+  ) SELECT array_agg(id ORDER BY id) FROM added;
+$$ LANGUAGE sql VOLATILE;
+GRANT EXECUTE ON FUNCTION "simple-pets-public".bulk_create_rls_notes(uuid[], uuid[]) TO authenticated;
 
-UPDATE routing_public.database_settings SET max_concurrent_requests = 8
+UPDATE routing_public.database_settings SET max_concurrent_requests = 8, max_request_bytes = 16384
 WHERE database_id = '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9';
 
 CREATE TABLE "simple-pets-public".long_realtime_notification_lifecycle_notes (

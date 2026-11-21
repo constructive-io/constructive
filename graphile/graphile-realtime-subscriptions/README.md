@@ -36,11 +36,11 @@ INSERT and UPDATE emit no frame when the RLS-scoped row lookup is null, includin
 
 Multi-row notifications are split into individual row events before authorization, so an invisible row cannot suppress visible rows later in the batch.
 
-The throttle counts individual matching row events, not NOTIFY batches. IDs excluded by the subscription do not consume the row budget.
+The throttle counts only individually authorized, matching rows, not NOTIFY batches. Invisible rows and IDs excluded by the subscription consume no budget. When the visible-row limit is exceeded, one overflow frame is emitted per rate window, with no row or row ID. Its event is the operation of the visible row that caused overflow.
 
 DELETE is delivered only for IDs previously seen as visible by that same subscription. An invisible UPDATE clears that history. History retains at most 10,000 recently visible IDs; eviction conservatively suppresses subsequent DELETE events for forgotten IDs.
 
-Unscoped INVALIDATE signals, including throttle overflow, are suppressed because their visibility cannot be established.
+Triggers send byte-bounded ID chunks instead of unscoped INVALIDATE markers. Ephemeral small-row JSON notifications are reduced to IDs and reauthorized in the same way; their embedded row data is never trusted for delivery. Producer and server changes require coordinated deployment; legacy INVALIDATE payloads are rejected as malformed.
 
 ## Subscription Modes
 

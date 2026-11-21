@@ -14,6 +14,7 @@ jest.setTimeout(60000);
 const HOST = 'app.test.constructive.io';
 const ALICE = 'bbbbbbbb-0000-4000-8000-000000000002';
 const BOB = 'bbbbbbbb-0000-4000-8000-000000000003';
+const CHARLIE = 'bbbbbbbb-0000-4000-8000-000000000004';
 const shared = path.join(__dirname, '../../../__fixtures__/seed');
 const pause = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const document = `subscription($ids: [UUID!]) {
@@ -30,6 +31,7 @@ describe('RLS-gated public tenant WebSocket events', () => {
   let teardown: () => Promise<void>;
   let alice: string;
   let bob: string;
+  let charlie: string;
   let streams: Stream[] = [];
 
   async function http(token: string | undefined, query: string, variables = {}) {
@@ -50,6 +52,22 @@ describe('RLS-gated public tenant WebSocket events', () => {
 
   async function visible(token: string, id: string, expected: boolean) {
     expect((await http(token, 'query($id: UUID!) { rlsNoteVisible(noteId: $id) }', { id })).rlsNoteVisible).toBe(expected);
+  }
+
+  async function bulkCreate(token: string, ids: string[], sharedIds: string[] = []) {
+    const result = await http(token, `mutation($ids: [UUID]!, $shared: [UUID]!) {
+      bulkCreateRlsNotes(input: {noteIds: $ids, sharedIds: $shared}) { result }
+    }`, { ids, shared: sharedIds });
+    expect(result.bulkCreateRlsNotes.result).toEqual([...ids].sort());
+  }
+
+  async function overflow(stream: Stream) {
+    for (let i = 0; i < 100 && !payloads(stream).some(payload => payload.overflow); i++) await pause(20);
+    expect(stream.errors).toEqual([]);
+    expect(stream.frames.flatMap(frame => frame.errors ?? [])).toEqual([]);
+    expect(payloads(stream).filter(payload => payload.overflow)).toEqual([
+      { event: 'INSERT', rowId: null, overflow: true, rlsNote: null }
+    ]);
   }
 
   function open(token: string, ids?: string[], query = document, client?: Client) {
@@ -115,6 +133,7 @@ describe('RLS-gated public tenant WebSocket events', () => {
     ])]));
     alice = (await http(undefined, `mutation { issueSession(input: {actor: "${ALICE}"}) { result } }`)).issueSession.result;
     bob = (await http(undefined, `mutation { issueSession(input: {actor: "${BOB}"}) { result } }`)).issueSession.result;
+    charlie = (await http(undefined, `mutation { issueSession(input: {actor: "${CHARLIE}"}) { result } }`)).issueSession.result;
     expect(alice).not.toBe(bob);
   });
   beforeEach(async () => { await pg.beforeEach(); await db.beforeEach(); });
@@ -265,12 +284,46 @@ describe('RLS-gated public tenant WebSocket events', () => {
     await silent(fresh);
   });
 
-  it('does not disclose unscoped INVALIDATE notifications', async () => {
-    const a = open(alice);
-    const b = open(bob);
-    await ready(a, b);
-    await http(alice, 'mutation { rlsOverflow(input: {}) { result } }');
-    await silent(b);
+  it('delivers 50 visible events and one id-less overflow for an owner bulk insert of 61 rows', async () => {
+    const owner = open(alice);
+    const observer = open(charlie);
+    await ready(owner, observer);
+    await pause(1100);
+    const ids = Array.from({ length: 61 }, () => randomUUID()).sort();
+    await bulkCreate(alice, ids);
+    await overflow(owner);
+    const events = payloads(owner).filter(payload => !payload.overflow);
+    expect(events).toHaveLength(50);
+    expect(events.map(payload => payload.rowId)).toEqual(ids.slice(0, 50));
+    expect(events.every(payload => payload.rlsNote.id === payload.rowId)).toBe(true);
+    await silent(observer);
+  });
+
+  it('does not send a third user any frame for another user bulk inserting 61 private rows', async () => {
+    const writer = open(bob);
+    const observer = open(charlie);
+    await ready(writer, observer);
+    await pause(1100);
+    const ids = Array.from({ length: 61 }, () => randomUUID()).sort();
+    await bulkCreate(bob, ids);
+    await delivered(writer, ids[0], 'INSERT');
+    await visible(charlie, ids[0], false);
+    await silent(observer);
+  });
+
+  it('counts only visible rows in a mixed batch with 61 invisible IDs first', async () => {
+    const owner = open(alice);
+    const observer = open(bob);
+    await ready(owner, observer);
+    await pause(1100);
+    const ids = Array.from({ length: 64 }, () => randomUUID()).sort();
+    const sharedIds = ids.slice(61);
+    await bulkCreate(alice, ids, sharedIds);
+    for (const id of sharedIds) await delivered(observer, id, 'INSERT');
+    await overflow(owner);
+    await pause(100);
+    expect(payloads(observer).map(payload => payload.rowId)).toEqual(sharedIds);
+    expect(payloads(observer).some(payload => payload.overflow)).toBe(false);
   });
 
   it('authorizes metadata-only selections, including an aliased subscription field', async () => {

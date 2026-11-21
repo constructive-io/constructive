@@ -9,7 +9,7 @@
  * - Tables without @realtime tag are excluded
  * - Empty registry produces no fields
  * - Multiple realtime tables produce multiple fields
- * - NOTIFY payload parsing (TG_OP:id1,id2,... and INVALIDATE)
+ * - NOTIFY payload parsing (TG_OP:id1,id2,... and ephemeral JSON)
  * - Per-subscriber event throttling with configurable limit
  * - Sparse set subscriptions (ids: [UUID!]) with row ID intersection filtering
  * - RLS-aware rowId masking in payload resolvers
@@ -56,7 +56,7 @@ jest.mock('graphile-utils', () => ({
 }));
 
 import type { EventGateOptions } from '../src/event-gate';
-import { SubscriptionVisibility } from '../src/visibility';
+import { SubscriptionDelivery } from '../src/delivery';
 import {
   createGatedSubscriber,
   createRealtimeSubscriptionsPlugin,
@@ -139,13 +139,18 @@ describe('parseNotifyPayload', () => {
     });
   });
 
-  it('parses INVALIDATE as overflow', () => {
-    const result = parseNotifyPayload('INVALIDATE');
-    expect(result).toEqual({
-      event: 'INVALIDATE',
-      rowIds: [],
-      overflow: true,
+  it('rejects the legacy id-less INVALIDATE marker', () => {
+    expect(() => parseNotifyPayload('INVALIDATE')).toThrow(MalformedNotifyPayloadError);
+  });
+
+  it('extracts only ids from ephemeral rows, never their embedded data', () => {
+    expect(parseNotifyPayload(JSON.stringify({ op: 'INSERT', rows: [{ id: 'a', title: 'private' }] }))).toEqual({
+      event: 'INSERT', rowIds: ['a'], overflow: false,
     });
+  });
+
+  it.each(['{', '{"op":"INSERT","rows":[]}', '{"op":"INSERT","rows":[{}]}'])('rejects malformed ephemeral input %s without echoing row data', raw => {
+    expect(() => parseNotifyPayload(raw)).toThrow(MalformedNotifyPayloadError);
   });
 
   // A payload this cannot read means emit_change and this plugin have
@@ -441,7 +446,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const resource = { ...createMockResource('tasks', codec), get: jest.fn(() => row) };
       const result = capturedFactory!(createMockBuild({ tasks: resource }));
       const parsed = { event: 'INSERT', rowIds: ['row-uuid'], overflow: false };
-      const visibility = new SubscriptionVisibility();
+      const visibility = new SubscriptionDelivery(50);
       const mockEvent = { get: (key: string) => ({ parsed, visibility }[key]) };
       expect(result.plans['Subscription']['onTasksChanged'].plan(mockEvent)).toEqual({ parsed, row });
       expect(resource.get).toHaveBeenCalledWith({ id: 'row-uuid' });
@@ -556,7 +561,6 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('yields nothing at all for an unsubscribed row', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-y'), {
         ids: ['id-a', 'id-b'],
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([]);
@@ -565,7 +569,6 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('narrows to the subscribed IDs and authorizes each row independently', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-b,id-a'), {
         ids: ['id-a', 'id-b'],
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([
@@ -577,7 +580,6 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('passes every event through in full collection mode', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('INSERT:id-x', 'DELETE:id-y'), {
         ids: null,
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([
@@ -586,53 +588,29 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       ]);
     });
 
-    it('delivers INVALIDATE regardless of the sparse set', async () => {
-      const gated = createGatedSubscriber(subscriberEmitting('INVALIDATE'), {
-        ids: ['id-a'],
-        threshold: 50,
-      });
-
-      await expect(collect(gated)).resolves.toEqual([
-        { event: 'INVALIDATE', rowIds: [], overflow: true },
-      ]);
+    it('rejects id-less legacy notifications even for a sparse set', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('INVALIDATE'), { ids: ['id-a'] });
+      await expect(collect(gated)).rejects.toThrow(MalformedNotifyPayloadError);
     });
 
-    it('collapses a burst to one INVALIDATE and then yields nothing', async () => {
-      const gated = createGatedSubscriber(
-        subscriberEmitting('INSERT:a', 'INSERT:b', 'INSERT:c', 'INSERT:d'),
-        { ids: null, threshold: 2 }
-      );
-
-      await expect(collect(gated)).resolves.toEqual([
-        { event: 'INSERT', rowIds: ['a'], overflow: false },
-        { event: 'INSERT', rowIds: ['b'], overflow: false },
-        { event: 'INVALIDATE', rowIds: [], overflow: true },
-      ]);
-    });
-
-    it('counts individual rows in a batch against the throttle', async () => {
-      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:a,b,c', 'UPDATE:d'), {
-        ids: null,
-        threshold: 1,
-      });
-      await expect(collect(gated)).resolves.toEqual([
-        { event: 'UPDATE', rowIds: ['a'], overflow: false },
-        { event: 'INVALIDATE', rowIds: [], overflow: true },
-      ]);
+    it('does not consume a rate budget before rows can be authorized', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:a,b,c', 'UPDATE:d'), { ids: null });
+      await expect(collect(gated)).resolves.toEqual(['a', 'b', 'c', 'd'].map(id => ({
+        event: 'UPDATE', rowIds: [id], overflow: false,
+      })));
     });
 
     it('does not charge the row budget for IDs excluded by the subscription', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:excluded', 'UPDATE:a'), {
         ids: ['a'],
-        threshold: 1,
       });
       await expect(collect(gated)).resolves.toEqual([
         { event: 'UPDATE', rowIds: ['a'], overflow: false },
       ]);
     });
 
-    it('throttles each subscription independently', async () => {
-      const opts: EventGateOptions = { ids: null, threshold: 1 };
+    it('keeps sparse gating independent for each subscription', async () => {
+      const opts: EventGateOptions = { ids: null };
       const noisy = createGatedSubscriber(subscriberEmitting('INSERT:a', 'INSERT:b'), opts);
       await collect(noisy);
 
@@ -645,7 +623,6 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('surfaces a malformed payload instead of emitting an event for it', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('TRUNCATE:a'), {
         ids: null,
-        threshold: 50,
       });
 
       await expect(collect(gated)).rejects.toThrow(MalformedNotifyPayloadError);

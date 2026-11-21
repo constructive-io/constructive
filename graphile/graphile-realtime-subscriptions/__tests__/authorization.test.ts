@@ -2,10 +2,64 @@ import { type ExecutionResult, GraphQLError, parse } from 'graphql';
 
 import { filterMapIterator, flatMapIterator } from '../src/async-iterator';
 import { createGatedSubscriber, type ParsedPayload } from '../src/event-gate';
+import { SubscriptionDelivery } from '../src/delivery';
 import { filterInaccessibleEvents, realtimeResponseNames } from '../src/subscription-filter';
 import { SubscriptionVisibility } from '../src/visibility';
 
 const payload = (event: string, id = 'id'): ParsedPayload => ({ event, rowIds: [id], overflow: false });
+
+describe('visible-row throttling', () => {
+  beforeEach(() => { jest.spyOn(Date, 'now').mockReturnValue(1000); });
+  afterEach(() => { jest.restoreAllMocks(); });
+
+  it('delivers 50 owner rows and one id-less overflow for 61 visible changes', () => {
+    const state = new SubscriptionDelivery(50);
+    const delivered = Array.from({ length: 61 }, (_, i) => state.project(payload('INSERT', String(i)), true)).filter(Boolean);
+    expect(delivered).toHaveLength(51);
+    expect(delivered.slice(0, 50)).toEqual(Array.from({ length: 50 }, (_, i) => payload('INSERT', String(i))));
+    expect(delivered[50]).toEqual({ event: 'INSERT', rowIds: [], overflow: true });
+  });
+
+  it('does not spend any budget or emit overflow for invisible changes', () => {
+    const state = new SubscriptionDelivery(2);
+    for (let i = 0; i < 61; i++) expect(state.project(payload('INSERT', String(i)), false)).toBeNull();
+    expect(state.project(payload('INSERT', 'a'), true)).toEqual(payload('INSERT', 'a'));
+    expect(state.project(payload('INSERT', 'b'), true)).toEqual(payload('INSERT', 'b'));
+  });
+
+  it('counts only visible rows in mixed batches and keeps subscription budgets independent', () => {
+    const a = new SubscriptionDelivery(1), b = new SubscriptionDelivery(1);
+    expect(a.project(payload('UPDATE', 'private'), false)).toBeNull();
+    expect(a.project(payload('UPDATE', 'shared'), true)).toEqual(payload('UPDATE', 'shared'));
+    expect(a.project(payload('UPDATE', 'private'), false)).toBeNull();
+    expect(a.project(payload('UPDATE', 'next'), true)).toEqual({ event: 'UPDATE', rowIds: [], overflow: true });
+    expect(b.project(payload('UPDATE', 'next'), true)).toEqual(payload('UPDATE', 'next'));
+  });
+
+  it('resets the visible budget and overflow flag in the next window', () => {
+    const state = new SubscriptionDelivery(1);
+    state.project(payload('INSERT'), true);
+    expect(state.project(payload('INSERT'), true)?.overflow).toBe(true);
+    expect(state.project(payload('INSERT'), true)).toBeNull();
+    jest.mocked(Date.now).mockReturnValue(2001);
+    expect(state.project(payload('INSERT'), true)).toEqual(payload('INSERT'));
+    expect(state.project(payload('INSERT'), true)?.overflow).toBe(true);
+  });
+
+  it('uses observed visibility for DELETE and does not charge empty input', () => {
+    const state = new SubscriptionDelivery(2);
+    expect(state.project({ event: 'UPDATE', rowIds: [], overflow: false }, true)).toBeNull();
+    expect(state.project(payload('DELETE'), false)).toBeNull();
+    expect(state.project(payload('INSERT'), true)).toEqual(payload('INSERT'));
+    expect(state.project(payload('DELETE'), false)).toEqual(payload('DELETE'));
+  });
+
+  it('rejects an unexpanded batch before charging any row', () => {
+    const state = new SubscriptionDelivery(1);
+    expect(() => state.project({ event: 'UPDATE', rowIds: ['a', 'b'], overflow: false }, true)).toThrow('single-row');
+    expect(state.project(payload('UPDATE'), true)).toEqual(payload('UPDATE'));
+  });
+});
 
 describe('per-row batch authorization', () => {
   it('rejects an unexpanded batch rather than silently authorizing only its first row', () => {
@@ -16,7 +70,7 @@ describe('per-row batch authorization', () => {
   it.each(['INSERT', 'UPDATE', 'DELETE'])('splits every %s batch before applying visibility', async event => {
     const state = new SubscriptionVisibility();
     if (event === 'DELETE') state.allow(payload('INSERT', 'visible'), true);
-    const gate = createGatedSubscriber({ async *subscribe() { yield `${event}:hidden,visible`; } }, { threshold: 50 });
+    const gate = createGatedSubscriber({ async *subscribe() { yield `${event}:hidden,visible`; } }, {});
     const accepted = [];
     for await (const row of await gate.subscribe('topic')) {
       expect(row.rowIds).toHaveLength(1);
