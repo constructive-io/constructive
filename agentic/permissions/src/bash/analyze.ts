@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
-import { expandBraces, MAX_BRACE_RESULTS } from './braces';
+import { expandBraces, expandsToPlainNames, MAX_BRACE_RESULTS } from './braces';
 import { generic } from './args';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
@@ -306,7 +306,7 @@ class Analyzer {
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (!expandBraces(text, mask, expanded)) {
+    if (!expandBraces(text, mask, expanded) && (unknown || !expandsToPlainNames(text))) {
       this.unresolvable(`a brace expansion has more than ${MAX_BRACE_RESULTS} results, so not every word could be checked`);
     }
     const braced = text[0] === '{' && mask[0];

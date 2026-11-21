@@ -7,7 +7,7 @@
  */
 
 import type { CommandPart } from '../types';
-import { expandBraces } from './braces';
+import { expandBraces, expandsToPlainNames } from './braces';
 import type { Lexed, Redirect, Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
@@ -63,7 +63,7 @@ function optionsOf(words: readonly Word[]): string[] | null {
     }
     const { text, mask } = literalText(word);
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (!expandBraces(text, mask, expanded)) return null;
+    if (!expandBraces(text, mask, expanded) && !expandsToPlainNames(text)) return null;
     for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
   }
   return options;
