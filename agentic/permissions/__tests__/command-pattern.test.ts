@@ -24,8 +24,7 @@ describe('parseCommandPattern', () => {
     ['git status *, npm run test *', prefixes('git status', 'npm run test')],
     ['  git   status * ,npm run test *  ', prefixes('git status', 'npm run test')],
     ['git status *, git status *', prefixes('git status')],
-    ['python -m pytest *', prefixes('python -m pytest')],
-    ['./scripts/deploy.sh *', prefixes('./scripts/deploy.sh')],
+    ['node scripts/build.js *', prefixes('node scripts/build.js')],
     ['pnpm   test', exact('pnpm test')],
     ['echo a, b', exact('echo a, b')],
     ['curl -d @data.json https://api.example.com', exact('curl -d @data.json https://api.example.com')]
@@ -50,7 +49,13 @@ describe('parseCommandPattern', () => {
     ['git status && npm test *', '`git status && npm test *` holds more than one command. Write each one as its own prefix, separated by commas.'],
     ['if true *', 'A prefix can\'t start with the shell keyword `if`. Start it with the program name.'],
     ['echo «secret:ACCESS_TOKEN#1a2b»', 'A command with a `«secret:…»` placeholder asks every time, so this rule would never apply. Remove the placeholder.'],
-    ['ls *, cat *, git status *, git log *, npm test *, pnpm install *', 'A rule can hold at most 5 prefixes, and this one has 6. Split it into two rules.']
+    ['ls *, cat *, git status *, git log *, npm test *, pnpm test *', 'A rule can hold at most 5 prefixes, and this one has 6. Split it into two rules.'],
+    ['printf *', '`printf *` isn\'t on the prefix list, so a rule can\'t cover its later runs. Use a listed prefix, such as `git status *` or `npm run test *`, or save the exact command instead.'],
+    ['git *', '`git *` isn\'t on the prefix list, so a rule can\'t cover its later runs. Use a listed prefix, such as `git status *` or `npm run test *`, or save the exact command instead.'],
+    ['./scripts/deploy.sh *', '`./scripts/deploy.sh *` isn\'t on the prefix list, so a rule can\'t cover its later runs. Use a listed prefix, such as `git status *` or `npm run test *`, or save the exact command instead.'],
+    ['npm run *', '`npm run *` is too broad. Add the script name after `npm run`.'],
+    ['node *', '`node *` is too broad. Add the script name after `node`.'],
+    ['python -m pytest *', 'A prefix can\'t hold an option such as `-m`. End the prefix before it, or save the exact command instead.']
   ];
   it.each(refused)('refuses %j', (text, reason) => {
     expect(parseCommandPattern(text)).toEqual({ ok: false, reason });
@@ -78,7 +83,7 @@ describe('commandPattern', () => {
       'echo a, b > out.txt'
     ];
     const offered = await Promise.all(cards.map(async (c) => asAsk(await sb.bash(c, 'ask')).grantOptions[1].match));
-    const typed = [prefixes('git status', 'npm run test'), prefixes('python -m pytest'), exact('echo a, b'), exact('pnpm test')];
+    const typed = [prefixes('git status', 'npm run test'), prefixes('node scripts/build.js'), exact('echo a, b'), exact('pnpm test')];
     for (const match of [...offered, ...typed] as (CommandMatch | CommandPrefixMatch)[]) {
       const read = parseCommandPattern(commandPattern(match));
       expect(read.ok && sameMatch(read.match, match)).toBe(true);

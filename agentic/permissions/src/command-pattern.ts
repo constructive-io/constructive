@@ -8,7 +8,7 @@
 import { hasPlaceholder, normalizeCommand } from './bash/analyze';
 import { isShellSyntax } from './bash/parts';
 import { tokenize } from './bash/tokenize';
-import { firstNonPrefixWord, MAX_PREFIXES } from './command-prefix';
+import { firstNonPrefixWord, MAX_PREFIXES, prefixShortfall } from './command-prefix';
 import type { CommandMatch, CommandPrefixMatch } from './types';
 
 /** A typed pattern read back: the match, or a short plain reason that says what is wrong and how to fix it. */
@@ -51,7 +51,7 @@ function readPrefix(piece: string): PrefixResult {
     return { ok: false, reason: `A prefix can't start with the shell keyword \`${words[0]}\`. Start it with the program name.` };
   }
   const bad = firstNonPrefixWord(words);
-  if (bad === undefined) return { ok: true, prefix: text };
+  if (bad === undefined) return listed(piece, words) ?? { ok: true, prefix: text };
   if (bad.includes('*')) {
     return { ok: false, reason: `A \`*\` can only end a prefix, as in \`git status *\`. Remove the other \`*\` in \`${piece}\`.` };
   }
@@ -62,6 +62,19 @@ function readPrefix(piece: string): PrefixResult {
     };
   }
   return { ok: false, reason: `A prefix can only hold plain words, and \`${bad}\` isn't one. Remove it, or save the exact command instead.` };
+}
+
+/** A refusal when the table does not list the prefix, or `null`. */
+function listed(piece: string, words: readonly string[]): PrefixResult | null {
+  const shortfall = prefixShortfall(words);
+  if (shortfall === null) return null;
+  if ('short' in shortfall) {
+    return { ok: false, reason: `\`${piece}\` is too broad. Add the script name after \`${shortfall.short}\`.` };
+  }
+  return {
+    ok: false,
+    reason: `\`${piece}\` isn't on the prefix list, so a rule can't cover its later runs. Use a listed prefix, such as \`git status *\` or \`npm run test *\`, or save the exact command instead.`
+  };
 }
 
 function readExact(text: string): CommandPatternResult {

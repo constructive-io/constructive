@@ -9,35 +9,34 @@ import { normalizeCommand } from './bash/analyze';
 import type { CommandPart } from './types';
 
 /**
- * How many leading words a prefix keeps, by the words that name the program;
- * the longest key wins (`npm run` before `npm`). It lists programs whose
- * leading words say what a run does: a reader or filter by its name, a tool by
- * its subcommand, a script runner by its script. A program that is not listed
- * gets no prefix (its grant stays the exact command): an unknown CLI may hide
- * very different actions behind one name, and `rm`, `mv`, `sed` or `xargs`
- * would cover far more than the run the user saw.
+ * The prefixes "always" may offer and a grant may hold: by the words that name
+ * the program, how many leading words a prefix keeps. The longest key wins
+ * (`npm run` before `npm test`).
+ *
+ * A prefix is offered only when its words name an action that runs no code
+ * taken from its arguments: a reader or filter by its name, a git or package
+ * manager subcommand that acts on this repo, a package script by its name, or
+ * an interpreter's script by its path. Anything else keeps the exact command:
+ * a program that runs or fetches code named by an argument (`npx`, `npm
+ * init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`, `make`, `gh
+ * api`, `git bisect run`), one that writes files (`touch`, `mkdir`, `sort -o`,
+ * `tree -o`), one whose options run a program (`rg --pre`, `printf -v`), and
+ * any program the table does not list.
  */
-const ARITY: ReadonlyMap<string, number> = new Map([
+const ARITY: ReadonlyMap<string, number> = new Map<string, number>([
   ...[
     'cat',
     'head',
     'tail',
-    'less',
     'wc',
     'ls',
-    'tree',
     'pwd',
     'echo',
-    'printf',
     'grep',
-    'rg',
-    'sort',
-    'uniq',
     'cut',
     'diff',
     'jq',
     'which',
-    'file',
     'stat',
     'du',
     'df',
@@ -46,63 +45,45 @@ const ARITY: ReadonlyMap<string, number> = new Map([
     'basename',
     'dirname',
     'realpath',
-    'mkdir',
-    'touch',
-    'cd',
-    'jest',
-    'vitest',
-    'pytest',
-    'tsc',
-    'eslint',
-    'prettier'
+    'cd'
   ].map((name) => [name, 1] as const),
   ...[
-    'git',
-    'npm',
-    'npx',
-    'pnpm',
-    'yarn',
-    'bun',
-    'bunx',
-    'deno',
-    'docker',
-    'podman',
-    'kubectl',
-    'helm',
-    'cargo',
-    'go',
-    'make',
-    'pip',
-    'pip3',
-    'uv',
-    'poetry',
-    'brew',
-    'node',
-    'python',
-    'python3',
-    'ruby',
-    'bash',
-    'sh',
-    'zsh',
-    'tsx',
-    'ts-node'
-  ].map((name) => [name, 2] as const),
-  ...[
-    'npm run',
-    'npm exec',
-    'pnpm run',
-    'pnpm exec',
-    'pnpm dlx',
-    'yarn run',
-    'bun run',
-    'deno task',
-    'uv run',
-    'poetry run',
-    'docker compose',
-    'python -m',
-    'python3 -m',
-    'gh'
-  ].map((name) => [name, 3] as const)
+    'status',
+    'diff',
+    'log',
+    'show',
+    'add',
+    'commit',
+    'restore',
+    'switch',
+    'checkout',
+    'branch',
+    'tag',
+    'stash',
+    'fetch',
+    'pull',
+    'push',
+    'merge',
+    'rebase',
+    'cherry-pick',
+    'revert',
+    'reset',
+    'rm',
+    'mv',
+    'blame',
+    'grep',
+    'ls-files',
+    'rev-parse',
+    'describe',
+    'shortlog',
+    'reflog'
+  ].map((sub) => [`git ${sub}`, 2] as const),
+  ...['test', 't', 'ls', 'outdated', 'view', 'why', 'explain'].map((sub) => [`npm ${sub}`, 2] as const),
+  ...['test', 't', 'ls', 'list', 'outdated', 'why'].map((sub) => [`pnpm ${sub}`, 2] as const),
+  ...['test', 'why', 'info'].map((sub) => [`yarn ${sub}`, 2] as const),
+  ['bun test', 2],
+  ...['node', 'python', 'python3', 'ruby', 'bash', 'sh', 'zsh', 'tsx', 'ts-node'].map((name) => [name, 2] as const),
+  ...['npm run', 'pnpm run', 'yarn run', 'bun run'].map((name) => [name, 3] as const)
 ]);
 
 const LONGEST_KEY = Math.max(...[...ARITY.keys()].map((key) => key.split(' ').length));
@@ -122,9 +103,20 @@ function arityKey(words: readonly string[]): { length: number; arity: number } |
   return null;
 }
 
-/** The first word a prefix may not hold, or `undefined`. A table key's own words count as plain (`python -m`). */
+/** The first word a prefix may not hold, or `undefined`. */
 export function firstNonPrefixWord(words: readonly string[]): string | undefined {
-  return words.slice(arityKey(words)?.length ?? 0).find((w) => !PREFIX_WORD.test(w));
+  return words.find((w) => !PREFIX_WORD.test(w));
+}
+
+/**
+ * Why `words` cannot be a prefix of the table: no listed program starts it,
+ * or it stops before the words its entry keeps (`npm run`, `node`). `null`
+ * for a listed prefix.
+ */
+export function prefixShortfall(words: readonly string[]): { unlisted: true } | { short: string } | null {
+  const key = arityKey(words);
+  if (!key) return { unlisted: true };
+  return words.length < key.arity ? { short: words.slice(0, key.length).join(' ') } : null;
 }
 
 /**
@@ -187,13 +179,14 @@ export function prefixFor(part: CommandPart): string | null {
 }
 
 /**
- * The part starts with the prefix's words, word by word, writes no file and
- * passes no risky option: Ask mode asks before a file change, so only an
+ * The part starts with the prefix's words, word by word, the prefix is one
+ * the table lists, and the part writes no file and passes no risky option: Ask mode asks before a file change, so only an
  * exact grant of the whole command covers such a part.
  */
 export function prefixCovers(prefix: string, part: CommandPart): boolean {
   if (part.writesFile || passesRiskyOption(part)) return false;
   const words = prefix.split(' ');
+  if (prefixShortfall(words) !== null || firstNonPrefixWord(words) !== undefined) return false;
   return words.length <= part.words.length && words.every((w, i) => part.words[i] === w);
 }
 

@@ -95,8 +95,8 @@ describe('command prefix grants', () => {
   // prettier-ignore
   const patterns: [command: string, pattern: string][] = [
     ['npm run test -- --watch', 'npm run test *'],
-    ['pnpm install', 'pnpm install *'],
-    ['docker compose up -d', 'docker compose up *'],
+    ['pnpm test --watch', 'pnpm test *'],
+    ['pnpm run build', 'pnpm run build *'],
     ['ls -la src', 'ls *'],
     ['node scripts/build.js --watch', 'node scripts/build.js *'],
     ['grep -rn foo src | head -5', 'grep *, head *'],
@@ -142,6 +142,7 @@ describe('command prefix grants', () => {
     const upload = 'git status && curl -d @data.json https://api.example.com';
     expect((await sb.bash(upload, 'workspace', broad)).decision).toBe('ask');
     expect((await sb.bash('cat .env', 'ask', broad)).decision).toBe('ask');
+    expect((await sb.bash('git push --force origin main', 'workspace', [prefixGrant('git push')])).decision).toBe('ask');
     expect((await sb.bash(upload, 'workspace', [exactGrant(upload)])).decision).toBe('allow');
   });
 
@@ -185,7 +186,7 @@ describe('command prefix grants', () => {
   });
 
   it('falls back to the exact command when a chain has more parts than one grant may hold', async () => {
-    const chain = 'git status && git log && git diff && npm test && pnpm install && ls';
+    const chain = 'git status && git log && git diff && npm test && pnpm test && ls';
     expect(projectGrant(asAsk(await sb.bash(chain, 'ask'))).match).toEqual({ type: 'command', command: chain });
   });
 
