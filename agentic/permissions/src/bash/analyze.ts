@@ -68,7 +68,7 @@ export interface BashAnalysis {
   envRefs: string[];
   /** The command may turn on globs that match dotfiles (`shopt -s dotglob`). */
   dotglob: boolean;
-  /** The simple commands of a plain list or pipeline; `null` for any other syntax. */
+  /** The simple commands of a plain list or pipeline; `null` for any other syntax, or after a `cd`. */
   parts: CommandPart[] | null;
 }
 
@@ -189,6 +189,8 @@ class Analyzer {
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
   base: string | null;
+  /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
+  changedDir = false;
   /** How many shell strings (`sh -c`, `eval`, …) deep the analysis is. */
   private depth = 0;
 
@@ -506,7 +508,7 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
     flows: analyzer.tracker.flows,
     envRefs: [...analyzer.envRefs],
     dotglob: DOTGLOB_RE.test(command),
-    parts: lexed ? commandParts(command, lexed) : null
+    parts: lexed && !analyzer.changedDir ? commandParts(command, lexed) : null
   };
 }
 

@@ -51,6 +51,9 @@ const bypasses: [command: string, prefixes: string[]][] = [
   ["echo ' --output=.husky/pre-commit --format=touch%x20x -1'; git log HEAD$_", ['echo', 'git log']],
   ["echo '/.. --upload-pack=touch${IFS}x;#'; git fetch src$_", ['echo', 'git fetch']],
   [`git fetch {.,${'x,'.repeat(300)}--upload-pack='touch x;'}`, ['git fetch']],
+  // a `+x` is an option, and a `cd` points every later relative path somewhere else
+  ['bash +x other.sh', ['bash +x']],
+  ['cd sub && npm test', ['cd', 'npm test']],
   // a part with a heredoc or a `\r`
   ['cat <<EOF\nhi\nEOF', ['cat']],
   ['echo a\rb', ['echo']]
@@ -66,6 +69,11 @@ describe('a prefix never covers a part that writes a file or runs another progra
     expect((await sb.bash('git log -1 --format=%H', 'ask', [prefix('git log')])).decision).toBe('allow');
     expect((await sb.bash('git switch -c feature', 'ask', [prefix('git switch')])).decision).toBe('allow');
     expect((await sb.bash('npm run build -- --watch', 'ask', [prefix('npm run build')])).decision).toBe('allow');
+  });
+
+  it('does not cover the parts after a cd with grants made for another dir', async () => {
+    expect((await sb.bash('cd sub && npm test', 'ask', [exact('cd sub'), prefix('npm test')])).decision).toBe('ask');
+    expect((await sb.bash('builtin cd sub; node scripts/x.js', 'ask', [exact('builtin cd sub'), prefix('node scripts/x.js')])).decision).toBe('ask');
   });
 
   it('lets an exact grant of the whole command still cover it', async () => {
@@ -117,7 +125,9 @@ const broad: string[] = [
   'git bisect run make',
   'git submodule foreach ls',
   'git config user.name x',
-  'git remote add x https://x.example'
+  'git remote add x https://x.example',
+  'bash +x deploy.sh',
+  'cd src && git diff'
 ];
 
 describe('the arity table offers a prefix only for an action that runs no code from its arguments', () => {

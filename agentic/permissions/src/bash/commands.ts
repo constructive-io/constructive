@@ -261,6 +261,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   switch (name) {
   case 'cd':
   case 'pushd': {
+    analyzer.changedDir = true;
     const target = parse(rest).positionals[0];
     if (!target) {
       analyzer.base = path.resolve(analyzer.ctx.homeDir);
@@ -275,6 +276,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return;
   }
   case 'popd':
+    analyzer.changedDir = true;
     analyzer.base = null;
     return;
   case 'export':
