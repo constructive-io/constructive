@@ -11,6 +11,7 @@ import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import type { GraphQLResponse } from 'graphile-test';
 import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
+import type { PgTestClient } from 'pgsql-test';
 
 import { createPgvectorAdapter } from '../adapters/pgvector';
 import { VectorCodecPlugin } from '../codecs/vector-codec';
@@ -28,6 +29,7 @@ interface Result {
 }
 
 describe('vector search follows the request language', () => {
+  let db: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;
 
@@ -47,6 +49,7 @@ describe('vector search follows the request language', () => {
       },
       [seed.sqlfile([join(__dirname, './vector-i18n.sql')])]
     );
+    db = connections.db;
     teardown = connections.teardown;
     query = connections.query as QueryFn;
   });
@@ -54,6 +57,9 @@ describe('vector search follows the request language', () => {
   afterAll(async () => {
     if (teardown) await teardown();
   });
+
+  beforeEach(() => db.beforeEach());
+  afterEach(() => db.afterEach());
 
   async function matches(langCodes?: string[]): Promise<number[]> {
     const result = await query<Result>(

@@ -40,9 +40,16 @@ export function getI18nVectorInfo(
   const translationDimensions = vector.extensions?.vectorDimensions;
   if (dimensions && translationDimensions && dimensions !== translationDimensions) return undefined;
 
+  const resources = Object.values(build?.input?.pgRegistry?.pgResources ?? {}) as any[];
+  const primaryKey = resources
+    .find((r) => r?.codec === codec && !r.parameters)
+    ?.uniques?.find((u: any) => u.isPrimary)?.attributes;
+  if (!Array.isArray(primaryKey) || primaryKey.length !== 1) return undefined;
+  const parentPkField: string = primaryKey[0];
+
   const parentFkField = `${pg.name}_id`;
   const langField = 'lang_code';
-  if (!attributes[parentFkField] || !attributes[langField] || !codec.attributes?.id) return undefined;
+  if (!attributes[parentFkField] || !attributes[langField]) return undefined;
 
   const modelColumn =
     Object.entries(attributes).find(([, other]) => other.extensions?.tags?.embeddingModelOf === attributeName)?.[0] ??
@@ -52,7 +59,7 @@ export function getI18nVectorInfo(
     schema: pg.schemaName,
     tableName,
     parentFkField,
-    parentPkField: 'id',
+    parentPkField,
     langField,
     embeddingField: attributeName,
     modelColumn,
