@@ -153,8 +153,8 @@ describe('subscription result filtering', () => {
   });
   it('does not hide source failures', async () => {
     const error = new Error('LISTEN failed');
-    async function* broken() { throw error; }
-    await expect(filterInaccessibleEvents(broken(), ['change']).next()).rejects.toBe(error);
+    const broken = { [Symbol.asyncIterator]() { return { next: () => Promise.reject(error) }; } };
+    await expect(filterInaccessibleEvents(broken, ['change']).next()).rejects.toBe(error);
   });
   it('closes the source on a transform failure', async () => {
     let closed = false;
