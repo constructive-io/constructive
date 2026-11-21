@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
-import { expandBraces } from './braces';
+import { expandBraces, MAX_BRACE_RESULTS } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
@@ -302,13 +302,35 @@ class Analyzer {
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    expandBraces(text, mask, expanded);
-    return expanded.map((e) => ({
-      text: e.text,
-      raw: word.raw,
-      unknown,
-      glob: [...e.text].some((ch, k) => e.mask[k] && (ch === '*' || ch === '?' || ch === '['))
-    }));
+    if (!expandBraces(text, mask, expanded)) {
+      this.unresolvable(`a brace expansion has more than ${MAX_BRACE_RESULTS} results, so not every word could be checked`);
+    }
+    const braced = text[0] === '{' && mask[0];
+    return expanded.map((e) => {
+      const result = braced ? this.alternativeTilde(e) : e;
+      return {
+        text: result.text,
+        raw: word.raw,
+        unknown,
+        glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
+      };
+    });
+  }
+
+  /**
+   * Brace expansion runs before tilde expansion, so a word that starts with a
+   * brace and expands to one that starts with an unquoted `~` gets the home
+   * dir there (`{a,~/x}` → `a`, `$HOME/x`). `~user` cannot be known.
+   */
+  private alternativeTilde(e: { text: string; mask: boolean[] }): { text: string; mask: boolean[] } {
+    if (e.text[0] !== '~' || !e.mask[0]) return e;
+    const user = /^~([^/]*)/.exec(e.text)[1];
+    if (user !== '') {
+      this.dynamic(`it uses ~${user} expansion`);
+      return e;
+    }
+    const home = path.resolve(this.ctx.homeDir);
+    return { text: home + e.text.slice(1), mask: [...new Array<boolean>(home.length).fill(false), ...e.mask.slice(1)] };
   }
 
   /** The absolute location of an argument, or `null` when it is unknown. */
