@@ -9,7 +9,7 @@
 import * as path from 'node:path';
 
 import type { Arg } from './analyze';
-import { type CommandContext, files, generic, leadingOptions, parse } from './args';
+import { type CommandContext, files, generic, leadingOptions, parse, valuesOf } from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
@@ -87,6 +87,29 @@ function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const evaluates = operands.some((a) => a.text === '-v' || (name === '[[' && ARITHMETIC_TESTS.has(a.text)));
   if (evaluates) ctx.analyzer.dynamic(`it runs ${name} with an operator that evaluates expressions`);
   generic(ctx, operands);
+}
+
+/** The variables a builtin assigns by name: `printf -v NAME`, `read NAME…`, `unset NAME…`. */
+function namedVariables(name: string, rest: readonly Arg[]): Arg[] {
+  if (name === 'printf') return valuesOf(parse(rest, new Set(['-v'])), '-v');
+  if (name === 'read') {
+    const p = parse(rest, new Set(['-a', '-d', '-i', '-n', '-N', '-p', '-t', '-u']));
+    return [...valuesOf(p, '-a'), ...p.positionals];
+  }
+  if (name === 'unset') return parse(rest).positionals;
+  return [];
+}
+
+/**
+ * A variable a builtin assigns. The subscript of an array element is
+ * arithmetic, which runs any substitution in it even from a quoted word, and
+ * a name such as `PATH` changes what later commands run.
+ */
+function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void {
+  const { analyzer } = ctx;
+  if (variable.unknown) return analyzer.dynamic(`it runs ${builtin} on a variable name from a variable or substitution`);
+  if (variable.text.includes('[')) return analyzer.dynamic(`it runs ${builtin} on an array element, whose subscript runs as code`);
+  if (builtin !== 'unset') analyzer.assign(variable.text, null);
 }
 
 /** Shell options that take a value; the `*file` ones name a script the shell loads. */
@@ -223,6 +246,8 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     for (const v of parse(rest, readerValues).positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
     return generic(ctx, rest);
   }
+  if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
+  for (const variable of namedVariables(name, rest)) assignNamed(ctx, name, variable);
   if (NO_OPERANDS.has(name)) return;
   switch (name) {
   case 'cd':
@@ -248,7 +273,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'local':
   case 'readonly':
   case 'typeset':
+    if (rest.some((a) => /^-[A-Za-z]*i/.test(a.text))) analyzer.dynamic(`it runs ${name} -i, which reads every value it assigns as arithmetic`);
     for (const arg of rest) {
+      if (/^[^=-][^=]*\[/.test(arg.text)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
       const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(arg.text);
       if (m) analyzer.assign(m[1], arg.unknown ? null : m[2]);
     }
