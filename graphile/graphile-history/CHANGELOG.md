@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.13](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.12...graphile-history@1.11.13) (2026-11-21)
+
+**Note:** Version bump only for package graphile-history
+
 ## [1.11.12](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.11...graphile-history@1.11.12) (2026-11-19)
 
 **Note:** Version bump only for package graphile-history

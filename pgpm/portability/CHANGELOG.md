@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.12.11...@pgpmjs/portability@0.12.12) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/portability
+
 ## [0.12.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/portability@0.12.10...@pgpmjs/portability@0.12.11) (2026-11-19)
 
 **Note:** Version bump only for package @pgpmjs/portability
