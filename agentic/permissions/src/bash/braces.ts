@@ -3,6 +3,15 @@
 export const MAX_BRACE_RESULTS = 256;
 
 /**
+ * Every word a cut-off expansion of `text` leaves out is another plain name
+ * in the current dir: with no comma alternative, `~`, `/`, `$`, `-` or glob
+ * character, only sequence groups (`{1..300}`, `{a..z}`) expand.
+ */
+export function expandsToPlainNames(text: string): boolean {
+  return !/[-,~/$*?[]/.test(text);
+}
+
+/**
  * Expand `{a,b}` and `{1..3}` in the unquoted parts of a word. Returns
  * `false` when it stopped at `MAX_BRACE_RESULTS`, so some words are missing.
  */
