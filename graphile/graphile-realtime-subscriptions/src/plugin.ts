@@ -253,7 +253,7 @@ export function createRealtimeSubscriptionsPlugin(
         const fields = fieldsBySchema.get(args.schema);
         if (!fields) throw new Error('Realtime authorization metadata is missing for this schema.');
         if (!fields.size || !(Symbol.asyncIterator in result)) return result;
-        const names = realtimeResponseNames(args.document, args.operationName, fields);
+        const names = realtimeResponseNames(args.document, args.operationName, fields, args.variableValues);
         return names.length ? filterInaccessibleEvents(result, names) : result;
       }
     }

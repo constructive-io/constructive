@@ -193,4 +193,27 @@ describe('subscription result filtering', () => {
     expect(realtimeResponseNames(document, undefined, fields)).toEqual([]);
     expect(realtimeResponseNames(document, 'Watch', new Set())).toEqual([]);
   });
+
+  it.each(['@skip(if: true)', '@include(if: false)'])('ignores excluded aliases when filtering inaccessible events: %s', async directive => {
+    const document = parse(`subscription { change: onNoteChanged { event } skipped: onNoteChanged ${directive} { event } }`);
+    const names = realtimeResponseNames(document, undefined, new Set(['onNoteChanged']));
+    expect(names).toEqual(['change']);
+    const allowed = { data: { change: { event: 'INSERT' } } };
+    expect(await collect(filterInaccessibleEvents(source({ data: { change: null } }, allowed), names))).toEqual([allowed]);
+  });
+
+  it('honors variable values and defaults on fields, spreads and inline fragments', () => {
+    const document = parse(`subscription Watch($skip: Boolean! = true, $include: Boolean! = false) {
+      excluded: onNoteChanged @skip(if: $skip) { event }
+      ...Root @include(if: $include)
+      ... on Subscription @skip(if: $skip) { inline: onNoteChanged { event } }
+      ...Root
+    }
+    fragment Root on Subscription { change: onNoteChanged @include(if: true) { event } }`);
+    const fields = new Set(['onNoteChanged']);
+    expect(realtimeResponseNames(document, 'Watch', fields)).toEqual(['change']);
+    expect(realtimeResponseNames(document, 'Watch', fields, { skip: false, include: true })).toEqual(['excluded', 'change', 'inline']);
+    const skipped = parse('subscription { onNoteChanged @include(if: false) { event } }');
+    expect(realtimeResponseNames(skipped, undefined, fields)).toEqual([]);
+  });
 });

@@ -1,14 +1,20 @@
-import { type DocumentNode, getOperationAST, Kind, type SelectionSetNode } from 'graphql';
+import { type DocumentNode, getDirectiveValues, getOperationAST, GraphQLIncludeDirective, GraphQLSkipDirective, Kind, type SelectionSetNode, valueFromASTUntyped } from 'graphql';
 
 import { filterMapIterator } from './async-iterator';
 
-export function realtimeResponseNames(document: DocumentNode, operationName: string | null | undefined, fields: ReadonlySet<string>): string[] {
+export function realtimeResponseNames(document: DocumentNode, operationName: string | null | undefined, fields: ReadonlySet<string>, variableValues: Record<string, unknown> = {}): string[] {
   const operation = getOperationAST(document, operationName);
   if (operation?.operation !== 'subscription') return [];
+  const variables = Object.fromEntries((operation.variableDefinitions ?? [])
+    .filter(definition => definition.defaultValue)
+    .map(definition => [definition.variable.name.value, valueFromASTUntyped(definition.defaultValue!)]));
+  Object.assign(variables, variableValues);
   const names = new Set<string>();
   const visited = new Set<string>();
   function visit(selectionSet: SelectionSetNode) {
     for (const selection of selectionSet.selections) {
+      if (getDirectiveValues(GraphQLSkipDirective, selection, variables)?.if === true ||
+        getDirectiveValues(GraphQLIncludeDirective, selection, variables)?.if === false) continue;
       if (selection.kind === Kind.FIELD) {
         if (fields.has(selection.name.value)) names.add(selection.alias?.value ?? selection.name.value);
       } else if (selection.kind === Kind.INLINE_FRAGMENT) {

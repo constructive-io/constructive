@@ -183,6 +183,21 @@ describe('RLS-gated public tenant WebSocket events', () => {
     expect(events[2].longRealtimeNotificationLifecycleNote).toBeNull();
   });
 
+  it.each(['@skip(if: true)', '@include(if: false)'])('does not disclose a private change alongside an excluded alias: %s', async directive => {
+    const a = open(alice);
+    const b = open(bob, undefined, `subscription {
+      active: onRlsNoteChanged { event rowId overflow rlsNote { id title } }
+      excluded: onRlsNoteChanged ${directive} { event rowId }
+    }`);
+    await ready(a, b);
+    const id = randomUUID();
+    await write(id, 'INSERT');
+    await delivered(a, id, 'INSERT');
+    await visible(alice, id, true);
+    await visible(bob, id, false);
+    await silent(b);
+  });
+
   it.each(['INSERT', 'UPDATE', 'DELETE'])('suppresses every frame for a private %s, not just the row object', async operation => {
     const a = open(alice);
     const b = open(bob);
