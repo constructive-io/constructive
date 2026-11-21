@@ -1,9 +1,10 @@
 import '../augmentations';
 
-import { pgSelectFromRecords } from '@dataplan/pg';
 import { access } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
+
+import { pgSelectReturningRecords } from '../utils/returning';
 
 const version = '0.1.0';
 
@@ -583,7 +584,7 @@ export const BulkTypesPlugin: GraphileConfig.Plugin = {
                             $parent,
                             'returning'
                           ) as any;
-                          return pgSelectFromRecords(
+                          return pgSelectReturningRecords(
                             payloadResource,
                             $records
                           );

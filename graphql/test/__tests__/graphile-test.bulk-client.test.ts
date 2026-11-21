@@ -80,6 +80,28 @@ it('returns no records when a bulk update matches no rows', async () => {
   expect(result.data.bulkUpdateItems).toEqual({ affectedCount: 0, returning: [] });
 });
 
+it('omits an unsupported physical column before timestamps without shifting returning values', async () => {
+  const shape = await query<any>({ query: '{ __type(name: "Item") { fields { name } } }' });
+  expect(shape.errors).toBeUndefined();
+  expect(shape.data.__type.fields.map((field: any) => field.name)).not.toContain('unsupportedValue');
+  const result = await query<any>({ query: `mutation { bulkCreateItems(input: {values: [{name: "Unsupported"}]}) { returning { ${returning} } } }` });
+  expect(result.errors).toBeUndefined();
+  expect(result.data.bulkCreateItems.returning).toHaveLength(1);
+  expectTypedRow(result.data.bulkCreateItems.returning[0]);
+});
+
+it('returns non-casting codec attributes without including unsupported physical slots', async () => {
+  const result = await query<any>({ query: 'mutation { bulkCreatePlainItems(input: {values: [{quantity: 12}]}) { returning { id quantity state } } }' });
+  expect(result.errors).toBeUndefined();
+  expect(result.data.bulkCreatePlainItems.returning).toEqual([{ id: expect.any(Number), quantity: 12, state: 'QUEUED' }]);
+});
+
+it('preserves the primary-key-only returning contract for deleted rows', async () => {
+  const result = await query<any>({ query: 'mutation { bulkDeleteItems(input: {where: {name: {equalTo: "Widget A"}}}) { affectedCount returning { id } } }' });
+  expect(result.errors).toBeUndefined();
+  expect(result.data.bulkDeleteItems).toEqual({ affectedCount: 1, returning: [{ id: expect.any(Number) }] });
+});
+
 it('an empty bulk insert does not issue an empty query', async () => {
   const result = await query<any>({ query: 'mutation { bulkCreateItems(input: {values: []}) { affectedCount returning { id } } }' });
   expect(result.errors).toBeUndefined();
