@@ -64,6 +64,7 @@ describe('public tenant WebSocket subscriptions', () => {
         path.join(shared, 'app-schemas/simple-pets/schema.sql'),
         path.join(shared, 'scoped/test-data.sql'),
         path.join(__dirname, '../__fixtures__/seed/realtime-module-registrations.sql'),
+        path.join(__dirname, '../__fixtures__/seed/realtime-module-registrations.sql'),
         path.join(__dirname, '../__fixtures__/seed/websocket.sql')
       ])
     ]));

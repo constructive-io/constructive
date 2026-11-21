@@ -4,7 +4,9 @@
 -- requires: metaschema-modules:schemas/metaschema_modules_public/tables/realtime_module/table
 -- requires: metaschema-schema:schemas/metaschema_public/tables/schema/table
 
-BEGIN;
+DO $seed$
+BEGIN
+IF to_regprocedure('function_resolution.realtime_module_registrations(uuid)') IS NULL THEN
 
 -- One database's physical realtime schema, for the serving login before a
 -- request identity exists. No request role may execute this reader.
@@ -22,4 +24,6 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 REVOKE ALL ON FUNCTION function_resolution.realtime_module_registrations(uuid) FROM PUBLIC;
 
-COMMIT;
+END IF;
+END
+$seed$;
