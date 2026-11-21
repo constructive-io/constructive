@@ -612,6 +612,7 @@ CRUD operations for Derive records.
 | Field | Type |
 |-------|------|
 | `createdAt` | Datetime |
+| `data` | JSON |
 | `databaseId` | UUID |
 | `id` | UUID |
 | `includeGrants` | Boolean |
@@ -623,7 +624,7 @@ CRUD operations for Derive records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `kind`, `sourceTableId`, `tableId`
-**Optional create fields (backend defaults):** `databaseId`, `includeGrants`, `includeMutations`, `policyPrefix`
+**Optional create fields (backend defaults):** `data`, `databaseId`, `includeGrants`, `includeMutations`, `policyPrefix`
 
 ### `domain`
 
