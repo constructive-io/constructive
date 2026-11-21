@@ -57,6 +57,7 @@
     "@pgpmjs/types": "workspace:^",
     "@pgsql/quotes": "^18.2.4",
     "@simplewebauthn/server": "13.3.2",
+    "accept-language-parser": "^1.5.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
@@ -85,6 +86,7 @@
     "postgraphile": "5.1.4"
   },
   "devDependencies": {
+    "@types/accept-language-parser": "^1.5.4",
     "@aws-sdk/client-s3": "^3.1052.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",

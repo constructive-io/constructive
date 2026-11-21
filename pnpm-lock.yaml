@@ -2189,6 +2189,9 @@ importers:
       '@simplewebauthn/server':
         specifier: 13.3.2
         version: 13.3.2
+      accept-language-parser:
+        specifier: ^1.5.0
+        version: 1.5.0
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -2271,6 +2274,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1052.0
         version: 3.1052.0
+      '@types/accept-language-parser':
+        specifier: ^1.5.4
+        version: 1.5.8
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.6)
