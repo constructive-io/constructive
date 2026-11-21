@@ -17,7 +17,8 @@ import { createFunctionBindingsPlugin } from 'graphile-function-bindings';
 import { FunctionFromSourcePreset } from 'graphile-function-source';
 import {
   createConstructivePreset,
-  createGrafastCacheLimitsPreset
+  createGrafastCacheLimitsPreset,
+  PublicKeySignature
 } from 'graphile-settings';
 import { getOperationAST, GraphQLError, parse } from 'graphql';
 import type { IncomingMessage } from 'http';
@@ -33,7 +34,7 @@ import { OwnerHandoffPlugin } from '../plugins/owner-handoff-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
 import { recordRefusal } from '../refusals/recorder';
-import type { ApiOptions, DatabaseSettings } from '../types';
+import type { ApiOptions, DatabaseSettings, PubkeyChallengeSettings } from '../types';
 import { getApiConfig, isApiError } from './api';
 import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
@@ -98,7 +99,8 @@ const buildPreset = (
   compute?: ComputeConfig,
   webauthn?: boolean,
   platform?: boolean,
-  serverOptions: ConstructiveOptions = {}
+  serverOptions: ConstructiveOptions = {},
+  pubkey?: PubkeyChallengeSettings
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -119,6 +121,14 @@ const buildPreset = (
     ],
     plugins: [
       ...(configuredPreset.plugins ?? []),
+      ...(pubkey ? [PublicKeySignature({
+        schema: pubkey.schema,
+        crypto_network: pubkey.cryptoNetwork,
+        sign_up_with_key: pubkey.signUpWithKey,
+        sign_in_request_challenge: pubkey.signInRequestChallenge,
+        sign_in_record_failure: pubkey.signInRecordFailure,
+        sign_in_with_challenge: pubkey.signInWithChallenge
+      }, anonRole)] : []),
       AuthCookiePlugin,
       RequestProtectionPlugin,
       CaptchaPlugin,
@@ -470,7 +480,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         compute,
         Boolean(api.webauthnSettings),
         platform?.platform,
-        opts
+        opts,
+        api.pubkeyChallengeSettings
       );
       const instance = await observeGraphileBuild(
         {

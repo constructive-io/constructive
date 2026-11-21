@@ -40,17 +40,26 @@ export const requireApiRole = (
     error.apiId = apiId;
     throw error;
   }
-  // administrator bypasses RLS; an API never serves as it.
-  if (value === 'administrator') {
+  return value;
+};
+
+export const validateApiRoles = async (pool: Pool, api: ApiStructure): Promise<void> => {
+  const { rows } = await pool.query<{ rolname: string }>(
+    'SELECT rolname FROM pg_roles WHERE rolname = ANY($1::text[]) AND (rolsuper OR rolbypassrls)',
+    [[api.roleName, api.anonRole]]
+  );
+  for (const column of ['role_name', 'anon_role'] as const) {
+    const value = column === 'role_name' ? api.roleName : api.anonRole;
+    if (!rows.some((row) => row.rolname === value)) continue;
+    const apiId = api.apiId;
     const error = new Error(
-      `API ${apiId ?? '<unknown>'} ${column} is administrator; APIs serve as request roles under RLS.`
+      `API ${apiId ?? '<unknown>'} ${column} is superuser or BYPASSRLS; APIs serve as request roles under RLS.`
     ) as Error & { code?: string; column?: string; apiId?: string };
     error.code = 'API_ROLE_FORBIDDEN';
     error.column = column;
     error.apiId = apiId;
     throw error;
   }
-  return value;
 };
 
 /** Row shape returned by <schema>.resolve_route() — frozen DB↔server contract. */
