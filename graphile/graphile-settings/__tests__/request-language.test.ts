@@ -1,12 +1,12 @@
 import type { GraphQLQueryFn } from 'graphile-test';
 import { getConnections, seed } from 'graphile-test';
 import { join } from 'path';
-import type { PgTestClient } from 'pgsql-test';
 
 import { ConstructivePreset } from '../src/presets/constructive-preset';
 
-let db: PgTestClient;
-let pg: PgTestClient;
+type Connections = Awaited<ReturnType<typeof getConnections>>;
+let db: Connections['db'];
+let pg: Connections['pg'];
 let teardown: () => Promise<void>;
 let query: GraphQLQueryFn;
 
