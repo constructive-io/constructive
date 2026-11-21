@@ -128,8 +128,9 @@ export type CommandMatch = { type: 'command'; command: string };
 
 /**
  * Bash commands by their leading words. Each prefix is words joined by one
- * space (`git status`) and covers a part that starts with those words. A call
- * is covered only when it raises no signal and every part is covered.
+ * space (`git status`) and covers a part with no redirection that starts with
+ * those words. A call is covered only when it raises no signal and every part
+ * is covered.
  */
 export type CommandPrefixMatch = { type: 'command-prefix'; prefixes: string[] };
 

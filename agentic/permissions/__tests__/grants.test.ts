@@ -145,6 +145,18 @@ describe('command prefix grants', () => {
     expect((await sb.bash(upload, 'workspace', [exactGrant(upload)])).decision).toBe('allow');
   });
 
+  it('never covers a part with a redirection, so Ask mode still asks before it writes a file', async () => {
+    const echo = prefixGrant('echo');
+    expect((await sb.bash('echo x', 'ask', [echo])).decision).toBe('allow');
+    expect((await sb.bash('echo x > out.txt', 'ask', [echo])).decision).toBe('ask');
+    expect((await sb.bash('git status && echo x >> out.txt', 'ask', [echo, prefixGrant('git status')])).decision).toBe('ask');
+    const options = asAsk(await sb.bash('echo x > out.txt', 'ask')).grantOptions;
+    expect(options.map((o) => o.match)).toEqual([
+      { type: 'command', command: 'echo x > out.txt' },
+      { type: 'command', command: 'echo x > out.txt' }
+    ]);
+  });
+
   it('keeps the options exact for a command with a signal', async () => {
     const dynamic = asAsk(await sb.bash('node -e "process.exit(0)"'));
     expect(dynamic.grantOptions.map((o) => o.match)).toEqual([

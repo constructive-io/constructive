@@ -112,6 +112,7 @@ const PREFIX_WORD = /^[\w@%+=:,./][\w@%+=:,./-]*$/;
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
 export function prefixFor(part: CommandPart): string | null {
+  if (part.redirected) return null;
   const { words } = part;
   for (let k = Math.min(words.length, LONGEST_KEY); k > 0; k--) {
     const arity = ARITY.get(words.slice(0, k).join(' '));
@@ -123,8 +124,13 @@ export function prefixFor(part: CommandPart): string | null {
   return null;
 }
 
-/** The part starts with the prefix's words, word by word. */
+/**
+ * The part starts with the prefix's words, word by word, and has no
+ * redirection: a redirection can write a file, which Ask mode asks about, so
+ * only an exact grant of the whole command covers a part with one.
+ */
 export function prefixCovers(prefix: string, part: CommandPart): boolean {
+  if (part.redirected) return false;
   const words = prefix.split(' ');
   return words.length <= part.words.length && words.every((w, i) => part.words[i] === w);
 }
