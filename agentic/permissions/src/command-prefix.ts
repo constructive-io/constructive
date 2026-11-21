@@ -127,9 +127,59 @@ export function firstNonPrefixWord(words: readonly string[]): string | undefined
   return words.slice(arityKey(words)?.length ?? 0).find((w) => !PREFIX_WORD.test(w));
 }
 
+/**
+ * Options that make a listed program run another program or write a file the
+ * analysis cannot place, by the program or by the program and subcommand. A
+ * part that passes one is never covered by a prefix, and its card offers only
+ * the exact command. A short option also matches inside a cluster (`-ix`), and
+ * a long one by an abbreviation (`--upl`), because git and getopt accept both.
+ * git's own `-c`, `--config-env` and `--exec-path` come before the subcommand,
+ * where no git prefix can match; after it, `-c` means "create" or "count".
+ */
+const PACKAGE_MANAGER_RISKY = ['--script-shell', '--node-options', '--userconfig', '--globalconfig', '--config', '--prefix', '-C', '--dir', '--cwd'];
+
+const RISKY_OPTIONS: ReadonlyMap<string, readonly string[]> = new Map<string, readonly string[]>([
+  [
+    'git',
+    [
+      '--output',
+      '--ext-diff',
+      '--textconv',
+      '-O',
+      '--open-files-in-pager',
+      '-x',
+      '--exec',
+      '--upload-pack',
+      '--receive-pack',
+      '--repo',
+      '--config-env',
+      '--exec-path'
+    ]
+  ],
+  ['git fetch', ['-u']],
+  ['git pull', ['-u']],
+  ['npm', PACKAGE_MANAGER_RISKY],
+  ['pnpm', PACKAGE_MANAGER_RISKY],
+  ['yarn', PACKAGE_MANAGER_RISKY],
+  ['bun', ['--preload', '-r', '--require', '--config', '-c', '--cwd']]
+]);
+
+function optionMatches(option: string, denied: string): boolean {
+  if (!denied.startsWith('--')) return !option.startsWith('--') && option.slice(1).includes(denied.slice(1));
+  const name = option.split('=')[0];
+  return option.startsWith('--') && name.length > 2 && (denied.startsWith(name) || name.startsWith(denied));
+}
+
+/** The part passes a risky option, or an option it cannot read. */
+function passesRiskyOption(part: CommandPart): boolean {
+  if (part.options === null) return true;
+  const denied = [part.words[0], part.words.slice(0, 2).join(' ')].flatMap((key) => RISKY_OPTIONS.get(key) ?? []);
+  return part.options.some((option) => denied.some((d) => optionMatches(option, d)));
+}
+
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
 export function prefixFor(part: CommandPart): string | null {
-  if (part.writesFile) return null;
+  if (part.writesFile || passesRiskyOption(part)) return null;
   const key = arityKey(part.words);
   if (!key || part.words.length < key.arity) return null;
   const kept = part.words.slice(0, key.arity);
@@ -137,12 +187,12 @@ export function prefixFor(part: CommandPart): string | null {
 }
 
 /**
- * The part starts with the prefix's words, word by word, and writes no file:
- * Ask mode asks before a file change, so only an exact grant of the whole
- * command covers a part that writes one.
+ * The part starts with the prefix's words, word by word, writes no file and
+ * passes no risky option: Ask mode asks before a file change, so only an
+ * exact grant of the whole command covers such a part.
  */
 export function prefixCovers(prefix: string, part: CommandPart): boolean {
-  if (part.writesFile) return false;
+  if (part.writesFile || passesRiskyOption(part)) return false;
   const words = prefix.split(' ');
   return words.length <= part.words.length && words.every((w, i) => part.words[i] === w);
 }

@@ -156,7 +156,6 @@ describe('command prefix grants', () => {
     expect((await sb.bash('echo x 2>/dev/null', 'ask', [echo])).decision).toBe('allow');
     expect((await sb.bash('echo x >&2', 'ask', [echo])).decision).toBe('allow');
     expect((await sb.bash('cat < src/config.ts', 'ask', [cat])).decision).toBe('allow');
-    expect((await sb.bash('cat <<EOF\nhi\nEOF', 'ask', [cat])).decision).toBe('allow');
   });
 
   it('never covers a part that writes a file, so Ask mode still asks before the change', async () => {
@@ -191,11 +190,13 @@ describe('command prefix grants', () => {
   });
 
   it('splits only a plain list or pipeline into parts', async () => {
-    expect((await sb.bash('git status 2>&1 | head -5 > out.txt', 'ask')).request.parts).toEqual([
-      { words: ['git', 'status'], writesFile: false },
-      { words: ['head', '-5'], writesFile: true }
+    expect((await sb.bash("git status 2>&1 | head -5 > out.txt; git log '--format=%H' -- -x", 'ask')).request.parts).toEqual([
+      { words: ['git', 'status'], writesFile: false, options: [] },
+      { words: ['head', '-5'], writesFile: true, options: ['-5'] },
+      { words: ['git', 'log', "'--format=%H'", '--', '-x'], writesFile: false, options: ['--format=%H'] }
     ]);
-    for (const command of ['if true; then npm test; fi', 'for f in a b; do echo $f; done', '{ npm test; }']) {
+    expect((await sb.bash('git fetch $OPT', 'ask')).request.parts?.[0].options).toBeNull();
+    for (const command of ['if true; then npm test; fi', 'for f in a b; do echo $f; done', '{ npm test; }', 'cat <<EOF\nhi\nEOF', 'echo a\rb']) {
       expect((await sb.bash(command, 'ask')).request.parts).toBeUndefined();
     }
   });

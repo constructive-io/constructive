@@ -101,6 +101,12 @@ export interface CommandPart {
    * (`2>&1`), input (`<`, a heredoc, a here-string) or the exact path `/dev/null`.
    */
   writesFile: boolean;
+  /**
+   * The options it passes, after quote removal and brace expansion, up to
+   * `--`; `null` when a word may be an option the lexer cannot read (one that
+   * starts with a variable).
+   */
+  options: string[] | null;
 }
 
 /** One tool call, classified. */

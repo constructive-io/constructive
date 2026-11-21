@@ -7,12 +7,15 @@ import * as path from 'node:path';
 
 import { isSecretFile } from '../secret-files';
 import type { Arg } from './analyze';
-import { type CommandContext, generic, has, parse, type Parsed, valuesOf } from './args';
+import { type CommandContext, generic, has, longSpellings, parse, type Parsed, valuesOf } from './args';
 import { isRemoteSpec, isUrl } from './words';
 
 /** `git -c` keys that make git run a program. */
 const GIT_EXEC_CONFIG =
   /^(alias\.|core\.(sshcommand|pager|editor|fsmonitor|hookspath|askpass|gitproxy)|diff\.|credential\.|sequence\.editor|gpg\.|filter\.|uploadpack\.|protocol\.|include\.|includeif\.|remote\..*\.(uploadpack|receivepack))/i;
+
+/** `--output` and its abbreviations: git writes what it prints to that file. */
+const OUTPUT = longSpellings('--output');
 
 /** `git -c remote.<name>.url=…`: the remote points somewhere else for this run. */
 const GIT_REMOTE_URL_CONFIG = /^remote\.(.+)\.(url|pushurl)=/i;
@@ -91,7 +94,8 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     if (sub === 'remote') return remote(ctx, args);
     if (sub === 'add') return add(ctx, args);
     if (sub === 'push') return push(ctx, parse(args, new Set(['--repo', '-o', '--push-option', '--receive-pack', '--exec'])));
-    const p = parse(args, new Set(['-m', '-F', '-C', '-c', '--file', '-f', '-o', '--message', '--format']));
+    const p = parse(args, new Set(['-m', '-F', '-C', '-c', '--file', '-f', '-o', '--message', '--format', ...OUTPUT]));
+    for (const out of valuesOf(p, ...OUTPUT)) analyzer.addPath(out, 'write', true);
     const here: Arg = { text: '.', raw: rest[k]?.raw ?? '.', unknown: base === null, glob: false };
     if (sub === 'reset' && has(p, '--hard')) analyzer.destroy(here, 'git reset --hard');
     if (sub === 'clean' && has(p, '-f', '--force')) analyzer.destroy(here, 'git clean -f');
