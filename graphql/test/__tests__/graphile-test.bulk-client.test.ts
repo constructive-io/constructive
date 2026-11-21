@@ -2,7 +2,8 @@ import { execute } from 'grafast';
 import { makeSchema } from 'graphile-build';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
 import type { GraphQLQueryFnObj } from 'graphile-test';
-import { parse } from 'graphql';
+import type { GraphQLInputObjectType } from 'graphql';
+import { getNamedType, parse } from 'graphql';
 import { join } from 'path';
 import { getWithPgClientFromPgService } from 'postgraphile/@dataplan/pg';
 import { getConnections, seed } from 'pgsql-test';
@@ -61,4 +62,17 @@ it('reports the real database constraint error rather than an invalid query call
   const result = await query<any>({ query: 'mutation { bulkCreateItems(input: {values: [{name: "Widget A"}]}) { affectedCount } }' });
   expect(result.errors).toHaveLength(1);
   expect(result.errors[0].message).toMatch(/duplicate key value violates unique constraint/);
+});
+
+it.each([true, false])('builds full-preset bulk update/delete inputs with connection filtering %s', async (enableConnectionFilter) => {
+  const { schema } = await makeSchema({
+    extends: [createConstructivePreset({ enableBulk: true, enableConnectionFilter })],
+    pgServices: [service]
+  });
+  const fields = schema.getMutationType()!.getFields();
+  for (const name of ['bulkUpdateItems', 'bulkDeleteItems']) {
+    expect(fields[name]).toBeDefined();
+    const input = getNamedType(fields[name].args[0].type) as GraphQLInputObjectType;
+    expect(String(input.getFields().where.type)).toBe(enableConnectionFilter ? 'ItemFilter!' : 'ItemCondition!');
+  }
 });

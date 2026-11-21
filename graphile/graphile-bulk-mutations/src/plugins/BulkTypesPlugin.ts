@@ -469,12 +469,9 @@ export const BulkTypesPlugin: GraphileConfig.Plugin = {
                       const filterTypeName = `${typeName}Filter`;
                       const filterType = build.getTypeByName(filterTypeName) as GraphQLInputType | undefined;
                       // Fall back to PostGraphile's built-in condition type
-                      const conditionTypeName = inflection.conditionType(
-                        typeName
+                      const whereType = filterType || (
+                        build.getTypeByName(inflection.conditionType(typeName)) as GraphQLInputType | undefined
                       );
-                      const conditionType =
-                        build.getTypeByName(conditionTypeName) as GraphQLInputType | undefined;
-                      const whereType = filterType || conditionType;
                       return {
                         description:
                           'Condition to select which rows to update.',
@@ -513,12 +510,9 @@ export const BulkTypesPlugin: GraphileConfig.Plugin = {
                     () => {
                       const filterTypeName = `${typeName}Filter`;
                       const filterType = build.getTypeByName(filterTypeName) as GraphQLInputType | undefined;
-                      const conditionTypeName = inflection.conditionType(
-                        typeName
+                      const whereType = filterType || (
+                        build.getTypeByName(inflection.conditionType(typeName)) as GraphQLInputType | undefined
                       );
-                      const conditionType =
-                        build.getTypeByName(conditionTypeName) as GraphQLInputType | undefined;
-                      const whereType = filterType || conditionType;
                       return {
                         description:
                           'Condition to select which rows to delete.',
