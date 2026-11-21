@@ -85,11 +85,13 @@ const requestLanguages = (header: string | string[] | undefined): string[] | und
   const preferences = parseAcceptLanguage(value);
   const languages = preferences
     .filter(({ code, quality }) => code !== '*' && quality > 0 && quality <= 1)
-    .map(({ code, script, region }) => [
-      code.toLowerCase(),
-      script && script[0].toUpperCase() + script.slice(1).toLowerCase(),
-      region && (region.length === 4 ? region[0].toUpperCase() + region.slice(1).toLowerCase() : region.toUpperCase())
-    ].filter(Boolean).join('-'));
+    .map(({ code, script, region }) => [code, script, region].filter(Boolean)
+      .map((subtag, index) => {
+        if (index === 0) return subtag.toLowerCase();
+        if (/^[a-z]{4}$/i.test(subtag)) return subtag[0].toUpperCase() + subtag.slice(1).toLowerCase();
+        if (/^(?:[a-z]{2}|[0-9]{3})$/i.test(subtag)) return subtag.toUpperCase();
+        return subtag.toLowerCase();
+      }).join('-'));
   if (languages.length) return [...new Set(languages)];
   return preferences.length && !preferences.some(({ code, quality }) => code === '*' && quality > 0)
     ? [] : undefined;

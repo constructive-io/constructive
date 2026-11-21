@@ -148,6 +148,8 @@ describe('public tenant WebSocket subscriptions', () => {
     ['fr; q=0, en;q=0.5', ['en']],
     ['fr ; q = 0, en ; q = 0.5', ['en']],
     ['zh-hant, zh-Hant-TW;q=0.9', ['zh-Hant', 'zh-Hant-TW']],
+    ['de-DE-1996', ['de-DE-1996']],
+    ['SL-ROZAJ, es-419;q=0.9, EN-latn-us;q=0.8', ['sl-rozaj', 'es-419', 'en-Latn-US']],
     ['fr;q=0.8, en;q=1, fr-CA;q=0.9', ['en', 'fr-CA', 'fr']],
     ['FR-ca, fr;q=0.9, fr;q=0.8', ['fr-CA', 'fr']]
   ])('parses HTTP request languages %p', async (header, expected) => {
@@ -171,6 +173,7 @@ describe('public tenant WebSocket subscriptions', () => {
 
   it.each([
     [{}, { 'Accept-Language': 'fr' }, ['fr']],
+    [{}, { 'Accept-Language': 'de-DE-1996' }, ['de-DE-1996']],
     [{ 'Accept-Language': 'fr; q=0, en;q=0.5' }, {}, ['en']],
     [{ 'Accept-Language': 'fr-CA, fr;q=0.8, en;q=0.5' }, {}, ['fr-CA', 'fr', 'en']],
     [{ 'aCcEpT-LaNgUaGe': 'en' }, { 'Accept-Language': 'fr' }, ['en']],
