@@ -44,14 +44,18 @@ function literalText(word: Word): { text: string; mask: boolean[] } {
 }
 
 /**
- * The options a part passes, after quote removal and brace expansion, up to
- * `--`. `null` when a word may be an option it cannot read: one that starts
- * with a variable, or whose known start is an option or a brace.
+ * The options a part passes, after quote removal and brace expansion. A `--`
+ * does not end them: git reads it as the value of an option that takes one
+ * and goes on reading options. `null` when a word may hold an option the
+ * lexer cannot read: an unquoted variable or an unknown part anywhere in it
+ * (word splitting can turn `HEAD$IFS--upload-pack=x` into two words), or a
+ * quoted variable at a start that may be an option.
  */
 function optionsOf(words: readonly Word[]): string[] | null {
   const options: string[] = [];
   for (const word of words) {
-    const open = word.parts.findIndex((p) => p.kind === 'var' || p.kind === 'unknown');
+    if (word.parts.some((p) => p.kind === 'unknown' || (p.kind === 'var' && !p.quoted))) return null;
+    const open = word.parts.findIndex((p) => p.kind === 'var');
     if (open >= 0) {
       const lead = literalText({ ...word, parts: word.parts.slice(0, open) }).text;
       if (lead === '' || lead.startsWith('-') || lead.includes('{')) return null;
@@ -60,10 +64,7 @@ function optionsOf(words: readonly Word[]): string[] | null {
     const { text, mask } = literalText(word);
     const expanded: { text: string; mask: boolean[] }[] = [];
     expandBraces(text, mask, expanded);
-    for (const e of expanded) {
-      if (e.text === '--') return options;
-      if (e.text.startsWith('-')) options.push(e.text);
-    }
+    for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
   }
   return options;
 }
