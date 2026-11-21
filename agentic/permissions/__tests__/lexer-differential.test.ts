@@ -76,6 +76,9 @@ const rows: Row[] = [
   ['for i in {1..300}; do echo $i; done', 'ask', 'allow', 'allow', []],
   ['mkdir -p d{1..300}', 'ask', 'allow', 'allow', []],
   ['echo {a..z}{a..z}', 'ask', 'allow', 'allow', []],
+  // a sequence expansion's words past the first limit can still spell a credential or a secret file
+  ['cd ~ && cat .{a..z}{e..e}{a..z}{r..r}{c..c}', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['rev .{z..a}{z..a}{z..a} 2>/dev/null', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // an expansion cut off at its limit leaves words unchecked, so it asks in every mode
   [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'ask', 'ask', 'ask', ['unresolvable-path']]
 ];
