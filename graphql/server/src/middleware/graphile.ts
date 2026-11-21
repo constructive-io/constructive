@@ -80,7 +80,9 @@ const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
 const requestLanguages = (header: string | string[] | undefined): string[] | undefined => {
-  const preferences = parseAcceptLanguage(Array.isArray(header) ? header.join(',') : header ?? '');
+  const value = (Array.isArray(header) ? header.join(',') : header ?? '')
+    .replace(/\s*;\s*/g, ';').replace(/\s*=\s*/g, '=');
+  const preferences = parseAcceptLanguage(value);
   const languages = preferences
     .filter(({ code, quality }) => code !== '*' && quality > 0 && quality <= 1)
     .map(({ code, script, region }) => [

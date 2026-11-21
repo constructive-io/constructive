@@ -145,6 +145,8 @@ describe('public tenant WebSocket subscriptions', () => {
     [';;;', null],
     ['*;q=1, fr;q=0', null],
     ['en;q=0', []],
+    ['fr; q=0, en;q=0.5', ['en']],
+    ['fr ; q = 0, en ; q = 0.5', ['en']],
     ['zh-hant, zh-Hant-TW;q=0.9', ['zh-Hant', 'zh-Hant-TW']],
     ['fr;q=0.8, en;q=1, fr-CA;q=0.9', ['en', 'fr-CA', 'fr']],
     ['FR-ca, fr;q=0.9, fr;q=0.8', ['fr-CA', 'fr']]
@@ -169,6 +171,7 @@ describe('public tenant WebSocket subscriptions', () => {
 
   it.each([
     [{}, { 'Accept-Language': 'fr' }, ['fr']],
+    [{ 'Accept-Language': 'fr; q=0, en;q=0.5' }, {}, ['en']],
     [{ 'Accept-Language': 'fr-CA, fr;q=0.8, en;q=0.5' }, {}, ['fr-CA', 'fr', 'en']],
     [{ 'aCcEpT-LaNgUaGe': 'en' }, { 'Accept-Language': 'fr' }, ['en']],
     [{}, {}, null]
