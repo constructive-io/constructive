@@ -13,8 +13,8 @@ import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
-import { expandBraces, expandsToPlainNames, MAX_BRACE_RESULTS } from './braces';
 import { generic } from './args';
+import { expandBraces, expandsToPlainNames, MAX_BRACE_RESULTS } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
