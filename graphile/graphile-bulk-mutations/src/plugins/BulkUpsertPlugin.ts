@@ -4,6 +4,8 @@ import { sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
 
+import { selectReturningRecords } from '../utils/returning';
+
 import type { ColumnSpec } from '../utils/sql-builder';
 import { buildBulkInsertSQL } from '../utils/sql-builder';
 
@@ -188,24 +190,9 @@ export const BulkUpsertPlugin: GraphileConfig.Plugin = {
                         }
 
                         // Follow-up SELECT using PKs to respect column-level grants
-                        let returning: unknown[] = [];
-                        if (allPkRows.length > 0) {
-                          const pkConditions = allPkRows.map((pkRow, rowIdx) => {
-                            return pkColumns.map((col, colIdx) => {
-                              const paramIdx = rowIdx * pkColumns.length + colIdx + 1;
-                              return `"${col}" = $${paramIdx}`;
-                            }).join(' AND ');
-                          });
-                          const whereClause = pkConditions.map((c) => `(${c})`).join(' OR ');
-                          const selectParams = allPkRows.flatMap((pkRow) =>
-                            pkColumns.map((col) => pkRow[col])
-                          );
-                          const selectResult = await pgClient.query({
-                            text: `SELECT * FROM ${compiledFrom} WHERE ${whereClause}`,
-                            values: selectParams
-                          });
-                          returning = selectResult.rows || [];
-                        }
+                        const returning = await selectReturningRecords(
+                          pgClient, resource.from, resource.codec, pkColumns, allPkRows
+                        );
 
                         return {
                           affectedCount: totalAffected,

@@ -4,6 +4,8 @@ import { sideEffectWithPgClient } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { GraphQLInputType, GraphQLOutputType } from 'graphql';
 
+import { selectReturningRecords } from '../utils/returning';
+
 const version = '0.1.0';
 
 /**
@@ -216,25 +218,9 @@ export const BulkUpdatePlugin: GraphileConfig.Plugin = {
                         const affectedCount = mutationResult.rowCount ?? 0;
 
                         // Follow-up SELECT using PKs to respect column-level grants
-                        let returning: unknown[] = [];
-                        if (mutationResult.rows && mutationResult.rows.length > 0) {
-                          const pkRows: Record<string, unknown>[] = mutationResult.rows;
-                          const pkConditions = pkRows.map((pkRow, rowIdx) => {
-                            return pkColumns.map((col, colIdx) => {
-                              const paramIdx = rowIdx * pkColumns.length + colIdx + 1;
-                              return `"${col}" = $${paramIdx}`;
-                            }).join(' AND ');
-                          });
-                          const selectWhere = pkConditions.map((c) => `(${c})`).join(' OR ');
-                          const selectParams = pkRows.flatMap((pkRow) =>
-                            pkColumns.map((col) => pkRow[col])
-                          );
-                          const selectResult = await pgClient.query({
-                            text: `SELECT * FROM ${compiledFrom} WHERE ${selectWhere}`,
-                            values: selectParams
-                          });
-                          returning = selectResult.rows || [];
-                        }
+                        const returning = await selectReturningRecords(
+                          pgClient, resource.from, resource.codec, pkColumns, mutationResult.rows || []
+                        );
 
                         return {
                           affectedCount,
