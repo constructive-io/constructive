@@ -45,9 +45,9 @@
 
 import { Logger } from '@pgpmjs/logger';
 import { constant, context as grafastContext, inhibitIf, lambda, listen, object, sideEffect } from 'grafast';
-import type { GraphQLSchema } from 'graphql';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema } from 'graphile-utils';
+import type { GraphQLSchema } from 'graphql';
 
 import { realtimeChannel } from './channel';
 import { SubscriptionDelivery } from './delivery';

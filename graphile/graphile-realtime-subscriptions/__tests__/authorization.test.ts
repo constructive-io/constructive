@@ -1,8 +1,8 @@
 import { type ExecutionResult, GraphQLError, parse } from 'graphql';
 
 import { filterMapIterator, flatMapIterator } from '../src/async-iterator';
-import { createGatedSubscriber, type ParsedPayload } from '../src/event-gate';
 import { SubscriptionDelivery } from '../src/delivery';
+import { createGatedSubscriber, type ParsedPayload } from '../src/event-gate';
 import { filterInaccessibleEvents, realtimeResponseNames } from '../src/subscription-filter';
 import { SubscriptionVisibility } from '../src/visibility';
 
