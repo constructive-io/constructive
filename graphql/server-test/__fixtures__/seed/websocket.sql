@@ -1,5 +1,16 @@
 CREATE SCHEMA "simple-pets-auth-private";
 COMMENT ON TABLE "simple-pets-pets-public".animals IS E'@realtime';
+CREATE TABLE "simple-pets-public".search_language_documents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  fulltext tsvector NOT NULL
+);
+INSERT INTO "simple-pets-public".search_language_documents (title, fulltext)
+VALUES ('opaque', to_tsvector('french', 'chevaux'));
+GRANT SELECT ON "simple-pets-public".search_language_documents TO authenticated;
+ALTER TABLE "simple-pets-public".search_language_documents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY select_documents ON "simple-pets-public".search_language_documents
+  FOR SELECT TO authenticated USING (true);
 GRANT USAGE ON SCHEMA "simple-pets-auth-private" TO authenticated, anonymous;
 CREATE TABLE "simple-pets-auth-private".sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -26,6 +37,6 @@ INSERT INTO metaschema_public.function (id, database_id, schema_id, name)
 VALUES ('6dba0002-0000-4000-8000-000000000001', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0001-0000-4000-8000-000000000001', 'authenticate');
 INSERT INTO routing_public.rls_settings (database_id, authenticate_schema_id, authenticate_function_id, authenticate_strict_function_id)
 VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', '6dba0001-0000-4000-8000-000000000001', '6dba0002-0000-4000-8000-000000000001', '6dba0002-0000-4000-8000-000000000001');
-INSERT INTO routing_public.database_settings (database_id, enable_realtime, max_concurrent_requests, max_queue_wait_ms, max_request_bytes)
-VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', true, 2, 0, 1024);
+INSERT INTO routing_public.database_settings (database_id, enable_realtime, enable_search, max_concurrent_requests, max_queue_wait_ms, max_request_bytes)
+VALUES ('80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', true, true, 2, 0, 1024);
 SET session_replication_role TO DEFAULT;
