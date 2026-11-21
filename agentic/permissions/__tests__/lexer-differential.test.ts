@@ -38,6 +38,14 @@ const rows: Row[] = [
   ["declare 'a[$(touch /tmp/pwned)]=1'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["unset 'a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['printf -v PATH %s /tmp/evil; git status', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // arithmetic with no name in it reads nothing, so it runs no code
+  ['echo $((1+2))', 'ask', 'allow', 'allow', []],
+  ['sleep $((2*3))', 'ask', 'allow', 'allow', []],
+  ['echo $[1+2]', 'ask', 'allow', 'allow', []],
+  ['((1+2))', 'ask', 'allow', 'allow', []],
+  // a name reference reads its target as a subscript, which runs code
+  ["declare -n r='a[$(touch /tmp/pwned)]'; echo $r", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["local -rn r='a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],
