@@ -37,7 +37,12 @@ const rows: Row[] = [
   ["read 'a[$(touch /tmp/pwned)]' <<< v", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["declare 'a[$(touch /tmp/pwned)]=1'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["unset 'a[$(touch /tmp/pwned)]'", 'ask', 'ask', 'allow', ['shell-dynamic']],
-  ['printf -v PATH %s /tmp/evil; git status', 'ask', 'ask', 'allow', ['shell-dynamic']]
+  ['printf -v PATH %s /tmp/evil; git status', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
+  ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],
+  // an expansion cut off at its limit leaves words unchecked, so it asks in every mode
+  [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'ask', 'ask', 'ask', ['unresolvable-path']]
 ];
 
 const modes: PermissionMode[] = ['ask', 'workspace', 'full'];

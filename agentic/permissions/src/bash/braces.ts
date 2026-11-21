@@ -1,10 +1,13 @@
 /** Brace expansion (`{a,b}`, `{1..3}`) on the unquoted parts of a word. */
 
-const MAX_BRACE_RESULTS = 256;
+export const MAX_BRACE_RESULTS = 256;
 
-/** Expand `{a,b}` and `{1..3}` in the unquoted parts of a word. */
-export function expandBraces(text: string, mask: boolean[], out: { text: string; mask: boolean[] }[]): void {
-  if (out.length >= MAX_BRACE_RESULTS) return;
+/**
+ * Expand `{a,b}` and `{1..3}` in the unquoted parts of a word. Returns
+ * `false` when it stopped at `MAX_BRACE_RESULTS`, so some words are missing.
+ */
+export function expandBraces(text: string, mask: boolean[], out: { text: string; mask: boolean[] }[]): boolean {
+  if (out.length >= MAX_BRACE_RESULTS) return false;
   for (let open = 0; open < text.length; open++) {
     if (text[open] !== '{' || !mask[open]) continue;
     let depth = 0;
@@ -21,7 +24,10 @@ export function expandBraces(text: string, mask: boolean[], out: { text: string;
         }
       } else if (text[j] === ',' && depth === 1) commas.push(j);
     }
-    if (close < 0) return void out.push({ text, mask });
+    if (close < 0) {
+      out.push({ text, mask });
+      return true;
+    }
     const pre = text.slice(0, open);
     const preMask = mask.slice(0, open);
     const post = text.slice(close + 1);
@@ -38,25 +44,30 @@ export function expandBraces(text: string, mask: boolean[], out: { text: string;
     } else {
       const seq = /^(-?\d+|[A-Za-z])\.\.(-?\d+|[A-Za-z])(?:\.\.(-?\d+))?$/.exec(text.slice(open + 1, close));
       if (!seq) continue;
-      alternatives = sequence(seq[1], seq[2], seq[3]).map((t) => ({ text: t, mask: [...t].map(() => true) }));
+      const values = sequence(seq[1], seq[2], seq[3]);
+      if (values === null) return false;
+      alternatives = values.map((t) => ({ text: t, mask: [...t].map(() => true) }));
     }
+    let complete = true;
     for (const alt of alternatives) {
-      expandBraces(pre + alt.text + post, [...preMask, ...alt.mask, ...postMask], out);
+      complete = expandBraces(pre + alt.text + post, [...preMask, ...alt.mask, ...postMask], out) && complete;
     }
-    return;
+    return complete;
   }
   out.push({ text, mask });
+  return true;
 }
 
-function sequence(from: string, to: string, step?: string): string[] {
+/** The values of `{from..to..step}`, or `null` when there are more than `MAX_BRACE_RESULTS`. */
+function sequence(from: string, to: string, step?: string): string[] | null {
   const numeric = /^-?\d+$/.test(from) && /^-?\d+$/.test(to);
   const a = numeric ? Number(from) : from.charCodeAt(0);
   const b = numeric ? Number(to) : to.charCodeAt(0);
   const inc = Math.max(1, Math.abs(Number(step ?? 1)));
   const out: string[] = [];
   for (let v = a; a <= b ? v <= b : v >= b; v += a <= b ? inc : -inc) {
+    if (out.length >= MAX_BRACE_RESULTS) return null;
     out.push(numeric ? String(v) : String.fromCharCode(v));
-    if (out.length >= MAX_BRACE_RESULTS) break;
   }
   return out;
 }

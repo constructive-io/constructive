@@ -50,6 +50,7 @@ const bypasses: [command: string, prefixes: string[]][] = [
   ["git grep -e foo$IFS-O'touch x;'", ['git grep']],
   ["echo ' --output=.husky/pre-commit --format=touch%x20x -1'; git log HEAD$_", ['echo', 'git log']],
   ["echo '/.. --upload-pack=touch${IFS}x;#'; git fetch src$_", ['echo', 'git fetch']],
+  [`git fetch {.,${'x,'.repeat(300)}--upload-pack='touch x;'}`, ['git fetch']],
   // a part with a heredoc or a `\r`
   ['cat <<EOF\nhi\nEOF', ['cat']],
   ['echo a\rb', ['echo']]

@@ -63,7 +63,7 @@ function optionsOf(words: readonly Word[]): string[] | null {
     }
     const { text, mask } = literalText(word);
     const expanded: { text: string; mask: boolean[] }[] = [];
-    expandBraces(text, mask, expanded);
+    if (!expandBraces(text, mask, expanded)) return null;
     for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
   }
   return options;
