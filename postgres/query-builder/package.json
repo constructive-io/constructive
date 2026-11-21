@@ -42,7 +42,7 @@
   "dependencies": {
     "@pgsql/quotes": "^18.2.4",
     "pg-ast": "workspace:^",
-    "pgsql-deparser": "^18.5.1",
+    "pgsql-deparser": "^18.5.2",
     "query-spec": "workspace:^"
   }
 }
