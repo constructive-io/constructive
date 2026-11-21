@@ -12,12 +12,14 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
-import type { Access, Signal } from '../types';
-import { expandBraces } from './braces';
+import type { Access, CommandPart, Signal } from '../types';
+import { generic } from './args';
+import { expandWord, MAX_PLAIN_NAME_RESULTS } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
-import { type SimpleCommand, tokenize, type Word } from './tokenize';
-import { isPathLike, isUrl } from './words';
+import { commandParts } from './parts';
+import { type Lexed, type SimpleCommand, tokenize, type Word } from './tokenize';
+import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
 
 /** One argument after the expansions the analyzer can do. */
@@ -67,6 +69,8 @@ export interface BashAnalysis {
   envRefs: string[];
   /** The command may turn on globs that match dotfiles (`shopt -s dotglob`). */
   dotglob: boolean;
+  /** The simple commands of a plain list or pipeline; `null` for any other syntax, or after a `cd`. */
+  parts: CommandPart[] | null;
 }
 
 export interface AnalyzeContext {
@@ -80,12 +84,30 @@ export interface Run {
   rest: Arg[];
 }
 
+/** The text without the spaces and tabs at its ends; any other character there stays. */
+export function trimBlanks(text: string): string {
+  return text.replace(/^[ \t]+|[ \t]+$/g, '');
+}
+
+/**
+ * The exact-grant key: the ends trimmed of spaces and tabs, and every run of
+ * them made one space. Any other character stays, newline, `\r` and NBSP
+ * included, because bash reads each of them differently from a space. A
+ * command with a quote, a backslash or a heredoc keeps its spacing as
+ * written: there a space or tab can be text, and changing it can move where
+ * a heredoc ends.
+ */
 export function normalizeCommand(command: string): string {
-  return command.trim().replace(/\s+/g, ' ');
+  const trimmed = trimBlanks(command);
+  return /['"\\]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
 }
 
 const MAX_NESTING = 4;
-const MAX_COMMAND_LENGTH = 64 * 1024;
+
+/** The most names brace expansion may add to one command for the checks; past it the command asks. */
+const MAX_BRACE_NAMES = 8192;
+/** The longest command the analysis reads; a longer one is `shell-dynamic`. */
+export const MAX_COMMAND_LENGTH = 64 * 1024;
 
 /** Device paths that are not files. */
 const HARMLESS_DEVICES = new Set([
@@ -115,8 +137,6 @@ const DANGEROUS_VARS = new RegExp(
   ].join('|')})$`
 );
 
-const RESERVED = new Set(['!', '{', '}', 'if', 'then', 'else', 'elif', 'fi', 'do', 'done', 'while', 'until', 'esac', 'coproc']);
-
 /** The oh-my-pi critical list (`tools/bash.ts`), matched on the raw command. */
 const CRITICAL_PATTERNS: readonly RegExp[] = [
   /\brm\s+(?:-\S+\s+)*(?:-[a-z]*[rRfF][a-z]*|--recursive|--force)\s+(?:-\S+\s+)*\//i,
@@ -145,11 +165,26 @@ const CRITICAL_PATTERNS: readonly RegExp[] = [
 
 const PLACEHOLDER_RE = /«secret:[^»]*»/;
 
+/** The command holds a `«secret:…»` placeholder, which raises `placeholder-in-command`. */
+export function hasPlaceholder(command: string): boolean {
+  return PLACEHOLDER_RE.test(command);
+}
+
 /** Shell options that make `*` match dotfiles. */
 const DOTGLOB_RE = /dotglob|glob_?dots|GLOBIGNORE/i;
 
 /** `$NAME` and `${NAME…}` in a heredoc body. */
 const BODY_VAR_RE = /\$\{?[#!]?([A-Za-z_][A-Za-z0-9_]*)/g;
+
+/** The word's leading literal text is `IFS`, `IFS=…` or `IFS+=…`. */
+function namesIfs(word: Word): boolean {
+  let lead = '';
+  for (const part of word.parts) {
+    if (part.kind !== 'lit') break;
+    lead += part.text;
+  }
+  return /^IFS(\+?=|$)/.test(lead);
+}
 
 function isHarmlessDevice(abs: string): boolean {
   return HARMLESS_DEVICES.has(abs) || abs.startsWith('/dev/fd/');
@@ -169,6 +204,12 @@ class Analyzer {
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
   base: string | null;
+  /** Names brace expansion has added to this command so far. */
+  private braceNames = 0;
+  /** A word in the command names IFS, so it may set it (`IFS=:`, `read IFS`, `mapfile -t IFS`, `for IFS in`). */
+  ifsSet = false;
+  /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
+  changedDir = false;
   /** How many shell strings (`sh -c`, `eval`, …) deep the analysis is. */
   private depth = 0;
 
@@ -197,19 +238,22 @@ class Analyzer {
     return this.vars.has('CDPATH') && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
   }
 
-  analyzeString(command: string): void {
+  /** Analyze one shell string. Returns what it lexed to, or `null` when it was not lexed. */
+  analyzeString(command: string): Lexed | null {
     if (this.depth > MAX_NESTING) {
       this.dynamic('the command nests shell strings too deeply to check');
-      return;
+      return null;
     }
     if (command.length > MAX_COMMAND_LENGTH) {
       this.dynamic('the command is too long to check');
-      return;
+      return null;
     }
     const lexed = tokenize(command);
+    if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifsSet = true;
     if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);
+    return lexed;
   }
 
   /** A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own scope. */
@@ -274,19 +318,59 @@ class Analyzer {
         if (part.ref) this.noteRef(part.ref);
       } else {
         this.noteRef(part.name);
-        const value = this.valueOf(part.name, part.fallback);
+        // An IFS the command sets splits an unquoted expansion where this analysis does not follow it.
+        const value = !part.quoted && this.ifsSet ? null : this.valueOf(part.name, part.fallback);
         if (value === null) unknown = true;
         else append(value, false);
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    expandBraces(text, mask, expanded);
-    return expanded.map((e) => ({
-      text: e.text,
-      raw: word.raw,
-      unknown,
-      glob: [...e.text].some((ch, k) => e.mask[k] && (ch === '*' || ch === '?' || ch === '['))
-    }));
+    if (!expandWord(text, mask, expanded)) {
+      this.unresolvable(`a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`);
+    }
+    const braced = text[0] === '{' && mask[0];
+    return this.withinNameBudget(expanded).map((e) => {
+      const result = braced ? this.alternativeTilde(e) : e;
+      return {
+        text: result.text,
+        raw: word.raw,
+        unknown,
+        glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
+      };
+    });
+  }
+
+  /**
+   * The expansions this word may add to the command's checks. Past
+   * `MAX_BRACE_NAMES` the rest go unchecked, so the command raises
+   * `unresolvable-path`; the word keeps its first name so later words keep
+   * their positions as operands.
+   */
+  private withinNameBudget<T>(expanded: T[]): T[] {
+    if (expanded.length <= 1) return expanded;
+    const room = MAX_BRACE_NAMES - this.braceNames;
+    const kept = expanded.length > room ? expanded.slice(0, Math.max(1, room)) : expanded;
+    if (kept.length < expanded.length) {
+      this.unresolvable(`the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`);
+    }
+    this.braceNames += kept.length;
+    return kept;
+  }
+
+  /**
+   * Brace expansion runs before tilde expansion, so a word that starts with a
+   * brace and expands to one that starts with an unquoted `~` gets the home
+   * dir there (`{a,~/x}` → `a`, `$HOME/x`). `~user` cannot be known.
+   */
+  private alternativeTilde(e: { text: string; mask: boolean[] }): { text: string; mask: boolean[] } {
+    if (e.text[0] !== '~' || !e.mask[0]) return e;
+    const user = /^~([^/]*)/.exec(e.text)[1];
+    if (user !== '') {
+      this.dynamic(`it uses ~${user} expansion`);
+      return e;
+    }
+    const home = path.resolve(this.ctx.homeDir);
+    return { text: home + e.text.slice(1), mask: [...new Array<boolean>(home.length).fill(false), ...e.mask.slice(1)] };
   }
 
   /** The absolute location of an argument, or `null` when it is unknown. */
@@ -392,7 +476,7 @@ class Analyzer {
         i++;
         continue;
       }
-      if (arg.raw === arg.text && RESERVED.has(arg.text)) {
+      if (arg.raw === arg.text && SHELL_KEYWORDS.has(arg.text)) {
         i++;
         continue;
       }
@@ -413,12 +497,11 @@ class Analyzer {
     if (i >= args.length) return null;
 
     const argv0 = args[i];
-    if (argv0.unknown) {
-      this.dynamic(`the command name ${argv0.raw} comes from a variable or substitution`);
-      return null;
-    }
-    if (argv0.glob && !TESTS.has(argv0.text)) {
-      this.dynamic(`the command name ${argv0.raw} is a glob`);
+    const unknownProgram = argv0.unknown || (argv0.glob && !TESTS.has(argv0.text));
+    if (unknownProgram) {
+      this.dynamic(`the command name ${argv0.raw} ${argv0.unknown ? 'comes from a variable or substitution' : 'is a glob'}`);
+      // Whatever it turns out to be, its operands are files it may touch.
+      generic({ analyzer: this, stdinFed, xargs: scope.xargs !== null }, args.slice(i + 1));
       return null;
     }
     if (argv0.text.includes('/')) {
@@ -446,14 +529,14 @@ class Analyzer {
  */
 export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Findings): BashAnalysis {
   const analyzer = new Analyzer(ctx, findings);
-  analyzer.analyzeString(command);
+  const lexed = analyzer.analyzeString(command);
   for (const pattern of CRITICAL_PATTERNS) {
     if (pattern.test(command)) {
       analyzer.flag('destructive', 'it matches a known destructive pattern');
       break;
     }
   }
-  if (PLACEHOLDER_RE.test(command)) {
+  if (hasPlaceholder(command)) {
     analyzer.flag('placeholder-in-command', 'it contains a «secret:…» placeholder');
   }
   return {
@@ -461,7 +544,8 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
     destructiveChecks: analyzer.checks,
     flows: analyzer.tracker.flows,
     envRefs: [...analyzer.envRefs],
-    dotglob: DOTGLOB_RE.test(command)
+    dotglob: DOTGLOB_RE.test(command),
+    parts: lexed && !analyzer.changedDir ? commandParts(command, lexed) : null
   };
 }
 

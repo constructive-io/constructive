@@ -199,10 +199,10 @@ export class FlowTracker {
     if (cmd.pipedIn) {
       const up = cmd.upstream;
       if (!up || up === 'group' || up.words.every((w) => GROUP_END.has(w.raw))) {
-        sources.push(...this.all);
+        for (const source of this.all) sources.push(source);
         words = null;
       } else {
-        sources.push(...(this.outputs.get(up) ?? []));
+        for (const source of this.outputs.get(up) ?? []) sources.push(source);
         const said = this.printed.get(up);
         words = words && said ? [...words, ...said] : null;
         const onlyPipe = cmd.redirects.every((r) => r.op !== '<') && cmd.hereStrings.length === 0 && cmd.heredocs.length === 0;
@@ -218,7 +218,7 @@ export class FlowTracker {
    */
   record(cmd: SimpleCommand, run: Run | null, sources: Source[], redirects: Source[]): void {
     this.outputs.set(cmd, sources);
-    this.all.push(...sources);
+    for (const source of sources) this.all.push(source);
     if (!run) return;
     if (run.name === 'echo' || run.name === 'printf') this.printed.set(cmd, printedWords(run.name, run.rest));
     const roots = listedRoots(run.name, run.rest);

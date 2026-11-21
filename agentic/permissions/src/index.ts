@@ -9,6 +9,7 @@
  * `redactResult` after. Classification, the policy and the vault stay internal.
  */
 
+export { commandPattern, type CommandPatternResult, parseCommandPattern } from './command-pattern';
 export {
   createPermissionEngine,
   type EvaluateContext,
@@ -23,7 +24,7 @@ export {
 export { scrubEnv } from './env';
 export { describeGrant, grantFrom, type GrantStore, memoryGrantStore, NEVER_GRANTED, sameMatch } from './grants';
 export { nodeFsProbe } from './node-fs';
-export type { PolicyRules } from './policy';
+export type { PolicyRules, RuleMatch } from './policy';
 export {
   defaultHardDeny,
   defaultTempDirs,

@@ -9,7 +9,17 @@
 import * as path from 'node:path';
 
 import type { Arg } from './analyze';
-import { type CommandContext, files, generic, leadingOptions, parse } from './args';
+import {
+  type CommandContext,
+  files,
+  generic,
+  hiddenLeadingOption,
+  leadingOptions,
+  longSpellings,
+  parse,
+  type Parsed,
+  valuesOf
+} from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
@@ -62,13 +72,20 @@ const READERS = new Map<string, ReadonlySet<string>>([
   ...['cat', 'less', 'more', 'bat', 'wc', 'nl', 'strings', 'file', 'stat', 'cmp', 'diff'].map((n) => [n, new Set<string>()] as const),
   ['head', new Set(['-n', '-c'])],
   ['tail', new Set(['-n', '-c', '-b'])],
-  ['sort', new Set(['-k', '-t', '-o', '-S', '-T'])],
+  ['sort', new Set(['-k', '-t', '-o', '-S', '-T', ...longSpellings('--output')])],
   ['uniq', new Set(['-f', '-s'])],
   ['base64', new Set(['-b', '-i', '-o', '-w'])],
   ['xxd', new Set(['-c', '-g', '-l', '-s', '-o'])],
   ['od', new Set(['-A', '-j', '-N', '-t'])],
   ['hexdump', new Set(['-e', '-f', '-n', '-s'])]
 ]);
+
+/** Where a reader writes instead of stdout: `sort -o FILE`, `uniq IN OUT`. */
+function readerOutputs(name: string, p: Parsed): Arg[] {
+  if (name === 'sort') return valuesOf(p, '-o', ...longSpellings('--output'));
+  if (name === 'uniq') return p.positionals.slice(1, 2);
+  return [];
+}
 
 /** The test commands: `[` and `[[` are names here, not globs. */
 export const TESTS = new Set(['test', '[', '[[']);
@@ -87,6 +104,32 @@ function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const evaluates = operands.some((a) => a.text === '-v' || (name === '[[' && ARITHMETIC_TESTS.has(a.text)));
   if (evaluates) ctx.analyzer.dynamic(`it runs ${name} with an operator that evaluates expressions`);
   generic(ctx, operands);
+}
+
+/** Builtins whose options (`-i`, `-n`, `-v`) make them read a value as a subscript or arithmetic. */
+const EVALUATING_BUILTINS: ReadonlySet<string> = new Set(['declare', 'local', 'typeset', 'printf', 'read']);
+
+/** The variables a builtin assigns by name: `printf -v NAME`, `read NAME…`, `unset NAME…`. */
+function namedVariables(name: string, rest: readonly Arg[]): Arg[] {
+  if (name === 'printf') return valuesOf(parse(rest, new Set(['-v'])), '-v');
+  if (name === 'read') {
+    const p = parse(rest, new Set(['-a', '-d', '-i', '-n', '-N', '-p', '-t', '-u']));
+    return [...valuesOf(p, '-a'), ...p.positionals];
+  }
+  if (name === 'unset') return parse(rest).positionals;
+  return [];
+}
+
+/**
+ * A variable a builtin assigns. The subscript of an array element is
+ * arithmetic, which runs any substitution in it even from a quoted word, and
+ * a name such as `PATH` changes what later commands run.
+ */
+function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void {
+  const { analyzer } = ctx;
+  if (variable.unknown) return analyzer.dynamic(`it runs ${builtin} on a variable name from a variable or substitution`);
+  if (variable.text.includes('[')) return analyzer.dynamic(`it runs ${builtin} on an array element, whose subscript runs as code`);
+  if (builtin !== 'unset') analyzer.assign(variable.text, null);
 }
 
 /** Shell options that take a value; the `*file` ones name a script the shell loads. */
@@ -220,13 +263,20 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   if (TESTS.has(name)) return test(name, ctx, rest);
   const readerValues = READERS.get(name);
   if (readerValues) {
-    for (const v of parse(rest, readerValues).positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
+    const p = parse(rest, readerValues);
+    for (const v of p.positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
+    files(ctx, readerOutputs(name, p), 'write');
     return generic(ctx, rest);
   }
+  if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
+  const hidden = EVALUATING_BUILTINS.has(name) ? hiddenLeadingOption(rest) : undefined;
+  if (hidden) analyzer.dynamic(`it runs ${name} with ${hidden.raw}, which may be an option such as -i, -n or -v`);
+  for (const variable of namedVariables(name, rest)) assignNamed(ctx, name, variable);
   if (NO_OPERANDS.has(name)) return;
   switch (name) {
   case 'cd':
   case 'pushd': {
+    analyzer.changedDir = true;
     const target = parse(rest).positionals[0];
     if (!target) {
       analyzer.base = path.resolve(analyzer.ctx.homeDir);
@@ -241,6 +291,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return;
   }
   case 'popd':
+    analyzer.changedDir = true;
     analyzer.base = null;
     return;
   case 'export':
@@ -248,7 +299,13 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'local':
   case 'readonly':
   case 'typeset':
+    if (rest.some((a) => /^-[A-Za-z]*i/.test(a.text))) analyzer.dynamic(`it runs ${name} -i, which reads every value it assigns as arithmetic`);
+    // `export -n` takes the export flag off; only declare, local and typeset make a reference.
+    if (name !== 'export' && name !== 'readonly' && rest.some((a) => /^-[A-Za-z]*n/.test(a.text))) {
+      analyzer.dynamic(`it runs ${name} -n, which makes a name reference whose target is read as a subscript that can run code`);
+    }
     for (const arg of rest) {
+      if (/^[^=-][^=]*\[/.test(arg.text)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
       const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(arg.text);
       if (m) analyzer.assign(m[1], arg.unknown ? null : m[2]);
     }
@@ -306,6 +363,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return files(ctx, parse(rest, new Set(['-m', '--mode', '-s', '--size', '-r', '--reference', '-t', '-d'])).positionals, 'write');
   case 'tee':
     return tee(ctx, rest);
+  case 'tree':
+    files(ctx, valuesOf(parse(rest, new Set(['-o', '-L', '-P', '-I', '-H', '-T'])), '-o'), 'write');
+    return generic(ctx, rest);
   case 'cp':
   case 'mv':
   case 'ln':

@@ -15,9 +15,11 @@
 import {
   decodeAnsiC,
   findAnsiClose,
+  heredocDelimiter,
   LexError,
   matchBacktick,
   matchBrace,
+  matchBracket,
   matchParen,
   stripQuotes,
   unescapeBackticks
@@ -71,6 +73,9 @@ export interface Lexed {
 }
 
 const MAX_DEPTH = 6;
+
+/** Arithmetic with no name, substitution or quote in it: it reads no variable, so it runs no code. */
+const PLAIN_ARITHMETIC = /^[\d\s+\-*/%()<>=!&|^~?:,]*$/;
 const OPERATOR_CHARS = new Set([';', '&', '|', '(', ')', '<', '>']);
 const NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const SPECIAL_PARAMS = new Set(['?', '$', '!', '#', '@', '*', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
@@ -104,7 +109,7 @@ class Lexer {
     const { s } = this;
     while (this.i < s.length) {
       const ch = s[this.i];
-      if (ch === ' ' || ch === '\t' || ch === '\r') {
+      if (ch === ' ' || ch === '\t') {
         this.i++;
       } else if (ch === '\\' && s[this.i + 1] === '\n') {
         this.i += 2;
@@ -166,6 +171,7 @@ class Lexer {
       this.endCommand(true);
     } else {
       // `;`, `&`, `(`, `)`
+      if (ch === '(' && s[this.i + 1] === '(' && !this.plainArithmeticCommand()) this.dynamic.push('an arithmetic command ((…))');
       if (ch === '(' && s[this.i + 1] === ')') {
         // `name()`: a function definition hides a body that runs later.
         this.dynamic.push('defines a shell function');
@@ -174,6 +180,25 @@ class Lexer {
       }
       this.i++;
       this.endCommand(false);
+    }
+  }
+
+  /**
+   * `$((` at `this.i` is arithmetic only when the paren its second `(` opens
+   * closes right before the final `)`. Otherwise bash reads it as a command
+   * substitution of a subshell (`$((1) | cmd )`) and runs it.
+   */
+  private isArithmetic(): boolean {
+    return matchParen(this.s, this.i + 2) === matchParen(this.s, this.i + 1) - 1;
+  }
+
+  /** `((…))` at `this.i` holds only numbers and operators. */
+  private plainArithmeticCommand(): boolean {
+    try {
+      return PLAIN_ARITHMETIC.test(this.s.slice(this.i + 1, matchParen(this.s, this.i)));
+    } catch (error) {
+      if (error instanceof LexError) return false;
+      throw error;
     }
   }
 
@@ -199,8 +224,7 @@ class Lexer {
     const target: Word = { parts, raw: s.slice(start, this.i) };
     const cmd = this.current;
     if (op === '<<' || op === '<<-') {
-      const quoted = parts.some((p) => p.kind === 'lit' && p.quoted);
-      const delim = parts.map((p) => (p.kind === 'lit' ? p.text : '')).join('');
+      const { delim, quoted } = heredocDelimiter(target.raw);
       this.pending.push({ delim, quoted, stripTabs: op === '<<-', command: cmd });
       cmd.stdinDoc = true;
       cmd.redirects.push({ op, fd, target: null });
@@ -219,15 +243,28 @@ class Lexer {
     cmd.redirects.push({ op, fd, target });
   }
 
+  /** The next line of input, without its newline. */
+  private nextLine(): string {
+    const { s } = this;
+    const nl = s.indexOf('\n', this.i);
+    const line = s.slice(this.i, nl < 0 ? s.length : nl);
+    this.i = nl < 0 ? s.length : nl + 1;
+    return line;
+  }
+
+  /**
+   * Read the pending heredoc bodies. An unquoted body joins a line that ends
+   * in an odd run of backslashes to the next one before it looks for the
+   * delimiter, as bash does; a quoted body stays literal.
+   */
   private readHeredocs(): void {
     const { s } = this;
     for (const doc of this.pending) {
       let body = '';
       let found = false;
       while (this.i < s.length) {
-        const nl = s.indexOf('\n', this.i);
-        const line = s.slice(this.i, nl < 0 ? s.length : nl);
-        this.i = nl < 0 ? s.length : nl + 1;
+        let line = this.nextLine();
+        while (!doc.quoted && /(^|[^\\])(\\\\)*\\$/.test(line) && this.i < s.length) line = line.slice(0, -1) + this.nextLine();
         const check = doc.stripTabs ? line.replace(/^\t+/, '') : line;
         if (check === doc.delim) {
           found = true;
@@ -280,7 +317,7 @@ class Lexer {
     const wordStart = this.i;
     while (this.i < s.length) {
       const ch = s[this.i];
-      if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') break;
+      if (ch === ' ' || ch === '\t' || ch === '\n') break;
       if ((ch === '<' || ch === '>') && s[this.i + 1] === '(') {
         const end = matchParen(s, this.i + 1);
         this.substitute(s.slice(this.i + 2, end), 'process substitution');
@@ -350,12 +387,18 @@ class Lexer {
     return parts;
   }
 
-  /** `~` expands at the start of a word and right after `NAME=` (an assignment). */
+  /**
+   * `~` expands at the start of a word, and in a word shaped like an
+   * assignment (`PATH=a:~/bin`, also as an argument) right after its `=` or
+   * an unquoted `:`.
+   */
   private atTildePosition(parts: Part[]): boolean {
     if (parts.length === 0) return true;
-    if (parts.length !== 1) return false;
-    const only = parts[0];
-    return only.kind === 'lit' && !only.quoted && /^[A-Za-z_][A-Za-z0-9_]*=$/.test(only.text);
+    const first = parts[0];
+    if (first.kind !== 'lit' || first.quoted || !/^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(first.text)) return false;
+    const last = parts[parts.length - 1];
+    if (last.kind !== 'lit' || last.quoted) return false;
+    return last.text.endsWith(':') || (parts.length === 1 && /^[A-Za-z_][A-Za-z0-9_]*\+?=$/.test(last.text));
   }
 
   private readDouble(parts: Part[], lit: (text: string, quoted: boolean) => void): void {
@@ -401,9 +444,11 @@ class Lexer {
   private readDollar(parts: Part[], lit: (text: string, quoted: boolean) => void, quoted: boolean): void {
     const { s } = this;
     const next = s[this.i + 1];
-    if (next === '(' && s[this.i + 2] === '(') {
-      const end = matchParen(s, this.i + 1);
-      const inner = s.slice(this.i + 3, end - 1);
+    if (next === '[' || (next === '(' && s[this.i + 2] === '(' && this.isArithmetic())) {
+      // Arithmetic reads a variable's value as an expression, and a subscript in it runs code.
+      const end = next === '[' ? matchBracket(s, this.i + 1) : matchParen(s, this.i + 1);
+      const inner = s.slice(this.i + 2, end);
+      if (!PLAIN_ARITHMETIC.test(inner)) this.dynamic.push(next === '[' ? 'arithmetic expansion $[…]' : 'arithmetic expansion $((…))');
       if (/\$\(|`/.test(inner)) this.substitute(inner.replace(/^[^$`]*/, ''), 'command substitution in arithmetic');
       parts.push({ kind: 'unknown' });
       this.i = end + 1;

@@ -40,7 +40,7 @@ export function parse(rest: readonly Arg[], withValue: ReadonlySet<string> = new
     const arg = rest[k];
     const t = arg.text;
     if (t === '--') {
-      positionals.push(...rest.slice(k + 1));
+      for (const arg of rest.slice(k + 1)) positionals.push(arg);
       break;
     }
     if (t.startsWith('--')) {
@@ -114,6 +114,35 @@ export function leadingOptions(
     if (stopAfter.has(options[options.length - 1]?.key ?? '')) return { options, next: k + 1 };
   }
   return { options, next: k };
+}
+
+/** A long option and every abbreviation git and getopt accept for it: `--o`, `--ou`, …, `--output`. */
+export function longSpellings(option: string): string[] {
+  return Array.from({ length: option.length - 2 }, (_, k) => option.slice(0, k + 3));
+}
+
+/**
+ * `option` is `denied` as git and getopt read it: a short one also inside a
+ * cluster (`-ix` holds `-x`), a long one also by an abbreviation (`--upl`).
+ */
+export function optionMatches(option: string, denied: string): boolean {
+  if (!denied.startsWith('--')) return /^-[^-]/.test(option) && option.slice(1).includes(denied.slice(1));
+  const name = option.split('=')[0];
+  return option.startsWith('--') && name.length > 2 && (denied.startsWith(name) || name.startsWith(denied));
+}
+
+/** An argument whose value is not known and does not start with a literal, so it may be an option. */
+export function mayBeOption(arg: Arg): boolean {
+  return arg.unknown && !/^[\w./]/.test(arg.raw);
+}
+
+/** The first argument before the operands that may be an option the analysis cannot read, or `undefined`. */
+export function hiddenLeadingOption(rest: readonly Arg[]): Arg | undefined {
+  for (const arg of rest) {
+    if (mayBeOption(arg)) return arg;
+    if (arg.text === '--' || !/^[-+]/.test(arg.text)) return undefined;
+  }
+  return undefined;
 }
 
 export const has = (p: Parsed, ...keys: string[]) => keys.some((key) => p.flags.has(key));
