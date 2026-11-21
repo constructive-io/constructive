@@ -223,7 +223,7 @@ export function createConstructivePreset(
   if (opts.enableConnectionFilter) {
     if (opts.enableSearch) {
       operatorFactories.push(
-        createMatchesOperatorFactory('FullText', 'english'),
+        createMatchesOperatorFactory('FullText'),
         createTrgmOperatorFactories()
       );
     }
