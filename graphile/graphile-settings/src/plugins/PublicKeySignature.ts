@@ -38,7 +38,10 @@ const MAX_MESSAGE_LENGTH = 4096;
 const MAX_SIGNATURE_LENGTH = 1024;
 const ENABLE_SIGNATURE_VERIFICATION = process.env.ENABLE_SIGNATURE_VERIFICATION === 'true';
 
-export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): GraphileConfig.Plugin => {
+export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig, anonRole: string): GraphileConfig.Plugin => {
+  if (typeof anonRole !== 'string' || !anonRole.trim()) {
+    throw new Error('PublicKeySignature: anonymous role is required');
+  }
   const {
     schema,
     crypto_network,
@@ -115,7 +118,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
               try {
                 await pgQueryWithContext({
                   client: pgClient,
-                  context: { role: 'anonymous' },
+                  context: { role: anonRole },
                   query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_up_with_key)}($1)`,
                   variables: [input.publicKey],
                   skipTransaction: true
@@ -125,7 +128,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                   rows: [{ [sign_in_request_challenge]: message }]
                 } = await pgQueryWithContext({
                   client: pgClient,
-                  context: { role: 'anonymous' },
+                  context: { role: anonRole },
                   query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
                   variables: [input.publicKey],
                   skipTransaction: true
@@ -156,7 +159,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                 rows: [{ [sign_in_request_challenge]: message }]
               } = await pgQueryWithContext({
                 client: pgClient,
-                context: { role: 'anonymous' },
+                context: { role: anonRole },
                 query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_request_challenge)}($1)`,
                 variables: [input.publicKey]
               });
@@ -202,7 +205,7 @@ export const PublicKeySignature = (pubkey_challenge: PublicKeyChallengeConfig): 
                   rows: [token]
                 } = await pgQueryWithContext({
                   client: pgClient,
-                  context: { role: 'anonymous' },
+                  context: { role: anonRole },
                   query: `SELECT * FROM ${QuoteUtils.quoteQualifiedIdentifier(schema, sign_in_with_challenge)}($1, $2)`,
                   variables: [publicKey, message],
                   skipTransaction: true
