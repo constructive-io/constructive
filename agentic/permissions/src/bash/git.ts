@@ -50,9 +50,11 @@ const RUNS_COMMAND: ReadonlyMap<string, string> = new Map([
 function runsProgram(ctx: CommandContext, sub: string | undefined, args: readonly Arg[]): void {
   if (sub === undefined) return;
   const action = RUNS_COMMAND.get(sub);
-  if (action && args.find((a) => !a.text.startsWith('-'))?.text === action) {
-    return ctx.analyzer.dynamic(`it runs git ${sub} ${action}, which runs the command after it`);
+  const word = action ? args.find((a) => a.unknown || !a.text.startsWith('-')) : undefined;
+  if (word?.unknown) {
+    return ctx.analyzer.dynamic(`it passes git ${sub} ${word.raw}, a value from a variable that may be \`${action}\``);
   }
+  if (action && word?.text === action) return ctx.analyzer.dynamic(`it runs git ${sub} ${action}, which runs the command after it`);
   if (sub === 'clone') {
     const config = valuesOf(parse(args, new Set(['-c', '--config'])), '-c', '--config').find((kv) => GIT_EXEC_CONFIG.test(kv.text));
     if (config) return ctx.analyzer.dynamic(`git clone -c ${config.text} makes git run a program`);

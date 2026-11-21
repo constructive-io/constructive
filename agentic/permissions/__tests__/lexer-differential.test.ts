@@ -70,6 +70,9 @@ const rows: Row[] = [
   ["git difftool -x 'touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git difftool --extcmd='touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git bisect run touch x', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // the action word from a variable (`$_` after `echo run`) can be `run` or `foreach`
+  ['echo run >/dev/null; git bisect $_ touch x', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo foreach >/dev/null; git submodule $_ 'touch x'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git submodule --quiet foreach 'touch x'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git filter-branch --tree-filter 'touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git send-email --to-cmd='touch x' x.patch", 'ask', 'ask', 'allow', ['shell-dynamic', 'upload']],
