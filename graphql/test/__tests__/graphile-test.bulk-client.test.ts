@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import { execute } from 'grafast';
 import { makeSchema } from 'graphile-build';
 import { createConstructivePreset, makePgService } from 'graphile-settings';
@@ -14,6 +15,7 @@ let db: PgTestClient;
 let query: GraphQLQueryFnObj;
 let teardown: () => Promise<void>;
 let service: ReturnType<typeof makePgService>;
+let withPgClient: Awaited<ReturnType<typeof getWithPgClientFromPgService>>;
 
 const returning = 'id name quantity createdAt localTime day metadata labels state history position { x label } optionalAt';
 
@@ -39,7 +41,7 @@ beforeEach(async () => {
     pgServices: [service]
   });
   // Bulk callbacks must receive the production PgClient facade.
-  const withPgClient = await getWithPgClientFromPgService(service);
+  withPgClient = await getWithPgClientFromPgService(service);
   query = async ({ query: document }) => execute({
     schema, resolvedPreset,
     document: typeof document === 'string' ? parse(document) : document,
@@ -100,6 +102,23 @@ it('preserves the primary-key-only returning contract for deleted rows', async (
   const result = await query<any>({ query: 'mutation { bulkDeleteItems(input: {where: {name: {equalTo: "Widget A"}}}) { affectedCount returning { id } } }' });
   expect(result.errors).toBeUndefined();
   expect(result.data.bulkDeleteItems).toEqual({ affectedCount: 1, returning: [{ id: expect.any(Number) }] });
+});
+
+it.each([
+  ['bulkCreateItems', 'values: [{name: "Computed", quantity: 4}]', 'Computed:4'],
+  ['bulkUpsertItems', 'values: [{name: "Widget A", quantity: 6}], onConflict: {constraint: ITEMS_NAME_KEY}', 'Widget A:6'],
+  ['bulkUpdateItems', 'where: {name: {equalTo: "Widget A"}}, patch: {quantity: 8}', 'Widget A:8']
+])('%s resolves overloaded computed-column functions using the table row type', async (field, input, label) => {
+  const shape = await query<any>({ query: '{ __type(name: "Item") { fields { name } } }' });
+  expect(shape.data.__type.fields.map((field: any) => field.name)).toContain('label');
+  await withPgClient({ role: 'postgres' }, (client) => client.query({
+    text: readFileSync(join(__dirname, '../sql/bulk-client-overload.sql'), 'utf8')
+  }));
+  const result = await query<any>({ query: `mutation { ${field}(input: {${input}}) { returning { ${returning} label } } }` });
+  expect(result.errors).toBeUndefined();
+  expect(result.data[field].returning).toHaveLength(1);
+  expect(result.data[field].returning[0].label).toBe(label);
+  expectTypedRow(result.data[field].returning[0]);
 });
 
 it('an empty bulk insert does not issue an empty query', async () => {

@@ -9,6 +9,13 @@ function returningAttributes(codec: PgCodec) {
   return Object.entries(codec.attributes).filter(([, attribute]) => !attribute.expression && !attribute.via);
 }
 
+function jsonRecordValue(codec: PgCodec, value: SQL): SQL {
+  while (codec.domainOfCodec) codec = codec.domainOfCodec;
+  return sql.isEquivalent(codec.sqlType, TYPES.json.sqlType) || sql.isEquivalent(codec.sqlType, TYPES.jsonb.sqlType)
+    ? sql`(${value})::json`
+    : sql`to_json(${value})`;
+}
+
 export async function selectReturningRecords(
   pgClient: PgClient,
   from: SQL,
@@ -53,16 +60,24 @@ export function pgSelectReturningRecords(resource: PgResource, $records: Step) {
   ), true);
   const alias = sql.identifier('__bulk_records');
   const row = sql`${alias}."value"`;
-  const columns = attributes.map(([name, attribute], index) => sql`
-    (${row}->>${sql.literal(index)})::${attribute.codec.sqlType} AS ${sql.identifier(name)}
-  `);
+  const fields = sql.identifier('__bulk_attributes');
+  const entries = attributes.map(([name, attribute], index) => sql`(
+    ${sql.literal(name)},
+    ${jsonRecordValue(attribute.codec, sql`${row}->>${sql.literal(index)}`)}
+  )`);
   return pgSelect({
     resource,
     identifiers: [],
     args: [{ step: $encoded, pgCodec: TYPES.json }],
-    from: (records) => sql`(
-      SELECT ${sql.join(columns, ', ')}
-      FROM json_array_elements(${records.placeholder}) AS ${alias}("value")
+    from: (records) => sql`json_populate_recordset(
+      NULL::${resource.codec.sqlType},
+      (
+        SELECT coalesce(json_agg((
+          SELECT json_object_agg(${fields}."key", ${fields}."value")
+          FROM (VALUES ${sql.join(entries, ', ')}) AS ${fields}("key", "value")
+        )), '[]'::json)
+        FROM json_array_elements(${records.placeholder}) AS ${alias}("value")
+      )
     )`
   });
 }

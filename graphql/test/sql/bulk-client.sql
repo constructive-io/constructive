@@ -26,3 +26,6 @@ CREATE TABLE bulk_test.plain_items (
   state bulk_test.item_state NOT NULL DEFAULT 'queued'
 );
 COMMENT ON TABLE bulk_test.plain_items IS E'@behavior +bulkInsert';
+
+CREATE FUNCTION bulk_test.items_label(item bulk_test.items) RETURNS text
+  LANGUAGE sql STABLE AS $$ SELECT item.name || ':' || item.quantity::text $$;
