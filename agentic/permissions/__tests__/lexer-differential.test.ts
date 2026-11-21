@@ -72,6 +72,9 @@ const rows: Row[] = [
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],
   // after the command sets IFS, an unquoted expansion splits where the analysis cannot follow
   ['X=a:~/.ssh/id_rsa; IFS=:; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
+  ['mapfile -t IFS <<< ":"; X=a:~/.netrc; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
+  ['readarray -t IFS <<< ":"; X=a:~/.netrc; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
+  ['for IFS in :; do X=a:~/.netrc; cat $X; done', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // a cut-off expansion of sequences alone only leaves out more plain names in the current dir
   ['for i in {1..300}; do echo $i; done', 'ask', 'allow', 'allow', []],
   ['mkdir -p d{1..300}', 'ask', 'allow', 'allow', []],
@@ -93,6 +96,11 @@ describe('bash analysis reads a command the way bash runs it', () => {
       expect([mode, d.decision]).toEqual([mode, verdicts[k]]);
       for (const signal of rest[3] as Signal[]) expect(d.request.signals).toContain(signal);
     }
+  });
+
+  it('expands a `~` after `:` in a word shaped like an assignment, as bash does', async () => {
+    const d = await sb.bash('make OUT=a:~/notes', 'workspace');
+    expect(d.request.targets.map((t) => t.path)).toEqual([`${sb.ws}/a:${sb.home}/notes`]);
   });
 
   it('keeps a quoted heredoc body literal and does not join its lines', async () => {

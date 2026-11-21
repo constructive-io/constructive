@@ -173,6 +173,16 @@ const DOTGLOB_RE = /dotglob|glob_?dots|GLOBIGNORE/i;
 /** `$NAME` and `${NAME…}` in a heredoc body. */
 const BODY_VAR_RE = /\$\{?[#!]?([A-Za-z_][A-Za-z0-9_]*)/g;
 
+/** The word's leading literal text is `IFS`, `IFS=…` or `IFS+=…`. */
+function namesIfs(word: Word): boolean {
+  let lead = '';
+  for (const part of word.parts) {
+    if (part.kind !== 'lit') break;
+    lead += part.text;
+  }
+  return /^IFS(\+?=|$)/.test(lead);
+}
+
 function isHarmlessDevice(abs: string): boolean {
   return HARMLESS_DEVICES.has(abs) || abs.startsWith('/dev/fd/');
 }
@@ -191,6 +201,8 @@ class Analyzer {
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
   base: string | null;
+  /** A word in the command names IFS, so it may set it (`IFS=:`, `read IFS`, `mapfile -t IFS`, `for IFS in`). */
+  ifsSet = false;
   /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
   changedDir = false;
   /** How many shell strings (`sh -c`, `eval`, …) deep the analysis is. */
@@ -232,6 +244,7 @@ class Analyzer {
       return null;
     }
     const lexed = tokenize(command);
+    if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifsSet = true;
     if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);
@@ -300,8 +313,8 @@ class Analyzer {
         if (part.ref) this.noteRef(part.ref);
       } else {
         this.noteRef(part.name);
-        // An IFS the command set splits an unquoted expansion where this analysis does not follow it.
-        const value = !part.quoted && this.vars.has('IFS') ? null : this.valueOf(part.name, part.fallback);
+        // An IFS the command sets splits an unquoted expansion where this analysis does not follow it.
+        const value = !part.quoted && this.ifsSet ? null : this.valueOf(part.name, part.fallback);
         if (value === null) unknown = true;
         else append(value, false);
       }

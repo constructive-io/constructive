@@ -387,12 +387,18 @@ class Lexer {
     return parts;
   }
 
-  /** `~` expands at the start of a word and right after `NAME=` (an assignment). */
+  /**
+   * `~` expands at the start of a word, and in a word shaped like an
+   * assignment (`PATH=a:~/bin`, also as an argument) right after its `=` or
+   * an unquoted `:`.
+   */
   private atTildePosition(parts: Part[]): boolean {
     if (parts.length === 0) return true;
-    if (parts.length !== 1) return false;
-    const only = parts[0];
-    return only.kind === 'lit' && !only.quoted && /^[A-Za-z_][A-Za-z0-9_]*=$/.test(only.text);
+    const first = parts[0];
+    if (first.kind !== 'lit' || first.quoted || !/^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(first.text)) return false;
+    const last = parts[parts.length - 1];
+    if (last.kind !== 'lit' || last.quoted) return false;
+    return last.text.endsWith(':') || (parts.length === 1 && /^[A-Za-z_][A-Za-z0-9_]*\+?=$/.test(last.text));
   }
 
   private readDouble(parts: Part[], lit: (text: string, quoted: boolean) => void): void {
