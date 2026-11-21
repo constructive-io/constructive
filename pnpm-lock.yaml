@@ -3326,9 +3326,6 @@ importers:
       makage:
         specifier: ^0.8.0
         version: 0.8.0
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   pgpm/diff:

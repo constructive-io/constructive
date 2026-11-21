@@ -1,7 +1,7 @@
 import { getConnEnvOptions } from '@pgpmjs/env';
 import { PgTestConnectionOptions, RoleMapping } from '@pgpmjs/types';
-import { getConnections, PgTestClient } from 'pgsql-test';
 
+import { getConnections, PgTestClient } from '../../../../postgres/pgsql-test/src';
 import { generateRoleBridgesSQL } from '../../src/roles';
 
 describe('Role bridge configuration and SQL', () => {
