@@ -62,6 +62,14 @@ then preset `tsConfig`, then request preferences. Configuration names and query
 text are SQL parameters; request preferences can select only built-in names
 from the language mapping.
 
+Vector search follows the same request languages on a table tagged
+`@i18n <translations table>` whose translations table has a vector column of
+the same name (with `<table>_id` and `lang_code` columns). A row is compared
+with the query through its translation in the first requested language it has
+an embedded translation for, and through its own vector otherwise. Without
+request languages, or for a language the row has no translation in, only the
+row's own vector is compared, so another language's translation never matches.
+
 ## Features
 
 - **4 search algorithms** via adapters: tsvector (ts_rank), BM25 (pg_textsearch), pg_trgm (similarity), pgvector (distance)

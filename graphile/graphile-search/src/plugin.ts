@@ -27,7 +27,14 @@ import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
 import type { SQL } from 'pg-sql2';
 
-import { columnWithRequestTsConfig, REQUEST_TS_CONFIG, requestTsConfig } from './ts-config';
+import {
+  columnWithRequestContext,
+  columnWithRequestLangCodes,
+  REQUEST_LANG_CODES,
+  REQUEST_TS_CONFIG,
+  requestLangCodes,
+  requestTsConfig
+} from './ts-config';
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
 /**
@@ -718,6 +725,7 @@ export function createUnifiedSearchPlugin(
                 const { context, lambda } = build.grafast;
                 $select.apply(lambda(context(), (ctx: any) => (qb: any) => {
                   qb.setMeta(REQUEST_TS_CONFIG, requestTsConfig(ctx.langCodes));
+                  qb.setMeta(REQUEST_LANG_CODES, requestLangCodes(ctx.langCodes));
                 }, true));
                 return applyPlan($parent, $result, input, info);
               },
@@ -1305,7 +1313,7 @@ export function createUnifiedSearchPlugin(
                         if (val == null) return;
 
                         const applyFor = (alias: SQL) =>
-                          adapter.buildFilterApply(sql, alias, adapter.name === 'tsv' ? columnWithRequestTsConfig(column, $condition) : column, val, build);
+                          adapter.buildFilterApply(sql, alias, columnWithRequestContext(adapter.name, column, $condition), val, build);
                         const result = applyFor($condition.alias);
                         if (!result) return;
 
@@ -1401,7 +1409,7 @@ export function createUnifiedSearchPlugin(
                             const filterInput = adapter.buildTextSearchInput!(text);
 
                             const applyFor = (alias: SQL) =>
-                              adapter.buildFilterApply(sql, alias, adapter.name === 'tsv' ? columnWithRequestTsConfig(column, $condition) : column, filterInput, build);
+                              adapter.buildFilterApply(sql, alias, columnWithRequestContext(adapter.name, column, $condition), filterInput, build);
                             const result = applyFor($condition.alias);
                             if (!result) continue;
 
@@ -1427,7 +1435,7 @@ export function createUnifiedSearchPlugin(
                               if (declared && declared !== query.vector.length) continue;
                               const applyFor = (alias: SQL) =>
                                 adapter.buildFilterApply(
-                                  sql, alias, column,
+                                  sql, alias, columnWithRequestLangCodes(column, $condition),
                                   { vector: query.vector, model: query.model, metric: 'COSINE' },
                                   build
                                 );
