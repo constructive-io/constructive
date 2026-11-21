@@ -53,7 +53,6 @@ subscription RunEventChanged {
   ${field} {
     event
     ${names.event} { __typename }
-    timestamp
   }
 }`;
 

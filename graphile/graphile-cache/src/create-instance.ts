@@ -19,6 +19,7 @@ interface GraphileInstanceOptions {
    * pgServices (managed by pg-cache) rather than passed separately.
    */
   enableRealtime?: boolean;
+  realtimeSchema?: string;
 }
 
 /**
@@ -44,7 +45,7 @@ interface GraphileInstanceOptions {
 export const createGraphileInstance = async (
   opts: GraphileInstanceOptions
 ): Promise<GraphileCacheEntry> => {
-  const { preset, cacheKey, enableRealtime = false } = opts;
+  const { preset, cacheKey, enableRealtime = false, realtimeSchema } = opts;
 
   const heapBefore = process.memoryUsage().heapUsed;
   const pgl = postgraphile(preset);
@@ -70,7 +71,7 @@ export const createGraphileInstance = async (
     heapBytes,
   };
 
-  if (enableRealtime) {
+  if (enableRealtime && realtimeSchema) {
     try {
       // Extract PgSubscriber and pool from the resolved preset's pgServices.
       // The pool is the same instance managed by pg-cache (via getPgPool)
@@ -81,15 +82,15 @@ export const createGraphileInstance = async (
       const pool = pgService?.adaptorSettings?.pool ?? null;
 
       if (!pgSubscriber) {
-        log.warn(`PostGraphile[${cacheKey}] has no pgSubscriber — RealtimeManager will not be started`);
+        throw new Error(`PostGraphile[${cacheKey}] has no pgSubscriber for realtime`);
       } else if (!pool) {
-        log.warn(`PostGraphile[${cacheKey}] has no pool in pgService — RealtimeManager will not be started`);
+        throw new Error(`PostGraphile[${cacheKey}] has no pool in pgService for realtime`);
       } else {
         const manager = new RealtimeManager({
           pgSubscriber,
           pool,
           nodeId: `graphile-cache:${cacheKey}`,
-          schema: 'realtime_public',
+          schema: realtimeSchema,
         });
 
         await manager.start();
@@ -97,7 +98,12 @@ export const createGraphileInstance = async (
         log.info(`RealtimeManager started for PostGraphile[${cacheKey}]`);
       }
     } catch (err) {
-      log.error(`Failed to start RealtimeManager for PostGraphile[${cacheKey}]:`, err);
+      try {
+        await pgl.release();
+      } catch (cleanupError) {
+        throw new AggregateError([err, cleanupError], `Realtime startup and cleanup failed for PostGraphile[${cacheKey}]`);
+      }
+      throw err;
     }
   }
 

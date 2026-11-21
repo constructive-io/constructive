@@ -28,7 +28,14 @@ const log = new Logger('cursor-tracker');
 const DEFAULT_POLL_INTERVAL_MS = 5000;
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 30000;
 const DEFAULT_BATCH_LIMIT = 500;
-const DEFAULT_SCHEMA = 'realtime_public';
+const DEFAULT_SCHEMA = 'realtime_private';
+
+interface RuntimeSource {
+  source_schema: string;
+  source_table: string;
+  fanout_function: string;
+  cleanup_function: string;
+}
 
 export class CursorTracker {
   readonly nodeId: string;
@@ -44,6 +51,7 @@ export class CursorTracker {
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private running = false;
+  private cleanupPending = false;
   private draining = false;
 
   constructor(options: CursorTrackerOptions) {
@@ -65,22 +73,36 @@ export class CursorTracker {
 
     log.info(`Starting cursor tracker: node=${this.nodeId}, schema=${this.schema}`);
 
-    await this.touchListener();
-
-    // Initial drain immediately after registration
-    await this.drain();
+    let registered = false;
+    try {
+      if (this.cleanupPending) await this.cleanupEphemeral();
+      await this.touchListener();
+      registered = true;
+      this.cleanupPending = true;
+      await this.drain();
+    } catch (error) {
+      this.running = false;
+      if (registered) {
+        try {
+          await this.cleanupEphemeral();
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], `Cursor startup and cleanup failed for node=${this.nodeId}`);
+        }
+      }
+      throw error;
+    }
 
     this.pollTimer = setInterval(() => {
-      void this.drain();
+      void this.drain().catch(this.onError);
     }, this.pollIntervalMs);
 
     this.heartbeatTimer = setInterval(() => {
-      void this.touchListener();
+      void this.touchListener().catch(this.onError);
     }, this.heartbeatIntervalMs);
   }
 
   async stop(): Promise<void> {
-    if (!this.running) return;
+    if (!this.running && !this.cleanupPending) return;
     this.running = false;
 
     log.info(`Stopping cursor tracker: node=${this.nodeId}`);
@@ -104,21 +126,35 @@ export class CursorTracker {
 
     try {
       const sql = `SELECT * FROM ${this.quoteIdent(this.schema)}.drain_changes($1, $2)`;
-      const result = await this.pool.query<{ drain_changes: ChangeLogEntry }>(
+      const result = await this.pool.query<{ drain_changes: Omit<ChangeLogEntry, 'subscriber_ids'> }>(
         sql,
         [this.nodeId, this.batchLimit],
       );
-      const entries = result.rows.map((row) => row.drain_changes);
-
-      if (entries.length > 0) {
-        log.info(`Drained ${entries.length} change(s) for node=${this.nodeId}`);
-        this.onChanges(entries);
+      const pending = result.rows.map((row) => row.drain_changes);
+      const entries: ChangeLogEntry[] = [];
+      if (pending.length > 0) {
+        for (const source of await this.runtimeSources()) {
+          const changes = pending.filter(change => change.source_schema === source.source_schema && change.source_table === source.source_table);
+          if (changes.length === 0) continue;
+          const fanout = await this.pool.query<{ entry: ChangeLogEntry }>(
+            `SELECT ${this.quoteIdent(this.schema)}.${this.quoteIdent(source.fanout_function)}($1, $2) AS entry`,
+            [this.nodeId, JSON.stringify(changes)],
+          );
+          entries.push(...fanout.rows.map(row => row.entry));
+        }
+        if (entries.length > 0) {
+          log.info(`Drained ${entries.length} change(s) for node=${this.nodeId}`);
+          await this.onChanges(entries);
+        }
+        await this.pool.query(
+          `SELECT ${this.quoteIdent(this.schema)}.advance_cursor($1, $2)`,
+          [this.nodeId, pending[pending.length - 1].occurred_at],
+        );
       }
 
       return entries;
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
-      return [];
+      throw err instanceof Error ? err : new Error(String(err));
     } finally {
       this.draining = false;
     }
@@ -129,18 +165,32 @@ export class CursorTracker {
       const sql = `SELECT ${this.quoteIdent(this.schema)}.touch_listener($1)`;
       await this.pool.query(sql, [this.nodeId]);
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
+      throw err instanceof Error ? err : new Error(String(err));
     }
   }
 
   async cleanupEphemeral(): Promise<void> {
     try {
+      for (const source of await this.runtimeSources()) {
+        await this.pool.query(
+          `SELECT ${this.quoteIdent(this.schema)}.${this.quoteIdent(source.cleanup_function)}($1)`,
+          [this.nodeId],
+        );
+      }
       const sql = `SELECT ${this.quoteIdent(this.schema)}.cleanup_ephemeral($1)`;
       await this.pool.query(sql, [this.nodeId]);
+      this.cleanupPending = false;
       log.info(`Cleaned up ephemeral subscriptions for node=${this.nodeId}`);
     } catch (err) {
-      this.onError(err instanceof Error ? err : new Error(String(err)));
+      throw err instanceof Error ? err : new Error(String(err));
     }
+  }
+
+  private async runtimeSources(): Promise<RuntimeSource[]> {
+    const result = await this.pool.query<{ runtime_sources: RuntimeSource }>(
+      `SELECT * FROM ${this.quoteIdent(this.schema)}.runtime_sources()`,
+    );
+    return result.rows.map(row => row.runtime_sources);
   }
 
   get isRunning(): boolean {

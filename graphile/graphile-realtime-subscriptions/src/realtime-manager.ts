@@ -25,6 +25,7 @@
 
 import { Logger } from '@pgpmjs/logger';
 
+import { realtimeChannel } from './channel';
 import { CursorTracker } from './cursor-tracker';
 import type {
   ChangeLogEntry,
@@ -61,10 +62,10 @@ function entryToNotifyPayload(entry: ChangeLogEntry): string {
 
 /**
  * Build the NOTIFY channel name for a change_log entry.
- * Matches the channel format used by emit_change: "realtime:{schema}.{table}"
+ * Matches the bounded channel used by emit_change and subscription plans.
  */
 function entryToChannel(entry: ChangeLogEntry): string {
-  return `realtime:${entry.source_schema}.${entry.source_table}`;
+  return realtimeChannel(entry.source_schema, entry.source_table);
 }
 
 export class RealtimeManager {
@@ -103,11 +104,15 @@ export class RealtimeManager {
     this.started = true;
 
     log.info(`Starting RealtimeManager: node=${this.nodeId}`);
-    await this.cursorTracker.start();
+    try {
+      await this.cursorTracker.start();
+    } catch (error) {
+      this.started = false;
+      throw error;
+    }
   }
 
   async stop(): Promise<void> {
-    if (!this.started) return;
     this.started = false;
 
     log.info(`Stopping RealtimeManager: node=${this.nodeId}`);

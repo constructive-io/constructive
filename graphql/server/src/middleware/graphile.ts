@@ -19,6 +19,8 @@ import {
   createConstructivePreset,
   createGrafastCacheLimitsPreset
 } from 'graphile-settings';
+import { getOperationAST, GraphQLError, parse } from 'graphql';
+import type { IncomingMessage } from 'http';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import errorPage404Message from '../errors/404-message';
@@ -30,12 +32,14 @@ import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
 import { OwnerHandoffPlugin } from '../plugins/owner-handoff-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
+import { recordRefusal } from '../refusals/recorder';
 import type { ApiOptions, DatabaseSettings } from '../types';
 import { getApiConfig, isApiError } from './api';
 import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import { authenticatedWebSocketRequest, forwardWebSocketUpgrade } from './websocket';
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
@@ -93,7 +97,8 @@ const buildPreset = (
   apiId?: string,
   compute?: ComputeConfig,
   webauthn?: boolean,
-  platform?: boolean
+  platform?: boolean,
+  serverOptions: ConstructiveOptions = {}
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -118,6 +123,45 @@ const buildPreset = (
       RequestProtectionPlugin,
       CaptchaPlugin,
       createErrorEventsPlugin(pool),
+      {
+        name: 'WebSocketSubscriptionOnlyPlugin',
+        version: '0.0.0',
+        grafserv: {
+          middleware: {
+            async onSubscribe(next, event) {
+              const req = (event.ctx.extra as { request: Request }).request;
+              const limit = (req.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+              const bytes = Buffer.byteLength(JSON.stringify(event.message.payload), 'utf8');
+              if (bytes > limit) {
+                recordRefusal(req, 'request_too_large');
+                const error = errors.REQUEST_TOO_LARGE({ bytes, limit });
+                return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+              }
+              let operation;
+              try {
+                operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+              } catch (error) {
+                if (error instanceof GraphQLError) return [error];
+                throw error;
+              }
+              if (operation?.operation !== 'subscription') {
+                return [new GraphQLError('WebSocket transport only accepts subscriptions')];
+              }
+              const result = await next();
+              if (result && !Array.isArray(result)) {
+                const refreshed = (result as { requestContext?: { ws?: { request?: Request } } }).requestContext?.ws?.request;
+                const refreshedLimit = (refreshed?.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+                if (refreshed && bytes > refreshedLimit) {
+                  recordRefusal(refreshed, 'request_too_large');
+                  const error = errors.REQUEST_TOO_LARGE({ bytes, limit: refreshedLimit });
+                  return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+                }
+              }
+              return result;
+            }
+          }
+        }
+      },
       // Only when the tenant provisioned the WebAuthn module; the policy
       // itself is read per request from `req.api.webauthnSettings`.
       ...(webauthn ? [WebauthnPlugin] : []),
@@ -151,6 +195,7 @@ const buildPreset = (
       pgScopedIntrospection: introspection.pgScopedIntrospection
     },
     grafserv: {
+      websockets: databaseSettings?.enableRealtime === true,
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
       graphiql: true,
@@ -159,9 +204,13 @@ const buildPreset = (
     },
     grafast: {
       explain: graphileOptions?.explain === true,
-      context: (requestContext: Partial<Grafast.RequestContext>) => {
+      context: async (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        const ws = (requestContext as { ws?: { request: IncomingMessage; normalizedConnectionParams?: Record<string, unknown> } }).ws;
+        const req = ws
+          ? await authenticatedWebSocketRequest(ws.request, ws.normalizedConnectionParams, serverOptions)
+          : (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        if (ws && req) ws.request = req;
         const context: Record<string, string> = {};
 
         // Timeouts travel with the transaction as GUCs, so they bound the work
@@ -420,7 +469,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         api.apiId,
         compute,
         Boolean(api.webauthnSettings),
-        platform?.platform
+        platform?.platform,
+        opts
       );
       const instance = await observeGraphileBuild(
         {
@@ -431,6 +481,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         () => createGraphileInstance({
           preset,
           cacheKey: key,
+          realtimeSchema: api.realtimeModule?.schemaName,
           enableRealtime: api.databaseSettings?.enableRealtime
         }),
         { enabled: observabilityEnabled }
@@ -525,6 +576,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           api = resolved;
           continue;
         }
+        if (forwardWebSocketUpgrade(req, res, instance)) return;
         return instance.handler(req, res, next);
       }
     } catch (e: any) {

@@ -30,7 +30,10 @@ export const documentRefusalReason = (err: unknown): RefusalReason | undefined =
  */
 const getExpressRequest = (
   requestContext: Partial<Grafast.RequestContext> | undefined
-): Request | undefined => (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+): Request | undefined => {
+  const ctx = requestContext as { expressv4?: { req?: Request }; ws?: { request?: Request } };
+  return ctx?.expressv4?.req ?? ctx?.ws?.request;
+};
 
 /**
  * Check the operation against the tenant's bounds. Returns the refusal as a

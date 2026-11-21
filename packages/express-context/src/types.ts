@@ -142,6 +142,7 @@ export interface ApiStructure {
   roleName: string;
   schema: string[];
   rlsModule?: RlsModule;
+  realtimeModule?: { schemaName: string };
   domains?: string[];
   databaseId?: string;
   isPublic?: boolean;
@@ -284,6 +285,7 @@ export interface PlatformDatabase {
  */
 export interface BuiltinModuleMap {
   rlsModule: RlsModule;
+  realtimeModule: { schemaName: string };
   corsOrigins: string[];
   databaseSettings: DatabaseSettings;
   authSettings: AuthSettings;

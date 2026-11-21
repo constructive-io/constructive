@@ -1,4 +1,4 @@
-import { subscribe as grafastSubscribe } from 'grafast';
+import { hookArgs,subscribe as grafastSubscribe } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import type { DocumentNode, ExecutionResult,GraphQLSchema } from 'graphql';
 import { parse } from 'graphql';
@@ -37,13 +37,16 @@ export async function subscribe(
   const document =
     typeof opts.query === 'string' ? parse(opts.query) : opts.query;
 
-  const result = await grafastSubscribe({
+  const args = {
     schema: opts.schema,
     document,
     variableValues: opts.variables ?? undefined,
-    contextValue: opts.contextValue ?? {},
+    contextValue: {},
     resolvedPreset: opts.resolvedPreset,
-  });
+  };
+  await hookArgs(args);
+  Object.assign(args.contextValue, opts.contextValue);
+  const result = await grafastSubscribe(args);
 
   return result as AsyncIterableIterator<ExecutionResult> | ExecutionResult;
 }

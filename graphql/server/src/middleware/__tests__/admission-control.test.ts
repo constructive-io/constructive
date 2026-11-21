@@ -6,6 +6,10 @@ import type { NextFunction, Request, Response } from 'express';
 import { installRefusalRecorder } from '../../refusals/recorder';
 import { createAdmissionControlMiddleware } from '../admission-control';
 
+jest.mock('../websocket', () => ({
+  isWebSocketUpgrade: (req: Request) => req.headers.upgrade === 'websocket'
+}));
+
 const protection = (overrides: Partial<RequestProtection>): RequestProtection => ({
   ...DEFAULT_REQUEST_PROTECTION,
   ...overrides
@@ -75,6 +79,27 @@ const send = (
 };
 
 describe('createAdmissionControlMiddleware', () => {
+  it('holds a shared concurrency slot until an upgraded socket closes', async () => {
+    const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
+    const bounds = protection({ maxConcurrentRequests: 1, maxQueueWaitMs: 0 });
+    const req = fakeReq({ protection: bounds });
+    req.headers.upgrade = 'websocket';
+    const socket = Object.assign(new EventEmitter(), { remoteAddress: '10.0.0.1' });
+    Object.assign(req, { socket });
+    const upgrade = send(middleware, req);
+    await upgrade.done;
+    expect(upgrade.next).toHaveBeenCalledTimes(1);
+    upgrade.res.emit('close');
+    const refused = send(middleware, fakeReq({ protection: bounds }));
+    await refused.done;
+    expect(refused.res.captured.status).toBe(429);
+    socket.emit('close');
+    const accepted = send(middleware, fakeReq({ protection: bounds }));
+    await accepted.done;
+    expect(accepted.next).toHaveBeenCalledTimes(1);
+    accepted.res.emit('finish');
+  });
+
   it('admits a request under both bounds', async () => {
     const middleware = createAdmissionControlMiddleware({ trustedProxyHops: 0 });
     const { next, res, done } = send(middleware, fakeReq());

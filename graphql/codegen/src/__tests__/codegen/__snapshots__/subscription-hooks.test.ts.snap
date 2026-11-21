@@ -62,7 +62,7 @@ import type { SubscriptionEvent, SubscriptionFieldMeta, Unsubscribe } from "../.
 import type { Contact } from "../../orm/input-types";
 import { contactKeys } from "../query-keys";
 export type { SubscriptionEvent, Unsubscribe } from "../../orm/client";
-const SUBSCRIPTION_DOCUMENT = "subscription OnContactChanged {\\n  onContactChanged {\\n    event\\n    contact { __typename }\\n    timestamp\\n  }\\n}";
+const SUBSCRIPTION_DOCUMENT = "subscription OnContactChanged {\\n  onContactChanged {\\n    event\\n    contact { __typename }\\n  }\\n}";
 const FIELD_META: SubscriptionFieldMeta = {
   fieldName: "onContactChanged",
   tableName: "contact",
@@ -129,7 +129,7 @@ import type { SubscriptionEvent, SubscriptionFieldMeta, Unsubscribe } from "../.
 import type { Project } from "../../orm/input-types";
 import { projectKeys } from "../query-keys";
 export type { SubscriptionEvent, Unsubscribe } from "../../orm/client";
-const SUBSCRIPTION_DOCUMENT = "subscription OnProjectChanged {\\n  onProjectChanged {\\n    event\\n    project { __typename }\\n    timestamp\\n  }\\n}";
+const SUBSCRIPTION_DOCUMENT = "subscription OnProjectChanged {\\n  onProjectChanged {\\n    event\\n    project { __typename }\\n  }\\n}";
 const FIELD_META: SubscriptionFieldMeta = {
   fieldName: "onProjectChanged",
   tableName: "project",

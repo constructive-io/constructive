@@ -98,6 +98,7 @@ interface RoutingHeaders {
 
 interface ResolvedModuleSettings {
   rlsModule?: RlsModule;
+  realtimeModule?: { schemaName: string };
   authSettings?: AuthSettings;
   corsOrigins?: string[];
   databaseSettings?: DatabaseSettings;
@@ -146,6 +147,9 @@ const resolveModuleSettings = async (
 
   return {
     rlsModule,
+    realtimeModule: databaseSettings?.enableRealtime
+      ? await registry.resolve<{ schemaName: string }>('realtimeModule', ctx)
+      : undefined,
     authSettings,
     corsOrigins,
     databaseSettings,
@@ -234,6 +238,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleS
   roleName: requireApiRole('role_name', row.role_name, row.api_id),
   schema: row.schemas || [],
   rlsModule: settings.rlsModule,
+  realtimeModule: settings.realtimeModule,
   domains: [],
   databaseId: row.database_id,
   isPublic: row.is_public,
@@ -373,6 +378,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
   return {
     ...structure,
     rlsModule: settings.rlsModule,
+    realtimeModule: settings.realtimeModule,
     authSettings: settings.authSettings,
     corsOrigins: settings.corsOrigins,
     databaseSettings: settings.databaseSettings,
