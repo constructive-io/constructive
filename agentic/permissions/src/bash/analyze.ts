@@ -102,7 +102,8 @@ export function normalizeCommand(command: string): string {
 }
 
 const MAX_NESTING = 4;
-const MAX_COMMAND_LENGTH = 64 * 1024;
+/** The longest command the analysis reads; a longer one is `shell-dynamic`. */
+export const MAX_COMMAND_LENGTH = 64 * 1024;
 
 /** Device paths that are not files. */
 const HARMLESS_DEVICES = new Set([

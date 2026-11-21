@@ -65,6 +65,13 @@ describe('parseCommandPattern', () => {
     expect(parseCommandPattern(text)).toEqual({ ok: false, reason });
   });
 
+  it('refuses a rule longer than the engine checks', () => {
+    expect(parseCommandPattern(`echo ${'a'.repeat(64 * 1024)}`)).toEqual({
+      ok: false,
+      reason: 'This rule is longer than 64 KB, and the engine checks no command longer than that. Shorten it, or split it into several rules.'
+    });
+  });
+
   it('accepts as many prefixes as a card may offer', () => {
     expect(parseCommandPattern('ls *, cat *, git status *, git log *, npm test *')).toMatchObject({ ok: true });
   });
