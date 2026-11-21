@@ -190,6 +190,34 @@ describe('RealtimeManager', () => {
     await manager.stop(); // should be no-op
   });
 
+  it('retries pending tracker cleanup after a failed shutdown', async () => {
+    const manager = createManager();
+    await manager.start();
+    const query = mockPool.query.getMockImplementation()!;
+    mockPool.query.mockImplementation((sql, values) => sql.includes('cleanup_ephemeral') ? Promise.reject(new Error('cleanup failed')) : query(sql, values));
+    await expect(manager.stop()).rejects.toThrow('cleanup failed');
+    expect(manager.isRunning).toBe(false);
+    mockPool.query.mockImplementation(query).mockClear();
+    await manager.stop();
+    expect(mockPool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [manager.nodeId]);
+    mockPool.query.mockClear();
+    await manager.stop();
+    expect(mockPool.query).not.toHaveBeenCalled();
+  });
+
+  it('retries pending cleanup after startup and its cleanup both fail', async () => {
+    const manager = createManager();
+    mockPool.query.mockImplementation(async sql => {
+      if (sql.includes('drain_changes') || sql.includes('cleanup_ephemeral')) throw new Error('startup or cleanup failed');
+      return { rows: [] };
+    });
+    await expect(manager.start()).rejects.toBeInstanceOf(AggregateError);
+    expect(manager.isRunning).toBe(false);
+    mockPool.query.mockResolvedValue({ rows: [] }).mockClear();
+    await manager.stop();
+    expect(mockPool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [manager.nodeId]);
+  });
+
   describe('event dispatching', () => {
     it('emits cursor-tracked events on PgSubscriber eventEmitter', async () => {
       const emitted: { channel: string; payload: string }[] = [];

@@ -51,6 +51,7 @@ export class CursorTracker {
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private running = false;
+  private cleanupPending = false;
   private draining = false;
 
   constructor(options: CursorTrackerOptions) {
@@ -74,8 +75,10 @@ export class CursorTracker {
 
     let registered = false;
     try {
+      if (this.cleanupPending) await this.cleanupEphemeral();
       await this.touchListener();
       registered = true;
+      this.cleanupPending = true;
       await this.drain();
     } catch (error) {
       this.running = false;
@@ -99,7 +102,7 @@ export class CursorTracker {
   }
 
   async stop(): Promise<void> {
-    if (!this.running) return;
+    if (!this.running && !this.cleanupPending) return;
     this.running = false;
 
     log.info(`Stopping cursor tracker: node=${this.nodeId}`);
@@ -176,6 +179,7 @@ export class CursorTracker {
       }
       const sql = `SELECT ${this.quoteIdent(this.schema)}.cleanup_ephemeral($1)`;
       await this.pool.query(sql, [this.nodeId]);
+      this.cleanupPending = false;
       log.info(`Cleaned up ephemeral subscriptions for node=${this.nodeId}`);
     } catch (err) {
       throw err instanceof Error ? err : new Error(String(err));

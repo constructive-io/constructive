@@ -170,6 +170,60 @@ describe('CursorTracker.stop()', () => {
     jest.useRealTimers();
   });
 
+  it('does not clean up a tracker that never started', async () => {
+    const pool = createMockPool();
+    await new CursorTracker({ pool }).stop();
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
+  it.each(['cleanup_projects', 'cleanup_ephemeral'])('retries pending shutdown after %s fails', async cleanup => {
+    const pool = createMockPool();
+    const query = pool.query.getMockImplementation()!;
+    const tracker = new CursorTracker({ pool });
+    await tracker.start();
+    pool.query.mockImplementation((sql, values) => sql.includes(cleanup) ? Promise.reject(new Error('cleanup failed')) : query(sql, values));
+    await expect(tracker.stop()).rejects.toThrow('cleanup failed');
+    expect(tracker.isRunning).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
+    pool.query.mockImplementation(query).mockClear();
+    await tracker.stop();
+    expect(pool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [tracker.nodeId]);
+    pool.query.mockClear();
+    await tracker.stop();
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
+  it('retries pending cleanup after startup and its cleanup both fail', async () => {
+    const pool = createMockPool();
+    const query = pool.query.getMockImplementation()!;
+    pool.query.mockImplementation((sql, values) => sql.includes('drain_changes') || sql.includes('cleanup_projects') ? Promise.reject(new Error('startup or cleanup failed')) : query(sql, values));
+    const tracker = new CursorTracker({ pool });
+    await expect(tracker.start()).rejects.toBeInstanceOf(AggregateError);
+    expect(tracker.isRunning).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
+    pool.query.mockImplementation(query).mockClear();
+    await tracker.stop();
+    expect(pool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [tracker.nodeId]);
+  });
+
+  it('cleans up once before concurrent restarts after a failed shutdown', async () => {
+    const pool = createMockPool();
+    const query = pool.query.getMockImplementation()!;
+    const tracker = new CursorTracker({ pool });
+    await tracker.start();
+    pool.query.mockImplementation((sql, values) => sql.includes('cleanup_projects') ? Promise.reject(new Error('cleanup failed')) : query(sql, values));
+    await expect(tracker.stop()).rejects.toThrow('cleanup failed');
+    pool.query.mockImplementation(query).mockClear();
+    await Promise.all([tracker.start(), tracker.start()]);
+    const calls = pool.query.mock.calls.map(([sql]) => sql);
+    expect(calls.filter(sql => sql.includes('touch_listener'))).toHaveLength(1);
+    expect(jest.getTimerCount()).toBe(2);
+    expect(calls.findIndex(sql => sql.includes('cleanup_ephemeral'))).toBeGreaterThanOrEqual(0);
+    expect(calls.findIndex(sql => sql.includes('cleanup_ephemeral'))).toBeLessThan(calls.findIndex(sql => sql.includes('touch_listener')));
+    expect(tracker.isRunning).toBe(true);
+    await tracker.stop();
+  });
+
   it('calls cleanup_ephemeral on stop', async () => {
     const mockPool = createMockPool();
     const tracker = new CursorTracker({

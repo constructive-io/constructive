@@ -113,7 +113,6 @@ export class RealtimeManager {
   }
 
   async stop(): Promise<void> {
-    if (!this.started) return;
     this.started = false;
 
     log.info(`Stopping RealtimeManager: node=${this.nodeId}`);
