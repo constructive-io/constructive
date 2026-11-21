@@ -100,6 +100,8 @@ describe('command prefix grants', () => {
     ['pnpm run build', 'pnpm run build *'],
     ['ls -la src', 'ls *'],
     ['node scripts/build.js --watch', 'node scripts/build.js *'],
+    ['tsx watch src/index.ts', 'tsx watch src/index.ts *'],
+    ['node inspect src/index.js', 'node inspect src/index.js *'],
     ['grep -rn foo src | head -5', 'grep *, head *'],
     // An unknown program, a flag before the subcommand, or too few words: the exact command.
     ['./scripts/deploy.sh staging', './scripts/deploy.sh staging'],

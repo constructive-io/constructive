@@ -17,7 +17,7 @@ import type { CommandPart } from './types';
  * A prefix is offered only when its words name an action that runs no code
  * taken from its arguments: a reader or filter by its name, a git or package
  * manager subcommand that acts on this repo, a package script by its name, or
- * an interpreter's script by its path. Anything else keeps the exact command:
+ * an interpreter's script by its path (after `tsx watch` or `node inspect`, too). Anything else keeps the exact command:
  * a program that runs or fetches code named by an argument (`npx`, `npm
  * init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`, `make`, `gh
  * api`, `git bisect run`), one that writes files (`touch`, `mkdir`, `sort -o`,
@@ -83,7 +83,8 @@ const ARITY: ReadonlyMap<string, number> = new Map<string, number>([
   ...['test', 'why', 'info'].map((sub) => [`yarn ${sub}`, 2] as const),
   ['bun test', 2],
   ...['node', 'python', 'python3', 'ruby', 'bash', 'sh', 'zsh', 'tsx', 'ts-node'].map((name) => [name, 2] as const),
-  ...['npm run', 'pnpm run', 'yarn run', 'bun run'].map((name) => [name, 3] as const)
+  ...['npm run', 'pnpm run', 'yarn run', 'bun run'].map((name) => [name, 3] as const),
+  ...['tsx watch', 'node inspect'].map((name) => [name, 3] as const)
 ]);
 
 const LONGEST_KEY = Math.max(...[...ARITY.keys()].map((key) => key.split(' ').length));

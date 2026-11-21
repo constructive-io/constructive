@@ -53,6 +53,9 @@ const bypasses: [command: string, prefixes: string[]][] = [
   [`git fetch {.,${'x,'.repeat(300)}--upload-pack='touch x;'}`, ['git fetch']],
   // a `+x` is an option, and a `cd` points every later relative path somewhere else
   ['bash +x other.sh', ['bash +x']],
+  // a runner's subcommand comes before the script, so the script must still be in the prefix
+  ['tsx watch other.ts', ['tsx watch']],
+  ['node inspect other.js', ['node inspect']],
   ['cd sub && npm test', ['cd', 'npm test']],
   // a part with a heredoc or a `\r`
   ['cat <<EOF\nhi\nEOF', ['cat']],
