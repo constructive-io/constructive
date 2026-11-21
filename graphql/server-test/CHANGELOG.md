@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.42.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.11...graphql-server-test@3.42.12) (2026-11-21)
+
+### Bug Fixes
+
+- **i18n:** localized reads on tenant APIs (physical table names + request languages) ([#2045](https://github.com/constructive-io/constructive/issues/2045)) ([836796e](https://github.com/constructive-io/constructive/commit/836796ef9ca06aaf91bbaf3e88f3110a1cd4dd20))
+
 ## [3.42.11](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.10...graphql-server-test@3.42.11) (2026-11-21)
 
 **Note:** Version bump only for package graphql-server-test
