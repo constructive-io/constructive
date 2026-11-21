@@ -64,7 +64,7 @@ describe('Role bridges on PostgreSQL', () => {
   const roles: RoleMapping = {
     anonymous: "bridge_anon'quoted",
     authenticated: 'bridge_authenticated',
-    administrator: 'administrator'
+    administrator: 'bridge_administrator'
   };
   const external = "bridge_external'quoted";
   const bridges: PgTestConnectionOptions['roleBridges'] = { [external]: 'anonymous' };
@@ -83,6 +83,7 @@ describe('Role bridges on PostgreSQL', () => {
     await pg.query(`
       CREATE ROLE "${roles.anonymous}" NOLOGIN NOBYPASSRLS;
       CREATE ROLE "${roles.authenticated}" NOLOGIN NOBYPASSRLS;
+      CREATE ROLE "${roles.administrator}" NOLOGIN BYPASSRLS;
       CREATE ROLE "${external}" NOLOGIN NOINHERIT NOBYPASSRLS;
       CREATE TABLE public.bridge_rows (id integer PRIMARY KEY);
       INSERT INTO public.bridge_rows VALUES (1), (2);
@@ -119,9 +120,9 @@ describe('Role bridges on PostgreSQL', () => {
     expect((await pg.query('SELECT current_user')).rows).toEqual([{ current_user: external }]);
     expect((await pg.query('SELECT * FROM public.bridge_rows')).rows).toEqual([{ id: 1 }]);
     const { rows } = await pg.query(`
-      SELECT rolinherit, rolbypassrls, pg_has_role(current_user, 'administrator', 'MEMBER') AS administrator
+      SELECT rolinherit, rolbypassrls, pg_has_role(current_user, $1, 'MEMBER') AS administrator
       FROM pg_roles WHERE rolname = current_user
-    `);
+    `, [roles.administrator]);
     expect(rows).toEqual([{ rolinherit: false, rolbypassrls: false, administrator: false }]);
   });
 
