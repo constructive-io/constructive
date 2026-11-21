@@ -44,7 +44,7 @@
     "@pgsql/quotes": "^18.2.4"
   },
   "peerDependencies": {
-    "grafast": "^1.1.1",
+    "grafast": "^1.1.2",
     "graphile-build": "^5.1.1",
     "graphile-build-pg": "^5.1.3",
     "graphile-config": "^1.1.0",
