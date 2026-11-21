@@ -13,6 +13,7 @@ Admin Users Bootstrap Command:
 
   Initialize postgres roles and permissions. This command must be run before adding users.
   Creates the standard postgres roles: anonymous, authenticated, administrator.
+  Applies configured db.roleBridges to existing external roles with INHERIT TRUE.
 
 Options:
   --help, -h              Show this help message
@@ -60,6 +61,9 @@ export default async (
   
   try {
     await init.bootstrapRoles(db.roles!);
+    if (db.roleBridges) {
+      await init.bootstrapRoleBridges(db.roles!, db.roleBridges);
+    }
     if (argv.client) {
       await init.bootstrapClientRole(db.roles!);
     }

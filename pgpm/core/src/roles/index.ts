@@ -1,4 +1,4 @@
-import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
+import { PgTestConnectionOptions, RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 
 /**
  * Safely escape a string for use as a SQL string literal.
@@ -197,6 +197,49 @@ BEGIN
 END
 $do$;
 COMMIT;
+`;
+}
+
+export function generateRoleBridgesSQL(
+  roles: RoleMapping,
+  bridges: PgTestConnectionOptions['roleBridges'] = {}
+): string {
+  if (!roles) {
+    throw new Error('generateRoleBridgesSQL: roles parameter is undefined');
+  }
+  const entries = Object.entries(bridges);
+  if (!entries.length) return '';
+
+  const grants = entries.map(([external, target]) => {
+    if (target !== 'anonymous' && target !== 'authenticated') {
+      throw new Error(`Role bridge for "${external}": target must be anonymous or authenticated, not "${target}"`);
+    }
+    const base = roles[target];
+    if (!base) {
+      throw new Error(`Role bridge for "${external}": roles.${target} is not configured`);
+    }
+    if (base === 'administrator' || base === roles.administrator) {
+      throw new Error(`Role bridge for "${external}": cannot target the administrator role`);
+    }
+    return `
+  v_external := ${sqlLiteral(external)};
+  v_base := ${sqlLiteral(base)};
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = v_external) THEN
+    RAISE EXCEPTION 'Role bridge external role "%" does not exist', v_external
+      USING ERRCODE = '42704';
+  END IF;
+  EXECUTE format('GRANT %I TO %I WITH INHERIT TRUE', v_base, v_external);`;
+  });
+
+  return `
+DO $do$
+DECLARE
+  v_external text;
+  v_base text;
+BEGIN
+${grants.join('\n')}
+END
+$do$;
 `;
 }
 

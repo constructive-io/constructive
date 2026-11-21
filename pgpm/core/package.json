@@ -47,7 +47,8 @@
     "@types/semver": "^7.8.0",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.9.4",
-    "makage": "^0.8.0"
+    "makage": "^0.8.0",
+    "pgsql-test": "workspace:^"
   },
   "dependencies": {
     "@pgpmjs/ast": "workspace:^",

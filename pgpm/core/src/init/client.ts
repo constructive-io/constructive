@@ -1,5 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
-import { RoleMapping, TestUserCredentials } from '@pgpmjs/types';
+import { PgTestConnectionOptions, RoleMapping, TestUserCredentials } from '@pgpmjs/types';
 import { Pool } from 'pg';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
@@ -10,7 +10,8 @@ import {
   generateCreateClientRoleSQL,
   generateCreateTestUsersSQL,
   generateCreateUserSQL, 
-  generateRemoveUserSQL
+  generateRemoveUserSQL,
+  generateRoleBridgesSQL
 } from '../roles';
 
 const log = new Logger('init');
@@ -59,6 +60,19 @@ export class PgpmInit {
       log.success('Successfully bootstrapped PGPM client role');
     } catch (error) {
       log.error('Failed to bootstrap client role:', error);
+      throw error;
+    }
+  }
+
+  async bootstrapRoleBridges(roles: RoleMapping, bridges: PgTestConnectionOptions['roleBridges']): Promise<void> {
+    try {
+      const sql = generateRoleBridgesSQL(roles, bridges);
+      if (!sql) return;
+      log.info('Bootstrapping PGPM role bridges...');
+      await this.pool.query(sql);
+      log.success('Successfully bootstrapped PGPM role bridges');
+    } catch (error) {
+      log.error('Failed to bootstrap role bridges:', error);
       throw error;
     }
   }
