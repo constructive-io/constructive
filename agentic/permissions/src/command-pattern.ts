@@ -5,7 +5,7 @@
  * exact command, commas included (`echo a, b`).
  */
 
-import { hasPlaceholder, normalizeCommand, trimBlanks } from './bash/analyze';
+import { hasPlaceholder, MAX_COMMAND_LENGTH, normalizeCommand, trimBlanks } from './bash/analyze';
 import { isShellSyntax } from './bash/parts';
 import { tokenize } from './bash/tokenize';
 import { firstNonPrefixWord, MAX_PREFIXES, prefixShortfall } from './command-prefix';
@@ -94,6 +94,12 @@ function readExact(text: string): CommandPatternResult {
 /** A pattern a person typed, read back into a command match by the rules the engine matches with. */
 export function parseCommandPattern(text: string): CommandPatternResult {
   if (text.trim() === '') return { ok: false, reason: 'Type a command, such as `pnpm test`, or a prefix, such as `git status *`.' };
+  if (text.length > MAX_COMMAND_LENGTH) {
+    return {
+      ok: false,
+      reason: `This rule is longer than ${MAX_COMMAND_LENGTH / 1024} KB, and the engine checks no command longer than that. Shorten it, or split it into several rules.`
+    };
+  }
   const trimmed = trimBlanks(text);
   const pieces = trimmed.split(',').map(trimBlanks);
   const starred = pieces.filter(isPrefixPiece).length;
