@@ -41,7 +41,8 @@ CREATE TABLE "shared-storage-public".files (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   database_id uuid NOT NULL,
   bucket_id uuid NOT NULL REFERENCES "shared-storage-public".buckets(id),
-  key text NOT NULL,
+  key text NOT NULL DEFAULT 'originals/' || gen_random_uuid()::text,
+  logical_key text,
   content_hash text NOT NULL,
   mime_type text NOT NULL,
   size bigint,
@@ -54,6 +55,9 @@ CREATE TABLE "shared-storage-public".files (
   updated_at timestamptz DEFAULT now(),
   UNIQUE (bucket_id, key)
 );
+
+CREATE INDEX ON "shared-storage-public".files (bucket_id, logical_key, content_hash)
+  WHERE status IN ('uploaded', 'processed');
 
 COMMENT ON TABLE "shared-storage-public".files IS E'@storageFiles\nStorage files table';
 
@@ -102,7 +106,7 @@ DECLARE
   v_row "shared-storage-public".files;
 BEGIN
   INSERT INTO "shared-storage-public".files (
-    database_id, bucket_id, key, content_hash, mime_type, size, filename, is_public, previous_version_id
+    database_id, bucket_id, logical_key, content_hash, mime_type, size, filename, is_public, previous_version_id
   )
   SELECT b.database_id, $1, $2, $3, $4, $5, $6, b.is_public, $9
   FROM "shared-storage-public".buckets b

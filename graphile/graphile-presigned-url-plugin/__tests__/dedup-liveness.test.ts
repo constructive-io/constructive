@@ -86,9 +86,9 @@ function fakeTx(rowKey: string, status: string) {
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
-      if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
+      if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID, key: `originals/${NEW_FILE_ID}` }] };
       if (/^SELECT id/.test(opts.text)) {
-        return { rows: opts.values[0] === rowKey ? [{ id: OLD_FILE_ID, status }] : [] };
+        return { rows: opts.values[0] === rowKey && ['uploaded', 'processed'].includes(status) ? [{ id: OLD_FILE_ID, key: `originals/${OLD_FILE_ID}` }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -125,7 +125,7 @@ describe.each([
       });
       expect(heads(s3)).toEqual([]);
       const del = queries.find((q) => /^DELETE/.test(q.text));
-      expect(del?.values).toEqual([OLD_FILE_ID]);
+      expect(del).toBeUndefined();
     },
   );
 
@@ -152,8 +152,8 @@ describe('content-addressed upload whose hash a custom-key row carries', () => {
 
     const result = await upload(txClient, s3);
 
-    expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: HASH });
-    expect(queries[0].values).toEqual([HASH, BUCKET_ID]);
+    expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: `originals/${NEW_FILE_ID}` });
+    expect(queries[0].values).toEqual([HASH, BUCKET_ID, HASH]);
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
   });
 });
