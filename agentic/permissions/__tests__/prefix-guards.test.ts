@@ -40,6 +40,16 @@ const bypasses: [command: string, prefixes: string[]][] = [
   ['npm test --script-shell=./evil.sh', ['npm test']],
   ['npm run build --prefix sub', ['npm run build']],
   ['bun test --preload ./x.ts', ['bun test']],
+  // options after `--`: git still reads them when `--` is the value of the option before it
+  ["git fetch -o -- --upload-pack='touch x;' .", ['git fetch']],
+  ["git grep -e -- -O'touch x;'", ['git grep']],
+  ["git rebase -X -- -x 'touch x' HEAD~1", ['git rebase']],
+  ['git fetch "--" --upload-pack=\'touch x;\' .', ['git fetch']],
+  // an unquoted variable inside a word splits it into words the guard cannot see
+  ["git fetch . HEAD$IFS--upload-pack='touch x;'", ['git fetch']],
+  ["git grep -e foo$IFS-O'touch x;'", ['git grep']],
+  ["echo ' --output=.husky/pre-commit --format=touch%x20x -1'; git log HEAD$_", ['echo', 'git log']],
+  ["echo '/.. --upload-pack=touch${IFS}x;#'; git fetch src$_", ['echo', 'git fetch']],
   // a part with a heredoc or a `\r`
   ['cat <<EOF\nhi\nEOF', ['cat']],
   ['echo a\rb', ['echo']]
@@ -54,7 +64,7 @@ describe('a prefix never covers a part that writes a file or runs another progra
     expect((await sb.bash('git fetch origin', 'ask', [prefix('git fetch')])).decision).toBe('allow');
     expect((await sb.bash('git log -1 --format=%H', 'ask', [prefix('git log')])).decision).toBe('allow');
     expect((await sb.bash('git switch -c feature', 'ask', [prefix('git switch')])).decision).toBe('allow');
-    expect((await sb.bash('npm run build -- --prefix x', 'ask', [prefix('npm run build')])).decision).toBe('allow');
+    expect((await sb.bash('npm run build -- --watch', 'ask', [prefix('npm run build')])).decision).toBe('allow');
   });
 
   it('lets an exact grant of the whole command still cover it', async () => {

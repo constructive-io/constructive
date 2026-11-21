@@ -102,9 +102,9 @@ export interface CommandPart {
    */
   writesFile: boolean;
   /**
-   * The options it passes, after quote removal and brace expansion, up to
-   * `--`; `null` when a word may be an option the lexer cannot read (one that
-   * starts with a variable).
+   * The options it passes, after quote removal and brace expansion, `--` and
+   * the words after it included; `null` when a word may hold an option the
+   * lexer cannot read (an unquoted variable, or a quoted one at its start).
    */
   options: string[] | null;
 }
