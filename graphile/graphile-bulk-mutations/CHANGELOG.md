@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.13](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.12...graphile-bulk-mutations@1.19.13) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
 ## [1.19.12](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.11...graphile-bulk-mutations@1.19.12) (2026-11-19)
 
 **Note:** Version bump only for package graphile-bulk-mutations

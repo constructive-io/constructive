@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.42.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.7...graphql-server-test@3.42.8) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
 ## [3.42.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.6...graphql-server-test@3.42.7) (2026-11-19)
 
 **Note:** Version bump only for package graphql-server-test
