@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.45](https://github.com/constructive-io/constructive/compare/@agentic-kit/dsh@0.9.44...@agentic-kit/dsh@0.9.45) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/dsh
+
 ## [0.9.44](https://github.com/constructive-io/constructive/compare/@agentic-kit/dsh@0.9.43...@agentic-kit/dsh@0.9.44) (2026-11-21)
 
 **Note:** Version bump only for package @agentic-kit/dsh

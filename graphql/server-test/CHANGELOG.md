@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.42.13](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.12...graphql-server-test@3.42.13) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
 ## [3.42.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.11...graphql-server-test@3.42.12) (2026-11-21)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.6](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.5...graphile-search@2.20.6) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
 ## [2.20.5](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.4...graphile-search@2.20.5) (2026-11-21)
 
 **Note:** Version bump only for package graphile-search
