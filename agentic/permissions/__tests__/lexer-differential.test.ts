@@ -70,6 +70,8 @@ const rows: Row[] = [
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],
+  // after the command sets IFS, an unquoted expansion splits where the analysis cannot follow
+  ['X=a:~/.ssh/id_rsa; IFS=:; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // a cut-off expansion of sequences alone only leaves out more plain names in the current dir
   ['for i in {1..300}; do echo $i; done', 'ask', 'allow', 'allow', []],
   ['mkdir -p d{1..300}', 'ask', 'allow', 'allow', []],

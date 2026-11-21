@@ -300,7 +300,8 @@ class Analyzer {
         if (part.ref) this.noteRef(part.ref);
       } else {
         this.noteRef(part.name);
-        const value = this.valueOf(part.name, part.fallback);
+        // An IFS the command set splits an unquoted expansion where this analysis does not follow it.
+        const value = !part.quoted && this.vars.has('IFS') ? null : this.valueOf(part.name, part.fallback);
         if (value === null) unknown = true;
         else append(value, false);
       }
