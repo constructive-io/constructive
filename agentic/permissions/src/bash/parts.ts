@@ -2,8 +2,8 @@
  * The simple commands of a bash call, for grants that match one command at a
  * time. Only a plain list or pipeline has parts. A keyword (`if`, `for`,
  * `{ … }`), a function, a substitution, a heredoc or here-string, a `\r` or a
- * lexer error leaves it with none, so only an exact grant of the whole
- * command covers it.
+ * lexer error leaves it with none, and so does a `cd` (the analyzer checks
+ * that), so only an exact grant of the whole command covers it.
  */
 
 import type { CommandPart } from '../types';

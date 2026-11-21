@@ -120,7 +120,8 @@ export interface PermissionRequest {
   /**
    * bash only: the simple commands of a plain list or pipeline, in order.
    * Absent when the command uses other shell syntax (`if`, `for`, `{ … }`, a
-   * function, a substitution) or does not parse: only an exact grant covers it.
+   * function, a substitution, a heredoc), changes dir (`cd`, `pushd`, `popd`)
+   * or does not parse: only an exact grant covers it.
    */
   parts?: CommandPart[];
   signals: Signal[];

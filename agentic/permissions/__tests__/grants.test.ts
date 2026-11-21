@@ -101,7 +101,6 @@ describe('command prefix grants', () => {
     ['ls -la src', 'ls *'],
     ['node scripts/build.js --watch', 'node scripts/build.js *'],
     ['grep -rn foo src | head -5', 'grep *, head *'],
-    ['cd src && git diff', 'cd *, git diff *'],
     // An unknown program, a flag before the subcommand, or too few words: the exact command.
     ['./scripts/deploy.sh staging', './scripts/deploy.sh staging'],
     ['git -C src status', 'git -C src status'],
