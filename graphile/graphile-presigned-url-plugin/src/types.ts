@@ -56,7 +56,7 @@ export interface StorageModuleConfig {
 
   /** S3-compatible API endpoint URL presigned URLs are signed for (NULL = AWS S3) */
   endpoint: string | null;
-  /** Public URL prefix for generating download URLs */
+  /** Public base URL; file URLs append the resolved physical bucket and object key. */
   publicUrlPrefix: string | null;
   /** Storage provider type: 'minio', 'rustfs', 's3', 'gcs', etc. */
   provider: string | null;
@@ -176,8 +176,6 @@ export interface FileProjection {
   mime: string;
   size: number;
   filename?: string;
-  /** @deprecated Read the files row's `downloadUrl` via `id` instead. */
-  url?: string;
 }
 
 /**
@@ -194,7 +192,7 @@ export interface S3Config {
   region?: string;
   /** Whether to use path-style URLs (required for path-style S3-compatible storage) */
   forcePathStyle?: boolean;
-  /** Public URL prefix for generating download URLs */
+  /** Public base URL; file URLs append the resolved physical bucket and object key. */
   publicUrlPrefix?: string;
 }
 

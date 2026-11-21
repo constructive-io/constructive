@@ -229,9 +229,10 @@ export function createPresignedUrlPlugin(
                     file: {
                       type: jsonType,
                       description:
-                          'The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. ' +
+                          'The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. ' +
                           'Store this verbatim in an image/upload column — its `id` is what keeps the object from being ' +
-                          'garbage collected while the column still references it.',
+                          'garbage collected while the column still references it. ' +
+                          'After the upload is confirmed, use `file.id` to query the file row\'s `downloadUrl`.',
                     },
                   }
                   : {}),
@@ -558,11 +559,7 @@ export async function processSingleFile(
   // disagree, and it names the files row by id — which is what stops GC from
   // collecting an object a document still points at.
   const projectFile = (fileId: string, key: string): FileProjection =>
-    buildFileProjection(
-      { id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename },
-      bucket,
-      s3ForDb,
-    );
+    buildFileProjection({ id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename });
 
   // Determine S3 key
   let s3Key: string;
