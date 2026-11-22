@@ -82,6 +82,7 @@ const db = createClient({
 | `phoneNumbersModule` | findMany, findOne, create, update, delete |
 | `plansModule` | findMany, findOne, create, update, delete |
 | `principalAuthModule` | findMany, findOne, create, update, delete |
+| `principalsModule` | findMany, findOne, create, update, delete |
 | `profilesModule` | findMany, findOne, create, update, delete |
 | `rateLimitMetersModule` | findMany, findOne, create, update, delete |
 | `rateLimitsModule` | findMany, findOne, create, update, delete |
@@ -3081,6 +3082,48 @@ const updated = await db.principalAuthModule.update({ where: { id: '<UUID>' }, d
 
 // Delete
 const deleted = await db.principalAuthModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.principalsModule`
+
+CRUD operations for PrincipalsModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `createOrgPrincipalFunction` | String | Yes |
+| `createPrincipalFunction` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `deleteOrgPrincipalFunction` | String | Yes |
+| `deletePrincipalFunction` | String | Yes |
+| `id` | UUID | No |
+| `principalEntitiesTableId` | UUID | Yes |
+| `principalScopeOverridesTableId` | UUID | Yes |
+| `principalsTableId` | UUID | Yes |
+| `principalsTableName` | String | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `sweepExpiredPrincipalsFunction` | String | Yes |
+| `usersTableId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all principalsModule records
+const items = await db.principalsModule.findMany({ select: { createOrgPrincipalFunction: true, createPrincipalFunction: true, databaseId: true, deleteOrgPrincipalFunction: true, deletePrincipalFunction: true, id: true, principalEntitiesTableId: true, principalScopeOverridesTableId: true, principalsTableId: true, principalsTableName: true, privateSchemaId: true, schemaId: true, sweepExpiredPrincipalsFunction: true, usersTableId: true } }).execute();
+
+// Get one by id
+const item = await db.principalsModule.findOne({ id: '<UUID>', select: { createOrgPrincipalFunction: true, createPrincipalFunction: true, databaseId: true, deleteOrgPrincipalFunction: true, deletePrincipalFunction: true, id: true, principalEntitiesTableId: true, principalScopeOverridesTableId: true, principalsTableId: true, principalsTableName: true, privateSchemaId: true, schemaId: true, sweepExpiredPrincipalsFunction: true, usersTableId: true } }).execute();
+
+// Create
+const created = await db.principalsModule.create({ data: { createOrgPrincipalFunction: '<String>', createPrincipalFunction: '<String>', databaseId: '<UUID>', deleteOrgPrincipalFunction: '<String>', deletePrincipalFunction: '<String>', principalEntitiesTableId: '<UUID>', principalScopeOverridesTableId: '<UUID>', principalsTableId: '<UUID>', principalsTableName: '<String>', privateSchemaId: '<UUID>', schemaId: '<UUID>', sweepExpiredPrincipalsFunction: '<String>', usersTableId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.principalsModule.update({ where: { id: '<UUID>' }, data: { createOrgPrincipalFunction: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.principalsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.profilesModule`

@@ -2908,12 +2908,22 @@ type MetaField {
 """How a field holds files"""
 type MetaFileField {
   """
+  Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one
+  """
+  bucketKey: String
+
+  """
   GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise
   """
   filesType: String
 
   """Whether the field holds a list of files"""
   isMultiple: Boolean!
+
+  """
+  Whether the bound bucket must be public (true) or private (false); null when the binding does not say
+  """
+  isPublic: Boolean
 
   """
   image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.

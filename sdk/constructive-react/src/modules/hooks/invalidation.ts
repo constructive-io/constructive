@@ -76,6 +76,7 @@ import {
   phoneNumbersModuleKeys,
   plansModuleKeys,
   principalAuthModuleKeys,
+  principalsModuleKeys,
   profilesModuleKeys,
   rateLimitMetersModuleKeys,
   rateLimitsModuleKeys,
@@ -1158,6 +1159,23 @@ export const invalidate = {
         queryKey: principalAuthModuleKeys.detail(id),
       }),
   },
+  /** Invalidate principalsModule queries */ principalsModule: {
+    /** Invalidate all principalsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalsModuleKeys.all,
+      }),
+    /** Invalidate principalsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: principalsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific principalsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: principalsModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate profilesModule queries */ profilesModule: {
     /** Invalidate all profilesModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -2107,6 +2125,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: principalAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove principalsModule from cache */ principalsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: principalsModuleKeys.detail(id),
     });
   },
   /** Remove profilesModule from cache */ profilesModule: (

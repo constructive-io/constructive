@@ -569,6 +569,15 @@ export const principalAuthModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...principalAuthModuleKeys.details(), id] as const,
 } as const;
+export const principalsModuleKeys = {
+  /** All principalsModule queries */ all: ['principalsmodule'] as const,
+  /** List query keys */ lists: () => [...principalsModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...principalsModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...principalsModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...principalsModuleKeys.details(), id] as const,
+} as const;
 export const profilesModuleKeys = {
   /** All profilesModule queries */ all: ['profilesmodule'] as const,
   /** List query keys */ lists: () => [...profilesModuleKeys.all, 'list'] as const,
@@ -897,6 +906,7 @@ export const queryKeys = {
   phoneNumbersModule: phoneNumbersModuleKeys,
   plansModule: plansModuleKeys,
   principalAuthModule: principalAuthModuleKeys,
+  principalsModule: principalsModuleKeys,
   profilesModule: profilesModuleKeys,
   rateLimitMetersModule: rateLimitMetersModuleKeys,
   rateLimitsModule: rateLimitsModuleKeys,
