@@ -96,6 +96,16 @@ function createMetaSchemaType(): GraphQLObjectType {
         type: GraphQLString,
         description:
           'GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise'
+      },
+      bucketKey: {
+        type: GraphQLString,
+        description:
+          'Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one'
+      },
+      isPublic: {
+        type: GraphQLBoolean,
+        description:
+          'Whether the bound bucket must be public (true) or private (false); null when the binding does not say'
       }
     })
   });
