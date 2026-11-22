@@ -93,13 +93,13 @@ export function trimBlanks(text: string): string {
  * The exact-grant key: the ends trimmed of spaces and tabs, and every run of
  * them made one space. Any other character stays, newline, `\r` and NBSP
  * included, because bash reads each of them differently from a space. A
- * command with a quote, a backslash or a heredoc keeps its spacing as
- * written: there a space or tab can be text, and changing it can move where
- * a heredoc ends.
+ * command with a quote, a backslash, a `$` or a heredoc keeps its spacing as
+ * written: there a space or tab can be text (inside `${x/ /-}`, or split by
+ * an IFS the command sets), and changing it can move where a heredoc ends.
  */
 export function normalizeCommand(command: string): string {
   const trimmed = trimBlanks(command);
-  return /['"\\]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
+  return /['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
 }
 
 const MAX_NESTING = 4;

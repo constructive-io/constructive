@@ -166,7 +166,10 @@ const keys: [granted: string, other: string, modes: PermissionMode[]][] = [
   // a tab before the delimiter ends a `<<-` body, a space does not
   ['cat <<-EOF\n EOF\nrm -rf src\nEOF', 'cat <<-EOF\n\tEOF\nrm -rf src\nEOF', ['ask']],
   // a line ends a quoted delimiter's body only with the delimiter's own spacing
-  ["cat <<'E  F'\nE F\nrm -rf src\nE  F", "cat <<'E F'\nE F\nrm -rf src\nE F", ['ask']]
+  ["cat <<'E  F'\nE F\nrm -rf src\nE  F", "cat <<'E F'\nE F\nrm -rf src\nE F", ['ask']],
+  // inside `${…}`, and wherever IFS may split, a tab or a run of spaces is text
+  ['echo ${x/ /-}', 'echo ${x/\t/-}', ['ask']],
+  ['IFS=; echo ${y:-a  b}', 'IFS=; echo ${y:-a\t\tb}', ['ask']]
 ];
 
 describe('an exact grant key keeps what bash reads differently', () => {
