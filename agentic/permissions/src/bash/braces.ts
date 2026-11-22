@@ -5,7 +5,26 @@ const MAX_BRACE_RESULTS = 256;
 /** The most words a word of plain names may expand to, so that each name is still checked. */
 export const MAX_PLAIN_NAME_RESULTS = 4096;
 
+/** The most names brace expansion may add to one command's checks; past it the command asks. */
+export const MAX_BRACE_NAMES = 8192;
+
 type Expansion = { text: string; mask: boolean[] };
+
+/** How many more names brace expansion may add to one command's checks. */
+export class NameBudget {
+  constructor(private left: number) {}
+
+  get room(): number {
+    return this.left;
+  }
+
+  take(names: number): void {
+    this.left -= names;
+  }
+}
+
+/** Where an expansion stopped: it made every word, hit the word's own limit, or the command's budget. */
+export type Cut = 'none' | 'word' | 'budget';
 
 /**
  * The word can only expand to plain names in the current dir: with no comma
@@ -20,14 +39,17 @@ function expandsToPlainNames(text: string): boolean {
  * Expand a word's braces, every word it makes included: up to
  * `MAX_BRACE_RESULTS`, or up to `MAX_PLAIN_NAME_RESULTS` for a word of plain
  * names (`for i in {1..300}`), whose names can still spell a secret file or
- * a credential store (`.{a..z}{e..e}{a..z}{r..r}{c..c}` holds `.netrc`).
- * Returns `false` when it stopped at the limit, so some words are missing.
+ * a credential store (`.{a..z}{e..e}{a..z}{r..r}{c..c}` holds `.netrc`), and
+ * never past what `budget` has left. The word keeps at least its first name,
+ * so later words keep their positions. Any cut leaves words missing.
  */
-export function expandWord(text: string, mask: boolean[], out: Expansion[]): boolean {
-  if (expandBraces(text, mask, out, MAX_BRACE_RESULTS)) return true;
-  if (!expandsToPlainNames(text)) return false;
-  out.length = 0;
-  return expandBraces(text, mask, out, MAX_PLAIN_NAME_RESULTS);
+export function expandWord(text: string, mask: boolean[], out: Expansion[], budget: NameBudget): Cut {
+  const cap = expandsToPlainNames(text) ? MAX_PLAIN_NAME_RESULTS : MAX_BRACE_RESULTS;
+  const limit = Math.min(cap, Math.max(1, budget.room));
+  const complete = expandBraces(text, mask, out, limit);
+  if (out.length > 1) budget.take(out.length);
+  if (complete) return 'none';
+  return limit < cap ? 'budget' : 'word';
 }
 
 /**
@@ -61,6 +83,7 @@ function expandBraces(text: string, mask: boolean[], out: Expansion[], limit: nu
     const post = text.slice(close + 1);
     const postMask = mask.slice(close + 1);
     let alternatives: { text: string; mask: boolean[] }[] = [];
+    let cutShort = false;
     if (commas.length > 0) {
       const bounds = [open, ...commas, close];
       for (let k = 0; k < bounds.length - 1; k++) {
@@ -73,10 +96,10 @@ function expandBraces(text: string, mask: boolean[], out: Expansion[], limit: nu
       const seq = /^(-?\d+|[A-Za-z])\.\.(-?\d+|[A-Za-z])(?:\.\.(-?\d+))?$/.exec(text.slice(open + 1, close));
       if (!seq) continue;
       const values = sequence(seq[1], seq[2], seq[3], limit);
-      if (values === null) return false;
-      alternatives = values.map((t) => ({ text: t, mask: [...t].map(() => true) }));
+      alternatives = values.texts.map((t) => ({ text: t, mask: [...t].map(() => true) }));
+      cutShort = !values.complete;
     }
-    let complete = true;
+    let complete = !cutShort;
     for (const alt of alternatives) {
       complete = expandBraces(pre + alt.text + post, [...preMask, ...alt.mask, ...postMask], out, limit) && complete;
     }
@@ -86,16 +109,16 @@ function expandBraces(text: string, mask: boolean[], out: Expansion[], limit: nu
   return true;
 }
 
-/** The values of `{from..to..step}`, or `null` when there are more than `limit`. */
-function sequence(from: string, to: string, step: string | undefined, limit: number): string[] | null {
+/** The first `limit` values of `{from..to..step}`, and whether that is all of them. */
+function sequence(from: string, to: string, step: string | undefined, limit: number): { texts: string[]; complete: boolean } {
   const numeric = /^-?\d+$/.test(from) && /^-?\d+$/.test(to);
   const a = numeric ? Number(from) : from.charCodeAt(0);
   const b = numeric ? Number(to) : to.charCodeAt(0);
   const inc = Math.max(1, Math.abs(Number(step ?? 1)));
-  const out: string[] = [];
+  const texts: string[] = [];
   for (let v = a; a <= b ? v <= b : v >= b; v += a <= b ? inc : -inc) {
-    if (out.length >= limit) return null;
-    out.push(numeric ? String(v) : String.fromCharCode(v));
+    if (texts.length >= limit) return { texts, complete: false };
+    texts.push(numeric ? String(v) : String.fromCharCode(v));
   }
-  return out;
+  return { texts, complete: true };
 }

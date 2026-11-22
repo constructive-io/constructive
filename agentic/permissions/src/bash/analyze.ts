@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
 import { generic } from './args';
-import { expandWord, MAX_PLAIN_NAME_RESULTS } from './braces';
+import { expandWord, MAX_BRACE_NAMES, MAX_PLAIN_NAME_RESULTS, NameBudget } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
@@ -104,8 +104,6 @@ export function normalizeCommand(command: string): string {
 
 const MAX_NESTING = 4;
 
-/** The most names brace expansion may add to one command for the checks; past it the command asks. */
-const MAX_BRACE_NAMES = 8192;
 /** The longest command the analysis reads; a longer one is `shell-dynamic`. */
 export const MAX_COMMAND_LENGTH = 64 * 1024;
 
@@ -176,6 +174,11 @@ const DOTGLOB_RE = /dotglob|glob_?dots|GLOBIGNORE/i;
 /** `$NAME` and `${NAME…}` in a heredoc body. */
 const BODY_VAR_RE = /\$\{?[#!]?([A-Za-z_][A-Za-z0-9_]*)/g;
 
+/** A value a switch over a closed union cannot hold; a new variant is a compile error here. */
+export function unreachable(value: never): never {
+  throw new Error(`permissions: unexpected state ${JSON.stringify(value)} in the bash analysis. This is a bug in @agentic-kit/permissions; report it with the command that caused it.`);
+}
+
 /** The word's leading literal text is `IFS`, `IFS=…` or `IFS+=…`. */
 function namesIfs(word: Word): boolean {
   let lead = '';
@@ -204,8 +207,8 @@ class Analyzer {
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
   base: string | null;
-  /** Names brace expansion has added to this command so far. */
-  private braceNames = 0;
+  /** The names brace expansion may still add to this command's checks. */
+  private readonly names = new NameBudget(MAX_BRACE_NAMES);
   /** A word in the command names IFS, so it may set it (`IFS=:`, `read IFS`, `mapfile -t IFS`, `for IFS in`). */
   ifsSet = false;
   /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
@@ -325,11 +328,21 @@ class Analyzer {
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (!expandWord(text, mask, expanded)) {
+    const cut = expandWord(text, mask, expanded, this.names);
+    switch (cut) {
+    case 'none':
+      break;
+    case 'word':
       this.unresolvable(`a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`);
+      break;
+    case 'budget':
+      this.unresolvable(`the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`);
+      break;
+    default:
+      return unreachable(cut);
     }
     const braced = text[0] === '{' && mask[0];
-    return this.withinNameBudget(expanded).map((e) => {
+    return expanded.map((e) => {
       const result = braced ? this.alternativeTilde(e) : e;
       return {
         text: result.text,
@@ -338,23 +351,6 @@ class Analyzer {
         glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
       };
     });
-  }
-
-  /**
-   * The expansions this word may add to the command's checks. Past
-   * `MAX_BRACE_NAMES` the rest go unchecked, so the command raises
-   * `unresolvable-path`; the word keeps its first name so later words keep
-   * their positions as operands.
-   */
-  private withinNameBudget<T>(expanded: T[]): T[] {
-    if (expanded.length <= 1) return expanded;
-    const room = MAX_BRACE_NAMES - this.braceNames;
-    const kept = expanded.length > room ? expanded.slice(0, Math.max(1, room)) : expanded;
-    if (kept.length < expanded.length) {
-      this.unresolvable(`the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`);
-    }
-    this.braceNames += kept.length;
-    return kept;
   }
 
   /**

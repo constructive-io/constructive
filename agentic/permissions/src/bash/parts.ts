@@ -7,7 +7,7 @@
  */
 
 import type { CommandPart } from '../types';
-import { expandWord } from './braces';
+import { expandWord, MAX_BRACE_NAMES, NameBudget } from './braces';
 import type { Lexed, Redirect, Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
@@ -51,7 +51,7 @@ function literalText(word: Word): { text: string; mask: boolean[] } {
  * (word splitting can turn `HEAD$IFS--upload-pack=x` into two words), or a
  * quoted variable at a start that may be an option.
  */
-function optionsOf(words: readonly Word[]): string[] | null {
+function optionsOf(words: readonly Word[], names: NameBudget): string[] | null {
   const options: string[] = [];
   for (const word of words) {
     if (word.parts.some((p) => p.kind === 'unknown' || (p.kind === 'var' && !p.quoted))) return null;
@@ -63,7 +63,7 @@ function optionsOf(words: readonly Word[]): string[] | null {
     }
     const { text, mask } = literalText(word);
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (!expandWord(text, mask, expanded)) return null;
+    if (expandWord(text, mask, expanded, names) !== 'none') return null;
     for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
   }
   return options;
@@ -72,9 +72,10 @@ function optionsOf(words: readonly Word[]): string[] | null {
 export function commandParts(command: string, lexed: Lexed): CommandPart[] | null {
   if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0 || command.includes('\r')) return null;
   if (lexed.commands.some((cmd) => cmd.stdinDoc || isShellSyntax(cmd.words[0]?.raw))) return null;
+  const names = new NameBudget(MAX_BRACE_NAMES);
   return lexed.commands.map((cmd) => ({
     words: cmd.words.map((w) => w.raw),
     writesFile: cmd.redirects.some(writesFile),
-    options: optionsOf(cmd.words)
+    options: optionsOf(cmd.words, names)
   }));
 }
