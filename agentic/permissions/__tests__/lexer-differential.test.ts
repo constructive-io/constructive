@@ -86,6 +86,7 @@ const rows: Row[] = [
   ['mapfile -t IFS <<< ":"; X=a:~/.netrc; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   ['readarray -t IFS <<< ":"; X=a:~/.netrc; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   ['for IFS in :; do X=a:~/.netrc; cat $X; done', 'ask', 'ask', 'ask', ['unresolvable-path']],
+  ['N=IFS; export $N=:; X=a:~/.netrc; cat $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // a cut-off expansion of sequences alone only leaves out more plain names in the current dir
   ['for i in {1..300}; do echo $i; done', 'ask', 'allow', 'allow', []],
   ['mkdir -p d{1..300}', 'ask', 'allow', 'allow', []],

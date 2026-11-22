@@ -102,6 +102,9 @@ export function normalizeCommand(command: string): string {
   return /['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
 }
 
+/** Whether IFS may differ from bash's default (space, tab, newline). */
+type IfsState = 'default' | 'maybe-changed';
+
 const MAX_NESTING = 4;
 
 /** The longest command the analysis reads; a longer one is `shell-dynamic`. */
@@ -209,8 +212,12 @@ class Analyzer {
   base: string | null;
   /** The names brace expansion may still add to this command's checks. */
   private readonly names = new NameBudget(MAX_BRACE_NAMES);
-  /** A word in the command names IFS, so it may set it (`IFS=:`, `read IFS`, `mapfile -t IFS`, `for IFS in`). */
-  ifsSet = false;
+  /**
+   * Whether IFS may differ from bash's default: a word names it (`IFS=:`,
+   * `read IFS`, `mapfile -t IFS`, `for IFS in …`) or the command assigns it
+   * (also through a name it built, `N=IFS; export $N=:`).
+   */
+  private ifs: IfsState = 'default';
   /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
   changedDir = false;
   /** How many shell strings (`sh -c`, `eval`, …) deep the analysis is. */
@@ -252,7 +259,7 @@ class Analyzer {
       return null;
     }
     const lexed = tokenize(command);
-    if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifsSet = true;
+    if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifs = 'maybe-changed';
     if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);
@@ -277,7 +284,20 @@ class Analyzer {
    * `NAME=value`, inline or through `export`, `declare` or `readonly`.
    * `value` is `null` when it is not known statically.
    */
+  /** An unquoted expansion may split where this analysis does not follow it. */
+  private ifsMaySplit(): boolean {
+    switch (this.ifs) {
+    case 'default':
+      return false;
+    case 'maybe-changed':
+      return true;
+    default:
+      return unreachable(this.ifs);
+    }
+  }
+
   assign(name: string, value: string | null): void {
+    if (name === 'IFS') this.ifs = 'maybe-changed';
     if (DANGEROUS_VARS.test(name)) this.dynamic(`it sets ${name}, which changes what runs`);
     this.vars.set(name, value);
   }
@@ -322,7 +342,7 @@ class Analyzer {
       } else {
         this.noteRef(part.name);
         // An IFS the command sets splits an unquoted expansion where this analysis does not follow it.
-        const value = !part.quoted && this.ifsSet ? null : this.valueOf(part.name, part.fallback);
+        const value = !part.quoted && this.ifsMaySplit() ? null : this.valueOf(part.name, part.fallback);
         if (value === null) unknown = true;
         else append(value, false);
       }
