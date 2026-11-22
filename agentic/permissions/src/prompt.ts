@@ -1,6 +1,7 @@
 /** The approval card for an ASK: a title, what it touches, and why it asks. */
 
 import { showPath } from './paths';
+import { byRequest } from './requests';
 import type { GrantOption, PermissionPrompt, PermissionRequest, Signal } from './types';
 
 /** The title of a write to a file that runs code later, by the label of its root. */
@@ -60,14 +61,15 @@ export function buildPrompt(
   display: PromptDisplay
 ): PermissionPrompt {
   const shown = request.targets.map((t) => showPath(t.path, display.workspace, display.homeDir));
-  const only = request.command === undefined && shown.length === 1 ? `${shown[0]} ` : null;
+  const command = byRequest<string | undefined>(request, { bash: (r) => r.command, file: () => undefined });
+  const only = command === undefined && shown.length === 1 ? `${shown[0]} ` : null;
   const cardReasons = reasons.map((r) => (only && r.startsWith(only) ? `it ${r.slice(only.length)}` : r));
   return {
     title: promptTitle(request),
-    summary: request.command ?? shown.join('\n'),
+    summary: command ?? shown.join('\n'),
     toolName: request.toolName,
     kind: request.kind,
-    ...(request.command === undefined ? {} : { command: request.command }),
+    ...(command === undefined ? {} : { command }),
     targets: request.targets.map((t, i) => ({ path: shown[i], access: t.access, zone: t.zone })),
     signals: request.signals,
     reasons: cardReasons,

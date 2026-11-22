@@ -1,10 +1,13 @@
 import type { ApprovalOutcome, ApprovalRequest } from '@agentic-kit/harness';
 import type {
+  CommandKey,
+  FileTool,
   Grant,
   GrantOption,
   PermissionDecision,
   PermissionEngine,
   PermissionPrompt,
+  PermissionRequest,
   PermissionVerdict
 } from '@agentic-kit/permissions';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
@@ -63,16 +66,19 @@ const projectOption: GrantOption = { ...chatOption, scope: 'project', label: 'Al
 const CARD = { title: 'Read a file outside the project' } as PermissionPrompt;
 
 const decisionFor = (toolName: string, verdict: PermissionVerdict, toolCallId = 'call-1'): PermissionDecision => {
-  const request: PermissionDecision['request'] = {
+  const base = {
     toolCallId,
-    toolName: toolName as PermissionDecision['request']['toolName'],
-    kind: 'read',
     targets: [
-      { raw: 'x', path: '/home/u/work/lib/x', access: 'read', zone: 'outside', secretFile: false, label: 'outside' }
+      { raw: 'x', path: '/home/u/work/lib/x', access: 'read' as const, zone: 'outside' as const, secretFile: false, label: 'outside' }
     ],
-    signals: ['outside-workspace'],
+    signals: ['outside-workspace' as const],
     signalReasons: {}
   };
+  // A fake engine decision: the command key is made up, not normalized by the kit.
+  const request: PermissionRequest =
+    toolName === 'bash'
+      ? { ...base, toolName: 'bash', kind: 'exec', command: 'x' as CommandKey }
+      : { ...base, toolName: toolName as FileTool, kind: 'read' };
   const reason = `permissions: ${toolName} ${verdict}`;
   return verdict === 'ask'
     ? { decision: verdict, reason, request, prompt: CARD, grantOptions: [chatOption, projectOption] }

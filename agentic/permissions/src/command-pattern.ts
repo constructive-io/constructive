@@ -9,12 +9,12 @@ import { hasPlaceholder, MAX_COMMAND_LENGTH, normalizeCommand, trimBlanks } from
 import { isShellSyntax } from './bash/parts';
 import { tokenize } from './bash/tokenize';
 import { firstNonPrefixWord, MAX_PREFIXES, prefixShortfall } from './command-prefix';
-import type { CommandMatch, CommandPrefixMatch } from './types';
+import type { CommandKey, CommandMatch, CommandPrefixMatch, ListedPrefix } from './types';
 
 /** A typed pattern read back: the match, or a short plain reason that says what is wrong and how to fix it. */
 export type CommandPatternResult = { ok: true; match: CommandMatch | CommandPrefixMatch } | { ok: false; reason: string };
 
-type PrefixResult = { ok: true; prefix: string } | { ok: false; reason: string };
+type PrefixResult = { ok: true; prefix: ListedPrefix } | { ok: false; reason: string };
 
 const PREFIX_END = ' *';
 
@@ -51,7 +51,7 @@ function readPrefix(piece: string): PrefixResult {
     return { ok: false, reason: `A prefix can't start with the shell keyword \`${words[0]}\`. Start it with the program name.` };
   }
   const bad = firstNonPrefixWord(words);
-  if (bad === undefined) return listed(piece, words) ?? { ok: true, prefix: text };
+  if (bad === undefined) return listed(piece, words) ?? { ok: true, prefix: text as string as ListedPrefix };
   if (bad.includes('*')) {
     return { ok: false, reason: `A \`*\` can only end a prefix, as in \`git status *\`. Remove the other \`*\` in \`${piece}\`.` };
   }
@@ -92,13 +92,13 @@ function readExact(text: string): CommandPatternResult {
 }
 
 /** `prefix` is one the table lists, written the way a card saves it. */
-export function isStoredPrefix(prefix: string): boolean {
+export function isStoredPrefix(prefix: string): prefix is ListedPrefix {
   const read = readPrefix(`${prefix}${PREFIX_END}`);
   return read.ok && read.prefix === prefix;
 }
 
 /** `command` is an exact-grant key the engine could have saved: its own normalized form, within the length cap. */
-export function isExactKey(command: string): boolean {
+export function isExactKey(command: string): command is CommandKey {
   if (command === '' || command.length > MAX_COMMAND_LENGTH) return false;
   const read = readExact(command);
   return read.ok && read.match.type === 'command' && read.match.command === command;
@@ -123,7 +123,7 @@ export function parseCommandPattern(text: string): CommandPatternResult {
       : 'Use either prefixes or one exact command. End every part with ` *`, or remove each ` *` to save the exact command.';
     return { ok: false, reason };
   }
-  const prefixes = new Set<string>();
+  const prefixes = new Set<ListedPrefix>();
   for (const piece of pieces) {
     const read = readPrefix(piece);
     if (read.ok === false) return read;

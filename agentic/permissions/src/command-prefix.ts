@@ -7,7 +7,7 @@
 
 import { normalizeCommand } from './bash/analyze';
 import { optionMatches } from './bash/args';
-import type { CommandPart } from './types';
+import type { CommandPart, ListedPrefix } from './types';
 
 /**
  * The prefixes "always" may offer and a grant may hold: by the words that name
@@ -168,12 +168,12 @@ function passesRiskyOption(part: CommandPart): boolean {
 }
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
-export function prefixFor(part: CommandPart): string | null {
+export function prefixFor(part: CommandPart): ListedPrefix | null {
   if (part.writesFile || passesRiskyOption(part)) return null;
   const key = arityKey(part.words);
   if (!key || part.words.length < key.arity) return null;
   const kept = part.words.slice(0, key.arity);
-  return firstNonPrefixWord(kept) === undefined ? kept.join(' ') : null;
+  return firstNonPrefixWord(kept) === undefined ? (kept.join(' ') as ListedPrefix) : null;
 }
 
 /**

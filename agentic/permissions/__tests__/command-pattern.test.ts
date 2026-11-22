@@ -6,7 +6,7 @@ import {
   parseCommandPattern,
   sameMatch
 } from '../src';
-import { asAsk, makeSandbox, type Sandbox } from './sandbox';
+import { asAsk, makeSandbox, type Sandbox, storedCommand, storedPrefixes } from './sandbox';
 
 let sb: Sandbox;
 
@@ -15,8 +15,8 @@ beforeAll(async () => {
 });
 afterAll(() => sb.cleanup());
 
-const prefixes = (...list: string[]): CommandPrefixMatch => ({ type: 'command-prefix', prefixes: list });
-const exact = (command: string): CommandMatch => ({ type: 'command', command });
+const prefixes = storedPrefixes;
+const exact = storedCommand;
 
 describe('parseCommandPattern', () => {
   // prettier-ignore

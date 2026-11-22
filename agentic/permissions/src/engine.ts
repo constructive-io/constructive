@@ -15,17 +15,18 @@ import * as path from 'node:path';
 import { classify } from './classify';
 import { nodeFsProbe } from './node-fs';
 import { decide, type PolicyRules } from './policy';
+import { byRequest } from './requests';
 import { buildHostHardDeny, buildRoots, type Roots } from './roots';
 import { isSecretFile } from './secret-files';
 import { collectWorkspaceSecrets, isSecretEntry, redactToolResult, SecretVault } from './secrets';
 import { mapCommand, mapWriteTexts } from './tool-input';
 import {
+  type FileRequest,
   type FsProbe,
   type Grant,
   isBuiltinTool,
   type PermissionDecision,
   type PermissionMode,
-  type PermissionRequest,
   TOOL_KIND
 } from './types';
 
@@ -138,7 +139,7 @@ const MIN_HOST_SECRET = 4;
  * named `.env` that points at a plain file gets no real values, and a plainly
  * named link to `.env` gets them back, as the values came from there.
  */
-function writesSecretFile(request: PermissionRequest): boolean {
+function writesSecretFile(request: FileRequest): boolean {
   if (request.toolName !== 'write' && request.toolName !== 'edit') return false;
   const target = request.targets[0];
   return Boolean(target) && target.zone !== 'unresolvable' && isSecretFile(target.path);
@@ -207,11 +208,14 @@ export function createPermissionEngine(options: PermissionEngineOptions): Permis
     },
 
     restoreInput(decision, input, restoreOptions) {
-      if (decision.request.toolName === 'bash') {
-        if (restoreOptions?.approved) mapCommand(input, restore);
-      } else if (writesSecretFile(decision.request)) {
-        mapWriteTexts(input, restore);
-      }
+      byRequest(decision.request, {
+        bash: () => {
+          if (restoreOptions?.approved) mapCommand(input, restore);
+        },
+        file: (request) => {
+          if (writesSecretFile(request)) mapWriteTexts(input, restore);
+        }
+      });
     },
 
     async redactResult(result) {

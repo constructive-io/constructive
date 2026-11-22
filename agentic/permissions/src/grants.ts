@@ -14,16 +14,20 @@ import * as path from 'node:path';
 import { commandPattern, isExactKey, isStoredPrefix } from './command-pattern';
 import { MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
 import { commonParent, contains, displayDir } from './paths';
+import { byRequest } from './requests';
 import { SIGNAL_RULES } from './signals';
 import type {
   Access,
+  BashRequest,
   CommandMatch,
   CommandPart,
   CommandPrefixMatch,
+  FileRequest,
   Grant,
   GrantMatch,
   GrantOption,
   GrantScope,
+  ListedPrefix,
   PermissionRequest,
   Signal,
   Target
@@ -124,10 +128,10 @@ export function describeGrant(match: GrantMatch, homeDir: string): string {
  * grant must be the exact command: the call raises a signal or is not a plain
  * list, a part's program has no prefix, or the chain needs too many.
  */
-function newPrefixes(request: PermissionRequest, held: readonly Grant[]): string[] | null {
+function newPrefixes(request: BashRequest, held: readonly Grant[]): ListedPrefix[] | null {
   const parts = prefixableParts(request);
   if (!parts) return null;
-  const prefixes = new Set<string>();
+  const prefixes = new Set<ListedPrefix>();
   for (const part of parts) {
     if (held.some((g) => coversPart(g.match, part))) continue;
     const prefix = prefixFor(part);
@@ -142,7 +146,7 @@ function newPrefixes(request: PermissionRequest, held: readonly Grant[]): string
  * already covers, the project option only those a project grant covers, so
  * the project grant still holds in the next chat.
  */
-function commandOption(scope: GrantScope, request: PermissionRequest, grants: readonly Grant[]): GrantOption {
+function commandOption(scope: GrantScope, request: BashRequest, grants: readonly Grant[]): GrantOption {
   const held = scope === 'chat' ? grants : grants.filter((g) => g.scope === 'project');
   const prefixes = newPrefixes(request, held);
   const match: CommandMatch | CommandPrefixMatch = prefixes
@@ -152,7 +156,7 @@ function commandOption(scope: GrantScope, request: PermissionRequest, grants: re
   return { scope, label: scope === 'chat' ? 'Allow in this chat' : `Always allow ${pattern}`, pattern, match };
 }
 
-function pathOptions(request: PermissionRequest, homeDir: string): GrantOption[] {
+function pathOptions(request: FileRequest, homeDir: string): GrantOption[] {
   if (!pathGrantable(request)) return [];
   const access = request.targets[0].access;
   if (request.targets.some((t) => t.access !== access)) return [];
@@ -168,9 +172,10 @@ function pathOptions(request: PermissionRequest, homeDir: string): GrantOption[]
 /** The scopes the user may pick on an ASK: this chat, or always for this project. `grants` are the ones already held. */
 export function grantOptionsFor(request: PermissionRequest, homeDir: string, grants: readonly Grant[] = []): GrantOption[] {
   if (!isGrantable(request)) return [];
-  if (request.toolName !== 'bash') return pathOptions(request, homeDir);
-  if (!request.command) return [];
-  return [commandOption('chat', request, grants), commandOption('project', request, grants)];
+  return byRequest(request, {
+    bash: (r) => (r.command === '' ? [] : [commandOption('chat', r, grants), commandOption('project', r, grants)]),
+    file: (r) => pathOptions(r, homeDir)
+  });
 }
 
 const ACCESSES: readonly string[] = ['read', 'write', 'exec'];
@@ -192,7 +197,7 @@ export function parseGrantMatch(value: unknown): GrantMatch | null {
   case 'command-prefix': {
     const { prefixes } = v;
     if (!Array.isArray(prefixes) || prefixes.length === 0 || prefixes.length > MAX_PREFIXES) return null;
-    if (!prefixes.every((p): p is string => typeof p === 'string' && isStoredPrefix(p))) return null;
+    if (!prefixes.every((p): p is ListedPrefix => typeof p === 'string' && isStoredPrefix(p))) return null;
     return { type: 'command-prefix', prefixes: [...new Set(prefixes)] };
   }
   case 'path': {

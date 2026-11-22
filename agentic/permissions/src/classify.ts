@@ -266,15 +266,10 @@ export async function classify(
     }
   }
 
-  return {
-    toolCallId: call.toolCallId,
-    toolName,
-    kind: TOOL_KIND[toolName],
-    targets,
-    ...(command === undefined ? {} : { command: normalizeCommand(command) }),
-    ...(bash?.parts ? { parts: bash.parts } : {}),
-    signals: [...findings.signals],
-    signalReasons: findings.reasons
-  };
+  const base = { toolCallId: call.toolCallId, targets, signals: [...findings.signals], signalReasons: findings.reasons };
+  if (toolName === 'bash') {
+    return { ...base, toolName, kind: TOOL_KIND[toolName], command: normalizeCommand(command ?? ''), ...(bash?.parts ? { parts: bash.parts } : {}) };
+  }
+  return { ...base, toolName, kind: TOOL_KIND[toolName] };
 }
 

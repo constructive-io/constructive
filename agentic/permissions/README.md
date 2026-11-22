@@ -83,6 +83,19 @@ if (decision === null) {
 const { content, details, changed } = await engine.redactResult({ toolName, content: result.content, details: result.details });
 ```
 
+### Types a host works with
+
+- `PermissionRequest` is `BashRequest | FileRequest`, told apart by `toolName`. A `BashRequest` (`toolName: 'bash'`, `kind: 'exec'`) carries `command`, its exact-grant key, and `parts`, its simple commands when it is a plain list or pipeline. A `FileRequest` (`read`, `write`, `edit`, `grep`, `find`, `ls`; `kind: 'read' | 'write'`) carries only the targets every request has. Narrow on `toolName` before reading `command` or `parts`.
+- `CommandKey` and `ListedPrefix` are branded strings inside `GrantMatch`: a `command` match holds a `CommandKey` (a command normalized as an exact-grant key) and a `command-prefix` match holds `ListedPrefix`es (prefixes on the table, written as a card writes them). Only the kit makes them: a request's `command`, a card's option (`grantFrom`), `parseCommandPattern` and `parseGrantMatch`. The brands are type-only, so a stored grant's JSON is a plain string as before.
+- A host that loads grants from disk reads each match through `parseGrantMatch` and drops the ones that come back `null`, so an edited or damaged file never reaches the engine as a grant:
+
+```ts
+const grants = stored.flatMap((g) => {
+  const match = parseGrantMatch(g.match);
+  return match ? [{ ...g, match }] : [];
+});
+```
+
 ### Engine API
 
 | Member | What it does |

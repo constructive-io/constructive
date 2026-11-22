@@ -12,7 +12,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
-import type { Access, CommandPart, Signal } from '../types';
+import type { Access, CommandKey, CommandPart, Signal } from '../types';
 import { unreachable } from '../unreachable';
 import { generic } from './args';
 import { expandWord, MAX_BRACE_NAMES, MAX_PLAIN_NAME_RESULTS, NameBudget } from './braces';
@@ -111,9 +111,9 @@ export function trimBlanks(text: string): string {
  * written: there a space or tab can be text (inside `${x/ /-}`, or split by
  * an IFS the command sets), and changing it can move where a heredoc ends.
  */
-export function normalizeCommand(command: string): string {
+export function normalizeCommand(command: string): CommandKey {
   const trimmed = trimBlanks(command);
-  return /['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
+  return (/['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ')) as CommandKey;
 }
 
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */

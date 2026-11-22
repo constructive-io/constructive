@@ -20,7 +20,7 @@ export type Access = 'read' | 'write' | 'exec';
 export type RequestKind = 'read' | 'write' | 'exec';
 
 /** What each built-in does: the request kind it makes. */
-export const TOOL_KIND: Readonly<Record<BuiltinTool, RequestKind>> = {
+export const TOOL_KIND = {
   read: 'read',
   write: 'write',
   edit: 'write',
@@ -28,7 +28,7 @@ export const TOOL_KIND: Readonly<Record<BuiltinTool, RequestKind>> = {
   grep: 'read',
   find: 'read',
   ls: 'read'
-};
+} as const satisfies Readonly<Record<BuiltinTool, RequestKind>>;
 
 export const BUILTIN_TOOLS: ReadonlySet<string> = new Set(Object.keys(TOOL_KIND));
 
@@ -109,40 +109,71 @@ export interface CommandPart {
   options: string[] | null;
 }
 
-/** One tool call, classified. */
-export interface PermissionRequest {
+interface RequestBase {
   toolCallId: string;
-  toolName: BuiltinTool;
-  kind: RequestKind;
   targets: Target[];
-  /** bash only: the command with runs of spaces and tabs made one space (the exact-grant key, see `normalizeCommand`). */
-  command?: string;
-  /**
-   * bash only: the simple commands of a plain list or pipeline, in order.
-   * Absent when the command uses other shell syntax (`if`, `for`, `{ … }`, a
-   * function, a substitution, a heredoc), changes dir (`cd`, `pushd`, `popd`)
-   * or does not parse: only an exact grant covers it.
-   */
-  parts?: CommandPart[];
   signals: Signal[];
   /** One specific sentence for each signal ("it uploads data: curl -d @.env sends a file's contents"). */
   signalReasons: Partial<Record<Signal, string>>;
 }
 
+/** A bash call, classified. */
+export interface BashRequest extends RequestBase {
+  toolName: 'bash';
+  kind: 'exec';
+  /** The command as its exact-grant key: runs of spaces and tabs made one space where that keeps its meaning. */
+  command: CommandKey;
+  /**
+   * The simple commands of a plain list or pipeline, in order. Absent when
+   * the command uses other shell syntax (`if`, `for`, `{ … }`, a function, a
+   * substitution, a heredoc), changes dir (`cd`, `pushd`, `popd`) or does not
+   * parse: only an exact grant covers it.
+   */
+  parts?: CommandPart[];
+}
+
+/** The built-in tools that work on a path: everything but `bash`. */
+export type FileTool = Exclude<BuiltinTool, 'bash'>;
+
+/** A file tool call (`read`, `write`, `edit`, `grep`, `find`, `ls`), classified: its targets are the paths it touches. */
+export interface FileRequest extends RequestBase {
+  toolName: FileTool;
+  kind: 'read' | 'write';
+}
+
+/** One tool call, classified: a bash call or a file tool call, told apart by `toolName`. */
+export type PermissionRequest = BashRequest | FileRequest;
+
 export type PermissionVerdict = 'allow' | 'ask' | 'deny';
+
+declare const commandKeyBrand: unique symbol;
+declare const listedPrefixBrand: unique symbol;
+
+/**
+ * A bash command as an exact-grant key, normalized by the kit. Only the kit
+ * makes one (a classified request's `command`, `grantFrom`,
+ * `parseCommandPattern`, `parseGrantMatch`); on disk it is a plain string.
+ */
+export type CommandKey = string & { readonly [commandKeyBrand]: true };
+
+/**
+ * A prefix on the kit's table, written as a card writes it (`git status`,
+ * `npm run test`). Only the kit makes one (a card's option,
+ * `parseCommandPattern`, `parseGrantMatch`); on disk it is a plain string.
+ */
+export type ListedPrefix = string & { readonly [listedPrefixBrand]: true };
 
 export type PathMatch = { type: 'path'; access: Access; pathPrefix: string };
 
-/** A bash command, as its exact-grant key (`normalizeCommand`). */
-export type CommandMatch = { type: 'command'; command: string };
+/** A bash command, by its exact-grant key. */
+export type CommandMatch = { type: 'command'; command: CommandKey };
 
 /**
- * Bash commands by their leading words. Each prefix is words joined by one
- * space (`git status`) and covers a part that writes no file and starts with
- * those words. A call is covered only when it raises no signal and every part
- * is covered.
+ * Bash commands by their leading words. Each prefix covers a part that
+ * writes no file and starts with those words. A call is covered only when it
+ * raises no signal and every part is covered.
  */
-export type CommandPrefixMatch = { type: 'command-prefix'; prefixes: string[] };
+export type CommandPrefixMatch = { type: 'command-prefix'; prefixes: ListedPrefix[] };
 
 /** What a grant matches. Never a tool name alone. */
 export type GrantMatch = PathMatch | CommandMatch | CommandPrefixMatch;

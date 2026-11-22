@@ -1,5 +1,5 @@
 import { type Grant, grantFrom, type PermissionMode, type PermissionVerdict, type Signal } from '../src';
-import { asAsk, makeSandbox, type Sandbox } from './sandbox';
+import { asAsk, exactGrant, makeSandbox, prefixGrant, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
 
@@ -151,8 +151,8 @@ describe('bash analysis reads a command the way bash runs it', () => {
   });
 });
 
-const prefix = (...prefixes: string[]): Grant => ({ scope: 'project', match: { type: 'command-prefix', prefixes }, createdAt: '' });
-const exact = (command: string): Grant => ({ scope: 'project', match: { type: 'command', command }, createdAt: '' });
+const prefix = prefixGrant;
+const exact = exactGrant;
 
 // The grants the audit held when each command ran without a card in Ask mode.
 // prettier-ignore

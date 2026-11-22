@@ -1,5 +1,4 @@
-import type { Grant } from '../src';
-import { asAsk, makeSandbox, type Sandbox } from './sandbox';
+import { asAsk, exactGrant, makeSandbox, prefixGrant, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
 
@@ -8,8 +7,8 @@ beforeAll(async () => {
 });
 afterAll(() => sb.cleanup());
 
-const prefix = (...prefixes: string[]): Grant => ({ scope: 'project', match: { type: 'command-prefix', prefixes }, createdAt: '' });
-const exact = (command: string): Grant => ({ scope: 'project', match: { type: 'command', command }, createdAt: '' });
+const prefix = prefixGrant;
+const exact = exactGrant;
 const projectMatch = async (command: string) => asAsk(await sb.bash(command, 'ask')).grantOptions[1].match;
 
 // Each command writes a file or runs another program through an option, and a held prefix
