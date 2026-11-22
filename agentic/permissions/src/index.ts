@@ -22,7 +22,7 @@ export {
   type ToolResultInput
 } from './engine';
 export { scrubEnv } from './env';
-export { describeGrant, grantFrom, type GrantStore, memoryGrantStore, NEVER_GRANTED, sameMatch } from './grants';
+export { describeGrant, grantFrom, type GrantStore, memoryGrantStore, NEVER_GRANTED, parseGrantMatch, sameMatch } from './grants';
 export { nodeFsProbe } from './node-fs';
 export type { PolicyRules, RuleMatch } from './policy';
 export {

@@ -91,6 +91,19 @@ function readExact(text: string): CommandPatternResult {
   return { ok: true, match: { type: 'command', command } };
 }
 
+/** `prefix` is one the table lists, written the way a card saves it. */
+export function isStoredPrefix(prefix: string): boolean {
+  const read = readPrefix(`${prefix}${PREFIX_END}`);
+  return read.ok && read.prefix === prefix;
+}
+
+/** `command` is an exact-grant key the engine could have saved: its own normalized form, within the length cap. */
+export function isExactKey(command: string): boolean {
+  if (command === '' || command.length > MAX_COMMAND_LENGTH) return false;
+  const read = readExact(command);
+  return read.ok && read.match.type === 'command' && read.match.command === command;
+}
+
 /** A pattern a person typed, read back into a command match by the rules the engine matches with. */
 export function parseCommandPattern(text: string): CommandPatternResult {
   if (text.trim() === '') return { ok: false, reason: 'Type a command, such as `pnpm test`, or a prefix, such as `git status *`.' };

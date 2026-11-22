@@ -9,7 +9,9 @@
  * command. Nothing ever matches on a tool name alone.
  */
 
-import { commandPattern } from './command-pattern';
+import * as path from 'node:path';
+
+import { commandPattern, isExactKey, isStoredPrefix } from './command-pattern';
 import { MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
 import { commonParent, contains, displayDir } from './paths';
 import { SIGNAL_RULES } from './signals';
@@ -169,6 +171,39 @@ export function grantOptionsFor(request: PermissionRequest, homeDir: string, gra
   if (request.toolName !== 'bash') return pathOptions(request, homeDir);
   if (!request.command) return [];
   return [commandOption('chat', request, grants), commandOption('project', request, grants)];
+}
+
+const ACCESSES: readonly string[] = ['read', 'write', 'exec'];
+
+/**
+ * A stored grant's match, checked by the rules the engine saves grants with:
+ * at most `MAX_PREFIXES` listed prefixes written as a card writes them, an
+ * exact command that is its own key, or a path grant on an absolute,
+ * normalized path. `null` for anything else, so a host can drop an edited or
+ * damaged grant when it loads its store instead of trusting it. Returns a
+ * clean copy without other fields.
+ */
+export function parseGrantMatch(value: unknown): GrantMatch | null {
+  if (typeof value !== 'object' || value === null) return null;
+  const v = value as Record<string, unknown>;
+  switch (v.type) {
+  case 'command':
+    return typeof v.command === 'string' && isExactKey(v.command) ? { type: 'command', command: v.command } : null;
+  case 'command-prefix': {
+    const { prefixes } = v;
+    if (!Array.isArray(prefixes) || prefixes.length === 0 || prefixes.length > MAX_PREFIXES) return null;
+    if (!prefixes.every((p): p is string => typeof p === 'string' && isStoredPrefix(p))) return null;
+    return { type: 'command-prefix', prefixes: [...new Set(prefixes)] };
+  }
+  case 'path': {
+    const { access, pathPrefix } = v;
+    if (typeof access !== 'string' || !ACCESSES.includes(access)) return null;
+    if (typeof pathPrefix !== 'string' || !path.isAbsolute(pathPrefix) || path.normalize(pathPrefix) !== pathPrefix) return null;
+    return { type: 'path', access: access as Access, pathPrefix };
+  }
+  default:
+    return null;
+  }
 }
 
 /** The grant one of an ASK's options saves. */

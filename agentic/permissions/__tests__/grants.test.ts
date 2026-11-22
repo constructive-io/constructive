@@ -1,6 +1,15 @@
 import * as path from 'node:path';
 
-import { describeGrant, type Grant, grantFrom, type GrantMatch, memoryGrantStore, type PermissionDecision, sameMatch } from '../src';
+import {
+  describeGrant,
+  type Grant,
+  grantFrom,
+  type GrantMatch,
+  memoryGrantStore,
+  parseGrantMatch,
+  type PermissionDecision,
+  sameMatch
+} from '../src';
 import { asAsk, makeSandbox, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
@@ -215,5 +224,41 @@ describe('command prefix grants', () => {
     const store = memoryGrantStore([prefixGrant('git status', 'npm run test')]);
     store.add(prefixGrant('npm run test', 'git status'));
     expect(store.grants).toHaveLength(1);
+  });
+});
+
+describe('parseGrantMatch', () => {
+  it('reads back every match a card offers', async () => {
+    const offered = await Promise.all(
+      [['read', { path: '../lib/util.ts' }], ['bash', { command: 'git status && npm run test' }], ['bash', { command: 'node -e "x"' }]].map(
+        async ([tool, input]) => projectGrant(await sb.run(tool as string, input as Record<string, unknown>, 'ask')).match
+      )
+    );
+    for (const match of offered) expect(sameMatch(parseGrantMatch(JSON.parse(JSON.stringify(match))), match)).toBe(true);
+  });
+
+  it('drops fields a match does not have', () => {
+    expect(parseGrantMatch({ type: 'command', command: 'pnpm test', extra: 1 })).toEqual({ type: 'command', command: 'pnpm test' });
+  });
+
+  // prettier-ignore
+  const invalid: [what: string, value: unknown][] = [
+    ['not an object', 'git status'],
+    ['an unknown type', { type: 'tool', name: 'bash' }],
+    ['a prefix the table does not list', { type: 'command-prefix', prefixes: ['git'] }],
+    ['a prefix with extra spacing', { type: 'command-prefix', prefixes: ['git  status'] }],
+    ['a prefix with an option', { type: 'command-prefix', prefixes: ['git -C src status'] }],
+    ['no prefixes', { type: 'command-prefix', prefixes: [] }],
+    ['six prefixes', { type: 'command-prefix', prefixes: ['ls', 'cat', 'git status', 'git log', 'npm test', 'pnpm test'] }],
+    ['a prefix that is not text', { type: 'command-prefix', prefixes: [1] }],
+    ['an exact command that is not its own key', { type: 'command', command: 'git  status' }],
+    ['an empty exact command', { type: 'command', command: '' }],
+    ['an exact command with a secret placeholder', { type: 'command', command: 'echo «secret:TOKEN#1a2b»' }],
+    ['a relative path', { type: 'path', access: 'read', pathPrefix: 'src' }],
+    ['a path that is not normalized', { type: 'path', access: 'read', pathPrefix: '/a/../b' }],
+    ['an unknown access', { type: 'path', access: 'delete', pathPrefix: '/a' }]
+  ];
+  it.each(invalid)('refuses %s', (_what, value) => {
+    expect(parseGrantMatch(value)).toBeNull();
   });
 });
