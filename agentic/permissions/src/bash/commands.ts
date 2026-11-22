@@ -8,23 +8,25 @@
 
 import * as path from 'node:path';
 
-import type { Arg } from './analyze';
+import { type Arg, literalStart } from './analyze';
 import {
   type CommandContext,
   files,
   generic,
   hiddenLeadingOption,
+  knownTexts,
   leadingOptions,
   longSpellings,
   parse,
   type Parsed,
+  pathLikeArgs,
+  textOf,
   valuesOf
 } from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
-import { isPathLike } from './words';
 
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh', 'mksh', 'fish', 'ash']);
 const AWKS = new Set(['awk', 'gawk', 'mawk', 'nawk']);
@@ -100,8 +102,8 @@ const ARITHMETIC_TESTS = new Set(['-eq', '-ne', '-lt', '-le', '-gt', '-ge']);
  */
 function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const close = name === '[' ? ']' : name === '[[' ? ']]' : null;
-  const operands = close && rest[rest.length - 1]?.text === close ? rest.slice(0, -1) : rest;
-  const evaluates = operands.some((a) => a.text === '-v' || (name === '[[' && ARITHMETIC_TESTS.has(a.text)));
+  const operands = close && textOf(rest[rest.length - 1]) === close ? rest.slice(0, -1) : rest;
+  const evaluates = operands.some((a) => textOf(a) === '-v' || (name === '[[' && ARITHMETIC_TESTS.has(textOf(a) ?? '')));
   if (evaluates) ctx.analyzer.dynamic(`it runs ${name} with an operator that evaluates expressions`);
   generic(ctx, operands);
 }
@@ -127,7 +129,7 @@ function namedVariables(name: string, rest: readonly Arg[]): Arg[] {
  */
 function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void {
   const { analyzer } = ctx;
-  if (variable.unknown) return analyzer.dynamic(`it runs ${builtin} on a variable name from a variable or substitution`);
+  if (variable.kind === 'unknown') return analyzer.dynamic(`it runs ${builtin} on a variable name from a variable or substitution`);
   if (variable.text.includes('[')) return analyzer.dynamic(`it runs ${builtin} on an array element, whose subscript runs as code`);
   if (builtin !== 'unset') analyzer.assign(variable.text, null);
 }
@@ -144,21 +146,21 @@ const isOddShellOption = (text: string): boolean => /^[-+][^-]/.test(text) && !/
 function shell(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   // `+x`, `+o name`: the same options, turned off.
-  const words = rest.map((a) => (/^\+[a-zA-Z]/.test(a.text) ? { ...a, text: `-${a.text.slice(1)}` } : a));
+  const words = rest.map((a) => (a.kind === 'known' && /^\+[a-zA-Z]/.test(a.text) ? { ...a, text: `-${a.text.slice(1)}` } : a));
   const { options, next } = leadingOptions(words, SHELL_VALUE_OPTIONS);
-  const odd = rest.slice(0, next).find((a) => isOddShellOption(a.text));
+  const odd = rest.slice(0, next).find((a) => isOddShellOption(literalStart(a)));
   if (odd) analyzer.dynamic(`it passes ${name} an option it cannot read: ${odd.raw}`);
   for (const { key, value } of options) if (value && SHELL_LOADS.has(key)) analyzer.operand(value);
 
   const inline = options.find((o) => SHELL_INLINE.has(o.key));
   const script = inline ? inline.value : options.some((o) => o.key === '-c') ? (rest[next] ?? null) : undefined;
   if (script !== undefined) {
-    if (!script || script.unknown) analyzer.dynamic(`it runs ${name} -c with a string from a variable`);
+    if (!script || script.kind === 'unknown') analyzer.dynamic(`it runs ${name} -c with a string from a variable`);
     else analyzer.nested(script.text, `it runs a shell string with ${name} -c`);
     return;
   }
   const file = rest[next];
-  if (file && file.text !== '-') {
+  if (file && textOf(file) !== '-') {
     analyzer.addPath(file, 'read', true);
     generic(ctx, rest.slice(next + 1));
   } else if (ctx.stdinFed) {
@@ -223,12 +225,12 @@ function interpret(name: string, spec: Interpreter, ctx: CommandContext, rest: r
     if (spec.inline.has(key)) return analyzer.dynamic(`it runs inline code with ${name} ${key}`);
     if (value && spec.loads?.has(key)) analyzer.operand(value);
     if (key === spec.module) {
-      if (value && !value.unknown) spec.moduleServer?.(ctx, value.text, rest.slice(next));
+      if (value?.kind === 'known') spec.moduleServer?.(ctx, value.text, rest.slice(next));
       return generic(ctx, rest.slice(next));
     }
   }
   const script = rest[next];
-  if (script && script.text !== '-') {
+  if (script && textOf(script) !== '-') {
     analyzer.addPath(script, 'read', true);
     generic(ctx, rest.slice(next + 1));
   } else if (ctx.stdinFed) {
@@ -251,7 +253,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   if (GREPS.has(name)) return grep(ctx, rest);
   if (NETWORK_SHELLS.has(name)) {
     analyzer.flag('upload', `it uploads data: ${name} opens a raw network connection`);
-    return generic(ctx, rest.filter((a) => isPathLike(a.text)));
+    return generic(ctx, pathLikeArgs(rest));
   }
   if (TUNNELS.has(name)) return tunnel(name, ctx, rest);
   if (PERSISTENCE.has(name)) return persistence(name, ctx, rest);
@@ -264,7 +266,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   const readerValues = READERS.get(name);
   if (readerValues) {
     const p = parse(rest, readerValues);
-    for (const v of p.positionals) if (v.unknown) analyzer.addPath(v, 'read', true);
+    for (const v of p.positionals) if (v.kind === 'unknown') analyzer.addPath(v, 'read', true);
     files(ctx, readerOutputs(name, p), 'write');
     return generic(ctx, rest);
   }
@@ -279,7 +281,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     const target = parse(rest).positionals[0];
     if (!target) {
       analyzer.moveTo({ kind: 'moved', dir: path.resolve(analyzer.ctx.homeDir) });
-    } else if (target.unknown || /^[-+]\d*$/.test(target.text) || analyzer.searchesCdPath(target.text)) {
+    } else if (target.kind === 'unknown' || /^[-+]\d*$/.test(target.text) || analyzer.searchesCdPath(target.text)) {
       // `cd -`, `pushd +1` and a `CDPATH` lookup go to a dir the text does not name.
       analyzer.moveTo({ kind: 'unknown' });
     } else {
@@ -296,20 +298,25 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'local':
   case 'readonly':
   case 'typeset':
-    if (rest.some((a) => /^-[A-Za-z]*i/.test(a.text))) analyzer.dynamic(`it runs ${name} -i, which reads every value it assigns as arithmetic`);
+    if (rest.some((a) => /^-[A-Za-z]*i/.test(literalStart(a)))) analyzer.dynamic(`it runs ${name} -i, which reads every value it assigns as arithmetic`);
     // `export -n` takes the export flag off; only declare, local and typeset make a reference.
-    if (name !== 'export' && name !== 'readonly' && rest.some((a) => /^-[A-Za-z]*n/.test(a.text))) {
+    if (name !== 'export' && name !== 'readonly' && rest.some((a) => /^-[A-Za-z]*n/.test(literalStart(a)))) {
       analyzer.dynamic(`it runs ${name} -n, which makes a name reference whose target is read as a subscript that can run code`);
     }
     for (const arg of rest) {
-      if (/^[^=-][^=]*\[/.test(arg.text)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
-      const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(arg.text);
-      if (m) analyzer.assign(m[1], arg.unknown ? null : m[2]);
+      const start = literalStart(arg);
+      if (/^[^=-][^=]*\[/.test(start)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
+      if (arg.kind === 'unknown' && !/^[A-Za-z_]/.test(start) && arg.raw.includes('=')) analyzer.assignUnknownName(arg.raw);
+      const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(start);
+      if (m) analyzer.assign(m[1], arg.kind === 'known' ? m[2] : null);
     }
     return;
   case 'eval':
-    if (rest.some((a) => a.unknown)) analyzer.dynamic('it runs eval on a value from a variable');
-    else analyzer.nested(rest.map((a) => a.text).join(' '), 'it runs a string with eval');
+    {
+      const words = knownTexts(rest);
+      if (words === null) analyzer.dynamic('it runs eval on a value from a variable');
+      else analyzer.nested(words.join(' '), 'it runs a string with eval');
+    }
     return;
   case 'source':
   case '.':
@@ -317,7 +324,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     if (rest[0]) analyzer.addPath(rest[0], 'read', true);
     return;
   case 'deno':
-    if (rest[0]?.text === 'eval') return analyzer.dynamic('it runs inline code with deno eval');
+    if (textOf(rest[0]) === 'eval') return analyzer.dynamic('it runs inline code with deno eval');
     return generic(ctx, rest);
   case 'bun':
     if (leadingOptions(rest, NODE.inline).options.some((o) => NODE.inline.has(o.key))) {
@@ -336,7 +343,11 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'security':
     return security(ctx, rest);
   case 'busybox':
-    if (rest[0]?.text === 'httpd') return busyboxServer(ctx, rest.slice(1));
+    if (textOf(rest[0]) === 'httpd') return busyboxServer(ctx, rest.slice(1));
+    if (rest[0]?.kind === 'unknown') {
+      analyzer.dynamic(`it runs busybox ${rest[0].raw}, an applet from a variable`);
+      return generic(ctx, rest.slice(1));
+    }
     if (rest[0]) return runCommand(path.basename(rest[0].text), rest.slice(1), ctx);
     return;
   case 'find':
@@ -375,7 +386,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'dd':
     return dd(ctx, rest);
   case 'diskutil':
-    if (rest.some((a) => /^(erase|zero|partition|secureErase|reformat)/i.test(a.text))) {
+    if (rest.some((a) => a.kind === 'unknown' || /^(erase|zero|partition|secureErase|reformat)/i.test(a.text))) {
       analyzer.flag('destructive', 'it runs diskutil to erase or partition a disk');
     }
     return;

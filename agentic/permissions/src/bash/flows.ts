@@ -6,8 +6,8 @@
  */
 
 import { unreachable } from '../unreachable';
-import type { Analyzer, Arg, Run } from './analyze';
-import { literalArg } from './args';
+import { type Analyzer, type Arg, literalStart, type Run } from './analyze';
+import { isKnown, knownTexts, literalArg, textOf } from './args';
 import { findRoots } from './file-commands';
 import { heredocsOf, hereStringsOf, type SimpleCommand } from './tokenize';
 
@@ -112,7 +112,7 @@ const NO_CONTENT = new Set([
 
 /** `head -c`, `grep -o`, `rg -r`: a verbatim reader that cuts values apart. */
 function trims(name: string, rest: readonly Arg[]): boolean {
-  const flags = rest.map((a) => a.text).filter((t) => t.startsWith('-'));
+  const flags = rest.map(literalStart).filter((t) => t.startsWith('-'));
   if (name === 'head' || name === 'tail') return flags.some((t) => /^(-c|--bytes)/.test(t));
   if (name === 'rg' && flags.some((t) => /^(-r|--replace)/.test(t))) return true;
   return flags.some((t) => t === '--only-matching' || /^-[a-zA-Z]*o[a-zA-Z]*$/.test(t));
@@ -126,9 +126,10 @@ export function keepsContent(name: string, rest: readonly Arg[]): boolean {
 
 /** Split words the way `xargs` does (on whitespace). `null` when one is not known. */
 function splitWords(args: readonly Arg[]): Arg[] | null {
-  if (args.some((a) => a.unknown)) return null;
-  return args.flatMap((a) =>
-    a.text
+  const texts = knownTexts(args);
+  if (texts === null) return null;
+  return args.flatMap((a, k) =>
+    texts[k]
       .split(/\s+/)
       .filter(Boolean)
       .map((text) => literalArg(text, a.raw))
@@ -137,9 +138,9 @@ function splitWords(args: readonly Arg[]): Arg[] | null {
 
 /** The words `echo` or `printf` prints; `null` when one is not known. */
 function printedWords(name: string, rest: readonly Arg[]): Arg[] | null {
-  if (name === 'printf') return rest[0]?.text === '-v' ? [] : splitWords(rest);
+  if (name === 'printf') return textOf(rest[0]) === '-v' ? [] : splitWords(rest);
   let k = 0;
-  while (k < rest.length && /^-[neE]+$/.test(rest[k].text)) k++;
+  while (k < rest.length && /^-[neE]+$/.test(textOf(rest[k]) ?? '')) k++;
   return splitWords(rest.slice(k));
 }
 
@@ -149,7 +150,7 @@ function printedWords(name: string, rest: readonly Arg[]): Arg[] | null {
  * that follows symlinks (`-L`), whose names can leave its roots.
  */
 function listedRoots(name: string, rest: readonly Arg[]): Arg[] | null {
-  if (rest.some((a) => a.unknown)) return null;
+  if (!rest.every(isKnown)) return null;
   if (name === 'find') {
     if (rest.some((a) => a.text === '-L' || a.text === '-follow')) return null;
     return findRoots(rest).roots;
@@ -188,7 +189,7 @@ export class FlowTracker {
       if (r.kind !== 'file' || r.op !== '<') continue;
       words = null;
       for (const t of analyzer.resolveWord(r.target)) {
-        const abs = t.unknown ? null : analyzer.toAbs(t.text);
+        const abs = t.kind === 'unknown' ? null : analyzer.toAbs(t.text);
         if (abs) sources.push({ raw: t.raw, abs });
       }
     }

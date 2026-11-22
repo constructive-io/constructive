@@ -4,9 +4,9 @@
  * the network, and raw network tools.
  */
 
-import type { Arg } from './analyze';
-import { type CommandContext, generic, has, parse, valuesOf } from './args';
-import { isLoopbackHost, isPathLike, isRemoteSpec, isUrl } from './words';
+import { type Arg, literalStart } from './analyze';
+import { type CommandContext, firstOperand, generic, has, looksLikePath, parse, pathLikeArgs, restOf, textOf, valuesOf } from './args';
+import { isLoopbackHost, isRemoteSpec, isUrl } from './words';
 
 const CURL_WITH_VALUE = new Set([
   '-d',
@@ -80,55 +80,65 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
   for (const key of ['-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--json']) {
     for (const v of p.values.get(key) ?? []) {
       dataForms = true;
-      if (v.unknown) say(`curl ${key} with a value from a variable or substitution`);
-      if (v.text.startsWith('@')) {
-        say(`curl ${key} ${v.text} sends a file's contents`);
-        if (v.text !== '@-') analyzer.addPath({ ...v, text: v.text.slice(1) }, 'read', true);
+      if (v.kind === 'unknown') say(`curl ${key} with a value from a variable or substitution`);
+      if (literalStart(v).startsWith('@')) {
+        say(`curl ${key} ${v.raw} sends a file's contents`);
+        if (textOf(v) !== '@-') analyzer.addPath(restOf(v, 1), 'read', true);
       }
     }
   }
   for (const v of p.values.get('--data-urlencode') ?? []) {
     dataForms = true;
-    const at = v.text.indexOf('@');
+    const at = literalStart(v).indexOf('@');
     if (at >= 0) {
-      say(`curl --data-urlencode ${v.text} sends a file's contents`);
-      const file = v.text.slice(at + 1);
-      if (file !== '-') analyzer.addPath({ ...v, text: file }, 'read', true);
+      say(`curl --data-urlencode ${v.raw} sends a file's contents`);
+      const file = restOf(v, at + 1);
+      if (textOf(file) !== '-') analyzer.addPath(file, 'read', true);
+    } else if (v.kind === 'unknown') {
+      say('curl --data-urlencode with a value from a variable or substitution, which may name a file');
     }
   }
   for (const v of valuesOf(p, '-F', '--form')) {
     dataForms = true;
-    const m = /=([@<])([^;]*)/.exec(v.text);
+    const m = /=([@<])([^;]*)/.exec(literalStart(v));
     if (m) {
-      say(`curl -F ${v.text} sends a file`);
-      if (m[2] !== '-') analyzer.addPath({ ...v, text: m[2] }, 'read', true);
+      say(`curl -F ${v.raw} sends a file`);
+      if (m[2] !== '-') analyzer.addPath(restOf(v, m.index + 2), 'read', true);
+    } else if (v.kind === 'unknown') {
+      say('curl -F with a value from a variable or substitution, which may name a file');
     }
   }
   for (const v of valuesOf(p, '-T', '--upload-file')) {
     dataForms = true;
-    say(`curl -T ${v.text} uploads a file`);
-    if (v.text !== '-' && v.text !== '.') analyzer.addPath(v, 'read', true);
+    say(`curl -T ${v.raw} uploads a file`);
+    if (textOf(v) !== '-' && textOf(v) !== '.') analyzer.addPath(v, 'read', true);
   }
   for (const v of valuesOf(p, '-H', '--header')) {
-    if (v.text.startsWith('@')) {
-      say(`curl -H ${v.text} sends headers from a file`);
-      analyzer.addPath({ ...v, text: v.text.slice(1) }, 'read', true);
+    const start = literalStart(v);
+    if (start.startsWith('@')) {
+      say(`curl -H ${v.raw} sends headers from a file`);
+      analyzer.addPath(restOf(v, 1), 'read', true);
+    } else if (start === '') {
+      say('curl -H with a value from a variable or substitution, which may name a file');
     }
   }
   for (const v of valuesOf(p, '-K', '--config')) {
-    analyzer.dynamic(`curl ${v.text === '-' ? 'reads its options from stdin' : `reads its options from ${v.raw}`}`);
-    if (v.text !== '-') analyzer.addPath(v, 'read', true);
+    analyzer.dynamic(`curl ${textOf(v) === '-' ? 'reads its options from stdin' : `reads its options from ${v.raw}`}`);
+    if (textOf(v) !== '-') analyzer.addPath(v, 'read', true);
   }
   for (const v of valuesOf(p, '-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header')) {
-    if (v.text !== '-') analyzer.addPath(v, 'write', true);
+    if (textOf(v) !== '-') analyzer.addPath(v, 'write', true);
   }
   for (const v of valuesOf(p, '--output-dir')) analyzer.addPath(v, 'write', true);
   for (const v of valuesOf(p, '-E', '--cert', '--key', '--cacert', '-b', '--cookie')) {
-    if (isPathLike(v.text)) analyzer.addPath(v, 'read', true);
+    if (looksLikePath(v)) analyzer.addPath(v, 'read', true);
   }
   const urls = [...p.positionals, ...valuesOf(p, '--url')];
-  for (const u of p.positionals) if (!isUrl(u.text) && isPathLike(u.text) && !/^[\w.-]+:\d/.test(u.text)) analyzer.operand(u);
-  const remote = urls.length === 0 || urls.some((u) => u.unknown || !isLocalUrl(u.text));
+  for (const u of p.positionals) {
+    const start = literalStart(u);
+    if (!isUrl(start) && looksLikePath(u) && !/^[\w.-]+:\d/.test(start)) analyzer.operand(u);
+  }
+  const remote = urls.length === 0 || urls.some((u) => u.kind === 'unknown' || !isLocalUrl(u.text));
   if (ctx.stdinFed && dataForms) say('curl sends data it reads from stdin');
   else if (ctx.stdinFed && remote) say('curl gets piped input and talks to a remote host');
 }
@@ -146,14 +156,14 @@ export function wget(ctx: CommandContext, rest: readonly Arg[]): void {
   // Like curl -d: a body built from a variable may carry anything.
   for (const key of ['--post-data', '--body-data']) {
     for (const v of p.values.get(key) ?? []) {
-      if (v.unknown) analyzer.flag('upload', `it uploads data: wget ${key} with a value from a variable or substitution`);
+      if (v.kind === 'unknown') analyzer.flag('upload', `it uploads data: wget ${key} with a value from a variable or substitution`);
     }
   }
   for (const v of valuesOf(p, '-O', '--output-document', '-o', '-a', '-P')) {
-    if (v.text !== '-') analyzer.addPath(v, 'write', true);
+    if (textOf(v) !== '-') analyzer.addPath(v, 'write', true);
   }
-  for (const v of valuesOf(p, '-i', '--input-file')) if (v.text !== '-') analyzer.addPath(v, 'read', true);
-  const remote = p.positionals.length === 0 || p.positionals.some((u) => u.unknown || !isLocalUrl(u.text));
+  for (const v of valuesOf(p, '-i', '--input-file')) if (textOf(v) !== '-') analyzer.addPath(v, 'read', true);
+  const remote = p.positionals.length === 0 || p.positionals.some((u) => u.kind === 'unknown' || !isLocalUrl(u.text));
   if (ctx.stdinFed && remote) analyzer.flag('upload', 'it uploads data: wget gets piped input and talks to a remote host');
 }
 
@@ -165,19 +175,19 @@ export function remoteCopy(name: string, ctx: CommandContext, rest: readonly Arg
       : new Set(['-e', '--rsh', '--exclude', '--include', '--exclude-from', '--include-from', '--files-from', '-f', '--filter']);
   const p = parse(rest, withValue);
   for (const v of valuesOf(p, '-i', '-F', '--exclude-from', '--include-from', '--files-from')) {
-    if (v.text === '-') analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
+    if (textOf(v) === '-') analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
     else analyzer.addPath(v, 'read', true);
   }
   const ops = p.positionals;
   if (ops.length === 0) return;
   const dest = ops[ops.length - 1];
   const sources = ops.slice(0, -1);
-  if (isRemoteSpec(dest.text) || dest.unknown) {
+  if (dest.kind === 'unknown' || isRemoteSpec(dest.text)) {
     analyzer.flag('upload', `it uploads data: ${name} copies to the remote ${dest.raw}`);
   } else {
     analyzer.addPath(dest, 'write', true);
   }
-  for (const s of sources) if (!isRemoteSpec(s.text)) analyzer.addPath(s, 'read', true);
+  for (const s of sources) if (s.kind === 'unknown' || !isRemoteSpec(s.text)) analyzer.addPath(s, 'read', true);
 }
 
 export function ssh(ctx: CommandContext, rest: readonly Arg[]): void {
@@ -197,14 +207,14 @@ export const TUNNELS = new Set(['ngrok', 'cloudflared', 'localtunnel', 'lt']);
 
 export function tunnel(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   expose(ctx, `${name} opens a public tunnel to a local port`);
-  generic(ctx, rest.filter((a) => isPathLike(a.text)));
+  generic(ctx, pathLikeArgs(rest));
 }
 
 /** The value of one option, as `-b X`, `-bX`, `--bind X` or `--bind=X`. */
 function optionValue(rest: readonly Arg[], short: string | null, long: string | null): string | undefined {
   for (let k = 0; k < rest.length; k++) {
-    const t = rest[k].text;
-    if (t === short || t === long) return rest[k + 1]?.text ?? '';
+    const t = textOf(rest[k]) ?? '';
+    if (t === short || t === long) return textOf(rest[k + 1]) ?? '';
     if (long && t.startsWith(`${long}=`)) return t.slice(long.length + 1);
     if (short && t.startsWith(short) && t.length > short.length && !t.startsWith('--')) return t.slice(short.length);
   }
@@ -239,8 +249,8 @@ export function phpServer(ctx: CommandContext, rest: readonly Arg[]): void {
 
 /** `ruby -run -e httpd`. */
 export function rubyServer(ctx: CommandContext, rest: readonly Arg[]): void {
-  const un = rest.some((a, k) => a.text === '-run' || (a.text === '-r' && rest[k + 1]?.text === 'un'));
-  if (un && rest.some((a) => a.text === 'httpd')) serves(ctx, 'ruby -run -e httpd', optionValue(rest, null, '--bind-address'));
+  const un = rest.some((a, k) => textOf(a) === '-run' || (textOf(a) === '-r' && textOf(rest[k + 1]) === 'un'));
+  if (un && rest.some((a) => textOf(a) === 'httpd')) serves(ctx, 'ruby -run -e httpd', optionValue(rest, null, '--bind-address'));
 }
 
 /** `busybox httpd -p [ip:]port`. */
@@ -265,5 +275,7 @@ const PUBLISH = new Map([
 /** `npm publish`, `docker push`, …: an upload. */
 export function publishes(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const sub = PUBLISH.get(name);
-  if (sub && rest.some((a) => a.text === sub)) ctx.analyzer.flag('upload', `it uploads data: ${name} ${sub} sends it to a registry`);
+  if (!sub) return;
+  if (rest.some((a) => textOf(a) === sub)) ctx.analyzer.flag('upload', `it uploads data: ${name} ${sub} sends it to a registry`);
+  else if (firstOperand(rest)?.kind === 'unknown') ctx.analyzer.flag('upload', `it uploads data: ${name} takes its subcommand from a variable, which may be ${sub}`);
 }

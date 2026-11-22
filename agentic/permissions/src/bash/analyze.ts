@@ -24,13 +24,26 @@ import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
 
 /** One argument after the expansions the analyzer can do. */
-export interface Arg {
+/** One argument after the expansions the analyzer can do: its whole text, or only the literal start of it. */
+export type Arg = KnownArg | UnknownArg;
+
+export interface KnownArg {
+  kind: 'known';
   text: string;
   raw: string;
-  /** Part of the value is not known statically (`$VAR`, `$(…)`). */
-  unknown: boolean;
   /** Has an unquoted `*`, `?` or `[`. */
   glob: boolean;
+}
+
+/**
+ * Part of the value is not known statically (`$VAR`, `$(…)`), so nothing may
+ * read it as text: only `knownPrefix`, the literal text before the first
+ * unknown part, is certain (`src/` in `src/$X`, empty in `$_`).
+ */
+export interface UnknownArg {
+  kind: 'unknown';
+  knownPrefix: string;
+  raw: string;
 }
 
 export interface BashPath {
@@ -105,6 +118,14 @@ export function normalizeCommand(command: string): string {
 
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
 export type Cwd = { kind: 'start' } | { kind: 'moved'; dir: string } | { kind: 'unknown' };
+
+/** Stands for the first unknown part of a word while braces expand, so each result keeps its literal start. */
+const UNKNOWN_MARK = '\u0000';
+
+/** The text an argument certainly starts with: all of it when known, its literal start otherwise. */
+export function literalStart(arg: Arg): string {
+  return arg.kind === 'known' ? arg.text : arg.knownPrefix;
+}
 
 /** Whether IFS may differ from bash's default (space, tab, newline). */
 type IfsState = 'default' | 'maybe-changed';
@@ -346,6 +367,12 @@ class Analyzer {
     }
   }
 
+  /** `export $N=x`: an assignment whose name the analysis cannot know may set PATH, IFS or anything else. */
+  assignUnknownName(raw: string): void {
+    this.ifs = 'maybe-changed';
+    this.dynamic(`it sets a variable whose name comes from ${raw}, which may change what runs`);
+  }
+
   assign(name: string, value: string | null): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     if (DANGEROUS_VARS.test(name)) this.dynamic(`it sets ${name}, which changes what runs`);
@@ -383,17 +410,21 @@ class Analyzer {
       text += value;
       for (let k = 0; k < value.length; k++) mask.push(expandable);
     };
+    const markUnknown = () => {
+      if (!unknown) append(UNKNOWN_MARK, false);
+      unknown = true;
+    };
     for (const part of word.parts) {
       if (part.kind === 'lit') append(part.text, !part.quoted);
       else if (part.kind === 'tilde') append(path.resolve(this.ctx.homeDir), false);
       else if (part.kind === 'unknown') {
-        unknown = true;
+        markUnknown();
         if (part.ref) this.noteRef(part.ref);
       } else {
         this.noteRef(part.name);
         // An IFS the command sets splits an unquoted expansion where this analysis does not follow it.
         const value = !part.quoted && this.ifsMaySplit() ? null : this.valueOf(part.name, part.fallback);
-        if (value === null) unknown = true;
+        if (value === null) markUnknown();
         else append(value, false);
       }
     }
@@ -412,12 +443,16 @@ class Analyzer {
       return unreachable(cut);
     }
     const braced = text[0] === '{' && mask[0];
-    return expanded.map((e) => {
+    return expanded.map((e): Arg => {
       const result = braced ? this.alternativeTilde(e) : e;
+      if (unknown) {
+        const cut = result.text.indexOf(UNKNOWN_MARK);
+        return { kind: 'unknown', knownPrefix: cut < 0 ? result.text : result.text.slice(0, cut), raw: word.raw };
+      }
       return {
+        kind: 'known',
         text: result.text,
         raw: word.raw,
-        unknown,
         glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
       };
     });
@@ -455,7 +490,7 @@ class Analyzer {
 
   /** Record a path the command touches. `quiet`: the program loads it without printing it. */
   addPath(arg: Arg, access: Access, hard: boolean, quiet = false): void {
-    if (arg.unknown) {
+    if (arg.kind === 'unknown') {
       if (hard) this.unresolvable(`the path ${arg.raw} is built from a variable or substitution`);
       return;
     }
@@ -468,7 +503,7 @@ class Analyzer {
     if (isHarmlessDevice(abs)) return;
     if (arg.glob) {
       const components = arg.text.split('/');
-      const firstGlob = components.findIndex((c) => /[*?[]/.test(c));
+      const firstGlob = components.findIndex((c: string) => /[*?[]/.test(c));
       if (components.slice(firstGlob).includes('..')) {
         this.dynamic(`the glob ${arg.raw} climbs out with ..`);
         return;
@@ -478,7 +513,7 @@ class Analyzer {
   }
 
   destroy(arg: Arg | null, what: string, rootCounts = false): void {
-    if (arg === null || arg.unknown) {
+    if (arg === null || arg.kind === 'unknown') {
       this.flag('destructive', `it runs ${what} on paths that are not known until it runs`);
       return;
     }
@@ -502,7 +537,7 @@ class Analyzer {
       if (r.kind !== 'file') continue;
       const access: Access = r.op === '<' ? 'read' : 'write';
       for (const target of this.resolveWord(r.target)) {
-        if (target.unknown) {
+        if (target.kind === 'unknown') {
           this.unresolvable(`it redirects to ${target.raw}, a path from a variable or substitution`);
           continue;
         }
@@ -535,13 +570,13 @@ class Analyzer {
     let i = 0;
     while (i < args.length) {
       const arg = args[i];
-      const assignment = /^([A-Za-z_][A-Za-z0-9_]*)\+?=(.*)$/s.exec(arg.text);
+      const assignment = /^([A-Za-z_][A-Za-z0-9_]*)\+?=(.*)$/s.exec(literalStart(arg));
       if (assignment && /^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(arg.raw)) {
-        this.assign(assignment[1], arg.unknown ? null : assignment[2]);
+        this.assign(assignment[1], arg.kind === 'known' ? assignment[2] : null);
         i++;
         continue;
       }
-      if (arg.raw === arg.text && SHELL_KEYWORDS.has(arg.text)) {
+      if (arg.kind === 'known' && arg.raw === arg.text && SHELL_KEYWORDS.has(arg.text)) {
         i++;
         continue;
       }
@@ -562,9 +597,8 @@ class Analyzer {
     if (i >= args.length) return null;
 
     const argv0 = args[i];
-    const unknownProgram = argv0.unknown || (argv0.glob && !TESTS.has(argv0.text));
-    if (unknownProgram) {
-      this.dynamic(`the command name ${argv0.raw} ${argv0.unknown ? 'comes from a variable or substitution' : 'is a glob'}`);
+    if (argv0.kind === 'unknown' || (argv0.glob && !TESTS.has(argv0.text))) {
+      this.dynamic(`the command name ${argv0.raw} ${argv0.kind === 'unknown' ? 'comes from a variable or substitution' : 'is a glob'}`);
       // Whatever it turns out to be, its operands are files it may touch.
       generic({ analyzer: this, stdinFed, xargs: scope.xargs !== null }, args.slice(i + 1));
       return null;
@@ -582,8 +616,9 @@ class Analyzer {
 
   /** A bare operand: a hard path when it looks like one, a soft one otherwise. URLs are skipped. */
   operand(arg: Arg, access: Access = 'read'): void {
-    if (isUrl(arg.text)) return;
-    const hard = isPathLike(arg.text) || isPathLike(arg.raw) || /^file:\/\//i.test(arg.text);
+    const start = literalStart(arg);
+    if (isUrl(start)) return;
+    const hard = isPathLike(start) || isPathLike(arg.raw) || /^file:\/\//i.test(start);
     this.addPath(arg, access, hard);
   }
 }

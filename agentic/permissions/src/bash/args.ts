@@ -1,7 +1,7 @@
 /** Option parsing and the generic operand rule, shared by the command rules. */
 
 import type { Access } from '../types';
-import type { Analyzer, Arg } from './analyze';
+import { type Analyzer, type Arg, type KnownArg, literalStart } from './analyze';
 import { isPathLike, isUrl } from './words';
 
 export interface CommandContext {
@@ -13,8 +13,46 @@ export interface CommandContext {
 }
 
 /** An argument the analyzer made up itself (`.` for a default root): fully known, no glob. */
-export function literalArg(text: string, raw: string = text): Arg {
-  return { text, raw, unknown: false, glob: false };
+export function literalArg(text: string, raw: string = text): KnownArg {
+  return { kind: 'known', text, raw, glob: false };
+}
+
+/** The argument may name a path: its literal start, or for an unknown one its spelling, looks like one. */
+export function looksLikePath(arg: Arg): boolean {
+  return isPathLike(literalStart(arg)) || (arg.kind === 'unknown' && isPathLike(arg.raw));
+}
+
+export function pathLikeArgs(rest: readonly Arg[]): Arg[] {
+  return rest.filter(looksLikePath);
+}
+
+/** The first word that is not an option: a subcommand or action, known or not. */
+export function firstOperand(rest: readonly Arg[]): Arg | undefined {
+  return rest.find((a) => !literalStart(a).startsWith('-'));
+}
+
+/** The texts of `args` when every one is known, or `null` (a shell string built from them cannot be read). */
+export function knownTexts(args: readonly Arg[]): string[] | null {
+  const texts: string[] = [];
+  for (const arg of args) {
+    if (arg.kind === 'unknown') return null;
+    texts.push(arg.text);
+  }
+  return texts;
+}
+
+export function isKnown(arg: Arg): arg is KnownArg {
+  return arg.kind === 'known';
+}
+
+/** The text of a known argument, or `undefined` for an unknown or missing one. */
+export function textOf(arg: Arg | undefined): string | undefined {
+  return arg?.kind === 'known' ? arg.text : undefined;
+}
+
+/** The rest of `arg` from `from` on, as an argument of its own (`x` out of `--opt=x`); `from` indexes its literal start. */
+export function restOf(arg: Arg, from: number): Arg {
+  return arg.kind === 'known' ? { ...arg, text: arg.text.slice(from) } : { ...arg, knownPrefix: arg.knownPrefix.slice(from) };
 }
 
 export interface Parsed {
@@ -38,8 +76,8 @@ export function parse(rest: readonly Arg[], withValue: ReadonlySet<string> = new
   };
   for (let k = 0; k < rest.length; k++) {
     const arg = rest[k];
-    const t = arg.text;
-    if (t === '--') {
+    const t = literalStart(arg);
+    if (arg.kind === 'known' && t === '--') {
       for (const arg of rest.slice(k + 1)) positionals.push(arg);
       break;
     }
@@ -47,11 +85,11 @@ export function parse(rest: readonly Arg[], withValue: ReadonlySet<string> = new
       const eq = t.indexOf('=');
       const key = eq < 0 ? t : t.slice(0, eq);
       flags.add(key);
-      if (eq >= 0) put(key, { ...arg, text: t.slice(eq + 1) });
+      if (eq >= 0) put(key, restOf(arg, eq + 1));
       else if (withValue.has(key)) put(key, rest[++k]);
       continue;
     }
-    if (t.startsWith('-') && t.length > 1 && !arg.unknown) {
+    if (arg.kind === 'known' && t.startsWith('-') && t.length > 1) {
       for (let c = 1; c < t.length; c++) {
         const key = `-${t[c]}`;
         flags.add(key);
@@ -91,13 +129,14 @@ export function leadingOptions(
   let k = 0;
   for (; k < rest.length; k++) {
     const arg = rest[k];
+    if (arg.kind === 'unknown') break;
     const t = arg.text;
     if (t === '--') return { options, next: k + 1 };
-    if (arg.unknown || !t.startsWith('-') || t === '-') break;
+    if (!t.startsWith('-') || t === '-') break;
     if (t.startsWith('--')) {
       const eq = t.indexOf('=');
       const key = eq < 0 ? t : t.slice(0, eq);
-      if (eq >= 0) options.push({ key, value: { ...arg, text: t.slice(eq + 1) } });
+      if (eq >= 0) options.push({ key, value: restOf(arg, eq + 1) });
       else options.push(withValue.has(key) ? { key, value: rest[++k] } : { key });
     } else {
       for (let c = 1; c < t.length; c++) {
@@ -133,14 +172,15 @@ export function optionMatches(option: string, denied: string): boolean {
 
 /** An argument whose value is not known and does not start with a literal, so it may be an option. */
 export function mayBeOption(arg: Arg): boolean {
-  return arg.unknown && !/^[\w./]/.test(arg.raw);
+  return arg.kind === 'unknown' && !/^[\w./]/.test(arg.raw);
 }
 
 /** The first argument before the operands that may be an option the analysis cannot read, or `undefined`. */
 export function hiddenLeadingOption(rest: readonly Arg[]): Arg | undefined {
   for (const arg of rest) {
     if (mayBeOption(arg)) return arg;
-    if (arg.text === '--' || !/^[-+]/.test(arg.text)) return undefined;
+    const t = literalStart(arg);
+    if ((arg.kind === 'known' && t === '--') || !/^[-+]/.test(t)) return undefined;
   }
   return undefined;
 }
@@ -157,8 +197,8 @@ export function generic(ctx: CommandContext, rest: readonly Arg[]): void {
   let afterDashes = false;
   for (let k = 0; k < rest.length; k++) {
     const arg = rest[k];
-    const t = arg.text;
-    if (t === '--') {
+    const t = literalStart(arg);
+    if (arg.kind === 'known' && t === '--') {
       afterDashes = true;
       continue;
     }
@@ -166,22 +206,26 @@ export function generic(ctx: CommandContext, rest: readonly Arg[]): void {
       const eq = t.indexOf('=');
       const key = eq < 0 ? t : t.slice(0, eq);
       const quiet = ENV_FILE_OPTIONS.has(key);
-      if (eq > 0 && (quiet || isPathLike(t.slice(eq + 1)))) {
-        analyzer.addPath({ ...arg, text: t.slice(eq + 1) }, 'read', true, quiet);
+      const value = eq > 0 ? restOf(arg, eq + 1) : null;
+      // An unknown value is a path when its spelling looks like one (`--file=$DIR/x`).
+      if (value && (quiet || isPathLike(literalStart(value)) || (value.kind === 'unknown' && isPathLike(arg.raw)))) {
+        analyzer.addPath(value, 'read', true, quiet);
       } else if (eq < 0 && quiet && rest[k + 1]) {
         analyzer.addPath(rest[++k], 'read', true, true);
       }
       continue;
     }
-    const kv = /^[A-Za-z_][\w.-]*=(.+)$/.exec(t);
-    if (kv && isPathLike(kv[1]) && !isUrl(kv[1])) {
-      analyzer.addPath({ ...arg, text: kv[1] }, 'read', true);
-      continue;
+    if (arg.kind === 'known') {
+      const kv = /^[A-Za-z_][\w.-]*=(.+)$/.exec(t);
+      if (kv && isPathLike(kv[1]) && !isUrl(kv[1])) {
+        analyzer.addPath({ ...arg, text: kv[1] }, 'read', true);
+        continue;
+      }
     }
     analyzer.operand(arg);
   }
 }
 
 export function files(ctx: CommandContext, list: readonly Arg[], access: Access): void {
-  for (const arg of list) if (!isUrl(arg.text)) ctx.analyzer.addPath(arg, access, true);
+  for (const arg of list) if (!isUrl(literalStart(arg))) ctx.analyzer.addPath(arg, access, true);
 }

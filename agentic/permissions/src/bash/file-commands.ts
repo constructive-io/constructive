@@ -7,8 +7,8 @@
 import * as path from 'node:path';
 
 import type { Access } from '../types';
-import type { Arg } from './analyze';
-import { type CommandContext, files, has, literalArg, parse, valuesOf } from './args';
+import { type Arg, literalStart } from './analyze';
+import { type CommandContext, files, has, literalArg, parse, restOf, textOf, valuesOf } from './args';
 import type { Source } from './flows';
 
 /**
@@ -17,11 +17,11 @@ import type { Source } from './flows';
  */
 function copies(ctx: CommandContext, what: string, sources: readonly Arg[], dest: Arg, dir: boolean, stdin: readonly Source[] = []) {
   const { analyzer } = ctx;
-  const to = dest.unknown ? null : analyzer.toAbs(dest.text);
+  const to = dest.kind === 'unknown' ? null : analyzer.toAbs(dest.text);
   if (to === null) return;
   const from: Source[] = [...stdin];
   for (const s of sources) {
-    const abs = s.unknown ? null : analyzer.toAbs(s.text);
+    const abs = s.kind === 'unknown' ? null : analyzer.toAbs(s.text);
     if (abs !== null) from.push({ raw: s.raw, abs });
   }
   if (from.length > 0) analyzer.tracker.flows.push({ sources: from, to: { kind: 'file', raw: dest.raw, abs: to, dir }, what });
@@ -40,9 +40,9 @@ const FIND_LEADING = new Set(['-H', '-L', '-P', '-E', '-X', '-s', '-x', '-d', '-
 /** The dirs `find` searches (`.` when none is given), and the index of its first expression word. */
 export function findRoots(rest: readonly Arg[]): { roots: Arg[]; next: number } {
   let k = 0;
-  while (k < rest.length && FIND_LEADING.has(rest[k].text)) k++;
+  while (k < rest.length && FIND_LEADING.has(textOf(rest[k]) ?? '')) k++;
   const roots: Arg[] = [];
-  while (k < rest.length && !/^[-(!)]/.test(rest[k].text)) roots.push(rest[k++]);
+  while (k < rest.length && !/^[-(!)]/.test(literalStart(rest[k]))) roots.push(rest[k++]);
   return { roots: roots.length > 0 ? roots : [literalArg('.')], next: k };
 }
 
@@ -51,19 +51,28 @@ export function find(ctx: CommandContext, rest: readonly Arg[]): void {
   const { roots, next } = findRoots(rest);
   for (const r of roots) analyzer.addPath(r, 'read', true);
   for (let k = next; k < rest.length; k++) {
-    const t = rest[k].text;
+    const word = rest[k];
+    if (word.kind === 'unknown') {
+      analyzer.dynamic(`its find expression takes ${word.raw} from a variable, which may be -exec or -delete`);
+      continue;
+    }
+    const t = word.text;
     if (t === '-delete') {
       for (const r of roots) analyzer.destroy(r, 'find -delete');
     } else if (/^-(fprint0?|fprintf|fls)$/.test(t) && rest[k + 1]) {
       analyzer.addPath(rest[++k], 'write', true);
     } else if (/^-(exec|execdir|ok|okdir)$/.test(t)) {
-      const end = rest.findIndex((a, j) => j > k && (a.text === ';' || a.text === '+'));
+      const end = rest.findIndex((a, j) => j > k && (textOf(a) === ';' || textOf(a) === '+'));
       const sub = rest.slice(k + 1, end < 0 ? rest.length : end);
       k = end < 0 ? rest.length : end;
       if (sub.length === 0) continue;
       // `{}` stands for each match: a path inside each root.
       for (const r of roots) {
-        const replaced = sub.map((a) => (a.text.includes('{}') ? { ...a, text: a.text.split('{}').join(`${r.text}/{}`) } : a));
+        const replaced = sub.map((a): Arg => {
+          if (a.kind === 'unknown' || !a.text.includes('{}')) return a;
+          if (r.kind === 'known') return { ...a, text: a.text.split('{}').join(`${r.text}/{}`) };
+          return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf('{}')) + r.knownPrefix, raw: a.raw };
+        });
         analyzer.runArgs(replaced, false);
       }
     }
@@ -75,7 +84,7 @@ export function sed(ctx: CommandContext, rest: readonly Arg[]): void {
   const inPlace = has(p, '-i', '--in-place') || [...p.flags].some((f) => f.startsWith('-i'));
   let ops = p.positionals;
   // BSD `sed -i '' …`: the empty word is the backup suffix.
-  if (inPlace && ops[0]?.text === '') ops = ops.slice(1);
+  if (inPlace && textOf(ops[0]) === '') ops = ops.slice(1);
   for (const f of valuesOf(p, '-f', '--file')) ctx.analyzer.addPath(f, 'read', true);
   if (valuesOf(p, '-e', '--expression', '-f', '--file').length === 0) ops = ops.slice(1);
   files(ctx, ops, inPlace ? 'write' : 'read');
@@ -123,13 +132,13 @@ export function awk(name: string, ctx: CommandContext, rest: readonly Arg[]): vo
   if (progFiles.length === 0) {
     const program = ops[0];
     ops = ops.slice(1);
-    if (program && (program.unknown || /\bsystem\s*\(|\|/.test(program.text))) {
+    if (program && (program.kind === 'unknown' || /\bsystem\s*\(|\|/.test(program.text))) {
       ctx.analyzer.dynamic(`its ${name} program runs commands`);
     }
   }
-  const inPlace = valuesOf(p, '-i', '--include').some((v) => v.text === 'inplace');
+  const inPlace = valuesOf(p, '-i', '--include').some((v) => textOf(v) === 'inplace');
   for (const op of ops) {
-    if (/^[A-Za-z_]\w*=/.test(op.text)) continue;
+    if (/^[A-Za-z_]\w*=/.test(literalStart(op))) continue;
     if (inPlace) ctx.analyzer.addPath(op, 'write', true);
     else ctx.analyzer.operand(op);
   }
@@ -165,15 +174,16 @@ export function copyLike(name: string, ctx: CommandContext, rest: readonly Arg[]
     return files(ctx, ops, sourceAccess);
   }
   if (ops.length === 1 && name === 'ln') {
-    analyzer.addPath(ops[0], 'read', true);
-    analyzer.addPath({ ...ops[0], text: path.basename(ops[0].text) }, 'write', true);
+    const link = ops[0];
+    analyzer.addPath(link, 'read', true);
+    analyzer.addPath(link.kind === 'known' ? { ...link, text: path.basename(link.text) } : link, 'write', true);
     return;
   }
   if (ops.length === 0) return;
   const dest = ops[ops.length - 1];
   files(ctx, ops.slice(0, -1), sourceAccess);
   analyzer.addPath(dest, 'write', true);
-  if (name !== 'ln') copies(ctx, name, ops.slice(0, -1), dest, ops.length > 2 || dest.text.endsWith('/'));
+  if (name !== 'ln') copies(ctx, name, ops.slice(0, -1), dest, ops.length > 2 || literalStart(dest).endsWith('/'));
 }
 
 export function chmodLike(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
@@ -181,7 +191,7 @@ export function chmodLike(name: string, ctx: CommandContext, rest: readonly Arg[
   let reference = false;
   const operands: Arg[] = [];
   for (const arg of rest) {
-    const t = arg.text;
+    const t = literalStart(arg);
     if (/^-[RvcfhHLP]+$/.test(t) || t === '--recursive' || t.startsWith('--')) {
       if (/^-[a-zA-Z]*R/.test(t) || t === '--recursive') recursive = true;
       if (t.startsWith('--reference')) reference = true;
@@ -197,17 +207,17 @@ export function chmodLike(name: string, ctx: CommandContext, rest: readonly Arg[
 }
 
 export function dd(ctx: CommandContext, rest: readonly Arg[]): void {
-  const input = rest.find((a) => a.text.startsWith('if='));
-  const output = rest.find((a) => a.text.startsWith('of='));
+  const input = rest.find((a) => literalStart(a).startsWith('if='));
+  const output = rest.find((a) => literalStart(a).startsWith('of='));
   if (output) {
-    const dest = { ...output, text: output.text.slice(3) };
-    if (input) copies(ctx, 'dd', [{ ...input, text: input.text.slice(3) }], dest, false);
+    const dest = restOf(output, 3);
+    if (input) copies(ctx, 'dd', [restOf(input, 3)], dest, false);
     else copies(ctx, 'dd', [], dest, false, ctx.analyzer.stdin.sources);
   }
   for (const arg of rest) {
-    const m = /^(if|of)=(.*)$/.exec(arg.text);
+    const m = /^(if|of)=(.*)$/.exec(literalStart(arg));
     if (!m) continue;
-    const target = { ...arg, text: m[2] };
+    const target = restOf(arg, 3);
     if (m[1] === 'if') {
       ctx.analyzer.addPath(target, 'read', true);
     } else {
