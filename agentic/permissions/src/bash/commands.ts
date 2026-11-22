@@ -276,23 +276,20 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   switch (name) {
   case 'cd':
   case 'pushd': {
-    analyzer.changedDir = true;
     const target = parse(rest).positionals[0];
     if (!target) {
-      analyzer.base = path.resolve(analyzer.ctx.homeDir);
+      analyzer.moveTo({ kind: 'moved', dir: path.resolve(analyzer.ctx.homeDir) });
     } else if (target.unknown || /^[-+]\d*$/.test(target.text) || analyzer.searchesCdPath(target.text)) {
       // `cd -`, `pushd +1` and a `CDPATH` lookup go to a dir the text does not name.
-      analyzer.base = null;
+      analyzer.moveTo({ kind: 'unknown' });
     } else {
-      const abs = analyzer.toAbs(target.text);
       analyzer.addPath(target, 'read', true);
-      analyzer.base = abs === null ? null : path.resolve(abs);
+      analyzer.moveTo(analyzer.dirAt(target.text));
     }
     return;
   }
   case 'popd':
-    analyzer.changedDir = true;
-    analyzer.base = null;
+    analyzer.moveTo({ kind: 'unknown' });
     return;
   case 'export':
   case 'declare':

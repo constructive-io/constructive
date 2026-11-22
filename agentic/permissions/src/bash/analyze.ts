@@ -102,6 +102,9 @@ export function normalizeCommand(command: string): string {
   return /['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ');
 }
 
+/** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
+export type Cwd = { kind: 'start' } | { kind: 'moved'; dir: string } | { kind: 'unknown' };
+
 /** Whether IFS may differ from bash's default (space, tab, newline). */
 type IfsState = 'default' | 'maybe-changed';
 
@@ -208,8 +211,10 @@ class Analyzer {
   stdin: Stdin = { sources: [], words: [], listedUnder: null };
   /** Shell variables set earlier in the command. `null` = set to something unknown. */
   vars = new Map<string, string | null>();
-  /** The shell's working dir at this point. `null` after a `cd` we cannot follow. */
-  base: string | null;
+  /** The shell's working dir at this point of the command. */
+  private cwd: Cwd = { kind: 'start' };
+  /** Some command ran, or the shell moved, outside the start dir. */
+  private leftStart = false;
   /** The names brace expansion may still add to this command's checks. */
   private readonly names = new NameBudget(MAX_BRACE_NAMES);
   /**
@@ -218,8 +223,6 @@ class Analyzer {
    * (also through a name it built, `N=IFS; export $N=:`).
    */
   private ifs: IfsState = 'default';
-  /** A `cd`, `pushd` or `popd` ran, so later relative paths point elsewhere. */
-  changedDir = false;
   /** How many shell strings (`sh -c`, `eval`, …) deep the analysis is. */
   private depth = 0;
 
@@ -227,7 +230,6 @@ class Analyzer {
     readonly ctx: AnalyzeContext,
     private readonly findings: Findings
   ) {
-    this.base = path.resolve(ctx.cwd);
   }
 
   flag(signal: Signal, reason: string): void {
@@ -266,16 +268,68 @@ class Analyzer {
     return lexed;
   }
 
+  /** The working dir as an absolute path, or `null` when it cannot be known. */
+  get base(): string | null {
+    return this.dirOf(this.cwd);
+  }
+
+  /** Every command so far ran in the start dir, so relative paths in its parts mean what they say. */
+  get stayedAtStart(): boolean {
+    return !this.leftStart;
+  }
+
+  private dirOf(cwd: Cwd): string | null {
+    switch (cwd.kind) {
+    case 'start':
+      return path.resolve(this.ctx.cwd);
+    case 'moved':
+      return cwd.dir;
+    case 'unknown':
+      return null;
+    default:
+      return unreachable(cwd);
+    }
+  }
+
+  /** The dir `text` names from `from` (the working dir by default). */
+  dirAt(text: string, from: Cwd = this.cwd): Cwd {
+    const abs = this.toAbs(text, this.dirOf(from));
+    return abs === null ? { kind: 'unknown' } : { kind: 'moved', dir: path.resolve(abs) };
+  }
+
+  /** `cd`, `pushd`, `popd`: the shell moves for the rest of the command. */
+  moveTo(next: Cwd): void {
+    this.cwd = next;
+    if (next.kind !== 'start') this.leftStart = true;
+  }
+
+  /** `env -C dir`: the shell moves for this one command, and `runArgs` moves it back. */
+  moveForOneCommand(scope: WrapperScope, next: Cwd): void {
+    scope.outerCwd ??= this.cwd;
+    this.moveTo(next);
+  }
+
+  /** `git -C dir`: run `fn` with the shell in `dir`, then move back. */
+  within<T>(dir: Cwd, fn: () => T): T {
+    const outer = this.cwd;
+    this.moveTo(dir);
+    try {
+      return fn();
+    } finally {
+      this.cwd = outer;
+    }
+  }
+
   /** A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own scope. */
   nested(text: string, why: string): void {
     this.dynamic(why);
-    const savedBase = this.base;
+    const savedCwd = this.cwd;
     const savedVars = new Map(this.vars);
     const savedStdin = this.stdin;
     this.depth++;
     this.analyzeString(text);
     this.depth--;
-    this.base = savedBase;
+    this.cwd = savedCwd;
     this.vars = savedVars;
     this.stdin = savedStdin;
   }
@@ -473,12 +527,11 @@ class Analyzer {
    * A wrapper's working dir (`env -C`) holds for this command only.
    */
   runArgs(args: Arg[], stdinFed: boolean): Run | null {
-    const scope: WrapperScope = { sudo: false, xargs: null, chdir: false };
-    const outer = this.base;
+    const scope: WrapperScope = { sudo: false, xargs: null, outerCwd: null };
     try {
       return this.run(args, stdinFed, scope);
     } finally {
-      if (scope.chdir) this.base = outer;
+      if (scope.outerCwd) this.cwd = scope.outerCwd;
     }
   }
 
@@ -561,7 +614,7 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
     flows: analyzer.tracker.flows,
     envRefs: [...analyzer.envRefs],
     dotglob: DOTGLOB_RE.test(command),
-    parts: lexed && !analyzer.changedDir ? commandParts(command, lexed) : null
+    parts: lexed && analyzer.stayedAtStart ? commandParts(command, lexed) : null
   };
 }
 

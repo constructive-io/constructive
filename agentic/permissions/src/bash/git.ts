@@ -3,10 +3,8 @@
  * unknown remote, config writes, and force-adding a secret file.
  */
 
-import * as path from 'node:path';
-
 import { isSecretFile } from '../secret-files';
-import type { Arg } from './analyze';
+import type { Arg, Cwd } from './analyze';
 import { type CommandContext, generic, has, longSpellings, optionMatches, parse, type Parsed, valuesOf } from './args';
 import { isRemoteSpec, isUrl } from './words';
 
@@ -122,12 +120,12 @@ function add(ctx: CommandContext, args: readonly Arg[]): void {
 export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   let k = 0;
-  let base = analyzer.base;
+  let cwd: Cwd | null = null;
   for (; k < rest.length; k++) {
     const t = rest[k].text;
     if (t === '-C') {
       const dir = rest[++k];
-      base = dir && !dir.unknown && base !== null ? path.resolve(base, dir.text) : null;
+      cwd = dir && !dir.unknown ? analyzer.dirAt(dir.text, cwd ?? undefined) : { kind: 'unknown' };
       if (dir) analyzer.addPath(dir, 'read', true);
     } else if (t === '-c') {
       const kv = rest[++k];
@@ -149,15 +147,13 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   const args = rest.slice(k + 1);
   runsProgram(ctx, sub, args);
   if (sub === 'send-email') analyzer.flag('upload', 'it uploads data: git send-email mails patches from this repo');
-  const saved = analyzer.base;
-  analyzer.base = base;
-  try {
+  const handle = (): void => {
     if (sub === 'remote') return remote(ctx, args);
     if (sub === 'add') return add(ctx, args);
     if (sub === 'push') return push(ctx, parse(args, new Set(['--repo', '-o', '--push-option', '--receive-pack', '--exec'])));
     const p = parse(args, new Set(['-m', '-F', '-C', '-c', '--file', '-f', '-o', '--message', '--format', ...OUTPUT]));
     for (const out of valuesOf(p, ...OUTPUT)) analyzer.addPath(out, 'write', true);
-    const here: Arg = { text: '.', raw: rest[k]?.raw ?? '.', unknown: base === null, glob: false };
+    const here: Arg = { text: '.', raw: rest[k]?.raw ?? '.', unknown: analyzer.base === null, glob: false };
     if (sub === 'reset' && has(p, '--hard')) analyzer.destroy(here, 'git reset --hard');
     if (sub === 'clean' && has(p, '-f', '--force')) analyzer.destroy(here, 'git clean -f');
     if (sub === 'config') {
@@ -174,7 +170,6 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     }
     for (const f of valuesOf(p, '-F', '--file')) analyzer.addPath(f, 'read', true);
     generic(ctx, p.positionals.filter((a) => !isUrl(a.text)));
-  } finally {
-    analyzer.base = saved;
-  }
+  };
+  return cwd ? analyzer.within(cwd, handle) : handle();
 }

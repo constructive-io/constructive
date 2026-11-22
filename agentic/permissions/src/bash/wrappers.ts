@@ -6,7 +6,7 @@
 
 import * as path from 'node:path';
 
-import type { Analyzer, Arg } from './analyze';
+import type { Analyzer, Arg, Cwd } from './analyze';
 import { leadingOptions } from './args';
 import { NO_OPERANDS } from './commands';
 
@@ -23,8 +23,8 @@ export interface WrapperScope {
   sudo: boolean;
   /** Set once `xargs` came off: more operands arrive from its input. */
   xargs: XargsInput | null;
-  /** `env -C dir` moved the working dir for this one command. */
-  chdir: boolean;
+  /** The working dir before `env -C dir` moved it for this one command. */
+  outerCwd: Cwd | null;
 }
 
 /** `xargs` options whose value is the next word (`-i`, `-e`, `-l` and `--replace` take only a glued one). */
@@ -146,8 +146,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
         return args.length;
       }
       if (key === '-C' || key === '--chdir') {
-        analyzer.base = value && !value.unknown ? analyzer.toAbs(value.text) : null;
-        scope.chdir = true;
+        analyzer.moveForOneCommand(scope, value && !value.unknown ? analyzer.dirAt(value.text) : { kind: 'unknown' });
       }
     }
     return from + next;
