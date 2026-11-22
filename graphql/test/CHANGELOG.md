@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.23.14...@constructive-io/graphql-test@5.24.0) (2026-11-22)
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
 ## [5.23.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@5.23.13...@constructive-io/graphql-test@5.23.14) (2026-11-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

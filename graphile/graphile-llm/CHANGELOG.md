@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.9...graphile-llm@1.25.0) (2026-11-22)
+
+### Features
+
+- **graphile-search:** vector search in the request language on tables with translations ([#2048](https://github.com/constructive-io/constructive/issues/2048)) ([ebf6839](https://github.com/constructive-io/constructive/commit/ebf68391bcc0f54d8e36cf8da37b05a5c304e04b))
+
 ## [1.24.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.8...graphile-llm@1.24.9) (2026-11-21)
 
 **Note:** Version bump only for package graphile-llm

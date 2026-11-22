@@ -1,6 +1,6 @@
 {
   "name": "graphql-server-test",
-  "version": "3.42.13",
+  "version": "3.43.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
   "main": "index.js",

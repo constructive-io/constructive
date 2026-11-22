@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.7...@constructive-io/graphql-server@5.36.8) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
 ## [5.36.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.6...@constructive-io/graphql-server@5.36.7) (2026-11-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

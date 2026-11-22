@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.43.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.13...graphql-server-test@3.43.0) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
 ## [3.42.13](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.12...graphql-server-test@3.42.13) (2026-11-21)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.13.1...graphile-meta@1.14.0) (2026-11-22)
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
 ## [1.13.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.13.0...graphile-meta@1.13.1) (2026-11-16)
 
 **Note:** Version bump only for package graphile-meta
