@@ -12,7 +12,7 @@
  *
  * Environment variables:
  *   EMBEDDER_PROVIDER  - Embedding provider name (default: 'ollama')
- *   EMBEDDER_MODEL     - Embedding model (default: 'nomic-embed-text')
+ *   EMBEDDER_MODEL     - Embedding model (default: 'embeddinggemma-2:440m')
  *   EMBEDDER_BASE_URL  - Embedding provider URL (default: 'http://localhost:11434')
  *   CHAT_PROVIDER      - Chat provider name (default: 'ollama')
  *   CHAT_MODEL         - Chat model (default: 'llama3')
@@ -54,7 +54,7 @@ export interface ResolvedLlmEnvOptions {
 export const llmDefaults: ResolvedLlmEnvOptions = {
   embedding: {
     provider: 'ollama',
-    model: 'nomic-embed-text',
+    model: 'embeddinggemma-2:440m',
     baseUrl: 'http://localhost:11434'
   },
   chat: {

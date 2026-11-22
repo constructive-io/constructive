@@ -113,14 +113,14 @@ describe('getLlmEnvOptions (backward compat)', () => {
       EMBEDDER_PROVIDER: 'openai',
     });
     expect(result.embedding.provider).toBe('openai');
-    expect(result.embedding.model).toBe('nomic-embed-text');
+    expect(result.embedding.model).toBe('embeddinggemma-2:440m');
   });
 });
 
 describe('llmDefaults', () => {
   it('exports default values', () => {
     expect(llmDefaults.embedding.provider).toBe('ollama');
-    expect(llmDefaults.embedding.model).toBe('nomic-embed-text');
+    expect(llmDefaults.embedding.model).toBe('embeddinggemma-2:440m');
     expect(llmDefaults.embedding.baseUrl).toBe('http://localhost:11434');
     expect(llmDefaults.chat.provider).toBe('ollama');
     expect(llmDefaults.chat.model).toBe('llama3');
