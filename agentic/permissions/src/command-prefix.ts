@@ -92,8 +92,11 @@ const LONGEST_KEY = Math.max(...[...ARITY.keys()].map((key) => key.split(' ').le
 /** The most prefixes one grant holds: a card offers the exact command for a longer chain. */
 export const MAX_PREFIXES = 5;
 
-/** A word a prefix may keep: plain text, not an option (`-x`, `+x`), quote, expansion or glob. */
-const PREFIX_WORD = /^[\w@%=:,./][\w@%+=:,./-]*$/;
+/**
+ * A word a prefix may keep: plain text, not an option (`-x`, `+x`), quote,
+ * expansion or glob, and no `,`, which separates prefixes in the text form.
+ */
+const PREFIX_WORD = /^[\w@%=:./][\w@%+=:./-]*$/;
 
 /** The table entry the leading words name, longest key first. */
 function arityKey(words: readonly string[]): { length: number; arity: number } | null {

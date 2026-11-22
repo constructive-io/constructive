@@ -106,6 +106,7 @@ describe('command prefix grants', () => {
     // An unknown program, a flag before the subcommand, or too few words: the exact command.
     ['./scripts/deploy.sh staging', './scripts/deploy.sh staging'],
     ['git -C src status', 'git -C src status'],
+    ['npm run a,b', 'npm run a,b'],
     ['git', 'git'],
     ['if true; then npm test; fi', 'if true; then npm test; fi']
   ];
