@@ -2420,6 +2420,9 @@ importers:
       nested-obj:
         specifier: ^0.2.3
         version: 0.2.3
+      postgraphile:
+        specifier: 5.1.4
+        version: 5.1.4(6fac2ccd59325b02d1508e585e9ab2d6)
       ws:
         specifier: ^8.21.3
         version: 8.21.3
