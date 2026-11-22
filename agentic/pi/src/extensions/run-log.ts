@@ -17,6 +17,9 @@ import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-a
  * Events after which the session may have grown. `session_start` also covers
  * resume (pi replays the file before the first event), so a resumed run
  * re-appends its history and the store's idempotency discards the duplicates.
+ * pi appends a message only after extensions see its `message_end`, so the
+ * assistant entry that calls a tool is first readable at `tool_execution_start`,
+ * before the tool runs.
  */
 export const MIRROR_EVENTS = [
   'session_start',
@@ -26,6 +29,7 @@ export const MIRROR_EVENTS = [
   'input',
   'before_agent_start',
   'message_end',
+  'tool_execution_start',
   'tool_execution_end',
   'turn_end',
   'agent_end',
