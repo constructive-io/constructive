@@ -5,10 +5,11 @@
  * which sources are secret files, since that needs the real paths.
  */
 
+import { unreachable } from '../unreachable';
 import type { Analyzer, Arg, Run } from './analyze';
 import { literalArg } from './args';
 import { findRoots } from './file-commands';
-import type { SimpleCommand } from './tokenize';
+import { heredocsOf, hereStringsOf, type SimpleCommand } from './tokenize';
 
 export interface Source {
   raw: string;
@@ -184,30 +185,42 @@ export class FlowTracker {
     let words: Arg[] | null = [];
     let listedUnder: Arg[] | null = null;
     for (const r of cmd.redirects) {
-      if (r.op !== '<' || !r.target) continue;
+      if (r.kind !== 'file' || r.op !== '<') continue;
       words = null;
       for (const t of analyzer.resolveWord(r.target)) {
         const abs = t.unknown ? null : analyzer.toAbs(t.text);
         if (abs) sources.push({ raw: t.raw, abs });
       }
     }
-    if (cmd.heredocs.length > 0) words = null;
-    for (const w of cmd.hereStrings) {
+    if (heredocsOf(cmd).length > 0) words = null;
+    for (const w of hereStringsOf(cmd)) {
       const said = splitWords(analyzer.resolveWord(w));
       words = words && said ? [...words, ...said] : null;
     }
-    if (cmd.pipedIn) {
-      const up = cmd.upstream;
-      if (!up || up === 'group' || up.words.every((w) => GROUP_END.has(w.raw))) {
+    const input = cmd.input;
+    switch (input.kind) {
+    case 'inherited':
+      break;
+    case 'group-pipe':
+      for (const source of this.all) sources.push(source);
+      words = null;
+      break;
+    case 'pipe': {
+      const up = input.from;
+      if (up.words.every((w) => GROUP_END.has(w.raw))) {
         for (const source of this.all) sources.push(source);
         words = null;
-      } else {
-        for (const source of this.outputs.get(up) ?? []) sources.push(source);
-        const said = this.printed.get(up);
-        words = words && said ? [...words, ...said] : null;
-        const onlyPipe = cmd.redirects.every((r) => r.op !== '<') && cmd.hereStrings.length === 0 && cmd.heredocs.length === 0;
-        listedUnder = onlyPipe ? (this.listed.get(up) ?? null) : null;
+        break;
       }
+      for (const source of this.outputs.get(up) ?? []) sources.push(source);
+      const said = this.printed.get(up);
+      words = words && said ? [...words, ...said] : null;
+      const onlyPipe = cmd.redirects.every((r) => r.kind === 'dup' || (r.kind === 'file' && r.op !== '<'));
+      listedUnder = onlyPipe ? (this.listed.get(up) ?? null) : null;
+      break;
+    }
+    default:
+      return unreachable(input);
     }
     return { sources, words, listedUnder };
   }

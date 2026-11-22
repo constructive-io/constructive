@@ -7,23 +7,31 @@
  */
 
 import type { CommandPart } from '../types';
+import { unreachable } from '../unreachable';
 import { expandWord, MAX_BRACE_NAMES, NameBudget } from './braces';
-import type { Lexed, Redirect, Word } from './tokenize';
+import { type Lexed, readsStdinDoc, type Redirect, type Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
 /** Words that open a compound command. */
 const COMPOUND_OPENERS: ReadonlySet<string> = new Set(['for', 'select', 'case', 'function']);
 
-/** Redirections that only read: a file, a heredoc, a here-string, or a copied input descriptor. */
-const INPUT_OPS: ReadonlySet<string> = new Set(['<', '<<', '<<-', '<<<', '<&']);
-
 /**
- * The redirection opens a file for writing. A copied descriptor (`2>&1`) has
- * no target. Only the literal `/dev/null` is exempt: another device or a word
- * with quotes or a variable is not proven harmless.
+ * The redirection opens a file for writing. Input (`<`, a heredoc, a
+ * here-string) and a copied descriptor (`2>&1`) do not. Only the literal
+ * `/dev/null` is exempt: another device or a word with quotes or a variable
+ * is not proven harmless.
  */
 function writesFile(r: Redirect): boolean {
-  return !INPUT_OPS.has(r.op) && r.target !== null && r.target.raw !== '/dev/null';
+  switch (r.kind) {
+  case 'file':
+    return r.op !== '<' && r.op !== '<&' && r.target.raw !== '/dev/null';
+  case 'dup':
+  case 'heredoc':
+  case 'here-string':
+    return false;
+  default:
+    return unreachable(r);
+  }
 }
 
 /** The word is a shell keyword or opens a compound command, so it is syntax and not a program. */
@@ -71,7 +79,7 @@ function optionsOf(words: readonly Word[], names: NameBudget): string[] | null {
 
 export function commandParts(command: string, lexed: Lexed): CommandPart[] | null {
   if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0 || command.includes('\r')) return null;
-  if (lexed.commands.some((cmd) => cmd.stdinDoc || isShellSyntax(cmd.words[0]?.raw))) return null;
+  if (lexed.commands.some((cmd) => readsStdinDoc(cmd) || isShellSyntax(cmd.words[0]?.raw))) return null;
   const names = new NameBudget(MAX_BRACE_NAMES);
   return lexed.commands.map((cmd) => ({
     words: cmd.words.map((w) => w.raw),

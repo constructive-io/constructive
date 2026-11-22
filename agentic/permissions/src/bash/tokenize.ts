@@ -39,30 +39,48 @@ export interface Word {
   raw: string;
 }
 
-export interface Redirect {
-  op: string;
-  fd: number | null;
-  /** `null` for an fd duplication (`2>&1`) or a heredoc. */
-  target: Word | null;
-}
+/** The operator of a redirection to or from a file. */
+export type FileOp = '<' | '>' | '>>' | '>|' | '&>' | '&>>' | '<>' | '>&' | '<&';
 
 export interface Heredoc {
   quoted: boolean;
+  /** Filled in when the lexer reaches the lines after the command. */
   body: string;
 }
+
+/** A redirection: to or from a file, a copied descriptor (`2>&1`), a heredoc or a here-string. */
+export type Redirect =
+  | { kind: 'file'; op: FileOp; fd: number | null; target: Word }
+  | { kind: 'dup'; op: '>&' | '<&'; fd: number | null }
+  | { kind: 'heredoc'; fd: number | null; doc: Heredoc }
+  | { kind: 'here-string'; fd: number | null; word: Word };
+
+/** Where a command's stdin comes from when no redirection sets it: the shell's, or the stdout of what pipes into it. */
+export type Input = { kind: 'inherited' } | { kind: 'pipe'; from: SimpleCommand } | { kind: 'group-pipe' };
 
 export interface SimpleCommand {
   words: Word[];
   redirects: Redirect[];
-  heredocs: Heredoc[];
-  /** stdin is the previous command's stdout. */
-  pipedIn: boolean;
-  /** stdin is a heredoc or a here-string. */
-  stdinDoc: boolean;
-  /** The words after `<<<`. */
-  hereStrings: Word[];
-  /** The command whose stdout this one reads, or `group` after `( … ) |`. */
-  upstream?: SimpleCommand | 'group';
+  input: Input;
+}
+
+export function heredocsOf(cmd: SimpleCommand): Heredoc[] {
+  return cmd.redirects.flatMap((r) => (r.kind === 'heredoc' ? [r.doc] : []));
+}
+
+/** The words after `<<<`. */
+export function hereStringsOf(cmd: SimpleCommand): Word[] {
+  return cmd.redirects.flatMap((r) => (r.kind === 'here-string' ? [r.word] : []));
+}
+
+/** stdin is a heredoc or a here-string. */
+export function readsStdinDoc(cmd: SimpleCommand): boolean {
+  return cmd.redirects.some((r) => r.kind === 'heredoc' || r.kind === 'here-string');
+}
+
+/** stdin is the stdout of a command or group piped into this one. */
+export function isPipedIn(cmd: SimpleCommand): boolean {
+  return cmd.input.kind !== 'inherited';
 }
 
 export interface Lexed {
@@ -82,13 +100,12 @@ const SPECIAL_PARAMS = new Set(['?', '$', '!', '#', '@', '*', '-', '0', '1', '2'
 
 interface PendingHeredoc {
   delim: string;
-  quoted: boolean;
   stripTabs: boolean;
-  command: SimpleCommand;
+  doc: Heredoc;
 }
 
 function newCommand(): SimpleCommand {
-  return { words: [], redirects: [], heredocs: [], pipedIn: false, stdinDoc: false, hereStrings: [] };
+  return { words: [], redirects: [], input: { kind: 'inherited' } };
 }
 
 class Lexer {
@@ -96,8 +113,8 @@ class Lexer {
   readonly dynamic: string[] = [];
   private current = newCommand();
   private pending: PendingHeredoc[] = [];
-  private pipeNext = false;
-  private upstream: SimpleCommand | 'group' | null = null;
+  /** The stdin the next command gets: after `|` the stdout of what came before. */
+  private nextInput: Input = { kind: 'inherited' };
   private i = 0;
 
   constructor(
@@ -116,7 +133,7 @@ class Lexer {
       } else if (ch === '\n') {
         this.i++;
         // A pipe may continue on the next line.
-        if (!this.pipeNext || this.current.words.length > 0 || this.current.redirects.length > 0) this.endCommand(false);
+        if (this.nextInput.kind === 'inherited' || this.current.words.length > 0 || this.current.redirects.length > 0) this.endCommand(false);
         this.readHeredocs();
       } else if (ch === '#') {
         const nl = s.indexOf('\n', this.i);
@@ -136,18 +153,12 @@ class Lexer {
   private endCommand(pipe: boolean): void {
     const cmd = this.current;
     if (cmd.words.length > 0 || cmd.redirects.length > 0) {
-      cmd.pipedIn = cmd.pipedIn || this.pipeNext;
-      if (cmd.pipedIn && this.upstream) cmd.upstream = this.upstream;
+      cmd.input = this.nextInput;
       this.commands.push(cmd);
-      this.pipeNext = pipe;
-      this.upstream = pipe ? cmd : null;
-    } else if (pipe) {
-      // `( … ) | x`: the group's output is piped on.
-      this.pipeNext = true;
-      this.upstream = 'group';
+      this.nextInput = pipe ? { kind: 'pipe', from: cmd } : { kind: 'inherited' };
     } else {
-      this.pipeNext = false;
-      this.upstream = null;
+      // `( … ) | x`: the group's output is piped on.
+      this.nextInput = pipe ? { kind: 'group-pipe' } : { kind: 'inherited' };
     }
     this.current = newCommand();
   }
@@ -225,22 +236,20 @@ class Lexer {
     const cmd = this.current;
     if (op === '<<' || op === '<<-') {
       const { delim, quoted } = heredocDelimiter(target.raw);
-      this.pending.push({ delim, quoted, stripTabs: op === '<<-', command: cmd });
-      cmd.stdinDoc = true;
-      cmd.redirects.push({ op, fd, target: null });
+      const doc: Heredoc = { quoted, body: '' };
+      this.pending.push({ delim, stripTabs: op === '<<-', doc });
+      cmd.redirects.push({ kind: 'heredoc', fd, doc });
       return;
     }
     if (op === '<<<') {
-      cmd.stdinDoc = true;
-      cmd.hereStrings.push(target);
-      cmd.redirects.push({ op, fd, target: null });
+      cmd.redirects.push({ kind: 'here-string', fd, word: target });
       return;
     }
     if ((op === '>&' || op === '<&') && /^(\d+-?|-)$/.test(target.raw)) {
-      cmd.redirects.push({ op, fd, target: null });
+      cmd.redirects.push({ kind: 'dup', op, fd });
       return;
     }
-    cmd.redirects.push({ op, fd, target });
+    cmd.redirects.push({ kind: 'file', op: op as FileOp, fd, target });
   }
 
   /** The next line of input, without its newline. */
@@ -259,14 +268,15 @@ class Lexer {
    */
   private readHeredocs(): void {
     const { s } = this;
-    for (const doc of this.pending) {
+    for (const pending of this.pending) {
+      const { doc } = pending;
       let body = '';
       let found = false;
       while (this.i < s.length) {
         let line = this.nextLine();
         while (!doc.quoted && /(^|[^\\])(\\\\)*\\$/.test(line) && this.i < s.length) line = line.slice(0, -1) + this.nextLine();
-        const check = doc.stripTabs ? line.replace(/^\t+/, '') : line;
-        if (check === doc.delim) {
+        const check = pending.stripTabs ? line.replace(/^\t+/, '') : line;
+        if (check === pending.delim) {
           found = true;
           break;
         }
@@ -274,7 +284,7 @@ class Lexer {
       }
       if (!found) throw new LexError('unterminated heredoc');
       if (!doc.quoted) this.scanExpansions(body);
-      doc.command.heredocs.push({ quoted: doc.quoted, body });
+      doc.body = body;
     }
     this.pending = [];
   }

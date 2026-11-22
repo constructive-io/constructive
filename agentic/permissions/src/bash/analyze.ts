@@ -13,12 +13,13 @@ import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
 import type { Access, CommandPart, Signal } from '../types';
+import { unreachable } from '../unreachable';
 import { generic } from './args';
 import { expandWord, MAX_BRACE_NAMES, MAX_PLAIN_NAME_RESULTS, NameBudget } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import { commandParts } from './parts';
-import { type Lexed, type SimpleCommand, tokenize, type Word } from './tokenize';
+import { heredocsOf, isPipedIn, type Lexed, readsStdinDoc, type SimpleCommand, tokenize, type Word } from './tokenize';
 import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
 
@@ -179,11 +180,6 @@ const DOTGLOB_RE = /dotglob|glob_?dots|GLOBIGNORE/i;
 
 /** `$NAME` and `${NAME…}` in a heredoc body. */
 const BODY_VAR_RE = /\$\{?[#!]?([A-Za-z_][A-Za-z0-9_]*)/g;
-
-/** A value a switch over a closed union cannot hold; a new variant is a compile error here. */
-export function unreachable(value: never): never {
-  throw new Error(`permissions: unexpected state ${JSON.stringify(value)} in the bash analysis. This is a bug in @agentic-kit/permissions; report it with the command that caused it.`);
-}
 
 /** The word's leading literal text is `IFS`, `IFS=…` or `IFS+=…`. */
 function namesIfs(word: Word): boolean {
@@ -493,17 +489,17 @@ class Analyzer {
 
   analyzeCommand(cmd: SimpleCommand): void {
     const args = cmd.words.flatMap((w) => this.resolveWord(w));
-    const stdinFed = cmd.pipedIn || cmd.stdinDoc || cmd.redirects.some((r) => r.op === '<' && r.target);
+    const stdinFed = isPipedIn(cmd) || readsStdinDoc(cmd) || cmd.redirects.some((r) => r.kind === 'file' && r.op === '<');
     const stdin = this.tracker.stdinOf(cmd);
     this.stdin = stdin;
-    for (const doc of cmd.heredocs) {
+    for (const doc of heredocsOf(cmd)) {
       if (!doc.quoted) for (const m of doc.body.matchAll(BODY_VAR_RE)) this.noteRef(m[1]);
     }
 
     const from = this.paths.length;
     const stdout: Source[] = [];
     for (const r of cmd.redirects) {
-      if (!r.target) continue;
+      if (r.kind !== 'file') continue;
       const access: Access = r.op === '<' ? 'read' : 'write';
       for (const target of this.resolveWord(r.target)) {
         if (target.unknown) {
