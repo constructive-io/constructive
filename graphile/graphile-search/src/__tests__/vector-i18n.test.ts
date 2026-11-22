@@ -94,6 +94,10 @@ describe('vector search follows the request language', () => {
     expect(await matches(['es'])).toEqual([1, 3]);
   });
 
+  it('falls back from a regional request to its primary language', async () => {
+    expect(await matches(['fr-CA'])).toEqual([2]);
+  });
+
   it('uses the first requested language a row has a translation in', async () => {
     expect(await matches(['es', 'fr'])).toEqual([2, 3]);
   });

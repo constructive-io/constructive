@@ -44,8 +44,12 @@ export function columnWithRequestTsConfig(column: SearchableColumn, condition: a
   };
 }
 
+// Each requested tag is followed by its primary language (fr-CA, fr), so a
+// regional request still finds a translation stored under the bare language.
 export function requestLangCodes(langCodes: unknown): string[] {
-  return Array.isArray(langCodes) ? langCodes.filter((code): code is string => typeof code === 'string' && code !== '') : [];
+  if (!Array.isArray(langCodes)) return [];
+  const codes = langCodes.filter((code): code is string => typeof code === 'string' && code !== '');
+  return [...new Set(codes.flatMap((code) => [code, code.split('-')[0]]))];
 }
 
 export function conditionLangCodes(condition: any): string[] | undefined {
