@@ -1,6 +1,7 @@
 import type { SearchableColumn } from './types';
 
 export const REQUEST_TS_CONFIG = '__graphile_search_ts_config';
+export const REQUEST_LANG_CODES = '__graphile_search_lang_codes';
 
 const languageConfigs = new Map(Object.entries({
   ar: 'arabic', hy: 'armenian', eu: 'basque', ca: 'catalan', da: 'danish',
@@ -41,4 +42,38 @@ export function columnWithRequestTsConfig(column: SearchableColumn, condition: a
       requestTsConfig: conditionTsConfig(condition),
     },
   };
+}
+
+// Each requested tag is followed by its primary language (fr-CA, fr), so a
+// regional request still finds a translation stored under the bare language.
+export function requestLangCodes(langCodes: unknown): string[] {
+  if (!Array.isArray(langCodes)) return [];
+  const codes = langCodes.filter((code): code is string => typeof code === 'string' && code !== '');
+  return [...new Set(codes.flatMap((code) => [code, code.split('-')[0]]))];
+}
+
+export function conditionLangCodes(condition: any): string[] | undefined {
+  for (let current = condition; current; current = current.parent) {
+    const codes = current.getMetaRaw?.(REQUEST_LANG_CODES);
+    if (codes !== undefined) return codes;
+  }
+  return undefined;
+}
+
+/** The request's languages, for a vector column whose table has translations (@i18n). */
+export function columnWithRequestLangCodes(column: SearchableColumn, condition: any): SearchableColumn {
+  if (!(column.adapterData as { i18nInfo?: unknown } | undefined)?.i18nInfo) return column;
+  return {
+    ...column,
+    adapterData: {
+      ...(column.adapterData as object),
+      langCodes: conditionLangCodes(condition) ?? [],
+    },
+  };
+}
+
+export function columnWithRequestContext(adapterName: string, column: SearchableColumn, condition: any): SearchableColumn {
+  if (adapterName === 'tsv') return columnWithRequestTsConfig(column, condition);
+  if (adapterName === 'vector') return columnWithRequestLangCodes(column, condition);
+  return column;
 }

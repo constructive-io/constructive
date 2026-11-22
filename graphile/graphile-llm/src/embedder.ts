@@ -179,7 +179,7 @@ export function buildEmbedder(config: EmbedderConfig): EmbedderFunction {
  *   AGENTIC_SERVER_URL - The gateway root; with it set, an embedder is always
  *                        available (the gateway resolves the upstream).
  *   EMBEDDER_PROVIDER  - Upstream dialect the gateway should use (default: 'ollama')
- *   EMBEDDER_MODEL     - Model identifier (default: 'nomic-embed-text')
+ *   EMBEDDER_MODEL     - Model identifier (default: 'embeddinggemma-2:440m')
  *
  * Naming a provider or model without a gateway throws; naming nothing at all
  * leaves text fields disabled.
