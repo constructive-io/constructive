@@ -1,6 +1,44 @@
 import type { GrafastSubscriber } from 'grafast';
-import type { Pool } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import { PgSubscriber } from 'postgraphile/adaptors/pg';
+
+type ClientEvent = Parameters<PoolClient['on']>[0];
+
+function subscriberPool(pool: Pool): Pool {
+  return new Proxy(pool, {
+    get(target, property) {
+      if (property === 'connect') {
+        return async () => {
+          const client = await target.connect();
+          const listeners: Array<[ClientEvent, (...args: any[]) => void]> = [];
+          const scopedClient: PoolClient = new Proxy(client, {
+            get(target, property) {
+              if (property === 'on' || property === 'addListener') {
+                return (event: ClientEvent, listener: (...args: any[]) => void) => {
+                  listeners.push([event, listener]);
+                  target.on(event, listener);
+                  return scopedClient;
+                };
+              }
+              if (property === 'release') {
+                return (...args: Parameters<PoolClient['release']>) => {
+                  for (const [event, listener] of listeners) target.removeListener(event, listener);
+                  listeners.length = 0;
+                  target.release(...args);
+                };
+              }
+              const value = Reflect.get(target, property, target);
+              return typeof value === 'function' ? value.bind(target) : value;
+            }
+          });
+          return scopedClient;
+        };
+      }
+      const value = Reflect.get(target, property, target);
+      return typeof value === 'function' ? value.bind(target) : value;
+    }
+  });
+}
 
 export class IdleReleasingPgSubscriber implements GrafastSubscriber<Record<string, string>> {
   private current: PgSubscriber | null = null;
@@ -20,7 +58,7 @@ export class IdleReleasingPgSubscriber implements GrafastSubscriber<Record<strin
 
   subscribe(topic: string): AsyncIterableIterator<string> {
     if (this.closed) throw new Error('PgSubscriber is released');
-    const subscriber = this.current ??= new PgSubscriber(this.pool);
+    const subscriber = this.current ??= new PgSubscriber(subscriberPool(this.pool));
     const source = subscriber.subscribe(topic);
     this.subscriptions++;
     let finished = false;

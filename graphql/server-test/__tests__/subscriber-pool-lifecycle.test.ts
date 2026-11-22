@@ -169,3 +169,49 @@ it('does not acquire a listener for an unused service', async () => {
   await service.release!();
   expect(pool.totalCount - pool.idleCount).toBe(1);
 });
+
+it.each(['return', 'throw', 'release'] as const)('removes only subscriber-owned client listeners after repeated %s cycles', async (completion) => {
+  const client = await pool.connect();
+  const notification = jest.fn();
+  const error = jest.fn();
+  client.on('notification', notification);
+  client.on('error', error);
+  const baseline = {
+    notification: client.listenerCount('notification'),
+    error: client.listenerCount('error')
+  };
+  client.release();
+  let service: Service;
+  try {
+    for (let i = 0; i < 25; i++) {
+      if (!service || completion === 'release') {
+        service = makeIntrospectionWiring(pool, ['listeners'], undefined).pgService as Service;
+        services.push(service);
+      }
+      const stream = await service.pgSubscriber!.subscribe('listener_topic');
+      await waitForCommand('LISTEN', 2);
+      if (completion === 'throw') {
+        const failure = new Error('subscriber failed');
+        await expect(stream.throw!(failure)).rejects.toBe(failure);
+      } else if (completion === 'release') {
+        await service.release!();
+      } else {
+        await stream.return!();
+      }
+      await until(() => pool.totalCount - pool.idleCount === 1);
+      const reused = await pool.connect();
+      try {
+        expect(reused).toBe(client);
+        expect(reused.listenerCount('notification')).toBe(baseline.notification);
+        expect(reused.listenerCount('error')).toBe(baseline.error);
+        expect(reused.listeners('notification')).toContain(notification);
+        expect(reused.listeners('error')).toContain(error);
+      } finally {
+        reused.release();
+      }
+    }
+  } finally {
+    client.removeListener('notification', notification);
+    client.removeListener('error', error);
+  }
+});
