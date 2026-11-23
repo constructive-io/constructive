@@ -11,7 +11,7 @@ import { generic, knownTexts, leadingOptions, literalArg, textOf } from './args'
 import { NO_OPERANDS } from './commands';
 import { hasOption, isOption, readArgs, valuesOf } from './options';
 import { ENV, XARGS } from './programs';
-import { applyEffects } from './scripts';
+import { applyEffects, dirSpecOf, movedBy } from './scripts';
 
 /** How `xargs` feeds the command it runs. */
 export interface XargsInput {
@@ -242,6 +242,44 @@ function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
 }
 
 /**
+ * env's arguments, read as env reads them: `-S` splits its string into words
+ * that env reads as arguments again, before the ones after it, and each `-C`
+ * moves by its repeat rule (the last one counts, from the dir env started in).
+ * Returns the words from its command on.
+ */
+function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: Arg[] } {
+  const start = analyzer.cwdNow;
+  let words = rest;
+  for (;;) {
+    const read = readArgs(ENV, words);
+    const split = read.options.find((o) => isOption(o, '-S', '--split-string'));
+    for (const option of read.options) {
+      if (option === split) break;
+      const moves = dirSpecOf(option);
+      if (moves && option.value) analyzer.moveForOneCommand(scope, movedBy(analyzer, moves, option.value, analyzer.cwdNow, start));
+    }
+    if (!split) {
+      if (read.unknown.length > 0) {
+        // It may be `-C dir` or `-S string`.
+        analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+        analyzer.dynamic(`it passes env ${read.unknown[0].raw}, a value from a variable that may be an option that runs a string`);
+      }
+      return { argv: words.slice(read.next) };
+    }
+    const at = words.indexOf(split.arg);
+    const after = words.slice(split.value !== undefined && split.value === words[at + 1] ? at + 2 : at + 1);
+    const text = textOf(split.value);
+    const parts = text === undefined ? null : envSplit(text);
+    if (parts === null) {
+      analyzer.dynamic(`it runs env -S ${split.value?.raw ?? ''}, a string the analysis cannot split`.trimEnd());
+      generic({ analyzer, stdinFed: false, xargs: false }, after);
+      return { argv: [] };
+    }
+    words = [...parts.map((w) => literalArg(w, split.arg.raw)), ...after];
+  }
+}
+
+/**
  * Take one wrapper off the front of the command. Returns the index of the
  * next word, `i` when `args[i]` is not a wrapper, or the words the command
  * runs from here when the wrapper builds new ones (`env -S`).
@@ -285,34 +323,9 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     const k = opts(/^-[sk]$/, /^-/);
     return k + 1;
   }
-  case 'env': {
+  case 'env':
     // `env -` is `env -i`.
-    const from = textOf(args[i + 1]) === '-' ? i + 2 : i + 1;
-    const rest = args.slice(from);
-    const read = readArgs(ENV, rest);
-    for (const option of read.options) {
-      if (isOption(option, '-S', '--split-string')) {
-        // env reads the split words, and the words after the option, as its arguments again.
-        const at = rest.indexOf(option.arg);
-        const after = rest.slice(option.value !== undefined && option.value === rest[at + 1] ? at + 2 : at + 1);
-        const text = textOf(option.value);
-        const words = text === undefined ? null : envSplit(text);
-        if (words !== null) return { argv: [args[i], ...words.map((w) => literalArg(w, option.arg.raw)), ...after] };
-        analyzer.dynamic(`it runs env -S ${option.value?.raw ?? ''}, a string the analysis cannot split`.trimEnd());
-        generic({ analyzer, stdinFed: false, xargs: false }, after);
-        return args.length;
-      }
-      if (isOption(option, '-C', '--chdir')) {
-        analyzer.moveForOneCommand(scope, option.value?.kind === 'known' ? analyzer.dirAt(option.value.text) : { kind: 'unknown' });
-      }
-    }
-    if (read.unknown.length > 0) {
-      // It may be `-C dir` or `-S string`.
-      analyzer.moveForOneCommand(scope, { kind: 'unknown' });
-      analyzer.dynamic(`it passes env ${read.unknown[0].raw}, a value from a variable that may be an option that runs a string`);
-    }
-    return from + read.next;
-  }
+    return envArgs(analyzer, args.slice(textOf(args[i + 1]) === '-' ? i + 2 : i + 1), scope);
   case 'sudo':
   case 'doas':
   case 'pkexec': {

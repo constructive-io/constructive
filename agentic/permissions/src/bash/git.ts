@@ -11,7 +11,7 @@ import { type Arg, type Cwd, literalStart } from './analyze';
 import { type CommandContext, generic, literalArg, textOf } from './args';
 import { hasOption, isOption, type ReadArgs, readArgs, valuesOf, withEffect } from './options';
 import { GIT, gitSubcommand } from './programs';
-import { applyEffects } from './scripts';
+import { applyEffects, dirSpecOf, movedBy } from './scripts';
 import { isRemoteSpec, isUrl } from './words';
 
 /** `git -c` keys that make git run a program. */
@@ -120,12 +120,12 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     return;
   }
   let cwd: Cwd | null = null;
+  const start = analyzer.cwdNow;
   for (const option of global.options) {
     const v = option.value;
-    if (isOption(option, '-C')) {
-      // Each -C is read from the dir the one before it names.
-      if (v) analyzer.within(cwd ?? analyzer.cwdNow, () => analyzer.addPath(v, 'read', true));
-      cwd = v?.kind === 'known' ? analyzer.dirAt(v.text, cwd ?? undefined) : { kind: 'unknown' };
+    const moves = dirSpecOf(option);
+    if (moves) {
+      if (v) cwd = movedBy(analyzer, moves, v, cwd ?? start, start);
     } else if (isOption(option, '-c')) {
       configKey(ctx, 'git -c', v);
       const repointed = v?.kind === 'known' ? GIT_REMOTE_URL_CONFIG.exec(v.text) : null;

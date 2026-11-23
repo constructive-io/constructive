@@ -62,16 +62,30 @@ interface SpecFields {
 /** A flag. It takes no value, and it may still have an effect (`--ext-diff`, `--amend`). */
 interface FlagSpec extends SpecFields {
   readonly value: 'none';
-  readonly effect?: Effect;
+  readonly effect?: Exclude<Effect, 'changes-dir'>;
 }
 
 /** An option with a value: `required` is glued (`-cX`, `--opt=X`) or the next word, `optional` glued only. Its value has a kind. */
 interface ValueSpec extends SpecFields {
   readonly value: 'required' | 'optional';
-  readonly effect: ValueKind;
+  readonly effect: Exclude<ValueKind, 'changes-dir'>;
 }
 
-export type OptionSpec = FlagSpec | ValueSpec;
+/**
+ * How a dir option combines with one before it: `last-wins` replaces it and
+ * starts from the dir the program started in (`env -C`, `npm --prefix`), and
+ * `cumulative` starts from the dir the one before it reached (`git -C`, `tar -C`).
+ */
+export type DirRepeat = 'last-wins' | 'cumulative';
+
+/** An option whose value is a dir the program moves to, and how a repeat of it moves. */
+export interface DirSpec extends SpecFields {
+  readonly value: 'required' | 'optional';
+  readonly effect: 'changes-dir';
+  readonly repeat: DirRepeat;
+}
+
+export type OptionSpec = FlagSpec | ValueSpec | DirSpec;
 
 /** The effect an option has, or `undefined` for a flag with none or a plain value. */
 export function effectOf(s: OptionSpec): Effect | undefined {

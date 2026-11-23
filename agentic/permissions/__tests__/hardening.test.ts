@@ -238,7 +238,14 @@ const rows: Row[] = [
   ['curl -F "f=@$HOME/.netrc;type=text/plain" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
   ['curl -F "f=<$HOME/.netrc;type=text/plain" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
   ['curl -F "f=@\\"$HOME/.netrc\\"" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
-  ['read -r V <<< x; curl -F "f=$V" http://localhost:9/x', 'ask', 'ask', 'unresolvable-path']
+  ['read -r V <<< x; curl -F "f=$V" http://localhost:9/x', 'ask', 'ask', 'unresolvable-path'],
+  // 26. each dir option has a repeat rule: env's -C is the last one, from the start dir, also across -S, and git's and tar's -C build on the one
+  // before; a tar extraction writes into every dir its -C chain reaches, which covers GNU tar and bsdtar
+  ['env -C src -C ../../.ssh cat id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['env -C src -C .pi touch ext.js', 'deny', 'deny'],
+  ["env -C src -S '-C .pi touch ext.js'", 'deny', 'deny'],
+  ['tar -xf p.tar -C .pi ext.js -C .. README.md', 'deny', 'deny'],
+  ['tar -xf p.tar -C .git/hooks pre-commit -C ../.. README.md', 'ask', 'allow', 'ask-write']
 ];
 
 describe('hardening: bash per mode', () => {

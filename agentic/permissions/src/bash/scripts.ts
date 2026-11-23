@@ -8,15 +8,32 @@
  */
 
 import { unreachable } from '../unreachable';
-import type { Arg, Cwd } from './analyze';
+import { type Arg, type Cwd, sameCwd } from './analyze';
 import { type CommandContext, generic, literalArg, operands, restOf, textOf } from './args';
-import { effectOf, effectsOf, hasEffect, hasOption, isOption, namedFiles, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf } from './options';
+import { type DirSpec, effectsOf, hasEffect, hasOption, isOption, namedFiles, type ProgramSpec, type ReadArgs, readArgs, type ReadOption, shellCommands, valuesOf } from './options';
 import { MAN, SORT, TAR, type TextProgram, ZIP } from './programs';
 
 /** A dir the program moves to: the option that moves it, and the dir it is in from there on. */
 export interface DirChange {
   readonly at: Arg;
   readonly dir: Cwd;
+}
+
+/**
+ * Where a dir option moves the program, by its repeat rule: a cumulative one
+ * (`git -C`, `tar -C`) from the dir the one before it reached, a last-wins one
+ * (`env -C`, `npm --prefix`) from the dir the program started in. Its value is
+ * read as a path from there.
+ */
+export function movedBy(analyzer: CommandContext['analyzer'], spec: DirSpec, value: Arg, reached: Cwd, start: Cwd): Cwd {
+  const from = spec.repeat === 'cumulative' ? reached : start;
+  analyzer.within(from, () => analyzer.addPath(value, 'read', true));
+  return value.kind === 'known' ? analyzer.dirAt(value.text, from) : { kind: 'unknown' };
+}
+
+/** The spec of the dir option a read option can be, if any. */
+export function dirSpecOf(option: ReadOption): DirSpec | undefined {
+  return option.specs.find((s): s is DirSpec => s.effect === 'changes-dir');
 }
 
 /**
@@ -29,13 +46,12 @@ export interface DirChange {
 export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpec, read: ReadArgs): DirChange[] {
   const { analyzer } = ctx;
   const changes: DirChange[] = [];
-  const dir = (): Cwd | undefined => changes[changes.length - 1]?.dir;
+  const start = analyzer.cwdNow;
   for (const option of read.options) {
     const { value } = option;
     for (const s of option.specs) {
-      const effect = effectOf(s);
-      if (!effect || !hasEffect(s, effect, value)) continue;
-      switch (effect) {
+      if (s.effect === undefined || s.effect === 'plain' || !hasEffect(s, s.effect, value)) continue;
+      switch (s.effect) {
       case 'runs-program': {
         const commands = shellCommands(option);
         if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program or code the analysis does not read`);
@@ -49,9 +65,7 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
         for (const file of namedFiles(s, value)) analyzer.addPath(file, 'write', true);
         break;
       case 'changes-dir':
-        if (!value) break;
-        analyzer.within(dir() ?? analyzer.cwdNow, () => analyzer.addPath(value, 'read', true));
-        changes.push({ at: option.arg, dir: value.kind === 'known' ? analyzer.dirAt(value.text, dir()) : { kind: 'unknown' } });
+        if (value) changes.push({ at: option.arg, dir: movedBy(analyzer, s, value, changes[changes.length - 1]?.dir ?? start, start) });
         break;
       // git, ssh and the prefix guard read these themselves.
       case 'sets-config':
@@ -59,7 +73,7 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
       case 'rewrites-history':
         break;
       default:
-        return unreachable(effect);
+        return unreachable(s.effect);
       }
     }
   }
@@ -145,8 +159,11 @@ function tarWords(rest: readonly Arg[]): Arg[] {
 
 /**
  * tar: the mode sets the archive's access (create, append and update write
- * it), a member it adds is read from the dir the `-C` before it names, and an
- * extraction writes into the dir the last `-C` names.
+ * it), and the -C chain sets where its members are. GNU tar reads options
+ * anywhere, so a member is in the dir the -C before it reached; bsdtar stops
+ * reading options at the first member, so every member is in the dir the
+ * chain reached there. A member counts in both, and an extraction writes into
+ * the dir of every member, or the dir the chain reached when it names none.
  */
 export function tar(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
@@ -154,15 +171,24 @@ export function tar(ctx: CommandContext, rest: readonly Arg[]): void {
   const read = readArgs(TAR, words);
   const changes = applyEffects(ctx, 'tar', TAR, read);
   const writes = hasOption(read, '-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete');
-  for (const archive of valuesOf(read, '-f', '--file')) if (textOf(archive) !== '-') analyzer.addPath(archive, writes ? 'write' : 'read', true);
+  if (writes) for (const archive of valuesOf(read, '-f', '--file')) if (textOf(archive) !== '-') analyzer.addPath(archive, 'write', true);
+  const start = analyzer.cwdNow;
   const at = (arg: Arg) => words.indexOf(arg);
-  const dirBefore = (arg: Arg): Cwd => changes.filter((c) => at(c.at) < at(arg)).pop()?.dir ?? analyzer.cwdNow;
+  const dirBefore = (index: number): Cwd => changes.filter((c) => at(c.at) < index).pop()?.dir ?? start;
+  const members = read.positionals;
+  const bsd = dirBefore(members.length > 0 ? at(members[0]) : words.length);
+  const dirsOf = (member: Arg): Cwd[] => {
+    const gnu = dirBefore(at(member));
+    return sameCwd(gnu, bsd) ? [gnu] : [gnu, bsd];
+  };
   if (hasOption(read, '-x', '--extract', '--get')) {
-    analyzer.within(finalDir(changes) ?? analyzer.cwdNow, () => analyzer.addPath(literalArg('.'), 'write', true));
+    const dirs = members.length > 0 ? members.flatMap(dirsOf) : [bsd];
+    const distinct = dirs.filter((d, k) => dirs.findIndex((e) => sameCwd(d, e)) === k);
+    for (const dir of distinct) analyzer.within(dir, () => analyzer.addPath(literalArg('.'), 'write', true));
     return;
   }
   if (!writes) return;
-  for (const member of read.positionals) analyzer.within(dirBefore(member), () => operands(ctx, [member], 'read'));
+  for (const member of members) for (const dir of dirsOf(member)) analyzer.within(dir, () => operands(ctx, [member], 'read'));
 }
 
 /** zip: its first operand is the archive it writes, the rest are files it reads. */

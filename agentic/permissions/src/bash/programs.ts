@@ -11,13 +11,15 @@ import type { Arg } from './analyze';
 import { AT_FILE, FORM_FILES, NAME_AT_FILE, VARIABLE_FILE, WRITE_OUT_FILES } from './curl-forms';
 import type { CommandLanguage } from './languages';
 import * as languages from './languages';
-import { type Effect, type FileForm, mayBeOption, type OptionSpec, type ProgramSpec, type ValueKind } from './options';
+import { type DirRepeat, type Effect, type FileForm, mayBeOption, type OptionSpec, type ProgramSpec, type ValueKind } from './options';
 
 const flag = (...names: string[]): OptionSpec => ({ names, value: 'none' });
 /** A flag with an effect (`--ext-diff` runs a program, `--amend` rewrites history). */
-const flagDoes = (effect: Effect, ...names: string[]): OptionSpec => ({ names, value: 'none', effect });
+const flagDoes = (effect: Exclude<Effect, 'changes-dir'>, ...names: string[]): OptionSpec => ({ names, value: 'none', effect });
 /** An option whose value is a `kind` of thing: a file it reads or writes, a dir, a program, config, a destination, or plain text. */
-const does = (kind: ValueKind, value: 'required' | 'optional', ...names: string[]): OptionSpec => ({ names, value, effect: kind });
+const does = (kind: Exclude<ValueKind, 'changes-dir'>, value: 'required' | 'optional', ...names: string[]): OptionSpec => ({ names, value, effect: kind });
+/** An option whose value is a dir the program moves to; `repeat` says how a second one moves. */
+const movesTo = (repeat: DirRepeat, ...names: string[]): OptionSpec => ({ names, value: 'required', effect: 'changes-dir', repeat });
 const plain = (...names: string[]): OptionSpec => does('plain', 'required', ...names);
 const optionalPlain = (...names: string[]): OptionSpec => does('plain', 'optional', ...names);
 
@@ -44,7 +46,7 @@ export const GIT: ProgramSpec = {
   abbreviations: false,
   stopAtOperand: true,
   options: [
-    does('changes-dir', 'required', '-C'),
+    movesTo('cumulative', '-C'),
     does('sets-config', 'required', '-c', '--config-env'),
     does('reads-file', 'required', '--git-dir', '--work-tree'),
     does('runs-program', 'optional', '--exec-path'),
@@ -229,7 +231,7 @@ const PACKAGE_MANAGER: ProgramSpec = {
   options: [
     // A config file can set the script shell, so loading one runs what it names.
     does('runs-program', 'required', '--script-shell', '--node-options', '--userconfig', '--globalconfig', '--config'),
-    does('changes-dir', 'required', '--prefix', '-C', '--dir', '--cwd')
+    movesTo('last-wins', '--prefix', '-C', '--dir', '--cwd')
   ]
 };
 
@@ -245,7 +247,7 @@ export const PROGRAMS: ReadonlyMap<string, ProgramSpec> = new Map([
       stopAtOperand: false,
       options: [
         does('runs-program', 'required', '--preload', '-r', '--require', '--config', '-c'),
-        does('changes-dir', 'required', '--cwd')
+        movesTo('last-wins', '--cwd')
       ]
     }
   ]
@@ -390,7 +392,7 @@ export const ENV: ProgramSpec = {
   ...sub(
     flag('-i', '--ignore-environment', '-0', '--null', '-v', '--debug'),
     plain('-u', '--unset'),
-    does('changes-dir', 'required', '-C', '--chdir'),
+    movesTo('last-wins', '-C', '--chdir'),
     does('runs-program', 'required', '-S', '--split-string'),
     optionalPlain('--default-signal', '--ignore-signal', '--block-signal')
   ),
@@ -451,7 +453,7 @@ export const TAR: ProgramSpec = sub(
   runsShell('required', '--to-command', '-I', '--use-compress-program', '--rsh-command', '--rmt-command', '-F', '--info-script', '--new-volume-script'),
   { names: ['--checkpoint-action'], value: 'required', effect: 'runs-program', when: /^exec=/, shell: /^exec=([\s\S]*)$/ },
   does('reads-file', 'required', '-T', '--files-from', '-X', '--exclude-from'),
-  does('changes-dir', 'required', '-C', '--directory'),
+  movesTo('cumulative', '-C', '--directory'),
   flag('-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete', '-x', '--extract', '--get', '-t', '--list', '-d', '--diff', '--compare'),
   // The archive: read, and written too in a mode that writes it, which `tar` adds.
   stdio(does('reads-file', 'required', '-f', '--file')),
@@ -622,7 +624,7 @@ const PWSH: TextProgram = {
     options: [
       plain('-Command', '-c', '-EncodedCommand', '-e', '-ec', '-CommandWithArgs', '-cwa', '-ExecutionPolicy', '-ep'),
       does('reads-file', 'required', '-File', '-f'),
-      does('changes-dir', 'required', '-WorkingDirectory', '-wd'),
+      movesTo('last-wins', '-WorkingDirectory', '-wd'),
       flag('-NoProfile', '-nop', '-NonInteractive', '-NoLogo', '-Version', '-Help', '-Login', '-l')
     ]
   },
@@ -641,7 +643,7 @@ const GDB: TextProgram = {
       // A script file holds gdb commands the analysis does not read.
       does('runs-program', 'required', '-x', '--command', '-command', '-ix', '--init-command', '-init-command'),
       does('reads-file', 'required', '-x', '--command', '-command', '-ix', '--init-command', '-init-command'),
-      does('changes-dir', 'required', '-cd', '--cd'),
+      movesTo('last-wins', '-cd', '--cd'),
       does('reads-file', 'required', '-d', '--directory', '-s', '--symbols', '-c', '--core', '-se', '-e', '--exec'),
       plain('-p', '--pid'),
       flag('-batch', '--batch', '-nx', '--nx', '-n', '-q', '--quiet', '-silent', '--args')

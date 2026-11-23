@@ -131,7 +131,7 @@ export function normalizeCommand(command: string): CommandKey {
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
 export type Cwd = { kind: 'start' } | { kind: 'moved'; dir: string } | { kind: 'unknown' };
 
-function sameCwd(a: Cwd, b: Cwd): boolean {
+export function sameCwd(a: Cwd, b: Cwd): boolean {
   return a.kind === b.kind && (a.kind !== 'moved' || (b.kind === 'moved' && a.dir === b.dir));
 }
 
