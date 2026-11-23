@@ -1,5 +1,7 @@
 /** Brace expansion (`{a,b}`, `{1..3}`) on the unquoted parts of a word. */
 
+import type { Limit } from './limits';
+
 const MAX_BRACE_RESULTS = 256;
 
 /** The most words a word of plain names may expand to, so that each name is still checked. */
@@ -23,8 +25,8 @@ export class NameBudget {
   }
 }
 
-/** Where an expansion stopped: it made every word, hit the word's own limit, or the command's budget. */
-export type Cut = 'none' | 'word' | 'budget';
+/** Where an expansion stopped short: at the word's own limit, or at the command's budget. */
+export type BraceLimit = Extract<Limit, 'brace-results' | 'brace-names'>;
 
 /**
  * The word can only expand to plain names in the current dir: with no comma
@@ -41,15 +43,15 @@ function expandsToPlainNames(text: string): boolean {
  * names (`for i in {1..300}`), whose names can still spell a secret file or
  * a credential store (`.{a..z}{e..e}{a..z}{r..r}{c..c}` holds `.netrc`), and
  * never past what `budget` has left. The word keeps at least its first name,
- * so later words keep their positions. Any cut leaves words missing.
+ * so later words keep their positions. A limit it returns leaves words missing.
  */
-export function expandWord(text: string, mask: boolean[], out: Expansion[], budget: NameBudget): Cut {
+export function expandWord(text: string, mask: boolean[], out: Expansion[], budget: NameBudget): BraceLimit | null {
   const cap = expandsToPlainNames(text) ? MAX_PLAIN_NAME_RESULTS : MAX_BRACE_RESULTS;
   const limit = Math.min(cap, Math.max(1, budget.room));
   const complete = expandBraces(text, mask, out, limit);
   if (out.length > 1) budget.take(out.length);
-  if (complete) return 'none';
-  return limit < cap ? 'budget' : 'word';
+  if (complete) return null;
+  return limit < cap ? 'brace-names' : 'brace-results';
 }
 
 /**

@@ -9,9 +9,11 @@
  * It never executes or expands anything that needs the environment. What it
  * cannot know it marks: a word part is `unknown`, and constructs that hide code
  * add a `dynamic` note. Any lexer error (an unterminated quote) is reported as
- * `error`, and the analyzer turns both into `shell-dynamic`.
+ * `error`, and the analyzer turns both into `shell-dynamic`. A substitution
+ * nested past `MAX_SUBSTITUTION_DEPTH` is left unread and listed in `limits`.
  */
 
+import type { Limit } from './limits';
 import {
   arithmeticEnd,
   decodeAnsiC,
@@ -88,10 +90,12 @@ export interface Lexed {
   commands: SimpleCommand[];
   /** Notes on constructs that run code the analyzer cannot see. */
   dynamic: string[];
+  /** The limits of the analysis the lexer stopped at, leaving text unread. */
+  limits: Limit[];
   error?: string;
 }
 
-const MAX_DEPTH = 6;
+export const MAX_SUBSTITUTION_DEPTH = 6;
 
 /** Arithmetic with no name, substitution or quote in it: it reads no variable, so it runs no code. */
 const PLAIN_ARITHMETIC = /^[\d\s+\-*/%()<>=!&|^~?:,]*$/;
@@ -112,6 +116,7 @@ function newCommand(): SimpleCommand {
 class Lexer {
   readonly commands: SimpleCommand[] = [];
   readonly dynamic: string[] = [];
+  readonly limits: Limit[] = [];
   private current = newCommand();
   private pending: PendingHeredoc[] = [];
   /** The stdin the next command gets: after `|` the stdout of what came before. */
@@ -316,7 +321,10 @@ class Lexer {
 
   private substitute(inner: string, note: string): void {
     this.dynamic.push(note);
-    if (this.depth >= MAX_DEPTH) throw new LexError('substitutions nested too deep');
+    if (this.depth >= MAX_SUBSTITUTION_DEPTH) {
+      this.limits.push('substitution-depth');
+      return;
+    }
     const sub = new Lexer(inner, this.depth + 1);
     try {
       sub.run();
@@ -328,6 +336,7 @@ class Lexer {
     }
     this.commands.push(...sub.commands);
     this.dynamic.push(...sub.dynamic);
+    this.limits.push(...sub.limits);
   }
 
   /** Read one word starting at `this.i`, up to unquoted whitespace or an operator. */
@@ -545,9 +554,9 @@ export function tokenize(command: string): Lexed {
   const lexer = new Lexer(command, 0);
   try {
     lexer.run();
-    return { commands: lexer.commands, dynamic: lexer.dynamic };
+    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits };
   } catch (error) {
     if (!(error instanceof LexError)) throw error;
-    return { commands: lexer.commands, dynamic: lexer.dynamic, error: error.message };
+    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits, error: error.message };
   }
 }

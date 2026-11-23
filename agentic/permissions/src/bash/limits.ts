@@ -1,0 +1,17 @@
+/**
+ * The limits of the analysis itself. Past one, the analyzer has not read the
+ * whole command, and what it did not read can touch any path, so every limit
+ * reports through `Analyzer.incomplete`, which raises `unresolvable-path`: it
+ * asks in every mode, Full included. A new limit adds a member here.
+ */
+export type Limit =
+  /** A command substitution nested deeper than the lexer reads. */
+  | 'substitution-depth'
+  /** A shell string (`sh -c`, `eval`, …) nested deeper than the analyzer reads. */
+  | 'shell-string-depth'
+  /** A command longer than the analyzer reads. */
+  | 'command-length'
+  /** One word's brace expansion has more results than are checked. */
+  | 'brace-results'
+  /** The command's brace expansions make more names than are checked. */
+  | 'brace-names';

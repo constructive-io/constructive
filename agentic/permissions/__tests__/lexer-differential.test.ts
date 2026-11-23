@@ -121,7 +121,10 @@ const rows: Row[] = [
   ['cd ~ && cat .{a..z}{e..e}{a..z}{r..r}{c..c}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['rev .{z..a}{z..a}{z..a} 2>/dev/null', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // an expansion cut off at its limit leaves words unchecked, so it asks in every mode
-  [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'ask', 'ask', 'ask', ['unresolvable-path']]
+  [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'ask', 'ask', 'ask', ['unresolvable-path']],
+  // so does every other limit of the analysis: substitution depth and shell-string depth
+  [`${'echo $('.repeat(7)}cat ~/.ssh/id_rsa${')'.repeat(7)}`, 'ask', 'ask', 'ask', ['unresolvable-path']],
+  ['eval eval eval eval eval cat ~/.ssh/id_rsa', 'ask', 'ask', 'ask', ['unresolvable-path']]
 ];
 
 const modes: PermissionMode[] = ['ask', 'workspace', 'full'];
@@ -145,6 +148,15 @@ describe('bash analysis reads a command the way bash runs it', () => {
     const command = `cat ${Array.from({ length: 30 }, (_, k) => `w${k}{a..z}{a..z}{a..f}`).join(' ')}`;
     const d = await sb.bash(command, 'workspace');
     expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
+  });
+
+  it('asks in every mode for a command longer than the analysis reads', async () => {
+    const command = `cat ~/.ssh/id_rsa; : ${'x'.repeat(64 * 1024)}`;
+    for (const mode of modes) {
+      const d = await sb.bash(command, mode);
+      expect([mode, d.decision]).toEqual([mode, 'ask']);
+      expect(d.request.signals).toContain('unresolvable-path');
+    }
   });
 
   it('keeps a quoted heredoc body literal and does not join its lines', async () => {

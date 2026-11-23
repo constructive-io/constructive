@@ -71,7 +71,7 @@ function optionsOf(words: readonly Word[], names: NameBudget): string[] | null {
     }
     const { text, mask } = literalText(word);
     const expanded: { text: string; mask: boolean[] }[] = [];
-    if (expandWord(text, mask, expanded, names) !== 'none') return null;
+    if (expandWord(text, mask, expanded, names) !== null) return null;
     for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
   }
   return options;

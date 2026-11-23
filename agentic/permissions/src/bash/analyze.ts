@@ -2,7 +2,8 @@
  * Static risk analysis of a bash command. It finds the paths a command touches
  * and the signals that make it risky, and it fails toward asking: anything it
  * cannot see through (substitution, `eval`, `sh -c`, a variable it cannot
- * resolve, a lexer error) raises `shell-dynamic`.
+ * resolve, a lexer error) raises `shell-dynamic`. Where the analysis stops at
+ * one of its own limits, it raises `unresolvable-path`, which asks in every mode.
  *
  * This is best effort and is not a security boundary. A program the agent
  * wrote can still do anything the user can; only an OS sandbox stops that.
@@ -18,8 +19,18 @@ import { generic } from './args';
 import { expandWord, MAX_BRACE_NAMES, MAX_PLAIN_NAME_RESULTS, NameBudget } from './braces';
 import { runCommand, TESTS } from './commands';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
+import type { Limit } from './limits';
 import { commandParts } from './parts';
-import { heredocsOf, isPipedIn, type Lexed, readsStdinDoc, type SimpleCommand, tokenize, type Word } from './tokenize';
+import {
+  heredocsOf,
+  isPipedIn,
+  type Lexed,
+  MAX_SUBSTITUTION_DEPTH,
+  readsStdinDoc,
+  type SimpleCommand,
+  tokenize,
+  type Word
+} from './tokenize';
 import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
 
@@ -130,10 +141,20 @@ export function literalStart(arg: Arg): string {
 /** Whether IFS may differ from bash's default (space, tab, newline). */
 type IfsState = 'default' | 'maybe-changed';
 
-const MAX_NESTING = 4;
+/** How many shell strings (`sh -c`, `eval`, …) deep the analysis reads. */
+const MAX_SHELL_STRING_DEPTH = 4;
 
-/** The longest command the analysis reads; a longer one is `shell-dynamic`. */
+/** The longest command the analysis reads. */
 export const MAX_COMMAND_LENGTH = 64 * 1024;
+
+/** What each limit of the analysis leaves unread. */
+const LIMIT_REASONS: Record<Limit, string> = {
+  'substitution-depth': `it nests command substitutions more than ${MAX_SUBSTITUTION_DEPTH} deep, and the analysis did not read past that`,
+  'shell-string-depth': `it nests shell strings (\`sh -c\`, \`eval\`, …) more than ${MAX_SHELL_STRING_DEPTH} deep, and the analysis did not read past that`,
+  'command-length': `it is longer than ${MAX_COMMAND_LENGTH / 1024} KB, and the analysis did not read it`,
+  'brace-results': `a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`,
+  'brace-names': `the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`
+};
 
 /** Device paths that are not files. */
 const HARMLESS_DEVICES = new Set([
@@ -262,6 +283,11 @@ class Analyzer {
     this.flag('unresolvable-path', reason);
   }
 
+  /** The analysis stopped at one of its own limits, so it has not read the whole command. */
+  incomplete(limit: Limit): void {
+    this.unresolvable(LIMIT_REASONS[limit]);
+  }
+
   /** `cd dir` looks `dir` up in `CDPATH` when the command set it and `dir` is not `/…`, `./…` or `../…`. */
   searchesCdPath(dir: string): boolean {
     return this.vars.has('CDPATH') && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
@@ -269,18 +295,19 @@ class Analyzer {
 
   /** Analyze one shell string. Returns what it lexed to, or `null` when it was not lexed. */
   analyzeString(command: string): Lexed | null {
-    if (this.depth > MAX_NESTING) {
-      this.dynamic('the command nests shell strings too deeply to check');
+    if (this.depth > MAX_SHELL_STRING_DEPTH) {
+      this.incomplete('shell-string-depth');
       return null;
     }
     if (command.length > MAX_COMMAND_LENGTH) {
-      this.dynamic('the command is too long to check');
+      this.incomplete('command-length');
       return null;
     }
     const lexed = tokenize(command);
     if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifs = 'maybe-changed';
     if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
+    for (const limit of lexed.limits) this.incomplete(limit);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);
     return lexed;
   }
@@ -429,19 +456,8 @@ class Analyzer {
       }
     }
     const expanded: { text: string; mask: boolean[] }[] = [];
-    const cut = expandWord(text, mask, expanded, this.names);
-    switch (cut) {
-    case 'none':
-      break;
-    case 'word':
-      this.unresolvable(`a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`);
-      break;
-    case 'budget':
-      this.unresolvable(`the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`);
-      break;
-    default:
-      return unreachable(cut);
-    }
+    const limit = expandWord(text, mask, expanded, this.names);
+    if (limit) this.incomplete(limit);
     const braced = text[0] === '{' && mask[0];
     return expanded.map((e): Arg => {
       const result = braced ? this.alternativeTilde(e) : e;
