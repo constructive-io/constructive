@@ -23,6 +23,7 @@ jest.mock('../src/s3-signer', () => ({
 import { HeadObjectCommand } from '@aws-sdk/client-s3';
 
 import { processSingleFile } from '../src/plugin';
+import { generatePresignedPutUrl } from '../src/s3-signer';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from '../src/types';
 
 const BUCKET_ID = '33333333-3333-3333-3333-333333333333';
@@ -166,5 +167,48 @@ describe('content-addressed upload whose hash a custom-key row carries', () => {
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false, key: `originals/${NEW_FILE_ID}` });
     expect(queries[0].values).toEqual([HASH, BUCKET_ID, HASH]);
     expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
+  });
+});
+
+describe('site release requested before the deploy was canceled', () => {
+  const retry = async (checkOnly: boolean, ageSeconds = 60) => {
+    const key = `originals/${OLD_FILE_ID}`;
+    const txClient = {
+      query: jest.fn().mockResolvedValueOnce({
+        rows: [{ id: OLD_FILE_ID, key, status: 'requested', mime_type: 'text/html', size: '16',
+          created_at: new Date(Date.now() - ageSeconds * 1000) }],
+      }),
+    };
+    const s3 = fakeS3();
+    const result = await processSingleFile(options, txClient, storageConfig(), 'db', bucket, s3,
+      { contentHash: HASH, contentType: 'text/html', size: 16, filename: SITE_KEY },
+      { release: true, checkOnly });
+    expect(txClient.query).toHaveBeenCalledTimes(1);
+    expect(heads(s3)).toEqual([]);
+    return { result, key, s3 };
+  };
+
+  beforeEach(() => jest.mocked(generatePresignedPutUrl).mockClear());
+
+  it('reissues a PUT for the same managed row and only for its remaining lifetime', async () => {
+    const { result, key, s3 } = await retry(false);
+    expect(result).toMatchObject({ fileId: OLD_FILE_ID, key, deduplicated: false, uploadUrl: 'https://s3.example.com/put' });
+    expect(result.pending).not.toBe(true);
+    expect(result.uploadHeaders).toMatchObject({ 'x-amz-meta-upload-id': OLD_FILE_ID, 'Content-Type': 'text/html' });
+    const ttl = jest.mocked(generatePresignedPutUrl).mock.calls[0][4]!;
+    expect(ttl).toBeGreaterThanOrEqual(839);
+    expect(ttl).toBeLessThanOrEqual(840);
+    expect(generatePresignedPutUrl).toHaveBeenCalledWith(s3, key, 'text/html', 16, ttl, HASH, OLD_FILE_ID);
+  });
+
+  it('does not sign during a confirmation-only poll', async () => {
+    const { result } = await retry(true);
+    expect(result).toMatchObject({ fileId: OLD_FILE_ID, pending: true, uploadUrl: null });
+    expect(generatePresignedPutUrl).not.toHaveBeenCalled();
+  });
+
+  it('does not reissue a PUT after the original confirmation deadline', async () => {
+    await expect(retry(false, 900)).rejects.toThrow('SITE_RELEASE_UPLOAD_EXPIRED');
+    expect(generatePresignedPutUrl).not.toHaveBeenCalled();
   });
 });

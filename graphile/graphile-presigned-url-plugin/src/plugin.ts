@@ -657,6 +657,12 @@ export async function processSingleFile(
   const projectFile = (fileId: string, key: string): FileProjection =>
     buildFileProjection({ id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename });
 
+  const signUpload = async (fileId: string, key: string, mime: string, bytes: number, ttl: number) => ({
+    uploadUrl: await generatePresignedPutUrl(s3ForDb, key, mime, bytes, ttl, contentHash, fileId),
+    uploadHeaders: presignedPutHeaders(mime, contentHash, fileId),
+    expiresAt: new Date(Date.now() + ttl * 1000).toISOString(),
+  });
+
   // The user names a logical slot, never an object-store location. Only the
   // recorder allocates the physical key, independently for every new request.
   const logicalKey = siteUpload?.release ? RELEASE_SLOT_PREFIX + contentHash : customKey || contentHash;
@@ -674,7 +680,7 @@ export async function processSingleFile(
 
   if (siteUpload?.release || siteUpload?.checkOnly) {
     const { rows } = await txClient.query({
-      text: `SELECT id, key, status::text AS status
+      text: `SELECT id, key, status::text AS status, mime_type, size, filename, created_at
                FROM ${storageConfig.filesQualifiedName}
               WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
                 AND NOT logical_key_retired AND status IN ('requested', 'uploaded', 'processed')
@@ -683,6 +689,20 @@ export async function processSingleFile(
     });
     const row = rows[0];
     if (row) {
+      if (row.status === 'requested' && !siteUpload.checkOnly) {
+        const deadline = new Date(row.created_at).getTime() + storageConfig.uploadUrlExpirySeconds * 1000;
+        const remainingSeconds = Math.floor((deadline - Date.now()) / 1000);
+        if (remainingSeconds <= 0) throw new Error('SITE_RELEASE_UPLOAD_EXPIRED');
+        return {
+          ...await signUpload(row.id, row.key, row.mime_type, Number(row.size), remainingSeconds),
+          fileId: row.id, key: row.key, logicalKey,
+          deduplicated: false, pending: false,
+          file: buildFileProjection({
+            id: row.id, key: row.key, bucketId: bucket.id,
+            mime: row.mime_type, size: Number(row.size), filename: row.filename,
+          }),
+        };
+      }
       return {
         uploadUrl: null as string | null, uploadHeaders: null as Record<string, string> | null,
         fileId: row.id, key: row.key, logicalKey,
@@ -736,27 +756,12 @@ export async function processSingleFile(
   // Generate presigned PUT URL, signed over the client's SHA-256 so the store
   // only accepts bytes that hash to the content hash on this row and any
   // later dedup hit. Neither logical keys nor checksums locate the object.
-  const uploadUrl = await generatePresignedPutUrl(
-    s3ForDb,
-    s3Key,
-    contentType,
-    size,
-    storageConfig.uploadUrlExpirySeconds,
-    contentHash,
-    fileId,
-  );
-  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId);
-
-  const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
-
   return {
-    uploadUrl,
-    uploadHeaders,
+    ...await signUpload(fileId, s3Key, contentType, size, storageConfig.uploadUrlExpirySeconds),
     fileId,
     key: s3Key,
     logicalKey,
     deduplicated: false,
-    expiresAt,
     file: projectFile(fileId, s3Key),
   };
 }
