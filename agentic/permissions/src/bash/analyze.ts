@@ -2,8 +2,9 @@
  * Static risk analysis of a bash command. It finds the paths a command touches
  * and the signals that make it risky, and it fails toward asking: anything it
  * cannot see through (substitution, `eval`, `sh -c`, a variable it cannot
- * resolve, a lexer error) raises `shell-dynamic`. Where the analysis stops at
- * one of its own limits, it raises `unresolvable-path`, which asks in every mode.
+ * resolve) raises `shell-dynamic`. Where the analysis stops at one of its own
+ * limits or at text it cannot parse, it raises `unresolvable-path`, which asks
+ * in every mode.
  *
  * This is best effort and is not a security boundary. A program the agent
  * wrote can still do anything the user can; only an OS sandbox stops that.
@@ -150,7 +151,8 @@ const LIMIT_REASONS: Record<Limit, string> = {
   'shell-string-depth': `it nests shell strings (\`sh -c\`, \`eval\`, …) more than ${MAX_SHELL_STRING_DEPTH} deep, and the analysis did not read past that`,
   'command-length': `it is longer than ${MAX_COMMAND_LENGTH / 1024} KB, and the analysis did not read it`,
   'expansion-chars': `its expansions build more than ${MAX_EXPANSION_CHARS / 1024} KB of text, and the analysis did not build the rest`,
-  'expansion-words': `its expansions make more than ${MAX_EXPANSION_WORDS} words, so not every word could be checked`
+  'expansion-words': `its expansions make more than ${MAX_EXPANSION_WORDS} words, so not every word could be checked`,
+  unparsed: 'the analysis could not parse it, so it did not read what bash may run there'
 };
 
 /** Builtins whose `NAME=value` arguments bash expands as assignments, with no splitting or glob. */
@@ -285,9 +287,9 @@ class Analyzer implements ExpansionScope {
     this.flag('unresolvable-path', reason);
   }
 
-  /** The analysis stopped at one of its own limits, so it has not read the whole command. */
-  incomplete(limit: Limit): void {
-    this.unresolvable(LIMIT_REASONS[limit]);
+  /** The analysis stopped at one of its own limits, or at text it cannot parse, so it has not read the whole command. */
+  incomplete(limit: Limit, detail?: string): void {
+    this.unresolvable(detail ? `${LIMIT_REASONS[limit]} (${detail})` : LIMIT_REASONS[limit]);
   }
 
   /** `cd dir` looks `dir` up in `CDPATH` when the command set it and `dir` is not `/…`, `./…` or `../…`. */
@@ -307,7 +309,7 @@ class Analyzer implements ExpansionScope {
     }
     const lexed = tokenize(command);
     if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifs = 'maybe-changed';
-    if (lexed.error) this.dynamic(`the command could not be parsed (${lexed.error})`);
+    if (lexed.error) this.incomplete('unparsed', lexed.error);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const limit of lexed.limits) this.incomplete(limit);
     for (const cmd of lexed.commands) this.analyzeCommand(cmd);

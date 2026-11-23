@@ -45,7 +45,10 @@ const rows: Row[] = [
   ['cat setup.sh | sh', 'ask', 'ask', 'allow', 'shell-dynamic'],
   ['node -e "process.exit(0)"', 'ask', 'ask', 'allow', 'shell-dynamic'],
   ["python3 -c 'print(1)'", 'ask', 'ask', 'allow', 'shell-dynamic'],
-  ['echo "unterminated', 'ask', 'ask', 'allow', 'shell-dynamic'],
+  // what the lexer cannot parse is unread, so it asks in every mode
+  ['echo "unterminated', 'ask', 'ask', 'ask', 'unresolvable-path'],
+  ["echo `'`", 'ask', 'ask', 'ask', 'unresolvable-path'],
+  ["eval \"echo '\"", 'ask', 'ask', 'ask', 'unresolvable-path'],
   ['PATH=./bin:$PATH ls', 'ask', 'ask', 'allow', 'shell-dynamic'],
   // substitution and nesting still find credential reads, in every mode
   ['echo `cat ~/.ssh/id_ed25519`', 'deny', 'deny', 'deny', 'hard-deny'],

@@ -8,9 +8,10 @@
  *
  * It never executes or expands anything that needs the environment. What it
  * cannot know it marks: a word part is `unknown`, and constructs that hide code
- * add a `dynamic` note. Any lexer error (an unterminated quote) is reported as
- * `error`, and the analyzer turns both into `shell-dynamic`. A substitution
- * nested past `MAX_SUBSTITUTION_DEPTH` is left unread and listed in `limits`.
+ * add a `dynamic` note, which the analyzer turns into `shell-dynamic`. A lexer
+ * error (an unterminated quote) comes back in `error`; a substitution it cannot
+ * parse, or one nested past `MAX_SUBSTITUTION_DEPTH`, is left unread and listed
+ * in `limits`. The analyzer reports both as an incomplete analysis.
  */
 
 import type { Limit } from './limits';
@@ -332,6 +333,7 @@ class Lexer {
       // Bash parses a backtick body (and in 3.2 a `$(…)` body) only when it expands it,
       // so a body it cannot parse fails that substitution and the command around it still runs.
       this.dynamic.push(`a substitution it could not read (${error.message})`);
+      this.limits.push('unparsed');
     }
     this.commands.push(...sub.commands);
     this.dynamic.push(...sub.dynamic);
