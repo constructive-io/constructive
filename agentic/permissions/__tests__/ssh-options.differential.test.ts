@@ -8,10 +8,19 @@ import { makeSandbox, type Sandbox } from './sandbox';
 // `ssh -G` prints the config ssh would use and exits: it opens no connection and runs no command,
 // so it shows how OpenSSH itself reads each argument order and -o spelling.
 const home = fs.mkdtempSync(path.join(os.tmpdir(), 'ssh-g-'));
-const sshG = (args: string[]) =>
+const runSshG = (args: string[]) =>
   spawnSync('ssh', ['-G', '-F', '/dev/null', ...args], { encoding: 'utf8', timeout: 5000, env: { PATH: '/usr/bin:/bin', HOME: home } });
+/** The config `ssh -G` prints. A run that fails is an error, not an empty config, so a case ssh rejects cannot pass as one that runs nothing. */
+const sshG = (args: string[]) => {
+  const r = runSshG(args);
+  if (r.error || r.status !== 0) {
+    const why = r.error?.message ?? (r.signal ? `it was killed by ${r.signal}` : `it exited ${r.status}`);
+    throw new Error(`ssh -G did not read ${JSON.stringify(args)}: ${why}. Check that the case is one OpenSSH accepts.\nstderr: ${r.stderr}`);
+  }
+  return r;
+};
 const available = (() => {
-  const r = sshG(['h']);
+  const r = runSshG(['h']);
   return r.status === 0 && /^hostname h$/m.test(r.stdout);
 })();
 

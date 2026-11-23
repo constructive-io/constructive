@@ -36,7 +36,7 @@ const rows: Row[] = [
   ["pwsh -c 'cd ~/.ssh; cat id_rsa'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["expect -c 'spawn sh'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // option values that are a shell command
-  ["tar -cf /dev/null --to-command='cd ~/.ssh; cat id_rsa' x", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["tar -xf a.tar --to-command='cd ~/.ssh; cat id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
   ["tar -xf a.tar --to-command='sh -c x'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["tar -cf a.tar -I 'sh -c \"cd ~/.ssh; cat id_rsa\"' src", 'deny', 'deny', 'deny', ['hard-deny']],
   ["rsync -e 'sh -c \"cd ~/.ssh; cat id_rsa\"' a b:c", 'deny', 'deny', 'deny', ['hard-deny']],

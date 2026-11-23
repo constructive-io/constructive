@@ -4,13 +4,20 @@ import path from 'path';
 
 import { createPermissionEngine, type Grant, type PermissionEngine } from '../src';
 import { runInGroup, seeded } from './differential';
+import { EXACT_ONLY_PREFIXES } from './exact-only';
 
 const BASH = '/bin/bash';
 const SEEDS = [7, 2027];
 const CASES_PER_SEED = 600;
 
+/** The grants hold `git rebase` and `git push` too, which the kit honours only as exact rules, so they cover nothing. */
 const PREFIXES = ['git status', 'git log', 'git diff', 'git fetch', 'git grep', 'git rebase', 'git push', 'npm test', 'npm run build', 'cat', 'ls', 'echo', 'grep', 'head', 'wc', 'node scripts/build.js'];
-const EXACT = ['ls -la', 'npm test'];
+const COVERED = PREFIXES.filter((p) => !EXACT_ONLY_PREFIXES.includes(p));
+/** Exact commands no prefix covers, so a run of one is covered only by its exact grant. */
+const EXACT = ['git stash list', 'npm run lint'];
+const EXACT_ARGV = EXACT.map((command) => command.split(' '));
+/** A builtin runs no shim, so the DEBUG trap's record is all bash leaves of it: its first word must start a covered command. */
+const FIRST_WORDS = new Set([...COVERED, ...EXACT].map((p) => p.split(' ')[0]));
 const GRANTS = [
   { scope: 'project', match: { type: 'command-prefix', prefixes: PREFIXES.slice(0, 5) }, createdAt: 'x' },
   { scope: 'chat', match: { type: 'command-prefix', prefixes: PREFIXES.slice(5, 10) }, createdAt: 'x' },
@@ -64,7 +71,11 @@ function generator(seed: number) {
   return { next, undrawn: () => undrawn({ PREFIXES, EXACT, WORDS, SAFE, SEP, REDIR, UNCOVERED }) };
 }
 
-/** Every file in the workspace with its size and time, so any write shows. */
+/**
+ * Every file in the workspace with its size and modification time. A run that
+ * creates, deletes, resizes or touches a file changes it; a new empty dir, or
+ * a write that keeps a file's size and lands in the same millisecond, does not.
+ */
 function snapshot(dir: string): string {
   const out: string[] = [];
   const walk = (d: string) => {
@@ -79,7 +90,8 @@ function snapshot(dir: string): string {
 }
 
 function uncovered(argv: string[]): string | null {
-  const covered = PREFIXES.some((p) => p.split(' ').every((w, i) => argv[i] === w)) || EXACT.includes(argv.join(' '));
+  const exact = EXACT_ARGV.some((e) => e.length === argv.length && e.every((w, i) => argv[i] === w));
+  const covered = exact || COVERED.some((p) => p.split(' ').every((w, i) => argv[i] === w));
   if (!covered) return 'uncovered';
   const risky = [...(RISKY[argv[0]] ?? []), ...(RISKY[argv.slice(0, 2).join(' ')] ?? [])];
   const hit = argv.slice(1).find((a) => risky.some((r) => optionIs(a, r)));
@@ -146,6 +158,7 @@ withBash('a call the grants let through runs only what they cover', () => {
       if (snapshot(ws) !== before) found.push('wrote a file');
       for (const r of records) {
         if (r[0] === 'NOTFOUND') found.push(`tried to run ${r.slice(1).join(' ')}`);
+        if (r[0] === 'DBG' && !FIRST_WORDS.has(r[1].trimStart().split(/[ \t\n]/)[0])) found.push(`ran ${JSON.stringify(r[1])}`);
         const why = r[0] === 'RUN' ? uncovered(r.slice(1)) : null;
         if (why) found.push(`${why}: ${JSON.stringify(r.slice(1))}`);
       }

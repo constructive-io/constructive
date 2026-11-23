@@ -1,3 +1,4 @@
+import { EXACT_ONLY_GIT } from './exact-only';
 import { asAsk, exactGrant, makeSandbox, prefixGrant, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
@@ -150,26 +151,8 @@ describe('the arity table offers a prefix only for an action that runs no code f
   });
 });
 
-// Each one can discard uncommitted work, or rewrite or publish history.
-// prettier-ignore
-const exactOnlyGit: string[] = [
-  'git reset HEAD~1',
-  'git rm src/a.ts',
-  'git mv a.ts b.ts',
-  'git checkout -- src',
-  'git restore src/a.ts',
-  'git switch main',
-  'git stash drop',
-  'git push origin main',
-  'git pull origin main',
-  'git merge feature',
-  'git rebase main',
-  'git cherry-pick abc123',
-  'git revert HEAD'
-];
-
 describe('a git command that can lose work or change history gets only an exact rule', () => {
-  it.each(exactOnlyGit)('%j gets the exact command', async (command) => {
+  it.each(EXACT_ONLY_GIT)('%j gets the exact command', async (command) => {
     expect(await projectMatch(command)).toEqual({ type: 'command', command });
   });
 
