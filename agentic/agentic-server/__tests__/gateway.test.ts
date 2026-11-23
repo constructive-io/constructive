@@ -28,6 +28,8 @@ let agenticPort: number;
 let llmRequests: Array<{ path: string; method: string; body: any }>;
 // Track entries routed to the injected sink
 let sinkEntries: InferenceEntry[];
+// Upstream requests whose caller (the gateway) hung up before they answered
+const upstreamHangUps: string[] = [];
 
 beforeAll(async () => {
   // Start a mock LLM provider (simulates Ollama)
@@ -65,6 +67,10 @@ beforeAll(async () => {
 
   llmApp.post('/api/embed', (req: any, res: any) => {
     llmRequests.push({ path: req.path, method: req.method, body: req.body });
+    if (req.body?.model === 'never-answers') {
+      res.on('close', () => upstreamHangUps.push(req.path));
+      return;
+    }
     res.json({ embeddings: [[0.1, 0.2, 0.3, 0.4, 0.5]], prompt_eval_count: 7 });
   });
 
@@ -94,6 +100,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await new Promise<void>((r, e) => agenticServer.close((err) => (err ? e(err) : r())));
+  // An upstream request the gateway never hung up on would hold close() open.
+  mockLlmServer.closeAllConnections();
   await new Promise<void>((r, e) => mockLlmServer.close((err) => (err ? e(err) : r())));
 });
 
@@ -371,6 +379,28 @@ describe('POST /v1/embeddings', () => {
     expect(sinkEntries[0]).toMatchObject({
       databaseId: 'db-test-2', service: 'embed', status: 'ok', inputTokens: 7, totalTokens: 7
     });
+  });
+});
+
+describe('a caller that hangs up', () => {
+  it('stops the upstream embedding it was waiting on', async () => {
+    const caller = new AbortController();
+    const pending = fetch(`http://localhost:${agenticPort}/v1/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Database-Id': 'db-test-hangup' },
+      body: JSON.stringify({ model: 'never-answers', input: 'abandoned' }),
+      signal: caller.signal
+    });
+    const reached = Date.now();
+    while (llmRequests.length === 0 && Date.now() - reached < 5_000) await new Promise((r) => setTimeout(r, 10));
+    expect(llmRequests).toHaveLength(1);
+
+    caller.abort();
+    await expect(pending).rejects.toThrow();
+
+    const hungUp = Date.now();
+    while (upstreamHangUps.length === 0 && Date.now() - hungUp < 5_000) await new Promise((r) => setTimeout(r, 10));
+    expect(upstreamHangUps).toEqual(['/api/embed']);
   });
 });
 

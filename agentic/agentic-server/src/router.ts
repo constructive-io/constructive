@@ -33,6 +33,22 @@ const log = new Logger('agentic-server');
  * with `400`, or report that `err` was something else. A client mistake must
  * not be metered or reported as a provider failure.
  */
+/**
+ * A signal that fires when the caller hangs up before its response is sent, so
+ * the upstream call it was waiting on stops too: a worker restart or a timed-out
+ * caller otherwise leaves the provider computing an answer nobody reads, billed
+ * and holding the provider's capacity from the retry that replaces it. The
+ * request stream's own 'close' fires as soon as its body is consumed, so the
+ * response is what reports the disconnect.
+ */
+function abortOnHangUp(res: any): AbortSignal {
+  const abort = new AbortController();
+  res.on('close', () => {
+    if (!res.writableEnded) abort.abort();
+  });
+  return abort.signal;
+}
+
 function rejectBadRequest(res: any, err: unknown): boolean {
   if (!(err instanceof BadRequestError)) return false;
   res.status(err.status).json({ error: { message: err.message } });
@@ -156,21 +172,11 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       const body = streaming ? withUsageStreamOptions(transformed) : transformed;
       const headers = buildProviderHeaders(provider);
 
-      const abort = new AbortController();
-      // A client that hangs up mid-stream stops the upstream read; the request
-      // stream's own 'close' fires as soon as the body is consumed, so the
-      // response is what reports the disconnect.
-      if (streaming) {
-        res.on('close', () => {
-          if (!res.writableEnded) abort.abort();
-        });
-      }
-
       const upstream = await fetch(upstreamUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
-        ...(streaming ? { signal: abort.signal } : {})
+        signal: abortOnHangUp(res)
       });
 
       const latencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
@@ -314,7 +320,8 @@ export const createRouter = (options: AgenticServerOptions): Router => {
       const upstream = await fetch(upstreamUrl, {
         method: 'POST',
         headers,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: abortOnHangUp(res)
       });
 
       const latencyMs = Number(process.hrtime.bigint() - startTime) / 1e6;
