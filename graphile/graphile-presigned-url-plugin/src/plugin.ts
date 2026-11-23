@@ -573,6 +573,7 @@ export async function processSingleFile(
     text: `SELECT id, key
        FROM ${storageConfig.filesQualifiedName}
        WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
+         AND NOT logical_key_retired
          AND status IN ('uploaded', 'processed')
        LIMIT 1`,
     values: [logicalKey, bucket.id, contentHash],

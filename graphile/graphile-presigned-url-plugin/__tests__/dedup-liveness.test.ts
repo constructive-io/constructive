@@ -82,13 +82,14 @@ const options: PresignedUrlPluginOptions = { credentials: { accessKeyId: 'test',
  * resolver probes by key (the custom key, or the hash's own key), so the row is
  * found only when the probed key is its own.
  */
-function fakeTx(rowKey: string, status: string) {
+function fakeTx(rowKey: string, status: string, retired = false) {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID, key: `originals/${NEW_FILE_ID}` }] };
       if (/^SELECT id/.test(opts.text)) {
+        if (retired && /AND NOT logical_key_retired/.test(opts.text)) return { rows: [] };
         return { rows: opts.values[0] === rowKey && ['uploaded', 'processed'].includes(status) ? [{ id: OLD_FILE_ID, key: `originals/${OLD_FILE_ID}` }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
@@ -142,6 +143,13 @@ describe.each([
     expect(result.file).not.toHaveProperty('url');
     expect(queries).toHaveLength(1);
     expect(queries[0].text).toContain('status');
+  });
+
+  it('does not deduplicate against a retired but still readable row', async () => {
+    const { txClient } = fakeTx(rowKey, 'uploaded', true);
+    const result = await upload(txClient, fakeS3(), customKey);
+
+    expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false });
   });
 });
 
