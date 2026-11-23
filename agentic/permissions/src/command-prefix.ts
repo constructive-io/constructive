@@ -6,7 +6,8 @@
  */
 
 import { normalizeCommand } from './bash/analyze';
-import { type Effect, optionsIn } from './bash/options';
+import { type Effect, operandEffects, optionsIn } from './bash/options';
+import { wordTexts } from './bash/parts';
 import { gitSubcommand, PROGRAMS } from './bash/programs';
 import type { CommandPart, ListedPrefix } from './types';
 
@@ -131,22 +132,25 @@ export function prefixShortfall(words: readonly string[]): { unlisted: true } | 
  * covered by a prefix, and its card offers only the exact command. A read is
  * not one of them: the analysis checks the file it reads like any other path.
  */
-const GUARDED: ReadonlySet<Effect> = new Set(['runs-program', 'writes-file', 'sets-config', 'changes-dir', 'sends-to']);
+const GUARDED: ReadonlySet<Effect> = new Set(['runs-program', 'writes-file', 'sets-config', 'changes-dir', 'sends-to', 'rewrites-history']);
 
 /**
- * The part passes an option with a guarded effect, or an option it cannot
- * read. Its options are read with the program registry's spec, so every
+ * The part passes an option or an operand form with a guarded effect, or one
+ * it cannot read. Options are read with the program registry's spec, so every
  * spelling the program accepts counts (`-ix` holds `-x`, `--upl` is
- * `--upload-pack`). git's own options come before the subcommand, where no git
- * prefix can match.
+ * `--upload-pack`); operand forms are read after quote removal (`'delete'`).
+ * git's own options come before the subcommand, where no git prefix can match.
  */
 function passesRiskyOption(part: CommandPart): boolean {
   if (part.options === null) return true;
-  const spec = part.words[0] === 'git' ? gitSubcommand(part.words[1]) : PROGRAMS.get(part.words[0]);
+  const git = part.words[0] === 'git';
+  const spec = git ? gitSubcommand(part.words[1]) : PROGRAMS.get(part.words[0]);
   if (!spec) return false;
-  return part.options.some((option) =>
-    (optionsIn(spec, option) ?? []).some(({ specs }) => specs.some((s) => s.effect !== undefined && GUARDED.has(s.effect)))
-  );
+  const guarded = (effect: Effect | undefined) => effect !== undefined && GUARDED.has(effect);
+  if (part.options.some((option) => (optionsIn(spec, option) ?? []).some(({ specs }) => specs.some((s) => guarded(s.effect))))) return true;
+  if (!spec.operandEffects) return false;
+  const texts = wordTexts(part.words);
+  return texts === null || operandEffects(spec, texts.slice(git ? 2 : 1)).some(guarded);
 }
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */

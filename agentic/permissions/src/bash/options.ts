@@ -21,7 +21,9 @@ export type Effect =
   /** It runs the program in the dir the value names. */
   | 'changes-dir'
   /** It sends the program's data where the value names. */
-  | 'sends-to';
+  | 'sends-to'
+  /** It rewrites or deletes history or refs, or discards work that is not committed. */
+  | 'rewrites-history';
 
 export interface OptionSpec {
   /** Its spellings: `-c`, `--config`. */
@@ -31,12 +33,16 @@ export interface OptionSpec {
   readonly effect?: Effect;
 }
 
+/** An operand with an effect: an action word in first place (`reflog expire`), or a prefix any operand starts with (`+main`). */
+export type OperandEffect = { readonly first: string; readonly effect: Effect } | { readonly prefix: string; readonly effect: Effect };
+
 export interface ProgramSpec {
   /** A long option may be shortened to a prefix of its name (git's parse-options, getopt_long). */
   readonly abbreviations: boolean;
   /** The options end at the first operand (git's own options before the subcommand); otherwise they may follow operands. */
   readonly stopAtOperand: boolean;
   readonly options: readonly OptionSpec[];
+  readonly operandEffects?: readonly OperandEffect[];
 }
 
 /** One option as the program reads it, with every option its spelling can be. */
@@ -184,6 +190,14 @@ export function effectsOf(spec: ProgramSpec, read: ReadArgs): Set<Effect> {
   for (const option of read.options) for (const s of option.specs) if (s.effect) effects.add(s.effect);
   if (read.unknown.length > 0) for (const s of spec.options) if (s.effect) effects.add(s.effect);
   return effects;
+}
+
+/** The effects of a program's operands, given as text after its name (and a git subcommand's name). */
+export function operandEffects(spec: ProgramSpec, words: readonly string[]): Effect[] {
+  return (spec.operandEffects ?? []).flatMap((o) => {
+    const hit = 'first' in o ? words[0] === o.first : words.some((w) => !w.startsWith('-') && w.startsWith(o.prefix));
+    return hit ? [o.effect] : [];
+  });
 }
 
 /** The read options whose spelling can be an option with `effect`. */

@@ -46,6 +46,9 @@ const sub = (...options: (OptionSpec | OptionSpec[])[]): ProgramSpec => ({
   options: options.flat()
 });
 
+/** Rewriting or deleting history and refs, as git's own documentation names each form. */
+const REWRITES = (...names: string[]): OptionSpec => does('rewrites-history', 'none', ...names);
+
 /**
  * A subcommand the registry does not list (or an alias) gets the options that
  * run a program, write a file or send data anywhere in git, so an alias that
@@ -64,7 +67,14 @@ export const GIT_OTHER: ProgramSpec = sub(
 /** git subcommands by name. */
 export const GIT_SUBCOMMANDS: ReadonlyMap<string, ProgramSpec> = new Map([
   ['clone', sub(does('sets-config', 'required', '-c', '--config'), does('runs-program', 'required', '-u', '--upload-pack', '--template'), value('-o', '--origin', '-b', '--branch', '--depth', '--reference', '--separate-git-dir', '-j', '--jobs'))],
-  ['fetch', sub(UPLOAD_PACK, value('-j', '--jobs', '--depth', '--deepen', '--shallow-since', '--refmap', '-o', '--server-option'), flag('-u', '--update-head-ok'))],
+  [
+    'fetch',
+    {
+      // `--update-head-ok` lets fetch move the branch that is checked out; `-P` deletes and clobbers local tags.
+      ...sub(UPLOAD_PACK, REWRITES('-f', '--force', '-P', '--prune-tags', '-u', '--update-head-ok'), value('-j', '--jobs', '--depth', '--deepen', '--shallow-since', '--refmap', '-o', '--server-option')),
+      operandEffects: [{ prefix: '+', effect: 'rewrites-history' }]
+    }
+  ],
   ['pull', sub(UPLOAD_PACK, value('-s', '--strategy', '-X', '--strategy-option', '--depth', '-j', '--jobs'))],
   ['ls-remote', sub(does('runs-program', 'required', '-u', '--upload-pack'), value('--sort', '-o', '--server-option'))],
   [
@@ -95,8 +105,9 @@ export const GIT_SUBCOMMANDS: ReadonlyMap<string, ProgramSpec> = new Map([
   ['show', sub(DIFF)],
   ['whatchanged', sub(DIFF)],
   ['format-patch', sub(DIFF, does('writes-file', 'required', '-o', '--output-directory'))],
-  ['commit', sub(MESSAGE, PATHSPEC_FILE, does('reads-file', 'required', '-t', '--template'), value('-C', '--reuse-message', '-c', '--reedit-message', '--author', '--date', '--fixup', '--squash'))],
-  ['tag', sub(MESSAGE, value('-u', '--local-user'))],
+  ['commit', sub(MESSAGE, PATHSPEC_FILE, REWRITES('--amend'), does('reads-file', 'required', '-t', '--template'), value('-C', '--reuse-message', '-c', '--reedit-message', '--author', '--date', '--fixup', '--squash'))],
+  ['tag', sub(MESSAGE, REWRITES('-d', '--delete', '-f', '--force'), value('-u', '--local-user'))],
+  ['reflog', { ...sub(), operandEffects: [{ first: 'expire', effect: 'rewrites-history' }, { first: 'delete', effect: 'rewrites-history' }] }],
   ['merge', sub(MESSAGE, value('-s', '--strategy', '-X', '--strategy-option'))],
   ['notes', sub(MESSAGE, value('-C', '--reuse-message', '-c', '--reedit-message', '--ref'))],
   ['add', sub(PATHSPEC_FILE, value('--chmod'), flag('-f', '--force'))],
@@ -122,7 +133,14 @@ export const GIT_SUBCOMMANDS: ReadonlyMap<string, ProgramSpec> = new Map([
   ['revert', sub(flag('-n', '--no-commit', '-e', '--edit', '-s', '--signoff'), value('-m', '--mainline', '--strategy', '-X', '--strategy-option', '--cleanup'))],
   ['bisect', sub(value('--term-old', '--term-new', '--term-bad', '--term-good'))],
   ['submodule', sub(value('--reference', '--depth', '-b', '--branch', '--name', '-j', '--jobs'))],
-  ['branch', sub(value('-m', '-M', '-c', '-C', '-u', '--set-upstream-to', '--format', '--sort', '--contains', '--merged'))]
+  [
+    'branch',
+    sub(
+      REWRITES('-d', '--delete', '-D', '-f', '--force', '-M', '-C'),
+      flag('-m', '--move', '-c', '--copy'),
+      value('-u', '--set-upstream-to', '--format', '--sort', '--contains', '--no-contains', '--merged', '--no-merged', '--points-at')
+    )
+  ]
 ]);
 
 /** The spec of a git subcommand. */

@@ -9,7 +9,7 @@
 import type { CommandPart } from '../types';
 import { unreachable } from '../unreachable';
 import { expandWord,ExpansionBudget, type ExpansionScope } from './expand';
-import { type Lexed, readsStdinDoc, type Redirect, type Word } from './tokenize';
+import { type Lexed, readsStdinDoc, type Redirect, tokenize, type Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
 /** Words that open a compound command. */
@@ -78,6 +78,22 @@ function optionsOf(words: readonly Word[], budget: ExpansionBudget, spent: () =>
     if (spent()) return null;
   }
   return options;
+}
+
+/**
+ * A part's words after quote removal and brace expansion, or `null` when one
+ * holds a variable, a substitution or another part the lexer cannot read.
+ */
+export function wordTexts(words: readonly string[]): string[] | null {
+  const lexed = tokenize(words.join(' '));
+  const cmd = lexed.commands[0];
+  if (lexed.error || lexed.commands.length !== 1 || cmd.words.some((w) => w.parts.some((p) => p.kind !== 'lit'))) return null;
+  let spent = false;
+  const budget = new ExpansionBudget(() => {
+    spent = true;
+  });
+  const texts = cmd.words.flatMap((w) => literalTexts(w, budget));
+  return spent ? null : texts;
 }
 
 export function commandParts(command: string, lexed: Lexed): CommandPart[] | null {
