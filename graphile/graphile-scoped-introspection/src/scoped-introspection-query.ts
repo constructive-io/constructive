@@ -50,7 +50,9 @@ interface IntrospectionQueryScope {
 /**
  * SQL for a smart-tag identifier, mirroring graphile-build-pg@5.1.3
  * PgFakeConstraintsPlugin `removeQuotes`: quoted names are taken verbatim and
- * unquoted names are lower-cased. The input is already trimmed.
+ * unquoted names are lower-cased. The input is already trimmed. Lower-casing
+ * uses the "C" collation, so it changes ASCII letters only, independent of the
+ * database locale (upstream uses JavaScript's Unicode `toLowerCase()`).
  */
 const smartTagIdentifier = (expression: string): string => `case
           when pg_catalog.left(${expression}, 1) = '"' then
@@ -59,7 +61,7 @@ const smartTagIdentifier = (expression: string): string => `case
                 and pg_catalog.right(${expression}, 1) = '"'
               then pg_catalog.substr(${expression}, 2, pg_catalog.length(${expression}) - 2)
             end
-          else pg_catalog.lower(${expression})
+          else pg_catalog.lower(${expression} collate "C")
         end`;
 
 /**

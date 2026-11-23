@@ -142,13 +142,15 @@ describe('schema-scoped introspection with @foreignKey smart tags', () => {
         .sort();
 
     expect(retained(scoped.introspection)).toEqual([
+      'Smart_Tag_Prüfung.approvers',
       'Smart_Tag_Quoted.Reviewers',
       'smart_tag_hidden.owners',
       'smart_tag_hidden.priority',
       'smart_tag_root.tickets',
       'smart_tag_transitive.teams',
     ]);
-    // A tag-like line after the description is text, not a tag.
+    // Tag-like lines after description text or after a blank line are
+    // description, not tags.
     expect(
       scoped.introspection.namespaces.map((namespace) => namespace.nspname)
     ).not.toContain('smart_tag_unrelated');
