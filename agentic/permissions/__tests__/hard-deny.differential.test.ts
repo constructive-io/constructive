@@ -1,9 +1,9 @@
-import { spawnSync } from 'child_process';
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import path from 'path';
 
 import { createPermissionEngine } from '../src';
+import { fencedEnv, runBash, seeded } from './differential';
 
 const BASH = '/bin/bash';
 const SEEDS = [1, 2];
@@ -24,14 +24,10 @@ const WRAP: ((w: string) => string)[] = [
   (w) => `{a,${w}}{,}`
 ];
 
-function generate(seed: number, count: number): string[] {
-  let state = seed;
-  const rnd = (n: number) => {
-    state = (state * 1103515245 + 12345) % 2147483648;
-    return state % n;
-  };
-  const pick = <T>(list: readonly T[]): T => list[rnd(list.length)];
-  return Array.from({ length: count }, () => `cat ${pick(WRAP)(pick(HEAD) + pick(MID) + pick(TAIL))}`);
+function generate(seed: number, count: number): { forms: string[]; undrawn: string[] } {
+  const { pick, undrawn } = seeded(seed);
+  const forms = Array.from({ length: count }, () => `cat ${pick(WRAP)(pick(HEAD) + pick(MID) + pick(TAIL))}`);
+  return { forms, undrawn: undrawn({ WRAP, HEAD, MID, TAIL }) };
 }
 
 const withBash = existsSync(BASH) ? describe : describe.skip;
@@ -53,9 +49,10 @@ withBash('a credential store read that bash runs is denied in every mode', () =>
   afterAll(() => rmSync(root, { recursive: true, force: true }));
 
   it.each(SEEDS)('seed %d', async (seed) => {
-    const forms = generate(seed, CASES_PER_SEED);
+    const { forms, undrawn } = generate(seed, CASES_PER_SEED);
+    expect(undrawn).toEqual([]);
     const script = forms.map((form, k) => `printf '\\n@${k}:'; ${form} 2>/dev/null`).join('\n');
-    const { stdout } = spawnSync(BASH, ['-c', script], { cwd: ws, env: { HOME: home, PATH: '/usr/bin:/bin' }, encoding: 'utf8', timeout: 30_000 });
+    const stdout = runBash(BASH, script, { cwd: ws, env: fencedEnv(root, home) });
     const read = forms.filter((_, k) => (stdout.split(`\n@${k}:`)[1] ?? '').split('\n@')[0].includes('MARKER-KEY'));
     const engine = createPermissionEngine({ cwd: ws, homeDir: home, roots: { temp: [] } });
     const allowed: string[] = [];
@@ -64,6 +61,7 @@ withBash('a credential store read that bash runs is denied in every mode', () =>
       if (d.decision !== 'deny') allowed.push(`${JSON.stringify(command)}: ${d.decision} ${d.request.signals.join(',')}`);
     }
     expect(allowed).toEqual([]);
-    expect(read.length).toBeGreaterThan(CASES_PER_SEED / 2);
+    // With every wrap drawn, the quoted ones read nothing, so about two fifths of the forms reach the key.
+    expect(read.length).toBeGreaterThan(CASES_PER_SEED / 4);
   }, 30_000);
 });
