@@ -22,7 +22,7 @@ current: after any tool that can write (anything but `read`, `grep`, `find`,
 
 - reads, writes and runs in credential stores (`~/.ssh`, `~/.aws`, …), in every mode, also through symlinks, `..`, `~`, `$HOME`, brace expansion, globs, `cd`, command substitution, file names piped from `echo`/`printf` or a here-string into `xargs`, the keychain CLI (`security find-generic-password`, …), and the shell command a program runs from its own text when the analysis can read it: psql's `\!`, `\o |`, `\g |` and `COPY … PROGRAM`, sqlite3's and duckdb's `.shell`/`.system`/`.output |`, mysql's `system`/`pager`, gdb's `shell`, vim's `!`, and option values such as tar's `--to-command`/`-I`, zip's `-TT`, rsync's `-e`, ssh's and scp's `-o ProxyCommand=…`, and man's `-P`, from an option, an argument, a pipe from `echo`/`printf`, a here-string or a heredoc;
 - writes to the agent's own extension dir (`<ws>/.pi`), the trusted harness roots and the host's protected paths, in every mode;
-- silent writes to files that run code later (git hooks, `.git/config`, `.husky`, `.envrc`, `.vscode/tasks.json`) outside Full mode;
+- silent writes to files that run code later (git hooks, `.git/config`, `.husky`, `.envrc`, `.vscode/tasks.json`, and package-manager config: `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.yarn/releases`, `.yarn/plugins`, `.pnpmfile.cjs`, `bunfig.toml`) outside Full mode;
 - silent access outside the project outside Full mode;
 - bash commands that upload data (including `git push` to a new remote, publishing a package, a secret file on the clipboard), destroy data, run as root, run code the analyzer cannot see (`eval`, `sh -c`, `node -e`, `$(…)`, a heredoc into an interpreter, a git option that runs a program such as `git fetch --upload-pack=…`, `git grep -O…` or `git rebase -x …`), outlast the session (`crontab`, `launchctl load`), expose the machine (`python -m http.server`, `ngrok`), or take file names from stdin that it cannot see (`find | xargs …`), outside Full mode;
 - a secret leaving in a form redaction cannot match: a secret file copied into a plain file or through a program that changes its text (`base64 .env`), and a secret env var expanded in a command (`$OPENAI_API_KEY`), outside Full mode;
@@ -208,7 +208,7 @@ A target with an unexpanded glob (`*`, `?`, `[…]`, `**`) is matched component 
 
 **Protected write** (deny): `<ws>/.pi`, the trusted roots, and `roots.protectedWrite`.
 
-**Ask write** (ask outside Full): `<ws>/.git/hooks`, `<ws>/.git/config`, `<ws>/.husky`, `<ws>/.envrc`, `<ws>/.vscode/tasks.json`, and `roots.askWrite`.
+**Ask write** (ask outside Full): `<ws>/.git/hooks`, `<ws>/.git/config`, `<ws>/.husky`, `<ws>/.envrc`, `<ws>/.vscode/tasks.json`, the package-manager config that runs code on a later install or script run (`<ws>/.npmrc` with `script-shell` or `node-options`, `<ws>/.yarnrc` with `yarn-path`, `<ws>/.yarnrc.yml` with `yarnPath` or plugins, the `<ws>/.yarn/releases` and `<ws>/.yarn/plugins` code they load, `<ws>/.pnpmfile.cjs`, `<ws>/bunfig.toml` with `preload`), and `roots.askWrite`. `package.json` scripts run code too, but agents edit it for every dependency, so it stays a plain workspace file.
 
 **Temp** (read and write): `os.tmpdir()`, `/tmp`, `/private/tmp`, and `/private/var/folders` on macOS (`defaultTempDirs()`), unless `roots.temp` is given.
 

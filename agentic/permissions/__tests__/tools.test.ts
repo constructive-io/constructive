@@ -40,6 +40,14 @@ const rows: Row[] = [
   ['write', { path: '.husky/pre-commit', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.envrc', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.vscode/tasks.json', content: '{}' }, 'ask', 'ask', 'allow'],
+  // package-manager config that runs code on a later install or script run
+  ['write', { path: '.npmrc', content: 'script-shell=./x.sh' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarnrc', content: 'yarn-path "./x.js"' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarnrc.yml', content: 'yarnPath: ./x.cjs' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarn/releases/yarn-4.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarn/plugins/p.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.pnpmfile.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: 'bunfig.toml', content: 'preload = ["./x.ts"]' }, 'ask', 'ask', 'allow'],
   // path escapes
   ['read', { path: 'src/../../lib/util.ts' }, 'ask', 'ask', 'allow'],
   ['read', { path: 'lib-link/util.ts' }, 'ask', 'ask', 'allow'],

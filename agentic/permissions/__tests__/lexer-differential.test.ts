@@ -111,6 +111,8 @@ const rows: Row[] = [
   // an unquoted `$IFS`, or a value the analysis cannot know, splits off a word that can be an option
   ["git fetch . HEAD$IFS--upload-pack='touch m;'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git grep -e foo$IFS-O'touch m19;'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // `--output=.npmrc` writes npm config whose `script-shell` the next npm script runs
+  ['git log HEAD$IFS--output=.npmrc$IFS--format=script-shell=./x.sh$IFS-1', 'ask', 'ask', 'allow', ['ask-write']],
   ['git fetch origin$X', 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git log $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
