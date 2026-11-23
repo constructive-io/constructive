@@ -27,12 +27,15 @@ function kitWords(form: string): { words: string[]; differ: boolean } {
   const word = tokenize(`printf %s ${form}`).commands[0].words[2];
   let differ = false;
   const scope: ExpansionScope = {
-    home: HOME,
+    tildeHomes: () => [HOME],
     value: () => null,
     ifsMayDiffer: () => false,
     noteRef: () => undefined,
     dynamic: () => undefined,
     bashesDiffer: () => {
+      differ = true;
+    },
+    tildesDiffer: () => {
       differ = true;
     }
   };

@@ -639,6 +639,23 @@ class Analyzer implements ExpansionScope {
     this.unresolvable(`bash 3.2 and bash 4 or later expand the braces in ${word} to different words, and the analysis cannot know which bash runs it`);
   }
 
+  /** After the command changed HOME, bash 3.2 and bash 5.3 expand a tilde to different dirs. */
+  tildesDiffer(word: string): void {
+    this.unresolvable(`bash 3.2 expands the ~ in ${word} from the HOME the command set, and bash 5.3 from the HOME it started with, and the analysis cannot know which bash runs it`);
+  }
+
+  /**
+   * The dirs `~` may expand to. bash 3.2 reads the shell's HOME (the user's
+   * home when it is unset), and bash 5.3 keeps the HOME the shell started
+   * with, so the two differ once the command sets HOME.
+   */
+  tildeHomes(): readonly string[] | null {
+    const now = this.lookup('HOME');
+    if (now === null) return null;
+    const old = now === undefined ? this.home : now;
+    return old === this.home ? [old] : [old, this.home];
+  }
+
   /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
   lookup(name: string): string | null | undefined {
     if (this.trapUnknown !== null ? this.trapUnknown.has(name) : this.trapAssigns.has(name)) return null;
@@ -660,11 +677,12 @@ class Analyzer implements ExpansionScope {
     return taken;
   }
 
-  /** A fallback's value: unknown with its own expansion, and a leading `~` is the home dir as in bash (`~user` is not known). */
+  /** A fallback's value: unknown with its own expansion, and a leading `~` is the home dir as in bash (`~user`, and a `~` the bashes read differently, is not known). */
   private fallbackValue(fallback: string): string | null {
     if (/[$`]/.test(fallback)) return null;
     if (!fallback.startsWith('~')) return fallback;
-    return /^~(\/|$)/.test(fallback) ? this.home + fallback.slice(1) : null;
+    const homes = this.tildeHomes();
+    return /^~(\/|$)/.test(fallback) && homes?.length === 1 ? homes[0] + fallback.slice(1) : null;
   }
 
   get home(): string {

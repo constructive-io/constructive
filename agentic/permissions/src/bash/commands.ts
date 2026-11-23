@@ -312,8 +312,17 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'cd':
   case 'pushd': {
     const target = operandWords(readArgs(CD, rest), rest)[0];
-    if (!target) {
-      analyzer.moveTo({ kind: 'moved', dir: path.resolve(analyzer.ctx.homeDir) });
+    if (!target && name === 'pushd') {
+      // It swaps the top two dirs of the stack, which the analysis does not keep.
+      analyzer.moveTo({ kind: 'unknown' });
+    } else if (!target) {
+      // `cd` goes to HOME; with HOME unset or empty it stays where it is.
+      const home = analyzer.lookup('HOME');
+      if (home === null) analyzer.moveTo({ kind: 'unknown' });
+      else if (home !== undefined && home !== '') {
+        analyzer.addPath(literalArg(home, 'cd'), 'read', true);
+        analyzer.moveTo(analyzer.dirAt(home));
+      }
     } else if (target.kind === 'unknown' || /^[-+]\d*$/.test(target.text) || analyzer.searchesCdPath(target.text)) {
       // `cd -`, `pushd +1` and a `CDPATH` lookup go to a dir the text does not name.
       analyzer.moveTo({ kind: 'unknown' });

@@ -105,7 +105,10 @@ function config(ctx: CommandContext, read: ReadArgs, here: Arg, raw: string): vo
   const file = valuesOf(read, '--file', '-f')[0];
   if (file && writes) analyzer.addPath(file, 'write', true);
   if (!writes || file) return;
-  if (hasOption(read, '--global')) analyzer.addPath(literalArg(`${analyzer.ctx.homeDir}/.gitconfig`, raw), 'write', true);
+  if (hasOption(read, '--global')) {
+    const home = analyzer.lookup('HOME');
+    analyzer.addPath(home === null ? { kind: 'unknown', knownPrefix: '', raw, splits: false } : literalArg(`${home ?? analyzer.home}/.gitconfig`, raw), 'write', true);
+  }
   else if (hasOption(read, '--system')) analyzer.addPath(literalArg('/etc/gitconfig', raw), 'write', true);
   else analyzer.addPath(analyzer.base === null ? here : literalArg('.git/config'), 'write', true);
 }

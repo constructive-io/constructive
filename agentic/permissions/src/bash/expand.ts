@@ -171,8 +171,12 @@ export class Variables {
 
 /** What the expansions need from the analysis. */
 export interface ExpansionScope {
-  /** The dir `~` expands to. */
-  readonly home: string;
+  /**
+   * The dirs `~` may expand to: one where every bash agrees, two where the
+   * command changed HOME (bash 3.2 follows the shell's HOME, and bash 5.3
+   * keeps the HOME the shell started with), `null` when HOME is unknown.
+   */
+  tildeHomes(): readonly string[] | null;
   /**
    * `$name`, or `${name-fallback}` (`colon` for `${name:-fallback}`, which
    * also takes the fallback for an empty value); `null` when it cannot be
@@ -186,6 +190,8 @@ export interface ExpansionScope {
   dynamic(reason: string): void;
   /** bash 3.2 and bash 4+ expand the word's braces differently, so the analysis cannot know which words it makes. */
   bashesDiffer(word: string): void;
+  /** bash 3.2 and bash 5.3 expand the word's tilde to different dirs. */
+  tildesDiffer(word: string): void;
 }
 
 /**
@@ -200,16 +206,28 @@ export type WordUse = 'argument' | 'assignment';
 export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budget: ExpansionBudget): Arg[] {
   const built = build(word, scope, budget);
   const arg = (piece: Piece, globs: boolean) => toArg(piece, word.raw, globs, built.splits);
-  if (use === 'assignment') return [arg(tildes(built, true, scope, budget), false)];
-  const args: Arg[] = [];
-  for (const piece of bothBashes(built, word.raw, scope, budget)) {
-    const fields = split(tildes(piece, NAME_EQUALS.test(piece.text) && allLiteral(piece.kinds, 0, piece.text.indexOf('=')), scope, budget));
-    if (fields.length > 1 && !budget.takeWords(fields.length - 1)) {
-      args.push(arg(fields[0], true));
-      break;
-    }
-    for (const field of fields) args.push(arg(field, true));
+  if (use === 'assignment') {
+    const readings = tildes(built, true, scope, budget);
+    if (readings.length === 1) return [arg(readings[0], false)];
+    // A variable holds one value, so where the bashes differ it is unknown.
+    scope.tildesDiffer(word.raw);
+    return [arg(withHome(built, tildeSpans(built, true), null, budget), false)];
   }
+  const args: Arg[] = [];
+  let differ = false;
+  for (const piece of bothBashes(built, word.raw, scope, budget)) {
+    const readings = tildes(piece, NAME_EQUALS.test(piece.text) && allLiteral(piece.kinds, 0, piece.text.indexOf('=')), scope, budget);
+    differ ||= readings.length > 1;
+    for (const reading of readings) {
+      const fields = split(reading);
+      if (fields.length > 1 && !budget.takeWords(fields.length - 1)) {
+        args.push(arg(fields[0], true));
+        return args;
+      }
+      for (const field of fields) args.push(arg(field, true));
+    }
+  }
+  if (differ) scope.tildesDiffer(word.raw);
   return args;
 }
 
@@ -472,12 +490,20 @@ function expand32(text: string, kinds: string, budget: ExpansionBudget): Piece[]
   return middles === null ? null : join(text, kinds, open, close, middles, budget, expand32);
 }
 
+/** A tilde prefix in a word: from its `~` up to the `/` (or `:`) after it; `named` for `~user`, `~+` and `~-`. */
+interface TildeSpan {
+  readonly start: number;
+  readonly end: number;
+  readonly named: boolean;
+}
+
 /**
- * Tilde expansion at the start of a word, and in an assignment after its `=`
- * and each unquoted `:`. The prefix runs to the first unquoted `/` (or `:` in
- * an assignment); any quoted or expanded character in it stops the expansion.
+ * The tilde prefixes bash expands: at the start of a word, and in an
+ * assignment after its `=` and each unquoted `:`. A prefix runs to the first
+ * unquoted `/` (or `:` in an assignment); a quoted or expanded character in it
+ * stops the expansion.
  */
-function tildes(piece: Piece, assignment: boolean, scope: ExpansionScope, budget: ExpansionBudget): Piece {
+function tildeSpans(piece: Piece, assignment: boolean): TildeSpan[] {
   const { text, kinds } = piece;
   const starts = [0];
   if (assignment) {
@@ -485,27 +511,41 @@ function tildes(piece: Piece, assignment: boolean, scope: ExpansionScope, budget
     starts[0] = eq + 1;
     for (let k = eq + 1; k < text.length; k++) if (text[k] === ':' && kinds[k] === 'l') starts.push(k + 1);
   }
-  let outText = '';
-  let outKinds = '';
-  let from = 0;
+  const spans: TildeSpan[] = [];
   for (const start of starts) {
     if (text[start] !== '~' || kinds[start] !== 'l') continue;
     let end = start + 1;
     while (end < text.length && !(kinds[end] === 'l' && (text[end] === '/' || (assignment && text[end] === ':')))) end++;
-    if (!allLiteral(kinds, start + 1, end)) continue;
-    if (end > start + 1) {
-      // `~user`, `~+` and `~-` name a dir the analysis cannot know, so the word is unknown from here.
-      outText += text.slice(from, start) + UNKNOWN;
-      outKinds += kinds.slice(from, start) + 'q';
-      from = end;
-      continue;
-    }
-    if (!budget.takeChars(scope.home.length)) continue;
-    outText += text.slice(from, start) + scope.home;
-    outKinds += kinds.slice(from, start) + 'q'.repeat(scope.home.length);
+    if (allLiteral(kinds, start + 1, end)) spans.push({ start, end, named: end > start + 1 });
+  }
+  return spans;
+}
+
+/**
+ * The word with each tilde prefix put back by `home`. A named one (`~user`),
+ * a `null` home and a home past the budget name a dir the analysis cannot
+ * know, so the word is unknown from there.
+ */
+function withHome(piece: Piece, spans: readonly TildeSpan[], home: string | null, budget: ExpansionBudget): Piece {
+  const { text, kinds } = piece;
+  let outText = '';
+  let outKinds = '';
+  let from = 0;
+  for (const { start, end, named } of spans) {
+    const value = named || home === null || !budget.takeChars(home.length) ? null : home;
+    outText += text.slice(from, start) + (value ?? UNKNOWN);
+    outKinds += kinds.slice(from, start) + (value === null ? 'q' : 'q'.repeat(value.length));
     from = end;
   }
-  return from === 0 ? piece : { text: outText + text.slice(from), kinds: outKinds + kinds.slice(from) };
+  return { text: outText + text.slice(from), kinds: outKinds + kinds.slice(from) };
+}
+
+/** The word after tilde expansion, once for each dir `~` may expand to. */
+function tildes(piece: Piece, assignment: boolean, scope: ExpansionScope, budget: ExpansionBudget): Piece[] {
+  const spans = tildeSpans(piece, assignment);
+  if (spans.length === 0) return [piece];
+  const homes = spans.every((s) => s.named) ? null : scope.tildeHomes();
+  return (homes ?? [null]).map((home) => withHome(piece, spans, home, budget));
 }
 
 /**

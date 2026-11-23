@@ -48,13 +48,14 @@ export function isShellSyntax(word: string | undefined): boolean {
 
 /** Option words hold no variable here, so their expansion needs nothing from the analysis. */
 const LITERAL_SCOPE: ExpansionScope = {
-  home: '~',
+  tildeHomes: () => ['~'],
   value: () => null,
   ifsMayDiffer: () => false,
   noteRef: () => undefined,
   dynamic: () => undefined,
   // The words of both bashes count, so an option either one makes is seen.
-  bashesDiffer: () => undefined
+  bashesDiffer: () => undefined,
+  tildesDiffer: () => undefined
 };
 
 /** The texts a word of literals expands to: after braces, tilde and quote removal. */

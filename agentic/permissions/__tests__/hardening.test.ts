@@ -245,7 +245,18 @@ const rows: Row[] = [
   ['env -C src -C .pi touch ext.js', 'deny', 'deny'],
   ["env -C src -S '-C .pi touch ext.js'", 'deny', 'deny'],
   ['tar -xf p.tar -C .pi ext.js -C .. README.md', 'deny', 'deny'],
-  ['tar -xf p.tar -C .git/hooks pre-commit -C ../.. README.md', 'ask', 'allow', 'ask-write']
+  ['tar -xf p.tar -C .git/hooks pre-commit -C ../.. README.md', 'ask', 'allow', 'ask-write'],
+  // 27. HOME has one owner: a bare cd and a tilde read the shell's HOME, an unknown one is an unknown dir and an unset one leaves cd where it is;
+  // after HOME changes, bash 3.2's tilde follows it and bash 5's does not, so both count
+  ['HOME=~/.ssh; cd; cat id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['HOME=~/.ssh cd; cat id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['HOME=.pi; cd; touch ext.js', 'deny', 'deny'],
+  ['HOME=~/.ssh; cat ~/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['HOME=~/.ssh; cd ~; cat id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['HOME=.pi; touch ~/ext.js', 'deny', 'deny'],
+  ['read -r HOME <<< x; cd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  ['HOME=~/.ssh; pushd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  ['unset HOME; cd; cat src/config.ts', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
