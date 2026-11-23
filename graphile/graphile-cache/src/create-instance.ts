@@ -79,7 +79,7 @@ export const createGraphileInstance = async (
   };
 
   await awaitGraphileBuildReadiness({
-    schemaResult: pgl.getSchemaResult(),
+    schemaResult: pgl.getSchema(),
     addTo: () => serv.addTo(handler, httpServer),
     ready: () => serv.ready(),
     release: releaseFailedBuild,
