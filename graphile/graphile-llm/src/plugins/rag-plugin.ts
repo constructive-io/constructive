@@ -103,11 +103,26 @@ function discoverChunkTables(build: any): ChunkTableInfo[] {
 
     const info = parseHasChunksTag(tags.hasChunks, c);
     if (info) {
-      chunkTables.push(info);
+      const embeddingModel = chunksEmbeddingModel(pgRegistry, info);
+      chunkTables.push(embeddingModel ? { ...info, embeddingModel } : info);
     }
   }
 
   return chunkTables;
+}
+
+/**
+ * The model the chunks table's vector column records with `@embeddingModel`.
+ * Two models' vectors are not comparable, so the prompt is embedded with it.
+ */
+function chunksEmbeddingModel(pgRegistry: any, info: ChunkTableInfo): string | undefined {
+  const chunksCodec = Object.values(pgRegistry.pgCodecs || {}).find((codec: any) => {
+    const pg = codec?.extensions?.pg;
+    return pg?.name === info.chunksTableName
+      && (!info.chunksSchema || pg?.schemaName === info.chunksSchema);
+  }) as any;
+  const named = chunksCodec?.attributes?.[info.embeddingField]?.extensions?.tags?.embeddingModel;
+  return typeof named === 'string' && named ? named : undefined;
 }
 
 /**
@@ -296,14 +311,20 @@ export function createLlmRagPlugin(
                 const maxDistance = minSim > 0 ? (1 - minSim) : null;
                 const systemPromptTemplate = querySystemPrompt ?? ragDefaults.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
 
-                // Step 1: Embed the prompt
+                // Step 1: Embed the prompt, once per model the chunks columns record
                 const startEmbed = Date.now();
-                const { embedding: vector } = await embedder(prompt);
+                const vectorsByModel = new Map<string | undefined, string>();
+                const models = chunkTables.length > 0
+                  ? [...new Set(chunkTables.map((table) => table.embeddingModel))]
+                  : [undefined];
+                for (const model of models) {
+                  const { embedding: vector } = await embedder(prompt, model);
+                  vectorsByModel.set(model, `[${vector.join(',')}]`);
+                }
                 const embedLatency = Date.now() - startEmbed;
-                const vectorString = `[${vector.join(',')}]`;
 
                 console.log(
-                  `[graphile-llm] RAG embed: dims=${vector.length}, latency=${embedLatency}ms`
+                  `[graphile-llm] RAG embed: models=${models.length}, latency=${embedLatency}ms`
                 );
 
                 // Step 2: Search chunks tables for similar content
@@ -317,7 +338,7 @@ export function createLlmRagPlugin(
                 if (chunkTables.length > 0) {
                   await withPgClient(pgSettings, async (pgClient: any) => {
                     for (const table of chunkTables) {
-                      const query = buildChunkSearchSql(table, vectorString, limit, maxDistance);
+                      const query = buildChunkSearchSql(table, vectorsByModel.get(table.embeddingModel), limit, maxDistance);
                       const result = await pgClient.query(query);
                       for (const row of result.rows) {
                         allChunks.push({
