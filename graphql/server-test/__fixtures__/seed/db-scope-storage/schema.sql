@@ -33,9 +33,7 @@ COMMENT ON TABLE "tess-storage-public".buckets IS E'@storageBuckets\nStorage buc
 CREATE TABLE "tess-storage-public".files (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   bucket_id uuid NOT NULL REFERENCES "tess-storage-public".buckets(id),
-  key text NOT NULL DEFAULT 'originals/' || gen_random_uuid()::text,
-  logical_key text,
-  logical_key_retired boolean NOT NULL DEFAULT false,
+  key text NOT NULL,
   content_hash text NOT NULL,
   mime_type text NOT NULL,
   size bigint,
@@ -48,9 +46,6 @@ CREATE TABLE "tess-storage-public".files (
   updated_at timestamptz DEFAULT now(),
   UNIQUE (bucket_id, key)
 );
-
-CREATE INDEX ON "tess-storage-public".files (bucket_id, logical_key, content_hash)
-  WHERE status IN ('uploaded', 'processed');
 
 COMMENT ON TABLE "tess-storage-public".files IS E'@storageFiles\nStorage files table';
 
@@ -77,7 +72,7 @@ DECLARE
 BEGIN
   INSERT INTO "tess-storage-public".files (
     bucket_id,
-    logical_key,
+    key,
     content_hash,
     mime_type,
     size,

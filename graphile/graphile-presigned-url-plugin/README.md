@@ -19,7 +19,7 @@ Presigned URL upload plugin for PostGraphile v5.
 - Per-files-table `upload<FilesType>` mutations — generate presigned PUT URLs for direct client-to-S3 upload; use `createStorageClient` from `@constructive-io/graphql-query` with `storageTransport` from `@constructive-io/upload-client` for client orchestration
 - `downloadUrl` computed field — presigned GET URLs for private files, public URLs for public files
 - `maxBulkFiles` field on bucket types — the most files one bulk-upload call accepts (`storage_module.max_bulk_files`, default 100)
-- Independent server-allocated object keys (`originals/<UUID>`), with SHA-256 integrity and deduplication of confirmed content in the same logical slot
+- Content-hash based S3 keys (SHA-256) with automatic deduplication — only against rows whose bytes are in S3, so a retry of a never-completed upload gets a fresh URL
 - Per-bucket MIME type and file size validation
 
 ## Usage
@@ -44,23 +44,3 @@ const preset = {
   ],
 };
 ```
-
-## Upload identity and retries
-
-The optional upload input `key` names a **logical slot** (`files.logical_key`);
-without it the logical slot is the SHA-256 content hash. It never chooses an S3
-location. The generated recorder allocates a fresh `originals/<UUID>` for each
-new request and returns it as `files.key`. The response `key`, projection `key`,
-PUT signature and downloads all use that physical key.
-
-A confirmed (`uploaded`/`processed`) row with the same bucket, logical key and
-checksum is reused, without issuing a PUT URL. Pending or rejected attempts do
-not deduplicate: a new request gets a new object and confirm job, and leaves the
-older attempt to its existing lifecycle. Repeating a PUT with the same URL is a
-retry of that same object; checksum and upload-id must still match its signature.
-
-This requires the matching constructive-db storage generator with `logical_key`
-and a server-allocated recorder result. Deploy the generator and pinned package
-together; there is no fallback to signing the caller's logical key. Successful
-logical replacement retains the existing database authorization policy; UUIDs
-are object identities, not access control.

@@ -70,8 +70,8 @@ describe('validateCustomKey', () => {
     expect(validateCustomKey(key)).toMatch(/^INVALID_KEY:/);
   });
 
-  // The legacy `.versions/` suffix remains reserved in logical-key syntax;
-  // physical storage isolation no longer depends on this validation.
+  // A file's rendered versions live under `<key>.versions/` and are served to
+  // whoever can read that file, so no file of its own may be stored there.
   it.each(['photo.png.versions/secret.webp', 'a/b.versions/c/d.txt'])('rejects %s: the versions prefix is reserved', (key) => {
     expect(validateCustomKey(key)).toMatch(/reserved/);
   });
