@@ -7,6 +7,7 @@
  */
 
 import type { Arg } from './analyze';
+import { isPathLike } from './words';
 
 /** What an option makes the program do. */
 export type Effect =
@@ -25,21 +26,56 @@ export type Effect =
   /** It rewrites or deletes history or refs, or discards work that is not committed. */
   | 'rewrites-history';
 
-export interface OptionSpec {
+/** What an option's value is to the program: what one of the effects acts on, or plain text it opens and runs nothing with. */
+export type ValueKind = Effect | 'plain';
+
+/**
+ * The files one value of an option names, when only some forms of its value
+ * name one (curl's `-d @file`, a `-F` form's files): it gets the value's text,
+ * or for a value from a variable its literal start (`whole` false), and gives
+ * the files named in it and whether the rest may name more.
+ */
+export type FileForm = (text: string, whole: boolean) => NamedFiles;
+
+export interface NamedFiles {
+  readonly paths: readonly string[];
+  /** A value from a variable may name another file in the part the analysis cannot see. */
+  readonly open: boolean;
+}
+
+interface SpecFields {
   /**
    * The spellings of the options it describes (`-c`, `--command`). Options
    * that share a spec share its value and effect, and stay separate options.
    */
   readonly names: readonly string[];
-  /** `none`: a flag. `required`: glued (`-cX`, `--opt=X`) or the next word. `optional`: glued only. */
-  readonly value: 'none' | 'required' | 'optional';
-  readonly effect?: Effect;
   /** The effect holds only for a value that matches (`ProxyCommand=…` among ssh's `-o` values); a value from a variable may. */
   readonly when?: RegExp;
   /** Captures, in group 1, the shell command the value runs, which the analysis reads as bash. */
   readonly shell?: RegExp;
   /** The value `-` is stdin or stdout, not a file of that name (`curl -o -`, `psql -f -`). */
   readonly stdio?: true;
+  /** The value names files only in these forms; without it, a file option's whole value is the file. */
+  readonly files?: FileForm;
+}
+
+/** A flag. It takes no value, and it may still have an effect (`--ext-diff`, `--amend`). */
+interface FlagSpec extends SpecFields {
+  readonly value: 'none';
+  readonly effect?: Effect;
+}
+
+/** An option with a value: `required` is glued (`-cX`, `--opt=X`) or the next word, `optional` glued only. Its value has a kind. */
+interface ValueSpec extends SpecFields {
+  readonly value: 'required' | 'optional';
+  readonly effect: ValueKind;
+}
+
+export type OptionSpec = FlagSpec | ValueSpec;
+
+/** The effect an option has, or `undefined` for a flag with none or a plain value. */
+export function effectOf(s: OptionSpec): Effect | undefined {
+  return s.effect === 'plain' ? undefined : s.effect;
 }
 
 /** An operand with an effect: an action word in first place (`reflog expire`), or a prefix any operand starts with (`+main`). */
@@ -58,6 +94,20 @@ export interface ProgramSpec {
   readonly anyCase?: boolean;
   /** A dash word is an option only when every letter in it is a listed one; otherwise it is an operand (`chmod -w f`). */
   readonly strictShort?: boolean;
+}
+
+/**
+ * An option no spec lists, with a glued value that looks like a path
+ * (`--contents=~/x`): a possible read, so the table need not list every option
+ * that names a file.
+ */
+const UNLISTED_PATH: OptionSpec = { names: [], value: 'required', effect: 'reads-file' };
+
+/** A glued value of an option no spec lists that may name a path: its literal start, or for a value from a variable its spelling, looks like one. */
+function unlistedPath(specs: readonly OptionSpec[], value: Arg): readonly OptionSpec[] {
+  if (specs.length > 0) return specs;
+  const start = value.kind === 'known' ? value.text : value.knownPrefix;
+  return isPathLike(start) || (value.kind === 'unknown' && isPathLike(value.raw)) ? [UNLISTED_PATH] : specs;
 }
 
 /** One option as the program reads it, with every option its spelling can be. */
@@ -225,7 +275,10 @@ export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
     const spelled = optionsIn(spec, t);
     if (spelled) {
       for (const { name, spellings, specs, glued, takesNext } of spelled) {
-        if (glued !== undefined) options.push({ arg, name, spellings, specs, value: restOf(arg, glued) });
+        if (glued !== undefined) {
+          const value = restOf(arg, glued);
+          options.push({ arg, name, spellings, specs: unlistedPath(specs, value), value });
+        }
         else if (takesNext) options.push({ arg, name, spellings, specs, value: args[++k] });
         else options.push({ arg, name, spellings, specs });
       }
@@ -249,8 +302,12 @@ export function operandWords(read: ReadArgs, args: readonly Arg[]): Arg[] {
 /** The effects the read options have; an argument that may be any option has every effect the program's options have. */
 export function effectsOf(spec: ProgramSpec, read: ReadArgs): Set<Effect> {
   const effects = new Set<Effect>();
-  for (const option of read.options) for (const s of option.specs) if (s.effect) effects.add(s.effect);
-  if (read.unknown.length > 0) for (const s of spec.options) if (s.effect) effects.add(s.effect);
+  const add = (s: OptionSpec) => {
+    const effect = effectOf(s);
+    if (effect) effects.add(effect);
+  };
+  for (const option of read.options) option.specs.forEach(add);
+  if (read.unknown.length > 0) spec.options.forEach(add);
   return effects;
 }
 
@@ -266,6 +323,22 @@ export function operandEffects(spec: ProgramSpec, words: readonly string[]): Eff
 export function hasEffect(s: OptionSpec, effect: Effect, value: Arg | undefined): boolean {
   if (s.effect !== effect) return false;
   return !s.when || value === undefined || value.kind === 'unknown' || s.when.test(value.text);
+}
+
+/**
+ * The files a file option's value names: the whole value, none for a `-`
+ * that is stdin or stdout, or what the spec's form finds in it. A value from
+ * a variable that may name one more gives a path the analysis cannot place.
+ */
+export function namedFiles(s: OptionSpec, value: Arg | undefined): Arg[] {
+  if (!value) return [];
+  if (s.stdio && value.kind === 'known' && value.text === '-') return [];
+  if (!s.files) return [value];
+  const whole = value.kind === 'known';
+  const { paths, open } = s.files(whole ? value.text : value.knownPrefix, whole);
+  const files: Arg[] = paths.map((text) => ({ kind: 'known', text, raw: value.raw, glob: value.kind === 'known' && value.glob && /[*?[]/.test(text) }));
+  if (open) files.push({ kind: 'unknown', knownPrefix: '', raw: value.raw, splits: false });
+  return files;
 }
 
 /** The read options whose spelling can be an option with `effect` for its value. */

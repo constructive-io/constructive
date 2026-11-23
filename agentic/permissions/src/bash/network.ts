@@ -5,8 +5,8 @@
  */
 
 import { type Arg, literalStart } from './analyze';
-import { type CommandContext, firstOperand, generic, looksLikePath, pathLikeArgs, restOf, textOf } from './args';
-import { hasOption, type ReadArgs, readArgs, valuesOf as valuesRead } from './options';
+import { type CommandContext, firstOperand, generic, looksLikePath, pathLikeArgs, textOf } from './args';
+import { effectOf, hasEffect, hasOption, isOption, namedFiles, type ReadArgs, readArgs, type ReadOption, valuesOf as valuesRead } from './options';
 import { CURL, RSYNC, SCP, SSH, WGET } from './programs';
 import { applyEffects } from './scripts';
 import { isLoopbackHost, isRemoteSpec, isUrl } from './words';
@@ -17,59 +17,40 @@ function isLocalUrl(url: string): boolean {
   return isLoopbackHost(m?.[1] ?? '');
 }
 
+/** curl's options that send data: their values are the request body, a form, a query or a file it uploads. */
+const CURL_DATA = ['-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--json', '--data-urlencode', '--url-query', '-F', '--form', '--form-string', '-T', '--upload-file'];
+
+/** The files an option's value names, by the forms its specs read (`-d @file`, `-F 'f=@a;headers=@b'`). */
+function filesOf(option: ReadOption): Arg[] {
+  return option.specs.flatMap((s) => (effectOf(s) === 'reads-file' && hasEffect(s, 'reads-file', option.value) ? namedFiles(s, option.value) : []));
+}
+
+/**
+ * curl: the registry reads every file a value names, in the form curl reads
+ * for that option; here a data option that sends a file, or a value the
+ * analysis cannot see, is an upload.
+ */
 export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   const read = readArgs(CURL, rest);
   const say = (detail: string) => analyzer.flag('upload', `it uploads data: ${detail}`);
-  let dataForms = false;
-  for (const key of ['-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--json']) {
-    for (const v of valuesRead(read, key)) {
-      dataForms = true;
-      if (v.kind === 'unknown') say(`curl ${key} with a value from a variable or substitution`);
-      if (literalStart(v).startsWith('@')) {
-        say(`curl ${key} ${v.raw} sends a file's contents`);
-        if (textOf(v) !== '@-') analyzer.addPath(restOf(v, 1), 'read', true);
-      }
-    }
-  }
-  for (const v of valuesRead(read, '--data-urlencode')) {
-    dataForms = true;
-    const at = literalStart(v).indexOf('@');
-    if (at >= 0) {
-      say(`curl --data-urlencode ${v.raw} sends a file's contents`);
-      const file = restOf(v, at + 1);
-      if (textOf(file) !== '-') analyzer.addPath(file, 'read', true);
-    } else if (v.kind === 'unknown') {
-      say('curl --data-urlencode with a value from a variable or substitution, which may name a file');
-    }
-  }
-  for (const v of valuesRead(read, '-F', '--form')) {
-    dataForms = true;
-    const m = /=([@<])([^;]*)/.exec(literalStart(v));
-    if (m) {
-      say(`curl -F ${v.raw} sends a file`);
-      if (m[2] !== '-') analyzer.addPath(restOf(v, m.index + 2), 'read', true);
-    } else if (v.kind === 'unknown') {
-      say('curl -F with a value from a variable or substitution, which may name a file');
-    }
-  }
-  for (const v of valuesRead(read, '-T', '--upload-file')) {
-    dataForms = true;
-    say(`curl -T ${v.raw} uploads a file`);
-  }
-  for (const v of valuesRead(read, '-H', '--header')) {
-    const start = literalStart(v);
-    if (start.startsWith('@')) {
-      say(`curl -H ${v.raw} sends headers from a file`);
-      analyzer.addPath(restOf(v, 1), 'read', true);
-    } else if (start === '') {
-      say('curl -H with a value from a variable or substitution, which may name a file');
-    }
-  }
-  for (const v of valuesRead(read, '-K', '--config')) {
-    analyzer.dynamic(`curl ${textOf(v) === '-' ? 'reads its options from stdin' : `reads its options from ${v.raw}`}`);
-  }
   applyEffects(ctx, 'curl', CURL, read);
+  let dataForms = false;
+  for (const option of read.options) {
+    const v = option.value;
+    if (!v) continue;
+    const sends = filesOf(option).length > 0;
+    if (isOption(option, ...CURL_DATA)) {
+      dataForms = true;
+      if (isOption(option, '-T', '--upload-file')) say(`curl ${option.name} ${v.raw} uploads a file`);
+      else if (sends) say(`curl ${option.name} ${v.raw} sends a file's contents`);
+      else if (v.kind === 'unknown') say(`curl ${option.name} with a value from a variable or substitution`);
+    } else if (sends && isOption(option, '-H', '--header')) {
+      say(`curl ${option.name} ${v.raw} sends headers from a file`);
+    } else if (isOption(option, '-K', '--config')) {
+      analyzer.dynamic(`curl ${textOf(v) === '-' ? 'reads its options from stdin' : `reads its options from ${v.raw}`}`);
+    }
+  }
   const urls = [...read.positionals, ...valuesRead(read, '--url')];
   for (const u of read.positionals) {
     const start = literalStart(u);

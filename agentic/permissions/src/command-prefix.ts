@@ -6,7 +6,7 @@
  */
 
 import { normalizeCommand } from './bash/analyze';
-import { type Effect, operandEffects, optionsIn } from './bash/options';
+import { type Effect, effectOf, operandEffects, optionsIn } from './bash/options';
 import { wordTexts } from './bash/parts';
 import { gitSubcommand, PROGRAMS } from './bash/programs';
 import type { CommandPart, GrantCaveat, GrantMatch, ListedPrefix } from './types';
@@ -200,7 +200,7 @@ function passesRiskyOption(part: CommandPart): boolean {
   const spec = git ? gitSubcommand(part.words[1]) : PROGRAMS.get(part.words[0]);
   if (!spec) return false;
   const guarded = (effect: Effect | undefined) => effect !== undefined && GUARDED.has(effect);
-  if (part.options.some((option) => (optionsIn(spec, option) ?? []).some(({ specs }) => specs.some((s) => guarded(s.effect))))) return true;
+  if (part.options.some((option) => (optionsIn(spec, option) ?? []).some(({ specs }) => specs.some((s) => guarded(effectOf(s)))))) return true;
   if (!spec.operandEffects) return false;
   const texts = wordTexts(part.words);
   return texts === null || operandEffects(spec, texts.slice(git ? 2 : 1)).some(guarded);

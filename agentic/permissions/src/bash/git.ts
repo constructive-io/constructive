@@ -9,8 +9,9 @@
 import { isSecretFile } from '../secret-files';
 import { type Arg, type Cwd, literalStart } from './analyze';
 import { type CommandContext, generic, literalArg, textOf } from './args';
-import { effectsOf, hasOption, isOption, type ReadArgs, readArgs, valuesOf, withEffect } from './options';
+import { hasOption, isOption, type ReadArgs, readArgs, valuesOf, withEffect } from './options';
 import { GIT, gitSubcommand } from './programs';
+import { applyEffects } from './scripts';
 import { isRemoteSpec, isUrl } from './words';
 
 /** `git -c` keys that make git run a program. */
@@ -35,25 +36,9 @@ function configKey(ctx: CommandContext, spelling: string, kv: Arg | undefined): 
   else if (kv && GIT_EXEC_CONFIG.test(kv.text)) ctx.analyzer.dynamic(`${spelling} ${kv.text} makes git run a program`);
 }
 
-/**
- * What the subcommand's options do: an option that runs a program, a config
- * key that does, and an argument from a variable, which may be any option the
- * subcommand takes.
- */
-function optionEffects(ctx: CommandContext, sub: string | undefined, read: ReadArgs, spec: ReturnType<typeof gitSubcommand>): void {
-  const { analyzer } = ctx;
+/** The subcommand's config options: a key that runs a program, or one from a variable, which may be such a key. */
+function configOptions(ctx: CommandContext, sub: string | undefined, read: ReadArgs): void {
   for (const option of withEffect(read, 'sets-config')) configKey(ctx, `git ${sub} ${option.name}`, option.value);
-  const runs = withEffect(read, 'runs-program')[0];
-  if (runs) analyzer.dynamic(`it runs git ${sub} ${runs.arg.raw}, which runs a program the command names`);
-  const hidden = read.unknown[0];
-  if (!hidden) return;
-  const could = effectsOf(spec, { ...read, options: [] });
-  if (could.has('runs-program') || could.has('sets-config')) {
-    analyzer.dynamic(`it passes git ${sub} ${hidden.raw}, a value from a variable that may be an option that runs a program`);
-  }
-  if (could.has('writes-file') || could.has('reads-file')) {
-    analyzer.unresolvable(`it passes git ${sub} ${hidden.raw}, a value from a variable that may be an option naming a file the analysis cannot place`);
-  }
 }
 
 /** `git bisect run`, `git submodule foreach`: the action word, known or from a variable, runs the command after it. */
@@ -116,9 +101,9 @@ function config(ctx: CommandContext, read: ReadArgs, here: Arg, raw: string): vo
   const reads = hasOption(read, '--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--show-origin') || action === 'get' || action === 'list';
   const edits = hasOption(read, '--add', '--unset', '--unset-all', '--replace-all', '--rename-section', '--remove-section', '-e', '--edit');
   const writes = !reads && (edits || read.operands.length >= 2 || read.unknown.length > 0);
-  // The file is read for a lookup and written for an edit.
+  // The registry reads the file; an edit writes it too.
   const file = valuesOf(read, '--file', '-f')[0];
-  if (file) analyzer.addPath(file, writes ? 'write' : 'read', true);
+  if (file && writes) analyzer.addPath(file, 'write', true);
   if (!writes || file) return;
   if (hasOption(read, '--global')) analyzer.addPath(literalArg(`${analyzer.ctx.homeDir}/.gitconfig`, raw), 'write', true);
   else if (hasOption(read, '--system')) analyzer.addPath(literalArg('/etc/gitconfig', raw), 'write', true);
@@ -158,17 +143,16 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   const spec = gitSubcommand(sub);
   const read = readArgs(spec, rest.slice(global.next + 1));
   runsCommand(ctx, sub, read);
-  optionEffects(ctx, sub, read, spec);
+  configOptions(ctx, sub, read);
   if (sub === 'send-email') analyzer.flag('upload', 'it uploads data: git send-email mails patches from this repo');
   const handle = (): void => {
+    applyEffects(ctx, `git ${sub}`, spec, read);
     if (sub === 'remote') return remote(ctx, read);
     if (sub === 'push') return push(ctx, read);
     const raw = subword?.raw ?? '.';
     const here: Arg = analyzer.base === null ? { kind: 'unknown', knownPrefix: '', raw, splits: false } : literalArg('.', raw);
     if (sub === 'config') return config(ctx, read, here, raw);
     if (sub === 'add') add(ctx, read);
-    for (const out of withEffect(read, 'writes-file')) if (out.value) analyzer.addPath(out.value, 'write', true);
-    for (const input of withEffect(read, 'reads-file')) if (input.value) analyzer.addPath(input.value, 'read', true);
     if (sub === 'reset' && hasOption(read, '--hard')) analyzer.destroy(here, 'git reset --hard');
     if (sub === 'clean' && hasOption(read, '-f', '--force')) analyzer.destroy(here, 'git clean -f');
     generic(ctx, read.operands.filter((a) => !isUrl(literalStart(a))));

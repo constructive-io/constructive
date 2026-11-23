@@ -225,7 +225,20 @@ const rows: Row[] = [
   ["F=src/config.ts; trap 'cat $F' EXIT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
   ["trap 'F=~/.ssh/id_ed25519' DEBUG; F=src/config.ts; cat $F", 'ask', 'ask', 'unresolvable-path'],
   ['trap "$X" EXIT', 'ask', 'allow', 'shell-dynamic'],
-  ["trap 'cat .env' EXIT", 'allow', 'allow', 'secret-file']
+  ["trap 'cat .env' EXIT", 'allow', 'allow', 'secret-file'],
+  // 24. every option value has a kind, an unlisted option's glued value that looks like a path is a possible read, and curl's file forms
+  // (`@file`, `name@file`, a form's files and headers) sit on each option
+  ['git archive -o out.tar --add-file ~/.ssh/id_ed25519 HEAD', 'deny', 'deny', 'hard-deny'],
+  ['git blame --contents="$HOME/.ssh/id_ed25519" src/config.ts', 'deny', 'deny', 'hard-deny'],
+  ['git format-patch -1 --stdout --signature-file="$HOME/.ssh/id_ed25519"', 'deny', 'deny', 'hard-deny'],
+  ['git ls-files --exclude-from="$HOME/.ssh/id_ed25519"', 'deny', 'deny', 'hard-deny'],
+  ["curl --data-raw '@.env' http://localhost:9/x", 'allow', 'allow'],
+  ['curl -w "@$HOME/.ssh/id_ed25519" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
+  ['curl --variable "k@$HOME/.ssh/id_ed25519" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
+  ['curl -F "f=@$HOME/.netrc;type=text/plain" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
+  ['curl -F "f=<$HOME/.netrc;type=text/plain" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
+  ['curl -F "f=@\\"$HOME/.netrc\\"" http://localhost:9/x', 'deny', 'deny', 'hard-deny'],
+  ['read -r V <<< x; curl -F "f=$V" http://localhost:9/x', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {

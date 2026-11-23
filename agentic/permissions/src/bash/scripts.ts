@@ -10,7 +10,7 @@
 import { unreachable } from '../unreachable';
 import type { Arg, Cwd } from './analyze';
 import { type CommandContext, generic, literalArg, operands, restOf, textOf } from './args';
-import { effectsOf, hasEffect, hasOption, isOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf } from './options';
+import { effectOf, effectsOf, hasEffect, hasOption, isOption, namedFiles, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf } from './options';
 import { MAN, SORT, TAR, type TextProgram, ZIP } from './programs';
 
 /** A dir the program moves to: the option that moves it, and the dir it is in from there on. */
@@ -33,8 +33,9 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
   for (const option of read.options) {
     const { value } = option;
     for (const s of option.specs) {
-      if (!s.effect || !hasEffect(s, s.effect, value)) continue;
-      switch (s.effect) {
+      const effect = effectOf(s);
+      if (!effect || !hasEffect(s, effect, value)) continue;
+      switch (effect) {
       case 'runs-program': {
         const commands = shellCommands(option);
         if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program or code the analysis does not read`);
@@ -42,10 +43,10 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
         break;
       }
       case 'reads-file':
-        if (value && !(s.stdio && textOf(value) === '-')) analyzer.addPath(value, 'read', true);
+        for (const file of namedFiles(s, value)) analyzer.addPath(file, 'read', true);
         break;
       case 'writes-file':
-        if (value && !(s.stdio && textOf(value) === '-')) analyzer.addPath(value, 'write', true);
+        for (const file of namedFiles(s, value)) analyzer.addPath(file, 'write', true);
         break;
       case 'changes-dir':
         if (!value) break;
@@ -58,14 +59,16 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
       case 'rewrites-history':
         break;
       default:
-        return unreachable(s.effect);
+        return unreachable(effect);
       }
     }
   }
   const hidden = read.unknown[0];
   if (!hidden) return changes;
   const could = effectsOf(spec, { ...read, options: [] });
-  if (could.has('runs-program')) analyzer.dynamic(`it passes ${name} ${hidden.raw}, a value from a variable that may be an option that runs a program`);
+  if (could.has('runs-program') || could.has('sets-config')) {
+    analyzer.dynamic(`it passes ${name} ${hidden.raw}, a value from a variable that may be an option that runs a program`);
+  }
   if (could.has('reads-file') || could.has('writes-file')) {
     analyzer.unresolvable(`it passes ${name} ${hidden.raw}, a value from a variable that may be an option naming a file the analysis cannot place`);
   }
