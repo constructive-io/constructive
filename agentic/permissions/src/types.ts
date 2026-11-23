@@ -204,8 +204,9 @@ export type GrantPattern = CommandPattern | PathPattern;
 /**
  * Something a host should say beside a rule, because the rule lets a call run
  * that the kit does not fully check. `script-unchecked`: the prefix runs a
- * script by its path (`node scripts/build.js`), and the kit never reads the
- * script, which the agent may have changed.
+ * script the kit never reads, which the agent may have changed: one by its
+ * path (`node scripts/build.js`), a package script (`npm run build`), or the
+ * project's tests (`npm test`).
  */
 export type GrantCaveat = 'script-unchecked';
 

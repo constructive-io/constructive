@@ -247,7 +247,9 @@ describe('command prefix grants', () => {
 describe('the script caveat', () => {
   it('marks each option that saves an interpreter and its script, and the card the host receives, and no other', async () => {
     const scripts = ['node scripts/build.js --watch', 'python3 manage.py migrate', 'bash deploy.sh staging', 'tsx watch src/x.ts', 'git status && node scripts/build.js'];
-    const others = ['git status', 'npm test', 'npm ls', 'npm run build', 'cat README.md', 'node -e "process.exit(0)"', './scripts/deploy.sh'];
+    // a package script and the project's tests run code the kit never reads, too
+    scripts.push('npm test', 'pnpm test -- --watch', 'npm run build', 'bun run dev');
+    const others = ['git status', 'npm ls', 'cat README.md', 'node -e "process.exit(0)"', './scripts/deploy.sh'];
     const caveats = async (command: string) => {
       const ask = asAsk(await sb.bash(command, 'ask'));
       return [command, ask.grantOptions.map((o) => o.caveat ?? null), ask.prompt.grantOptions.map((o) => o.caveat ?? null)];
@@ -262,7 +264,9 @@ describe('the script caveat', () => {
   it('reads it from the table for a stored grant', () => {
     expect(grantCaveat(storedPrefixes('git status', 'node scripts/build.js'))).toBe('script-unchecked');
     expect(grantCaveat(storedPrefixes('node inspect src/index.js'))).toBe('script-unchecked');
-    expect(grantCaveat(storedPrefixes('git status', 'npm run build'))).toBeUndefined();
+    expect(grantCaveat(storedPrefixes('git status', 'npm run build'))).toBe('script-unchecked');
+    expect(grantCaveat(storedPrefixes('git status', 'npm test'))).toBe('script-unchecked');
+    expect(grantCaveat(storedPrefixes('git status', 'npm ls'))).toBeUndefined();
     expect(grantCaveat(storedCommand('node scripts/build.js'))).toBeUndefined();
     expect(grantCaveat({ type: 'path', access: 'read', pathPrefix: '/a' })).toBeUndefined();
   });

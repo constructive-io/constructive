@@ -24,8 +24,8 @@ const exactText = (text: string): CommandPattern => ({ kind: 'exact', text });
 describe('parseCommandPattern', () => {
   // prettier-ignore
   const valid: [pattern: CommandPattern, match: GrantMatch][] = [
-    [prefixText('git status, npm run test'), prefixes('git status', 'npm run test')],
-    [prefixText('  git   status ,npm run test  '), prefixes('git status', 'npm run test')],
+    [prefixText('git status, npm ls'), prefixes('git status', 'npm ls')],
+    [prefixText('  git   status ,npm ls  '), prefixes('git status', 'npm ls')],
     [prefixText('git status, git status'), prefixes('git status')],
     [exactText('pnpm   test'), exact('pnpm test')],
     [exactText('pnpm\ttest '), exact('pnpm test')],
@@ -48,7 +48,10 @@ describe('parseCommandPattern', () => {
     [prefixText('python3 manage.py'), prefixes('python3 manage.py')],
     [prefixText('bash deploy.sh'), prefixes('bash deploy.sh')],
     [prefixText('tsx watch src/x.ts'), prefixes('tsx watch src/x.ts')],
-    [prefixText('git status, node scripts/build.js'), prefixes('git status', 'node scripts/build.js')]
+    [prefixText('git status, node scripts/build.js'), prefixes('git status', 'node scripts/build.js')],
+    [prefixText('npm run build'), prefixes('npm run build')],
+    [prefixText('npm test'), prefixes('npm test')],
+    [prefixText('git status, npm run test'), prefixes('git status', 'npm run test')]
   ];
   it.each(scripts)('reads %j with the script caveat, which the exact command does not get', (pattern, match) => {
     expect(parseCommandPattern(pattern)).toEqual({ ok: true, match, caveat: 'script-unchecked' });

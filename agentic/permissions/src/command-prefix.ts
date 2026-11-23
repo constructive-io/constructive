@@ -114,9 +114,9 @@ const ARITY: ReadonlyMap<string, PrefixEntry> = new Map<string, PrefixEntry>([
 const CLASS_CAVEAT: Readonly<Record<PrefixClass, GrantCaveat | undefined>> = {
   reader: undefined,
   vcs: undefined,
-  test: undefined,
+  test: 'script-unchecked',
   'package-query': undefined,
-  'package-script': undefined,
+  'package-script': 'script-unchecked',
   'script-runner': 'script-unchecked'
 };
 
@@ -142,8 +142,9 @@ function arityKey(words: readonly string[]): (PrefixEntry & { length: number }) 
 
 /**
  * The caveat a host shows beside a stored or offered grant, from the class of
- * each prefix the table lists: `script-unchecked` when one runs a script by
- * its path. An exact command, a path grant and an unlisted prefix get none.
+ * each prefix the table lists: `script-unchecked` when one runs a script the
+ * kit never reads (by its path, a package script, or the project's tests). An
+ * exact command, a path grant and an unlisted prefix get none.
  */
 export function grantCaveat(match: GrantMatch): GrantCaveat | undefined {
   if (match.type !== 'command-prefix') return undefined;
