@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.32.16](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.15...graphile-settings@6.32.16) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
 ## [6.32.15](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.14...graphile-settings@6.32.15) (2026-11-23)
 
 **Note:** Version bump only for package graphile-settings

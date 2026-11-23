@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.30.16](https://github.com/constructive-io/constructive/compare/safegres@1.30.15...safegres@1.30.16) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
 ## [1.30.15](https://github.com/constructive-io/constructive/compare/safegres@1.30.14...safegres@1.30.15) (2026-11-23)
 
 **Note:** Version bump only for package safegres

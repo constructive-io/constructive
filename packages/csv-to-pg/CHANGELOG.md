@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.8](https://github.com/constructive-io/constructive/compare/csv-to-pg@4.16.7...csv-to-pg@4.16.8) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
 ## [4.16.7](https://github.com/constructive-io/constructive/compare/csv-to-pg@4.16.6...csv-to-pg@4.16.7) (2026-11-23)
 
 **Note:** Version bump only for package csv-to-pg
