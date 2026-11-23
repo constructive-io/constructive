@@ -17,11 +17,11 @@ export async function hashFile(filePath: string): Promise<string> {
 }
 
 /**
- * Generate SHA256 hash of a SQL file's parsed and cleaned AST
+ * Generate SHA256 hash of a SQL file's parsed AST, excluding parser metadata
  */
 export async function hashSqlFile(filePath: string): Promise<string> {
   const content = await readFile(filePath, 'utf-8');
-  const parsed = await parse(content);
+  const { version: _version, ...parsed } = await parse(content);
   const cleaned = cleanTree(parsed);
   const astString = JSON.stringify(cleaned);
   return hashString(astString);
