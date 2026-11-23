@@ -5,6 +5,7 @@ import type { GraphileCacheEntry } from '../src';
 import {
   cacheGraphileInstance,
   closeAllCaches,
+  disposeUncachedEntry,
   getCacheStats,
   graphileCache,
   GraphileCacheBudgetError} from '../src';
@@ -50,12 +51,16 @@ describe('graphile cache heap budget', () => {
     const small = entry('small', 2 * MiB);
     await cacheGraphileInstance('small', small.entry);
     const huge = entry('huge', 11 * MiB);
+    const releasePresetServices = jest.fn(async () => undefined);
+    huge.entry.releasePresetServices = releasePresetServices;
 
     await expect(cacheGraphileInstance('huge', huge.entry)).rejects.toThrow(
       GraphileCacheBudgetError
     );
 
+    await disposeUncachedEntry(huge.entry);
     expect(huge.release).toHaveBeenCalledTimes(1);
+    expect(releasePresetServices).toHaveBeenCalledTimes(1);
     expect(graphileCache.has('huge')).toBe(false);
     expect(graphileCache.has('small')).toBe(true);
   });
