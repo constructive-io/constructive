@@ -1,75 +1,36 @@
 import './types'; // for Request type
 
-import { parseUrl } from '@constructive-io/url-domains';
 import corsPlugin from 'cors';
 import type { Request, RequestHandler } from 'express';
 
-import type { ApiStructure } from '../types';
-
 /**
- * Unified CORS middleware for Constructive API
+ * CORS for the routed API, decided against `req.api`, the API the request's
+ * host resolved to. Mount it both before and after the `api` middleware:
+ * before routing `req.api` is unset, so only the fallback origin is allowed,
+ * which keeps routing 404/500 responses readable for the platform origin.
  *
- * Feature parity + compatibility:
- *  - Respects a global fallback origin (e.g. from env/CLI) for quick overrides.
- *  - Reads per-API CORS origins from typed cors_settings table (via req.api.corsOrigins).
- *  - Always allows localhost to ease development.
+ * An origin is allowed, with credentials, when it is exactly:
+ *  - one of the routed API's typed `cors_settings` origins (`req.api.corsOrigins`,
+ *    the API row first and the database default otherwise), or
+ *  - the global fallback origin (`server.origin`), the platform's own origin.
+ *    A fallback of `*` reflects any origin.
  *
- * Usage:
- *  app.use(cors(fallbackOrigin));
+ * Every other origin, localhost included, gets no CORS headers.
  */
 export const cors = (fallbackOrigin?: string): RequestHandler => {
-  // Use the cors library's dynamic origin function to decide per request
-  const dynamicOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean | string) => void, req: Request) => {
-    // 1) Global fallback (fast path)
-    if (fallbackOrigin && fallbackOrigin.trim().length) {
-      if (fallbackOrigin.trim() === '*') {
-        // Reflect whatever Origin the caller sent
-        return callback(null, true);
-      }
-      if (origin && origin.trim() === fallbackOrigin.trim()) {
-        return callback(null, true);
-      }
-      // If a strict fallback origin is provided and does not match,
-      // continue to per-API checks below (do not immediately deny).
-    }
+  const fallback = fallbackOrigin?.trim();
 
-    // 2) Per-API allowlist sourced from req.api (if available)
-    //    createApiMiddleware runs before this in server.ts, so req.api should be set
-    const api = (req as any).api as ApiStructure | undefined;
-    if (api) {
-      // Typed cors_settings origins
-      const typedOrigins = api.corsOrigins || [];
-      const siteUrls = api.domains || [];
-      const listOfDomains = [...typedOrigins, ...siteUrls];
-
-      if (origin && listOfDomains.includes(origin)) {
-        return callback(null, true);
-      }
-    }
-
-    // 3) Localhost is always allowed
-    if (origin) {
-      try {
-        const parsed = parseUrl(new URL(origin));
-        if (parsed.domain === 'localhost') {
-          return callback(null, true);
-        }
-      } catch {
-        // ignore invalid origin
-      }
-    }
-
-    // Default: not allowed
-    return callback(null, false);
+  const isAllowed = (origin: string | undefined, req: Request): boolean => {
+    if (fallback === '*') return true;
+    if (!origin) return false;
+    if (origin === fallback) return true;
+    return req.api?.corsOrigins?.includes(origin) ?? false;
   };
 
-  // Wrap in the cors plugin with our dynamic origin resolver
-  const handler: RequestHandler = (req, res, next) =>
+  return (req, res, next) =>
     corsPlugin({
-      origin: (reqOrigin, cb) => dynamicOrigin(reqOrigin, cb as any, req),
+      origin: (origin, callback) => callback(null, isAllowed(origin, req)),
       credentials: true,
-      optionsSuccessStatus: 200,
+      optionsSuccessStatus: 200
     })(req, res, next);
-
-  return handler;
 };

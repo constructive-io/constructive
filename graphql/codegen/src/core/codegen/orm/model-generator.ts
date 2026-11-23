@@ -10,6 +10,8 @@ import { singularize } from 'inflekt';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getCreateInputTypeName,
   getCreateMutationName,
   getDeleteInputTypeName,
@@ -200,7 +202,7 @@ export function generateModelFile(
   // singular noun (e.g. "animal"), NOT the GraphQL by-id query name (e.g.
   // "animalById"), so the surface aligns with the rest of the SDK.
   const singleResultFieldName = singularName;
-  const createMutationName = table.query?.create ?? `create${typeName}`;
+  const createMutationName = table.query?.create === null ? null : table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
 
@@ -219,8 +221,8 @@ export function generateModelFile(
   });
 
   // Detect which bulk mutations are available for this table
-  const bulkInsertMutationName = table.query?.bulkInsert ?? null;
-  const bulkUpsertMutationName = table.query?.bulkUpsert ?? null;
+  const bulkInsertMutationName = getBulkInsertMutationName(table) ?? null;
+  const bulkUpsertMutationName = getBulkUpsertMutationName(table) ?? null;
   const bulkUpdateMutationName = table.query?.bulkUpdate ?? null;
   const bulkDeleteMutationName = table.query?.bulkDelete ?? null;
   const hasBulk = !!(bulkInsertMutationName || bulkUpsertMutationName || bulkUpdateMutationName || bulkDeleteMutationName);
@@ -265,7 +267,7 @@ export function generateModelFile(
     selectTypeName,
     whereTypeName,
     orderByTypeName,
-    createInputTypeName,
+    ...(createMutationName ? [createInputTypeName] : []),
     updateInputTypeName,
     patchTypeName,
   ];
@@ -768,7 +770,7 @@ export function generateModelFile(
   }
 
   // ── create ─────────────────────────────────────────────────────────────
-  {
+  if (createMutationName) {
     const dataType = () =>
       t.tsIndexedAccessType(
         t.tsTypeReference(t.identifier(createInputTypeName)),
@@ -1408,7 +1410,7 @@ export function generateModelFile(
     const rightPkInfo = rightTable ? getPrimaryKeyInfo(rightTable) : [];
 
     // ── add<Relation> ───────────────────────────────────────────────
-    {
+    if (junctionTable.query?.create !== null) {
       // Parameters: one param per left PK + one param per right PK, with actual types
       const params: t.Identifier[] = [];
       for (let i = 0; i < leftPkFields.length; i++) {

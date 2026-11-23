@@ -141,7 +141,8 @@ export function createBm25Adapter(
           {},
           () => ({
             description:
-              'Input for BM25 ranked text search. Provide a search query string and optional score threshold.',
+              'Input for BM25 ranked text search. Provide a search query string and an optional maximum score. ' +
+              'Only rows the query matches (negative score) are returned.',
             fields: () => ({
               query: {
                 type: new GraphQLNonNull(GraphQLString),
@@ -150,7 +151,8 @@ export function createBm25Adapter(
               threshold: {
                 type: GraphQLFloat,
                 description:
-                  'Maximum BM25 score threshold (negative values). Only rows with score <= threshold are returned.',
+                  'Maximum BM25 score (scores are negative; more negative = better match). ' +
+                  'Only rows with score <= threshold are returned.',
               },
             }),
           }),
@@ -186,6 +188,14 @@ export function createBm25Adapter(
       const bm25queryExpr = sql`to_bm25query(${sql.value(query)}, ${sql.value(qualifiedIndexName)})`;
       const scoreExpr = sql`(${columnExpr} <@> ${bm25queryExpr})`;
 
+      // A bm25 score is negative for a match and 0 for a row the query does
+      // not match, so the filter keeps negative scores. Without this the
+      // result would depend on whether the planner used the bm25 index.
+      const matchClause = (score: SQL): SQL =>
+        threshold !== undefined && threshold !== null
+          ? sql`(${score} < 0 AND ${score} <= ${sql.value(threshold)})`
+          : sql`${score} < 0`;
+
       // Check for chunk-aware querying
       const chunksInfo = columnData.chunksInfo;
       if (chunksInfo && chunksInfo.searchIndexes.includes('bm25') && (includeChunks !== false)) {
@@ -217,25 +227,15 @@ export function createBm25Adapter(
           COALESCE(${chunkScoreSubquery}, 0::real)
         )`;
 
-        let whereClause: SQL | null = null;
-        if (threshold !== undefined && threshold !== null) {
-          whereClause = sql`${combinedScoreExpr} < ${sql.value(threshold)}`;
-        }
-
         return {
-          whereClause,
+          whereClause: matchClause(combinedScoreExpr),
           scoreExpression: combinedScoreExpr,
         };
       }
 
       // Standard (non-chunk) query
-      let whereClause: SQL | null = null;
-      if (threshold !== undefined && threshold !== null) {
-        whereClause = sql`${scoreExpr} < ${sql.value(threshold)}`;
-      }
-
       return {
-        whereClause,
+        whereClause: matchClause(scoreExpr),
         scoreExpression: scoreExpr,
       };
     },

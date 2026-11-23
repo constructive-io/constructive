@@ -15,6 +15,8 @@
  * result and graceful error handling.
  */
 
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+
 import { BucketProvisioner } from '../src/provisioner';
 import type { StorageConnectionConfig } from '../src/types';
 import { ProvisionerError } from '../src/types';
@@ -36,6 +38,9 @@ const connection: StorageConnectionConfig = {
 };
 
 const TEST_ORIGINS = ['https://app.example.com'];
+
+// The logical bucket every bucket provisioned here belongs to
+const OWNER = '01a1c487-df93-7cf2-8a8d-ae2744facc98';
 
 jest.setTimeout(30000);
 
@@ -96,6 +101,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
       });
@@ -134,6 +140,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
       });
@@ -150,6 +157,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'public',
         publicUrlPrefix: 'https://cdn.example.com',
@@ -183,6 +191,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'temp',
       });
@@ -214,6 +223,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
         versioning: true,
@@ -238,6 +248,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const result = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
         allowedOrigins: customOrigins,
@@ -262,11 +273,11 @@ describe('BucketProvisioner integration (RustFS)', () => {
     it('clears the CORS rule set once the bucket records no origin', async () => {
       if (!objectStoreAvailable) return;
 
-      await provisioner.provision({ bucketName, accessType: 'private' });
+      await provisioner.provision({ owner: OWNER, bucketName, accessType: 'private' });
       expect((await provisioner.inspect(bucketName, 'private')).corsRules).toHaveLength(1);
 
       const unbrowsed = new BucketProvisioner({ connection, allowedOrigins: [] });
-      const result = await unbrowsed.provision({ bucketName, accessType: 'private' });
+      const result = await unbrowsed.provision({ owner: OWNER, bucketName, accessType: 'private' });
 
       expect(result.corsRules).toEqual([]);
       expect((await provisioner.inspect(bucketName, 'private')).corsRules).toEqual([]);
@@ -276,7 +287,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
       if (!objectStoreAvailable) return;
 
       const unbrowsed = new BucketProvisioner({ connection, allowedOrigins: [] });
-      await unbrowsed.provision({ bucketName: testBucketName('never-browsed'), accessType: 'private' });
+      await unbrowsed.provision({ owner: OWNER, bucketName: testBucketName('never-browsed'), accessType: 'private' });
     });
   });
 
@@ -286,6 +297,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
     beforeAll(async () => {
       if (!objectStoreAvailable) return;
       await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
       });
@@ -329,6 +341,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
     beforeAll(async () => {
       if (!objectStoreAvailable) return;
       await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
       });
@@ -371,6 +384,7 @@ describe('BucketProvisioner integration (RustFS)', () => {
 
       // 1. Provision a private bucket with versioning
       const provisionResult = await provisioner.provision({
+        owner: OWNER,
         bucketName,
         accessType: 'private',
         versioning: true,
@@ -399,6 +413,44 @@ describe('BucketProvisioner integration (RustFS)', () => {
       // 4. Re-inspect — bucket still exists and is accessible
       const inspected2 = await provisioner.inspect(bucketName, 'private');
       expect(inspected2.bucketName).toBe(bucketName);
+    });
+  });
+
+  describe('ownership — one physical bucket per logical bucket', () => {
+    const OTHER_OWNER = '01a1c62c-ec48-7a55-9759-db5232fb025c';
+
+    it('records the owner and refuses to hand the bucket to another owner', async () => {
+      if (!objectStoreAvailable) return;
+      const bucketName = testBucketName('owned');
+
+      await provisioner.provision({ owner: OWNER, bucketName, accessType: 'private' });
+      expect(await provisioner.bucketOwner(bucketName)).toBe(OWNER);
+
+      // The same owner re-provisioning converges
+      await provisioner.provision({ owner: OWNER, bucketName, accessType: 'private' });
+
+      // Another owner is refused before anything is reconfigured
+      await expect(
+        provisioner.provision({ owner: OTHER_OWNER, bucketName, accessType: 'public' }),
+      ).rejects.toMatchObject({ code: 'BUCKET_OWNED_ELSEWHERE' });
+      const inspected = await provisioner.inspect(bucketName, 'private');
+      expect(inspected.blockPublicAccess).toBe(true);
+      expect(await provisioner.bucketOwner(bucketName)).toBe(OWNER);
+    });
+
+    it('refuses an untagged bucket that already holds objects', async () => {
+      if (!objectStoreAvailable) return;
+      const bucketName = testBucketName('unclaimed');
+
+      await provisioner.createBucket(bucketName);
+      await provisioner.getClient().send(
+        new PutObjectCommand({ Bucket: bucketName, Key: 'someone-elses', Body: 'x' }),
+      );
+
+      await expect(
+        provisioner.provision({ owner: OWNER, bucketName, accessType: 'private' }),
+      ).rejects.toMatchObject({ code: 'BUCKET_OWNED_ELSEWHERE' });
+      expect(await provisioner.bucketOwner(bucketName)).toBeNull();
     });
   });
 });

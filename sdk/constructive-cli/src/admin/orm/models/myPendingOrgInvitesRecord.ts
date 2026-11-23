@@ -29,7 +29,6 @@ import type {
   MyPendingOrgInvitesRecordSelect,
   MyPendingOrgInvitesRecordFilter,
   MyPendingOrgInvitesRecordsOrderBy,
-  CreateMyPendingOrgInvitesRecordInput,
   UpdateMyPendingOrgInvitesRecordInput,
   MyPendingOrgInvitesRecordPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class MyPendingOrgInvitesRecordModel {
       }) => ({
         myPendingOrgInvitesRecord: data.myPendingOrgInvites?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends MyPendingOrgInvitesRecordSelect>(
-    args: CreateArgs<S, CreateMyPendingOrgInvitesRecordInput['myPendingOrgInvitesRecord']> & {
-      select: S;
-    } & StrictSelect<S, MyPendingOrgInvitesRecordSelect>
-  ): QueryBuilder<{
-    createMyPendingOrgInvitesRecord: {
-      myPendingOrgInvitesRecord: InferSelectResult<MyPendingOrgInvitesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'MyPendingOrgInvitesRecord',
-      'createMyPendingOrgInvitesRecord',
-      'myPendingOrgInvitesRecord',
-      args.select,
-      args.data,
-      'CreateMyPendingOrgInvitesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'MyPendingOrgInvitesRecord',
-      fieldName: 'createMyPendingOrgInvitesRecord',
-      document,
-      variables,
     });
   }
 }

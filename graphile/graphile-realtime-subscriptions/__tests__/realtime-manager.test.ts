@@ -98,12 +98,12 @@ describe('entryToNotifyPayload', () => {
 describe('entryToChannel', () => {
   it('builds channel from source_schema and source_table', () => {
     const entry = makeEntry({ source_schema: 'public', source_table: 'contact' });
-    expect(entryToChannel(entry)).toBe('realtime:public.contact');
+    expect(entryToChannel(entry)).toBe('realtime:9db2575819580f0b822621ba62a1976e');
   });
 
   it('handles custom schema names', () => {
     const entry = makeEntry({ source_schema: 'tenant_42', source_table: 'invoice' });
-    expect(entryToChannel(entry)).toBe('realtime:tenant_42.invoice');
+    expect(entryToChannel(entry)).toBe('realtime:6b8caecbaac87c42d4553ef6ea8709fb');
   });
 });
 
@@ -190,11 +190,39 @@ describe('RealtimeManager', () => {
     await manager.stop(); // should be no-op
   });
 
+  it('retries pending tracker cleanup after a failed shutdown', async () => {
+    const manager = createManager();
+    await manager.start();
+    const query = mockPool.query.getMockImplementation()!;
+    mockPool.query.mockImplementation((sql, values) => sql.includes('cleanup_ephemeral') ? Promise.reject(new Error('cleanup failed')) : query(sql, values));
+    await expect(manager.stop()).rejects.toThrow('cleanup failed');
+    expect(manager.isRunning).toBe(false);
+    mockPool.query.mockImplementation(query).mockClear();
+    await manager.stop();
+    expect(mockPool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [manager.nodeId]);
+    mockPool.query.mockClear();
+    await manager.stop();
+    expect(mockPool.query).not.toHaveBeenCalled();
+  });
+
+  it('retries pending cleanup after startup and its cleanup both fail', async () => {
+    const manager = createManager();
+    mockPool.query.mockImplementation(async sql => {
+      if (sql.includes('drain_changes') || sql.includes('cleanup_ephemeral')) throw new Error('startup or cleanup failed');
+      return { rows: [] };
+    });
+    await expect(manager.start()).rejects.toBeInstanceOf(AggregateError);
+    expect(manager.isRunning).toBe(false);
+    mockPool.query.mockResolvedValue({ rows: [] }).mockClear();
+    await manager.stop();
+    expect(mockPool.query).toHaveBeenLastCalledWith(expect.stringContaining('cleanup_ephemeral'), [manager.nodeId]);
+  });
+
   describe('event dispatching', () => {
     it('emits cursor-tracked events on PgSubscriber eventEmitter', async () => {
       const emitted: { channel: string; payload: string }[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (payload: string) => {
-        emitted.push({ channel: 'realtime:public.contact', payload });
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (payload: string) => {
+        emitted.push({ channel: 'realtime:9db2575819580f0b822621ba62a1976e', payload });
       });
 
       // Mock drain_changes to return entries
@@ -203,10 +231,15 @@ describe('RealtimeManager', () => {
         makeEntry({ operation: 'UPDATE', payload_after: { id: 'row-b' } }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -223,7 +256,7 @@ describe('RealtimeManager', () => {
 
     it('handles DELETE events with payload_before', async () => {
       const emitted: string[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (payload: string) => {
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (payload: string) => {
         emitted.push(payload);
       });
 
@@ -235,10 +268,15 @@ describe('RealtimeManager', () => {
         }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -254,8 +292,8 @@ describe('RealtimeManager', () => {
     it('dispatches to correct channels for different tables', async () => {
       const contactEvents: string[] = [];
       const invoiceEvents: string[] = [];
-      mockSubscriber.eventEmitter.on('realtime:public.contact', (p: string) => contactEvents.push(p));
-      mockSubscriber.eventEmitter.on('realtime:billing.invoice', (p: string) => invoiceEvents.push(p));
+      mockSubscriber.eventEmitter.on('realtime:9db2575819580f0b822621ba62a1976e', (p: string) => contactEvents.push(p));
+      mockSubscriber.eventEmitter.on('realtime:2e0654a46337baffc614fed360153337', (p: string) => invoiceEvents.push(p));
 
       const entries: ChangeLogEntry[] = [
         makeEntry({
@@ -272,10 +310,15 @@ describe('RealtimeManager', () => {
         }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 
@@ -290,7 +333,7 @@ describe('RealtimeManager', () => {
   });
 
   describe('error handling', () => {
-    it('calls onError when drain fails', async () => {
+    it('propagates an initial drain failure and resets its started state', async () => {
       const errors: Error[] = [];
 
       mockPool.query.mockImplementation(async (sql: string) => {
@@ -301,10 +344,14 @@ describe('RealtimeManager', () => {
       });
 
       const manager = createManager({ onError: (err: Error) => errors.push(err) });
-      await manager.start();
+      await expect(manager.start()).rejects.toThrow('drain failed');
+      expect(manager.isRunning).toBe(false);
+      expect(errors).toEqual([]);
+      expect(jest.getTimerCount()).toBe(0);
 
-      expect(errors).toHaveLength(1);
-      expect(errors[0].message).toBe('drain failed');
+      mockPool.query.mockResolvedValue({ rows: [] });
+      await manager.start();
+      expect(manager.isRunning).toBe(true);
 
       await manager.stop();
     });
@@ -314,10 +361,15 @@ describe('RealtimeManager', () => {
         makeEntry({ operation: 'INSERT', payload_after: { id: 'row-x' } }),
       ];
 
-      mockPool.query.mockImplementation(async (sql: string) => {
-        if (typeof sql === 'string' && sql.includes('drain_changes')) {
-          return { rows: entries.map((e) => ({ drain_changes: e })) };
-        }
+      mockPool.query.mockImplementation(async (sql: string, values?: unknown[]) => {
+        if (sql.includes('drain_changes')) return { rows: entries.map(entry => ({ drain_changes: entry })) };
+        if (sql.includes('runtime_sources')) return { rows: entries
+          .filter((entry, i) => entries.findIndex(other => other.source_schema === entry.source_schema && other.source_table === entry.source_table) === i)
+          .map(entry => ({ runtime_sources: {
+            source_schema: entry.source_schema, source_table: entry.source_table,
+            fanout_function: 'source_fanout', cleanup_function: 'source_cleanup',
+          } })) };
+        if (sql.includes('source_fanout')) return { rows: JSON.parse(values![1] as string).map((entry: ChangeLogEntry) => ({ entry })) };
         return { rows: [] };
       });
 

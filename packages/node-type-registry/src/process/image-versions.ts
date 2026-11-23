@@ -5,7 +5,7 @@ import type { NodeTypeDefinition } from '../types';
  * Image version processing node.
  *
  * Composes a JobTrigger that fires when an image file transitions to
- * status = 'uploaded' (or on INSERT if confirm_upload is not enabled).
+ * status = 'uploaded'.
  * The trigger enqueues an image-processing job that generates resized,
  * cropped, or reformatted variants of the source image.
  *

@@ -10,10 +10,7 @@
  *    Pairs are discovered from the registry's FK relations (see
  *    graphile-storage-registry) — table naming carries no meaning here.
  *
- * 2. Delete middleware — wraps `delete*` mutations on `@storageFiles`-tagged tables
- *    with S3 object cleanup (sync + async GC fallback via AFTER DELETE trigger).
- *
- * 3. downloadUrl — handled by download-url-field.ts (separate plugin).
+ * 2. downloadUrl — handled by download-url-field.ts (separate plugin).
  *
  * Scope resolution uses the codec's schema/table name matched against
  * cached storage module configs.
@@ -30,13 +27,13 @@ import { checkTypeAgreement } from 'mime-bytes';
 
 import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
-import { isLiveFileRow, statusSelectFragment } from './file-lifecycle';
+import { isLiveFileRow } from './file-lifecycle';
 import { fileNotReplaceable } from './file-not-replaceable';
-import { buildFileProjection, type FileProjection } from './managed-upload';
+import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
-import { deleteS3Object,generatePresignedPutUrl } from './s3-signer';
+import { generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
 import { recordManagedFile } from './storage-file-recorder';
-import { getBucketConfig, loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
+import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec } from './storage-module-cache';
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -86,20 +83,35 @@ async function resolveUploadBucket(
   bucketKey: string | null,
   ownerId: string | null,
   isPublic: boolean,
+  byDatabase: boolean,
+  explicitDatabase: boolean,
 ): Promise<BucketConfig | null> {
   if (bucketKey) {
-    return getBucketConfig(pgClient, storageConfig, databaseId, bucketKey, ownerId || undefined);
+    return getBucketConfig(pgClient, storageConfig, databaseId, bucketKey, ownerId || undefined, byDatabase);
+  }
+
+  // A database named on the input is the row's scope, not the session's: its
+  // default bucket is read by tag under the request role, so RLS decides
+  // whether the caller may see (and so write into) that database's buckets.
+  if (explicitDatabase) {
+    const result = await pgClient.query({
+      text: `SELECT key FROM ${storageConfig.bucketsQualifiedName}
+             WHERE database_id = $1 AND $2 = ANY(tags)
+             LIMIT 1`,
+      values: [databaseId, isPublic ? 'default-public' : 'default'],
+    });
+    const key = result.rows[0]?.key as string | undefined;
+    return key ? getBucketConfig(pgClient, storageConfig, databaseId, key, undefined, true) : null;
   }
 
   const coordinate = await resolveDefaultBucket(
     pgClient,
-    databaseId,
     storageConfig.scope,
     ownerId,
     isPublic,
     null,
   );
-  return getBucketConfig(pgClient, storageConfig, databaseId, coordinate.resolvedKey, ownerId || undefined);
+  return getBucketConfig(pgClient, storageConfig, databaseId, coordinate.resolvedKey, ownerId || undefined, byDatabase);
 }
 
 // --- Plugin factory ---
@@ -111,7 +123,7 @@ export function createPresignedUrlPlugin(
   return {
     name: 'PresignedUrlPlugin',
     version: '1.0.0',
-    description: 'Per-table S3 storage middleware: upload fields on @storageBuckets, delete middleware on @storageFiles',
+    description: 'Per-table S3 storage middleware: upload fields on @storageBuckets',
 
     after: ['PgAttributesPlugin', 'PgMutationCreatePlugin', 'PgMutationUpdateDeletePlugin'],
 
@@ -167,6 +179,8 @@ export function createPresignedUrlPlugin(
             const { filesTypeName, uploadMutation: mutationName } = names;
 
             const hasOwnerId = plane.hasOwnerId;
+            const hasDatabaseId = plane.hasDatabaseId;
+            const uuidGqlType = (build as any).getTypeByName('UUID') || GraphQLString;
 
             const ownerIdGqlType = hasOwnerId
               ? (build as any).getGraphQLTypeByPgCodec(matchingBucketCodec.attributes.owner_id.codec, 'input')
@@ -180,6 +194,9 @@ export function createPresignedUrlPlugin(
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
                   : {}),
+                ...(hasDatabaseId
+                  ? { databaseId: { type: uuidGqlType, description: 'Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused.' } }
+                  : {}),
                 contentHash: { type: new GraphQLNonNull(GraphQLString), description: 'SHA-256 content hash (hex-encoded, 64 chars)' },
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
                 size: { type: new GraphQLNonNull(GraphQLInt), description: 'File size in bytes' },
@@ -192,19 +209,30 @@ export function createPresignedUrlPlugin(
               name: names.uploadPayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString, description: 'Presigned PUT URL (null if deduplicated)' },
+                ...(jsonType
+                  ? {
+                    uploadHeaders: {
+                      type: jsonType,
+                      description:
+                          'The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is ' +
+                          'signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. ' +
+                          'Null if deduplicated.',
+                    },
+                  }
+                  : {}),
                 fileId: { type: new GraphQLNonNull(GraphQLString), description: 'The file ID (UUID)' },
                 key: { type: new GraphQLNonNull(GraphQLString), description: 'The S3 object key' },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean), description: 'Whether this file was deduplicated (content already exists)' },
                 expiresAt: { type: GraphQLString, description: 'Presigned URL expiry time (null if deduplicated)' },
-                previousVersionId: { type: GraphQLString, description: 'ID of the previous version (when using custom keys)' },
                 ...(jsonType
                   ? {
                     file: {
                       type: jsonType,
                       description:
-                          'The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. ' +
+                          'The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. ' +
                           'Store this verbatim in an image/upload column — its `id` is what keeps the object from being ' +
-                          'garbage collected while the column still references it.',
+                          'garbage collected while the column still references it. ' +
+                          'After the upload is confirmed, use `file.id` to query the file row\'s `downloadUrl`.',
                     },
                   }
                   : {}),
@@ -233,6 +261,7 @@ export function createPresignedUrlPlugin(
                     const $filename = access($input, 'filename');
                     const $customKey = access($input, 'key');
                     const $ownerId = hasOwnerId ? access($input, 'ownerId') : lambda(null, (): null => null);
+                    const $databaseId = hasDatabaseId ? access($input, 'databaseId') : lambda(null, (): null => null);
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
 
@@ -240,6 +269,7 @@ export function createPresignedUrlPlugin(
                       bucketKey: $bucketKey,
                       isPublic: $isPublic,
                       ownerId: $ownerId,
+                      databaseId: $databaseId,
                       contentHash: $contentHash,
                       contentType: $contentType,
                       size: $size,
@@ -253,16 +283,18 @@ export function createPresignedUrlPlugin(
                       // Request-lane reads/writes run under the request role's pgSettings
                       // inside an explicit transaction so the jwt claims stay applied
                       // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
+                      const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      // The input's databaseId selects the row's scope; identity stays on the claims.
+                      const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
                       // Storage config is read on the request lane through the claim-scoped
 
                       // function_resolution.storage_modules(): no role switch, no RLS bypass.
                       const allConfigs = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                        loadAllStorageModules(pgClient, claimDatabaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
@@ -272,8 +304,10 @@ export function createPresignedUrlPlugin(
                         resolveUploadBucket(
                           pgClient, storageConfig, databaseId,
                           vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                          hasDatabaseId, vals.databaseId != null,
                         ),
                       );
+                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // The reconciler records the coordinate; consumers never
@@ -312,11 +346,11 @@ export function createPresignedUrlPlugin(
               name: names.bulkUploadFilePayloadType,
               fields: {
                 uploadUrl: { type: GraphQLString },
+                ...(jsonType ? { uploadHeaders: { type: jsonType, description: 'The exact headers the PUT to uploadUrl must send.' } } : {}),
                 fileId: { type: new GraphQLNonNull(GraphQLString) },
                 key: { type: new GraphQLNonNull(GraphQLString) },
                 deduplicated: { type: new GraphQLNonNull(GraphQLBoolean) },
                 expiresAt: { type: GraphQLString },
-                previousVersionId: { type: GraphQLString },
                 ...(jsonType ? { file: { type: jsonType, description: 'The projection document for the created file.' } } : {}),
               },
             });
@@ -328,6 +362,9 @@ export function createPresignedUrlPlugin(
                 isPublic: { type: GraphQLBoolean, description: 'Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given.' },
                 ...(hasOwnerId
                   ? { ownerId: { type: new GraphQLNonNull(ownerIdGqlType || GraphQLString), description: 'Owner entity ID (required for entity-scoped buckets)' } }
+                  : {}),
+                ...(hasDatabaseId
+                  ? { databaseId: { type: uuidGqlType, description: 'Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused.' } }
                   : {}),
                 files: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(BulkFileInputType))), description: 'Array of files to upload' },
               },
@@ -356,6 +393,7 @@ export function createPresignedUrlPlugin(
                     const $bucketKey = access($input, 'bucketKey');
                     const $isPublic = access($input, 'isPublic');
                     const $ownerId = hasOwnerId ? access($input, 'ownerId') : lambda(null, (): null => null);
+                    const $databaseId = hasDatabaseId ? access($input, 'databaseId') : lambda(null, (): null => null);
                     const $files = access($input, 'files');
                     const $withPgClient = (grafastContext() as any).get('withPgClient');
                     const $pgSettings = (grafastContext() as any).get('pgSettings');
@@ -364,6 +402,7 @@ export function createPresignedUrlPlugin(
                       bucketKey: $bucketKey,
                       isPublic: $isPublic,
                       ownerId: $ownerId,
+                      databaseId: $databaseId,
                       files: $files,
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
@@ -373,16 +412,18 @@ export function createPresignedUrlPlugin(
                       // Request-lane reads/writes run under the request role's pgSettings
                       // inside an explicit transaction so the jwt claims stay applied
                       // across every statement (see withRequestPgClient).
-                      const databaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
+                      const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      // The input's databaseId selects the row's scope; identity stays on the claims.
+                      const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
                       // Storage config is read on the request lane through the claim-scoped
 
                       // function_resolution.storage_modules(): no role switch, no RLS bypass.
                       const allConfigs = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
-                        loadAllStorageModules(pgClient, databaseId),
+                        loadAllStorageModules(pgClient, claimDatabaseId),
                       );
                       const storageConfig = resolveStorageConfigFromCodec(capturedFilesCodec, allConfigs);
                       if (!storageConfig) throw new Error('STORAGE_MODULE_NOT_FOUND');
@@ -392,8 +433,10 @@ export function createPresignedUrlPlugin(
                         resolveUploadBucket(
                           pgClient, storageConfig, databaseId,
                           vals.bucketKey ?? null, vals.ownerId ?? null, vals.isPublic === true,
+                          hasDatabaseId, vals.databaseId != null,
                         ),
                       );
+                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // Enforce bulk upload limits
@@ -442,141 +485,6 @@ export function createPresignedUrlPlugin(
             newFields,
             'PresignedUrlPlugin adding file upload mutations',
           );
-        },
-
-        /**
-         * Wrap delete* mutations on @storageFiles-tagged tables with S3 cleanup.
-         *
-         * Pattern: identical to graphile-bucket-provisioner-plugin's create/update hooks.
-         * 1. Read the file row BEFORE delete (need key + bucket_id for S3 cleanup)
-         * 2. Call PostGraphile's generated delete (RLS enforced)
-         * 3. If delete succeeded, check refcount and attempt sync S3 delete
-         * 4. AFTER DELETE trigger (constructive-db) enqueues async GC job as fallback
-         */
-        GraphQLObjectType_fields_field(field: any, build: any, context: any) {
-          const {
-            scope: { isRootMutation, fieldName, pgCodec },
-          } = context;
-
-          if (!isRootMutation || !pgCodec || !pgCodec.attributes) {
-            return field;
-          }
-
-          const tags = pgCodec.extensions?.tags;
-          if (!tags?.storageFiles) {
-            return field;
-          }
-
-          if (!fieldName.startsWith('delete')) {
-            return field;
-          }
-
-          log.debug(`Wrapping delete mutation "${fieldName}" with S3 cleanup (codec: ${pgCodec.name})`);
-
-          const defaultResolver = (obj: any) => obj[fieldName];
-          const { resolve: oldResolve = defaultResolver, ...rest } = field;
-          const capturedCodec = pgCodec;
-
-          return {
-            ...rest,
-            async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Extract the file ID from the mutation input
-              const inputKey = Object.keys(args.input || {}).find(
-                (k) => k !== 'clientMutationId',
-              );
-              const fileInput = inputKey ? args.input[inputKey] : null;
-
-              let fileRow: { key: string; bucket_id: string } | null = null;
-
-              if (fileInput) {
-                // Read the file row BEFORE delete to get the S3 key + bucket_id
-                const withPgClient = graphqlContext.withPgClient;
-                const pgSettings = graphqlContext.pgSettings;
-
-                if (withPgClient) {
-                  try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Storage config is read on the request lane through the claim-scoped
-                    // function_resolution.storage_modules(): no role switch, no RLS bypass.
-                    const allConfigs = databaseId
-                      ? await withRequestPgClient(withPgClient, pgSettings, (pgClient) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
-                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-
-                    if (storageConfig) {
-                      await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
-                        // Read the file row (RLS enforced)
-                        const result = await pgClient.query({
-                          text: `SELECT key, bucket_id FROM ${storageConfig.filesQualifiedName} WHERE id = $1 LIMIT 1`,
-                          values: [fileInput],
-                        });
-                        if (result.rows.length > 0) {
-                          fileRow = result.rows[0] as { key: string; bucket_id: string };
-                        }
-                      });
-                    }
-                  } catch (err: any) {
-                    log.warn(`Pre-delete file lookup failed: ${err.message}`);
-                  }
-                }
-              }
-
-              // Call PostGraphile's generated delete (RLS enforced)
-              const result = await oldResolve(source, args, graphqlContext, info);
-
-              // Attempt sync S3 cleanup if we have the file row
-              if (fileRow) {
-                const withPgClient = graphqlContext.withPgClient;
-                const pgSettings = graphqlContext.pgSettings;
-
-                if (withPgClient) {
-                  try {
-                    const databaseId = await withRequestPgClient(withPgClient, pgSettings, (pgClient) => resolveDatabaseId(pgClient));
-                    // Storage config is read on the request lane through the claim-scoped
-                    // function_resolution.storage_modules(): no role switch, no RLS bypass.
-                    const allConfigs = databaseId
-                      ? await withRequestPgClient(withPgClient, pgSettings, (pgClient) => loadAllStorageModules(pgClient, databaseId))
-                      : [];
-                    const storageConfig = resolveStorageConfigFromCodec(capturedCodec, allConfigs);
-
-                    if (storageConfig) await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
-                      // Check refcount: any other file with the same key in this bucket?
-                      const refResult = await pgClient.query({
-                        text: `SELECT COUNT(*)::int AS ref_count FROM ${storageConfig.filesQualifiedName} WHERE key = $1 AND bucket_id = $2`,
-                        values: [fileRow!.key, fileRow!.bucket_id],
-                      });
-                      const refCount = (refResult.rows[0]?.ref_count as number | undefined) ?? 0;
-
-                      if (refCount > 0) {
-                        log.info(`File deleted from DB; S3 key ${fileRow!.key} still referenced by ${refCount} file(s)`);
-                        return;
-                      }
-
-                      // No other references — attempt sync S3 delete.
-                      // Read the stored physical coordinate; the object lives in the
-                      // recorded bucket, never a recomputed prefix name. A deleter may
-                      // not see the bucket row (path share with can_delete), so it is
-                      // read through the module's narrow bucket physical-name reader.
-                      const physicalName = await readBucketPhysicalName(pgClient, storageConfig, fileRow!.bucket_id);
-                      if (physicalName === null) {
-                        // No physical bucket was ever provisioned — there is no object to delete.
-                        log.warn(`Bucket ${fileRow!.bucket_id} has no physical_name; skipping S3 delete`);
-                        return;
-                      }
-                      const s3ForDb = resolveS3ForDatabase(options, storageConfig, physicalName);
-                      await deleteS3Object(s3ForDb, fileRow!.key);
-                      log.info(`Sync S3 delete succeeded for key=${fileRow!.key}`);
-                    });
-                  } catch (err: any) {
-                    // Sync S3 delete failed — the AFTER DELETE trigger has enqueued an async GC job
-                    log.warn(`Sync S3 delete failed for key=${fileRow.key}; async GC job will retry: ${err.message}`);
-                  }
-                }
-              }
-
-              return result;
-            },
-          };
         },
       },
     },
@@ -651,11 +559,7 @@ export async function processSingleFile(
   // disagree, and it names the files row by id — which is what stops GC from
   // collecting an object a document still points at.
   const projectFile = (fileId: string, key: string): FileProjection =>
-    buildFileProjection(
-      { id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename },
-      bucket,
-      s3ForDb,
-    );
+    buildFileProjection({ id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename });
 
   // Determine S3 key
   let s3Key: string;
@@ -674,9 +578,9 @@ export async function processSingleFile(
     s3Key = buildS3Key(contentHash);
   }
 
-  // Dedup / versioning check
-  let previousVersionId: string | null = null;
-
+  // Dedup check. A key is one stored object: a row at the key with the same
+  // hash already describes these bytes, and a live one is a dedup hit.
+  //
   // A row whose bytes never landed must not be reported as a dedup hit: the
   // caller would store a reference to an object that is not in S3. Such a row is
   // dropped instead, and the upload proceeds as a fresh one below — the insert is
@@ -686,81 +590,70 @@ export async function processSingleFile(
   // hash and a second row would collide on (bucket_id, key). The GC job the
   // delete enqueues re-takes the reference count when it runs (≥5s later), by
   // which point the replacement row exists, so it no-ops.
-  const statusColumn = statusSelectFragment(storageConfig);
+  //
+  // A custom key holding different bytes is replaced in place, by the database:
+  // the new row is inserted as `requested` beside the current one (its BEFORE
+  // INSERT trigger refuses a key held by a row this caller cannot read), the PUT
+  // through its URL overwrites the object, and its confirm deletes the row it
+  // replaced. Until then the current row stays listable and downloadable, so
+  // nothing is deleted here and no version link is made — a custom key has no
+  // version chain.
   let staleFileId: string | null = null;
 
   if (isCustomKey) {
     const existingResult = await txClient.query({
-      text: `SELECT id, content_hash${statusColumn}
+      text: `SELECT id, status
        FROM ${storageConfig.filesQualifiedName}
        WHERE key = $1
          AND bucket_id = $2
+         AND content_hash = $3
        ORDER BY created_at DESC
        LIMIT 1`,
-      values: [s3Key, bucket.id],
+      values: [s3Key, bucket.id, contentHash],
     });
 
     if (existingResult.rows.length > 0) {
       const existing = existingResult.rows[0];
-      if (existing.content_hash === contentHash) {
-        if (await isLiveFileRow(storageConfig, s3ForDb, { key: s3Key, status: existing.status })) {
-          log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
-          return {
-            uploadUrl: null as string | null,
-            fileId: existing.id as string,
-            key: s3Key,
-            deduplicated: true,
-            expiresAt: null as string | null,
-            previousVersionId: null as string | null,
-            file: projectFile(existing.id as string, s3Key),
-          };
-        }
-        staleFileId = existing.id as string;
-        log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} has no bytes behind it`);
-      } else if (storageConfig.hasVersioning) {
-        previousVersionId = existing.id;
-        log.info(`Versioning: new version of key ${s3Key}, previous=${previousVersionId}`);
-      } else if (storageConfig.hasContentHash) {
-        // GC of the deleted row counts references by its content hash, which the
-        // replacement does not share, so it would delete the object at this key
-        // after the new bytes land.
-        throw new Error(
-          `STORAGE_REPLACE_UNSUPPORTED: key ${s3Key} already holds file ${existing.id}; ` +
-            'a content-addressed module needs versioning to replace a custom key'
-        );
-      } else {
-        // Without versioning a key names one row: the new bytes replace the old
-        // row in this transaction, and the PUT overwrites the object at the key.
-        // GC of the old row counts references by key, so the replacement keeps it.
-        staleFileId = existing.id as string;
-        log.info(`Replacing key ${s3Key}: file ${staleFileId} is superseded (module has no versioning)`);
+      if (isLiveFileRow(existing)) {
+        log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
+        return {
+          uploadUrl: null as string | null,
+          uploadHeaders: null as Record<string, string> | null,
+          fileId: existing.id as string,
+          key: s3Key,
+          deduplicated: true,
+          expiresAt: null as string | null,
+          file: projectFile(existing.id as string, s3Key),
+        };
       }
+      staleFileId = existing.id as string;
+      log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} has no bytes behind it`);
     }
   } else {
+    // Only the row at the hash's own key names these bytes for good: a custom-key
+    // row carrying the hash holds them at a key whose next upload replaces them.
     const dedupResult = await txClient.query({
-      text: `SELECT id, key${statusColumn}
+      text: `SELECT id, status
        FROM ${storageConfig.filesQualifiedName}
-       WHERE content_hash = $1
+       WHERE key = $1
          AND bucket_id = $2
        LIMIT 1`,
-      values: [contentHash, bucket.id],
+      values: [s3Key, bucket.id],
     });
 
     if (dedupResult.rows.length > 0) {
       const existingFile = dedupResult.rows[0];
-      // A custom-key row can carry this hash, so the bytes are at the row's own key.
-      const existingKey = existingFile.key as string;
-      if (await isLiveFileRow(storageConfig, s3ForDb, { key: existingKey, status: existingFile.status })) {
+      if (isLiveFileRow(existingFile)) {
         log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
         return {
           uploadUrl: null as string | null,
+          uploadHeaders: null as Record<string, string> | null,
           fileId: existingFile.id as string,
-          key: existingKey,
+          key: s3Key,
           deduplicated: true,
           expiresAt: null as string | null,
-          previousVersionId: null as string | null,
-          file: projectFile(existingFile.id as string, existingKey),
+          file: projectFile(existingFile.id as string, s3Key),
         };
       }
       staleFileId = existingFile.id as string;
@@ -791,28 +684,32 @@ export async function processSingleFile(
     mimeType: contentType,
     size,
     filename: filename || null,
-    previousVersionId,
     path: derivedPath,
   });
 
-  // Generate presigned PUT URL
+  // Generate presigned PUT URL, signed over the client's SHA-256 so the store
+  // only accepts bytes that hash to the content hash the row (and, for
+  // content-addressed buckets, the key and any later dedup hit) is named by.
   const uploadUrl = await generatePresignedPutUrl(
     s3ForDb,
     s3Key,
     contentType,
     size,
     storageConfig.uploadUrlExpirySeconds,
+    contentHash,
+    fileId,
   );
+  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId);
 
   const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 
   return {
     uploadUrl,
+    uploadHeaders,
     fileId,
     key: s3Key,
     deduplicated: false,
     expiresAt,
-    previousVersionId,
     file: projectFile(fileId, s3Key),
   };
 }

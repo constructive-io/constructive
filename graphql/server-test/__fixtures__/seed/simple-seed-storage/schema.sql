@@ -54,6 +54,7 @@ BEGIN
        filename text,
        owner_id uuid,
        is_public boolean NOT NULL DEFAULT false,
+       status text NOT NULL DEFAULT ''requested'',
        previous_version_id uuid REFERENCES %I.app_files(id),
        created_at timestamptz DEFAULT now(),
        updated_at timestamptz DEFAULT now(),
@@ -116,6 +117,21 @@ BEGIN
 
   EXECUTE format(
     'GRANT EXECUTE ON FUNCTION %I.app_files_record_file(uuid, text, text, text, bigint, text, jsonb, text, uuid) TO administrator, authenticated, anonymous',
+    schema_name || '-private');
+
+  -- The generator's bucket physical-name reader, which downloadUrl calls.
+  EXECUTE format($sql$
+    CREATE FUNCTION %I.app_buckets_physical_name(bucket_id uuid) RETURNS text
+    LANGUAGE sql
+    SECURITY DEFINER
+    STABLE
+    AS $function$
+      SELECT b.physical_name FROM %I.app_buckets b WHERE b.id = app_buckets_physical_name.bucket_id
+    $function$;
+  $sql$, schema_name || '-private', schema_name);
+
+  EXECUTE format(
+    'GRANT EXECUTE ON FUNCTION %I.app_buckets_physical_name(uuid) TO administrator, authenticated, anonymous',
     schema_name || '-private');
 END;
 $$;

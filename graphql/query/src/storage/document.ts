@@ -12,11 +12,11 @@ import type { StorageSurface } from './types';
 
 const UPLOAD_PAYLOAD_FIELDS = [
   'uploadUrl',
+  'uploadHeaders',
   'fileId',
   'key',
   'deduplicated',
   'expiresAt',
-  'previousVersionId',
 ] as const;
 
 /**
@@ -24,7 +24,7 @@ const UPLOAD_PAYLOAD_FIELDS = [
  *
  *   mutation UploadAppFileMutation($input: UploadAppFileInput!) {
  *     uploadAppFile(input: $input) {
- *       uploadUrl fileId key deduplicated expiresAt previousVersionId
+ *       uploadUrl uploadHeaders fileId key deduplicated expiresAt
  *     }
  *   }
  */

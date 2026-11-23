@@ -8,7 +8,6 @@ React Query hooks for GetAllTreeNodesRecord data operations
 
 ```typescript
 useGetAllTreeNodesQuery({ selection: { fields: { data: true, path: true } } })
-useCreateGetAllTreeNodesRecordMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateGetAllTreeNodesRecordMutation({ selection: { fields: { id: true } } })
 const { data, isLoading } = useGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
-```
-
-### Create a getAllTreeNodesRecord
-
-```typescript
-const { mutate } = useCreateGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ data: '<JSON>', path: '<String>' });
 ```

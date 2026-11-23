@@ -8,6 +8,7 @@ describe('physicalBucketName', () => {
     scope: 'database',
     databaseId: DATABASE_ID,
     bucketKey: 'build-logs',
+    bucketId: '01a1c487-df93-7cf2-8a8d-ae2744facc98',
   };
 
   it('names the scope, the database and the key', () => {
@@ -61,6 +62,7 @@ describe('physicalBucketName', () => {
       scope: 'Some Very.Long_Entity Scope',
       databaseId: DATABASE_ID,
       bucketKey: 'Marketing_Site/Assets — 2024'.repeat(5),
+      bucketId: identity.bucketId,
     });
 
     expect(name).toMatch(BUCKET_NAME);
@@ -72,8 +74,26 @@ describe('physicalBucketName', () => {
       scope: '!!!',
       databaseId: '???',
       bucketKey: '***',
+      bucketId: identity.bucketId,
     });
 
     expect(name).toMatch(/^[a-f0-9]{12}$/);
+  });
+
+  it('gives two rows with the same scope, database and key different buckets', () => {
+    const first = physicalBucketName(identity);
+    const second = physicalBucketName({
+      ...identity,
+      bucketId: '01a1c62c-ec48-7a55-9759-db5232fb025c',
+    });
+
+    expect(first).not.toBe(second);
+    expect(second).toMatch(/^database-80a2eaaf-build-logs-[a-f0-9]{12}$/);
+  });
+
+  it('refuses to mint a name without the bucket row id', () => {
+    expect(() => physicalBucketName({ ...identity, bucketId: '' })).toThrow(
+      /without the bucket's id/,
+    );
   });
 });

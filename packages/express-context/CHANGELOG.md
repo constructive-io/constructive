@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.6](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.5...@constructive-io/express-context@0.37.6) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.37.5](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.4...@constructive-io/express-context@0.37.5) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
+## [0.37.4](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.3...@constructive-io/express-context@0.37.4) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.37.3](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.2...@constructive-io/express-context@0.37.3) (2026-11-18)
+
+### Bug Fixes
+
+- **express-context:** quote discovered module coordinates with escapeIdentifier ([#2020](https://github.com/constructive-io/constructive/issues/2020)) ([a078586](https://github.com/constructive-io/constructive/commit/a078586112b1d38836ce2b1ac59c49beca98057e))
+- **express-context:** read auth settings, billing and inference log through the database's login-only readers ([#2021](https://github.com/constructive-io/constructive/issues/2021)) ([e4ae447](https://github.com/constructive-io/constructive/commit/e4ae4470621ab6154fe8c801b3ff1f11c47b1c98))
+- **express-context:** read the auth surface, compute and events modules through the database's login-only readers ([#2023](https://github.com/constructive-io/constructive/issues/2023)) ([d193aac](https://github.com/constructive-io/constructive/commit/d193aac3b619b6cc3aaec621b1ac14f5cab00112)), closes [constructive-db#4411](https://github.com/constructive-db/issues/4411)
+- **express-context:** resolve agent chat from the org-scope agent module, through the login-only reader ([#2024](https://github.com/constructive-io/constructive/issues/2024)) ([2ce6deb](https://github.com/constructive-io/constructive/commit/2ce6deb24930c0ecaa836734194c47d38c91c49f))
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+- **server:** chat routes resolve an entity to the agent module of its own scope ([#2027](https://github.com/constructive-io/constructive/issues/2027)) ([eae302c](https://github.com/constructive-io/constructive/commit/eae302cb7aec48c74a387c470ae7c67d79d40f03))
+
+## [0.37.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.1...@constructive-io/express-context@0.37.2) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.37.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.37.0...@constructive-io/express-context@0.37.1) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+# [0.37.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.36.0...@constructive-io/express-context@0.37.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+# [0.36.0](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.4...@constructive-io/express-context@0.36.0) (2026-10-28)
+
+### Features
+
+- **graphql-server:** load function-source only for the platform database ([4121631](https://github.com/constructive-io/constructive/commit/4121631a7fbed43385846dd01ec5d35d602c8dad))
+
+## [0.35.4](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.3...@constructive-io/express-context@0.35.4) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/express-context
+
+## [0.35.3](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.2...@constructive-io/express-context@0.35.3) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+- **server:** keep an explicit TRUSTED_PROXY_HOPS=0 instead of widening it to SERVER_TRUST_PROXY's one hop ([b877e69](https://github.com/constructive-io/constructive/commit/b877e69ff8d262b58c5c75b3041911ee3d344a9b))
+
+## [0.35.2](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.1...@constructive-io/express-context@0.35.2) (2026-10-26)
+
+### Bug Fixes
+
+- **graphql-server:** drop a queued request whose client hung up instead of leaking its concurrency slot ([9648a44](https://github.com/constructive-io/constructive/commit/9648a440ca637d839527a80460208fc79af62034))
+
 ## [0.35.1](https://github.com/constructive-io/constructive/compare/@constructive-io/express-context@0.35.0...@constructive-io/express-context@0.35.1) (2026-10-16)
 
 ### Bug Fixes

@@ -7,6 +7,7 @@
 
 import type { GraphileConfig } from 'graphile-config';
 
+import { isConstantDefault } from './column-defaults';
 import { buildScalarEncoding } from './encoding-meta-builders';
 import { getTablesMetaForSchema, MetaSchemaPlugin } from './plugin';
 import { buildFieldMeta, pgTypeToGqlType } from './type-mappings';
@@ -21,6 +22,8 @@ export type {
   BelongsToRelation,
   ConstraintsMeta,
   FieldMeta,
+  FileFieldMeta,
+  FileKind,
   ForeignKeyConstraintMeta,
   HasRelation,
   IndexMeta,
@@ -29,6 +32,7 @@ export type {
   PrimaryKeyConstraintMeta,
   QueryMeta,
   RelationsMeta,
+  TableKind,
   TableMeta,
   TypeMeta,
   UniqueConstraintMeta,
@@ -40,5 +44,8 @@ export { pgTypeToGqlType as _pgTypeToGqlType };
 export { buildFieldMeta as _buildFieldMeta };
 /** @internal Exported for testing only */
 export { buildScalarEncoding as _buildScalarEncoding };
+
+/** @internal Exported for testing only */
+export { isConstantDefault as _isConstantDefault };
 
 export default MetaSchemaPlugin;

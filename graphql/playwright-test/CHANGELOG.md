@@ -3,6 +3,200 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.24.49](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.48...@constructive-io/playwright-test@3.24.49) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.48](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.47...@constructive-io/playwright-test@3.24.48) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.47](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.46...@constructive-io/playwright-test@3.24.47) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.46](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.45...@constructive-io/playwright-test@3.24.46) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.45](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.44...@constructive-io/playwright-test@3.24.45) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.44](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.43...@constructive-io/playwright-test@3.24.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.43](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.42...@constructive-io/playwright-test@3.24.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.42](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.41...@constructive-io/playwright-test@3.24.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.41](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.40...@constructive-io/playwright-test@3.24.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.40](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.39...@constructive-io/playwright-test@3.24.40) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.39](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.38...@constructive-io/playwright-test@3.24.39) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.38](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.37...@constructive-io/playwright-test@3.24.38) (2026-11-18)
+
+### Bug Fixes
+
+- **express-context:** read the auth surface, compute and events modules through the database's login-only readers ([#2023](https://github.com/constructive-io/constructive/issues/2023)) ([d193aac](https://github.com/constructive-io/constructive/commit/d193aac3b619b6cc3aaec621b1ac14f5cab00112)), closes [constructive-db#4411](https://github.com/constructive-db/issues/4411)
+
+## [3.24.37](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.36...@constructive-io/playwright-test@3.24.37) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.36](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.35...@constructive-io/playwright-test@3.24.36) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.35](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.34...@constructive-io/playwright-test@3.24.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.34](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.33...@constructive-io/playwright-test@3.24.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.33](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.32...@constructive-io/playwright-test@3.24.33) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.32](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.31...@constructive-io/playwright-test@3.24.32) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.31](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.30...@constructive-io/playwright-test@3.24.31) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.30](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.29...@constructive-io/playwright-test@3.24.30) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.29](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.28...@constructive-io/playwright-test@3.24.29) (2026-11-12)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.28](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.27...@constructive-io/playwright-test@3.24.28) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.27](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.26...@constructive-io/playwright-test@3.24.27) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.26](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.25...@constructive-io/playwright-test@3.24.26) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.25](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.24...@constructive-io/playwright-test@3.24.25) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.24](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.23...@constructive-io/playwright-test@3.24.24) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.23](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.22...@constructive-io/playwright-test@3.24.23) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.22](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.21...@constructive-io/playwright-test@3.24.22) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.21](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.20...@constructive-io/playwright-test@3.24.21) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.20](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.19...@constructive-io/playwright-test@3.24.20) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.19](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.18...@constructive-io/playwright-test@3.24.19) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.18](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.17...@constructive-io/playwright-test@3.24.18) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.17](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.16...@constructive-io/playwright-test@3.24.17) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.16](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.15...@constructive-io/playwright-test@3.24.16) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.15](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.14...@constructive-io/playwright-test@3.24.15) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.14](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.13...@constructive-io/playwright-test@3.24.14) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.13](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.12...@constructive-io/playwright-test@3.24.13) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.12](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.11...@constructive-io/playwright-test@3.24.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.11](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.10...@constructive-io/playwright-test@3.24.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.10](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.9...@constructive-io/playwright-test@3.24.10) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.9](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.8...@constructive-io/playwright-test@3.24.9) (2026-11-01)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.8](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.7...@constructive-io/playwright-test@3.24.8) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.7](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.6...@constructive-io/playwright-test@3.24.7) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.6](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.5...@constructive-io/playwright-test@3.24.6) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.5](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.4...@constructive-io/playwright-test@3.24.5) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.4](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.3...@constructive-io/playwright-test@3.24.4) (2026-10-27)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.3](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.2...@constructive-io/playwright-test@3.24.3) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
+## [3.24.2](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.1...@constructive-io/playwright-test@3.24.2) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/playwright-test
+
 ## [3.24.1](https://github.com/constructive-io/constructive/compare/@constructive-io/playwright-test@3.24.0...@constructive-io/playwright-test@3.24.1) (2026-10-24)
 
 **Note:** Version bump only for package @constructive-io/playwright-test

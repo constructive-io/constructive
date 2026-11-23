@@ -805,7 +805,6 @@ function ApiList() {
       fields: {
         id: true,
         name: true,
-        dbname: true,
         roleName: true,
         anonRole: true,
         isPublic: true,
@@ -838,11 +837,10 @@ function ApiList() {
         />
       </div>
       <DataTable
-        columns={['Name', 'DB Name', 'Role', 'Database', 'Public']}
+        columns={['Name', 'Role', 'Database', 'Public']}
         rows={apis}
         renderRow={(api) => [
           api.name,
-          api.dbname,
           api.roleName,
           api.database?.name ?? '—',
           api.isPublic ? 'Yes' : 'No',

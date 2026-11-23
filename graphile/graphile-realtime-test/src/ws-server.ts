@@ -1,12 +1,13 @@
 import { createServer, type Server as HttpServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import { subscribe as grafastSubscribe } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import type { ExecutionResult, GraphQLSchema } from 'graphql';
 import { type Client as GqlWsClient,createClient } from 'graphql-ws';
 import { useServer } from 'graphql-ws/use/ws';
 import { WebSocket,WebSocketServer } from 'ws';
+
+import { subscribe as subscribeHelper } from './subscribe.js';
 
 export interface WsTestServerInput {
   schema: GraphQLSchema;
@@ -65,10 +66,10 @@ export async function createWsTestServer(
           }
         }
 
-        const result = await grafastSubscribe({
+        const result = await subscribeHelper({
           schema: args.schema,
-          document: args.document,
-          variableValues: args.variableValues as
+          query: args.document,
+          variables: args.variableValues as
             | Record<string, unknown>
             | undefined,
           contextValue,

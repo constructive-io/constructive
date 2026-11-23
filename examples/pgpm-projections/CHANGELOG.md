@@ -3,6 +3,186 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.45](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.44...@constructive-io/examples-pgpm-projections@0.11.45) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.44](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.43...@constructive-io/examples-pgpm-projections@0.11.44) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.43](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.42...@constructive-io/examples-pgpm-projections@0.11.43) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.42](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.41...@constructive-io/examples-pgpm-projections@0.11.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.41](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.40...@constructive-io/examples-pgpm-projections@0.11.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.40](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.39...@constructive-io/examples-pgpm-projections@0.11.40) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.39](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.38...@constructive-io/examples-pgpm-projections@0.11.39) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.38](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.37...@constructive-io/examples-pgpm-projections@0.11.38) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.37](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.36...@constructive-io/examples-pgpm-projections@0.11.37) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.36](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.35...@constructive-io/examples-pgpm-projections@0.11.36) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.35](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.34...@constructive-io/examples-pgpm-projections@0.11.35) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.34](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.33...@constructive-io/examples-pgpm-projections@0.11.34) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.33](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.32...@constructive-io/examples-pgpm-projections@0.11.33) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.32](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.31...@constructive-io/examples-pgpm-projections@0.11.32) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.31](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.30...@constructive-io/examples-pgpm-projections@0.11.31) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.30](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.29...@constructive-io/examples-pgpm-projections@0.11.30) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.29](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.28...@constructive-io/examples-pgpm-projections@0.11.29) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.28](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.27...@constructive-io/examples-pgpm-projections@0.11.28) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.27](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.26...@constructive-io/examples-pgpm-projections@0.11.27) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.26](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.25...@constructive-io/examples-pgpm-projections@0.11.26) (2026-11-12)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.25](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.24...@constructive-io/examples-pgpm-projections@0.11.25) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.24](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.23...@constructive-io/examples-pgpm-projections@0.11.24) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.23](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.22...@constructive-io/examples-pgpm-projections@0.11.23) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.22](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.21...@constructive-io/examples-pgpm-projections@0.11.22) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.21](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.20...@constructive-io/examples-pgpm-projections@0.11.21) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.20](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.19...@constructive-io/examples-pgpm-projections@0.11.20) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.19](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.18...@constructive-io/examples-pgpm-projections@0.11.19) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.18](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.17...@constructive-io/examples-pgpm-projections@0.11.18) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.17](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.16...@constructive-io/examples-pgpm-projections@0.11.17) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.16](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.15...@constructive-io/examples-pgpm-projections@0.11.16) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.15](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.14...@constructive-io/examples-pgpm-projections@0.11.15) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.14](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.13...@constructive-io/examples-pgpm-projections@0.11.14) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.13](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.12...@constructive-io/examples-pgpm-projections@0.11.13) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.12](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.11...@constructive-io/examples-pgpm-projections@0.11.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.11](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.10...@constructive-io/examples-pgpm-projections@0.11.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.10](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.9...@constructive-io/examples-pgpm-projections@0.11.10) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.9](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.8...@constructive-io/examples-pgpm-projections@0.11.9) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.8](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.7...@constructive-io/examples-pgpm-projections@0.11.8) (2026-11-01)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.7](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.6...@constructive-io/examples-pgpm-projections@0.11.7) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.6](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.5...@constructive-io/examples-pgpm-projections@0.11.6) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.4...@constructive-io/examples-pgpm-projections@0.11.5) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.4](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.3...@constructive-io/examples-pgpm-projections@0.11.4) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.3](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.2...@constructive-io/examples-pgpm-projections@0.11.3) (2026-10-27)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.1...@constructive-io/examples-pgpm-projections@0.11.2) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.0...@constructive-io/examples-pgpm-projections@0.11.1) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
 # [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.10.7...@constructive-io/examples-pgpm-projections@0.11.0) (2026-10-24)
 
 **Note:** Version bump only for package @constructive-io/examples-pgpm-projections
@@ -275,5 +455,5 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))

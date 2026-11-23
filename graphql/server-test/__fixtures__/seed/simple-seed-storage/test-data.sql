@@ -48,9 +48,9 @@ VALUES (
 -- ROUTING DATA (routing_public)
 -- =====================================================
 
-INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
+INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
 VALUES
-  ('6c9997a4-591b-4cb3-9313-4ef45d6f134e', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'app', current_database(), false, 'authenticated', 'anonymous')
+  ('6c9997a4-591b-4cb3-9313-4ef45d6f134e', '80a2eaaf-f77e-4bfe-8506-df929ef1b8d9', 'app', false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id)
@@ -165,15 +165,15 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================
 
 -- Bob's primary API (presigned uploads enabled via database_settings defaults)
-INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
+INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
 VALUES
-  ('a3a3a3a3-b4b4-4c5c-d6d6-e7e7e7e7e7e7', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-app', current_database(), false, 'authenticated', 'anonymous')
+  ('a3a3a3a3-b4b4-4c5c-d6d6-e7e7e7e7e7e7', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-app', false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 -- Bob's restricted API (api_settings will disable presigned uploads)
-INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
+INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
 VALUES
-  ('a4a4a4a4-b5b5-4c6c-d7d7-e8e8e8e8e8e8', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-restricted', current_database(), false, 'authenticated', 'anonymous')
+  ('a4a4a4a4-b5b5-4c6c-d7d7-e8e8e8e8e8e8', 'a1a1a1a1-b2b2-4c3c-d4d4-e5e5e5e5e5e5', 'bob-restricted', false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id)
@@ -307,9 +307,9 @@ ON CONFLICT (id) DO NOTHING;
 -- MALLORY ROUTING DATA (routing_public)
 -- =====================================================
 
-INSERT INTO routing_public.apis (id, database_id, name, dbname, is_published, role_name, anon_role)
+INSERT INTO routing_public.apis (id, database_id, name, is_published, role_name, anon_role)
 VALUES
-  ('fa44fa44-a5a5-4b6b-c7c7-d8d8d8d8d8d8', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'mallory-app', current_database(), false, 'authenticated', 'anonymous')
+  ('fa44fa44-a5a5-4b6b-c7c7-d8d8d8d8d8d8', 'fa11fa11-a2a2-4b3b-c4c4-d5d5d5d5d5d5', 'mallory-app', false, 'authenticated', 'anonymous')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO routing_public.api_schemas (id, database_id, schema_id, api_id)

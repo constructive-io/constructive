@@ -5,11 +5,11 @@
  * - Table discovery via @realtime smart tag
  * - Subscription field generation (onXxxChanged)
  * - Payload type generation (XxxSubscriptionPayload) with rowId and overflow fields
- * - NOTIFY channel naming (realtime:{schema}.{table})
+ * - Bounded NOTIFY channel naming
  * - Tables without @realtime tag are excluded
  * - Empty registry produces no fields
  * - Multiple realtime tables produce multiple fields
- * - NOTIFY payload parsing (TG_OP:id1,id2,... and INVALIDATE)
+ * - NOTIFY payload parsing (TG_OP:id1,id2,... and ephemeral JSON)
  * - Per-subscriber event throttling with configurable limit
  * - Sparse set subscriptions (ids: [UUID!]) with row ID intersection filtering
  * - RLS-aware rowId masking in payload resolvers
@@ -38,6 +38,8 @@ jest.mock('grafast', () => ({
   object: mockObject,
   constant: mockConstant,
   lambda: mockLambda,
+  sideEffect: jest.fn((input: any, fn: Function) => fn(input)),
+  inhibitIf: jest.fn((input: any, hidden: boolean) => hidden ? null : input),
 }));
 
 let capturedFactory: Function | null = null;
@@ -54,6 +56,7 @@ jest.mock('graphile-utils', () => ({
 }));
 
 import type { EventGateOptions } from '../src/event-gate';
+import { SubscriptionDelivery } from '../src/delivery';
 import {
   createGatedSubscriber,
   createRealtimeSubscriptionsPlugin,
@@ -136,13 +139,18 @@ describe('parseNotifyPayload', () => {
     });
   });
 
-  it('parses INVALIDATE as overflow', () => {
-    const result = parseNotifyPayload('INVALIDATE');
-    expect(result).toEqual({
-      event: 'INVALIDATE',
-      rowIds: [],
-      overflow: true,
+  it('rejects the legacy id-less INVALIDATE marker', () => {
+    expect(() => parseNotifyPayload('INVALIDATE')).toThrow(MalformedNotifyPayloadError);
+  });
+
+  it('extracts only ids from ephemeral rows, never their embedded data', () => {
+    expect(parseNotifyPayload(JSON.stringify({ op: 'INSERT', rows: [{ id: 'a', title: 'private' }] }))).toEqual({
+      event: 'INSERT', rowIds: ['a'], overflow: false,
     });
+  });
+
+  it.each(['{', '{"op":"INSERT","rows":[]}', '{"op":"INSERT","rows":[{}]}'])('rejects malformed ephemeral input %s without echoing row data', raw => {
+    expect(() => parseNotifyPayload(raw)).toThrow(MalformedNotifyPayloadError);
   });
 
   // A payload this cannot read means emit_change and this plugin have
@@ -259,7 +267,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 
@@ -272,7 +280,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 
@@ -282,7 +290,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const build = createMockBuild({});
       const result = capturedFactory!(build);
 
-      expect(result.typeDefs).toBe('');
+      expect(result.typeDefs).toEqual([]);
       expect(result.plans).toEqual({});
     });
 
@@ -336,7 +344,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(result.typeDefs).toContain('documents: Documents');
       expect(result.typeDefs).toContain('rowId: UUID');
       expect(result.typeDefs).toContain('overflow: Boolean!');
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('visible to this subscription');
     });
 
     it('extends Subscription type', () => {
@@ -354,7 +362,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
   });
 
   describe('NOTIFY channel naming', () => {
-    it('uses realtime:{schema}.{table} format', () => {
+    it('uses the bounded deterministic channel format', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('projects', {
@@ -374,7 +382,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onProjectsChanged'].subscribePlan(null, mockArgs);
 
-      expect(mockConstant).toHaveBeenCalledWith('realtime:app_public.projects');
+      expect(mockConstant).toHaveBeenCalledWith('realtime:82e4cc86e360dca4f9342e08ca91489d');
     });
 
     it('handles different schema names', () => {
@@ -393,7 +401,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockArgs = { getRaw: jest.fn(() => 'test-id') };
       result.plans['Subscription']['onItemsChanged'].subscribePlan(null, mockArgs);
 
-      expect(mockConstant).toHaveBeenCalledWith('realtime:inventory_public.items');
+      expect(mockConstant).toHaveBeenCalledWith('realtime:e66af24f0e368ab1c28a95c1cd4fd830');
     });
   });
 
@@ -430,19 +438,20 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(mockListen).toHaveBeenCalled();
     });
 
-    it('plan function returns event as-is', () => {
+    it('plan function authorizes the row before exposing metadata', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
-      const build = createMockBuild({
-        tasks: createMockResource('tasks', codec),
-      });
-
-      const result = capturedFactory!(build);
-      const mockEvent = { get: jest.fn() };
-
-      const planResult = result.plans['Subscription']['onTasksChanged'].plan(mockEvent);
-      expect(planResult).toBe(mockEvent);
+      const row = { id: 'row-uuid' };
+      const resource = { ...createMockResource('tasks', codec), get: jest.fn(() => row) };
+      const result = capturedFactory!(createMockBuild({ tasks: resource }));
+      const parsed = { event: 'INSERT', rowIds: ['row-uuid'], overflow: false };
+      const visibility = new SubscriptionDelivery(50);
+      const mockEvent = { get: (key: string) => ({ parsed, visibility }[key]) };
+      expect(result.plans['Subscription']['onTasksChanged'].plan(mockEvent)).toEqual({ parsed, row });
+      expect(resource.get).toHaveBeenCalledWith({ id: 'row-uuid' });
+      resource.get.mockReturnValue(null);
+      expect(result.plans['Subscription']['onTasksChanged'].plan(mockEvent)).toEqual({ parsed: null, row: null });
     });
 
     it('generates payload type plans with event, row, rowId, and overflow resolvers', () => {
@@ -479,7 +488,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       expect(mockParent.get).toHaveBeenCalledWith('parsed');
     });
 
-    it('payload row resolver uses parsed rowId for full collection mode', () => {
+    it('payload row resolver reuses the authorized row', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('tasks', { realtime: true });
@@ -495,11 +504,9 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       const mockParent = { get: jest.fn(() => ({ event: 'INSERT', rowIds: ['row-uuid'], overflow: false })) };
 
       result.plans['TasksSubscriptionPayload'].tasks(mockParent);
-      // The gate already narrowed rowIds to the subscription's ids, so the
-      // resolver reads nothing but 'parsed'.
-      expect(mockParent.get).toHaveBeenCalledWith('parsed');
+      expect(mockParent.get).toHaveBeenCalledWith('row');
       expect(mockParent.get).not.toHaveBeenCalledWith('subscribedIds');
-      expect(mockResource.get).toHaveBeenCalled();
+      expect(mockResource.get).not.toHaveBeenCalled();
     });
   });
 
@@ -554,27 +561,25 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('yields nothing at all for an unsubscribed row', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-y'), {
         ids: ['id-a', 'id-b'],
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([]);
     });
 
-    it('narrows rowIds to the subscribed set so no consumer re-intersects', async () => {
+    it('narrows to the subscribed IDs and authorizes each row independently', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('UPDATE:id-x,id-b,id-a'), {
         ids: ['id-a', 'id-b'],
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([
-        { event: 'UPDATE', rowIds: ['id-b', 'id-a'], overflow: false },
+        { event: 'UPDATE', rowIds: ['id-b'], overflow: false },
+        { event: 'UPDATE', rowIds: ['id-a'], overflow: false },
       ]);
     });
 
     it('passes every event through in full collection mode', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('INSERT:id-x', 'DELETE:id-y'), {
         ids: null,
-        threshold: 50,
       });
 
       await expect(collect(gated)).resolves.toEqual([
@@ -583,32 +588,29 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       ]);
     });
 
-    it('delivers INVALIDATE regardless of the sparse set', async () => {
-      const gated = createGatedSubscriber(subscriberEmitting('INVALIDATE'), {
-        ids: ['id-a'],
-        threshold: 50,
+    it('rejects id-less legacy notifications even for a sparse set', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('INVALIDATE'), { ids: ['id-a'] });
+      await expect(collect(gated)).rejects.toThrow(MalformedNotifyPayloadError);
+    });
+
+    it('does not consume a rate budget before rows can be authorized', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:a,b,c', 'UPDATE:d'), { ids: null });
+      await expect(collect(gated)).resolves.toEqual(['a', 'b', 'c', 'd'].map(id => ({
+        event: 'UPDATE', rowIds: [id], overflow: false,
+      })));
+    });
+
+    it('does not charge the row budget for IDs excluded by the subscription', async () => {
+      const gated = createGatedSubscriber(subscriberEmitting('UPDATE:excluded', 'UPDATE:a'), {
+        ids: ['a'],
       });
-
       await expect(collect(gated)).resolves.toEqual([
-        { event: 'INVALIDATE', rowIds: [], overflow: true },
+        { event: 'UPDATE', rowIds: ['a'], overflow: false },
       ]);
     });
 
-    it('collapses a burst to one INVALIDATE and then yields nothing', async () => {
-      const gated = createGatedSubscriber(
-        subscriberEmitting('INSERT:a', 'INSERT:b', 'INSERT:c', 'INSERT:d'),
-        { ids: null, threshold: 2 }
-      );
-
-      await expect(collect(gated)).resolves.toEqual([
-        { event: 'INSERT', rowIds: ['a'], overflow: false },
-        { event: 'INSERT', rowIds: ['b'], overflow: false },
-        { event: 'INVALIDATE', rowIds: [], overflow: true },
-      ]);
-    });
-
-    it('throttles each subscription independently', async () => {
-      const opts: EventGateOptions = { ids: null, threshold: 1 };
+    it('keeps sparse gating independent for each subscription', async () => {
+      const opts: EventGateOptions = { ids: null };
       const noisy = createGatedSubscriber(subscriberEmitting('INSERT:a', 'INSERT:b'), opts);
       await collect(noisy);
 
@@ -621,7 +623,6 @@ describe('createRealtimeSubscriptionsPlugin', () => {
     it('surfaces a malformed payload instead of emitting an event for it', async () => {
       const gated = createGatedSubscriber(subscriberEmitting('TRUNCATE:a'), {
         ids: null,
-        threshold: 50,
       });
 
       await expect(collect(gated)).rejects.toThrow(MalformedNotifyPayloadError);
@@ -642,16 +643,15 @@ describe('createRealtimeSubscriptionsPlugin', () => {
 
       expect(mockArgs.getRaw).toHaveBeenCalledWith('ids');
 
-      // 'parsed' is the whole payload now — nothing downstream needs the ids.
       const listenCallback = mockListen.mock.calls[mockListen.mock.calls.length - 1][2];
       listenCallback({ event: 'INSERT', rowIds: ['id-a'], overflow: false });
       const objectArg = mockObject.mock.calls[mockObject.mock.calls.length - 1][0];
-      expect(Object.keys(objectArg)).toEqual(['parsed']);
+      expect(Object.keys(objectArg)).toEqual(['parsed', 'visibility']);
     });
   });
 
   describe('RLS-aware event delivery', () => {
-    it('rowId doc comment mentions RLS masking', () => {
+    it('rowId documentation describes authorized delivery', () => {
       createRealtimeSubscriptionsPlugin();
 
       const codec = createMockCodec('items', { realtime: true });
@@ -660,7 +660,7 @@ describe('createRealtimeSubscriptionsPlugin', () => {
       });
 
       const result = capturedFactory!(build);
-      expect(result.typeDefs).toContain('masked when RLS denies access');
+      expect(result.typeDefs).toContain('visible to this subscription');
     });
 
     it('type defs include sparse set ids argument', () => {

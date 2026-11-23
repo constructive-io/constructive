@@ -46,8 +46,8 @@ export const getConnections = async (
   cn: GetConnectionOpts = {},
   seedAdapters?: Parameters<typeof getPgConnections>[1]
 ): Promise<GetConnectionResult> => {
-  // Get environment variables (only includes defined keys)
-  const pgEnvVars = getPgEnvVars();
+  // Let pgsql-test name the test database unless the caller explicitly names it.
+  const { database: _database, ...pgEnvVars } = getPgEnvVars();
   
   // Build env overrides - pgEnvVars already only has defined keys
   // Mirror user/password to connections.app for the app connection

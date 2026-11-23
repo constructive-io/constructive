@@ -170,6 +170,22 @@ describe('projectSpans', () => {
     expect(spans[0]).toMatchObject({ status: 'error', errorMessage: 'overloaded' });
   });
 
+  it.each(['pending', 'deferred'] as const)('keeps a %s model turn open, since its response has not arrived', (stopReason) => {
+    const { spans } = projectSpans(
+      recordsOf(
+        userMessage('go', 1),
+        assistantToolCall({ id: 'call-1', name: 'bash' }, 2, { stopReason, responseId: 'resp-7' })
+      )
+    );
+
+    const model = spans.find((span): span is ModelSpan => span.kind === 'model');
+    expect(model).toMatchObject({ status: 'open', stopReason, responseId: 'resp-7', startSeq: 2 });
+    expect(model!.endSeq).toBeUndefined();
+    expect(model!.endedAt).toBeUndefined();
+    expect(model!.durationMs).toBeUndefined();
+    expect(byId(spans, 'tool:call-1')).toMatchObject({ parentId: model!.id });
+  });
+
   it('ignores entry types it has never seen', () => {
     const { spans } = projectSpans(recordsOf(header(), userMessage('go', 1), futureEntry(2)));
 

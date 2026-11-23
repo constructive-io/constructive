@@ -14,6 +14,7 @@
  */
 
 import { Logger } from '@pgpmjs/logger';
+import { escapeIdentifier } from 'pg';
 
 import type { BillingConfig, InferenceLogConfig, WithPgClient } from './types';
 
@@ -79,7 +80,7 @@ export function createBillingClient(
 
       try {
         return await withPgClient(async (client) => {
-          const sql = `SELECT "${billing.privateSchema}"."${billing.checkBillingQuotaFunction}"($1, $2::uuid, $3) AS allowed`;
+          const sql = `SELECT ${escapeIdentifier(billing.privateSchema)}.${escapeIdentifier(billing.checkBillingQuotaFunction)}($1, $2::uuid, $3) AS allowed`;
           const result = await client.query(sql, [meterSlug, entityId, amount]);
           return result.rows[0]?.allowed !== false;
         });
@@ -95,7 +96,7 @@ export function createBillingClient(
 
       try {
         await withPgClient(async (client) => {
-          const sql = `SELECT "${billing.privateSchema}"."${billing.recordUsageFunction}"($1, $2::uuid, $3, $4::jsonb)`;
+          const sql = `SELECT ${escapeIdentifier(billing.privateSchema)}.${escapeIdentifier(billing.recordUsageFunction)}($1, $2::uuid, $3, $4::jsonb)`;
           await client.query(sql, [meterSlug, entityId, amount, JSON.stringify(metadata ?? {})]);
         });
       } catch (e: unknown) {
@@ -110,7 +111,7 @@ export function createBillingClient(
       try {
         await withPgClient(async (client) => {
           await client.query(
-            `INSERT INTO "${inferenceLog.schema}"."${inferenceLog.tableName}"
+            `INSERT INTO ${escapeIdentifier(inferenceLog.schema)}.${escapeIdentifier(inferenceLog.tableName)}
              (entity_id, actor_id, model, provider, service, operation,
               input_tokens, output_tokens, total_tokens, latency_ms, status,
               cache_read_tokens, cache_write_tokens,

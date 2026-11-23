@@ -19,10 +19,11 @@
  */
 
 import { OllamaAdapter } from '@agentic-kit/ollama';
-import type { BillingClient, LlmConfig } from '@constructive-io/express-context';
+import type { AgentChatConfig, AgentChatScope, BillingClient, LlmConfig } from '@constructive-io/express-context';
 import { getEnvOptions as getLlmEnvOptions } from '@constructive-io/llm-env';
 import { Logger } from '@pgpmjs/logger';
 import express, { Request, Response,Router } from 'express';
+import { escapeIdentifier } from 'pg';
 
 const log = new Logger('agentic-server');
 
@@ -108,6 +109,85 @@ function resolveEmbeddingAdapter(llm: LlmConfig | null): ResolvedEmbeddingAdapte
   return null;
 }
 
+/**
+ * A stored turn in the shape the chat adapter takes: a user turn is plain
+ * text, an assistant turn is a list of content blocks. Handing the adapter an
+ * assistant turn as a string throws inside its detached stream, which takes
+ * the process down on the second turn of any thread.
+ */
+const toAdapterMessage = (m: { role: string; content: string }): any =>
+  m.role === 'user'
+    ? { role: 'user', content: m.content, timestamp: Date.now() }
+    : { role: 'assistant', content: [{ type: 'text', text: m.content }], timestamp: Date.now() };
+
+/** The provider's own failure, which the adapter reports on the result instead of throwing. */
+const providerFailure = (result: { stopReason?: string; errorMessage?: string }): string | null =>
+  result.stopReason === 'error' || result.stopReason === 'aborted'
+    ? result.errorMessage ?? result.stopReason
+    : null;
+
+/** Row-level security refusing the write is the caller's answer, not a server fault. */
+const sendRouteError = (res: Response, err: any): void => {
+  if (res.headersSent) return;
+  if (err?.code === '42501') {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
+  }
+  res.status(500).json({ error: 'Internal server error' });
+};
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The tables an entity's conversations live in, quoted for interpolation. */
+interface ChatTables {
+  thread: string;
+  message: string | null;
+  entityColumn: string;
+}
+
+const tableRef = (schemaName: string, tableName: string): string =>
+  `${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}`;
+
+/**
+ * The agent module an entity's threads belong to.
+ *
+ * A database installs the agent module once per entity scope (organizations,
+ * and each entity type that has agents), and a route names an entity, not a
+ * scope. The scope is the one whose memberships table holds the entity, read
+ * as the request's own role: row-level security answers only for entities the
+ * caller belongs to, so a stranger's entity resolves to nothing.
+ */
+async function resolveChatTables(
+  ctx: NonNullable<Request['constructive']>,
+  agentChat: AgentChatConfig,
+  entityId: string
+): Promise<ChatTables | null> {
+  const candidates = agentChat.scopes.filter((s) => s.threadTableName);
+  if (candidates.length === 0 || !UUID_RE.test(entityId)) return null;
+
+  const probe = candidates
+    .map((s, i) =>
+      `SELECT ${i} AS idx WHERE EXISTS (SELECT 1 FROM ${tableRef(s.membershipsSchemaName, s.membershipsTableName)} ` +
+      `WHERE ${escapeIdentifier(s.membershipsEntityField)} = $1)`)
+    .join(' UNION ALL ');
+  const matches = await ctx.withPgClient(async (client) => {
+    const { rows } = await client.query(probe, [entityId]);
+    return rows as Array<{ idx: number }>;
+  });
+  if (matches.length === 0) return null;
+  if (matches.length > 1) {
+    throw new Error(
+      `agent chat: entity ${entityId} belongs to ${matches.length} scopes (${matches.map((m) => candidates[m.idx].scope).join(', ')})`
+    );
+  }
+  const scope: AgentChatScope = candidates[matches[0].idx];
+  return {
+    thread: tableRef(scope.schemaName, scope.threadTableName),
+    message: scope.messageTableName ? tableRef(scope.schemaName, scope.messageTableName) : null,
+    entityColumn: escapeIdentifier(scope.entityField)
+  };
+}
+
 // ─── Route Handlers ─────────────────────────────────────────────────────────
 
 async function handleCreateThread(
@@ -122,18 +202,22 @@ async function handleCreateThread(
   }
 
   const agentChat = await ctx.useModule('agentChat');
-  if (!agentChat?.threadTableName) {
+  if (!agentChat) {
     res.status(404).json({ error: 'Agent module not provisioned for this database' });
+    return;
+  }
+  const tables = await resolveChatTables(ctx, agentChat, entityId);
+  if (!tables) {
+    res.status(404).json({ error: 'Entity not found' });
     return;
   }
 
   const body: CreateThreadBody = req.body || {};
-  const { schemaName, threadTableName } = agentChat;
 
   const result = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
-      `INSERT INTO "${schemaName}"."${threadTableName}"
-       (entity_id, owner_id, mode, model, system_prompt, title)
+      `INSERT INTO ${tables.thread}
+       (${tables.entityColumn}, owner_id, mode, model, system_prompt, title)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, mode, model, system_prompt, status, created_at`,
       [
@@ -170,7 +254,7 @@ async function handleSendMessage(
   }
 
   const agentChat = await ctx.useModule('agentChat');
-  if (!agentChat?.threadTableName || !agentChat?.messageTableName) {
+  if (!agentChat) {
     res.status(404).json({ error: 'Agent module not provisioned for this database' });
     return;
   }
@@ -181,7 +265,11 @@ async function handleSendMessage(
     return;
   }
 
-  const { schemaName, threadTableName, messageTableName } = agentChat;
+  const tables = await resolveChatTables(ctx, agentChat, entityId);
+  if (!tables?.message) {
+    res.status(404).json({ error: 'Entity not found' });
+    return;
+  }
   const threadId = req.params.thread_id;
   const userId = ctx.userId;
 
@@ -189,9 +277,9 @@ async function handleSendMessage(
   const threadRow = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
       `SELECT id, mode, model, system_prompt, status
-       FROM "${schemaName}"."${threadTableName}"
-       WHERE id = $1`,
-      [threadId]
+       FROM ${tables.thread}
+       WHERE id = $1 AND ${tables.entityColumn} = $2`,
+      [threadId, entityId]
     );
     return rows[0] as ThreadRow | undefined;
   });
@@ -231,9 +319,9 @@ async function handleSendMessage(
     for (const msg of body.messages) {
       if (msg.role === 'user') {
         await client.query(
-          `INSERT INTO "${schemaName}"."${messageTableName}"
-           (thread_id, owner_id, entity_id, author_role, parts)
-           VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4)`,
+          `INSERT INTO ${tables.message}
+           (thread_id, actor_id, ${tables.entityColumn}, author_role, parts)
+           VALUES ($1, $2, (SELECT ${tables.entityColumn} FROM ${tables.thread} WHERE id = $1), $3, $4)`,
           [threadId, userId, 'user', JSON.stringify([{ type: 'text', text: msg.content }])]
         );
       }
@@ -244,7 +332,7 @@ async function handleSendMessage(
   const history = await ctx.withPgClient(async (client) => {
     const { rows } = await client.query(
       `SELECT author_role, parts, created_at
-       FROM "${schemaName}"."${messageTableName}"
+       FROM ${tables.message}
        WHERE thread_id = $1
        ORDER BY created_at ASC`,
       [threadId]
@@ -277,14 +365,14 @@ async function handleSendMessage(
     await handleStreamingResponse(req, res, {
       ctx, chatAdapter, model, llmMessages, body,
       entityId, userId, threadId,
-      schemaName, threadTableName, messageTableName,
+      tables,
       billing, startTime, meterSlug
     });
   } else {
     await handleBatchResponse(req, res, {
       ctx, chatAdapter, model, llmMessages, body,
       entityId, userId, threadId,
-      schemaName, threadTableName, messageTableName,
+      tables,
       billing, startTime, meterSlug
     });
   }
@@ -299,9 +387,7 @@ interface MessageContext {
   entityId: string;
   userId: string;
   threadId: string;
-  schemaName: string;
-  threadTableName: string;
-  messageTableName: string;
+  tables: ChatTables;
   billing: BillingClient | null;
   startTime: number;
   meterSlug: string;
@@ -312,7 +398,7 @@ async function handleStreamingResponse(
   res: Response,
   mc: MessageContext
 ): Promise<void> {
-  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, schemaName, threadTableName, messageTableName, billing, startTime, meterSlug } = mc;
+  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, tables, billing, startTime, meterSlug } = mc;
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -329,11 +415,7 @@ async function handleStreamingResponse(
     const modelDesc = chatAdapter.adapter.createModel(model, { maxOutputTokens: undefined });
     const context = {
       systemPrompt: systemMsg?.content,
-      messages: nonSystem.map((m) => ({
-        role: m.role as 'user',
-        content: m.content,
-        timestamp: Date.now()
-      }))
+      messages: nonSystem.map(toAdapterMessage)
     };
     const stream = chatAdapter.adapter.stream(modelDesc, context, {
       temperature: body.temperature
@@ -357,6 +439,15 @@ async function handleStreamingResponse(
     }
 
     const result = await stream.result();
+    const failure = providerFailure(result);
+    if (failure) {
+      // Headers are sent: the failure travels as an event, and no reply is stored.
+      log.error('Model provider failed:', failure);
+      res.write(`data: ${JSON.stringify({ id: messageId, error: { message: 'Model provider failed' } })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
+    }
     const content = streamedContent;
     const latencyMs = Date.now() - startTime;
     const usage: UsageResult = {
@@ -375,9 +466,9 @@ async function handleStreamingResponse(
     if (content) {
       ctx.withPgClient(async (client) => {
         await client.query(
-          `INSERT INTO "${schemaName}"."${messageTableName}"
-           (thread_id, owner_id, entity_id, author_role, parts, model)
-           VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
+          `INSERT INTO ${tables.message}
+           (thread_id, actor_id, ${tables.entityColumn}, author_role, parts, model)
+           VALUES ($1, $2, (SELECT ${tables.entityColumn} FROM ${tables.thread} WHERE id = $1), $3, $4, $5)`,
           [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
         );
       }).catch((err) => log.error('Failed to persist assistant message:', err));
@@ -416,24 +507,26 @@ async function handleBatchResponse(
   res: Response,
   mc: MessageContext
 ): Promise<void> {
-  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, schemaName, threadTableName, messageTableName, billing, startTime, meterSlug } = mc;
+  const { ctx, chatAdapter, model, llmMessages, body, entityId, userId, threadId, tables, billing, startTime, meterSlug } = mc;
 
   const systemMsg = llmMessages.find(m => m.role === 'system');
   const nonSystem = llmMessages.filter(m => m.role !== 'system');
   const modelDesc = chatAdapter.adapter.createModel(model, { maxOutputTokens: undefined });
   const context = {
     systemPrompt: systemMsg?.content,
-    messages: nonSystem.map((m) => ({
-      role: m.role as 'user',
-      content: m.content,
-      timestamp: Date.now()
-    }))
+    messages: nonSystem.map(toAdapterMessage)
   };
   const stream = chatAdapter.adapter.stream(modelDesc, context, {
     temperature: body.temperature
   });
 
   const result = await stream.result();
+  const failure = providerFailure(result);
+  if (failure) {
+    log.error('Model provider failed:', failure);
+    res.status(502).json({ error: 'Model provider failed' });
+    return;
+  }
   const content = result.content
     .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
     .map((block) => block.text)
@@ -451,9 +544,9 @@ async function handleBatchResponse(
   // Persist assistant message
   await ctx.withPgClient(async (client) => {
     await client.query(
-      `INSERT INTO "${schemaName}"."${messageTableName}"
-       (thread_id, owner_id, entity_id, author_role, parts, model)
-       VALUES ($1, $2, (SELECT entity_id FROM "${schemaName}"."${threadTableName}" WHERE id = $1), $3, $4, $5)`,
+      `INSERT INTO ${tables.message}
+       (thread_id, actor_id, ${tables.entityColumn}, author_role, parts, model)
+       VALUES ($1, $2, (SELECT ${tables.entityColumn} FROM ${tables.thread} WHERE id = $1), $3, $4, $5)`,
       [threadId, userId, 'assistant', JSON.stringify([{ type: 'text', text: content }]), model]
     );
   });
@@ -597,7 +690,7 @@ export function createAgenticRouter(): Router {
       await handleCreateThread(req, res, req.params.entity_id);
     } catch (err: any) {
       log.error('Error creating thread:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -606,7 +699,7 @@ export function createAgenticRouter(): Router {
       await handleSendMessage(req, res, req.params.entity_id);
     } catch (err: any) {
       log.error('Error in messages endpoint:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -621,7 +714,7 @@ export function createAgenticRouter(): Router {
       await handleCreateThread(req, res, userId);
     } catch (err: any) {
       log.error('Error creating thread:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 
@@ -635,7 +728,7 @@ export function createAgenticRouter(): Router {
       await handleSendMessage(req, res, userId);
     } catch (err: any) {
       log.error('Error in messages endpoint:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+      sendRouteError(res, err);
     }
   });
 

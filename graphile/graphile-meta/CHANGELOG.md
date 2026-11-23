@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.14.0...graphile-meta@1.14.1) (2026-11-23)
+
+**Note:** Version bump only for package graphile-meta
+
+# [1.14.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.13.1...graphile-meta@1.14.0) (2026-11-22)
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
+## [1.13.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.13.0...graphile-meta@1.13.1) (2026-11-16)
+
+**Note:** Version bump only for package graphile-meta
+
+# [1.13.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.2...graphile-meta@1.13.0) (2026-11-16)
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
+## [1.12.2](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.1...graphile-meta@1.12.2) (2026-11-09)
+
+**Note:** Version bump only for package graphile-meta
+
+## [1.12.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.12.0...graphile-meta@1.12.1) (2026-10-29)
+
+### Bug Fixes
+
+- **graphile-meta:** count only generated values as system columns in junction detection ([e980be6](https://github.com/constructive-io/constructive/commit/e980be699a6cb9749703babc6cd5e1cc2200ca4e))
+
+# [1.12.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.11.0...graphile-meta@1.12.0) (2026-10-29)
+
+### Features
+
+- **db-tools,graphile-meta:** composed-app codegen, resumable provisions and form metadata in _meta ([#1919](https://github.com/constructive-io/constructive/issues/1919)) ([37fb805](https://github.com/constructive-io/constructive/commit/37fb80597dddf8538699f59d74b66fe2e5c827b6)), closes [constructive-db#4156](https://github.com/constructive-db/issues/4156)
+
 # [1.11.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.10.0...graphile-meta@1.11.0) (2026-10-14)
 
 **Note:** Version bump only for package graphile-meta

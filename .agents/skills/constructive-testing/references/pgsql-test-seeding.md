@@ -27,6 +27,28 @@ Use this skill when:
 | `loadSql()` | Complex data, version-controlled fixtures | Respects RLS (use `pg` to bypass) |
 | `loadCsv()` | Large datasets, spreadsheet exports | Bypasses RLS (uses COPY) |
 
+## Seed Once per File with Seed Adapters
+
+The second argument to `getConnections()` is a list of seed adapters. They run once, before any test, and are committed, so every per-test rollback returns to the seeded state:
+
+```typescript
+import { getConnections, seed } from 'pgsql-test';
+
+beforeAll(async () => {
+  ({ pg, db, teardown } = await getConnections({}, [
+    seed.pgpm(),                                     // deploy the pgpm module in cwd (the default when no list is passed)
+    seed.sqlfile([path.join(__dirname, 'fixtures/seed.sql')]),
+    seed.json({ 'app.users': [{ id: USER_ID, email: 'alice@example.com' }] }),
+    seed.csv({ 'app.categories': path.join(__dirname, 'fixtures/categories.csv') }),
+    seed.fn(async ({ pg }) => {
+      await pg.query(`SELECT setval('app.categories_id_seq', (SELECT max(id) FROM app.categories))`);
+    })
+  ]));
+});
+```
+
+`seed.pgpm(cwd?, cache?)` deploys a pgpm module or workspace (`db.loadPgpm()` is the same at runtime). Calling `pg.load*()` in `beforeAll`, as in the sections below, gives the same once-per-file result because those statements auto-commit.
+
 ## Seeding with loadJson()
 
 Best for inline test data. Clean, readable, and type-safe.
@@ -210,8 +232,11 @@ describe('empty state tests', () => {
 });
 
 describe('populated state tests', () => {
+  // Seed on the client you assert with: rows pg writes inside its own test
+  // transaction are invisible to db until pg commits.
   beforeEach(async () => {
-    await pg.loadJson({
+    db.setContext({ role: 'administrator' });
+    await db.loadJson({
       'app.posts': [
         { title: 'Test Post', owner_id: userId }
       ]

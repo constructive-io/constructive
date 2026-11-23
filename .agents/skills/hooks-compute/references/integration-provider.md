@@ -7,8 +7,8 @@ Branded catalog of external service integrations and their canonical secret/conf
 ## Usage
 
 ```typescript
-useIntegrationProvidersQuery({ selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } } })
-useIntegrationProviderQuery({ id: '<UUID>', selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } } })
+useIntegrationProvidersQuery({ selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, slug: true, updatedAt: true } } })
+useIntegrationProviderQuery({ id: '<UUID>', selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, slug: true, updatedAt: true } } })
 useCreateIntegrationProviderMutation({ selection: { fields: { id: true } } })
 useUpdateIntegrationProviderMutation({ selection: { fields: { id: true } } })
 useDeleteIntegrationProviderMutation({})
@@ -20,7 +20,7 @@ useDeleteIntegrationProviderMutation({})
 
 ```typescript
 const { data, isLoading } = useIntegrationProvidersQuery({
-  selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, requiredConfigs: true, requiredSecrets: true, slug: true, updatedAt: true } },
+  selection: { fields: { brand: true, category: true, createdAt: true, description: true, icon: true, id: true, logo: true, name: true, slug: true, updatedAt: true } },
 });
 ```
 

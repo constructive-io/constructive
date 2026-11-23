@@ -24,14 +24,14 @@ const db = createClient({
 | `auditLogAuth` | findMany, findOne, create, update, delete |
 | `cryptoAddress` | findMany, findOne, create, update, delete |
 | `email` | findMany, findOne, create, update, delete |
-| `identityProvider` | findMany, findOne, create, update, delete |
-| `orgApiKeyList` | findMany, findOne, create, update, delete |
+| `identityProvider` | findMany, findOne, update, delete |
+| `orgApiKeyList` | findMany, findOne, update, delete |
 | `phoneNumber` | findMany, findOne, create, update, delete |
-| `principal` | findMany, findOne, create, update, delete |
-| `principalEntity` | findMany, findOne, create, update, delete |
-| `principalScopeOverride` | findMany, findOne, create, update, delete |
+| `principal` | findMany, findOne, update, delete |
+| `principalEntity` | findMany, findOne, update, delete |
+| `principalScopeOverride` | findMany, findOne, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
-| `userConnectedAccount` | findMany, findOne, create, update, delete |
+| `userConnectedAccount` | findMany, findOne, update, delete |
 | `user` | findMany, findOne, create, update, delete |
 | `userSetting` | findMany, findOne, create, update, delete |
 | `userSettingsSecurity` | findMany, findOne, create, update, delete |
@@ -170,9 +170,6 @@ const items = await db.identityProvider.findMany({ select: { displayName: true, 
 // Get one by id
 const item = await db.identityProvider.findOne({ id: '<UUID>', select: { displayName: true, enabled: true, kind: true, slug: true } }).execute();
 
-// Create
-const created = await db.identityProvider.create({ data: { displayName: '<String>', enabled: '<Boolean>', kind: '<String>', slug: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.identityProvider.update({ where: { id: '<UUID>' }, data: { displayName: '<String>' }, select: { id: true } }).execute();
 
@@ -209,9 +206,6 @@ const items = await db.orgApiKeyList.findMany({ select: { accessLevel: true, cre
 
 // Get one by id
 const item = await db.orgApiKeyList.findOne({ id: '<UUID>', select: { accessLevel: true, createdAt: true, expiresAt: true, id: true, keyId: true, lastUsedAt: true, mfaLevel: true, name: true, orgId: true, principalId: true, revokedAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.orgApiKeyList.create({ data: { accessLevel: '<String>', expiresAt: '<Datetime>', keyId: '<String>', lastUsedAt: '<Datetime>', mfaLevel: '<String>', name: '<String>', orgId: '<UUID>', principalId: '<UUID>', revokedAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgApiKeyList.update({ where: { id: '<UUID>' }, data: { accessLevel: '<String>' }, select: { id: true } }).execute();
@@ -289,9 +283,6 @@ const items = await db.principal.findMany({ select: { apiKeyMaxDuration: true, b
 // Get one by principalId
 const item = await db.principal.findOne({ principalId: '<UUID>', select: { apiKeyMaxDuration: true, bypassStepUp: true, createdAt: true, createdBySessionId: true, depth: true, expiresAt: true, id: true, isReadOnly: true, name: true, ownerId: true, parentPrincipalId: true, updatedAt: true, useAdminOwner: true, userId: true } }).execute();
 
-// Create
-const created = await db.principal.create({ data: { apiKeyMaxDuration: '<Interval>', bypassStepUp: '<Boolean>', createdBySessionId: '<UUID>', depth: '<Int>', expiresAt: '<Datetime>', id: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', ownerId: '<UUID>', parentPrincipalId: '<UUID>', useAdminOwner: '<Boolean>', userId: '<UUID>' }, select: { principalId: true } }).execute();
-
 // Update
 const updated = await db.principal.update({ where: { principalId: '<UUID>' }, data: { apiKeyMaxDuration: '<Interval>' }, select: { principalId: true } }).execute();
 
@@ -322,9 +313,6 @@ const items = await db.principalEntity.findMany({ select: { createdAt: true, ent
 
 // Get one by id
 const item = await db.principalEntity.findOne({ id: '<UUID>', select: { createdAt: true, entityId: true, id: true, ownerId: true, principalId: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.principalEntity.create({ data: { entityId: '<UUID>', ownerId: '<UUID>', principalId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.principalEntity.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute();
@@ -359,9 +347,6 @@ const items = await db.principalScopeOverride.findMany({ select: { allowedMask: 
 
 // Get one by id
 const item = await db.principalScopeOverride.findOne({ id: '<UUID>', select: { allowedMask: true, createdAt: true, id: true, isActive: true, isReadOnly: true, membershipType: true, principalId: true, updatedAt: true, useAdminOwner: true } }).execute();
-
-// Create
-const created = await db.principalScopeOverride.create({ data: { allowedMask: '<BitString>', isActive: '<Boolean>', isReadOnly: '<Boolean>', membershipType: '<Int>', principalId: '<UUID>', useAdminOwner: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.principalScopeOverride.update({ where: { id: '<UUID>' }, data: { allowedMask: '<BitString>' }, select: { id: true } }).execute();
@@ -426,9 +411,6 @@ const items = await db.userConnectedAccount.findMany({ select: { createdAt: true
 // Get one by id
 const item = await db.userConnectedAccount.findOne({ id: '<UUID>', select: { createdAt: true, details: true, id: true, identifier: true, isVerified: true, ownerId: true, service: true, updatedAt: true } }).execute();
 
-// Create
-const created = await db.userConnectedAccount.create({ data: { details: '<JSON>', identifier: '<String>', isVerified: '<Boolean>', ownerId: '<UUID>', service: '<String>' }, select: { id: true } }).execute();
-
 // Update
 const updated = await db.userConnectedAccount.update({ where: { id: '<UUID>' }, data: { details: '<JSON>' }, select: { id: true } }).execute();
 
@@ -446,12 +428,14 @@ CRUD operations for User records.
 |-------|------|----------|
 | `createdAt` | Datetime | No |
 | `displayName` | String | Yes |
-| `displayNameTrgmSimilarity` | Float | Yes |
+| `displayNameTrgmSimilarity` | Float | No |
 | `id` | UUID | No |
 | `profilePicture` | ConstructiveInternalTypeImage | Yes |
-| `searchScore` | Float | Yes |
-| `searchTsv` | FullText | Yes |
-| `searchTsvRank` | Float | Yes |
+| `profilePictureUrl` | String | No |
+| `profilePictureVersions` | FileVersion | No |
+| `searchScore` | Float | No |
+| `searchTsv` | FullText | No |
+| `searchTsvRank` | Float | No |
 | `type` | Int | Yes |
 | `updatedAt` | Datetime | No |
 | `username` | String | Yes |
@@ -466,7 +450,7 @@ const items = await db.user.findMany({ select: { createdAt: true, displayName: t
 const item = await db.user.findOne({ id: '<UUID>', select: { createdAt: true, displayName: true, displayNameTrgmSimilarity: true, id: true, profilePicture: true, searchScore: true, searchTsv: true, searchTsvRank: true, type: true, updatedAt: true, username: true } }).execute();
 
 // Create
-const created = await db.user.create({ data: { displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' }, select: { id: true } }).execute();
+const created = await db.user.create({ data: { displayName: '<String>', profilePicture: '<Image>', type: '<Int>', username: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.user.update({ where: { id: '<UUID>' }, data: { displayName: '<String>' }, select: { id: true } }).execute();
@@ -662,6 +646,17 @@ requireStepUp
 const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
 ```
 
+### `db.query.signInOptions`
+
+signInOptions
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.signInOptions().execute();
+```
+
 ### `db.mutation.approveDevice`
 
 approveDevice
@@ -675,6 +670,21 @@ approveDevice
 
 ```typescript
 const result = await db.mutation.approveDevice({ input: { approvalToken: '<String>' } }).execute();
+```
+
+### `db.mutation.cancelSignUpHandoff`
+
+cancelSignUpHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CancelSignUpHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.cancelSignUpHandoff({ input: { codeChallenge: '<String>', email: '<String>' } }).execute();
 ```
 
 ### `db.mutation.checkPassword`
@@ -739,7 +749,7 @@ const result = await db.mutation.confirmTotpSetup({ input: { totpValue: '<String
 
 ### `db.mutation.createApiKey`
 
-createApiKey
+Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
 
 - **Type:** mutation
 - **Arguments:**
@@ -795,6 +805,21 @@ createOrgPrincipal
 
 ```typescript
 const result = await db.mutation.createOrgPrincipal({ input: { bypassStepUp: '<Boolean>', isReadOnly: '<Boolean>', name: '<String>', orgId: '<UUID>', useAdminOwner: '<Boolean>' } }).execute();
+```
+
+### `db.mutation.createPrincipal`
+
+createPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreatePrincipalInput (required) |
+
+```typescript
+const result = await db.mutation.createPrincipal({ input: { bypassStepUp: '<Boolean>', entityIds: '<UUID>', isReadOnly: '<Boolean>', name: '<String>', useAdminOwner: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.createPrincipalFromPreset`
@@ -947,6 +972,36 @@ enableTotp
 const result = await db.mutation.enableTotp({ input: '<EnableTotpInput>' }).execute();
 ```
 
+### `db.mutation.ensureAuthCsrf`
+
+ensureAuthCsrf
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | EnsureAuthCsrfInput (required) |
+
+```typescript
+const result = await db.mutation.ensureAuthCsrf({ input: { existingToken: '<String>' } }).execute();
+```
+
+### `db.mutation.exchangeNativeHandoff`
+
+exchangeNativeHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ExchangeNativeHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.exchangeNativeHandoff({ input: { code: '<String>', codeVerifier: '<String>', credentialKind: '<String>' } }).execute();
+```
+
 ### `db.mutation.extendTokenExpires`
 
 extendTokenExpires
@@ -1004,7 +1059,7 @@ linkIdentity
   | `input` | LinkIdentityInput (required) |
 
 ```typescript
-const result = await db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } }).execute();
+const result = await db.mutation.linkIdentity({ input: { ticket: '<String>' } }).execute();
 ```
 
 ### `db.mutation.mintAccessToken`
@@ -1072,6 +1127,21 @@ requestCrossOriginToken
 const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', origin: '<Origin>', password: '<String>', rememberMe: '<Boolean>' } }).execute();
 ```
 
+### `db.mutation.requestDeviceApproval`
+
+requestDeviceApproval
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RequestDeviceApprovalInput (required) |
+
+```typescript
+const result = await db.mutation.requestDeviceApproval({ input: { deviceToken: '<String>', next: '<String>', userId: '<UUID>' } }).execute();
+```
+
 ### `db.mutation.requestMagicLink`
 
 requestMagicLink
@@ -1084,7 +1154,7 @@ requestMagicLink
   | `input` | RequestMagicLinkInput (required) |
 
 ```typescript
-const result = await db.mutation.requestMagicLink({ input: { email: '<String>', next: '<String>' } }).execute();
+const result = await db.mutation.requestMagicLink({ input: { codeChallenge: '<String>', email: '<String>', nativeRedirectUri: '<String>', next: '<String>' } }).execute();
 ```
 
 ### `db.mutation.resetPassword`
@@ -1249,7 +1319,7 @@ setPassword
   | `input` | SetPasswordInput (required) |
 
 ```typescript
-const result = await db.mutation.setPassword({ input: { currentPassword: '<String>', newPassword: '<String>' } }).execute();
+const result = await db.mutation.setPassword({ input: { currentPassword: '<String>', newPassword: '<String>', signOutOtherSessions: '<Boolean>' } }).execute();
 ```
 
 ### `db.mutation.setPrincipalEntities`
@@ -1369,7 +1439,7 @@ signUp
   | `input` | SignUpInput (required) |
 
 ```typescript
-const result = await db.mutation.signUp({ input: { csrfToken: '<String>', email: '<String>', inviteToken: '<String>', password: '<String>' } }).execute();
+const result = await db.mutation.signUp({ input: '<SignUpInput>' }).execute();
 ```
 
 ### `db.mutation.signUpMagicLink`
@@ -1429,7 +1499,22 @@ verifyEmail
   | `input` | VerifyEmailInput (required) |
 
 ```typescript
-const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).execute();
+const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute();
+```
+
+### `db.mutation.verifyEmailHandoff`
+
+verifyEmailHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyEmailHandoffInput (required) |
+
+```typescript
+const result = await db.mutation.verifyEmailHandoff({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.verifyPassword`

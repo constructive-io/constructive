@@ -7,8 +7,8 @@ Resource definitions — templates for resource kinds declaring default spec and
 ## Usage
 
 ```typescript
-useResourceDefinitionsQuery({ selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
-useResourceDefinitionQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
+useResourceDefinitionsQuery({ selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
+useResourceDefinitionQuery({ id: '<UUID>', selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } } })
 useCreateResourceDefinitionMutation({ selection: { fields: { id: true } } })
 useUpdateResourceDefinitionMutation({ selection: { fields: { id: true } } })
 useDeleteResourceDefinitionMutation({})
@@ -20,7 +20,7 @@ useDeleteResourceDefinitionMutation({})
 
 ```typescript
 const { data, isLoading } = useResourceDefinitionsQuery({
-  selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, requiredConfigs: true, requiredSecrets: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
+  selection: { fields: { annotations: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, defaultSpec: true, description: true, id: true, integrations: true, kind: true, labels: true, name: true, namespaceId: true, paramsSchema: true, slug: true, stepUpMinAge: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } },
 });
 ```
 

@@ -3,6 +3,188 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.23.32](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.31...@constructive-io/graphql-dev-server@3.23.32) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.31](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.30...@constructive-io/graphql-dev-server@3.23.31) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.30](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.29...@constructive-io/graphql-dev-server@3.23.30) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.29](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.28...@constructive-io/graphql-dev-server@3.23.29) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.28](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.27...@constructive-io/graphql-dev-server@3.23.28) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.27](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.26...@constructive-io/graphql-dev-server@3.23.27) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.26](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.25...@constructive-io/graphql-dev-server@3.23.26) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.25](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.24...@constructive-io/graphql-dev-server@3.23.25) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.24](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.23...@constructive-io/graphql-dev-server@3.23.24) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.23](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.22...@constructive-io/graphql-dev-server@3.23.23) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.22](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.21...@constructive-io/graphql-dev-server@3.23.22) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.21](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.20...@constructive-io/graphql-dev-server@3.23.21) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.20](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.19...@constructive-io/graphql-dev-server@3.23.20) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.19](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.18...@constructive-io/graphql-dev-server@3.23.19) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.17...@constructive-io/graphql-dev-server@3.23.18) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.16...@constructive-io/graphql-dev-server@3.23.17) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.15...@constructive-io/graphql-dev-server@3.23.16) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.15](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.14...@constructive-io/graphql-dev-server@3.23.15) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.13...@constructive-io/graphql-dev-server@3.23.14) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.13](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.12...@constructive-io/graphql-dev-server@3.23.13) (2026-11-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.11...@constructive-io/graphql-dev-server@3.23.12) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.10...@constructive-io/graphql-dev-server@3.23.11) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.9...@constructive-io/graphql-dev-server@3.23.10) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.8...@constructive-io/graphql-dev-server@3.23.9) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.7...@constructive-io/graphql-dev-server@3.23.8) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.6...@constructive-io/graphql-dev-server@3.23.7) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.5...@constructive-io/graphql-dev-server@3.23.6) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.4...@constructive-io/graphql-dev-server@3.23.5) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.3...@constructive-io/graphql-dev-server@3.23.4) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.2...@constructive-io/graphql-dev-server@3.23.3) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.1...@constructive-io/graphql-dev-server@3.23.2) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.23.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.23.0...@constructive-io/graphql-dev-server@3.23.1) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+# [3.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.12...@constructive-io/graphql-dev-server@3.23.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+## [3.22.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.11...@constructive-io/graphql-dev-server@3.22.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.10...@constructive-io/graphql-dev-server@3.22.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.9...@constructive-io/graphql-dev-server@3.22.10) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.8...@constructive-io/graphql-dev-server@3.22.9) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.7...@constructive-io/graphql-dev-server@3.22.8) (2026-11-01)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.6...@constructive-io/graphql-dev-server@3.22.7) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.5...@constructive-io/graphql-dev-server@3.22.6) (2026-10-29)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.4...@constructive-io/graphql-dev-server@3.22.5) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.3...@constructive-io/graphql-dev-server@3.22.4) (2026-10-28)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.2...@constructive-io/graphql-dev-server@3.22.3) (2026-10-27)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.1...@constructive-io/graphql-dev-server@3.22.2) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
+## [3.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.22.0...@constructive-io/graphql-dev-server@3.22.1) (2026-10-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-dev-server
+
 # [3.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-dev-server@3.21.6...@constructive-io/graphql-dev-server@3.22.0) (2026-10-24)
 
 **Note:** Version bump only for package @constructive-io/graphql-dev-server

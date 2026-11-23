@@ -18,7 +18,6 @@ export interface DatabaseSettings {
   enableAggregates: boolean;
   enablePostgis: boolean;
   enableSearch: boolean;
-  enableDirectUploads: boolean;
   enablePresignedUploads: boolean;
   enableManyToMany: boolean;
   enableConnectionFilter: boolean;
@@ -137,11 +136,13 @@ export interface IdentityProvidersModule {
 
 export interface ApiStructure {
   apiId?: string;
-  dbname: string;
+  /** Pool for the database this API is served from. */
+  tenantPool: Pool;
   anonRole: string;
   roleName: string;
   schema: string[];
   rlsModule?: RlsModule;
+  realtimeModule?: { schemaName: string };
   domains?: string[];
   databaseId?: string;
   isPublic?: boolean;
@@ -187,11 +188,23 @@ export interface InferenceLogConfig {
   tableName: string;
 }
 
-export interface AgentChatConfig {
+/** One entity scope's agent conversation tables, and the memberships table of that scope. */
+export interface AgentChatScope {
+  scope: string;
+  /** The column on the thread and message tables that names the entity. */
+  entityField: string;
   schemaName: string;
   threadTableName: string | null;
   messageTableName: string | null;
   taskTableName: string | null;
+  membershipsSchemaName: string;
+  membershipsTableName: string;
+  /** The column on the memberships table that names the entity. */
+  membershipsEntityField: string;
+}
+
+export interface AgentChatConfig {
+  scopes: AgentChatScope[];
 }
 
 /** One provisioned function-module scope's compute table names. */
@@ -255,6 +268,11 @@ export interface DatabaseStanding {
   reason: string | null;
 }
 
+/** Whether a database is the platform's own (`metaschema_public.database.platform`). */
+export interface PlatformDatabase {
+  platform: boolean;
+}
+
 // ─── Module Types Map ───────────────────────────────────────────────────────
 
 /**
@@ -267,6 +285,7 @@ export interface DatabaseStanding {
  */
 export interface BuiltinModuleMap {
   rlsModule: RlsModule;
+  realtimeModule: { schemaName: string };
   corsOrigins: string[];
   databaseSettings: DatabaseSettings;
   authSettings: AuthSettings;
@@ -282,6 +301,7 @@ export interface BuiltinModuleMap {
   events: EventsConfig;
   requestProtection: RequestProtection;
   standing: DatabaseStanding;
+  platform: PlatformDatabase;
 }
 
 // ─── Constructive Context ───────────────────────────────────────────────────

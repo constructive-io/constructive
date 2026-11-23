@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.1](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.33.0...@constructive-io/bucket-provisioner@0.33.1) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/bucket-provisioner
+
+# [0.33.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.32.0...@constructive-io/bucket-provisioner@0.33.0) (2026-11-11)
+
+### Bug Fixes
+
+- **bucket-provisioner:** keep a bucket's existing tags when claiming it ([57e19d5](https://github.com/constructive-io/constructive/commit/57e19d58fc54c979f0ff46298489396000d496fa))
+
+### Features
+
+- **bucket-provisioner:** one physical bucket per logical bucket ([de5168d](https://github.com/constructive-io/constructive/commit/de5168d64cfc5bd1aca9ede1ebca715bcc2a029c))
+- **uploads:** bind presigned PUT URLs to the file row (x-amz-meta-upload-id) and return uploadHeaders ([7a879d3](https://github.com/constructive-io/constructive/commit/7a879d3840bb1cbea7829652678fd31ae72c6ead))
+
+# [0.32.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.31.0...@constructive-io/bucket-provisioner@0.32.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
 # [0.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/bucket-provisioner@0.30.1...@constructive-io/bucket-provisioner@0.31.0) (2026-10-14)
 
 ### Bug Fixes

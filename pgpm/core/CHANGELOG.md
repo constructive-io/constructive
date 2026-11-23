@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.35.15](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.14...@pgpmjs/core@7.35.15) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+- **pgpm:** accept pre-upgrade AST hashes in diff ledger classification ([3832a54](https://github.com/constructive-io/constructive/commit/3832a546dd69cb6e4bcbe7f6ca4d1351ca201e50))
+- **pgpm:** ignore new parser offsets in package round-trip diffs ([df1a5b5](https://github.com/constructive-io/constructive/commit/df1a5b5609fbf1144efb5fefc965c200d3a1988b))
+- **pgpm:** ignore parser version in migration AST hashes ([d1d948f](https://github.com/constructive-io/constructive/commit/d1d948f3cb2b586c4398ff123f12fb46184db4b2))
+- **pgpm:** preserve migration AST hashes after parser upgrade ([46cd8e0](https://github.com/constructive-io/constructive/commit/46cd8e0321a954874ab9fc989735c980d1bfebc6))
+
+## [7.35.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.13...@pgpmjs/core@7.35.14) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.12...@pgpmjs/core@7.35.13) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.11...@pgpmjs/core@7.35.12) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.10...@pgpmjs/core@7.35.11) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.9...@pgpmjs/core@7.35.10) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.8...@pgpmjs/core@7.35.9) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [7.35.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.7...@pgpmjs/core@7.35.8) (2026-11-09)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.6...@pgpmjs/core@7.35.7) (2026-11-08)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.5...@pgpmjs/core@7.35.6) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.4...@pgpmjs/core@7.35.5) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.3...@pgpmjs/core@7.35.4) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.2...@pgpmjs/core@7.35.3) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.1...@pgpmjs/core@7.35.2) (2026-11-01)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.0...@pgpmjs/core@7.35.1) (2026-10-29)
+
+### Bug Fixes
+
+- **pgpm:** keep requested module versions when installing several packages ([4782bf0](https://github.com/constructive-io/constructive/commit/4782bf07f1f285ff883d1600dd8ecd406545b0b9))
+
 # [7.35.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.34.0...@pgpmjs/core@7.35.0) (2026-10-24)
 
 ### Bug Fixes

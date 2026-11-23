@@ -17,6 +17,7 @@
  * ```
  */
 
+export { realtimeChannel } from './channel';
 export { CursorTracker } from './cursor-tracker';
 export { createRealtimeSubscriptionsPlugin, RealtimeSubscriptionsPlugin } from './plugin';
 export { RealtimeSubscriptionsPreset } from './preset';

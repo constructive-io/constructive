@@ -1,9 +1,16 @@
+/** Whether a table's rows are stored ('table') or come from a view ('view'). */
+export type TableKind = 'table' | 'view';
+
 export interface TableMeta {
   /** Final GraphQL output type name. */
   name: string;
   /** PostgreSQL table name. */
   tableName: string;
   schemaName: string;
+  /** 'view' for a view or materialized view, 'table' otherwise. */
+  kind: TableKind;
+  /** The table's comment without its smart tags, or null. */
+  description: string | null;
   fields: FieldMeta[];
   indexes: IndexMeta[];
   constraints: ConstraintsMeta;
@@ -18,6 +25,12 @@ export interface TableMeta {
   i18n: I18nMeta | null;
   realtime: RealtimeMeta | null;
   scope: ScopeMeta | null;
+  /**
+   * Whether a reported many-to-many relation names this table as its junction,
+   * either one the many-to-many plugin declares or one detected by
+   * `junctionForeignKeys` (see `isSystemColumn` for the system-column rule).
+   */
+  isJunction?: boolean;
 }
 
 /** Coarse provisioning tier a table's scope belongs to. */
@@ -142,6 +155,55 @@ export interface FieldMeta {
   isForeignKey: boolean;
   description: string | null;
   enumValues: EnumMeta | null;
+  /**
+   * Values permitted by simple single-column CHECK constraints
+   * (`col IN (…)`, `col = ANY (ARRAY[…])`, `col = 'a' OR col = 'b'`), else null.
+   * Set on `TableMeta.fields` only, which holds exposed columns only.
+   */
+  allowedValues?: string[] | null;
+  /**
+   * Whether the field is non-null in the table's create input type. Null when
+   * not resolved against the final schema, which is the case for fields nested
+   * in indexes, constraints and relations.
+   */
+  isRequiredOnCreate?: boolean | null;
+  /** Whether the table's create input type has this field (null as above). */
+  isWritableOnCreate?: boolean | null;
+  /** Whether the table's patch type has this field (null as above). */
+  isWritableOnUpdate?: boolean | null;
+  /**
+   * Whether the database always computes the value and rejects a written one
+   * (a generated column, or an identity ALWAYS column), whatever the inputs
+   * offer. Null as above.
+   */
+  isComputed?: boolean | null;
+  /**
+   * Set when the column's type is one of the Constructive file domains
+   * (`image`, `upload`, `attachment`, or a list of one), else null. Set on
+   * `TableMeta.fields` only.
+   */
+  file?: FileFieldMeta | null;
+}
+
+/** The Constructive file domains a column can hold. */
+export type FileKind = 'image' | 'upload' | 'attachment';
+
+export interface FileFieldMeta {
+  kind: FileKind;
+  /** Whether the column holds a list of files (an array of the domain). */
+  isMultiple: boolean;
+  /**
+   * GraphQL type name of the storage files table, when the API has exactly
+   * one; null when it has none or several.
+   */
+  filesType: string | null;
+  /**
+   * Bucket key the column's file reference is bound to (`DataFileRef`'s
+   * `bucket`); uploads for it must land there. Null when it is not bound to one.
+   */
+  bucketKey: string | null;
+  /** Public/private intent the binding declares; null when it declares none. */
+  isPublic: boolean | null;
 }
 
 export interface TypeMeta {
@@ -151,6 +213,15 @@ export interface TypeMeta {
   isNotNull?: boolean;
   hasDefault?: boolean;
   subtype?: string | null;
+  /**
+   * Declared length of a varchar/char (characters) or bit/varbit (bits) column,
+   * per element for an array; null when unbounded or not a string type.
+   */
+  maxLength?: number | null;
+  /** Declared precision of a numeric column; null when unbounded. */
+  precision?: number | null;
+  /** Declared scale of a numeric column; null when unbounded. */
+  scale?: number | null;
   /**
    * How the client must serialize/parse this scalar. `null` for plain scalars
    * (String/Int/Float/Boolean/JSON/enum) whose wire format is obvious from
@@ -186,8 +257,11 @@ export interface ScalarEncodingMeta {
   geometrySubtype?: string | null;
   /** For 'geojson': spatial reference id, else null. */
   srid?: number | null;
-  /** For 'ltree': values are dot-separated path strings ('a.b.c'). */
-  dotPath?: boolean;
+  /**
+   * For 'ltree': true when the column serves dot-separated paths ('a.b.c'),
+   * false when it serves slash-separated paths ('/a/b/c'), null when neither.
+   */
+  dotPath?: boolean | null;
   /** For 'composite': nested attribute encodings. */
   fields?: { name: string; type: TypeMeta }[] | null;
 }
@@ -237,7 +311,10 @@ export interface BelongsToRelation {
   fieldName: string | null;
   isUnique: boolean;
   type: string | null;
+  /** The foreign key columns on this table. */
   keys: FieldMeta[];
+  /** The columns those keys reference on the other table, in `keys` order. */
+  refKeys: FieldMeta[];
   references: { name: string };
 }
 
@@ -245,7 +322,10 @@ export interface HasRelation {
   fieldName: string | null;
   isUnique: boolean;
   type: string | null;
+  /** The referenced columns on this table. */
   keys: FieldMeta[];
+  /** The foreign key columns on the other table, in `keys` order. */
+  remoteKeys: FieldMeta[];
   referencedBy: { name: string };
 }
 
@@ -287,6 +367,7 @@ export interface QueryMeta {
 
 export interface PgCodec {
   name: string;
+  description?: string;
   attributes?: Record<string, PgAttribute>;
   arrayOfCodec?: PgCodec | null;
   domainOfCodec?: PgCodec | null;
@@ -296,13 +377,28 @@ export interface PgCodec {
       schemaName?: string;
       name?: string;
     };
+    tags?: Record<string, unknown>;
   };
 }
 
 export interface PgAttributeExtensions extends Record<string, unknown> {
+  /** Set at gather time from the column's simple CHECK constraints. */
+  allowedValues?: string[] | null;
+  /** Set at gather time: identity, generated column or non-constant default. */
+  generatedValue?: boolean;
+  /** Set at gather time: generated column or identity ALWAYS (rejects writes). */
+  computedValue?: boolean;
   geometrySubtype?: string | null;
+  /** Set at gather time from the column's type modifier. */
   geometrySrid?: number | null;
+  /** Set at gather time from the column's type modifier. */
   vectorDimensions?: number | null;
+  /** Set at gather time from the column's type modifier. */
+  maxLength?: number | null;
+  /** Set at gather time from the column's type modifier. */
+  precision?: number | null;
+  /** Set at gather time from the column's type modifier. */
+  scale?: number | null;
 }
 
 export interface PgAttribute {
@@ -342,6 +438,11 @@ export interface PgRelationInflectionDetails {
 
 export interface PgTableResource {
   codec?: PgCodec;
+  description?: string;
+  extensions?: {
+    isView?: boolean;
+    isMaterializedView?: boolean;
+  };
   uniques?: PgUnique[];
   relations?: Record<string, PgRelation>;
   parameters?: unknown;
@@ -395,6 +496,7 @@ export interface MetaInflection {
     details: { resource: PgTableResource },
   ) => string | null | undefined;
   tableFieldName?: (resource: PgTableResource) => string | null | undefined;
+  patchField?: (fieldName: string) => string | null | undefined;
   createField?: (resource: PgTableResource) => string | null | undefined;
   rowByUnique?: (details: PgUniqueInflectionDetails) => string | null | undefined;
   updateByKeysField?: (details: PgUniqueInflectionDetails) => string | null | undefined;
@@ -438,6 +540,7 @@ export interface MetaBuild extends GqlTypeResolverBuild {
       entity: [PgCodec, string],
       behavior: string,
     ) => boolean;
+    pgCodecRelationMatches?: (relation: PgRelation, behavior: string) => boolean;
   };
   options?: {
     pgSchemas?: string[];

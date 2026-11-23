@@ -82,6 +82,27 @@ export function nameUnnamedConstraints(sql: string): string {
     const stmt = node.AlterTableStmt as AlterTableStmtNode | undefined;
     const table = stmt?.relation?.relname;
     let rewritten = false;
+    const create = node.CreateStmt as {
+      relation?: { relname?: string };
+      tableElts?: { ColumnDef?: { colname?: string; constraints?: { Constraint?: ConstraintNode & { conname?: string } }[] }; Constraint?: ConstraintNode & { conname?: string } }[];
+    } | undefined;
+    if (create?.relation?.relname) {
+      // Inline constraints get their default names too, so a later DROP
+      // CONSTRAINT (or the revert of an ADD) can address them.
+      for (const elt of create.tableElts ?? []) {
+        const inline: { constraint: ConstraintNode & { conname?: string }; column?: string }[] = [];
+        if (elt.Constraint) inline.push({ constraint: elt.Constraint });
+        for (const c of elt.ColumnDef?.constraints ?? []) if (c.Constraint) inline.push({ constraint: c.Constraint, column: elt.ColumnDef!.colname });
+        for (const { constraint, column } of inline) {
+          if (constraint.conname || !['CONSTR_PRIMARY', 'CONSTR_UNIQUE', 'CONSTR_FOREIGN', 'CONSTR_CHECK', 'CONSTR_EXCLUSION'].includes(constraint.contype ?? '')) continue;
+          const name = defaultConstraintName(create.relation.relname, constraint, column);
+          if (name) {
+            constraint.conname = name;
+            rewritten = true;
+          }
+        }
+      }
+    }
     if (stmt && table) {
       for (const cmd of stmt.cmds ?? []) {
         const at = cmd.AlterTableCmd;

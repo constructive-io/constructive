@@ -62,6 +62,9 @@ export function piEntryToEvents(entry: TranscriptEntry): TranscriptEvent[] {
 
   const message = pi.message;
 
+  // The full prompt and tool schemas: context for the model, not part of the transcript.
+  if (message.role === 'system') return [];
+
   if (message.role === 'user') {
     return [{ kind: 'text', role: 'user', text: contentText(message.content), ...base }];
   }

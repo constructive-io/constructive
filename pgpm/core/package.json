@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/core",
-  "version": "7.35.0",
+  "version": "7.35.15",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM Package and Migration Tools",
   "main": "index.js",
@@ -44,6 +44,7 @@
     "@pgsql/types": "^18.0.0",
     "@types/cross-spawn": "^6.0.6",
     "@types/pg": "^8.20.4",
+    "@types/semver": "^7.8.0",
     "copyfiles": "^2.4.1",
     "inquirerer": "^4.9.4",
     "makage": "^0.8.0"
@@ -67,8 +68,9 @@
     "pg": "^8.21.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.4.0",
-    "pgsql-parser": "^18.3.0",
+    "pgsql-deparser": "^18.5.4",
+    "pgsql-parser": "^18.4.4",
+    "semver": "^7.8.5",
     "yaml": "^2.9.0",
     "yanse": "^0.2.2"
   }

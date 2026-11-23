@@ -29,6 +29,7 @@ import {
   getPatchTypeName,
   getPrimaryKeyInfo,
   getTableNames,
+  hasCreateMutation,
   isRelationField,
   lcFirst,
   stripSmartComments,
@@ -570,11 +571,46 @@ function collectCustomScalarTypes(
       if (excludedTypeNames.has(fieldType)) continue;
       if (tableTypeNames.has(fieldType)) continue;
       if (isLikelyEnumType(fieldType, typeRegistry)) continue;
+      if (typeRegistry.get(fieldType)?.kind === 'OBJECT') continue;
       customScalarTypes.add(fieldType);
     }
   }
 
   return Array.from(customScalarTypes).sort();
+}
+
+/**
+ * Object types returned by non-relation entity fields (e.g. a computed
+ * `avatarVersions: [FileVersion!]`). They need an interface and a Select type,
+ * and the field needs a sub-selection instead of `true`.
+ */
+function collectEntityObjectFieldTypes(
+  tables: Table[],
+  typeRegistry: TypeRegistry,
+): Set<string> {
+  const objectTypes = new Set<string>();
+  const tableTypeNames = new Set(tables.map((table) => table.name));
+
+  for (const table of tables) {
+    for (const field of table.fields) {
+      if (isRelationField(field.name, table)) continue;
+      const fieldType = getEntityObjectFieldType(field, typeRegistry);
+      if (fieldType && !tableTypeNames.has(fieldType)) objectTypes.add(fieldType);
+    }
+  }
+
+  return objectTypes;
+}
+
+function getEntityObjectFieldType(
+  field: Table['fields'][number],
+  typeRegistry?: TypeRegistry,
+): string | null {
+  const fieldType =
+    typeof field.type === 'string' ? field.type : field.type.gqlType;
+  // Types mapped to a TS scalar (e.g. Interval -> string) stay scalar selects
+  if (SCALAR_NAMES.has(fieldType)) return null;
+  return typeRegistry?.get(fieldType)?.kind === 'OBJECT' ? fieldType : null;
 }
 
 function generateCustomScalarTypes(customScalarTypes: string[]): t.Statement[] {
@@ -839,12 +875,18 @@ function generateEntityWithRelations(tables: Table[]): t.Statement[] {
 function buildSelectTypeLiteral(
   table: Table,
   tableByName: Map<string, Table>,
+  typeRegistry?: TypeRegistry,
 ): t.TSTypeLiteral {
   const members: t.TSTypeElement[] = [];
 
   // Add scalar fields (and fields with arguments)
   for (const field of table.fields) {
     if (!isRelationField(field.name, table)) {
+      const objectType = tableByName.has(
+        typeof field.type === 'string' ? field.type : field.type.gqlType,
+      )
+        ? null
+        : getEntityObjectFieldType(field, typeRegistry);
       if (field.args && field.args.length > 0) {
         // Field with arguments (e.g. requestUploadUrl on bucket types)
         const argMembers: t.TSTypeElement[] = field.args.map((arg) => {
@@ -873,20 +915,37 @@ function buildSelectTypeLiteral(
                 const selectProp = t.tsPropertySignature(
                   t.identifier('select'),
                   t.tsTypeAnnotation(
-                    t.tsTypeReference(
-                      t.identifier('Record'),
-                      t.tsTypeParameterInstantiation([
-                        t.tsStringKeyword(),
-                        t.tsBooleanKeyword(),
-                      ]),
-                    ),
+                    objectType
+                      ? t.tsTypeReference(t.identifier(`${objectType}Select`))
+                      : t.tsTypeReference(
+                        t.identifier('Record'),
+                        t.tsTypeParameterInstantiation([
+                          t.tsStringKeyword(),
+                          t.tsBooleanKeyword(),
+                        ]),
+                      ),
                   ),
                 );
-                selectProp.optional = true;
+                // An object type cannot be selected without a sub-selection
+                selectProp.optional = !objectType;
                 return selectProp;
               })(),
             ]),
           ),
+        );
+        prop.optional = true;
+        members.push(prop);
+      } else if (objectType) {
+        const selectProp = t.tsPropertySignature(
+          t.identifier('select'),
+          t.tsTypeAnnotation(
+            t.tsTypeReference(t.identifier(`${objectType}Select`)),
+          ),
+        );
+        selectProp.optional = false;
+        const prop = t.tsPropertySignature(
+          t.identifier(field.name),
+          t.tsTypeAnnotation(t.tsTypeLiteral([selectProp])),
         );
         prop.optional = true;
         members.push(prop);
@@ -1091,6 +1150,7 @@ function buildSelectTypeLiteral(
 function generateEntitySelectTypes(
   tables: Table[],
   tableByName: Map<string, Table>,
+  typeRegistry?: TypeRegistry,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
 
@@ -1099,7 +1159,7 @@ function generateEntitySelectTypes(
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(`${typeName}Select`),
       null,
-      buildSelectTypeLiteral(table, tableByName),
+      buildSelectTypeLiteral(table, tableByName, typeRegistry),
     );
     statements.push(t.exportNamedDeclaration(typeAlias));
   }
@@ -1505,8 +1565,9 @@ function generateCrudInputTypes(
   const pkFieldName = pkField?.name ?? 'id';
   const pkFieldTsType = pkField?.tsType ?? 'string';
 
-  // Create input
-  statements.push(buildCreateInputInterface(table, typeRegistry));
+  if (hasCreateMutation(table)) {
+    statements.push(buildCreateInputInterface(table, typeRegistry));
+  }
 
   // Patch interface
   statements.push(
@@ -1655,7 +1716,7 @@ function buildTableCrudTypeNames(tables: Table[]): Set<string> {
   const crudTypes = new Set<string>();
   for (const table of tables) {
     const { typeName } = getTableNames(table);
-    crudTypes.add(`Create${typeName}Input`);
+    if (hasCreateMutation(table)) crudTypes.add(`Create${typeName}Input`);
     crudTypes.add(`Update${typeName}Input`);
     crudTypes.add(`Delete${typeName}Input`);
     crudTypes.add(`${typeName}Filter`);
@@ -2081,6 +2142,12 @@ export function generateInputTypesFile(
     tablesList,
     enumTypes,
   );
+  // Object types returned by entity fields get an interface + Select type
+  // alongside the payload types (section 8)
+  const mergedUsedPayloadTypes = new Set([
+    ...(usedPayloadTypes ?? []),
+    ...collectEntityObjectFieldTypes(tablesList, typeRegistry),
+  ]);
 
   // 1. Scalar filter types
   statements.push(...generateScalarFilterTypes());
@@ -2097,7 +2164,7 @@ export function generateInputTypesFile(
     statements.push(...generateRelationHelperTypes());
     statements.push(...generateEntityRelationTypes(tablesList, tableByName));
     statements.push(...generateEntityWithRelations(tablesList));
-    statements.push(...generateEntitySelectTypes(tablesList, tableByName));
+    statements.push(...generateEntitySelectTypes(tablesList, tableByName, typeRegistry));
 
     // 4. Table filter types
     // Pass typeRegistry to use schema's filter type as source of truth,
@@ -2151,7 +2218,7 @@ export function generateInputTypesFile(
   );
 
   // 8. Payload/return types for custom operations
-  if (usedPayloadTypes && usedPayloadTypes.size > 0) {
+  if (mergedUsedPayloadTypes.size > 0) {
     const alreadyGeneratedTypes = new Set<string>();
     if (tables) {
       for (const table of tables) {
@@ -2162,7 +2229,7 @@ export function generateInputTypesFile(
     statements.push(
       ...generatePayloadTypes(
         typeRegistry,
-        usedPayloadTypes,
+        mergedUsedPayloadTypes,
         alreadyGeneratedTypes,
         comments,
       ),

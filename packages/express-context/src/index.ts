@@ -38,6 +38,7 @@
 // Types
 export type {
   AgentChatConfig,
+  AgentChatScope,
   ApiConfigResult,
   ApiError,
   ApiStructure,
@@ -51,6 +52,7 @@ export type {
   ConstructiveContext,
   DatabaseSettings,
   DatabaseStanding,
+  PlatformDatabase,
   EventsConfig,
   IdentityProviderConfig,
   IdentityProvidersModule,
@@ -160,6 +162,8 @@ export {
   identityProvidersLoader,
   inferenceLogLoader,
   llmLoader,
+  PLATFORM_DATABASE_SQL,
+  platformLoader,
   pubkeyLoader,
   requestProtectionLoader,
   requireDatabaseId,

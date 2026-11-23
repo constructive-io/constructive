@@ -24,6 +24,7 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 
+import { llmConfigStore, resolveRequestScope } from '../embedder';
 import type { ChatFunction, ChunkTableInfo, EmbedderFunction, RagDefaults } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
@@ -242,10 +243,12 @@ export function createLlmRagPlugin(
             const $contextLimit = fieldArgs.getRaw('contextLimit');
             const $minSimilarity = fieldArgs.getRaw('minSimilarity');
             const $systemPrompt = fieldArgs.getRaw('systemPrompt');
-            const $withPgClient = (grafastContext() as any).get('withPgClient');
-            const $pgSettings = (grafastContext() as any).get('pgSettings');
+            const $context = grafastContext() as any;
+            const $withPgClient = $context.get('withPgClient');
+            const $pgSettings = $context.get('pgSettings');
 
             const $combined = object({
+              context: $context,
               prompt: $prompt,
               contextLimit: $contextLimit,
               minSimilarity: $minSimilarity,
@@ -254,147 +257,157 @@ export function createLlmRagPlugin(
               pgSettings: $pgSettings
             });
 
-            return lambda($combined, async (input: any) => {
-              const {
-                prompt,
-                contextLimit: queryContextLimit,
-                minSimilarity: queryMinSimilarity,
-                systemPrompt: querySystemPrompt,
-                withPgClient,
-                pgSettings
-              } = input;
+            // Both model calls run under the request's scope: its identity, read
+            // from the same claims the chunk search runs with, and its model
+            // overrides.
+            return lambda($combined, async (input: any) => llmConfigStore.run(
+              await resolveRequestScope(input.context),
+              async () => {
+                const {
+                  prompt,
+                  contextLimit: queryContextLimit,
+                  minSimilarity: queryMinSimilarity,
+                  systemPrompt: querySystemPrompt,
+                  withPgClient,
+                  pgSettings
+                } = input;
 
-              if (!prompt || typeof prompt !== 'string') {
-                throw new Error('RAG_INVALID_PROMPT: prompt is required');
-              }
+                if (!prompt || typeof prompt !== 'string') {
+                  throw new Error('RAG_INVALID_PROMPT: prompt is required');
+                }
 
-              if (!embedder) {
-                throw new Error(
-                  'RAG_EMBEDDER_NOT_CONFIGURED: An embedding provider must be configured ' +
-                  'to use ragQuery. Set defaultEmbedder in GraphileLlmPreset options.'
+                if (!embedder) {
+                  throw new Error(
+                    'RAG_EMBEDDER_NOT_CONFIGURED: An embedding provider must be configured ' +
+                    'to use ragQuery. Set defaultEmbedder in GraphileLlmPreset options.'
+                  );
+                }
+
+                if (!chatCompleter) {
+                  throw new Error(
+                    'RAG_CHAT_NOT_CONFIGURED: A chat completion provider must be configured ' +
+                    'to use ragQuery. Set defaultChatCompleter in GraphileLlmPreset options.'
+                  );
+                }
+
+                // Resolve parameters with defaults
+                const limit = queryContextLimit ?? ragDefaults.contextLimit ?? DEFAULT_CONTEXT_LIMIT;
+                const minSim = queryMinSimilarity ?? ragDefaults.minSimilarity ?? DEFAULT_MIN_SIMILARITY;
+                const maxDistance = minSim > 0 ? (1 - minSim) : null;
+                const systemPromptTemplate = querySystemPrompt ?? ragDefaults.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+
+                // Step 1: Embed the prompt
+                const startEmbed = Date.now();
+                const { embedding: vector } = await embedder(prompt);
+                const embedLatency = Date.now() - startEmbed;
+                const vectorString = `[${vector.join(',')}]`;
+
+                console.log(
+                  `[graphile-llm] RAG embed: dims=${vector.length}, latency=${embedLatency}ms`
                 );
-              }
 
-              if (!chatCompleter) {
-                throw new Error(
-                  'RAG_CHAT_NOT_CONFIGURED: A chat completion provider must be configured ' +
-                  'to use ragQuery. Set defaultChatCompleter in GraphileLlmPreset options.'
-                );
-              }
+                // Step 2: Search chunks tables for similar content
+                const allChunks: Array<{
+                  content: string;
+                  parent_id: string;
+                  distance: number;
+                  table_name: string;
+                }> = [];
 
-              // Resolve parameters with defaults
-              const limit = queryContextLimit ?? ragDefaults.contextLimit ?? DEFAULT_CONTEXT_LIMIT;
-              const minSim = queryMinSimilarity ?? ragDefaults.minSimilarity ?? DEFAULT_MIN_SIMILARITY;
-              const maxDistance = minSim > 0 ? (1 - minSim) : null;
-              const systemPromptTemplate = querySystemPrompt ?? ragDefaults.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
-
-              // Step 1: Embed the prompt
-              const startEmbed = Date.now();
-              const { embedding: vector } = await embedder(prompt);
-              const embedLatency = Date.now() - startEmbed;
-              const vectorString = `[${vector.join(',')}]`;
-
-              console.log(
-                `[graphile-llm] RAG embed: dims=${vector.length}, latency=${embedLatency}ms`
-              );
-
-              // Step 2: Search chunks tables for similar content
-              const allChunks: Array<{
-                content: string;
-                parent_id: string;
-                distance: number;
-                table_name: string;
-              }> = [];
-
-              if (chunkTables.length > 0) {
-                await withPgClient(pgSettings, async (pgClient: any) => {
-                  for (const table of chunkTables) {
-                    const query = buildChunkSearchSql(table, vectorString, limit, maxDistance);
-                    const result = await pgClient.query(query);
-                    for (const row of result.rows) {
-                      allChunks.push({
-                        content: row.content,
-                        parent_id: row.parent_id,
-                        distance: parseFloat(row.distance),
-                        table_name: table.parentCodecName
-                      });
+                if (chunkTables.length > 0) {
+                  await withPgClient(pgSettings, async (pgClient: any) => {
+                    for (const table of chunkTables) {
+                      const query = buildChunkSearchSql(table, vectorString, limit, maxDistance);
+                      const result = await pgClient.query(query);
+                      for (const row of result.rows) {
+                        allChunks.push({
+                          content: row.content,
+                          parent_id: row.parent_id,
+                          distance: parseFloat(row.distance),
+                          table_name: table.parentCodecName
+                        });
+                      }
                     }
-                  }
+                  });
+                }
+
+                // Sort by distance (ascending) and take top N
+                allChunks.sort((a, b) => a.distance - b.distance);
+                const topChunks = allChunks.slice(0, limit);
+
+                if (topChunks.length === 0) {
+                  return {
+                    answer: 'No relevant context found for your query. ' +
+                      'Try broadening your search or lowering the minimum similarity threshold.',
+                    sources: [],
+                    tokensUsed: null
+                  };
+                }
+
+                // Step 3: Assemble context
+                const contextText = assembleContext(topChunks);
+
+                // Step 4: Call chat completion
+                const startChat = Date.now();
+                const chatResult = await chatCompleter([
+                  { role: 'system', content: systemPromptTemplate + contextText },
+                  { role: 'user', content: prompt }
+                ], {
+                  maxTokens: ragDefaults.maxTokens ?? DEFAULT_MAX_TOKENS
                 });
-              }
+                const chatLatency = Date.now() - startChat;
 
-              // Sort by distance (ascending) and take top N
-              allChunks.sort((a, b) => a.distance - b.distance);
-              const topChunks = allChunks.slice(0, limit);
+                console.log(
+                  `[graphile-llm] RAG chat: sources=${topChunks.length}, tokens=${chatResult.usage.totalTokens}, latency=${chatLatency}ms`
+                );
 
-              if (topChunks.length === 0) {
+                // Step 5: Return response
                 return {
-                  answer: 'No relevant context found for your query. ' +
-                    'Try broadening your search or lowering the minimum similarity threshold.',
-                  sources: [],
-                  tokensUsed: null
+                  answer: chatResult.content,
+                  sources: topChunks.map((chunk) => ({
+                    content: chunk.content,
+                    similarity: 1 - chunk.distance,
+                    tableName: chunk.table_name,
+                    parentId: chunk.parent_id
+                  })),
+                  tokensUsed: chatResult.usage.totalTokens
                 };
               }
-
-              // Step 3: Assemble context
-              const contextText = assembleContext(topChunks);
-
-              // Step 4: Call chat completion
-              const startChat = Date.now();
-              const chatResult = await chatCompleter([
-                { role: 'system', content: systemPromptTemplate + contextText },
-                { role: 'user', content: prompt }
-              ], {
-                maxTokens: ragDefaults.maxTokens ?? DEFAULT_MAX_TOKENS
-              });
-              const chatLatency = Date.now() - startChat;
-
-              console.log(
-                `[graphile-llm] RAG chat: sources=${topChunks.length}, tokens=${chatResult.usage.totalTokens}, latency=${chatLatency}ms`
-              );
-
-              // Step 5: Return response
-              return {
-                answer: chatResult.content,
-                sources: topChunks.map((chunk) => ({
-                  content: chunk.content,
-                  similarity: 1 - chunk.distance,
-                  tableName: chunk.table_name,
-                  parentId: chunk.parent_id
-                })),
-                tokensUsed: chatResult.usage.totalTokens
-              };
-            });
+            ));
           },
 
           embedText(_$root: any, fieldArgs: any) {
             const $text = fieldArgs.getRaw('text');
+            const $context = grafastContext() as any;
 
-            return lambda($text, async (text: any) => {
-              if (!text || typeof text !== 'string') {
-                throw new Error('EMBED_INVALID_TEXT: text is required');
-              }
+            return lambda(object({ text: $text, context: $context }), async ({ text, context }: any) => llmConfigStore.run(
+              await resolveRequestScope(context),
+              async () => {
+                if (!text || typeof text !== 'string') {
+                  throw new Error('EMBED_INVALID_TEXT: text is required');
+                }
 
-              if (!embedder) {
-                throw new Error(
-                  'EMBED_NOT_CONFIGURED: An embedding provider must be configured ' +
-                  'to use embedText. Set defaultEmbedder in GraphileLlmPreset options.'
+                if (!embedder) {
+                  throw new Error(
+                    'EMBED_NOT_CONFIGURED: An embedding provider must be configured ' +
+                    'to use embedText. Set defaultEmbedder in GraphileLlmPreset options.'
+                  );
+                }
+
+                const startTime = Date.now();
+                const { embedding: vector } = await embedder(text);
+                const latencyMs = Date.now() - startTime;
+
+                console.log(
+                  `[graphile-llm] embedText: dims=${vector.length}, latency=${latencyMs}ms`
                 );
+
+                return {
+                  vector,
+                  dimensions: vector.length
+                };
               }
-
-              const startTime = Date.now();
-              const { embedding: vector } = await embedder(text);
-              const latencyMs = Date.now() - startTime;
-
-              console.log(
-                `[graphile-llm] embedText: dims=${vector.length}, latency=${latencyMs}ms`
-              );
-
-              return {
-                vector,
-                dimensions: vector.length
-              };
-            });
+            ));
           }
         }
       }

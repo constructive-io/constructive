@@ -11,13 +11,17 @@
 
 import { S3Client } from '@aws-sdk/client-s3';
 import { createS3Bucket } from '@constructive-io/s3-utils';
+import { createHash } from 'crypto';
 
 import {
+  CHECKSUM_SHA256_HEADER,
+  checksumSha256Base64,
   deleteS3Object,
   generatePresignedGetUrl,
   generatePresignedPutUrl,
   headObject,
-  readObjectPrefix,
+  presignedPutHeaders,
+  UPLOAD_ID_HEADER,
 } from '../src/s3-signer';
 import type { S3Config } from '../src/types';
 
@@ -72,15 +76,21 @@ async function uploadToPresignedUrl(
   url: string,
   body: string,
   contentType: string,
+  extraHeaders: Record<string, string> = {},
 ): Promise<Response> {
   return fetch(url, {
     method: 'PUT',
     headers: {
       'Content-Type': contentType,
       'Content-Length': String(Buffer.byteLength(body)),
+      ...extraHeaders,
     },
     body,
   });
+}
+
+function sha256Hex(content: string): string {
+  return createHash('sha256').update(content).digest('hex');
 }
 
 /**
@@ -146,6 +156,112 @@ describe('s3-signer integration (RustFS)', () => {
     });
   });
 
+  describe('checksum-bound presigned PUT (content_hash binds the bytes)', () => {
+    const contentType = 'text/plain';
+    const real = 'the bytes this hash names';
+    const forged = 'FORGED bytes, same length'; // same Content-Length as `real`
+    const hash = sha256Hex(real);
+
+    beforeAll(() => {
+      expect(Buffer.byteLength(forged)).toBe(Buffer.byteLength(real));
+    });
+
+    it('signs x-amz-checksum-sha256 as a header, not a query parameter', async () => {
+      const url = await generatePresignedPutUrl(s3Config, 'checksum-shape.txt', contentType, Buffer.byteLength(real), 900, hash);
+      const params = new URL(url).searchParams;
+      expect(params.get('X-Amz-SignedHeaders')).toContain(CHECKSUM_SHA256_HEADER);
+      expect(params.has(CHECKSUM_SHA256_HEADER)).toBe(false);
+    });
+
+    it('accepts the bytes that hash to the content hash', async () => {
+      const key = 'checksum-ok.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, real, contentType, {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(200);
+
+      const head = await headObject(s3Config, key);
+      expect(head?.checksumSha256).toBe(checksumSha256Base64(hash));
+    });
+
+    it('rejects same-length bytes that do not hash to it (BadDigest)', async () => {
+      const key = 'checksum-forged.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, forged, contentType, {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(400);
+      expect(await res.text()).toContain('BadDigest');
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it('rejects a PUT that omits the checksum header (signature covers it)', async () => {
+      const key = 'checksum-missing.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const res = await uploadToPresignedUrl(url, forged, contentType);
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it('cannot replace a confirmed object through the same URL with different bytes', async () => {
+      const key = 'checksum-replay.txt';
+      const url = await generatePresignedPutUrl(s3Config, key, contentType, Buffer.byteLength(real), 900, hash);
+      const headers = { [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash) };
+      expect((await uploadToPresignedUrl(url, real, contentType, headers)).status).toBe(200);
+
+      expect((await uploadToPresignedUrl(url, forged, contentType, headers)).status).toBe(400);
+      expect((await uploadToPresignedUrl(url, forged, contentType)).status).toBe(403);
+
+      const getUrl = await generatePresignedGetUrl(s3Config, key);
+      expect((await downloadFromPresignedUrl(getUrl)).body).toBe(real);
+    });
+  });
+
+  describe('row-bound presigned PUT (x-amz-meta-upload-id names the file row)', () => {
+    const content = 'bytes this upload writes';
+    const hash = sha256Hex(content);
+    const fileId = '11111111-1111-4111-8111-111111111111';
+    const otherFileId = '22222222-2222-4222-8222-222222222222';
+
+    async function boundUrl(key: string): Promise<string> {
+      return generatePresignedPutUrl(s3Config, key, 'text/plain', Buffer.byteLength(content), 300, hash, fileId);
+    }
+
+    it('signs the upload id as a header, not a query parameter', async () => {
+      const url = new URL(await boundUrl(`row-bound/${Date.now()}-q`));
+      expect(url.searchParams.get('X-Amz-SignedHeaders')).toContain(UPLOAD_ID_HEADER);
+      expect(url.searchParams.has(UPLOAD_ID_HEADER)).toBe(false);
+    });
+
+    it('accepts the PUT that sends the headers it was issued with, and HEAD names the row', async () => {
+      const key = `row-bound/${Date.now()}-ok`;
+      const headers = presignedPutHeaders('text/plain', hash, fileId);
+      const res = await fetch(await boundUrl(key), { method: 'PUT', headers, body: content });
+      expect(res.status).toBe(200);
+      expect(await headObject(s3Config, key)).toEqual(expect.objectContaining({ uploadId: fileId }));
+    });
+
+    it('refuses a PUT that omits the upload id header (signature covers it)', async () => {
+      const key = `row-bound/${Date.now()}-missing`;
+      const res = await uploadToPresignedUrl(await boundUrl(key), content, 'text/plain', {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+      });
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+
+    it("refuses a PUT that names another row's id", async () => {
+      const key = `row-bound/${Date.now()}-other`;
+      const res = await uploadToPresignedUrl(await boundUrl(key), content, 'text/plain', {
+        [CHECKSUM_SHA256_HEADER]: checksumSha256Base64(hash),
+        [UPLOAD_ID_HEADER]: otherFileId,
+      });
+      expect(res.status).toBe(403);
+      expect(await headObject(s3Config, key)).toBeNull();
+    });
+  });
+
   describe('headObject', () => {
     const HEAD_KEY = 'test-head-object.json';
     const HEAD_CONTENT = JSON.stringify({ test: true });
@@ -182,42 +298,6 @@ describe('s3-signer integration (RustFS)', () => {
       // headObject still returns metadata even on mismatch — it just logs a warning
       expect(result).not.toBeNull();
       expect(result!.contentType).toBe(HEAD_CONTENT_TYPE); // actual type, not expected
-    });
-  });
-
-  describe('readObjectPrefix', () => {
-    const PREFIX_KEY = 'test-read-prefix.bin';
-    // Longer than the range this reads, so a truncated response proves the range
-    // was honoured rather than the whole object downloaded.
-    const PREFIX_CONTENT = 'ABCDEFGHIJ'.repeat(100);
-
-    beforeAll(async () => {
-      const putUrl = await generatePresignedPutUrl(
-        s3Config,
-        PREFIX_KEY,
-        'application/octet-stream',
-        Buffer.byteLength(PREFIX_CONTENT),
-      );
-      const res = await uploadToPresignedUrl(putUrl, PREFIX_CONTENT, 'application/octet-stream');
-      if (res.status !== 200) throw new Error(`Setup upload failed: ${res.status}`);
-    });
-
-    it('should read only the requested leading bytes', async () => {
-      const prefix = await readObjectPrefix(s3Config, PREFIX_KEY, 10);
-
-      expect(prefix).not.toBeNull();
-      expect(prefix!.length).toBe(10);
-      expect(prefix!.toString()).toBe('ABCDEFGHIJ');
-    });
-
-    it('should return the whole object when it is shorter than the range', async () => {
-      const prefix = await readObjectPrefix(s3Config, PREFIX_KEY, 100000);
-      expect(prefix!.length).toBe(Buffer.byteLength(PREFIX_CONTENT));
-    });
-
-    it('should return null for a non-existent object', async () => {
-      const prefix = await readObjectPrefix(s3Config, 'does-not-exist-' + Date.now(), 32);
-      expect(prefix).toBeNull();
     });
   });
 

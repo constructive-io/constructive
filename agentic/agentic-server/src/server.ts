@@ -21,13 +21,16 @@ const IDENTITY_HEADERS = [
   'x-run-id'
 ] as const;
 
+/** An image arrives inside the JSON body as base64, a third larger than its bytes. */
+export const DEFAULT_BODY_LIMIT = '32mb';
+
 /**
  * Create a standalone Express app for the agentic server.
  * Used by both standalone mode and integration tests.
  */
 export const createAgenticServer = (options: AgenticServerStartOptions): express.Express => {
   const app = express();
-  app.use(express.json());
+  app.use(express.json({ limit: options.bodyLimit ?? DEFAULT_BODY_LIMIT }));
 
   // When isPublic === true, strip identity headers from all incoming requests.
   // Public deployments cannot trust client-supplied tenant context.

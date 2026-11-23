@@ -29,7 +29,7 @@
 
 // Core provisioner
 export type { BucketProvisionerOptions } from './provisioner';
-export { BucketProvisioner } from './provisioner';
+export { BUCKET_OWNER_TAG, BucketProvisioner } from './provisioner';
 
 // Physical naming policy
 export type { PhysicalBucketIdentity } from './naming';

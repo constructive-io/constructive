@@ -23,9 +23,12 @@ const fakeRes = (captured: Captured): Response =>
 
 const fakeReq = (
   headers: Record<string, string>,
-  useModule?: jest.Mock
+  useModule?: jest.Mock,
+  path = '/graphql'
 ): Request =>
   ({
+    path,
+    requestId: 'req-1',
     get: (name: string) => headers[name.toLowerCase()],
     constructive: useModule ? { useModule } : undefined
   }) as unknown as Request;
@@ -108,18 +111,20 @@ describe('createRequestProtectionMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('exempts multipart uploads, whose bodies are files bounded by the upload limits', async () => {
+  it('rejects an oversized body on a REST path with the status and a JSON error', async () => {
     const req = fakeReq(
-      {
-        'content-length': '50000000',
-        'content-type': 'multipart/form-data; boundary=----x'
-      },
-      jest.fn().mockResolvedValue(protection({ maxRequestBytes: 2_000 }))
+      { 'content-length': '5000' },
+      jest.fn().mockResolvedValue(protection({ maxRequestBytes: 2_000 })),
+      '/fn/resize'
     );
 
-    const { next } = await run(req);
+    const { next, captured } = await run(req);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+    expect(captured.status).toBe(413);
+    expect(captured.body).toEqual({
+      error: { code: 'REQUEST_TOO_LARGE', message: expect.any(String), requestId: 'req-1' }
+    });
   });
 
   it('does not reject a request that declared no length', async () => {

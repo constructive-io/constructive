@@ -894,6 +894,9 @@ describe('MetaSchemaPlugin', () => {
           isNotNull: true,
           hasDefault: true,
           subtype: null,
+          maxLength: null,
+          precision: null,
+          scale: null,
           encoding: { kind: 'datetime' }
         },
         isNotNull: true,
@@ -901,7 +904,13 @@ describe('MetaSchemaPlugin', () => {
         isPrimaryKey: false,
         isForeignKey: false,
         description: null,
-        enumValues: null
+        enumValues: null,
+        allowedValues: null,
+        isRequiredOnCreate: null,
+        isWritableOnCreate: null,
+        isWritableOnUpdate: null,
+        isComputed: null,
+        file: null
       });
     });
 

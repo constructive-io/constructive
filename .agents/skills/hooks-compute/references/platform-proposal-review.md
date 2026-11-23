@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformProposalReviewsQuery({
 const { mutate } = useCreatePlatformProposalReviewMutation({
   selection: { fields: { id: true } },
 });
-mutate({ body: '<String>', bodyTrgmSimilarity: '<Float>', commitSha: '<String>', commitShaTrgmSimilarity: '<Float>', createdByPrincipal: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>', verdictTrgmSimilarity: '<Float>' });
+mutate({ body: '<String>', commitSha: '<String>', createdByPrincipal: '<UUID>', proposalId: '<UUID>', reviewerId: '<UUID>', submittedAt: '<Datetime>', updatedByPrincipal: '<UUID>', verdict: '<String>' });
 ```

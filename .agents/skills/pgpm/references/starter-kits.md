@@ -28,7 +28,7 @@ pgpm init workspace --dir pnpm
 
 | Template | Command | Description |
 |----------|---------|-------------|
-| PGPM workspace | `pgpm init workspace` | Monorepo with pgpm.json, migrations support |
+| PGPM workspace | `pgpm init workspace` | Monorepo with pgpm.json, migrations support, and a safegres database audit (`safegres.config.js`, `audit:db`, CI job) — see the `safegres` skill |
 | PGPM module | `pgpm init` | Database module with pgpm.plan, .control file |
 | PNPM workspace | `pgpm init workspace --dir pnpm` | Pure PNPM workspace (no pgpm files) |
 | PNPM module | `pgpm init --dir pnpm` | Pure TypeScript package |

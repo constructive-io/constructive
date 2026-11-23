@@ -3,6 +3,254 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.1...graphql-server-test@3.43.2) (2026-11-23)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.43.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.0...graphql-server-test@3.43.1) (2026-11-23)
+
+### Features
+
+- **presigned-url:** download a stored image version by name ([#2053](https://github.com/constructive-io/constructive/issues/2053)) ([696dfd0](https://github.com/constructive-io/constructive/commit/696dfd002d59d7f600746a4ce788849c25c9176f))
+
+# [3.43.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.13...graphql-server-test@3.43.0) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
+## [3.42.13](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.12...graphql-server-test@3.42.13) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
+## [3.42.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.11...graphql-server-test@3.42.12) (2026-11-21)
+
+### Bug Fixes
+
+- **i18n:** localized reads on tenant APIs (physical table names + request languages) ([#2045](https://github.com/constructive-io/constructive/issues/2045)) ([836796e](https://github.com/constructive-io/constructive/commit/836796ef9ca06aaf91bbaf3e88f3110a1cd4dd20))
+
+## [3.42.11](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.10...graphql-server-test@3.42.11) (2026-11-21)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.10](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.9...graphql-server-test@3.42.10) (2026-11-21)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.8...graphql-server-test@3.42.9) (2026-11-21)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.7...graphql-server-test@3.42.8) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
+## [3.42.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.6...graphql-server-test@3.42.7) (2026-11-19)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.5...graphql-server-test@3.42.6) (2026-11-19)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.4...graphql-server-test@3.42.5) (2026-11-18)
+
+### Bug Fixes
+
+- **express-context:** read the auth surface, compute and events modules through the database's login-only readers ([#2023](https://github.com/constructive-io/constructive/issues/2023)) ([d193aac](https://github.com/constructive-io/constructive/commit/d193aac3b619b6cc3aaec621b1ac14f5cab00112)), closes [constructive-db#4411](https://github.com/constructive-db/issues/4411)
+- **express-context:** resolve agent chat from the org-scope agent module, through the login-only reader ([#2024](https://github.com/constructive-io/constructive/issues/2024)) ([2ce6deb](https://github.com/constructive-io/constructive/commit/2ce6deb24930c0ecaa836734194c47d38c91c49f))
+- **graphql-server:** a flush makes rebuilt hosts read their settings again ([#2018](https://github.com/constructive-io/constructive/issues/2018)) ([278e12c](https://github.com/constructive-io/constructive/commit/278e12c2c32180583cd46cf8bb94c00ff7d3822c)), closes [constructive-planning#2539](https://github.com/constructive-planning/issues/2539)
+- **server:** a refused credential on a REST route answers its HTTP status with a JSON error ([#2028](https://github.com/constructive-io/constructive/issues/2028)) ([29b71f0](https://github.com/constructive-io/constructive/commit/29b71f0a25bf160da98c056ca712ed49f8d2fcbb))
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+- **server:** chat routes resolve an entity to the agent module of its own scope ([#2027](https://github.com/constructive-io/constructive/issues/2027)) ([eae302c](https://github.com/constructive-io/constructive/commit/eae302cb7aec48c74a387c470ae7c67d79d40f03))
+- **server:** gate captcha on the mutation fields that execute ([#2022](https://github.com/constructive-io/constructive/issues/2022)) ([d32d3ab](https://github.com/constructive-io/constructive/commit/d32d3ab97c95162764d3e83a7e2aef9c2bfed0b1))
+- **server:** return document-gate refusals with their registered error code ([#2025](https://github.com/constructive-io/constructive/issues/2025)) ([bbe2567](https://github.com/constructive-io/constructive/commit/bbe2567e0f249b03a2bb671563def01278e7c2e9))
+
+## [3.42.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.3...graphql-server-test@3.42.4) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.2...graphql-server-test@3.42.3) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.1...graphql-server-test@3.42.2) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.0...graphql-server-test@3.42.1) (2026-11-17)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.42.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.41.0...graphql-server-test@3.42.0) (2026-11-16)
+
+### Features
+
+- **presigned-url:** one URL mechanism for every file-reference column ([a1ba7c6](https://github.com/constructive-io/constructive/commit/a1ba7c6c4c1d049f4eeebc7ce454dbba4faa6cb5))
+- **presigned-url:** URLs for an image column and its own rendered versions ([3f72c41](https://github.com/constructive-io/constructive/commit/3f72c419cd4dc4e6628d69294925dcfdd3df1bde))
+
+# [3.41.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.6...graphql-server-test@3.41.0) (2026-11-16)
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
+## [3.40.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.5...graphql-server-test@3.40.6) (2026-11-16)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.40.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.4...graphql-server-test@3.40.5) (2026-11-14)
+
+### Bug Fixes
+
+- **graphql:** recover schema caches after listener interruptions ([425c725](https://github.com/constructive-io/constructive/commit/425c725d3d1ee2393819d7474a0213f4dc69b781))
+
+## [3.40.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.3...graphql-server-test@3.40.4) (2026-11-12)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.40.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.2...graphql-server-test@3.40.3) (2026-11-11)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.40.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.1...graphql-server-test@3.40.2) (2026-11-11)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.40.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.40.0...graphql-server-test@3.40.1) (2026-11-11)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.40.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.39.1...graphql-server-test@3.40.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
+## [3.39.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.39.0...graphql-server-test@3.39.1) (2026-11-09)
+
+### Bug Fixes
+
+- **graphql-server:** decide CORS per routed API and fail strictAuth closed ([04af3fd](https://github.com/constructive-io/constructive/commit/04af3fdde53d23ec1fe2bbc0b07b721dea6ca226))
+- **graphql-server:** keep CORS on routing errors and send strictAuth refusal as 503 ([baf7eb3](https://github.com/constructive-io/constructive/commit/baf7eb31edcf36d882fb905b50b240a38775cb35))
+
+# [3.39.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.6...graphql-server-test@3.39.0) (2026-11-09)
+
+### Features
+
+- **storage:** optional databaseId on uploadFile selects the file row's database ([bd01587](https://github.com/constructive-io/constructive/commit/bd01587bb1e60c480212a879320c054933742343))
+
+## [3.38.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.5...graphql-server-test@3.38.6) (2026-11-08)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.38.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.4...graphql-server-test@3.38.5) (2026-11-08)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.38.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.3...graphql-server-test@3.38.4) (2026-11-06)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.38.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.2...graphql-server-test@3.38.3) (2026-11-05)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.38.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.1...graphql-server-test@3.38.2) (2026-11-05)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.38.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.38.0...graphql-server-test@3.38.1) (2026-11-05)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.38.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.37.1...graphql-server-test@3.38.0) (2026-11-05)
+
+### Bug Fixes
+
+- **graphile-llm:** RAG and embedText resolve the full request scope; gateway forwards max_tokens to Ollama ([3f2920c](https://github.com/constructive-io/constructive/commit/3f2920cfd7ead170e3c01c45aa62e8694dd006cd))
+
+### Features
+
+- **graphile-llm:** every model call goes through the gateway; no direct provider route ([81ec4f2](https://github.com/constructive-io/constructive/commit/81ec4f2e142e35cbe3ad1384ca4aacf8abc6d4a5))
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
+## [3.37.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.37.0...graphql-server-test@3.37.1) (2026-11-05)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.37.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.6...graphql-server-test@3.37.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+## [3.36.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.5...graphql-server-test@3.36.6) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of a vector column or its text companion on create/update ([e4d9350](https://github.com/constructive-io/constructive/commit/e4d93504f65ec8d3eaac6cff51149055192b226e))
+
+## [3.36.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.4...graphql-server-test@3.36.5) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of vector or text on VectorNearbyInput ([a20df3d](https://github.com/constructive-io/constructive/commit/a20df3dc0bfdbfd55c0da0fd46e9e42a327fef63))
+
+## [3.36.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.3...graphql-server-test@3.36.4) (2026-11-04)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.36.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.2...graphql-server-test@3.36.3) (2026-11-04)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.36.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.1...graphql-server-test@3.36.2) (2026-11-01)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.36.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.36.0...graphql-server-test@3.36.1) (2026-10-29)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [3.36.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.35.0...graphql-server-test@3.36.0) (2026-10-29)
+
+### Features
+
+- **db-tools,graphile-meta:** composed-app codegen, resumable provisions and form metadata in _meta ([#1919](https://github.com/constructive-io/constructive/issues/1919)) ([37fb805](https://github.com/constructive-io/constructive/commit/37fb80597dddf8538699f59d74b66fe2e5c827b6)), closes [constructive-db#4156](https://github.com/constructive-db/issues/4156)
+
+# [3.35.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.5...graphql-server-test@3.35.0) (2026-10-28)
+
+### Features
+
+- **graphql-server:** load function-source only for the platform database ([4121631](https://github.com/constructive-io/constructive/commit/4121631a7fbed43385846dd01ec5d35d602c8dad))
+
+## [3.34.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.4...graphql-server-test@3.34.5) (2026-10-28)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.34.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.3...graphql-server-test@3.34.4) (2026-10-27)
+
+### Bug Fixes
+
+- **server:** attribute req.clientIp to the trusted proxy hop, not the leftmost X-Forwarded-For ([e4926dd](https://github.com/constructive-io/constructive/commit/e4926dd8907a545c70630d5927d6156375ee9780))
+
+## [3.34.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.2...graphql-server-test@3.34.3) (2026-10-26)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.34.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.1...graphql-server-test@3.34.2) (2026-10-26)
+
+**Note:** Version bump only for package graphql-server-test
+
 ## [3.34.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.34.0...graphql-server-test@3.34.1) (2026-10-24)
 
 **Note:** Version bump only for package graphql-server-test

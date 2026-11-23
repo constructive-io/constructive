@@ -63,7 +63,7 @@ pgpm import schema/schema.sql --pkg blog-part --partition schema/partition.json 
 pgpm import schema/schema-v2.sql --pkg blog-v2 --out ./out
 pgpm diff ./out/blog ./out/blog-v2 \
   --emit-migration ./out --pkg blog-migration \
-  --emit-sql ./out/migration.sql
+  --emit-sql ./out/migration.sql --allow-data-loss   # v2 drops posts.word_count
 
 # 5. Prove a projection is lossless against a real catalog (needs Postgres)
 cd out/blog
@@ -93,7 +93,8 @@ database needed, because equivalence is checked at the identity-keyed model:
   changes (two new tables, a new policy, a changed `posts` table, a changed
   function body) and nothing is guessed.
 - **output is composable** — one `pgpm diff` run emits a pgpm module *and* a
-  linear `.sql` file, in dependency order, with no `CREATE OR REPLACE`.
+  linear `.sql` file, in dependency order; `CREATE OR REPLACE` appears only
+  for a function whose signature is unchanged.
 
 ### Catalog-level equivalence
 

@@ -6,14 +6,15 @@ import {
   clientIpFrom,
   ConcurrencyLimiter,
   DEFAULT_REQUEST_PROTECTION,
-  RateWindow,
-  trustedProxyHops
+  RateWindow
 } from '@constructive-io/express-context';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { recordRefusal } from '../refusals/recorder';
+import { resolveProxyHops } from './client-ip';
+import { isWebSocketUpgrade } from './websocket';
 
 const log = new Logger('admission');
 
@@ -73,24 +74,6 @@ export interface AdmissionControlOptions {
 }
 
 /**
- * How far back through `X-Forwarded-For` to believe.
- *
- * `req.clientIp` and `req.ip` are both unusable as a limiter key here: this
- * server sets `trust proxy` to a predicate that returns true unconditionally,
- * and `request-ip` reads the *leftmost* forwarded entry regardless — so either
- * one hands a caller a fresh key per request for the cost of a header. The
- * fallback to 1 hop exists because the opposite failure is just as bad: behind
- * an ingress with no hop count configured, every caller resolves to the
- * ingress's address and one abuser throttles the whole tenant.
- */
-const resolveHops = (req: Request, configured?: number): number => {
-  if (typeof configured === 'number') return configured;
-  const fromEnv = trustedProxyHops();
-  if (fromEnv > 0) return fromEnv;
-  return req.app?.get('trust proxy') ? 1 : 0;
-};
-
-/**
  * Rate-limit callers per route, then admit at most `maxConcurrentRequests` of
  * them per database into the handler chain.
  *
@@ -110,7 +93,7 @@ export const createAdmissionControlMiddleware = (
     const databaseId = req.databaseId ?? UNKNOWN_DATABASE;
 
     // ─── Per-caller rate ────────────────────────────────────────────────────
-    const hops = resolveHops(req, options.trustedProxyHops);
+    const hops = resolveProxyHops(req, options.trustedProxyHops);
     const ip = clientIpFrom(req, hops);
     const rateKey = `${databaseId}\u0000${ip}\u0000${routeOf(req)}`;
     if (!rate.admit(rateKey, protection.rateLimitRpm, protection.rateLimitBurst)) {
@@ -124,14 +107,32 @@ export const createAdmissionControlMiddleware = (
     }
 
     // ─── Per-database concurrency ───────────────────────────────────────────
+    // A client that hangs up while queued must neither keep its place in the
+    // queue nor be handed the slot when its turn comes: nothing would ever
+    // release it. `close` is watched from before the wait, since a listener
+    // attached only after `acquire` resolves misses a hang-up during it.
+    const gone = new AbortController();
+    const onClose = () => gone.abort();
+    // An upgraded socket holds one slot for its entire lifetime.
+    const lifetime = isWebSocketUpgrade(req) ? req.socket : res;
+    lifetime.once('close', onClose);
+
     let lease: AdmissionLease;
     try {
       lease = await concurrency.acquire(databaseId, {
         limit: protection.maxConcurrentRequests,
-        queueWaitMs: protection.maxQueueWaitMs
+        queueWaitMs: protection.maxQueueWaitMs,
+        signal: gone.signal
       });
     } catch (e) {
+      lifetime.off('close', onClose);
       next(e);
+      return;
+    }
+    lifetime.off('close', onClose);
+
+    if (gone.signal.aborted) {
+      lease.release();
       return;
     }
 
@@ -164,7 +165,7 @@ export const createAdmissionControlMiddleware = (
     // until the process restarts, and a client that retries on abort would
     // drain the tenant's budget one leaked slot at a time. `release` is
     // idempotent, so both listeners can fire.
-    res.on('close', () => lease.release());
+    lifetime.on('close', () => lease.release());
     res.on('finish', () => lease.release());
     next();
   };

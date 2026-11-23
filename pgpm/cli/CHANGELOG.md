@@ -3,6 +3,210 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.41.28](https://github.com/constructive-io/constructive/compare/pgpm@5.41.27...pgpm@5.41.28) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [5.41.27](https://github.com/constructive-io/constructive/compare/pgpm@5.41.26...pgpm@5.41.27) (2026-11-23)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.26](https://github.com/constructive-io/constructive/compare/pgpm@5.41.25...pgpm@5.41.26) (2026-11-22)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.25](https://github.com/constructive-io/constructive/compare/pgpm@5.41.24...pgpm@5.41.25) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.24](https://github.com/constructive-io/constructive/compare/pgpm@5.41.23...pgpm@5.41.24) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.23](https://github.com/constructive-io/constructive/compare/pgpm@5.41.22...pgpm@5.41.23) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.22](https://github.com/constructive-io/constructive/compare/pgpm@5.41.21...pgpm@5.41.22) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.21](https://github.com/constructive-io/constructive/compare/pgpm@5.41.20...pgpm@5.41.21) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.20](https://github.com/constructive-io/constructive/compare/pgpm@5.41.19...pgpm@5.41.20) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.19](https://github.com/constructive-io/constructive/compare/pgpm@5.41.18...pgpm@5.41.19) (2026-11-19)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.18](https://github.com/constructive-io/constructive/compare/pgpm@5.41.17...pgpm@5.41.18) (2026-11-19)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.17](https://github.com/constructive-io/constructive/compare/pgpm@5.41.16...pgpm@5.41.17) (2026-11-18)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.16](https://github.com/constructive-io/constructive/compare/pgpm@5.41.15...pgpm@5.41.16) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.15](https://github.com/constructive-io/constructive/compare/pgpm@5.41.14...pgpm@5.41.15) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.14](https://github.com/constructive-io/constructive/compare/pgpm@5.41.13...pgpm@5.41.14) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.13](https://github.com/constructive-io/constructive/compare/pgpm@5.41.12...pgpm@5.41.13) (2026-11-16)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.12](https://github.com/constructive-io/constructive/compare/pgpm@5.41.11...pgpm@5.41.12) (2026-11-16)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.11](https://github.com/constructive-io/constructive/compare/pgpm@5.41.10...pgpm@5.41.11) (2026-11-16)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.10](https://github.com/constructive-io/constructive/compare/pgpm@5.41.9...pgpm@5.41.10) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [5.41.9](https://github.com/constructive-io/constructive/compare/pgpm@5.41.8...pgpm@5.41.9) (2026-11-12)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.8](https://github.com/constructive-io/constructive/compare/pgpm@5.41.7...pgpm@5.41.8) (2026-11-11)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.7](https://github.com/constructive-io/constructive/compare/pgpm@5.41.6...pgpm@5.41.7) (2026-11-11)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.6](https://github.com/constructive-io/constructive/compare/pgpm@5.41.5...pgpm@5.41.6) (2026-11-10)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.5](https://github.com/constructive-io/constructive/compare/pgpm@5.41.4...pgpm@5.41.5) (2026-11-09)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.4](https://github.com/constructive-io/constructive/compare/pgpm@5.41.3...pgpm@5.41.4) (2026-11-09)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.3](https://github.com/constructive-io/constructive/compare/pgpm@5.41.2...pgpm@5.41.3) (2026-11-08)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.2](https://github.com/constructive-io/constructive/compare/pgpm@5.41.1...pgpm@5.41.2) (2026-11-06)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.1](https://github.com/constructive-io/constructive/compare/pgpm@5.41.0...pgpm@5.41.1) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** attach GRANT ON FUNCTION/TYPE/DOMAIN and ALL ... IN SCHEMA grants to their own objects instead of the preceding statement's unit ([c5f5098](https://github.com/constructive-io/constructive/commit/c5f50984fd28cb9f74942c5a943c2b69efa1bec3))
+- **diff:** enum ADD VALUE neighbors and same-migration use, composite mid-list insert, sequence START after MINVALUE/MAXVALUE drop, --using single expression, -token privilege state, column rename on a renamed table, rename references and implicit constraint names ([abb4284](https://github.com/constructive-io/constructive/commit/abb428434563d9b640315e06e6fe6e607cb6d487))
+- **diff:** identify extensions, collations, aggregates, operators, casts, statistics, rules, opclasses, publications, event triggers and foreign objects; order extension and collation steps; snapshot aggregates ([e550a8c](https://github.com/constructive-io/constructive/commit/e550a8ce278660abc26ccee60eb6fee9797d72de))
+- **diff:** park dependent columns in jsonb/text around type changes Postgres refuses in place ([a494196](https://github.com/constructive-io/constructive/commit/a494196b23d493a9143431e8efd633d9249794c4))
+
+# [5.41.0](https://github.com/constructive-io/constructive/compare/pgpm@5.40.0...pgpm@5.41.0) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** --verify replays a .sql/database side in dependency order with function bodies unchecked (pg_dump order lists functions before the tables they name) ([918a2eb](https://github.com/constructive-io/constructive/commit/918a2eb8f84c0fd057ab9257a12ee40624fffb01))
+- **diff:** module vs live-database normalization — implicit ::text on string constants, restated sequence defaults, WITH NO DATA, FOR ROLE on default privileges, column attributes emitted as separate ALTERs by pg_dump ([81e6659](https://github.com/constructive-io/constructive/commit/81e6659ce0c39fd22f94c3efcf2090237ea58e70))
+- **diff:** name inline constraints of added tables so every inverse is derivable; e2e direct diffChangeSets calls accept data loss ([ebc0303](https://github.com/constructive-io/constructive/commit/ebc0303fb680d9d451351d4e69eee87826c8ddf8))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
+# [5.40.0](https://github.com/constructive-io/constructive/compare/pgpm@5.39.15...pgpm@5.40.0) (2026-11-05)
+
+### Bug Fixes
+
+- **pgpm:** drop a column's constraints before the column; --append-module rejects --emit-ledger ([204d7c1](https://github.com/constructive-io/constructive/commit/204d7c1849171d2abff94449e6c6fa3d8873739a))
+
+### Features
+
+- **pgpm:** order every undeployed diff change by one dependency graph ([fff381b](https://github.com/constructive-io/constructive/commit/fff381b6613b1b7a93c76d319878a669ecedd788))
+
+## [5.39.15](https://github.com/constructive-io/constructive/compare/pgpm@5.39.14...pgpm@5.39.15) (2026-11-05)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.14](https://github.com/constructive-io/constructive/compare/pgpm@5.39.13...pgpm@5.39.14) (2026-11-05)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.13](https://github.com/constructive-io/constructive/compare/pgpm@5.39.12...pgpm@5.39.13) (2026-11-05)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.12](https://github.com/constructive-io/constructive/compare/pgpm@5.39.11...pgpm@5.39.12) (2026-11-04)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.11](https://github.com/constructive-io/constructive/compare/pgpm@5.39.10...pgpm@5.39.11) (2026-11-04)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.10](https://github.com/constructive-io/constructive/compare/pgpm@5.39.9...pgpm@5.39.10) (2026-11-04)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.9](https://github.com/constructive-io/constructive/compare/pgpm@5.39.8...pgpm@5.39.9) (2026-11-04)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.8](https://github.com/constructive-io/constructive/compare/pgpm@5.39.7...pgpm@5.39.8) (2026-11-01)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.7](https://github.com/constructive-io/constructive/compare/pgpm@5.39.6...pgpm@5.39.7) (2026-10-29)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.6](https://github.com/constructive-io/constructive/compare/pgpm@5.39.5...pgpm@5.39.6) (2026-10-29)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.5](https://github.com/constructive-io/constructive/compare/pgpm@5.39.4...pgpm@5.39.5) (2026-10-28)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.4](https://github.com/constructive-io/constructive/compare/pgpm@5.39.3...pgpm@5.39.4) (2026-10-28)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.3](https://github.com/constructive-io/constructive/compare/pgpm@5.39.2...pgpm@5.39.3) (2026-10-27)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.2](https://github.com/constructive-io/constructive/compare/pgpm@5.39.1...pgpm@5.39.2) (2026-10-26)
+
+**Note:** Version bump only for package pgpm
+
+## [5.39.1](https://github.com/constructive-io/constructive/compare/pgpm@5.39.0...pgpm@5.39.1) (2026-10-26)
+
+**Note:** Version bump only for package pgpm
+
 # [5.39.0](https://github.com/constructive-io/constructive/compare/pgpm@5.38.7...pgpm@5.39.0) (2026-10-24)
 
 ### Bug Fixes
@@ -302,7 +506,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))
 - **pgpm:** pgpm diff --append-module — append the delta into an existing module ([4bfb5aa](https://github.com/constructive-io/constructive/commit/4bfb5aa1fbaaf1e9cf53f7f7d27584f503a0cd8a))
 - **pgpm:** uniform --emit-sql/--emit-bundle projections on transform and import ([a86a35d](https://github.com/constructive-io/constructive/commit/a86a35dced04f5df7d6ff1d87333590a5ee92c38))
@@ -337,7 +541,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **export:** granularity dial — route pgpm export through the dials pipeline ([5c71a7f](https://github.com/constructive-io/constructive/commit/5c71a7fddd6a40ee19f5b220a7ffae28e7fa88ff))
 - **pgpm:** add `pgpm package --check` to verify committed bundle artifacts are in sync with deploy/ ([c0b3b0a](https://github.com/constructive-io/constructive/commit/c0b3b0a040004d42f9e779fbdbb343068613089f))
 
 ## [5.17.4](https://github.com/constructive-io/constructive/compare/pgpm@5.17.3...pgpm@5.17.4) (2026-07-31)

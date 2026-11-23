@@ -4,7 +4,7 @@ import { errors } from '@constructive-io/errors';
 import type { DatabaseStanding } from '@constructive-io/express-context';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { respondWithGraphQLError } from '../errors/graphql-response';
+import { respondWithError } from '../errors/graphql-response';
 
 /**
  * Express middleware that refuses requests pinned to a database that is not in
@@ -33,7 +33,8 @@ export const createStandingMiddleware = (): RequestHandler => {
     }
 
     if (standing && (!standing.exists || standing.suspended)) {
-      respondWithGraphQLError(
+      respondWithError(
+        req,
         res,
         errors.ACCESS_SUSPENDED(standing.reason ? { reason: standing.reason } : {}),
         { status: 403 }

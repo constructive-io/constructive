@@ -3,6 +3,104 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.6](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.5...graphile-presigned-url-plugin@1.28.6) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [1.28.5](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.4...graphile-presigned-url-plugin@1.28.5) (2026-11-23)
+
+### Features
+
+- **presigned-url:** download a stored image version by name ([#2053](https://github.com/constructive-io/constructive/issues/2053)) ([696dfd0](https://github.com/constructive-io/constructive/commit/696dfd002d59d7f600746a4ce788849c25c9176f))
+
+## [1.28.4](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.3...graphile-presigned-url-plugin@1.28.4) (2026-11-21)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.2...graphile-presigned-url-plugin@1.28.3) (2026-11-19)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.1...graphile-presigned-url-plugin@1.28.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.0...graphile-presigned-url-plugin@1.28.1) (2026-11-17)
+
+### Bug Fixes
+
+- **presigned-url:** a bucket cache hit re-reads the bucket id under the caller's RLS ([#2007](https://github.com/constructive-io/constructive/issues/2007)) ([af63b90](https://github.com/constructive-io/constructive/commit/af63b90ea9946f62891901b417a5f238cb0fc8c5))
+
+# [1.28.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.2...graphile-presigned-url-plugin@1.28.0) (2026-11-16)
+
+### Bug Fixes
+
+- **presigned-url:** no file of its own under another file's .versions/ prefix ([640dbca](https://github.com/constructive-io/constructive/commit/640dbca7a23001b4aed0c3345652554b72a5c7ea))
+- **presigned-url:** no image URL fields for a column the API does not select ([05993d0](https://github.com/constructive-io/constructive/commit/05993d0db8aca42817eaa4169c21e78f0c8ea822))
+
+### Features
+
+- **presigned-url:** one URL mechanism for every file-reference column ([a1ba7c6](https://github.com/constructive-io/constructive/commit/a1ba7c6c4c1d049f4eeebc7ce454dbba4faa6cb5))
+- **presigned-url:** URLs for an image column and its own rendered versions ([3f72c41](https://github.com/constructive-io/constructive/commit/3f72c419cd4dc4e6628d69294925dcfdd3df1bde))
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
+## [1.27.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.1...graphile-presigned-url-plugin@1.27.2) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
+## [1.27.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.0...graphile-presigned-url-plugin@1.27.1) (2026-11-11)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** never pass previous_version_id to the recorder — the files table derives it from the head at the key ([a75e30e](https://github.com/constructive-io/constructive/commit/a75e30e404e9b03a753a5f63e7ef9771627adcb2))
+
+# [1.27.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.26.0...graphile-presigned-url-plugin@1.27.0) (2026-11-11)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file row (x-amz-meta-upload-id) and return uploadHeaders ([7a879d3](https://github.com/constructive-io/constructive/commit/7a879d3840bb1cbea7829652678fd31ae72c6ead))
+
+# [1.26.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.25.1...graphile-presigned-url-plugin@1.26.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
+## [1.25.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.25.0...graphile-presigned-url-plugin@1.25.1) (2026-11-09)
+
+### Bug Fixes
+
+- **presigned-url:** accept the characters Next.js writes into static-export file names ([152cd9c](https://github.com/constructive-io/constructive/commit/152cd9c0c713036bc468ff4426cfccd1be95dddf))
+- **presigned-url:** no downloadUrl for a file that is not uploaded ([221bc04](https://github.com/constructive-io/constructive/commit/221bc040beb9e31b29bbafd5f1682aa835e388dc))
+
+# [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.24.0...graphile-presigned-url-plugin@1.25.0) (2026-11-09)
+
+### Features
+
+- **storage:** optional databaseId on uploadFile selects the file row's database ([bd01587](https://github.com/constructive-io/constructive/commit/bd01587bb1e60c480212a879320c054933742343))
+
+# [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.23.5...graphile-presigned-url-plugin@1.24.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+## [1.23.5](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.23.4...graphile-presigned-url-plugin@1.23.5) (2026-11-04)
+
+### Bug Fixes
+
+- **presigned-url:** read file liveness from status on every files table ([fb3b3d7](https://github.com/constructive-io/constructive/commit/fb3b3d74cc16705542e5eeecbeb832f6a36c3aee))
+
+## [1.23.4](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.23.3...graphile-presigned-url-plugin@1.23.4) (2026-10-26)
+
+### Bug Fixes
+
+- **presigned-url:** resolve default bucket from the request's database ([46c1780](https://github.com/constructive-io/constructive/commit/46c17807ac1b6e0b9c8a15fc399b8638522e5265))
+
 ## [1.23.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.23.2...graphile-presigned-url-plugin@1.23.3) (2026-10-17)
 
 ### Bug Fixes

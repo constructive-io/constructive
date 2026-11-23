@@ -3,6 +3,198 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.48](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.47...@agentic-kit/pi-host@0.7.48) (2026-11-23)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.47](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.46...@agentic-kit/pi-host@0.7.47) (2026-11-23)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.46](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.45...@agentic-kit/pi-host@0.7.46) (2026-11-22)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.45](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.44...@agentic-kit/pi-host@0.7.45) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.44](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.43...@agentic-kit/pi-host@0.7.44) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.43](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.42...@agentic-kit/pi-host@0.7.43) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.42](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.41...@agentic-kit/pi-host@0.7.42) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.41](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.40...@agentic-kit/pi-host@0.7.41) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.40](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.39...@agentic-kit/pi-host@0.7.40) (2026-11-21)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.39](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.38...@agentic-kit/pi-host@0.7.39) (2026-11-19)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.38](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.37...@agentic-kit/pi-host@0.7.38) (2026-11-19)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.37](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.36...@agentic-kit/pi-host@0.7.37) (2026-11-18)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.36](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.35...@agentic-kit/pi-host@0.7.36) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.35](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.34...@agentic-kit/pi-host@0.7.35) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.34](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.33...@agentic-kit/pi-host@0.7.34) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.33](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.32...@agentic-kit/pi-host@0.7.33) (2026-11-17)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.32](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.31...@agentic-kit/pi-host@0.7.32) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.31](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.30...@agentic-kit/pi-host@0.7.31) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.30](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.29...@agentic-kit/pi-host@0.7.30) (2026-11-16)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.29](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.28...@agentic-kit/pi-host@0.7.29) (2026-11-14)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.28](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.27...@agentic-kit/pi-host@0.7.28) (2026-11-12)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.27](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.26...@agentic-kit/pi-host@0.7.27) (2026-11-11)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.26](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.25...@agentic-kit/pi-host@0.7.26) (2026-11-11)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.25](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.24...@agentic-kit/pi-host@0.7.25) (2026-11-11)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.24](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.23...@agentic-kit/pi-host@0.7.24) (2026-11-10)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.23](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.22...@agentic-kit/pi-host@0.7.23) (2026-11-09)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.22](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.21...@agentic-kit/pi-host@0.7.22) (2026-11-09)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.21](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.20...@agentic-kit/pi-host@0.7.21) (2026-11-08)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.20](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.19...@agentic-kit/pi-host@0.7.20) (2026-11-06)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.19](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.18...@agentic-kit/pi-host@0.7.19) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.18](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.17...@agentic-kit/pi-host@0.7.18) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.17](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.16...@agentic-kit/pi-host@0.7.17) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.16](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.15...@agentic-kit/pi-host@0.7.16) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.15](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.14...@agentic-kit/pi-host@0.7.15) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.14](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.13...@agentic-kit/pi-host@0.7.14) (2026-11-05)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.13](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.12...@agentic-kit/pi-host@0.7.13) (2026-11-04)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.12](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.11...@agentic-kit/pi-host@0.7.12) (2026-11-04)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.11](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.10...@agentic-kit/pi-host@0.7.11) (2026-11-04)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.10](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.9...@agentic-kit/pi-host@0.7.10) (2026-11-04)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.9](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.8...@agentic-kit/pi-host@0.7.9) (2026-11-03)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.8](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.7...@agentic-kit/pi-host@0.7.8) (2026-11-01)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.7](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.6...@agentic-kit/pi-host@0.7.7) (2026-10-29)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.6](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.5...@agentic-kit/pi-host@0.7.6) (2026-10-29)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.5](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.4...@agentic-kit/pi-host@0.7.5) (2026-10-28)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.4](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.3...@agentic-kit/pi-host@0.7.4) (2026-10-28)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.3](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.2...@agentic-kit/pi-host@0.7.3) (2026-10-27)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.1...@agentic-kit/pi-host@0.7.2) (2026-10-26)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
+## [0.7.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.0...@agentic-kit/pi-host@0.7.1) (2026-10-26)
+
+**Note:** Version bump only for package @agentic-kit/pi-host
+
 # [0.7.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.6.8...@agentic-kit/pi-host@0.7.0) (2026-10-24)
 
 **Note:** Version bump only for package @agentic-kit/pi-host

@@ -1,4 +1,5 @@
 import {
+  agentChatLoader,
   corsLoader,
   databaseSettingsLoader,
   type LoaderContext,
@@ -201,8 +202,7 @@ const routingSettingsAsLogin = async (): Promise<LoaderContext> => {
     routingPool,
     tenantPool: routingPool,
     databaseId: target.database_id,
-    apiId: target.api_id,
-    dbname: pg.config.database
+    apiId: target.api_id
   };
   for (const loader of ROUTING_LOADERS) loader.invalidate();
   return ctx;
@@ -223,6 +223,94 @@ it.each([
 ])('resolves the %s loader as the login instead of falling back to the defaults RLS hides', async (_name, check) => {
   await check(await routingSettingsAsLogin());
   for (const loader of ROUTING_LOADERS) loader.invalidate();
+});
+
+/**
+ * Registers what a tenant's blueprint does: memberships at the app, org and
+ * data_room scopes, and an agent module at each. The rest of the transaction
+ * runs as the login.
+ */
+const agentModulesAsLogin = async (extraOrgPrefix?: string): Promise<LoaderContext> => {
+  const { rows: [target] } = await pg.query(
+    'SELECT database_id FROM routing_public.domains LIMIT 1'
+  );
+  const schemaRow = async (name: string, schemaName: string): Promise<string> => (await pg.query(
+    `INSERT INTO metaschema_public.schema (database_id, name, schema_name, description, is_public)
+     VALUES ($1, $2, $3, 'agent chat', true) RETURNING id`,
+    [target.database_id, name, schemaName]
+  )).rows[0].id;
+  const agentSchema = await schemaRow('agent_public', 'tenant-agent-public');
+  const membershipsSchema = await schemaRow('memberships_public', 'tenant-memberships-public');
+  const table = async (name: string): Promise<string> => (await pg.query(
+    `INSERT INTO metaschema_public.table (database_id, schema_id, name, description)
+     VALUES ($1, $2, $3, 'agent chat') RETURNING id`,
+    [target.database_id, agentSchema, name]
+  )).rows[0].id;
+  const memberships = async (scope: string, entityField: string | null) => pg.query(
+    `INSERT INTO metaschema_modules_public.memberships_module
+       (database_id, schema_id, private_schema_id, scope, prefix, entity_field, memberships_table_name)
+     VALUES ($1, $2, $2, $3, $3, $4, $5)`,
+    [target.database_id, membershipsSchema, scope, entityField, `${scope}_memberships`]
+  );
+  const agents = async (scope: string, prefix: string, entityField: string | null) => pg.query(
+    `INSERT INTO metaschema_modules_public.agent_module
+       (database_id, schema_id, private_schema_id, scope, prefix, entity_field,
+        thread_table_id, message_table_id, task_table_id, prompts_table_id)
+     VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [
+      target.database_id, agentSchema, scope, prefix, entityField,
+      await table(`${prefix}_agent_thread`), await table(`${prefix}_agent_message`), await table(`${prefix}_agent_task`),
+      await table(`${prefix}_agent_prompt`)
+    ]
+  );
+  await pg.query('SET LOCAL session_replication_role TO replica');
+  await memberships('app', null);
+  await memberships('org', 'entity_id');
+  await memberships('data_room', 'entity_id');
+  await agents('app', 'app', null);
+  await agents('org', 'org', 'entity_id');
+  await agents('data_room', 'data_room', 'entity_id');
+  if (extraOrgPrefix) await agents('org', extraOrgPrefix, 'entity_id');
+  await pg.query('SET LOCAL session_replication_role TO DEFAULT');
+  // Production layers member policies over the registry; with RLS on and no
+  // policy, the login sees none of its rows.
+  await pg.query(`
+    ALTER TABLE metaschema_modules_public.agent_module ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE metaschema_modules_public.memberships_module ENABLE ROW LEVEL SECURITY;
+  `);
+
+  await pg.query(`SET LOCAL ROLE "${LOGIN}"`);
+  const pool = { query: (text: string, values?: unknown[]) => pg.query(text, values) } as unknown as Pool;
+  agentChatLoader.invalidate();
+  return { routingPool: pool, tenantPool: pool, databaseId: target.database_id };
+};
+
+it('resolves the agent chat loader as the login: every entity scope with its memberships table, and no global scope', async () => {
+  const ctx = await agentModulesAsLogin();
+  const hidden = await pg.query(`SELECT
+    (SELECT count(*)::int FROM metaschema_modules_public.agent_module) AS agents,
+    (SELECT count(*)::int FROM metaschema_modules_public.memberships_module) AS memberships`);
+  expect(hidden.rows[0]).toEqual({ agents: 0, memberships: 0 });
+
+  const scope = (name: string) => ({
+    scope: name,
+    entityField: 'entity_id',
+    schemaName: 'tenant-agent-public',
+    threadTableName: `${name}_agent_thread`,
+    messageTableName: `${name}_agent_message`,
+    taskTableName: `${name}_agent_task`,
+    membershipsSchemaName: 'tenant-memberships-public',
+    membershipsTableName: `${name}_memberships`,
+    membershipsEntityField: 'entity_id'
+  });
+  expect(await agentChatLoader.resolve(ctx)).toEqual({ scopes: [scope('data_room'), scope('org')] });
+  agentChatLoader.invalidate();
+});
+
+it('refuses two agent modules at one entity scope', async () => {
+  const ctx = await agentModulesAsLogin('org_support');
+  await expect(agentChatLoader.resolve(ctx)).rejects.toThrow(/more than one agent or memberships module at the org scope/);
+  agentChatLoader.invalidate();
 });
 
 it('resolves routes and serves GraphQL using the reconciled password', async () => {
@@ -253,6 +341,42 @@ it('rejects an unknown Bearer token as UNAUTHENTICATED', async () => {
     .set('Authorization', 'Bearer not-a-token')
     .send({ query: '{ animals { nodes { name } } }' });
   expect(res.body.errors?.[0]?.extensions?.code ?? res.body.error?.code).toBe('UNAUTHENTICATED');
+});
+
+it.each([
+  ['/fn/resize'],
+  ['/v1/threads'],
+  ['/flush']
+])('rejects an unknown Bearer token on %s with 401 and a JSON error', async (route) => {
+  const res = await request.post(route).set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token')
+    .send({ width: 1 });
+
+  expect(res.status).toBe(401);
+  expect(res.body).toEqual({
+    error: { code: 'UNAUTHENTICATED', message: expect.any(String), requestId: expect.any(String) }
+  });
+});
+
+it('keeps answering an unknown Bearer token on /graphql with a 200 GraphQL error', async () => {
+  const res = await request.post('/graphql').set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token')
+    .send({ query: '{ animals { nodes { name } } }' });
+
+  expect(res.status).toBe(200);
+  expect(res.body.data).toBeUndefined();
+  expect(res.body.errors).toEqual([
+    { message: expect.any(String), extensions: { code: 'UNAUTHENTICATED', class: 'public', http: 401 } }
+  ]);
+});
+
+it('answers /healthz the same with or without a credential', async () => {
+  const plain = await request.get('/healthz').set('Host', API_HOST);
+  const withBadToken = await request.get('/healthz').set('Host', API_HOST)
+    .set('Authorization', 'Bearer not-a-token');
+
+  expect(withBadToken.status).toBe(200);
+  expect(withBadToken.text).toBe(plain.text);
 });
 
 it('serves the function REST route with request-role isolation', async () => {

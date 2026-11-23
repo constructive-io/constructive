@@ -43,10 +43,12 @@ import {
   getBulkCreateMutationHookName,
   getBulkDeleteMutationFileName,
   getBulkDeleteMutationHookName,
+  getBulkInsertMutationName,
   getBulkUpdateMutationFileName,
   getBulkUpdateMutationHookName,
   getBulkUpsertMutationFileName,
   getBulkUpsertMutationHookName,
+  getBulkUpsertMutationName,
   getCreateMutationFileName,
   getCreateMutationHookName,
   getCreateMutationName,
@@ -61,6 +63,7 @@ import {
   getUpdateMutationFileName,
   getUpdateMutationHookName,
   getUpdateMutationName,
+  hasCreateMutation,
   hasValidPrimaryKey,
   lcFirst,
 } from './utils';
@@ -124,6 +127,7 @@ export function generateCreateMutationHook(
   const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
 
   if (!reactQueryEnabled) return null;
+  if (!hasCreateMutation(table)) return null;
 
   const { typeName, singularName } = getTableNames(table);
   const hookName = getCreateMutationHookName(table);
@@ -901,8 +905,8 @@ function generateBulkMutationHook(
 
   const mutationFieldName = (() => {
     switch (op) {
-    case 'bulkCreate': return table.query?.bulkInsert;
-    case 'bulkUpsert': return table.query?.bulkUpsert;
+    case 'bulkCreate': return getBulkInsertMutationName(table);
+    case 'bulkUpsert': return getBulkUpsertMutationName(table);
     case 'bulkUpdate': return table.query?.bulkUpdate;
     case 'bulkDelete': return table.query?.bulkDelete;
     }

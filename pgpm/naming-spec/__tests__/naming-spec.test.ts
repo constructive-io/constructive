@@ -63,4 +63,13 @@ describe('PGPM naming spec v1', () => {
     const identity = id({ kind: 'table', name: 'users' });
     expect(pathFor(identity)).toBe(pathFor({ ...identity }));
   });
+
+  it('keeps identifiers that need quoting to one whitespace-free segment', () => {
+    expect(pathFor(id({ kind: 'policy', schema: 'public', name: 'Users can view own data', table: 'todos' })))
+      .toBe('schemas/public/tables/todos/policies/Users_can_view_own_data/policy');
+    expect(pathFor(id({ kind: 'table', schema: 'my schema', name: 'a/b' })))
+      .toBe('schemas/my_schema/tables/a_b/table');
+    expect(pathFor(id({ kind: 'index', name: 'idx', table: 'my table' })))
+      .toBe('schemas/app/tables/my_table/indexes/idx');
+  });
 });

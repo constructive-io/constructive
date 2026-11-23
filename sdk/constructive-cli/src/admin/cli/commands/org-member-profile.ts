@@ -25,6 +25,8 @@ const fieldSchema: FieldSchema = {
   id: 'uuid',
   membershipId: 'uuid',
   profilePicture: 'string',
+  profilePictureUrl: 'string',
+  profilePictureVersions: 'string',
   title: 'string',
   updatedAt: 'string',
 };

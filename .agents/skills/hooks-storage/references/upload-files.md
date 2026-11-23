@@ -7,7 +7,7 @@ Upload multiple files: resolves the bucket by key, creates file rows, and return
 ## Usage
 
 ```typescript
-const { mutate } = useUploadFilesMutation(); mutate({ input: { bucketKey: '<String>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } });
+const { mutate } = useUploadFilesMutation(); mutate({ input: { bucketKey: '<String>', databaseId: '<UUID>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useUploadFilesMutation(); mutate({ input: { bucketKey: '<Stri
 
 ```typescript
 const { mutate, isLoading } = useUploadFilesMutation();
-mutate({ input: { bucketKey: '<String>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } });
+mutate({ input: { bucketKey: '<String>', databaseId: '<UUID>', files: '<UploadFileBulkFileInput>', isPublic: '<Boolean>' } });
 ```

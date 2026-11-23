@@ -90,7 +90,7 @@ export interface RealtimeTestContext {
   ): Promise<void>;
 
   /**
-   * Fire an INVALIDATE (overflow) NOTIFY.
+   * Fire a legacy INVALIDATE NOTIFY for protocol rejection tests.
    */
   notifyInvalidate(table: string, schema?: string): Promise<void>;
 

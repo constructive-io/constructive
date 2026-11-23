@@ -1,3 +1,4 @@
+import { corsLoader } from '@constructive-io/express-context';
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { svcCache } from '@pgpmjs/server-utils';
 import { EventEmitter } from 'events';
@@ -11,7 +12,7 @@ import {
 import type { PoolClient } from 'pg';
 
 import { Server } from '../../server';
-import { createFlushMiddleware } from '../flush';
+import { createFlushMiddleware, flushAllServices } from '../flush';
 
 const mockRoutingQuery = jest.fn();
 jest.mock('pg-cache', () => ({
@@ -87,6 +88,28 @@ describe('createFlushMiddleware', () => {
     expect(svcCache.get('tenant.example.com')).toBeUndefined();
   });
 
+  it('drops every host the database resolved to, including one it no longer lists', async () => {
+    svcCache.set('gone.example.com', { databaseId: DATABASE_ID } as any);
+    graphileCache.set('gone.example.com', { cached: true, heapBytes: 1 } as any);
+    svcCache.set('other.example.com', { databaseId: 'other-database' } as any);
+    graphileCache.set('other.example.com', { cached: true, heapBytes: 1 } as any);
+    mockRoutingQuery.mockResolvedValue({ rows: [], rowCount: 0 });
+    const server = Object.create(Server.prototype) as Server;
+    Object.assign(server, { opts: { api: { isPublic: true } } });
+    try {
+      await server.flush(DATABASE_ID);
+      expect(svcCache.get('gone.example.com')).toBeUndefined();
+      expect(graphileCache.get('gone.example.com')).toBeUndefined();
+      expect(svcCache.get('other.example.com')).toBeDefined();
+      expect(graphileCache.get('other.example.com')).toBeDefined();
+    } finally {
+      for (const key of ['gone.example.com', 'other.example.com']) {
+        svcCache.delete(key);
+        graphileCache.delete(key);
+      }
+    }
+  });
+
   it.each([
     ['no authorization header', undefined],
     ['a wrong token', 'Bearer nope'],
@@ -129,6 +152,25 @@ describe('createFlushMiddleware', () => {
         files_schema: 'tenant_storage',
         files_table: `${scope}_files`,
       });
+      let server: Server | undefined;
+      let listener: EventEmitter;
+      let flush: jest.SpyInstance;
+      if (path === 'notification') {
+        // Exercise the real listener and Server.flush without opening sockets.
+        // Empty routing rows must not prevent storage discovery invalidation.
+        server = Object.create(Server.prototype) as Server;
+        Object.assign(server, { opts: { api: { isPublic: true } } });
+        listener = Object.assign(new EventEmitter(), {
+          query: jest.fn().mockResolvedValue({ rows: [] }),
+        });
+        flush = jest.spyOn(server, 'flush');
+        server.listenForChanges(
+          null,
+          listener as unknown as PoolClient,
+          jest.fn()
+        );
+        await Promise.resolve();
+      }
       let rows = [row('app')];
       const client = { query: jest.fn(async () => ({ rows })) };
       const other = { query: jest.fn(async () => ({ rows: [row('other')] })) };
@@ -137,27 +179,14 @@ describe('createFlushMiddleware', () => {
       rows = [...rows, row('data_room')];
 
       if (path === 'notification') {
-        // Exercise the real listener and Server.flush without opening sockets.
-        // Empty routing rows must not prevent storage discovery invalidation.
-        const server = Object.create(Server.prototype) as Server;
-        Object.assign(server, { opts: { api: { isPublic: true } } });
-        const listener = Object.assign(new EventEmitter(), {
-          query: jest.fn().mockResolvedValue({ rows: [] }),
-        });
-        const flush = jest.spyOn(server, 'flush');
-        server.listenForChanges(
-          null,
-          listener as unknown as PoolClient,
-          jest.fn()
-        );
-        expect(listener.query).toHaveBeenCalledWith('LISTEN "schema:update"');
+        expect((listener as EventEmitter & { query: jest.Mock }).query).toHaveBeenCalledWith('LISTEN "schema:update"');
         listener.emit('notification', {
           channel: 'schema:update',
           payload: DATABASE_ID,
         });
         expect(flush).toHaveBeenCalledWith(DATABASE_ID);
         await flush.mock.results[0].value;
-        listener.removeAllListeners();
+        await server!.removeEventListener();
         expect(mockRoutingQuery).toHaveBeenCalledWith(expect.any(String), [
           DATABASE_ID,
         ]);
@@ -185,6 +214,57 @@ describe('createFlushMiddleware', () => {
       expect(other.query).toHaveBeenCalledTimes(1);
     }
   );
+
+  // A host evicted by a flush is rebuilt from the settings loaders. If their
+  // cached copy survived the flush, the rebuilt host would keep the old CORS
+  // list for as long as it stays cached.
+  it.each(['notification', 'authenticated HTTP', 'listener reconnect'])(
+    'makes the next host build read the CORS origins again through the %s flush path',
+    async (path) => {
+      let origins = ['https://preview.example.com'];
+      const routingPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: origins }] })) };
+      const otherPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: ['https://other.example.com'] }] })) };
+      const ctx = (databaseId: string, pool: typeof routingPool) =>
+        ({ routingPool: pool, tenantPool: pool, databaseId, apiId: 'auth-api' }) as any;
+      corsLoader.invalidate();
+      await corsLoader.resolve(ctx(DATABASE_ID, routingPool));
+      await corsLoader.resolve(ctx('other-database', otherPool));
+      origins = ['https://preview.example.com', 'https://site.example.com'];
+
+      if (path === 'notification') {
+        const server = Object.create(Server.prototype) as Server;
+        Object.assign(server, { opts: { api: { isPublic: true } } });
+        await server.flush(DATABASE_ID);
+      } else if (path === 'authenticated HTTP') {
+        await createFlushMiddleware(opts(TOKEN))(
+          makeReq('/flush', `Bearer ${TOKEN}`),
+          makeRes(),
+          next
+        );
+      } else {
+        flushAllServices();
+      }
+
+      expect(await corsLoader.resolve(ctx(DATABASE_ID, routingPool))).toEqual(origins);
+      expect(routingPool.query).toHaveBeenCalledTimes(2);
+      await corsLoader.resolve(ctx('other-database', otherPool));
+      expect(otherPool.query).toHaveBeenCalledTimes(path === 'listener reconnect' ? 2 : 1);
+    }
+  );
+
+  it('does not let an unauthenticated flush invalidate the settings loaders', async () => {
+    const routingPool = { query: jest.fn(async () => ({ rows: [{ allowed_origins: ['https://preview.example.com'] }] })) };
+    const ctx = { routingPool, tenantPool: routingPool, databaseId: DATABASE_ID, apiId: 'auth-api' } as any;
+    corsLoader.invalidate();
+    await corsLoader.resolve(ctx);
+    await createFlushMiddleware(opts(TOKEN))(
+      makeReq('/flush', 'Bearer wrong'),
+      makeRes(),
+      next
+    );
+    await corsLoader.resolve(ctx);
+    expect(routingPool.query).toHaveBeenCalledTimes(1);
+  });
 
   it('does not let an unauthenticated flush invalidate storage discovery', async () => {
     const client = {

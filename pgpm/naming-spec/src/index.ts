@@ -133,13 +133,23 @@ const KIND_TOKENS: Partial<Record<ObjectIdentityKind, string>> = {
 };
 
 /**
+ * One path segment from an identifier. Plan lines are whitespace-delimited and
+ * `/` separates segments, so anything outside letters, digits, `_`, `.`, `$`
+ * and `-` (e.g. the spaces in `"Users can view own data"`) collapses to `_`.
+ */
+export function pathSegment(identifier: string): string {
+  return identifier.replace(/[^\p{L}\p{N}_.$-]+/gu, '_');
+}
+
+/**
  * Render an identity to its canonical pgpm change path (naming spec v1).
  * Total and deterministic: every identity gets exactly one path per style.
  */
 export function pathFor(identity: ObjectIdentity, options: PathForOptions = {}): string {
   const style = options.style ?? 'directory';
-  const { kind, name } = identity;
-  const schema = identity.schema ?? 'public';
+  const { kind } = identity;
+  const name = pathSegment(identity.name);
+  const schema = pathSegment(identity.schema ?? 'public');
   const token = style === 'directory' ? KIND_TOKENS[kind] : undefined;
 
   if (kind === 'schema') return `schemas/${name}/schema`;
@@ -149,7 +159,8 @@ export function pathFor(identity: ObjectIdentity, options: PathForOptions = {}):
 
   if (TABLE_SCOPED.has(kind)) {
     const dir = TABLE_DIRS[kind]!;
-    const base = `schemas/${schema}/tables/${identity.table ?? name}/${dir}/${name}`;
+    const table = identity.table === undefined ? name : pathSegment(identity.table);
+    const base = `schemas/${schema}/tables/${table}/${dir}/${name}`;
     return token ? `${base}/${token}` : base;
   }
 

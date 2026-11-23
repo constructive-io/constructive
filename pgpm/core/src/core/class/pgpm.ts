@@ -23,6 +23,7 @@ import { parse } from 'parse-package-name';
 import path, { dirname, resolve } from 'path';
 import { getPgPool } from 'pg-cache';
 import { PgConfig } from 'pg-env';
+import semver from 'semver';
 import yanse from 'yanse';
 
 import { hasApplySpec, readApplySpec } from '../../apply/apply-spec';
@@ -65,6 +66,25 @@ export interface PgpmPackageOptions {
 
 function sortObjectByKey<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) as T;
+}
+
+function readInstalledVersion(dir: string): string {
+  const pkgJsonFile = path.join(dir, 'package.json');
+  if (!fs.existsSync(pkgJsonFile)) {
+    throw new Error(`Missing package.json in installed extension: ${dir}`);
+  }
+  return JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8')).version;
+}
+
+/**
+ * A module that arrives only as another package's dependency must not replace
+ * a module requested by name in the same install, nor downgrade one already
+ * installed: an older copy can drop `requires` edges and change deploy order.
+ */
+function shouldReplaceDependency(pkg: string, version: string, dst: string, pinned: Set<string>): boolean {
+  if (pinned.has(pkg)) return false;
+  if (!fs.existsSync(dst)) return true;
+  return semver.gt(version, readInstalledVersion(dst));
 }
 
 
@@ -1102,6 +1122,9 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
 
     const newlyAdded: string[] = [];
     const installedVersions: Record<string, string> = {};
+    // Packages requested by name in this call: their own version wins over
+    // any version another requested package depends on.
+    const pinned = new Set<string>();
 
     for (const pkgstr of pkgstrs) {
       const { name } = parse(pkgstr);
@@ -1130,14 +1153,23 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           const parts = toPosixPath(extDir).split('node_modules/');
           const relativeDir = parts[parts.length - 1];
           const dstDir = path.join(skitchExtDir, relativeDir);
-          return { src: extDir, dst: dstDir, pkg: relativeDir };
+          return { src: extDir, dst: dstDir, pkg: relativeDir, topLevel: parts.length === 2 };
         });
 
         // Sort deepest paths first so nested node_modules deps are
         // extracted before their parent directories are moved.
         installs.sort((a, b) => toPosixPath(b.src).split('/').length - toPosixPath(a.src).split('/').length);
 
-        for (const { src, dst, pkg } of installs) {
+        for (const { src, dst, pkg, topLevel } of installs) {
+          const version = readInstalledVersion(src);
+          const requested = topLevel && pkg === name;
+
+          if (!requested && !shouldReplaceDependency(pkg, version, dst, pinned)) {
+            logger.info(`kept ${pkg}@${readInstalledVersion(dst)} (a dependency wanted ${version})`);
+            newlyAdded.push(getExtensionName(dst));
+            continue;
+          }
+
           if (fs.existsSync(dst)) {
             fs.rmSync(dst, { recursive: true, force: true });
           }
@@ -1145,14 +1177,9 @@ ${dependencies.length > 0 ? dependencies.map(dep => `-- requires: ${dep}`).join(
           fs.mkdirSync(path.dirname(dst), { recursive: true });
           movePath(src, dst);
           logger.success(`✔ installed ${pkg}`);
-  
-          const pkgJsonFile = path.join(dst, 'package.json');
-          if (!fs.existsSync(pkgJsonFile)) {
-            throw new Error(`Missing package.json in installed extension: ${dst}`);
-          }
-  
-          const { name: installedName, version } = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf-8'));
-          if (installedName === name) {
+
+          if (requested) {
+            pinned.add(pkg);
             installedVersions[name] = `${version}`;
             if (pkgData) {
               pkgData.dependencies[name] = `${version}`;

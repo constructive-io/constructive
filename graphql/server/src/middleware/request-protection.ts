@@ -5,7 +5,7 @@ import type { RequestProtection } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION } from '@constructive-io/express-context';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { respondWithGraphQLError } from '../errors/graphql-response';
+import { respondWithError } from '../errors/graphql-response';
 import { recordRefusal } from '../refusals/recorder';
 
 /**
@@ -21,14 +21,6 @@ const resolveProtection = async (req: Request): Promise<RequestProtection> => {
   const resolved = await req.constructive?.useModule('requestProtection');
   return resolved ?? DEFAULT_REQUEST_PROTECTION;
 };
-
-/**
- * Multipart requests carry file bodies, which are streamed by the upload
- * plugin and bounded by the upload limits rather than by the GraphQL request
- * size: applying a JSON-sized cap to them would reject every upload.
- */
-const isMultipart = (req: Request): boolean =>
-  (req.get('content-type') ?? '').toLowerCase().startsWith('multipart/form-data');
 
 /**
  * Express middleware that resolves request protection and enforces the one
@@ -60,11 +52,11 @@ export const createRequestProtectionMiddleware = (): RequestHandler => {
     const declaredLength = Number(req.get('content-length') ?? '');
     if (
       Number.isFinite(declaredLength) &&
-      declaredLength > protection.maxRequestBytes &&
-      !isMultipart(req)
+      declaredLength > protection.maxRequestBytes
     ) {
       recordRefusal(req, 'request_too_large');
-      respondWithGraphQLError(
+      respondWithError(
+        req,
         res,
         errors.REQUEST_TOO_LARGE({ bytes: declaredLength, limit: protection.maxRequestBytes })
       );

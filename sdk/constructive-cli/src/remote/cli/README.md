@@ -29,6 +29,7 @@ csdk auth set-token <your-token>
 | `machine` | machine CRUD operations |
 | `machine-message` | machineMessage CRUD operations |
 | `machine-session` | machineSession CRUD operations |
+| `current-database-id` | currentDatabaseId |
 | `machines-enroll` | machinesEnroll |
 | `provision-bucket` | Reconcile an S3 bucket for a logical bucket in the database.
 Records the request on the bucket row via RLS; the bucket's job
@@ -145,7 +146,7 @@ CRUD operations for MachineMessage records.
 | `seq` | BigInt |
 | `sessionId` | UUID |
 
-**Required create fields:** `actorId`, `kind`, `seq`, `sessionId`
+**Required create fields:** `actorId`, `entityId`, `kind`, `ownerId`, `seq`, `sessionId`
 **Optional create fields (backend defaults):** `content`, `createdByPrincipal`, `recordedAt`
 
 ### `machine-session`
@@ -194,10 +195,17 @@ CRUD operations for MachineSession records.
 | `updatedBy` | UUID |
 | `updatedByPrincipal` | UUID |
 
-**Required create fields:** `machineId`, `ownerId`
+**Required create fields:** `entityId`, `machineId`, `ownerId`
 **Optional create fields (backend defaults):** `agentMode`, `agentSessionRef`, `args`, `cols`, `command`, `createdBy`, `createdByPrincipal`, `cwd`, `endedAt`, `env`, `exitCode`, `interactive`, `lastActivityAt`, `lastSeq`, `metadata`, `pid`, `runId`, `startedAt`, `state`, `termRows`, `updatedBy`, `updatedByPrincipal`
 
 ## Custom Operations
+
+### `current-database-id`
+
+currentDatabaseId
+
+- **Type:** query
+- **Arguments:** none
 
 ### `machines-enroll`
 

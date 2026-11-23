@@ -2,7 +2,7 @@
  * Server Integration Tests using graphql-server-test
  *
  * All host routing resolves through the scoped routing plane
- * (routing_public.resolve_route); there is no legacy fallback.
+ * (routing_private.resolve_route); there is no legacy fallback.
  * The single-tenant scenario runs against the dev server
  * (server.useRouting: false), which exposes the configured schemas
  * directly with no route resolution.

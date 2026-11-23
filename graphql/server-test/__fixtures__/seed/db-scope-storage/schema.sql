@@ -40,6 +40,7 @@ CREATE TABLE "tess-storage-public".files (
   filename text,
   owner_id uuid,
   is_public boolean NOT NULL DEFAULT false,
+  status text NOT NULL DEFAULT 'requested',
   previous_version_id uuid REFERENCES "tess-storage-public".files(id),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),

@@ -2,7 +2,6 @@ import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
 import { BulkMutationPreset } from 'graphile-bulk-mutations';
 import type { GraphileConfig } from 'graphile-config';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
-import { FunctionFromSourcePreset } from 'graphile-function-source';
 import { HistoryPreset } from 'graphile-history';
 import { I18nPreset } from 'graphile-i18n';
 import { GraphileLlmPreset } from 'graphile-llm';
@@ -12,7 +11,6 @@ import { createPostgisOperatorFactory,GraphilePostgisPreset } from 'graphile-pos
 import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { RealtimeSubscriptionsPreset } from 'graphile-realtime-subscriptions';
 import { createMatchesOperatorFactory, createTrgmOperatorFactories,UnifiedSearchPreset } from 'graphile-search';
-import { UploadPreset } from 'graphile-upload-plugin';
 
 import {
   ConflictDetectorPreset,
@@ -27,7 +25,6 @@ import {
   RequiredInputPreset
 } from '../plugins';
 import { getStorageCredentials } from '../presigned-url-resolver';
-import { constructiveUploadFieldDefinitions } from '../upload-resolver';
 
 /**
  * Feature flags that control which optional Graphile plugins are included
@@ -42,7 +39,6 @@ export interface ConstructivePresetOptions {
   enableAggregates?: boolean;
   enablePostgis?: boolean;
   enableSearch?: boolean;
-  enableDirectUploads?: boolean;
   enablePresignedUploads?: boolean;
   enableManyToMany?: boolean;
   enableConnectionFilter?: boolean;
@@ -76,7 +72,6 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
   enableAggregates: false,
   enablePostgis: true,
   enableSearch: true,
-  enableDirectUploads: true,
   enablePresignedUploads: true,
   enableManyToMany: true,
   enableConnectionFilter: true,
@@ -114,7 +109,6 @@ const DEFAULTS: Required<ConstructivePresetOptions> = {
  * - enableSearch            -> UnifiedSearchPreset (tsvector, BM25, pg_trgm, pgvector)
  * - enablePostgis           -> GraphilePostgisPreset
  * - enableLtree             -> GraphileLtreePreset
- * - enableDirectUploads     -> UploadPreset
  * - enablePresignedUploads  -> PresignedUrlPreset, BucketProvisionerPreset
  * - enableAggregates        -> PgAggregatesPreset (off by default)
  * - enableRealtime          -> RealtimeSubscriptionsPreset (off by default)
@@ -160,8 +154,7 @@ export function createConstructivePreset(
     NoUniqueLookupPreset,
     MetaSchemaPreset,
     PgTypeMappingsPreset,
-    RequiredInputPreset,
-    FunctionFromSourcePreset
+    RequiredInputPreset
   ];
 
   if (opts.enableConnectionFilter) {
@@ -177,7 +170,7 @@ export function createConstructivePreset(
 
   if (opts.enableSearch) {
     presets.push(
-      UnifiedSearchPreset({ fullTextScalarName: 'FullText', tsConfig: 'english' })
+      UnifiedSearchPreset({ fullTextScalarName: 'FullText' })
     );
   }
 
@@ -187,15 +180,6 @@ export function createConstructivePreset(
 
   if (opts.enableLtree) {
     presets.push(GraphileLtreePreset);
-  }
-
-  if (opts.enableDirectUploads) {
-    presets.push(
-      UploadPreset({
-        uploadFieldDefinitions: constructiveUploadFieldDefinitions,
-        maxFileSize: 10 * 1024 * 1024 // 10MB
-      })
-    );
   }
 
   if (opts.enablePresignedUploads) {
@@ -239,7 +223,7 @@ export function createConstructivePreset(
   if (opts.enableConnectionFilter) {
     if (opts.enableSearch) {
       operatorFactories.push(
-        createMatchesOperatorFactory('FullText', 'english'),
+        createMatchesOperatorFactory('FullText'),
         createTrgmOperatorFactories()
       );
     }

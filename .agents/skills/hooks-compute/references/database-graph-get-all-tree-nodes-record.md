@@ -8,7 +8,6 @@ React Query hooks for DatabaseGraphGetAllTreeNodesRecord data operations
 
 ```typescript
 useDatabaseGraphGetAllTreeNodesQuery({ selection: { fields: { data: true, path: true } } })
-useCreateDatabaseGraphGetAllTreeNodesRecordMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateDatabaseGraphGetAllTreeNodesRecordMutation({ selection: { fields: { id:
 const { data, isLoading } = useDatabaseGraphGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
-```
-
-### Create a databaseGraphGetAllTreeNodesRecord
-
-```typescript
-const { mutate } = useCreateDatabaseGraphGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ data: '<JSON>', path: '<String>' });
 ```

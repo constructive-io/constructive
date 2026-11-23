@@ -195,7 +195,7 @@ describe('graphile-history plugin', () => {
   it('reinserts a deleted row when reinsert is requested', async () => {
     // Delete post 2 (trigger records a DELETE tombstone).
     const del = await query(
-      `mutation { deletePostByRowId(input: { rowId: 2 }) { deletedPostId } }`,
+      `mutation { deletePostByRowId(input: { rowId: 2 }) { post { rowId } } }`,
       {},
       true
     );

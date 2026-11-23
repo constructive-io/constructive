@@ -45,11 +45,9 @@ import { getNamedType, isObjectType, Kind, typeFromAST } from 'graphql';
 /**
  * Reject the request with an error the client can act on.
  *
- * The gate runs inside grafast's `prepareArgs`, before execution, where a
- * plain throw is reported as an unknown handler failure: HTTP 500 with the
- * `extensions` dropped. `SafeError` is grafserv's contract for "this message
- * and these extensions are meant for the client", so the registered code,
- * class and HTTP status survive the trip.
+ * Thrown as a `SafeError` carrying the registered code, class and HTTP
+ * status; RequestProtectionPlugin turns it into the operation's result, since
+ * grafserv drops the `extensions` of an error thrown around execution.
  */
 const reject = (error: ConstructiveError): never => {
   throw new SafeError(error.message, {

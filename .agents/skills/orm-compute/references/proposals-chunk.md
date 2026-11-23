@@ -12,7 +12,7 @@ High-dimensional vector columns for semantic similarity search. Query via the Un
 ```typescript
 db.proposalsChunk.findMany({ select: { id: true } }).execute()
 db.proposalsChunk.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.proposalsChunk.create({ data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', proposalsId: '<UUID>', searchScore: '<Float>' }, select: { id: true } }).execute()
+db.proposalsChunk.create({ data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', metadata: '<JSON>', proposalsId: '<UUID>' }, select: { id: true } }).execute()
 db.proposalsChunk.update({ where: { id: '<UUID>' }, data: { actorId: '<UUID>' }, select: { id: true } }).execute()
 db.proposalsChunk.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -31,7 +31,7 @@ const items = await db.proposalsChunk.findMany({
 
 ```typescript
 const item = await db.proposalsChunk.create({
-  data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', proposalsId: '<UUID>', searchScore: '<Float>' },
+  data: { actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', metadata: '<JSON>', proposalsId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

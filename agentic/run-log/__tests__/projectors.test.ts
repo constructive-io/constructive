@@ -25,6 +25,7 @@ import {
   futureEntry,
   header,
   resetIds,
+  systemMessage,
   toolResult,
   usage,
   userMessage
@@ -115,6 +116,11 @@ describe('projectParts', () => {
     expect(parts[3]).toMatchObject({ customType: 'constructive.note', text: 'heads up', display: true });
     expect(parts[4]).toMatchObject({ reason: 'compaction', summary: 'summary so far' });
     expect(parts[5]).toMatchObject({ reason: 'branch', summary: 'branched' });
+  });
+
+  it('renders no part for a system message', () => {
+    const { parts } = projectParts(recordsOf(systemMessage(), userMessage('hi'), systemMessage(3)));
+    expect(parts).toEqual([expect.objectContaining({ kind: 'text', role: 'user', text: 'hi' })]);
   });
 
   it('surfaces an entry type it does not understand instead of dropping it', () => {
@@ -238,6 +244,12 @@ describe('projectSession', () => {
     expect(entries[0]).toMatchObject({ type: 'session', id: 'session-1' });
     expect(jsonl.endsWith('\n')).toBe(true);
     expect(parseSessionJsonl(jsonl)).toEqual(entries);
+  });
+
+  it('keeps system messages, so the resumed parent chain stays whole', () => {
+    const system = systemMessage();
+    const { entries } = projectSession(recordsOf(header(), system, userMessage('hi')));
+    expect(entries[1]).toEqual(system);
   });
 
   it('synthesises a header when the log has none', () => {

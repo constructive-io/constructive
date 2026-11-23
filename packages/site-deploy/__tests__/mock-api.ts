@@ -31,7 +31,7 @@ export interface MockServer {
   api: GraphQLExecutor;
   putObject: PutObject;
   calls: MockCall[];
-  puts: { url: string; size: number; contentType: string }[];
+  puts: { url: string; size: number; contentType: string; headers?: Record<string, string> }[];
   stored: Set<string>;
   release: { id: string; commitId: string; storeId: string; manifest: ReleaseManifest } | null;
   activeCommitId: string | null;
@@ -69,8 +69,9 @@ export function createMockServer(options: MockServerOptions = {}): MockServer {
       }
       return handle(operation, variables);
     },
-    putObject: async (url, body, contentType) => {
-      server.puts.push({ url, size: body.byteLength, contentType });
+    putObject: async (url, body, contentType, _signal, _contentHash, headers) => {
+      assertSignedHeaders(url, headers);
+      server.puts.push({ url, size: body.byteLength, contentType, headers });
       stored.add(url.slice(url.lastIndexOf('/') + 1));
     },
     countOf: (operation) => server.calls.filter((call) => call.operation === operation).length,
@@ -94,6 +95,7 @@ export function createMockServer(options: MockServerOptions = {}): MockServer {
               key,
               deduplicated,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
+              uploadHeaders: deduplicated ? null : signedHeaders(file),
             };
           }),
         },
@@ -172,4 +174,21 @@ export function keyOf(body: string): string {
 /** The hash of a body, as the bucket's dedupe set records it. */
 export function hashOf(body: string): string {
   return hashBytes(new TextEncoder().encode(body));
+}
+
+/** What the presigned-url plugin returns: the headers the URL is signed over. */
+function signedHeaders(file: { contentHash: string; contentType: string }): Record<string, string> {
+  return {
+    'Content-Type': file.contentType,
+    'x-amz-checksum-sha256': Buffer.from(file.contentHash, 'hex').toString('base64'),
+    'x-amz-meta-upload-id': `file-${file.contentHash.slice(0, 8)}`,
+  };
+}
+
+/** A PUT without every signed header fails the signature, as S3 does. */
+export function assertSignedHeaders(url: string, headers: Record<string, string> | undefined): void {
+  const hash = url.slice(url.lastIndexOf('/') + 1);
+  if (headers?.['x-amz-meta-upload-id'] !== `file-${hash.slice(0, 8)}`) {
+    throw new Error('SignatureDoesNotMatch: missing signed header: x-amz-meta-upload-id');
+  }
 }

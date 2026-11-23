@@ -3,7 +3,6 @@
  *
  * Provides per-table S3 storage middleware for PostGraphile v5:
  * - Upload fields on @storageBuckets types (requestUploadUrl, requestBulkUploadUrls)
- * - Delete middleware on @storageFiles tables (S3 cleanup on delete)
  * - downloadUrl computed field on @storageFiles types
  *
  * @example
@@ -23,26 +22,19 @@
  */
 
 export { createBulkLimitPlugin } from './bulk-limit-field';
-export {
-  CONFIRM_PREFIX_BYTES,
-  confirmUploadedBytes,
-  type ConfirmUploadInput,
-  type ConfirmUploadVerdict,
-} from './confirm-upload';
 export { validateCustomKey } from './custom-key';
 export type { ResolvedBucketCoordinate } from './default-bucket';
 export { resolveDefaultBucket } from './default-bucket';
 export { createDownloadUrlPlugin } from './download-url-field';
-export type { FileRefFieldBinding } from './file-ref-registry';
-export { clearFileRefFieldCache, FileRefFieldNotRegisteredError, getFileRefFieldBinding } from './file-ref-registry';
+export { buildFileProjection, type FileProjection } from './file-projection';
 export {
-  assertUploadAllowedByBucket,
-  buildFileProjection,
-  type FileProjection,
-  finalizeStagedUpload,
-  type ManagedUploadTarget,
-  resolveManagedUploadTarget,
-} from './managed-upload';
+  createFileRefUrlsPlugin,
+  type FileVersion,
+  isVersionKeyOf,
+  ownVersions,
+  pickUrl,
+  type ResolvedFile,
+} from './file-ref-urls';
 export {
   assertBucketReconciled,
   resolveS3ForDatabase,
@@ -53,7 +45,18 @@ export {
 export { createPresignedUrlPlugin,PresignedUrlPlugin } from './plugin';
 export { PresignedUrlPreset } from './preset';
 export { describeS3Failure, s3FailureError } from './s3-failure';
-export { copyS3Object, deleteS3Object, generatePresignedGetUrl, generatePresignedPutUrl, headObject, readObjectPrefix } from './s3-signer';
+export {
+  CHECKSUM_SHA256_HEADER,
+  checksumSha256Base64,
+  copyS3Object,
+  deleteS3Object,
+  generatePresignedGetUrl,
+  generatePresignedPutUrl,
+  headObject,
+  presignedPutHeaders,
+  UPLOAD_ID_HEADER,
+  UPLOAD_ID_METADATA_KEY,
+} from './s3-signer';
 export { clearBucketCache, clearStorageModuleCache, getBucketConfig, loadAllStorageModules,resolveStorageConfigFromCodec, resolveStorageModuleByFileId } from './storage-module-cache';
 export type {
   BucketConfig,

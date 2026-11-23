@@ -1,9 +1,11 @@
+import type { Pool } from 'pg';
+
 import { buildPgSettings } from '../src/pg-settings';
 import type { ApiStructure, ConstructiveAPIToken } from '../src/types';
 
 const api: ApiStructure = {
   apiId: '6c9997a4-591b-4cb3-9313-4ef45d6f134e',
-  dbname: 'testdb',
+  tenantPool: {} as Pool,
   anonRole: 'anonymous',
   roleName: 'authenticated',
   schema: ['public'],
@@ -82,5 +84,28 @@ describe('buildPgSettings — agent-auth claims (intent, session lineage)', () =
     expect(settings).not.toHaveProperty('jwt.claims.root_session_id');
     expect(settings).not.toHaveProperty('jwt.claims.parent_session_id');
     expect(settings).not.toHaveProperty('jwt.claims.intent');
+  });
+});
+
+describe('buildPgSettings — jwt.claims.principal_id', () => {
+  it('names the user as the acting principal of an ordinary session', () => {
+    const token = { user_id: 'u1' } as ConstructiveAPIToken;
+    const settings = buildPgSettings({ api, token, requestId: 'r1' });
+
+    expect(settings['jwt.claims.principal_id']).toBe('u1');
+  });
+
+  it('keeps the principal a credential names over its user', () => {
+    const token = { user_id: 'u1', principal_id: 'p1' } as ConstructiveAPIToken;
+    const settings = buildPgSettings({ api, token, requestId: 'r1' });
+
+    expect(settings['jwt.claims.user_id']).toBe('u1');
+    expect(settings['jwt.claims.principal_id']).toBe('p1');
+  });
+
+  it('sets no principal for an anonymous request', () => {
+    const settings = buildPgSettings({ api, token: null, requestId: 'r1' });
+
+    expect(settings['jwt.claims.principal_id']).toBeUndefined();
   });
 });

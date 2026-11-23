@@ -24,6 +24,11 @@ export interface ServerOptions {
    */
   useRouting?: boolean;
   /**
+   * `SERVER_TRUST_PROXY`: one proxy of our own sits in front, so the entry it
+   * appended to `X-Forwarded-For` is the client. Production-server suites only.
+   */
+  trustProxy?: boolean;
+  /**
    * API configuration options for the GraphQL server.
    * These options control how the server handles requests and which features are enabled.
    *

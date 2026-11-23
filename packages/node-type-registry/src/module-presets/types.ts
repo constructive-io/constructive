@@ -87,7 +87,6 @@ export type StorageModuleOptions = BaseModuleOptions & {
   has_content_hash?: boolean;
   has_custom_keys?: boolean;
   has_audit_log?: boolean;
-  has_confirm_upload?: boolean;
   /** Postgres interval literal, e.g. '30 seconds'. */
   confirm_upload_delay?: string;
   /** Provision a temp staging bucket that stages for the private default. */

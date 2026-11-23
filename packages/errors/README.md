@@ -14,7 +14,8 @@ service or client without pulling in pgpm.
 - **`errors.*` factory** — type-safe throwable builders derived from the
   registry, e.g. `throw errors.MODULE_NOT_FOUND({ name })`.
 - **`classify(code)`** — `public` or `internal`; unknown codes are `internal`
-  (fail safe) so transports never leak unregistered errors.
+  (fail safe). This is the fallback only: `parse()` trusts the class the
+  producer sent (`DETAIL.class`, `extensions.class`) before the registry.
 - **`httpStatusFor(code)`** — the canonical code → HTTP status mapping, so no
   transport keeps its own table. Unregistered codes answer `500` *and are
   reported*, never silently.
@@ -47,7 +48,10 @@ throw errors.ACCOUNT_EXISTS();
   - **Curated** (`src/registry.ts`) — refined, typed-context entries for the codes
     that matter most (public auth/limit copy, native PostgreSQL constraint codes,
     pgpm CLI codes). These override the generated entries.
-- Unregistered codes still `parse()` and are classified `internal` (masked).
+- Unregistered codes still `parse()`. One the database raised with an explicit
+  class keeps that class, so the GraphQL server passes it through with its
+  code, class and context; without a class it is `internal`. Either way it has
+  no registry copy and no HTTP status (`500`, reported).
 
 ## HTTP status
 
@@ -93,6 +97,14 @@ class from each canonical `errors.raise_error('CODE', context, 'class')` call �
 database is the source of truth for classification, so an explicit class is trusted
 directly; codes without one (e.g. single-arg calls relying on the helper default, or
 legacy `RAISE EXCEPTION`) fall back to a name-based heuristic.
+
+A generator often hands the code to a raise helper instead of spelling it at the
+raise (`wrong_status_code := 'FILE_STATUS_INVALID'` at the caller,
+`raise_error(wrong_status_code, …, 'internal')` in the helper). The audit resolves
+those too: it finds the parameters that reach a raise, then collects the codes
+passed to them by name, as a parameter default, as a jsonb `'error_code'`, or as
+the prefix of `raise_error(prefix || '_SUFFIX', …)`. A code built any other way at
+runtime is still invisible to it.
 `generate-registry.py` reads that snapshot and, when a
 `constructive-io/dashboard` checkout is found (via `DASHBOARD_DIR` or a sibling
 `../dashboard`), seeds public copy from its error catalogs. Re-run both whenever

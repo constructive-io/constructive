@@ -1,4 +1,4 @@
-import { clientIpFrom, ConcurrencyLimiter, RateWindow } from '../src/admission';
+import { clientIpFrom, ConcurrencyLimiter, RateWindow, trustedProxyHops } from '../src/admission';
 
 // ─── Concurrency ────────────────────────────────────────────────────────────
 
@@ -100,6 +100,41 @@ describe('ConcurrencyLimiter', () => {
     // The next arrival gets the slot straight away.
     const lease = await limiter.acquire('db', { limit: 1, queueWaitMs: 0 });
     expect(lease.granted).toBe(true);
+  });
+
+  it('drops a waiter whose caller gave up, and never hands it the slot', async () => {
+    const limiter = new ConcurrencyLimiter();
+    const held = await limiter.acquire('db', { limit: 1, queueWaitMs: 1_000 });
+
+    const gone = new AbortController();
+    const waiting = limiter.acquire('db', { limit: 1, queueWaitMs: 1_000, signal: gone.signal });
+    expect(limiter.queuedFor('db')).toBe(1);
+
+    gone.abort();
+    const refused = await waiting;
+    expect(refused.granted).toBe(false);
+    expect(refused.refusal).toBe('aborted');
+    expect(limiter.queuedFor('db')).toBe(0);
+
+    held.release();
+    expect(limiter.activeFor('db')).toBe(0);
+
+    const lease = await limiter.acquire('db', { limit: 1, queueWaitMs: 0 });
+    expect(lease.granted).toBe(true);
+  });
+
+  it('refuses at once when the caller had already given up', async () => {
+    const limiter = new ConcurrencyLimiter();
+    const held = await limiter.acquire('db', { limit: 1, queueWaitMs: 1_000 });
+
+    const gone = new AbortController();
+    gone.abort();
+    const refused = await limiter.acquire('db', { limit: 1, queueWaitMs: 1_000, signal: gone.signal });
+    expect(refused.granted).toBe(false);
+    expect(refused.refusal).toBe('aborted');
+    expect(limiter.queuedFor('db')).toBe(0);
+
+    held.release();
   });
 
   it('counts each database separately', async () => {
@@ -243,5 +278,31 @@ describe('clientIpFrom', () => {
 
   it('reports an unknown peer rather than throwing', () => {
     expect(clientIpFrom({ headers: {}, socket: {} }, 0)).toBe('unknown');
+  });
+});
+
+describe('trustedProxyHops', () => {
+  const saved = process.env.TRUSTED_PROXY_HOPS;
+  afterEach(() => {
+    if (saved === undefined) delete process.env.TRUSTED_PROXY_HOPS;
+    else process.env.TRUSTED_PROXY_HOPS = saved;
+  });
+
+  it('is null when unset, empty or not a count', () => {
+    for (const value of [undefined, '', '  ', 'abc', '-1']) {
+      if (value === undefined) delete process.env.TRUSTED_PROXY_HOPS;
+      else process.env.TRUSTED_PROXY_HOPS = value;
+      expect(trustedProxyHops()).toBeNull();
+    }
+  });
+
+  it('keeps an explicit 0 as 0', () => {
+    process.env.TRUSTED_PROXY_HOPS = '0';
+    expect(trustedProxyHops()).toBe(0);
+  });
+
+  it('reads a positive count', () => {
+    process.env.TRUSTED_PROXY_HOPS = '2';
+    expect(trustedProxyHops()).toBe(2);
   });
 });

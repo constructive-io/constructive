@@ -16,6 +16,8 @@ import {
   getReadmeHeader,
 } from '../docs-utils';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getPrimaryKeyInfo,
   getScalarFields,
   getTableNames,
@@ -132,13 +134,15 @@ export function generateReadme(
         lines.push(`| \`search <query>\` | Search ${singularName} records |`);
       }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
-      lines.push(`| \`create\` | Create a new ${singularName} |`);
+      if (table.query?.create !== null) {
+        lines.push(`| \`create\` | Create a new ${singularName} |`);
+      }
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
       }
-      if (table.query?.bulkUpsert) {
+      if (getBulkUpsertMutationName(table)) {
         lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
       }
       if (table.query?.bulkUpdate) {
@@ -170,7 +174,7 @@ export function generateReadme(
       }
       const specialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(specialGroups));
-      lines.push(...buildSearchExamplesMarkdown(specialGroups, toolName, kebab));
+      lines.push(...buildSearchExamplesMarkdown(specialGroups, toolName, kebab, table));
       lines.push('');
     }
   }
@@ -469,11 +473,11 @@ export function generateSkills(
             ? [`${toolName} ${kebab} search <query>`]
             : []),
           `${toolName} ${kebab} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
-          `${toolName} ${kebab} create ${createFlags}`,
+          ...(table.query?.create !== null ? [`${toolName} ${kebab} create ${createFlags}`] : []),
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
           `${toolName} ${kebab} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
-          ...(table.query?.bulkInsert ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
-          ...(table.query?.bulkUpsert ? [`${toolName} ${kebab} bulk-upsert --data '<JSON array>'`] : []),
+          ...(getBulkInsertMutationName(table) ? [`${toolName} ${kebab} bulk-create --data '<JSON array>'`] : []),
+          ...(getBulkUpsertMutationName(table) ? [`${toolName} ${kebab} bulk-upsert --data '<JSON array>'`] : []),
           ...(table.query?.bulkUpdate ? [`${toolName} ${kebab} bulk-update --where '<JSON>' --data '<JSON>'`] : []),
           ...(table.query?.bulkDelete ? [`${toolName} ${kebab} bulk-delete --where '<JSON>'`] : []),
         ],
@@ -502,13 +506,15 @@ export function generateSkills(
             description: `List ${singularName} records with filtering and ordering`,
             code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
           },
-          ...buildSearchExamples(skillSpecialGroups, toolName, kebab),
-          {
-            description: `Create a ${singularName}`,
-            code: [
-              `${toolName} ${kebab} create ${createFlags}`,
-            ],
-          },
+          ...buildSearchExamples(skillSpecialGroups, toolName, kebab, table),
+          ...(table.query?.create !== null
+            ? [{
+              description: `Create a ${singularName}`,
+              code: [
+                `${toolName} ${kebab} create ${createFlags}`,
+              ],
+            }]
+            : []),
           {
             description: `Get a ${singularName} by ${pk.name}`,
             code: [`${toolName} ${kebab} get --${pk.name} <value>`],
@@ -808,10 +814,10 @@ export function generateMultiTargetReadme(
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
       lines.push(`| \`delete\` | Delete a ${singularName} |`);
-      if (table.query?.bulkInsert) {
+      if (getBulkInsertMutationName(table)) {
         lines.push(`| \`bulk-create\` | Bulk create ${singularName} records |`);
       }
-      if (table.query?.bulkUpsert) {
+      if (getBulkUpsertMutationName(table)) {
         lines.push(`| \`bulk-upsert\` | Bulk upsert ${singularName} records |`);
       }
       if (table.query?.bulkUpdate) {
@@ -842,7 +848,7 @@ export function generateMultiTargetReadme(
       }
       const mtSpecialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(mtSpecialGroups));
-      lines.push(...buildSearchExamplesMarkdown(mtSpecialGroups, toolName, `${tgt.name}:${kebab}`));
+      lines.push(...buildSearchExamplesMarkdown(mtSpecialGroups, toolName, `${tgt.name}:${kebab}`, table));
       lines.push('');
     }
 
@@ -1237,7 +1243,7 @@ export function generateMultiTargetSkills(
               description: `List ${singularName} records with filtering and ordering`,
               code: [`${toolName} ${cmd} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
             },
-            ...buildSearchExamples(mtSkillSpecialGroups, toolName, cmd),
+            ...buildSearchExamples(mtSkillSpecialGroups, toolName, cmd, table),
             {
               description: `Create a ${singularName}`,
               code: [

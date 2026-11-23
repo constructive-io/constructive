@@ -26,6 +26,7 @@ export {
 } from './categorize';
 export type { ConstraintNode } from './constraint-names';
 export { defaultConstraintName, firstColumnRef } from './constraint-names';
+export { classifyStatements, identityOf } from './facts';
 export type {
   ClosureChange,
   ClosureInputChange,
@@ -92,6 +93,7 @@ export type {
   ChangeSatisfaction,
   DiffInputChange,
   ObjectDelta,
+  RenameDeclaration,
   SemanticDeltaChange,
   SemanticDiffOptions,
   SemanticDiffResult,
@@ -100,7 +102,9 @@ export type {
 export {
   coverChanges,
   diffChangeSets,
+  DiffPolicyError,
   diffSchemas,
+  parseRenameDeclaration,
 } from './semantic-diff-driver';
 export { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 export * from '@pgsql/transform';

@@ -59,6 +59,11 @@ function addVariable(
   variables[spec.varName] = spec.value;
 }
 
+function buildValueAst(value: unknown): import('graphql').ValueNode {
+  if (typeof value === 'number') return t.intValue({ value: value.toString() });
+  return t.stringValue({ value: String(value) });
+}
+
 function buildSelections(
   select: Record<string, unknown> | undefined,
   connectionFieldsMap?: Record<string, Record<string, string>>,
@@ -79,11 +84,31 @@ function buildSelections(
     if (typeof value === 'object' && value !== null) {
       const nested = value as {
         select?: Record<string, unknown>;
+        args?: Record<string, unknown>;
         first?: number;
         filter?: Record<string, unknown>;
         orderBy?: string[];
         connection?: boolean;
       };
+      if (nested.args && typeof nested.args === 'object') {
+        const fieldArgs = Object.entries(nested.args).map(
+          ([argName, argValue]) =>
+            t.argument({ name: argName, value: buildValueAst(argValue) }),
+        );
+        const subSelections = nested.select
+          ? buildSelections(nested.select, connectionFieldsMap)
+          : [];
+        fields.push(
+          t.field({
+            name: key,
+            args: fieldArgs.length ? fieldArgs : undefined,
+            selectionSet: subSelections.length
+              ? t.selectionSet({ selections: subSelections })
+              : undefined,
+          }),
+        );
+        continue;
+      }
       if (!nested.select || typeof nested.select !== 'object') {
         throw new Error(
           `Invalid selection for field "${key}": nested selections must include a "select" object.`,
@@ -524,6 +549,28 @@ describe('query-builder', () => {
       const authorSelections = result[1].selectionSet
         ?.selections as FieldNode[];
       expect(authorSelections[0].name.value).toBe('id');
+    });
+
+    it('keeps sub-selections of an object returned by a field with arguments', () => {
+      const result = buildSelections({
+        thumbnail: {
+          args: { width: 200 },
+          select: { url: true, source: { select: { key: true } } },
+        },
+      });
+
+      const document = t.document({
+        definitions: [
+          t.operationDefinition({
+            operation: OP_QUERY,
+            name: 'Q',
+            selectionSet: t.selectionSet({ selections: result }),
+          }),
+        ],
+      });
+      expect(print(document).replace(/\s+/g, ' ')).toContain(
+        'thumbnail(width: 200) { url source { key } }',
+      );
     });
   });
 

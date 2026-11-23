@@ -30,7 +30,7 @@ function createMetaSchemaType(): GraphQLObjectType {
   const MetaScalarEncodingType = new GraphQLObjectType({
     name: 'MetaScalarEncoding',
     description:
-      'How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.',
+      'How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.',
     fields: () => ({
       kind: {
         type: nn(GraphQLString),
@@ -41,7 +41,11 @@ function createMetaSchemaType(): GraphQLObjectType {
       dimensions: { type: GraphQLInt, description: "For 'vector': declared length, else null." },
       geometrySubtype: { type: GraphQLString, description: "For 'geojson': Point/LineString/Polygon/…, else null." },
       srid: { type: GraphQLInt, description: "For 'geojson': spatial reference id, else null." },
-      dotPath: { type: GraphQLBoolean, description: "For 'ltree': values are dot-separated path strings." }
+      dotPath: {
+        type: GraphQLBoolean,
+        description:
+          "For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c')."
+      }
     })
   });
 
@@ -55,9 +59,53 @@ function createMetaSchemaType(): GraphQLObjectType {
       isNotNull: { type: GraphQLBoolean },
       hasDefault: { type: GraphQLBoolean },
       subtype: { type: GraphQLString },
+      maxLength: {
+        type: GraphQLInt,
+        description:
+          'Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded.'
+      },
+      precision: {
+        type: GraphQLInt,
+        description: 'Most significant digits a decimal number may hold. Null when unbounded.'
+      },
+      scale: {
+        type: GraphQLInt,
+        description: 'Digits a decimal number keeps after the decimal point. Null when unbounded.'
+      },
       encoding: {
         type: MetaScalarEncodingType,
         description: 'Scalar serialization contract (null for plain scalars)'
+      }
+    })
+  });
+
+  const MetaFileFieldType = new GraphQLObjectType({
+    name: 'MetaFileField',
+    description: 'How a field holds files',
+    fields: () => ({
+      kind: {
+        type: nn(GraphQLString),
+        description:
+          'image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.'
+      },
+      isMultiple: {
+        type: nn(GraphQLBoolean),
+        description: 'Whether the field holds a list of files'
+      },
+      filesType: {
+        type: GraphQLString,
+        description:
+          'GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise'
+      },
+      bucketKey: {
+        type: GraphQLString,
+        description:
+          'Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one'
+      },
+      isPublic: {
+        type: GraphQLBoolean,
+        description:
+          'Whether the bound bucket must be public (true) or private (false); null when the binding does not say'
       }
     })
   });
@@ -89,7 +137,34 @@ function createMetaSchemaType(): GraphQLObjectType {
       isPrimaryKey: { type: nn(GraphQLBoolean) },
       isForeignKey: { type: nn(GraphQLBoolean) },
       description: { type: GraphQLString },
-      enumValues: { type: MetaEnumType, description: 'Enum metadata if this field has an enum type' }
+      enumValues: { type: MetaEnumType, description: 'Enum metadata if this field has an enum type' },
+      // Public copy: describe what a client may rely on, never how it is derived.
+      allowedValues: {
+        type: new GraphQLList(nn(GraphQLString)),
+        description:
+          "Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only."
+      },
+      isRequiredOnCreate: {
+        type: GraphQLBoolean,
+        description: "Whether a create must provide this field. Set on a table's own fields only."
+      },
+      isWritableOnCreate: {
+        type: GraphQLBoolean,
+        description: "Whether a create may set this field. Set on a table's own fields only."
+      },
+      isWritableOnUpdate: {
+        type: GraphQLBoolean,
+        description: "Whether an update may change this field. Set on a table's own fields only."
+      },
+      isComputed: {
+        type: GraphQLBoolean,
+        description:
+          "Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only."
+      },
+      file: {
+        type: MetaFileFieldType,
+        description: "Set when the field holds files; null otherwise. Set on a table's own fields only."
+      }
     })
   });
 
@@ -156,7 +231,7 @@ function createMetaSchemaType(): GraphQLObjectType {
 
   const MetaInflectionType = new GraphQLObjectType({
     name: 'MetaInflection',
-    description: 'Table inflection names',
+    description: 'Type and field names generated for this table',
     fields: () => ({
       tableType: { type: nn(GraphQLString) },
       allRows: { type: nn(GraphQLString) },
@@ -193,6 +268,10 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
+      refKeys: {
+        type: nnList(MetaFieldType),
+        description: 'Fields on the referenced table that keys point at, in the same order as keys'
+      },
       references: { type: nn(MetaRefTableType) }
     })
   });
@@ -205,6 +284,10 @@ function createMetaSchemaType(): GraphQLObjectType {
       isUnique: { type: nn(GraphQLBoolean) },
       type: { type: GraphQLString },
       keys: { type: nnList(MetaFieldType) },
+      remoteKeys: {
+        type: nnList(MetaFieldType),
+        description: 'Fields on the related table that point at this table, in the same order as keys'
+      },
       referencedBy: { type: nn(MetaRefTableType) }
     })
   });
@@ -240,7 +323,7 @@ function createMetaSchemaType(): GraphQLObjectType {
 
   const MetaStorageUploadType = new GraphQLObjectType({
     name: 'MetaStorageUpload',
-    description: 'The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from',
+    description: 'The upload mutations and types for a storage table pair',
     fields: () => ({
       mutation: { type: nn(GraphQLString), description: 'Root mutation field for single-file upload (e.g. uploadAppFile)' },
       inputType: { type: nn(GraphQLString), description: 'Input type of the single upload mutation' },
@@ -250,7 +333,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       bulkPayloadType: { type: nn(GraphQLString), description: 'Payload type of the bulk upload mutation' },
       bulkFileInputType: { type: nn(GraphQLString), description: 'Per-file input type inside the bulk input' },
       bulkFilePayloadType: { type: nn(GraphQLString), description: 'Per-file payload type inside the bulk payload' },
-      requiresOwnerId: { type: nn(GraphQLBoolean), description: 'Whether the upload input requires ownerId (entity-keyed plane)' }
+      requiresOwnerId: { type: nn(GraphQLBoolean), description: 'Whether the upload input requires ownerId' }
     })
   });
 
@@ -260,16 +343,16 @@ function createMetaSchemaType(): GraphQLObjectType {
     fields: () => ({
       isFilesTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage files table' },
       isBucketsTable: { type: nn(GraphQLBoolean), description: 'Whether this table is a storage buckets table' },
-      filesType: { type: nn(GraphQLString), description: 'GraphQL type name of the plane\'s files table' },
-      bucketsType: { type: nn(GraphQLString), description: 'GraphQL type name of the plane\'s buckets table' },
+      filesType: { type: nn(GraphQLString), description: 'GraphQL type name of the paired files table' },
+      bucketsType: { type: nn(GraphQLString), description: 'GraphQL type name of the paired buckets table' },
       downloadUrlField: { type: GraphQLString, description: 'Computed download-URL field on the files type; null on the buckets side' },
-      upload: { type: nn(MetaStorageUploadType), description: 'The plane\'s GraphQL upload surface' }
+      upload: { type: nn(MetaStorageUploadType), description: 'Upload mutations and types for this storage' }
     })
   });
 
   const MetaSearchConfigType = new GraphQLObjectType({
     name: 'MetaSearchConfig',
-    description: 'Per-table search configuration from @searchConfig smart tag',
+    description: 'Per-table search configuration',
     fields: () => ({
       weights: {
         type: GraphQLString,
@@ -315,7 +398,7 @@ function createMetaSchemaType(): GraphQLObjectType {
 
   const MetaI18nType = new GraphQLObjectType({
     name: 'MetaI18n',
-    description: 'i18n metadata for a table with @i18n tag',
+    description: 'i18n metadata for a translatable table',
     fields: () => ({
       translationTable: { type: nn(GraphQLString), description: 'Name of the translation table' },
       translatableFields: { type: nnList(MetaI18nFieldType), description: 'Fields that are translatable' }
@@ -324,7 +407,7 @@ function createMetaSchemaType(): GraphQLObjectType {
 
   const MetaRealtimeType = new GraphQLObjectType({
     name: 'MetaRealtime',
-    description: 'Realtime metadata for a table with @realtime tag',
+    description: 'Realtime metadata for a table with change subscriptions',
     fields: () => ({
       subscriptionFieldName: { type: nn(GraphQLString), description: 'The generated subscription field name (e.g. onPostChanged)' }
     })
@@ -336,9 +419,9 @@ function createMetaSchemaType(): GraphQLObjectType {
     fields: () => ({
       scope: { type: nn(GraphQLString), description: "Provisioning scope: 'platform', 'app', 'database', or an entity scope (e.g. 'org')" },
       tier: { type: nn(GraphQLString), description: "Coarse bucket: 'global', 'database', or 'entity'" },
-      keyColumn: { type: GraphQLString, description: 'Inflected scope key column (e.g. databaseId, orgId), null for global tiers' },
-      entityTable: { type: GraphQLString, description: 'SQL name of the entity table for entity scopes, else null' },
-      source: { type: nn(GraphQLString), description: "Provenance of the scope metadata (always 'smartTag')" }
+      keyColumn: { type: GraphQLString, description: 'Field name of the scope key (e.g. databaseId, orgId), null for global tiers' },
+      entityTable: { type: GraphQLString, description: 'Name of the entity table for entity scopes, else null' },
+      source: { type: nn(GraphQLString), description: 'Where this scope metadata comes from' }
     })
   });
 
@@ -355,6 +438,14 @@ function createMetaSchemaType(): GraphQLObjectType {
         description: 'PostgreSQL table name'
       },
       schemaName: { type: nn(GraphQLString) },
+      kind: {
+        type: nn(GraphQLString),
+        description: "'table' when rows are stored in this table, 'view' when they come from a view of other tables"
+      },
+      description: {
+        type: GraphQLString,
+        description: 'Description written for this table, or null'
+      },
       fields: { type: nnList(MetaFieldType) },
       indexes: { type: nnList(MetaIndexType) },
       constraints: { type: nn(MetaConstraintsType) },
@@ -366,9 +457,14 @@ function createMetaSchemaType(): GraphQLObjectType {
       query: { type: nn(MetaQueryType) },
       storage: { type: MetaStorageType, description: 'Storage metadata (null if not a storage table)' },
       search: { type: MetaSearchType, description: 'Search metadata (null if no search configured)' },
-      i18n: { type: MetaI18nType, description: 'i18n metadata (null if no @i18n tag)' },
-      realtime: { type: MetaRealtimeType, description: 'Realtime metadata (null if no @realtime tag)' },
-      scope: { type: MetaScopeType, description: 'Provisioning scope metadata (null if no @scope tag)' }
+      i18n: { type: MetaI18nType, description: 'i18n metadata (null if the table is not translatable)' },
+      realtime: { type: MetaRealtimeType, description: 'Realtime metadata (null if the table has no change subscriptions)' },
+      scope: { type: MetaScopeType, description: 'Provisioning scope metadata (null if the table has no scope)' },
+      isJunction: {
+        type: nn(GraphQLBoolean),
+        description:
+          'Whether this table only links rows of two other tables; the link appears in their manyToMany relations'
+      }
     })
   });
 

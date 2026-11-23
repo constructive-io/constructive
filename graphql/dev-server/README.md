@@ -39,7 +39,7 @@ await server.stop();
 
 ## What it does
 
-- Builds a Constructive-style PostGraphile v5 preset via `createConstructivePreset()`, so all the standard presets (connection filters, search, PostGIS, ltree, direct uploads, meta-schema, inflection, type mappings, etc.) are baked in automatically.
+- Builds a Constructive-style PostGraphile v5 preset via `createConstructivePreset()`, so all the standard presets (connection filters, search, PostGIS, ltree, meta-schema, inflection, type mappings, etc.) are baked in automatically.
 - Serves the schemas in `api.exposedSchemas` from a single database.
 - Runs every request as one fixed role (`api.roleName` → `api.anonRole` → `pg.user`). There is no per-request auth and no routing.
 - Exposes `/healthz`, `/graphql`, and `/graphiql`.
@@ -51,7 +51,7 @@ The following plugin groups resolve per-tenant configuration from a `database_id
 - **Presigned uploads / bucket provisioner** (`enablePresignedUploads: false`) — resolve per-tenant storage config keyed by `database_id`.
 - **LLM** (`enableLlm: false`) — resolves per-tenant billing / inference-log config keyed by `database_id`.
 
-Direct uploads stay enabled: they stream to a fixed, env-configured bucket and need no `database_id`.
+The dev server therefore has no upload path; uploads are presigned and resolve the tenant's storage module.
 
 ## Configuration
 

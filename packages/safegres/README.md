@@ -14,14 +14,15 @@
 
 <p align="center"><strong>Safe <em>and</em> fast Postgres. Graded.</strong></p>
 
-safegres is a static analyzer for a live PostgreSQL database. It reads the system catalog and
-parses every policy predicate and function body into an AST, then answers two questions the
-catalog already contains the answers to — *who can actually reach this row*, and *what does
-checking that cost per row* — and scores them on **two independent axes**.
+## Agent skill
 
-Two scores, never mixed. Hardening a table can't show up as a performance regression; adding an
-index can't show up as a security win. That is the whole design: the trade you make between them
-becomes visible instead of netting out to a single number.
+The fastest start: give your coding agent the safegres skill and ask it to audit your database.
+
+```bash
+npx skills add constructive-io/constructive --skill safegres
+```
+
+## Install
 
 ```bash
 npm i -D safegres
@@ -80,6 +81,15 @@ Also available as `--format json`, `json-pretty`, `markdown` (job summaries and 
 
 ## How it works
 
+safegres is a static analyzer for a live PostgreSQL database. It reads the system catalog and
+parses every policy predicate and function body into an AST, then answers two questions the
+catalog already contains the answers to — *who can actually reach this row*, and *what does
+checking that cost per row* — and scores them on **two independent axes**.
+
+Two scores, never mixed. Hardening a table can't show up as a performance regression; adding an
+index can't show up as a security win. That is the whole design: the trade you make between them
+becomes visible instead of netting out to a single number.
+
 Three analyses over three different representations. None of them run your queries.
 
 **1. The catalog, as a relation.** `pg_class`, `pg_namespace`, `pg_policy`, `pg_roles`,
@@ -87,7 +97,7 @@ Three analyses over three different representations. None of them run your queri
 grants, RLS flags, policies with their expressions, indexes, ownership.
 
 **2. Policy predicates, as ASTs.** Every `USING` / `WITH CHECK` expression is parsed with
-[`pgsql-parser`](https://github.com/launchql/pgsql-parser) (libpg_query — the *actual* PostgreSQL
+[`pgsql-parser`](https://github.com/constructive-io/pgsql-parser) (libpg_query — the *actual* PostgreSQL
 grammar, not a regex) and traversed. That is what makes the interesting rules possible: a literal
 `true` in a write policy (A7), a cast wrapping the policy's own column so no plain index can serve
 it (X3), a non-`IMMUTABLE` call whose arguments reference no column of the row and which sits
@@ -118,10 +128,11 @@ trust boundaries on the way.
 
 ## What it checks
 
-34 rules across two dimensions, plus a source-level convention linter. The prefix letter is a
-family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
+45 rules across two dimensions — 34 security, 11 performance — plus four opt-in runtime-statistics
+rules and a four-rule source-level convention linter. The prefix letter is a family, **not** the
+dimension: `P1`/`P1b` are performance, `P5` is security.
 
-### Security (19 rules)
+### Security (34 rules)
 
 | Code | Severity | Direction | Check |
 | --- | --- | --- | --- |
@@ -143,6 +154,7 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L4 | info | neutral | **Dead schema `USAGE`** — reaches no relation and no function |
 | L5 | info | fail-open | An untrusted role reaches an **RLS-off table** via PUBLIC/inheritance † |
 | L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name ‡ |
+| L7 | info | fail-open | **Role escalation** — an untrusted role can `SET ROLE` to a role with more reach † |
 | L8 | info | fail-open | **DEFINER view bypass** — an untrusted role reads a base relation, and named columns of it, as the view's owner † |
 | L9 | info | fail-open | **DEFINER view write** — an auto-updatable definer view writes a base relation as its owner † |
 | L10 | info | fail-open | **Rewrite-rule bypass** — a rule on a view writes a relation as the view's owner, `security_invoker` notwithstanding † |
@@ -156,11 +168,13 @@ family, **not** the dimension: `P1`/`P1b` are performance, `P5` is security.
 | L18 | info | fail-open | **Writable filtering view without `WITH CHECK OPTION`** — an untrusted role writes rows the view's own filter excludes † |
 | L19 | info | fail-open | **Definer-function reach** — an untrusted role touches a relation by executing a `SECURITY DEFINER` function, which runs as its owner † |
 | L20 | info | fail-open | **`INSTEAD OF` trigger write** — a write against a view becomes a trigger function's body, and a definer one lands it as the function's owner † |
+| L21 | info | fail-closed | **Revocable grant** — a role holds `EXECUTE` that no reachable path exercises † |
 | W1 | medium | — | **No exposure surface configured** — whole database assumed reachable, score capped |
 
-† R1/R2/L5 are no-ops until you name the untrusted roles:
-`"R1": ["critical", { "roles": ["anonymous"] }]`. They cost nothing on databases without an
-untrusted-role model; the `safegres:constructive` preset configures them for `anonymous`.
+† The untrusted-role rules are no-ops until there is an untrusted role: named outright
+(`"R1": ["critical", { "roles": ["anonymous"] }]`) or resolved from the exposure surface
+(`rolesFrom: "anon"`, which `safegres:recommended` and the stack presets set — see
+[Configuration](#configuration)). They cost nothing on databases without an untrusted-role model.
 
 ‡ L6 needs an adapter that can compute [API reach](#api-reach--the-relations-the-api-can-actually-name);
 without one nothing is unaddressable and it never fires.
@@ -180,9 +194,9 @@ availability and hygiene concern, not a leak. They contribute **zero** to the sc
 ### Convention (source-level lint, 4 rules — `safegres:constructive`)
 
 House-style rules that read function **definitions** (`pg_get_functiondef`), not the catalog. They
-are pure `source → findings` — no `pg` dependency in the lint module — and are **off outside the
-`safegres:constructive` preset**, which enables them. A function on a non-exposed schema costs
-nothing, like every other rule.
+are pure `source → findings` — they come from [`@pgsql/lint`](https://www.npmjs.com/package/@pgsql/lint),
+which has no `pg` dependency — and are **off outside the `safegres:constructive` preset**, which
+enables them. A function on a non-exposed schema costs nothing, like every other rule.
 
 | Code | Severity | Direction | Check |
 | --- | --- | --- | --- |
@@ -210,8 +224,9 @@ EXECUTE 'REFRESH MATERIALIZED VIEW app.mv';  -- safegres-disable-line no-dynamic
 -- safegres-disable-file no-set-search-path -- vendored extension shim
 ```
 
-A directive with no rule id applies to every convention rule. Waived findings are **not dropped** —
-they surface as `acknowledged` (accepted-risk) findings carrying their reason, off the score.
+The `pgsql-lint-` prefix (as written for the standalone `pgsql-lint` CLI) is read the same way, so
+one waiver covers both tools. A directive with no rule id applies to every convention rule. Waived
+findings are **not dropped** — they surface as `acknowledged` (accepted-risk) findings carrying their reason, off the score.
 
 ### Performance (11 rules, `--perf`)
 
@@ -227,7 +242,7 @@ they surface as `acknowledged` (accepted-risk) findings carrying their reason, o
 | X8 | info | **Sort-shaped column leads no index** (`timestamptz`/`date`) — heuristic, scores 0 |
 | X9 | medium | **Policy calls a STABLE function per row** — not wrapped in a scalar sub-select, so no InitPlan |
 | P1 | high | Policy body calls a **VOLATILE function** — re-evaluated per row |
-| P1b | medium | Policy body calls a **STABLE function** in a per-row position |
+| P1b | medium | Policy body calls a **`SECURITY DEFINER` function** — the planner cannot inline it |
 
 X2/X3/X4/X9 are the checks a generic index linter structurally cannot make, because they require
 the policy predicate's AST. RLS quals are evaluated **before** user quals, on every candidate row,
@@ -692,6 +707,30 @@ differ by their gates and their baseline, not by their 19-entry `public.read` li
   "perf":    { "baseline": "ci/nightly/perf.json" },
   "failOn":  { "grade": "D" } }
 ```
+
+### Your own preset
+
+A preset is a partial config file, so a team's own preset is just a file it `extends`. That is
+a path inside one repo, or an npm package when several repos share it. A bare name that is not
+a built-in is resolved as an installed package (its `main`, JSON or JS):
+
+```jsonc
+// @acme/safegres-preset/safegres.json   (package.json: "main": "safegres.json")
+{
+  "extends": ["safegres:postgrest", "safegres:multi-tenant"],
+  "exposure": { "anonRoles": ["web_anon"] },
+  "rules": { "A5": "high" },
+  "failOn": { "grade": "B" }
+}
+```
+
+```jsonc
+// each project's .safegresrc.json
+{ "extends": "@acme/safegres-preset", "public": { "read": ["api.plans"] } }
+```
+
+The project file wins over the preset, key by key; `overrides` unions across the chain.
+`safegres print-config --explain` prints the merged result and where each value came from.
 
 A path in an inherited file resolves against **the file that wrote it**, so a base file's
 `"baseline": "ci/perf.json"` keeps meaning the base file's `ci/`, whichever job inherits it —

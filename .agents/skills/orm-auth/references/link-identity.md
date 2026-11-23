@@ -7,7 +7,7 @@ Execute the linkIdentity mutation
 ## Usage
 
 ```typescript
-db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } }).execute()
+db.mutation.linkIdentity({ input: { ticket: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', s
 ### Run linkIdentity
 
 ```typescript
-const result = await db.mutation.linkIdentity({ input: { details: '<JSON>', identifier: '<String>', service: '<String>' } }).execute();
+const result = await db.mutation.linkIdentity({ input: { ticket: '<String>' } }).execute();
 ```

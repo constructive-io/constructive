@@ -48,6 +48,7 @@ const provisioner = new BucketProvisioner({
 
 // Provision a private bucket (presigned URLs only)
 const result = await provisioner.provision({
+  owner: 'bucket-row-id', // the one logical bucket this physical bucket backs
   bucketName: 'my-app-private',
   accessType: 'private',
   versioning: true,
@@ -73,6 +74,7 @@ Public buckets serve files via direct URL or CDN. The provisioner applies a publ
 
 ```typescript
 const result = await provisioner.provision({
+  owner: 'bucket-row-id',
   bucketName: 'my-app-public',
   accessType: 'public',
   publicUrlPrefix: 'https://cdn.example.com/public',
@@ -87,6 +89,7 @@ Temp buckets are staging areas for uploads. They behave like private buckets but
 
 ```typescript
 const result = await provisioner.provision({
+  owner: 'bucket-row-id',
   bucketName: 'my-app-temp',
   accessType: 'temp',
 });
@@ -158,7 +161,7 @@ The main class that orchestrates bucket creation and configuration.
 
 Creates and configures a bucket. Steps:
 
-1. Creates the bucket (or verifies it exists)
+1. Creates the bucket and claims it for `owner` (see [Ownership](#ownership))
 2. Configures Block Public Access
 3. Applies bucket policy (public-read or none)
 4. Sets CORS rules for presigned URL uploads (skipped when no origins are allowed)
@@ -168,6 +171,7 @@ Creates and configures a bucket. Steps:
 | Option | Type | Description |
 |--------|------|-------------|
 | `bucketName` | `string` | S3 bucket name |
+| `owner` | `string` | The logical bucket this physical bucket belongs to, recorded as its `constructive-owner` tag |
 | `accessType` | `'public' \| 'private' \| 'temp'` | Determines which policies are applied |
 | `region` | `string?` | Override region for this bucket |
 | `versioning` | `boolean?` | Enable S3 versioning (default: `false`) |
@@ -186,12 +190,38 @@ Returns the underlying `@aws-sdk/client-s3` S3Client for advanced operations.
 
 Checks if a bucket exists and is accessible.
 
+#### `provisioner.claimBucket(bucketName, owner)` / `provisioner.bucketOwner(bucketName)`
+
+See [Ownership](#ownership).
+
+### Ownership
+
+A physical bucket backs exactly one logical bucket. `provision()` records the
+owner on the bucket as the `constructive-owner` tag (`BUCKET_OWNER_TAG`) and,
+for a bucket that already exists:
+
+| Bucket state | Outcome |
+|--------------|---------|
+| Tagged for the same owner | Re-provisioned (a retry converges) |
+| Tagged for another owner | Refused with `BUCKET_OWNED_ELSEWHERE`, nothing reconfigured |
+| Untagged and empty | Claimed (tagged) and provisioned |
+| Untagged and holding objects | Refused with `BUCKET_OWNED_ELSEWHERE` |
+| Held by another account | Refused with `BUCKET_ALREADY_EXISTS` |
+
+S3 (us-east-1), MinIO and RustFS answer `CreateBucket` for a bucket the caller
+already owns with success, so creation alone cannot tell a retry from a name
+another logical bucket holds; the tag is what decides. `bucketOwner()` reads
+the tag (null when absent) so a caller can check ownership before emptying or
+deleting a bucket.
+
 ### Naming
 
-#### `physicalBucketName({ scope, databaseId, bucketKey })`
+#### `physicalBucketName({ scope, databaseId, bucketKey, bucketId })`
 
 The physical name a platform-provisioned bucket gets from its own identity:
-`{scope}-{database label}-{bucketKey}-{digest}`. Takes no prefix — a bucket
+`{scope}-{database label}-{bucketKey}-{digest}`. The digest covers the bucket
+row's id, so two rows sharing a scope, database and key (one per owning entity,
+or a key declared again after a delete) never mint the same name. Takes no prefix — a bucket
 belongs to one database at one scope, and there is no global bucket namespace to
 prefix into. Each readable component has its own budget, so a long scope cannot
 crowd out the database label, and the digest covers the untruncated identity.
@@ -245,7 +275,7 @@ All errors thrown by the provisioner are instances of `ProvisionerError`:
 import { ProvisionerError } from '@constructive-io/bucket-provisioner';
 
 try {
-  await provisioner.provision({ bucketName: 'test', accessType: 'private' });
+  await provisioner.provision({ owner: 'bucket-row-id', bucketName: 'test', accessType: 'private' });
 } catch (err) {
   if (err instanceof ProvisionerError) {
     console.error(err.code);    // 'POLICY_FAILED', 'CORS_FAILED', etc.
@@ -261,6 +291,7 @@ Error codes:
 |------|-------------|
 | `CONNECTION_FAILED` | Could not connect to the storage endpoint |
 | `BUCKET_ALREADY_EXISTS` | Bucket exists and is owned by another account |
+| `BUCKET_OWNED_ELSEWHERE` | Bucket is recorded for another owner, or holds objects no owner claimed |
 | `BUCKET_NOT_FOUND` | Bucket does not exist (for inspect/read operations) |
 | `INVALID_CONFIG` | Invalid configuration (missing credentials, origins, etc.) |
 | `POLICY_FAILED` | Failed to apply Block Public Access or bucket policy |

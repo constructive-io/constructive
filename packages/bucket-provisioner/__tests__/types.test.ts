@@ -79,6 +79,7 @@ describe('Type definitions', () => {
   it('CreateBucketOptions has required and optional fields', () => {
     const opts: CreateBucketOptions = {
       bucketName: 'test-bucket',
+      owner: 'logical-bucket-1',
       accessType: 'private',
       region: 'us-east-1',
       versioning: true,

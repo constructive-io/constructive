@@ -56,7 +56,7 @@ export interface StorageModuleConfig {
 
   /** S3-compatible API endpoint URL presigned URLs are signed for (NULL = AWS S3) */
   endpoint: string | null;
-  /** Public URL prefix for generating download URLs */
+  /** Public base URL; file URLs append the resolved physical bucket and object key. */
   publicUrlPrefix: string | null;
   /** Storage provider type: 'minio', 'rustfs', 's3', 'gcs', etc. */
   provider: string | null;
@@ -77,7 +77,7 @@ export interface StorageModuleConfig {
   uploadUrlExpirySeconds: number;
   /** Presigned GET URL expiry in seconds (default: 3600 = 1 hour) */
   downloadUrlExpirySeconds: number;
-  /** Default max file size in bytes (default: 200MB). Bucket-level max_file_size overrides this. */
+  /** Max file size in bytes for every bucket of this module (default: 200MB). A bucket's max_file_size can only lower it: both limits are checked. */
   defaultMaxFileSize: number;
   /** Max filename length in characters (default: 1024) */
   maxFilenameLength: number;
@@ -85,12 +85,6 @@ export interface StorageModuleConfig {
   cacheTtlSeconds: number;
   /** Whether this storage module uses ltree path + path shares (determines if path column exists on files) */
   hasPathShares: boolean;
-  /**
-   * Whether the files table carries the confirm-upload lifecycle (`status`,
-   * `promoted_at`). Only then can a row be told apart from the bytes it claims:
-   * without it every row is treated as live, because there is nothing to read.
-   */
-  hasConfirmUpload: boolean;
   /** Whether the files table carries the versioning chain. */
   hasVersioning: boolean;
   /**
@@ -162,8 +156,6 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
-  /** ID of the previous version (set when re-uploading to an existing custom key) */
-  previousVersionId: string | null;
   /**
    * The projection document to store in an `image`/`upload` column.
    *
@@ -175,7 +167,7 @@ export interface RequestUploadUrlPayload {
 }
 
 /**
- * The document a managed `image`/`upload` column stores. See `./managed-upload`.
+ * The document a managed `image`/`upload` column stores. See `./file-projection`.
  */
 export interface FileProjection {
   id: string;
@@ -184,8 +176,6 @@ export interface FileProjection {
   mime: string;
   size: number;
   filename?: string;
-  /** @deprecated Read the files row's `downloadUrl` via `id` instead. */
-  url?: string;
 }
 
 /**
@@ -202,7 +192,7 @@ export interface S3Config {
   region?: string;
   /** Whether to use path-style URLs (required for path-style S3-compatible storage) */
   forcePathStyle?: boolean;
-  /** Public URL prefix for generating download URLs */
+  /** Public base URL; file URLs append the resolved physical bucket and object key. */
   publicUrlPrefix?: string;
 }
 
@@ -224,4 +214,10 @@ export interface StorageCredentials {
  */
 export interface PresignedUrlPluginOptions {
   credentials: StorageCredentials | (() => StorageCredentials);
+  /**
+   * The jsonb domains whose columns hold a file document and get
+   * `<column>Url` / `<column>Versions`. Defaults to `FILE_REF_DOMAINS` of
+   * graphile-storage-registry (`image`, `upload`).
+   */
+  fileRefDomains?: readonly string[];
 }

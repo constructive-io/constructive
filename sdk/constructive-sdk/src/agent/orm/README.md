@@ -305,10 +305,10 @@ CRUD operations for AgentResourceChunk records.
 | `createdAt` | Datetime | No |
 | `databaseId` | UUID | Yes |
 | `embedding` | Vector | Yes |
-| `embeddingVectorDistance` | Float | Yes |
+| `embeddingVectorDistance` | Float | No |
 | `id` | UUID | No |
 | `metadata` | JSON | Yes |
-| `searchScore` | Float | Yes |
+| `searchScore` | Float | No |
 | `updatedAt` | Datetime | No |
 
 **Operations:**
@@ -321,7 +321,7 @@ const items = await db.agentResourceChunk.findMany({ select: { agentResourceId: 
 const item = await db.agentResourceChunk.findOne({ id: '<UUID>', select: { agentResourceId: true, body: true, chunkIndex: true, createdAt: true, databaseId: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, searchScore: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.agentResourceChunk.create({ data: { agentResourceId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', searchScore: '<Float>' }, select: { id: true } }).execute();
+const created = await db.agentResourceChunk.create({ data: { agentResourceId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', metadata: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentResourceChunk.update({ where: { id: '<UUID>' }, data: { agentResourceId: '<UUID>' }, select: { id: true } }).execute();
@@ -343,29 +343,31 @@ CRUD operations for AgentResource records.
 |-------|------|----------|
 | `archivedAt` | Datetime | Yes |
 | `body` | String | Yes |
-| `bodyTrgmSimilarity` | Float | Yes |
+| `bodyTrgmSimilarity` | Float | No |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `createdByPrincipal` | UUID | Yes |
 | `databaseId` | UUID | Yes |
 | `description` | String | Yes |
-| `descriptionTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | No |
 | `embedding` | Vector | Yes |
-| `embeddingUpdatedAt` | Datetime | Yes |
-| `embeddingVectorDistance` | Float | Yes |
+| `embeddingModel` | String | No |
+| `embeddingModelTrgmSimilarity` | Float | No |
+| `embeddingUpdatedAt` | Datetime | No |
+| `embeddingVectorDistance` | Float | No |
 | `id` | UUID | No |
 | `isActive` | Boolean | Yes |
 | `isArchived` | Boolean | Yes |
 | `keywords` | String | Yes |
 | `kind` | String | Yes |
-| `kindTrgmSimilarity` | Float | Yes |
+| `kindTrgmSimilarity` | Float | No |
 | `metadata` | JSON | Yes |
-| `search` | FullText | Yes |
-| `searchScore` | Float | Yes |
-| `searchTsvRank` | Float | Yes |
+| `search` | FullText | No |
+| `searchScore` | Float | No |
+| `searchTsvRank` | Float | No |
 | `slug` | String | Yes |
 | `title` | String | Yes |
-| `titleTrgmSimilarity` | Float | Yes |
+| `titleTrgmSimilarity` | Float | No |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
 | `updatedByPrincipal` | UUID | Yes |
@@ -374,13 +376,13 @@ CRUD operations for AgentResource records.
 
 ```typescript
 // List all agentResource records
-const items = await db.agentResource.findMany({ select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.agentResource.findMany({ select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.agentResource.findOne({ id: '<UUID>', select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.agentResource.findOne({ id: '<UUID>', select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, databaseId: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.agentResource.create({ data: { archivedAt: '<Datetime>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', isActive: '<Boolean>', isArchived: '<Boolean>', keywords: '<String>', kind: '<String>', kindTrgmSimilarity: '<Float>', metadata: '<JSON>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.agentResource.create({ data: { archivedAt: '<Datetime>', body: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', databaseId: '<UUID>', description: '<String>', embedding: '<Vector>', isActive: '<Boolean>', isArchived: '<Boolean>', keywords: '<String>', kind: '<String>', metadata: '<JSON>', slug: '<String>', title: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.agentResource.update({ where: { id: '<UUID>' }, data: { archivedAt: '<Datetime>' }, select: { id: true } }).execute();
@@ -836,11 +838,11 @@ CRUD operations for PlatformAgentResourceChunk records.
 | `chunkIndex` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `embedding` | Vector | Yes |
-| `embeddingVectorDistance` | Float | Yes |
+| `embeddingVectorDistance` | Float | No |
 | `id` | UUID | No |
 | `metadata` | JSON | Yes |
 | `platformAgentResourceId` | UUID | Yes |
-| `searchScore` | Float | Yes |
+| `searchScore` | Float | No |
 | `updatedAt` | Datetime | No |
 
 **Operations:**
@@ -853,7 +855,7 @@ const items = await db.platformAgentResourceChunk.findMany({ select: { body: tru
 const item = await db.platformAgentResourceChunk.findOne({ id: '<UUID>', select: { body: true, chunkIndex: true, createdAt: true, embedding: true, embeddingVectorDistance: true, id: true, metadata: true, platformAgentResourceId: true, searchScore: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.platformAgentResourceChunk.create({ data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformAgentResourceId: '<UUID>', searchScore: '<Float>' }, select: { id: true } }).execute();
+const created = await db.platformAgentResourceChunk.create({ data: { body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', metadata: '<JSON>', platformAgentResourceId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformAgentResourceChunk.update({ where: { id: '<UUID>' }, data: { body: '<String>' }, select: { id: true } }).execute();
@@ -875,28 +877,30 @@ CRUD operations for PlatformAgentResource records.
 |-------|------|----------|
 | `archivedAt` | Datetime | Yes |
 | `body` | String | Yes |
-| `bodyTrgmSimilarity` | Float | Yes |
+| `bodyTrgmSimilarity` | Float | No |
 | `createdAt` | Datetime | No |
 | `createdBy` | UUID | Yes |
 | `createdByPrincipal` | UUID | Yes |
 | `description` | String | Yes |
-| `descriptionTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | No |
 | `embedding` | Vector | Yes |
-| `embeddingUpdatedAt` | Datetime | Yes |
-| `embeddingVectorDistance` | Float | Yes |
+| `embeddingModel` | String | No |
+| `embeddingModelTrgmSimilarity` | Float | No |
+| `embeddingUpdatedAt` | Datetime | No |
+| `embeddingVectorDistance` | Float | No |
 | `id` | UUID | No |
 | `isActive` | Boolean | Yes |
 | `isArchived` | Boolean | Yes |
 | `keywords` | String | Yes |
 | `kind` | String | Yes |
-| `kindTrgmSimilarity` | Float | Yes |
+| `kindTrgmSimilarity` | Float | No |
 | `metadata` | JSON | Yes |
-| `search` | FullText | Yes |
-| `searchScore` | Float | Yes |
-| `searchTsvRank` | Float | Yes |
+| `search` | FullText | No |
+| `searchScore` | Float | No |
+| `searchTsvRank` | Float | No |
 | `slug` | String | Yes |
 | `title` | String | Yes |
-| `titleTrgmSimilarity` | Float | Yes |
+| `titleTrgmSimilarity` | Float | No |
 | `updatedAt` | Datetime | No |
 | `updatedBy` | UUID | Yes |
 | `updatedByPrincipal` | UUID | Yes |
@@ -905,13 +909,13 @@ CRUD operations for PlatformAgentResource records.
 
 ```typescript
 // List all platformAgentResource records
-const items = await db.platformAgentResource.findMany({ select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const items = await db.platformAgentResource.findMany({ select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Get one by id
-const item = await db.platformAgentResource.findOne({ id: '<UUID>', select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
+const item = await db.platformAgentResource.findOne({ id: '<UUID>', select: { archivedAt: true, body: true, bodyTrgmSimilarity: true, createdAt: true, createdBy: true, createdByPrincipal: true, description: true, descriptionTrgmSimilarity: true, embedding: true, embeddingModel: true, embeddingModelTrgmSimilarity: true, embeddingUpdatedAt: true, embeddingVectorDistance: true, id: true, isActive: true, isArchived: true, keywords: true, kind: true, kindTrgmSimilarity: true, metadata: true, search: true, searchScore: true, searchTsvRank: true, slug: true, title: true, titleTrgmSimilarity: true, updatedAt: true, updatedBy: true, updatedByPrincipal: true } }).execute();
 
 // Create
-const created = await db.platformAgentResource.create({ data: { archivedAt: '<Datetime>', body: '<String>', bodyTrgmSimilarity: '<Float>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', description: '<String>', descriptionTrgmSimilarity: '<Float>', embedding: '<Vector>', embeddingUpdatedAt: '<Datetime>', embeddingVectorDistance: '<Float>', isActive: '<Boolean>', isArchived: '<Boolean>', keywords: '<String>', kind: '<String>', kindTrgmSimilarity: '<Float>', metadata: '<JSON>', search: '<FullText>', searchScore: '<Float>', searchTsvRank: '<Float>', slug: '<String>', title: '<String>', titleTrgmSimilarity: '<Float>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.platformAgentResource.create({ data: { archivedAt: '<Datetime>', body: '<String>', createdBy: '<UUID>', createdByPrincipal: '<UUID>', description: '<String>', embedding: '<Vector>', isActive: '<Boolean>', isArchived: '<Boolean>', keywords: '<String>', kind: '<String>', metadata: '<JSON>', slug: '<String>', title: '<String>', updatedBy: '<UUID>', updatedByPrincipal: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.platformAgentResource.update({ where: { id: '<UUID>' }, data: { archivedAt: '<Datetime>' }, select: { id: true } }).execute();

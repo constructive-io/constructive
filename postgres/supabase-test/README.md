@@ -586,9 +586,9 @@ This table documents the available options for the `getConnections` function. Th
 
 ### `pg` Options (PgConfig)
 
-Environment variables will override these options when available:
+These environment variables override the defaults, but explicit options take precedence:
 
-* `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+* `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`
 
 | Option        | Type     | Default       | Description                                     |
 | ------------- | -------- | ------------- | ----------------------------------------------- |
@@ -596,7 +596,7 @@ Environment variables will override these options when available:
 | `pg.password` | `string` | `'password'`  | Password for the PostgreSQL superuser           |
 | `pg.host`     | `string` | `'localhost'` | Hostname for PostgreSQL                         |
 | `pg.port`     | `number` | `5423`        | Port for PostgreSQL                             |
-| `pg.database` | `string` | `'postgres'`  | Default database used when connecting initially |
+| `pg.database` | `string` | Generated     | Test database name; `PGDATABASE` is ignored     |
 
 ### Usage
 

@@ -4,8 +4,8 @@ import type { NodeTypeDefinition } from '../types';
 /**
  * File extraction processing node.
  *
- * Composes a JobTrigger that fires when a file transitions to status = 'uploaded'
- * (or on INSERT if confirm_upload is not enabled). The trigger enqueues a
+ * Composes a JobTrigger that fires when a file transitions to status = 'uploaded'.
+ * The trigger enqueues a
  * text-extraction job that converts the file contents (PDF, DOCX, HTML, etc.)
  * into plain text or markdown, storing the result in configurable output fields.
  *

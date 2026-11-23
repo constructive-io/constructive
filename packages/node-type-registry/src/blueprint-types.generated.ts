@@ -1944,9 +1944,7 @@ export interface BlueprintStorageConfig {
   default_max_file_size?: number;
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
-  /** Enable deferred upload confirmation via HeadObject. When true, creates SECURITY DEFINER status transition functions (confirm_uploaded, mark_processed) and an AFTER INSERT trigger that enqueues a storage:confirm_upload job. The job verifies the file exists in S3 before transitioning status from requested to uploaded. Defaults to false. */
-  has_confirm_upload?: boolean;
-  /** Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Only used when has_confirm_upload is true. Defaults to "30 seconds". */
+  /** Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Defaults to "30 seconds". */
   confirm_upload_delay?: string;
   /** Provision a temporary staging bucket (type temp, tagged default-temp) that stages for the private default bucket, so uploads land there and are promoted into their destination on confirmation. Setting staging_ttl implies this. Defaults to false. */
   staging?: boolean;

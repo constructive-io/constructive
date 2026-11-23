@@ -12,7 +12,6 @@ csdk database-graph-get-all-tree-nodes-record list --where.<field>.<op> <value> 
 csdk database-graph-get-all-tree-nodes-record list --limit 10 --after <cursor>
 csdk database-graph-get-all-tree-nodes-record find-first --where.<field>.<op> <value>
 csdk database-graph-get-all-tree-nodes-record get --id <UUID>
-csdk database-graph-get-all-tree-nodes-record create --data <JSON> --path <String>
 csdk database-graph-get-all-tree-nodes-record update --id <UUID> [--data <JSON>] [--path <String>]
 csdk database-graph-get-all-tree-nodes-record delete --id <UUID>
 ```
@@ -53,12 +52,6 @@ csdk database-graph-get-all-tree-nodes-record list --select id,id
 
 ```bash
 csdk database-graph-get-all-tree-nodes-record list --where.id.equalTo <value> --orderBy ID_ASC
-```
-
-### Create a databaseGraphGetAllTreeNodesRecord
-
-```bash
-csdk database-graph-get-all-tree-nodes-record create --data <JSON> --path <String>
 ```
 
 ### Get a databaseGraphGetAllTreeNodesRecord by id

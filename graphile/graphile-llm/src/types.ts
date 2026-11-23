@@ -14,30 +14,29 @@ export interface EmbeddingResult {
   embedding: number[];
   /** Number of prompt tokens consumed (from provider; 0 if unavailable) */
   promptTokens: number;
+  /** The model the gateway was asked for */
+  model?: string;
 }
 
 /**
  * A function that converts text into a vector embedding with token usage.
  */
-export type EmbedderFunction = (text: string) => Promise<EmbeddingResult>;
+export type EmbedderFunction = (text: string, model?: string) => Promise<EmbeddingResult>;
 
 /**
  * Configuration for an embedding provider.
  */
 export interface EmbedderConfig {
-  /** Provider name: 'ollama', 'openai', or 'custom' */
+  /** Upstream dialect the gateway should use: 'ollama', 'openai', ... */
   provider: string;
   /** Model identifier (e.g. 'nomic-embed-text', 'text-embedding-3-small') */
   model?: string;
-  /** Base URL for the provider (e.g. 'http://localhost:11434' for Ollama) */
-  baseUrl?: string;
 }
 
 // ─── Token Usage Types ──────────────────────────────────────────────────────
 
 /**
  * Token usage metadata returned by LLM providers.
- * Maps to the billing schema's inference_log columns.
  */
 export interface LlmUsage {
   /** Prompt / input tokens consumed */
@@ -92,12 +91,10 @@ export type ChatFunction = (messages: ChatMessage[], options?: ChatOptions) => P
  * Configuration for a chat completion provider.
  */
 export interface ChatConfig {
-  /** Provider name: 'ollama', 'openai', or 'custom' */
+  /** Upstream dialect the gateway should use: 'ollama', 'openai', ... */
   provider: string;
   /** Model identifier (e.g. 'llama3', 'gpt-4o') */
   model?: string;
-  /** Base URL for the provider */
-  baseUrl?: string;
 }
 
 // ─── LLM Module Types ───────────────────────────────────────────────────────
@@ -186,47 +183,6 @@ export interface ChunkTableInfo {
   contentField: string;
 }
 
-// ─── Metering Types ─────────────────────────────────────────────────────────
-
-/**
- * Configuration for billing/metering integration.
- * When provided, embedding and chat calls are wrapped with quota checks
- * and usage recording via the billing_module functions.
- */
-export interface MeteringConfig {
-  /**
-   * Meter slug for embedding operations.
-   * Must match a slug in the billing_module meters table.
-   *
-   * @default the embedding model name (e.g. 'text-embedding-3-small')
-   * — meter slug = model name, so each model has its own meter
-   * in the three-level waterfall (per-model → inference pool → universal).
-   */
-  embeddingMeterSlug?: string;
-
-  /**
-   * Meter slug for chat completion operations.
-   *
-   * @default the chat model name (e.g. 'gpt-4o-mini')
-   */
-  chatMeterSlug?: string;
-
-  /**
-   * Disable metering entirely (e.g. for local dev).
-   * When true, billing functions are never called.
-   * @default false
-   */
-  skipMetering?: boolean;
-
-  /**
-   * Resolve the billing entity_id from pgSettings.
-   * The entity_id identifies who gets billed (user, org, etc.).
-   *
-   * @default reads jwt.claims.user_id
-   */
-  resolveEntityId?: (pgSettings: Record<string, string>) => string | null;
-}
-
 // ─── Plugin Options ─────────────────────────────────────────────────────────
 
 /**
@@ -234,15 +190,15 @@ export interface MeteringConfig {
  */
 export interface GraphileLlmOptions {
   /**
-   * Default embedding provider when no llm_module is configured.
-   * Useful for development/testing without requiring llm_module setup.
-   * @default undefined (requires llm_module to be configured)
+   * Embedding provider and model the gateway (`AGENTIC_SERVER_URL`) is asked
+   * for. Falls back to `EMBEDDER_PROVIDER` / `EMBEDDER_MODEL`.
+   * @default undefined
    */
   defaultEmbedder?: EmbedderConfig;
 
   /**
-   * Default chat completion provider when no llm_module is configured.
-   * Required for RAG queries.
+   * Chat provider and model the gateway is asked for. Required for RAG
+   * queries. Falls back to `CHAT_PROVIDER` / `CHAT_MODEL`.
    * @default undefined
    */
   defaultChatCompleter?: ChatConfig;
@@ -254,7 +210,7 @@ export interface GraphileLlmOptions {
   enableTextSearch?: boolean;
 
   /**
-   * Controls behavior when the embedder returns null (e.g. billing quota exceeded).
+   * Controls behavior when the embedder returns null (provider unavailable or embedding failed).
    *
    * - `'degrade'` (default): Skip the vector search silently and fall back to
    *   text-only adapters (tsvector, BM25, trgm). If no text adapters are
@@ -287,18 +243,4 @@ export interface GraphileLlmOptions {
    * Individual queries can override these values.
    */
   ragDefaults?: RagDefaults;
-
-  /**
-   * Billing/metering configuration (opt-in).
-   * When truthy, loads the LlmMeteringPlugin which wraps the embedder
-   * with billing quota checks + usage recording.
-   *
-   * Set to `true` to enable metering with defaults (entity_id from jwt.claims.user_id).
-   * Provide a MeteringConfig object for fine-grained control (custom entity_id, meter slugs).
-   * Set to `false` or omit to disable metering entirely.
-   *
-   * @default undefined (metering disabled)
-   */
-  metering?: boolean | MeteringConfig;
-
 }
