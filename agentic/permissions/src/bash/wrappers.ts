@@ -78,7 +78,7 @@ export function xargsOperands(analyzer: Analyzer, name: string, rest: Arg[], inp
 /** `a` with every `replace` in it put back by the word `w` that xargs reads; unknown from there on when `w` is. */
 function replaced(a: KnownArg, replace: string, w: Arg): Arg {
   if (w.kind === 'known') return { ...a, text: a.text.split(replace).join(w.text) };
-  return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw };
+  return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw, splits: false };
 }
 
 const ENV_VALUE_OPTIONS = new Set(['-u', '--unset', '-C', '--chdir', '-S', '--split-string']);

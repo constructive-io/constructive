@@ -71,7 +71,7 @@ export function find(ctx: CommandContext, rest: readonly Arg[]): void {
         const replaced = sub.map((a): Arg => {
           if (a.kind === 'unknown' || !a.text.includes('{}')) return a;
           if (r.kind === 'known') return { ...a, text: a.text.split('{}').join(`${r.text}/{}`) };
-          return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf('{}')) + r.knownPrefix, raw: a.raw };
+          return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf('{}')) + r.knownPrefix, raw: a.raw, splits: false };
         });
         analyzer.runArgs(replaced, false);
       }

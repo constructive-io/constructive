@@ -159,7 +159,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     if (sub === 'remote') return remote(ctx, read);
     if (sub === 'push') return push(ctx, read);
     const raw = subword?.raw ?? '.';
-    const here: Arg = analyzer.base === null ? { kind: 'unknown', knownPrefix: '', raw } : literalArg('.', raw);
+    const here: Arg = analyzer.base === null ? { kind: 'unknown', knownPrefix: '', raw, splits: false } : literalArg('.', raw);
     if (sub === 'config') return config(ctx, read, here, raw);
     if (sub === 'add') add(ctx, read);
     for (const out of withEffect(read, 'writes-file')) if (out.value) analyzer.addPath(out.value, 'write', true);

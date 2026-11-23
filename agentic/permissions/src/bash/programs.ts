@@ -118,6 +118,8 @@ export const GIT_SUBCOMMANDS: ReadonlyMap<string, ProgramSpec> = new Map([
     )
   ],
   ['status', sub()],
+  ['cherry-pick', sub(flag('-x', '-n', '--no-commit', '-e', '--edit', '-s', '--signoff', '--ff'), value('-m', '--mainline', '--strategy', '-X', '--strategy-option', '--cleanup', '--empty'))],
+  ['revert', sub(flag('-n', '--no-commit', '-e', '--edit', '-s', '--signoff'), value('-m', '--mainline', '--strategy', '-X', '--strategy-option', '--cleanup'))],
   ['bisect', sub(value('--term-old', '--term-new', '--term-bad', '--term-good'))],
   ['submodule', sub(value('--reference', '--depth', '-b', '--branch', '--name', '-j', '--jobs'))],
   ['branch', sub(value('-m', '-M', '-c', '-C', '-u', '--set-upstream-to', '--format', '--sort', '--contains', '--merged'))]

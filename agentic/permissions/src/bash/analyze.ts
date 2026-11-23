@@ -56,6 +56,8 @@ export interface UnknownArg {
   kind: 'unknown';
   knownPrefix: string;
   raw: string;
+  /** An unquoted value the analysis cannot know may split it into more words, and one may be an option. */
+  splits: boolean;
 }
 
 export interface BashPath {
@@ -428,6 +430,8 @@ class Analyzer implements ExpansionScope {
   lookup(name: string): string | null {
     if (this.vars.has(name)) return this.vars.get(name);
     if (name === 'HOME') return this.home;
+    // Bash sets IFS to its default at startup and does not take it from the environment.
+    if (name === 'IFS') return ' \t\n';
     if (name === 'PWD') return this.base;
     return null;
   }

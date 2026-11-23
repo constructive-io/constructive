@@ -33,8 +33,11 @@ import {
 export type Part =
   | { kind: 'lit'; text: string; quoted: boolean }
   | { kind: 'var'; name: string; quoted: boolean; fallback?: string }
-  /** `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). */
-  | { kind: 'unknown'; ref?: string };
+  /**
+   * `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). `splits`: bash may split its
+   * value into more words (it is unquoted, or `$@`), which may be options.
+   */
+  | { kind: 'unknown'; ref?: string; splits: boolean };
 
 export interface Word {
   parts: Part[];
@@ -366,7 +369,7 @@ class Lexer {
       if ((ch === '<' || ch === '>') && s[this.i + 1] === '(') {
         const end = matchParen(s, this.i + 1);
         this.substitute(s.slice(this.i + 2, end), 'process substitution');
-        parts.push({ kind: 'unknown' });
+        parts.push({ kind: 'unknown', splits: false });
         this.i = end + 1;
         continue;
       }
@@ -405,7 +408,7 @@ class Lexer {
       if (ch === '`') {
         const end = matchBacktick(s, this.i);
         this.substitute(unescapeBackticks(s.slice(this.i + 1, end)), 'backtick substitution');
-        parts.push({ kind: 'unknown' });
+        parts.push({ kind: 'unknown', splits: true });
         this.i = end + 1;
         continue;
       }
@@ -446,7 +449,7 @@ class Lexer {
       if (ch === '`') {
         const end = matchBacktick(s, this.i);
         this.substitute(unescapeBackticks(s.slice(this.i + 1, end)), 'backtick substitution');
-        parts.push({ kind: 'unknown' });
+        parts.push({ kind: 'unknown', splits: false });
         this.i = end + 1;
         continue;
       }
@@ -466,21 +469,21 @@ class Lexer {
     const arithmetic = next === '(' && s[this.i + 2] === '(' ? arithmeticEnd(s, this.i + 1, 'dollar') : null;
     if (arithmetic !== null) {
       this.arithmetic(s.slice(this.i + 3, arithmetic - 1), 'arithmetic expansion $((…))');
-      parts.push({ kind: 'unknown' });
+      parts.push({ kind: 'unknown', splits: false });
       this.i = arithmetic + 1;
       return;
     }
     if (next === '[') {
       const end = matchBracket(s, this.i + 1);
       this.arithmetic(s.slice(this.i + 2, end), 'arithmetic expansion $[…]');
-      parts.push({ kind: 'unknown' });
+      parts.push({ kind: 'unknown', splits: false });
       this.i = end + 1;
       return;
     }
     if (next === '(') {
       const end = matchParen(s, this.i + 1);
       this.substitute(s.slice(this.i + 2, end), 'command substitution $(…)');
-      parts.push({ kind: 'unknown' });
+      parts.push({ kind: 'unknown', splits: !quoted });
       this.i = end + 1;
       return;
     }
@@ -493,7 +496,7 @@ class Lexer {
         return;
       }
       if (SPECIAL_PARAMS.has(inner)) {
-        parts.push({ kind: 'unknown' });
+        parts.push({ kind: 'unknown', splits: inner === '@' || !quoted });
         return;
       }
       const ref = /^[#!]?([A-Za-z_][A-Za-z0-9_]*)/.exec(inner)?.[1];
@@ -504,7 +507,8 @@ class Lexer {
         parts.push({ kind: 'var', name: withDefault[1], quoted, fallback: stripQuotes(withDefault[2]) });
         return;
       }
-      parts.push(ref ? { kind: 'unknown', ref } : { kind: 'unknown' });
+      const splits = inner.includes('@') || !quoted;
+      parts.push(ref ? { kind: 'unknown', ref, splits } : { kind: 'unknown', splits });
       return;
     }
     if (next === "'" && !quoted) {
@@ -525,7 +529,7 @@ class Lexer {
       return;
     }
     if (next !== undefined && SPECIAL_PARAMS.has(next)) {
-      parts.push({ kind: 'unknown' });
+      parts.push({ kind: 'unknown', splits: next === '@' || !quoted });
       this.i += 2;
       return;
     }

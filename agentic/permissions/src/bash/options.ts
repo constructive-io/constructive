@@ -59,9 +59,12 @@ export interface ReadArgs {
   readonly next: number;
 }
 
-/** An argument from a variable whose text does not start with a literal, so it may be an option. */
+/**
+ * An argument from a variable that may be an option: its text does not start
+ * with a literal, or an unquoted value in it may split off a word of its own.
+ */
 export function mayBeOption(arg: Arg): boolean {
-  return arg.kind === 'unknown' && !/^[\w./]/.test(arg.raw);
+  return arg.kind === 'unknown' && (arg.splits || !/^[\w./]/.test(arg.raw));
 }
 
 /**

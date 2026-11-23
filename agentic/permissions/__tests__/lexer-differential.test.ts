@@ -108,6 +108,10 @@ const rows: Row[] = [
   ["git clone --conf=core.sshCommand='touch m30 #' ssh://localhost/x y1", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git clone --conf core.sshCommand='touch m30 #' ssh://localhost/x y1", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // an argument from a variable can be any option the subcommand takes, `--output=<file>` included
+  // an unquoted `$IFS`, or a value the analysis cannot know, splits off a word that can be an option
+  ["git fetch . HEAD$IFS--upload-pack='touch m;'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git grep -e foo$IFS-O'touch m19;'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ['git fetch origin$X', 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git log $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],

@@ -98,32 +98,36 @@ export type WordUse = 'argument' | 'assignment';
 /** The arguments a word expands to, in order. */
 export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budget: ExpansionBudget): Arg[] {
   const built = build(word, scope, budget);
-  if (use === 'assignment') return [toArg(tildes(built, true, scope, budget), word.raw, false)];
+  const arg = (piece: Piece, globs: boolean) => toArg(piece, word.raw, globs, built.splits);
+  if (use === 'assignment') return [arg(tildes(built, true, scope, budget), false)];
   const args: Arg[] = [];
   for (const piece of braces(built, budget)) {
     const fields = split(tildes(piece, NAME_EQUALS.test(piece.text) && allLiteral(piece.kinds, 0, piece.text.indexOf('=')), scope, budget));
     if (fields.length > 1 && !budget.takeWords(fields.length - 1)) {
-      args.push(toArg(fields[0], word.raw, true));
+      args.push(arg(fields[0], true));
       break;
     }
-    for (const field of fields) args.push(toArg(field, word.raw, true));
+    for (const field of fields) args.push(arg(field, true));
   }
   return args;
 }
 
 /** The word's parts as one piece, with each known variable's value in place and an unknown part marked. */
-function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece {
+/** The built word, and whether an unknown unquoted value in it may split it further. */
+function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece & { splits: boolean } {
   let text = '';
   let kinds = '';
   let unknown = false;
-  const markUnknown = () => {
+  let splits = false;
+  const markUnknown = (split: boolean) => {
+    splits ||= split;
     if (unknown) return;
     unknown = true;
     text += UNKNOWN;
     kinds += 'q';
   };
   const add = (piece: string, kind: 'l' | 'v' | 'q') => {
-    if (!budget.takeChars(piece.length)) return markUnknown();
+    if (!budget.takeChars(piece.length)) return markUnknown(kind === 'v');
     text += piece;
     kinds += kind.repeat(piece.length);
   };
@@ -135,12 +139,12 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
       break;
     case 'unknown':
       if (part.ref) scope.noteRef(part.ref);
-      markUnknown();
+      markUnknown(part.splits);
       break;
     case 'var': {
       scope.noteRef(part.name);
       const value = !part.quoted && scope.ifsMayDiffer() ? null : scope.value(part.name, part.fallback);
-      if (value === null) markUnknown();
+      if (value === null) markUnknown(!part.quoted);
       else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'q');
       else add(value, part.quoted ? 'q' : 'v');
       break;
@@ -149,7 +153,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
       return unreachable(part);
     }
   }
-  return { text, kinds };
+  return { text, kinds, splits };
 }
 
 /** The characters from `from` up to `to` are all unquoted literals. */
@@ -282,13 +286,13 @@ function split(piece: Piece): Piece[] {
 }
 
 /** The argument a finished piece stands for; a glob character counts when it is unquoted. */
-function toArg(piece: Piece, raw: string, globs: boolean): Arg {
+function toArg(piece: Piece, raw: string, globs: boolean, splits: boolean): Arg {
   let glob = false;
   for (let k = 0; globs && !glob && k < piece.text.length; k++) {
     glob = piece.kinds[k] !== 'q' && (piece.text[k] === '*' || piece.text[k] === '?' || piece.text[k] === '[');
   }
   const settled = piece.text.split(EMPTY_QUOTE).join('');
   const cut = settled.indexOf(UNKNOWN);
-  if (cut >= 0) return { kind: 'unknown', knownPrefix: settled.slice(0, cut), raw };
+  if (cut >= 0) return { kind: 'unknown', knownPrefix: settled.slice(0, cut), raw, splits };
   return { kind: 'known', text: settled, raw, glob };
 }
