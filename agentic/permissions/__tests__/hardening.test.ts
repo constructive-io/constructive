@@ -275,7 +275,9 @@ const rows: Row[] = [
   ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap - EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
   ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
   ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap '' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
-  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'true' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow']
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'true' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
+  // 31. brace sequences with endpoints past 2^53 keep their digits, and past int64 they are text, as in both bashes
+  ['cat x{99999999999999999999999..99999999999999999999999}', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
@@ -296,6 +298,9 @@ describe('hardening: the words a brace sequence makes', () => {
     expect(await targets('cat ./{"1"..3}')).toEqual(['{1..3}']);
     expect(await targets('cat ./{1..c}')).toEqual(['{1..c}']);
     expect(await targets('cat ./{+1..3}')).toEqual(['1', '2', '3']);
+  });
+  it('keeps every digit of an endpoint past 2^53, and wraps it at 32 bits as bash 3.2 does', async () => {
+    expect(await targets('cat ./x{9007199254740993..9007199254740993}')).toEqual(['x9007199254740993', 'x1']);
   });
   it('keeps a control character in a word, apart from the mark an empty quote leaves', async () => {
     expect(await targets("cat ./$'\\x01'")).toEqual(['\u0001']);

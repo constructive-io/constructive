@@ -37,6 +37,18 @@ describe('expansions stay within one budget per command', () => {
     expect(heapMb).toBeLessThan(256);
   });
 
+  it('expands a word of thousands of brace groups, one after another, without a deep recursion', async () => {
+    const { d, ms } = await bounded(`echo ${'{a,b}'.repeat(2000)}`);
+    expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
+    expect(ms).toBeLessThan(1000);
+  });
+
+  it('expands braces nested thousands deep without a deep recursion', async () => {
+    const { d, ms } = await bounded(`echo ${'{a,'.repeat(4000)}b${'}'.repeat(4000)}`);
+    expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
+    expect(ms).toBeLessThan(1000);
+  });
+
   it('stops a variable that doubles itself before it builds the value', async () => {
     let command = 'v0=x';
     for (let k = 1; k <= 24; k++) command += `; v${k}=$v${k - 1}$v${k - 1}`;

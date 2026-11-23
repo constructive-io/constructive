@@ -314,8 +314,8 @@ function allLiteral(kinds: string, from: number, to: number): boolean {
 
 /**
  * Brace expansion as bash 4 and later do it, on the unquoted literal braces.
- * A word that cannot be built within the budget keeps what was built, and at
- * least itself, so later words keep their positions.
+ * A word that does not fit the budget stays as written, and the analysis is
+ * incomplete.
  */
 function braces(piece: Piece, budget: ExpansionBudget): Piece[] {
   return expand5(piece.text, piece.kinds, budget) ?? [piece];
@@ -324,13 +324,14 @@ function braces(piece: Piece, budget: ExpansionBudget): Piece[] {
 /**
  * The next group from `from` that both bashes look at: from an unquoted `{`
  * to the first `}` at its level after an unquoted `,` or `..` (one not right
- * before that `}`) at its level. A `{` that starts the word and is followed
- * by `}` (find's `{}`) starts none.
+ * before that `}`) at its level. A `{` that starts the word, or the rest of
+ * the word after a group (`start`), and is followed by `}` (find's `{}`)
+ * starts none.
  */
-function group(text: string, kinds: string, from: number): { open: number; close: number } | null {
+function group(text: string, kinds: string, from: number, start: number): { open: number; close: number } | null {
   for (let open = from; open < text.length; open++) {
     if (text[open] !== '{' || kinds[open] !== 'l') continue;
-    if (open === 0 && text[1] === '}' && kinds[1] === 'l') continue;
+    if (open === start && text[open + 1] === '}' && kinds[open + 1] === 'l') continue;
     let level = 0;
     let counts = 0;
     for (let j = open + 1; j < text.length; j++) {
@@ -359,8 +360,11 @@ function levelCommas(text: string, kinds: string, open: number, close: number): 
   return commas;
 }
 
-/** Each part of a list, between the commas, expanded the same way. */
+type Expander = (text: string, kinds: string, budget: ExpansionBudget) => Piece[] | null;
+
+/** Each part of a list, between the commas, expanded the same way. The parts' text is charged first, so a deep nesting ends at the budget. */
 function alternatives(text: string, kinds: string, open: number, commas: readonly number[], close: number, budget: ExpansionBudget, expand: Expander): Piece[] | null {
+  if (!budget.takeChars(close - open)) return null;
   const bounds = [open, ...commas, close];
   const out: Piece[] = [];
   for (let k = 1; k < bounds.length; k++) {
@@ -371,7 +375,52 @@ function alternatives(text: string, kinds: string, open: number, commas: readonl
   return out;
 }
 
-type Expander = (text: string, kinds: string, budget: ExpansionBudget) => Piece[] | null;
+/** Each of `heads` followed by each of `tails`, in order, charged before each one is built; `null` past the budget. */
+function product(heads: readonly Piece[], tails: readonly Piece[], budget: ExpansionBudget): Piece[] | null {
+  const out: Piece[] = [];
+  for (const head of heads) {
+    for (const tail of tails) {
+      if (!budget.takeChars(head.text.length + tail.text.length) || (out.length > 0 && !budget.takeWords(1))) return null;
+      out.push({ text: head.text + tail.text, kinds: head.kinds + tail.kinds });
+    }
+  }
+  return out;
+}
+
+/** A group one bash expands, and the words its braces make there (`null` past the budget). */
+interface Expanded {
+  readonly open: number;
+  readonly close: number;
+  readonly middles: readonly Piece[] | null;
+}
+
+/**
+ * The words a word makes, built as a product over its groups from left to
+ * right: the text before each group, then each word the group makes. `next`
+ * finds the group a bash expands from a point of the word, or `null` when the
+ * rest stays as written.
+ */
+function expandGroups(text: string, kinds: string, budget: ExpansionBudget, next: (start: number) => Expanded | null): Piece[] | null {
+  let words: Piece[] = [{ text: '', kinds: '' }];
+  for (let start = 0; ; ) {
+    const found = next(start);
+    if (found === null) return product(words, [{ text: text.slice(start), kinds: kinds.slice(start) }], budget);
+    if (found.middles === null) return null;
+    const before: Piece = { text: text.slice(start, found.open), kinds: kinds.slice(start, found.open) };
+    words = product(words, found.middles.map((m) => ({ text: before.text + m.text, kinds: before.kinds + m.kinds })), budget);
+    if (words === null) return null;
+    start = found.close + 1;
+  }
+}
+
+/** The values of a sequence group as words, or `null` when the group is not one this bash reads as a sequence. */
+function sequenceGroup(text: string, kinds: string, open: number, close: number, modern: boolean, budget: ExpansionBudget): Piece[] | null {
+  // A sequence needs every character between the braces unquoted.
+  const seq = allLiteral(kinds, open + 1, close) ? (modern ? SEQUENCE : SEQUENCE_32).exec(text.slice(open + 1, close)) : null;
+  if (!seq) return null;
+  const [, fromNumber, toNumber, fromLetter, toLetter, step] = seq;
+  return sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, modern, budget.wordRoom + 1)?.map(sequenceWord) ?? null;
+}
 
 /**
  * bash 4 and later: a group with a comma at its own level is a list, one
@@ -379,45 +428,16 @@ type Expander = (text: string, kinds: string, budget: ExpansionBudget) => Piece[
  * and the search goes on after its `{`.
  */
 function expand5(text: string, kinds: string, budget: ExpansionBudget): Piece[] | null {
-  for (let found = group(text, kinds, 0); found; found = group(text, kinds, found.open + 1)) {
-    const { open, close } = found;
-    const commas = levelCommas(text, kinds, open, close);
-    let middles: Piece[] | null;
-    if (commas.length > 0) {
-      middles = alternatives(text, kinds, open, commas, close, budget, expand5);
-    } else {
-      // A sequence needs every character between the braces unquoted.
-      const seq = allLiteral(kinds, open + 1, close) ? SEQUENCE.exec(text.slice(open + 1, close)) : null;
-      if (!seq) continue;
-      const [, fromNumber, toNumber, fromLetter, toLetter, step] = seq;
-      middles = sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, true, budget.wordRoom + 1).map(sequenceWord);
+  return expandGroups(text, kinds, budget, (start) => {
+    for (let found = group(text, kinds, start, start); found; found = group(text, kinds, found.open + 1, start)) {
+      const { open, close } = found;
+      const commas = levelCommas(text, kinds, open, close);
+      if (commas.length > 0) return { open, close, middles: alternatives(text, kinds, open, commas, close, budget, expand5) };
+      const middles = sequenceGroup(text, kinds, open, close, true, budget);
+      if (middles) return { open, close, middles };
     }
-    return middles === null ? null : join(text, kinds, open, close, middles, budget, expand5);
-  }
-  return [{ text, kinds }];
-}
-
-/** The text before the group, each middle, and each word of the text after it; a charge that does not fit ends the list. */
-function join(
-  text: string,
-  kinds: string,
-  open: number,
-  close: number,
-  middles: readonly Piece[],
-  budget: ExpansionBudget,
-  expand: Expander
-): Piece[] | null {
-  const posts = expand(text.slice(close + 1), kinds.slice(close + 1), budget);
-  if (posts === null) return null;
-  const out: Piece[] = [];
-  for (const middle of middles) {
-    for (const post of posts) {
-      const next = text.slice(0, open) + middle.text + post.text;
-      if (!budget.takeChars(next.length) || (out.length > 0 && !budget.takeWords(1))) return out.length > 0 ? out : null;
-      out.push({ text: next, kinds: kinds.slice(0, open) + middle.kinds + post.kinds });
-    }
-  }
-  return out;
+    return null;
+  });
 }
 
 /** One value of a sequence as a word: a backslash it makes is removed with the quotes, as in bash. */
@@ -427,22 +447,34 @@ function sequenceWord(text: string): Piece {
 
 const literal = (text: string): Piece => ({ text, kinds: 'l'.repeat(text.length) });
 
+const INT64_MAX = 2n ** 63n - 1n;
+
 /**
  * The first `limit` values of `{from..to..step}`: numbers, or the characters
- * between two letters. bash 4 and later (`modern`) take the step's size and
- * pad every number to the wider end when an end has a leading zero
- * (`{01..10}`); bash 3.2 takes no step and pads nothing.
+ * between two letters. Both bashes read the numbers as 64-bit integers, so a
+ * group with one past that range is no sequence (`null`). bash 3.2 then keeps
+ * the low 32 bits of each end, takes no step and pads nothing; bash 4 and
+ * later (`modern`) take the step's size and pad every number to the wider end
+ * when an end has a leading zero (`{01..10}`).
  */
-function sequence(from: string, to: string, step: string | undefined, modern: boolean, limit: number): string[] {
+function sequence(from: string, to: string, step: string | undefined, modern: boolean, limit: number): string[] | null {
   const numeric = /\d/.test(from);
-  const a = numeric ? Number(from) : from.charCodeAt(0);
-  const b = numeric ? Number(to) : to.charCodeAt(0);
-  const inc = Math.abs(Number(step ?? 1)) || 1;
+  const fits = (n: bigint) => -INT64_MAX - 1n <= n && n <= INT64_MAX;
+  const inc = step === undefined ? 1n : BigInt(step);
+  if (inc < -INT64_MAX || inc > INT64_MAX) return null;
+  let a = numeric ? BigInt(from) : BigInt(from.charCodeAt(0));
+  let b = numeric ? BigInt(to) : BigInt(to.charCodeAt(0));
+  if (!fits(a) || !fits(b)) return null;
+  if (!modern) {
+    a = BigInt.asIntN(32, a);
+    b = BigInt.asIntN(32, b);
+  }
+  const size = (inc < 0n ? -inc : inc) || 1n;
   const width = modern && numeric && (/^-?0\d/.test(from) || /^-?0\d/.test(to)) ? Math.max(from.length, to.length) : 0;
-  const pad = (v: number) => (v < 0 ? `-${String(-v).padStart(width - 1, '0')}` : String(v).padStart(width, '0'));
+  const pad = (v: bigint) => (v < 0n ? `-${String(-v).padStart(width - 1, '0')}` : String(v).padStart(width, '0'));
   const texts: string[] = [];
-  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit; v += a <= b ? inc : -inc) {
-    texts.push(numeric ? pad(v) : String.fromCharCode(v));
+  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit; v += a <= b ? size : -size) {
+    texts.push(numeric ? pad(v) : String.fromCharCode(Number(v)));
   }
   return texts;
 }
@@ -467,27 +499,22 @@ function bothBashes(piece: Piece, raw: string, scope: ExpansionScope, budget: Ex
  * Brace expansion as bash 3.2 does it, on the same groups: any comma in the
  * group, also a nested one, makes it a list split at its own level's commas;
  * without a comma it must be a sequence with no step and no padding, or the
- * whole word stays as written.
+ * rest of the word stays as written.
  */
 function braces32(piece: Piece, budget: ExpansionBudget): Piece[] {
   return expand32(piece.text, piece.kinds, budget) ?? [piece];
 }
 
 function expand32(text: string, kinds: string, budget: ExpansionBudget): Piece[] | null {
-  const found = group(text, kinds, 0);
-  if (!found) return [{ text, kinds }];
-  const { open, close } = found;
-  let middles: Piece[] | null;
-  // bash 3.2 looks for a comma anywhere in the group, nested or quoted; the kit cannot tell an escaped one from a quoted one, so it counts both.
-  if (text.slice(open + 1, close).includes(',')) {
-    middles = alternatives(text, kinds, open, levelCommas(text, kinds, open, close), close, budget, expand32);
-  } else {
-    const seq = allLiteral(kinds, open + 1, close) ? SEQUENCE_32.exec(text.slice(open + 1, close)) : null;
-    if (!seq) return [{ text, kinds }];
-    const [, fromNumber, toNumber, fromLetter, toLetter] = seq;
-    middles = sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, undefined, false, budget.wordRoom + 1).map(sequenceWord);
-  }
-  return middles === null ? null : join(text, kinds, open, close, middles, budget, expand32);
+  return expandGroups(text, kinds, budget, (start) => {
+    const found = group(text, kinds, start, start);
+    if (!found) return null;
+    const { open, close } = found;
+    // bash 3.2 looks for a comma anywhere in the group, nested or quoted; the kit cannot tell an escaped one from a quoted one, so it counts both.
+    if (text.slice(open + 1, close).includes(',')) return { open, close, middles: alternatives(text, kinds, open, levelCommas(text, kinds, open, close), close, budget, expand32) };
+    const middles = sequenceGroup(text, kinds, open, close, false, budget);
+    return middles ? { open, close, middles } : null;
+  });
 }
 
 /** A tilde prefix in a word: from its `~` up to the `/` (or `:`) after it; `named` for `~user`, `~+` and `~-`. */
