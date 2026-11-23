@@ -260,7 +260,9 @@ const rows: Row[] = [
   // 28. a shell that reads its script from stdin runs the text the analysis can see there as a script of its own
   ["sh <<< 'cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
   ["echo 'cat ~/.ssh/id_ed25519' | bash", 'deny', 'deny', 'hard-deny'],
-  ["bash -s <<'EOF'\ncat ~/.ssh/id_ed25519\nEOF", 'deny', 'deny', 'hard-deny']
+  ["bash -s <<'EOF'\ncat ~/.ssh/id_ed25519\nEOF", 'deny', 'deny', 'hard-deny'],
+  // 29. an argument from a variable may be an option, so every operand from a reader's output slot on may be the file it writes
+  ['read -r F <<< x; uniq "$F" src/config.ts .pi/ext.js', 'deny', 'deny']
 ];
 
 describe('hardening: bash per mode', () => {

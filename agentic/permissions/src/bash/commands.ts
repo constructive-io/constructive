@@ -309,8 +309,11 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     const read = readArgs(reader, rest);
     applyEffects(ctx, name, reader, read);
     const out = READER_OUTPUT.get(name);
-    operands(ctx, read.positionals.filter((_, k) => k !== out), 'read');
-    if (out !== undefined && read.positionals[out]) files(ctx, [read.positionals[out]], 'write');
+    // An argument from a variable may be an option, so then every operand from the output slot on may be the file it writes.
+    const unsure = read.unknown.length > 0;
+    const writes = out === undefined ? [] : read.positionals.slice(out, unsure ? undefined : out + 1);
+    operands(ctx, unsure ? read.positionals : read.positionals.filter((p) => !writes.includes(p)), 'read');
+    files(ctx, writes, 'write');
     return;
   }
   if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
