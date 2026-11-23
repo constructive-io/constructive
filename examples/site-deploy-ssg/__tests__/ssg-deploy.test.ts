@@ -40,7 +40,6 @@ const deployOptions = (server: ReturnType<typeof createMockServer>) => ({
   putObject: server.putObject,
   siteId: 'site-1',
   databaseId: 'db-1',
-  bucketKey: 'site-example',
   source: dist,
 });
 

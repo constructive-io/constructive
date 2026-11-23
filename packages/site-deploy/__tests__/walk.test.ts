@@ -48,7 +48,6 @@ describe('deploySite from a directory', () => {
       putObject: server.putObject,
       siteId: 'site-1',
       databaseId: 'db-1',
-      bucketKey: 'site-docs',
       source: dir,
     });
 

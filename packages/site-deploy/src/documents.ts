@@ -16,7 +16,7 @@ export function deployNames(scope: 'database' | 'platform' = 'database'): SiteDe
   const prefix = scope === 'platform' ? 'platform' : '';
   const lower = (name: string) => (prefix ? `${prefix}${name}` : lowerFirst(name));
   return {
-    bulkUploadMutation: `upload${Prefix}Files`,
+    bulkUploadMutation: `upload${Prefix}SiteFiles`,
     releasesQuery: `${lower('SiteReleases')}`,
     createRelease: `create${Prefix}SiteRelease`,
     releaseInputField: lower('SiteRelease'),
@@ -54,7 +54,7 @@ export function buildBulkUploadMutation(mutation: string): string {
 `;
 }
 
-/** `uploadFiles` → `UploadFileBulkInput`, `uploadPlatformFiles` → … */
+/** `uploadSiteFiles` → `UploadSiteFileBulkInput`, `uploadPlatformSiteFiles` → … */
 function inputTypeName(mutation: string): string {
   const capitalized = mutation.charAt(0).toUpperCase() + mutation.slice(1);
   return `${capitalized.replace(/s$/, '')}BulkInput`;

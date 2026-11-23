@@ -4,7 +4,7 @@
  * ```bash
  * CONSTRUCTIVE_API_URL=https://api.example.com/graphql \
  * CONSTRUCTIVE_TOKEN=$TOKEN \
- * SITE_ID=... DATABASE_ID=... BUCKET_KEY=site-example \
+ * SITE_ID=... DATABASE_ID=... \
  * PREVIEW=play pnpm deploy
  * ```
  *
@@ -86,7 +86,6 @@ async function main(): Promise<void> {
       : undefined,
     siteId: required('SITE_ID'),
     databaseId: process.env.DATABASE_ID,
-    bucketKey: required('BUCKET_KEY'),
     source: dist,
     preview: process.env.PREVIEW,
     previewApex: process.env.PREVIEW_APEX,

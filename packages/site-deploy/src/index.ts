@@ -7,7 +7,6 @@
  *   api,
  *   siteId,
  *   databaseId,
- *   bucketKey: 'site-docs',
  *   source: './dist',
  *   publish: true,
  * });

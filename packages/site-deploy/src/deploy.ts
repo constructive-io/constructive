@@ -59,7 +59,6 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
     storage = options.api,
     siteId,
     databaseId,
-    bucketKey,
     scope = 'database',
     publish = false,
     preview,
@@ -130,7 +129,7 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
   const uploadOptions = {
     storage,
     mutation: names.bulkUploadMutation,
-    bucketKey,
+    siteId,
     batchSize,
     concurrency,
     retries,

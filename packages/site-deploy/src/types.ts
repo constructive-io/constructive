@@ -56,7 +56,7 @@ export interface ReleaseManifest {
  * names when a plane's inflection differs.
  */
 export interface SiteDeployNames {
-  /** Bulk presigned-upload mutation, e.g. `uploadFiles`. */
+  /** Site-scoped bulk presigned-upload mutation, e.g. `uploadSiteFiles`. */
   bulkUploadMutation: string;
   /** Site release collection query, e.g. `siteReleases`. */
   releasesQuery: string;
@@ -125,8 +125,6 @@ export interface DeploySiteOptions {
    * site at `database` scope, where the column is NOT NULL.
    */
   databaseId?: string;
-  /** Bucket key of the site's bucket (`allow_custom_keys` must be on). */
-  bucketKey: string;
   /** The build: a directory path, or the files themselves. */
   source: DeploySource;
   /** Which generated surface to talk to. Defaults to `database`. */

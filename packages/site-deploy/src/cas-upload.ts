@@ -3,7 +3,7 @@
  *
  * The generic pieces come from `@constructive-io/upload-client` (a presigned
  * PUT); what is added here is the part a static release needs: many files in
- * one round trip, explicit `cas/sha256/<hash>` keys, and skipping every file
+ * one round trip, server-derived `cas/sha256/<hash>` keys, and skipping every file
  * the server already has. That skip is the whole incremental-deploy win — a
  * one-file change re-uploads one file however large the site is.
  */
@@ -28,10 +28,10 @@ interface BulkFilePayload {
 export interface UploadCasOptions {
   /** Executor for the storage target. */
   storage: GraphQLExecutor;
-  /** Bulk upload mutation field name, e.g. `uploadFiles`. */
+  /** Bulk upload mutation field name, e.g. `uploadSiteFiles`. */
   mutation: string;
-  /** Bucket key of the site's bucket. */
-  bucketKey: string;
+  /** Site whose backing bucket receives the files. */
+  siteId: string;
   /** Files per mutation call. */
   batchSize: number;
   /** Parallel PUTs. */
@@ -76,13 +76,12 @@ export async function diffCas(
     const batch = files.slice(offset, offset + options.batchSize);
     const data = await options.storage(mutation, {
       input: {
-        bucketKey: options.bucketKey,
+        siteId: options.siteId,
         files: batch.map((file) => ({
           contentHash: file.hash,
           contentType: file.contentType,
           size: file.size,
           filename: file.path.slice(file.path.lastIndexOf('/') + 1),
-          key: file.key,
         })),
       },
     });
@@ -98,8 +97,7 @@ export async function diffCas(
 
     results.forEach((result, index) => {
       const file = batch[index];
-      // The server does not enforce the CAS key form yet, so a mismatch here
-      // would publish a manifest pointing at bytes nobody can serve.
+      // A mismatch would publish a manifest pointing at bytes nobody can serve.
       if (result.key !== file.key || !CAS_KEY_PATTERN.test(result.key)) {
         throw new DeployError(
           'KEY_MISMATCH',

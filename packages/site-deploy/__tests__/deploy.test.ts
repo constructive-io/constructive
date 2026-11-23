@@ -1,12 +1,11 @@
 import { deploySite } from '../src/deploy';
 import type { DeployProgress, GraphQLExecutor, PutObject } from '../src/types';
 import { DeployError } from '../src/types';
-import { createMockServer, failingPut, file, hashOf, keyOf } from './mock-api';
+import { createMockServer, failingPut, file, hashOf } from './mock-api';
 
 const base = {
   siteId: 'site-1',
   databaseId: 'db-1',
-  bucketKey: 'site-docs',
 };
 
 const build = [file('index.html', '<h1>home</h1>'), file('assets/app.js', 'console.log(1)')];
@@ -45,16 +44,18 @@ describe('deploySite', () => {
     expect(server.countOf('updateSiteRelease')).toBe(0);
   });
 
-  it('registers the bytes under content-addressed keys', async () => {
+  it('requests content-addressed uploads for the site without physical keys', async () => {
     const server = createMockServer();
     await deploySite({ ...base, api: server.api, putObject: server.putObject, source: build });
 
-    const upload = server.firstCall('uploadFiles') as any;
-    expect(upload.input.bucketKey).toBe('site-docs');
-    expect(upload.input.files.map((f: any) => f.key)).toEqual([
-      keyOf('<h1>home</h1>'),
-      keyOf('console.log(1)'),
-    ]);
+    const upload = server.firstCall('uploadSiteFiles') as any;
+    expect(upload.input).toEqual({
+      siteId: 'site-1',
+      files: [
+        { contentHash: hashOf('<h1>home</h1>'), contentType: 'text/html; charset=utf-8', size: 13, filename: 'index.html' },
+        { contentHash: hashOf('console.log(1)'), contentType: 'text/javascript; charset=utf-8', size: 14, filename: 'app.js' },
+      ],
+    });
   });
 
   it('patches the existing row on later deploys instead of creating a second one', async () => {
@@ -137,7 +138,7 @@ describe('deploySite', () => {
       batchSize: 10,
     });
 
-    expect(server.countOf('uploadFiles')).toBe(3);
+    expect(server.countOf('uploadSiteFiles')).toBe(3);
     expect(server.puts).toHaveLength(25);
   });
 
@@ -155,7 +156,7 @@ describe('deploySite', () => {
     expect(server.activeCommitId).toBe(result.commitId);
     expect(server.calls.map((c) => c.operation)).toEqual([
       'siteReleases',
-      'uploadFiles',
+      'uploadSiteFiles',
       'createSiteRelease',
       'updateSite',
     ]);
@@ -221,7 +222,7 @@ describe('deploySite', () => {
     const server = createMockServer();
     const unsigned: GraphQLExecutor = async (query, variables) => {
       const data = await server.api(query, variables);
-      for (const result of (data.uploadFiles as any)?.files ?? []) result.uploadHeaders = null;
+      for (const result of (data.uploadSiteFiles as any)?.files ?? []) result.uploadHeaders = null;
       return data;
     };
     await expect(
@@ -318,7 +319,7 @@ describe('deploySite', () => {
       skipped: 2,
     });
     expect(server.countOf('updateSiteRelease')).toBe(0);
-    expect(server.countOf('uploadFiles')).toBe(1);
+    expect(server.countOf('uploadSiteFiles')).toBe(1);
   });
 
   it('commits again when the tree changed even with skipIfUnchanged', async () => {

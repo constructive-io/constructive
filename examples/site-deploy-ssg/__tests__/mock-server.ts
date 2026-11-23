@@ -56,14 +56,14 @@ export function createMockServer(): MockServer {
   function handle(operation: string, variables: Record<string, unknown>) {
     const input = (variables.input ?? {}) as Record<string, any>;
     switch (operation) {
-    case 'uploadFiles':
+    case 'uploadSiteFiles':
       return {
-        uploadFiles: {
+        uploadSiteFiles: {
           files: (input.files as any[]).map((file) => {
             const deduplicated = hashes.has(file.contentHash);
             return {
               fileId: `file-${file.contentHash.slice(0, 8)}`,
-              key: file.key as string,
+              key: `cas/sha256/${file.contentHash}`,
               deduplicated,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
               uploadHeaders: deduplicated ? null : signedHeaders(file),

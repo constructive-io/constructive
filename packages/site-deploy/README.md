@@ -32,7 +32,6 @@ const result = await deploySite({
   api,                     // GraphQL executor for the tenant API
   siteId,
   databaseId,              // required on a site's first deploy
-  bucketKey: 'site-docs',
   source: './dist',        // a directory, or the files themselves
   publish: true,           // move site.activeCommitId when it lands
 });
@@ -46,7 +45,6 @@ Deploy a branch preview instead of going live:
 const { previewUrl } = await deploySite({
   api,
   siteId,
-  bucketKey: 'site-docs',
   source: './dist',
   preview: 'pr-42',              // → preview/pr-42
   previewApex: 'preview.example.com',  // provisions pr-42--<site>.preview.example.com
