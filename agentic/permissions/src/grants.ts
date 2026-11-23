@@ -110,7 +110,7 @@ export function findGrants(grants: readonly Grant[], request: PermissionRequest)
     if (!grant) return [];
     used.add(grant);
   }
-  return [...used];
+  return ordered.filter((g) => used.has(g));
 }
 
 /**
@@ -189,8 +189,10 @@ export function parseGrantMatch(value: unknown): GrantMatch | null {
   case 'command':
     return typeof v.command === 'string' && isExactKey(v.command) ? { type: 'command', command: v.command } : null;
   case 'command-prefix': {
-    const { prefixes } = v;
-    if (!Array.isArray(prefixes) || prefixes.length === 0 || prefixes.length > MAX_PREFIXES) return null;
+    if (!Array.isArray(v.prefixes)) return null;
+    // A dense copy: `every` skips the holes of a sparse array, which a host's store may hand over.
+    const prefixes: unknown[] = Array.from(v.prefixes);
+    if (prefixes.length === 0 || prefixes.length > MAX_PREFIXES) return null;
     if (!prefixes.every((p): p is ListedPrefix => typeof p === 'string' && isStoredPrefix(p))) return null;
     return { type: 'command-prefix', prefixes: [...new Set(prefixes)] };
   }
