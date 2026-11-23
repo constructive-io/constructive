@@ -78,10 +78,24 @@ function readPrefixes(text: string): CommandPatternResult {
   return caveat === undefined ? { ok: true, match } : { ok: true, match, caveat };
 }
 
+/**
+ * The exact-grant key of a command, or why it has none: a blank command
+ * (empty, or only blanks and newlines) runs nothing, a `«secret:…»`
+ * placeholder asks every time, and the engine checks no command longer than
+ * 64 KB. A card's option, a stored grant and a typed rule all get their key
+ * here.
+ */
+export function exactKey(command: string): { ok: true; key: CommandKey } | { ok: false; reason: string } {
+  if (command.trim() === '') return refused(RULE_REFUSAL.empty('exact'));
+  if (command.length > MAX_COMMAND_LENGTH) return refused(RULE_REFUSAL.tooLong);
+  const key = normalizeCommand(command);
+  if (hasPlaceholder(key)) return refused(RULE_REFUSAL.placeholder);
+  return { ok: true, key };
+}
+
 function readExact(text: string): CommandPatternResult {
-  const command = normalizeCommand(text);
-  if (hasPlaceholder(command)) return refused(RULE_REFUSAL.placeholder);
-  return { ok: true, match: { type: 'command', command } };
+  const read = exactKey(text);
+  return read.ok === false ? read : { ok: true, match: { type: 'command', command: read.key } };
 }
 
 /** `prefix` is one the table lists, written the way a card saves it. */
@@ -91,20 +105,19 @@ export function isStoredPrefix(prefix: string): prefix is ListedPrefix {
   return read.ok && read.prefix === prefix;
 }
 
-/** `command` is an exact-grant key the engine could have saved: its own normalized form, within the length cap. */
+/** `command` is an exact-grant key the engine could have saved: its own key. */
 export function isExactKey(command: string): command is CommandKey {
-  if (command === '' || command.length > MAX_COMMAND_LENGTH) return false;
-  const read = readExact(command);
-  return read.ok && read.match.type === 'command' && read.match.command === command;
+  const read = exactKey(command);
+  return read.ok && read.key === command;
 }
 
 /** A rule a person typed, read back into a command match of its kind by the rules the engine matches with. */
 export function parseCommandPattern(pattern: CommandPattern): CommandPatternResult {
   const { kind, text } = pattern;
-  if (text.trim() === '') return refused(RULE_REFUSAL.empty(kind));
-  if (text.length > MAX_COMMAND_LENGTH) return refused(RULE_REFUSAL.tooLong);
   switch (kind) {
   case 'prefix':
+    if (text.trim() === '') return refused(RULE_REFUSAL.empty(kind));
+    if (text.length > MAX_COMMAND_LENGTH) return refused(RULE_REFUSAL.tooLong);
     return readPrefixes(text);
   case 'exact':
     return readExact(text);

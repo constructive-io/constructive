@@ -11,7 +11,7 @@
 
 import * as path from 'node:path';
 
-import { commandPattern, isExactKey, isStoredPrefix } from './command-pattern';
+import { commandPattern, exactKey, isExactKey, isStoredPrefix } from './command-pattern';
 import { grantCaveat, MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
 import { grantOptionLabel } from './grant-copy';
 import { commonParent, contains, displayDir } from './paths';
@@ -20,6 +20,7 @@ import { SIGNAL_RULES } from './signals';
 import type {
   Access,
   BashRequest,
+  CommandKey,
   CommandMatch,
   CommandPart,
   CommandPrefixMatch,
@@ -135,12 +136,10 @@ function newPrefixes(request: BashRequest, held: readonly Grant[]): ListedPrefix
  * already covers, the project option only those a project grant covers, so
  * the project grant still holds in the next chat.
  */
-function commandOption(scope: GrantScope, request: BashRequest, grants: readonly Grant[], homeDir: string): GrantOption {
+function commandOption(scope: GrantScope, request: BashRequest, key: CommandKey, grants: readonly Grant[], homeDir: string): GrantOption {
   const held = scope === 'chat' ? grants : grants.filter((g) => g.scope === 'project');
   const prefixes = newPrefixes(request, held);
-  const match: CommandMatch | CommandPrefixMatch = prefixes
-    ? { type: 'command-prefix', prefixes }
-    : { type: 'command', command: request.command };
+  const match: CommandMatch | CommandPrefixMatch = prefixes ? { type: 'command-prefix', prefixes } : { type: 'command', command: key };
   const caveat = grantCaveat(match);
   return {
     scope,
@@ -165,7 +164,10 @@ function pathOptions(request: FileRequest, homeDir: string): GrantOption[] {
 export function grantOptionsFor(request: PermissionRequest, homeDir: string, grants: readonly Grant[] = []): GrantOption[] {
   if (!isGrantable(request)) return [];
   return byRequest(request, {
-    bash: (r) => (r.command === '' ? [] : [commandOption('chat', r, grants, homeDir), commandOption('project', r, grants, homeDir)]),
+    bash: (r) => {
+      const read = exactKey(r.command);
+      return read.ok ? (['chat', 'project'] as const).map((scope) => commandOption(scope, r, read.key, grants, homeDir)) : [];
+    },
     file: (r) => pathOptions(r, homeDir)
   });
 }

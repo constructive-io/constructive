@@ -86,6 +86,10 @@ describe('grants', () => {
       'ask'
     );
   });
+
+  it('offers no grant for a blank command, which runs nothing', async () => {
+    for (const command of ['\n', ' \n\t', '\n\n']) expect(asAsk(await sb.bash(command, 'ask')).grantOptions).toEqual([]);
+  });
 });
 
 
@@ -308,6 +312,7 @@ describe('parseGrantMatch', () => {
     ['a prefix that is not text', { type: 'command-prefix', prefixes: [1] }],
     ['an exact command that is not its own key', { type: 'command', command: 'git  status' }],
     ['an empty exact command', { type: 'command', command: '' }],
+    ['a blank exact command', { type: 'command', command: '\n' }],
     ['an exact command with a secret placeholder', { type: 'command', command: 'echo «secret:TOKEN#1a2b»' }],
     ['a relative path', { type: 'path', access: 'read', pathPrefix: 'src' }],
     ['a path that is not normalized', { type: 'path', access: 'read', pathPrefix: '/a/../b' }],
