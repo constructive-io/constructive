@@ -32,7 +32,6 @@ import {
 export type Part =
   | { kind: 'lit'; text: string; quoted: boolean }
   | { kind: 'var'; name: string; quoted: boolean; fallback?: string }
-  | { kind: 'tilde' }
   /** `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). */
   | { kind: 'unknown'; ref?: string };
 
@@ -402,37 +401,10 @@ class Lexer {
         this.readDollar(parts, lit, false);
         continue;
       }
-      if (ch === '~' && this.atTildePosition(parts)) {
-        const rest = s.slice(this.i + 1);
-        const user = /^[^/\s;&|()<>:]*/.exec(rest)[0];
-        if (user === '') {
-          parts.push({ kind: 'tilde' });
-          this.i++;
-          continue;
-        }
-        this.dynamic.push(`~${user} expansion`);
-        lit(`~${user}`, false);
-        this.i += 1 + user.length;
-        continue;
-      }
       lit(ch, false);
       this.i++;
     }
     return parts;
-  }
-
-  /**
-   * `~` expands at the start of a word, and in a word shaped like an
-   * assignment (`PATH=a:~/bin`, also as an argument) right after its `=` or
-   * an unquoted `:`.
-   */
-  private atTildePosition(parts: Part[]): boolean {
-    if (parts.length === 0) return true;
-    const first = parts[0];
-    if (first.kind !== 'lit' || first.quoted || !/^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(first.text)) return false;
-    const last = parts[parts.length - 1];
-    if (last.kind !== 'lit' || last.quoted) return false;
-    return last.text.endsWith(':') || (parts.length === 1 && /^[A-Za-z_][A-Za-z0-9_]*\+?=$/.test(last.text));
   }
 
   private readDouble(parts: Part[], lit: (text: string, quoted: boolean) => void): void {
@@ -442,7 +414,8 @@ class Lexer {
       const ch = s[this.i];
       if (ch === '"') {
         this.i++;
-        if (parts.length === 0) lit('', true);
+        // An empty `""` is a part too: it keeps an empty word and stops a tilde before it.
+        lit('', true);
         return;
       }
       if (ch === '\\') {

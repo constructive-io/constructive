@@ -16,8 +16,8 @@ import type { Findings } from '../findings';
 import type { Access, CommandKey, CommandPart, Signal } from '../types';
 import { unreachable } from '../unreachable';
 import { generic } from './args';
-import { expandWord, MAX_BRACE_NAMES, MAX_PLAIN_NAME_RESULTS, NameBudget } from './braces';
 import { runCommand, TESTS } from './commands';
+import { expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, type WordUse } from './expand';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
@@ -130,9 +130,6 @@ export function normalizeCommand(command: string): CommandKey {
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
 export type Cwd = { kind: 'start' } | { kind: 'moved'; dir: string } | { kind: 'unknown' };
 
-/** Stands for the first unknown part of a word while braces expand, so each result keeps its literal start. */
-const UNKNOWN_MARK = '\u0000';
-
 /** The text an argument certainly starts with: all of it when known, its literal start otherwise. */
 export function literalStart(arg: Arg): string {
   return arg.kind === 'known' ? arg.text : arg.knownPrefix;
@@ -152,9 +149,14 @@ const LIMIT_REASONS: Record<Limit, string> = {
   'substitution-depth': `it nests command substitutions more than ${MAX_SUBSTITUTION_DEPTH} deep, and the analysis did not read past that`,
   'shell-string-depth': `it nests shell strings (\`sh -c\`, \`eval\`, …) more than ${MAX_SHELL_STRING_DEPTH} deep, and the analysis did not read past that`,
   'command-length': `it is longer than ${MAX_COMMAND_LENGTH / 1024} KB, and the analysis did not read it`,
-  'brace-results': `a brace expansion has more results than can be checked (${MAX_PLAIN_NAME_RESULTS} names at most)`,
-  'brace-names': `the command's brace expansions make more than ${MAX_BRACE_NAMES} names, so not every name could be checked`
+  'expansion-chars': `its expansions build more than ${MAX_EXPANSION_CHARS / 1024} KB of text, and the analysis did not build the rest`,
+  'expansion-words': `its expansions make more than ${MAX_EXPANSION_WORDS} words, so not every word could be checked`
 };
+
+/** Builtins whose `NAME=value` arguments bash expands as assignments, with no splitting or glob. */
+const DECLARATION_BUILTINS: ReadonlySet<string> = new Set(['export', 'declare', 'local', 'readonly', 'typeset']);
+
+const ASSIGNMENT_WORD = /^[A-Za-z_][A-Za-z0-9_]*\+?=/;
 
 /** Device paths that are not files. */
 const HARMLESS_DEVICES = new Set([
@@ -237,7 +239,7 @@ function isHarmlessDevice(abs: string): boolean {
   return HARMLESS_DEVICES.has(abs) || abs.startsWith('/dev/fd/');
 }
 
-class Analyzer {
+class Analyzer implements ExpansionScope {
   readonly paths: BashPath[] = [];
   readonly checks: DestructiveCheck[] = [];
   readonly tracker = new FlowTracker(this);
@@ -253,8 +255,8 @@ class Analyzer {
   private cwd: Cwd = { kind: 'start' };
   /** Some command ran, or the shell moved, outside the start dir. */
   private leftStart = false;
-  /** The names brace expansion may still add to this command's checks. */
-  private readonly names = new NameBudget(MAX_BRACE_NAMES);
+  /** What the expansions of this command may still build. */
+  private readonly budget = new ExpansionBudget((limit) => this.incomplete(limit));
   /**
    * Whether IFS may differ from bash's default: a word names it (`IFS=:`,
    * `read IFS`, `mapfile -t IFS`, `for IFS in …`) or the command assigns it
@@ -383,7 +385,7 @@ class Analyzer {
    * `value` is `null` when it is not known statically.
    */
   /** An unquoted expansion may split where this analysis does not follow it. */
-  private ifsMaySplit(): boolean {
+  ifsMayDiffer(): boolean {
     switch (this.ifs) {
     case 'default':
       return false;
@@ -413,7 +415,7 @@ class Analyzer {
 
   lookup(name: string): string | null {
     if (this.vars.has(name)) return this.vars.get(name);
-    if (name === 'HOME') return path.resolve(this.ctx.homeDir);
+    if (name === 'HOME') return this.home;
     if (name === 'PWD') return this.base;
     return null;
   }
@@ -423,71 +425,39 @@ class Analyzer {
    * command set the variable to empty: one from outside may hold anything, and
    * a fallback with its own expansion or a `~` is not known either.
    */
-  private valueOf(name: string, fallback: string | undefined): string | null {
+  value(name: string, fallback: string | undefined): string | null {
     const value = this.lookup(name);
     if (fallback === undefined || value !== '') return value;
     return /[$`~]/.test(fallback) ? null : fallback;
   }
 
-  resolveWord(word: Word): Arg[] {
-    let text = '';
-    const mask: boolean[] = [];
-    let unknown = false;
-    const append = (value: string, expandable: boolean) => {
-      text += value;
-      for (let k = 0; k < value.length; k++) mask.push(expandable);
-    };
-    const markUnknown = () => {
-      if (!unknown) append(UNKNOWN_MARK, false);
-      unknown = true;
-    };
-    for (const part of word.parts) {
-      if (part.kind === 'lit') append(part.text, !part.quoted);
-      else if (part.kind === 'tilde') append(path.resolve(this.ctx.homeDir), false);
-      else if (part.kind === 'unknown') {
-        markUnknown();
-        if (part.ref) this.noteRef(part.ref);
-      } else {
-        this.noteRef(part.name);
-        // An IFS the command sets splits an unquoted expansion where this analysis does not follow it.
-        const value = !part.quoted && this.ifsMaySplit() ? null : this.valueOf(part.name, part.fallback);
-        if (value === null) markUnknown();
-        else append(value, false);
-      }
-    }
-    const expanded: { text: string; mask: boolean[] }[] = [];
-    const limit = expandWord(text, mask, expanded, this.names);
-    if (limit) this.incomplete(limit);
-    const braced = text[0] === '{' && mask[0];
-    return expanded.map((e): Arg => {
-      const result = braced ? this.alternativeTilde(e) : e;
-      if (unknown) {
-        const cut = result.text.indexOf(UNKNOWN_MARK);
-        return { kind: 'unknown', knownPrefix: cut < 0 ? result.text : result.text.slice(0, cut), raw: word.raw };
-      }
-      return {
-        kind: 'known',
-        text: result.text,
-        raw: word.raw,
-        glob: [...result.text].some((ch, k) => result.mask[k] && (ch === '*' || ch === '?' || ch === '['))
-      };
-    });
+  get home(): string {
+    return path.resolve(this.ctx.homeDir);
+  }
+
+  /** The arguments a word expands to as bash expands an argument. */
+  resolveWord(word: Word, use: WordUse = 'argument'): Arg[] {
+    return expandWord(word, use, this, this.budget);
   }
 
   /**
-   * Brace expansion runs before tilde expansion, so a word that starts with a
-   * brace and expands to one that starts with an unquoted `~` gets the home
-   * dir there (`{a,~/x}` → `a`, `$HOME/x`). `~user` cannot be known.
+   * A command's words as bash expands them: the assignments before the
+   * command word, and the `NAME=value` arguments of a declaration builtin, as
+   * assignments; every other word as an argument.
    */
-  private alternativeTilde(e: { text: string; mask: boolean[] }): { text: string; mask: boolean[] } {
-    if (e.text[0] !== '~' || !e.mask[0]) return e;
-    const user = /^~([^/]*)/.exec(e.text)[1];
-    if (user !== '') {
-      this.dynamic(`it uses ~${user} expansion`);
-      return e;
+  private expandWords(words: readonly Word[]): Arg[] {
+    const args: Arg[] = [];
+    let beforeCommand = true;
+    let declaration = false;
+    for (const word of words) {
+      const assignment = ASSIGNMENT_WORD.test(word.raw);
+      if (beforeCommand && !assignment && !SHELL_KEYWORDS.has(word.raw)) {
+        beforeCommand = false;
+        declaration = DECLARATION_BUILTINS.has(word.raw);
+      }
+      args.push(...this.resolveWord(word, assignment && (beforeCommand || declaration) ? 'assignment' : 'argument'));
     }
-    const home = path.resolve(this.ctx.homeDir);
-    return { text: home + e.text.slice(1), mask: [...new Array<boolean>(home.length).fill(false), ...e.mask.slice(1)] };
+    return args;
   }
 
   /** The absolute location of an argument, or `null` when it is unknown. */
@@ -539,7 +509,7 @@ class Analyzer {
   }
 
   analyzeCommand(cmd: SimpleCommand): void {
-    const args = cmd.words.flatMap((w) => this.resolveWord(w));
+    const args = this.expandWords(cmd.words);
     const stdinFed = isPipedIn(cmd) || readsStdinDoc(cmd) || cmd.redirects.some((r) => r.kind === 'file' && r.op === '<');
     const stdin = this.tracker.stdinOf(cmd);
     this.stdin = stdin;

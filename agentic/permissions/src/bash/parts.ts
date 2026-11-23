@@ -8,7 +8,7 @@
 
 import type { CommandPart } from '../types';
 import { unreachable } from '../unreachable';
-import { expandWord, MAX_BRACE_NAMES, NameBudget } from './braces';
+import { expandWord,ExpansionBudget, type ExpansionScope } from './expand';
 import { type Lexed, readsStdinDoc, type Redirect, type Word } from './tokenize';
 import { SHELL_KEYWORDS } from './words';
 
@@ -39,16 +39,18 @@ export function isShellSyntax(word: string | undefined): boolean {
   return word !== undefined && (SHELL_KEYWORDS.has(word) || COMPOUND_OPENERS.has(word));
 }
 
-/** A word's text after quote removal, with the mask of characters brace expansion may act on. */
-function literalText(word: Word): { text: string; mask: boolean[] } {
-  let text = '';
-  const mask: boolean[] = [];
-  for (const part of word.parts) {
-    const piece = part.kind === 'lit' ? part.text : '~';
-    text += piece;
-    for (let k = 0; k < piece.length; k++) mask.push(part.kind === 'lit' && !part.quoted);
-  }
-  return { text, mask };
+/** Option words hold no variable here, so their expansion needs nothing from the analysis. */
+const LITERAL_SCOPE: ExpansionScope = {
+  home: '~',
+  value: () => null,
+  ifsMayDiffer: () => false,
+  noteRef: () => undefined,
+  dynamic: () => undefined
+};
+
+/** The texts a word of literals expands to: after braces, tilde and quote removal. */
+function literalTexts(word: Word, budget: ExpansionBudget): string[] {
+  return expandWord(word, 'argument', LITERAL_SCOPE, budget).map((arg) => (arg.kind === 'known' ? arg.text : arg.knownPrefix));
 }
 
 /**
@@ -59,20 +61,21 @@ function literalText(word: Word): { text: string; mask: boolean[] } {
  * (word splitting can turn `HEAD$IFS--upload-pack=x` into two words), or a
  * quoted variable at a start that may be an option.
  */
-function optionsOf(words: readonly Word[], names: NameBudget): string[] | null {
+function optionsOf(words: readonly Word[], budget: ExpansionBudget, spent: () => boolean): string[] | null {
   const options: string[] = [];
   for (const word of words) {
     if (word.parts.some((p) => p.kind === 'unknown' || (p.kind === 'var' && !p.quoted))) return null;
     const open = word.parts.findIndex((p) => p.kind === 'var');
     if (open >= 0) {
-      const lead = literalText({ ...word, parts: word.parts.slice(0, open) }).text;
+      const lead = word.parts
+        .slice(0, open)
+        .map((p) => (p.kind === 'lit' ? p.text : ''))
+        .join('');
       if (lead === '' || lead.startsWith('-') || lead.includes('{')) return null;
       continue;
     }
-    const { text, mask } = literalText(word);
-    const expanded: { text: string; mask: boolean[] }[] = [];
-    if (expandWord(text, mask, expanded, names) !== null) return null;
-    for (const e of expanded) if (e.text.startsWith('-')) options.push(e.text);
+    for (const text of literalTexts(word, budget)) if (text.startsWith('-')) options.push(text);
+    if (spent()) return null;
   }
   return options;
 }
@@ -80,10 +83,13 @@ function optionsOf(words: readonly Word[], names: NameBudget): string[] | null {
 export function commandParts(command: string, lexed: Lexed): CommandPart[] | null {
   if (lexed.error || lexed.dynamic.length > 0 || lexed.commands.length === 0 || command.includes('\r')) return null;
   if (lexed.commands.some((cmd) => readsStdinDoc(cmd) || isShellSyntax(cmd.words[0]?.raw))) return null;
-  const names = new NameBudget(MAX_BRACE_NAMES);
+  let spent = false;
+  const budget = new ExpansionBudget(() => {
+    spent = true;
+  });
   return lexed.commands.map((cmd) => ({
     words: cmd.words.map((w) => w.raw),
     writesFile: cmd.redirects.some(writesFile),
-    options: optionsOf(cmd.words, names)
+    options: optionsOf(cmd.words, budget, () => spent)
   }));
 }

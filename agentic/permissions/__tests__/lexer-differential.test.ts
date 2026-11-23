@@ -120,8 +120,11 @@ const rows: Row[] = [
   // a sequence expansion's words past the first limit can still spell a credential or a secret file
   ['cd ~ && cat .{a..z}{e..e}{a..z}{r..r}{c..c}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['rev .{z..a}{z..a}{z..a} 2>/dev/null', 'ask', 'ask', 'ask', ['unresolvable-path']],
-  // an expansion cut off at its limit leaves words unchecked, so it asks in every mode
-  [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'ask', 'ask', 'ask', ['unresolvable-path']],
+  // an unquoted value splits into words, and a glob character in it still globs
+  ['x="a $HOME/.ssh/id_rsa"; cat $x', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['x="$HOME/.ss?/id_rsa"; cat $x', 'deny', 'deny', 'deny', ['hard-deny']],
+  // every word of a brace expansion is checked, up to the command's budget
+  [`cat {README.md,${'x,'.repeat(300)}~/.ssh/id_rsa}`, 'deny', 'deny', 'deny', ['hard-deny']],
   // so does every other limit of the analysis: substitution depth and shell-string depth
   [`${'echo $('.repeat(7)}cat ~/.ssh/id_rsa${')'.repeat(7)}`, 'ask', 'ask', 'ask', ['unresolvable-path']],
   ['eval eval eval eval eval cat ~/.ssh/id_rsa', 'ask', 'ask', 'ask', ['unresolvable-path']]
@@ -137,7 +140,7 @@ describe('bash analysis reads a command the way bash runs it', () => {
       expect([mode, d.decision]).toEqual([mode, verdicts[k]]);
       for (const signal of rest[3] as Signal[]) expect(d.request.signals).toContain(signal);
     }
-  });
+  }, 20_000);
 
   it('expands a `~` after `:` in a word shaped like an assignment, as bash does', async () => {
     const d = await sb.bash('make OUT=a:~/notes', 'workspace');

@@ -11,7 +11,7 @@ export type Limit =
   | 'shell-string-depth'
   /** A command longer than the analyzer reads. */
   | 'command-length'
-  /** One word's brace expansion has more results than are checked. */
-  | 'brace-results'
-  /** The command's brace expansions make more names than are checked. */
-  | 'brace-names';
+  /** The command's expansions build more text than the analysis holds. */
+  | 'expansion-chars'
+  /** The command's expansions make more words than are checked. */
+  | 'expansion-words';
