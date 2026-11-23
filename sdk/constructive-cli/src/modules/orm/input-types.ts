@@ -1921,7 +1921,7 @@ export interface PlansModule {
   publicSchemaName?: string | null;
   schemaId?: string | null;
 }
-/** Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database. */
+/** Provisions credentials for principals on top of principals_module: API keys, child sessions, delegation and token exchange, and org API key management. Requires the built-in auth stack (sessions_module, user_auth_module); installing it provisions principals_module first when the database does not have it. Org API key functions are only generated when an org-scoped memberships_module exists for the database. */
 export interface PrincipalAuthModule {
   apiName?: string | null;
   auditsTableId?: string | null;
@@ -1941,6 +1941,23 @@ export interface PrincipalAuthModule {
   schemaId?: string | null;
   sessionCredentialsTableId?: string | null;
   sessionsTableId?: string | null;
+  sweepExpiredPrincipalsFunction?: string | null;
+  usersTableId?: string | null;
+}
+/** Provisions principals as authorization data, with no dependency on sessions or sign-in: the principals, principal_entities and principal_scope_overrides tables, the create/update/delete and scope mutations, the SPRT derivation that keeps a principal's capabilities in step with its owner, and the expiry sweep. The caller that opens the transaction sets jwt.claims.principal_id to a principal's user_id. Credentials for principals (API keys, child sessions, token exchange) are principal_auth_module, which builds on this one. */
+export interface PrincipalsModule {
+  createOrgPrincipalFunction?: string | null;
+  createPrincipalFunction?: string | null;
+  databaseId?: string | null;
+  deleteOrgPrincipalFunction?: string | null;
+  deletePrincipalFunction?: string | null;
+  id: string;
+  principalEntitiesTableId?: string | null;
+  principalScopeOverridesTableId?: string | null;
+  principalsTableId?: string | null;
+  principalsTableName?: string | null;
+  privateSchemaId?: string | null;
+  schemaId?: string | null;
   sweepExpiredPrincipalsFunction?: string | null;
   usersTableId?: string | null;
 }
@@ -2771,6 +2788,7 @@ export interface PagesModuleRelations {
 export interface PhoneNumbersModuleRelations {}
 export interface PlansModuleRelations {}
 export interface PrincipalAuthModuleRelations {}
+export interface PrincipalsModuleRelations {}
 export interface ProfilesModuleRelations {}
 export interface RateLimitMetersModuleRelations {}
 export interface RateLimitsModuleRelations {}
@@ -2893,6 +2911,7 @@ export type PagesModuleWithRelations = PagesModule & PagesModuleRelations;
 export type PhoneNumbersModuleWithRelations = PhoneNumbersModule & PhoneNumbersModuleRelations;
 export type PlansModuleWithRelations = PlansModule & PlansModuleRelations;
 export type PrincipalAuthModuleWithRelations = PrincipalAuthModule & PrincipalAuthModuleRelations;
+export type PrincipalsModuleWithRelations = PrincipalsModule & PrincipalsModuleRelations;
 export type ProfilesModuleWithRelations = ProfilesModule & ProfilesModuleRelations;
 export type RateLimitMetersModuleWithRelations = RateLimitMetersModule &
   RateLimitMetersModuleRelations;
@@ -4507,6 +4526,22 @@ export type PrincipalAuthModuleSelect = {
   schemaId?: boolean;
   sessionCredentialsTableId?: boolean;
   sessionsTableId?: boolean;
+  sweepExpiredPrincipalsFunction?: boolean;
+  usersTableId?: boolean;
+};
+export type PrincipalsModuleSelect = {
+  createOrgPrincipalFunction?: boolean;
+  createPrincipalFunction?: boolean;
+  databaseId?: boolean;
+  deleteOrgPrincipalFunction?: boolean;
+  deletePrincipalFunction?: boolean;
+  id?: boolean;
+  principalEntitiesTableId?: boolean;
+  principalScopeOverridesTableId?: boolean;
+  principalsTableId?: boolean;
+  principalsTableName?: boolean;
+  privateSchemaId?: boolean;
+  schemaId?: boolean;
   sweepExpiredPrincipalsFunction?: boolean;
   usersTableId?: boolean;
 };
@@ -8273,6 +8308,42 @@ export interface PrincipalAuthModuleFilter {
   sessionCredentialsTableId?: UUIDFilter;
   /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sweepExpiredPrincipalsFunction` field. */
+  sweepExpiredPrincipalsFunction?: StringFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+}
+export interface PrincipalsModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PrincipalsModuleFilter[];
+  /** Filter by the object’s `createOrgPrincipalFunction` field. */
+  createOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `createPrincipalFunction` field. */
+  createPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deleteOrgPrincipalFunction` field. */
+  deleteOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `deletePrincipalFunction` field. */
+  deletePrincipalFunction?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PrincipalsModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PrincipalsModuleFilter[];
+  /** Filter by the object’s `principalEntitiesTableId` field. */
+  principalEntitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `principalScopeOverridesTableId` field. */
+  principalScopeOverridesTableId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableId` field. */
+  principalsTableId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableName` field. */
+  principalsTableName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
   /** Filter by the object’s `sweepExpiredPrincipalsFunction` field. */
   sweepExpiredPrincipalsFunction?: StringFilter;
   /** Filter by the object’s `usersTableId` field. */
@@ -12317,6 +12388,38 @@ export type PrincipalAuthModuleOrderBy =
   | 'SESSIONS_TABLE_ID_DESC'
   | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
   | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_ASC'
+  | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_DESC'
+  | 'USERS_TABLE_ID_ASC'
+  | 'USERS_TABLE_ID_DESC';
+export type PrincipalsModuleOrderBy =
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'CREATE_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_PRINCIPAL_FUNCTION_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'DELETE_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_PRINCIPAL_FUNCTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPALS_TABLE_ID_ASC'
+  | 'PRINCIPALS_TABLE_ID_DESC'
+  | 'PRINCIPALS_TABLE_NAME_ASC'
+  | 'PRINCIPALS_TABLE_NAME_DESC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_ASC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_DESC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
   | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_ASC'
   | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_DESC'
   | 'USERS_TABLE_ID_ASC'
@@ -16778,6 +16881,48 @@ export interface DeletePrincipalAuthModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreatePrincipalsModuleInput {
+  clientMutationId?: string;
+  principalsModule: {
+    createOrgPrincipalFunction?: string;
+    createPrincipalFunction?: string;
+    databaseId: string;
+    deleteOrgPrincipalFunction?: string;
+    deletePrincipalFunction?: string;
+    principalEntitiesTableId?: string;
+    principalScopeOverridesTableId?: string;
+    principalsTableId?: string;
+    principalsTableName?: string;
+    privateSchemaId?: string;
+    schemaId?: string;
+    sweepExpiredPrincipalsFunction?: string;
+    usersTableId?: string;
+  };
+}
+export interface PrincipalsModulePatch {
+  createOrgPrincipalFunction?: string | null;
+  createPrincipalFunction?: string | null;
+  databaseId?: string | null;
+  deleteOrgPrincipalFunction?: string | null;
+  deletePrincipalFunction?: string | null;
+  principalEntitiesTableId?: string | null;
+  principalScopeOverridesTableId?: string | null;
+  principalsTableId?: string | null;
+  principalsTableName?: string | null;
+  privateSchemaId?: string | null;
+  schemaId?: string | null;
+  sweepExpiredPrincipalsFunction?: string | null;
+  usersTableId?: string | null;
+}
+export interface UpdatePrincipalsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  principalsModulePatch: PrincipalsModulePatch;
+}
+export interface DeletePrincipalsModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateProfilesModuleInput {
   clientMutationId?: string;
   profilesModule: {
@@ -20292,6 +20437,23 @@ export interface PrincipalAuthModuleInput {
   schemaId?: string;
   sessionCredentialsTableId?: string;
   sessionsTableId?: string;
+  sweepExpiredPrincipalsFunction?: string;
+  usersTableId?: string;
+}
+/** An input for mutations affecting `PrincipalsModule` */
+export interface PrincipalsModuleInput {
+  createOrgPrincipalFunction?: string;
+  createPrincipalFunction?: string;
+  databaseId: string;
+  deleteOrgPrincipalFunction?: string;
+  deletePrincipalFunction?: string;
+  id?: string;
+  principalEntitiesTableId?: string;
+  principalScopeOverridesTableId?: string;
+  principalsTableId?: string;
+  principalsTableName?: string;
+  privateSchemaId?: string;
+  schemaId?: string;
   sweepExpiredPrincipalsFunction?: string;
   usersTableId?: string;
 }
@@ -25761,6 +25923,51 @@ export type DeletePrincipalAuthModulePayloadSelect = {
     select: PrincipalAuthModuleEdgeSelect;
   };
 };
+export interface CreatePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was created by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
+}
+export type CreatePrincipalsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalsModule?: {
+    select: PrincipalsModuleSelect;
+  };
+  principalsModuleEdge?: {
+    select: PrincipalsModuleEdgeSelect;
+  };
+};
+export interface UpdatePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was updated by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
+}
+export type UpdatePrincipalsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalsModule?: {
+    select: PrincipalsModuleSelect;
+  };
+  principalsModuleEdge?: {
+    select: PrincipalsModuleEdgeSelect;
+  };
+};
+export interface DeletePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was deleted by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
+}
+export type DeletePrincipalsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  principalsModule?: {
+    select: PrincipalsModuleSelect;
+  };
+  principalsModuleEdge?: {
+    select: PrincipalsModuleEdgeSelect;
+  };
+};
 export interface CreateProfilesModulePayload {
   clientMutationId?: string | null;
   /** The `ProfilesModule` that was created by this mutation. */
@@ -27706,6 +27913,18 @@ export type PrincipalAuthModuleEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: PrincipalAuthModuleSelect;
+  };
+};
+/** A `PrincipalsModule` edge in the connection. */
+export interface PrincipalsModuleEdge {
+  cursor?: string | null;
+  /** The `PrincipalsModule` at the end of the edge. */
+  node?: PrincipalsModule | null;
+}
+export type PrincipalsModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PrincipalsModuleSelect;
   };
 };
 /** A `ProfilesModule` edge in the connection. */

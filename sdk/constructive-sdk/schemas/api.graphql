@@ -13586,6 +13586,35 @@ type Field {
   tags: [String]!
   type: JSON!
   updatedAt: Datetime
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsByUserFieldId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
 }
 
 type FieldBehavior {
@@ -13879,6 +13908,12 @@ input FieldFilter {
 
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
+
+  """Filter by the object’s `webauthnSettingsByUserFieldId` relation."""
+  webauthnSettingsByUserFieldId: FieldToManyWebauthnSettingFilter
+
+  """`webauthnSettingsByUserFieldId` exist."""
+  webauthnSettingsByUserFieldIdExist: Boolean
 }
 
 """An input for mutations affecting `Field`"""
@@ -14052,6 +14087,20 @@ input FieldToManySpatialRelationFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: SpatialRelationFilter
+}
+
+"""
+A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input FieldToManyWebauthnSettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebauthnSettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebauthnSettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebauthnSettingFilter
 }
 
 """One version rendered beside a file, with a URL to fetch it."""
@@ -14709,7 +14758,297 @@ type Function {
   isStrict: Boolean!
   kind: String!
   name: String!
+
+  """Reads and enables pagination through a set of `PubkeySetting`."""
+  pubkeySettingsBySignInRecordFailureFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PubkeySetting`."""
+    orderBy: [PubkeySettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PubkeySettingFilter
+  ): PubkeySettingConnection!
+
+  """Reads and enables pagination through a set of `PubkeySetting`."""
+  pubkeySettingsBySignInRequestChallengeFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PubkeySetting`."""
+    orderBy: [PubkeySettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PubkeySettingFilter
+  ): PubkeySettingConnection!
+
+  """Reads and enables pagination through a set of `PubkeySetting`."""
+  pubkeySettingsBySignInWithChallengeFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PubkeySetting`."""
+    orderBy: [PubkeySettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PubkeySettingFilter
+  ): PubkeySettingConnection!
+
+  """Reads and enables pagination through a set of `PubkeySetting`."""
+  pubkeySettingsBySignUpWithKeyFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PubkeySetting`."""
+    orderBy: [PubkeySettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PubkeySettingFilter
+  ): PubkeySettingConnection!
   returns: JSON
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByAuthenticateFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByAuthenticateStrictFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByCurrentIpAddressFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByCurrentRoleFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByCurrentRoleIdFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByCurrentUserAgentFunctionId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
 
   """Reads a single `Schema` that is related to this `Function`."""
   schema: Schema
@@ -14824,8 +15163,84 @@ input FunctionFilter {
   """Checks for any expressions in this list."""
   or: [FunctionFilter!]
 
+  """
+  Filter by the object’s `pubkeySettingsBySignInRecordFailureFunctionId` relation.
+  """
+  pubkeySettingsBySignInRecordFailureFunctionId: FunctionToManyPubkeySettingFilter
+
+  """`pubkeySettingsBySignInRecordFailureFunctionId` exist."""
+  pubkeySettingsBySignInRecordFailureFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `pubkeySettingsBySignInRequestChallengeFunctionId` relation.
+  """
+  pubkeySettingsBySignInRequestChallengeFunctionId: FunctionToManyPubkeySettingFilter
+
+  """`pubkeySettingsBySignInRequestChallengeFunctionId` exist."""
+  pubkeySettingsBySignInRequestChallengeFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `pubkeySettingsBySignInWithChallengeFunctionId` relation.
+  """
+  pubkeySettingsBySignInWithChallengeFunctionId: FunctionToManyPubkeySettingFilter
+
+  """`pubkeySettingsBySignInWithChallengeFunctionId` exist."""
+  pubkeySettingsBySignInWithChallengeFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `pubkeySettingsBySignUpWithKeyFunctionId` relation.
+  """
+  pubkeySettingsBySignUpWithKeyFunctionId: FunctionToManyPubkeySettingFilter
+
+  """`pubkeySettingsBySignUpWithKeyFunctionId` exist."""
+  pubkeySettingsBySignUpWithKeyFunctionIdExist: Boolean
+
   """Filter by the object’s `returns` field."""
   returns: JSONFilter
+
+  """Filter by the object’s `rlsSettingsByAuthenticateFunctionId` relation."""
+  rlsSettingsByAuthenticateFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByAuthenticateFunctionId` exist."""
+  rlsSettingsByAuthenticateFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `rlsSettingsByAuthenticateStrictFunctionId` relation.
+  """
+  rlsSettingsByAuthenticateStrictFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByAuthenticateStrictFunctionId` exist."""
+  rlsSettingsByAuthenticateStrictFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `rlsSettingsByCurrentIpAddressFunctionId` relation.
+  """
+  rlsSettingsByCurrentIpAddressFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByCurrentIpAddressFunctionId` exist."""
+  rlsSettingsByCurrentIpAddressFunctionIdExist: Boolean
+
+  """Filter by the object’s `rlsSettingsByCurrentRoleFunctionId` relation."""
+  rlsSettingsByCurrentRoleFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByCurrentRoleFunctionId` exist."""
+  rlsSettingsByCurrentRoleFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `rlsSettingsByCurrentRoleIdFunctionId` relation.
+  """
+  rlsSettingsByCurrentRoleIdFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByCurrentRoleIdFunctionId` exist."""
+  rlsSettingsByCurrentRoleIdFunctionIdExist: Boolean
+
+  """
+  Filter by the object’s `rlsSettingsByCurrentUserAgentFunctionId` relation.
+  """
+  rlsSettingsByCurrentUserAgentFunctionId: FunctionToManyRlsSettingFilter
+
+  """`rlsSettingsByCurrentUserAgentFunctionId` exist."""
+  rlsSettingsByCurrentUserAgentFunctionIdExist: Boolean
 
   """Filter by the object’s `schema` relation."""
   schema: SchemaFilter
@@ -14935,6 +15350,34 @@ input FunctionPatch {
   smartTags: JSON
   tags: [String]
   volatility: String
+}
+
+"""
+A filter to be used against many `PubkeySetting` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionToManyPubkeySettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: PubkeySettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PubkeySettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PubkeySettingFilter
+}
+
+"""
+A filter to be used against many `RlsSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input FunctionToManyRlsSettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: RlsSettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RlsSettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RlsSettingFilter
 }
 
 """
@@ -15909,12 +16352,22 @@ type MetaField {
 """How a field holds files"""
 type MetaFileField {
   """
+  Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one
+  """
+  bucketKey: String
+
+  """
   GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise
   """
   filesType: String
 
   """Whether the field holds a list of files"""
   isMultiple: Boolean!
+
+  """
+  Whether the bound bucket must be public (true) or private (false); null when the binding does not say
+  """
+  isPublic: Boolean
 
   """
   image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.
@@ -25755,41 +26208,31 @@ type PubkeySetting {
   """Reads a single `Schema` that is related to this `PubkeySetting`."""
   schema: Schema
 
-  """
-  Schema containing the crypto auth functions (FK to metaschema_public.schema)
-  """
+  """Schema containing the crypto auth functions"""
   schemaId: UUID
 
   """Reads a single `Function` that is related to this `PubkeySetting`."""
   signInRecordFailureFunction: Function
 
-  """
-  Reference to the sign-in failure recording function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in failure recording function"""
   signInRecordFailureFunctionId: UUID
 
   """Reads a single `Function` that is related to this `PubkeySetting`."""
   signInRequestChallengeFunction: Function
 
-  """
-  Reference to the sign-in challenge request function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in challenge request function"""
   signInRequestChallengeFunctionId: UUID
 
   """Reads a single `Function` that is related to this `PubkeySetting`."""
   signInWithChallengeFunction: Function
 
-  """
-  Reference to the sign-in-with-challenge function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in-with-challenge function"""
   signInWithChallengeFunctionId: UUID
 
   """Reads a single `Function` that is related to this `PubkeySetting`."""
   signUpWithKeyFunction: Function
 
-  """
-  Reference to the sign-up-with-key function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-up-with-key function"""
   signUpWithKeyFunctionId: UUID
   updatedAt: Datetime
 
@@ -25911,29 +26354,19 @@ input PubkeySettingInput {
   databaseId: UUID!
   id: UUID
 
-  """
-  Schema containing the crypto auth functions (FK to metaschema_public.schema)
-  """
+  """Schema containing the crypto auth functions"""
   schemaId: UUID
 
-  """
-  Reference to the sign-in failure recording function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in failure recording function"""
   signInRecordFailureFunctionId: UUID
 
-  """
-  Reference to the sign-in challenge request function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in challenge request function"""
   signInRequestChallengeFunctionId: UUID
 
-  """
-  Reference to the sign-in-with-challenge function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in-with-challenge function"""
   signInWithChallengeFunctionId: UUID
 
-  """
-  Reference to the sign-up-with-key function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-up-with-key function"""
   signUpWithKeyFunctionId: UUID
   updatedAt: Datetime
 
@@ -25983,29 +26416,19 @@ input PubkeySettingPatch {
   databaseId: UUID
   id: UUID
 
-  """
-  Schema containing the crypto auth functions (FK to metaschema_public.schema)
-  """
+  """Schema containing the crypto auth functions"""
   schemaId: UUID
 
-  """
-  Reference to the sign-in failure recording function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in failure recording function"""
   signInRecordFailureFunctionId: UUID
 
-  """
-  Reference to the sign-in challenge request function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in challenge request function"""
   signInRequestChallengeFunctionId: UUID
 
-  """
-  Reference to the sign-in-with-challenge function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-in-with-challenge function"""
   signInWithChallengeFunctionId: UUID
 
-  """
-  Reference to the sign-up-with-key function (FK to metaschema_public.function)
-  """
+  """Reference to the sign-up-with-key function"""
   signUpWithKeyFunctionId: UUID
   updatedAt: Datetime
 
@@ -28951,58 +29374,44 @@ type RlsSetting {
   """Reads a single `Function` that is related to this `RlsSetting`."""
   authenticateFunction: Function
 
-  """
-  Reference to the authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the authenticate function"""
   authenticateFunctionId: UUID
 
   """Reads a single `Schema` that is related to this `RlsSetting`."""
   authenticateSchema: Schema
 
-  """
-  Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema)
-  """
+  """Schema containing authenticate/authenticate_strict functions"""
   authenticateSchemaId: UUID
 
   """Reads a single `Function` that is related to this `RlsSetting`."""
   authenticateStrictFunction: Function
 
-  """
-  Reference to the strict authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the strict authenticate function"""
   authenticateStrictFunctionId: UUID
   createdAt: Datetime
 
   """Reads a single `Function` that is related to this `RlsSetting`."""
   currentIpAddressFunction: Function
 
-  """
-  Reference to the current_ip_address function (FK to metaschema_public.function)
-  """
+  """Reference to the current_ip_address function"""
   currentIpAddressFunctionId: UUID
 
   """Reads a single `Function` that is related to this `RlsSetting`."""
   currentRoleFunction: Function
 
-  """
-  Reference to the current_role function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role function"""
   currentRoleFunctionId: UUID
 
   """Reads a single `Function` that is related to this `RlsSetting`."""
   currentRoleIdFunction: Function
 
-  """
-  Reference to the current_role_id function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role_id function"""
   currentRoleIdFunctionId: UUID
 
   """Reads a single `Function` that is related to this `RlsSetting`."""
   currentUserAgentFunction: Function
 
-  """
-  Reference to the current_user_agent function (FK to metaschema_public.function)
-  """
+  """Reference to the current_user_agent function"""
   currentUserAgentFunctionId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -29012,9 +29421,7 @@ type RlsSetting {
   """Reads a single `Schema` that is related to this `RlsSetting`."""
   roleSchema: Schema
 
-  """
-  Schema containing current_role and related functions (FK to metaschema_public.schema)
-  """
+  """Schema containing current_role and related functions"""
   roleSchemaId: UUID
   updatedAt: Datetime
 }
@@ -29145,49 +29552,33 @@ input RlsSettingFilter {
 
 """An input for mutations affecting `RlsSetting`"""
 input RlsSettingInput {
-  """
-  Reference to the authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the authenticate function"""
   authenticateFunctionId: UUID
 
-  """
-  Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema)
-  """
+  """Schema containing authenticate/authenticate_strict functions"""
   authenticateSchemaId: UUID
 
-  """
-  Reference to the strict authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the strict authenticate function"""
   authenticateStrictFunctionId: UUID
   createdAt: Datetime
 
-  """
-  Reference to the current_ip_address function (FK to metaschema_public.function)
-  """
+  """Reference to the current_ip_address function"""
   currentIpAddressFunctionId: UUID
 
-  """
-  Reference to the current_role function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role function"""
   currentRoleFunctionId: UUID
 
-  """
-  Reference to the current_role_id function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role_id function"""
   currentRoleIdFunctionId: UUID
 
-  """
-  Reference to the current_user_agent function (FK to metaschema_public.function)
-  """
+  """Reference to the current_user_agent function"""
   currentUserAgentFunctionId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID!
   id: UUID
 
-  """
-  Schema containing current_role and related functions (FK to metaschema_public.schema)
-  """
+  """Schema containing current_role and related functions"""
   roleSchemaId: UUID
   updatedAt: Datetime
 }
@@ -29227,49 +29618,33 @@ enum RlsSettingOrderBy {
 Represents an update to a `RlsSetting`. Fields that are set will be updated.
 """
 input RlsSettingPatch {
-  """
-  Reference to the authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the authenticate function"""
   authenticateFunctionId: UUID
 
-  """
-  Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema)
-  """
+  """Schema containing authenticate/authenticate_strict functions"""
   authenticateSchemaId: UUID
 
-  """
-  Reference to the strict authenticate function (FK to metaschema_public.function)
-  """
+  """Reference to the strict authenticate function"""
   authenticateStrictFunctionId: UUID
   createdAt: Datetime
 
-  """
-  Reference to the current_ip_address function (FK to metaschema_public.function)
-  """
+  """Reference to the current_ip_address function"""
   currentIpAddressFunctionId: UUID
 
-  """
-  Reference to the current_role function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role function"""
   currentRoleFunctionId: UUID
 
-  """
-  Reference to the current_role_id function (FK to metaschema_public.function)
-  """
+  """Reference to the current_role_id function"""
   currentRoleIdFunctionId: UUID
 
-  """
-  Reference to the current_user_agent function (FK to metaschema_public.function)
-  """
+  """Reference to the current_user_agent function"""
   currentUserAgentFunctionId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
   databaseId: UUID
   id: UUID
 
-  """
-  Schema containing current_role and related functions (FK to metaschema_public.schema)
-  """
+  """Schema containing current_role and related functions"""
   roleSchemaId: UUID
   updatedAt: Datetime
 }
@@ -29887,6 +30262,93 @@ type Schema {
     where: PlatformApiSchemaFilter
   ): PlatformApiSchemaConnection!
 
+  """Reads and enables pagination through a set of `PubkeySetting`."""
+  pubkeySettings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PubkeySetting`."""
+    orderBy: [PubkeySettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PubkeySettingFilter
+  ): PubkeySettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByAuthenticateSchemaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
+  """Reads and enables pagination through a set of `RlsSetting`."""
+  rlsSettingsByRoleSchemaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RlsSetting`."""
+    orderBy: [RlsSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RlsSettingFilter
+  ): RlsSettingConnection!
+
   """Reads and enables pagination through a set of `SchemaGrant`."""
   schemaGrants(
     """Read all values in the set after (below) this cursor."""
@@ -29977,6 +30439,122 @@ type Schema {
     """
     where: ViewFilter
   ): ViewConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettings(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsByCredentialsSchemaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsBySessionSecretsSchemaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsBySessionsSchemaId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
 }
 
 """A connection to a list of `Schema` values."""
@@ -30090,6 +30668,24 @@ input SchemaFilter {
   """`platformApiSchemas` exist."""
   platformApiSchemasExist: Boolean
 
+  """Filter by the object’s `pubkeySettings` relation."""
+  pubkeySettings: SchemaToManyPubkeySettingFilter
+
+  """`pubkeySettings` exist."""
+  pubkeySettingsExist: Boolean
+
+  """Filter by the object’s `rlsSettingsByAuthenticateSchemaId` relation."""
+  rlsSettingsByAuthenticateSchemaId: SchemaToManyRlsSettingFilter
+
+  """`rlsSettingsByAuthenticateSchemaId` exist."""
+  rlsSettingsByAuthenticateSchemaIdExist: Boolean
+
+  """Filter by the object’s `rlsSettingsByRoleSchemaId` relation."""
+  rlsSettingsByRoleSchemaId: SchemaToManyRlsSettingFilter
+
+  """`rlsSettingsByRoleSchemaId` exist."""
+  rlsSettingsByRoleSchemaIdExist: Boolean
+
   """Filter by the object’s `schemaGrants` relation."""
   schemaGrants: SchemaToManySchemaGrantFilter
 
@@ -30119,6 +30715,34 @@ input SchemaFilter {
 
   """`views` exist."""
   viewsExist: Boolean
+
+  """Filter by the object’s `webauthnSettings` relation."""
+  webauthnSettings: SchemaToManyWebauthnSettingFilter
+
+  """
+  Filter by the object’s `webauthnSettingsByCredentialsSchemaId` relation.
+  """
+  webauthnSettingsByCredentialsSchemaId: SchemaToManyWebauthnSettingFilter
+
+  """`webauthnSettingsByCredentialsSchemaId` exist."""
+  webauthnSettingsByCredentialsSchemaIdExist: Boolean
+
+  """
+  Filter by the object’s `webauthnSettingsBySessionSecretsSchemaId` relation.
+  """
+  webauthnSettingsBySessionSecretsSchemaId: SchemaToManyWebauthnSettingFilter
+
+  """`webauthnSettingsBySessionSecretsSchemaId` exist."""
+  webauthnSettingsBySessionSecretsSchemaIdExist: Boolean
+
+  """Filter by the object’s `webauthnSettingsBySessionsSchemaId` relation."""
+  webauthnSettingsBySessionsSchemaId: SchemaToManyWebauthnSettingFilter
+
+  """`webauthnSettingsBySessionsSchemaId` exist."""
+  webauthnSettingsBySessionsSchemaIdExist: Boolean
+
+  """`webauthnSettings` exist."""
+  webauthnSettingsExist: Boolean
 }
 
 type SchemaGrant {
@@ -30409,6 +31033,34 @@ input SchemaToManyPlatformApiSchemaFilter {
 }
 
 """
+A filter to be used against many `PubkeySetting` object types. All fields are combined with a logical ‘and.’
+"""
+input SchemaToManyPubkeySettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: PubkeySettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PubkeySettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: PubkeySettingFilter
+}
+
+"""
+A filter to be used against many `RlsSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input SchemaToManyRlsSettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: RlsSettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: RlsSettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: RlsSettingFilter
+}
+
+"""
 A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’
 """
 input SchemaToManySchemaGrantFilter {
@@ -30448,6 +31100,20 @@ input SchemaToManyViewFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: ViewFilter
+}
+
+"""
+A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input SchemaToManyWebauthnSettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebauthnSettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebauthnSettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebauthnSettingFilter
 }
 
 """All input for the `setFieldOrder` mutation."""
@@ -34144,6 +34810,122 @@ type Table {
     """
     where: ViewFilter
   ): ViewConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsByCredentialsTableId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsBySessionCredentialsTableId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsBySessionSecretsTableId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
+
+  """Reads and enables pagination through a set of `WebauthnSetting`."""
+  webauthnSettingsBySessionsTableId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `WebauthnSetting`."""
+    orderBy: [WebauthnSettingOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnSettingFilter
+  ): WebauthnSettingConnection!
 }
 
 type TableBehavior {
@@ -34539,6 +35321,36 @@ input TableFilter {
 
   """`views` exist."""
   viewsExist: Boolean
+
+  """
+  Filter by the object’s `webauthnSettingsByCredentialsTableId` relation.
+  """
+  webauthnSettingsByCredentialsTableId: TableToManyWebauthnSettingFilter
+
+  """`webauthnSettingsByCredentialsTableId` exist."""
+  webauthnSettingsByCredentialsTableIdExist: Boolean
+
+  """
+  Filter by the object’s `webauthnSettingsBySessionCredentialsTableId` relation.
+  """
+  webauthnSettingsBySessionCredentialsTableId: TableToManyWebauthnSettingFilter
+
+  """`webauthnSettingsBySessionCredentialsTableId` exist."""
+  webauthnSettingsBySessionCredentialsTableIdExist: Boolean
+
+  """
+  Filter by the object’s `webauthnSettingsBySessionSecretsTableId` relation.
+  """
+  webauthnSettingsBySessionSecretsTableId: TableToManyWebauthnSettingFilter
+
+  """`webauthnSettingsBySessionSecretsTableId` exist."""
+  webauthnSettingsBySessionSecretsTableIdExist: Boolean
+
+  """Filter by the object’s `webauthnSettingsBySessionsTableId` relation."""
+  webauthnSettingsBySessionsTableId: TableToManyWebauthnSettingFilter
+
+  """`webauthnSettingsBySessionsTableId` exist."""
+  webauthnSettingsBySessionsTableIdExist: Boolean
 }
 
 type TableGrant {
@@ -35052,6 +35864,20 @@ input TableToManyViewTableFilter {
 
   """Filters to entities where at least one related entity matches."""
   some: ViewTableFilter
+}
+
+"""
+A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’
+"""
+input TableToManyWebauthnSettingFilter {
+  """Filters to entities where every related entity matches."""
+  every: WebauthnSettingFilter
+
+  """Filters to entities where no related entity matches."""
+  none: WebauthnSettingFilter
+
+  """Filters to entities where at least one related entity matches."""
+  some: WebauthnSettingFilter
 }
 
 type Trigger {
@@ -40145,17 +40971,13 @@ type WebauthnSetting {
   """Reads a single `Schema` that is related to this `WebauthnSetting`."""
   credentialsSchema: Schema
 
-  """
-  Schema of the webauthn_credentials table (FK to metaschema_public.schema)
-  """
+  """Schema of the webauthn_credentials table"""
   credentialsSchemaId: UUID
 
   """Reads a single `Table` that is related to this `WebauthnSetting`."""
   credentialsTable: Table
 
-  """
-  Reference to the webauthn_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the webauthn_credentials table"""
   credentialsTableId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -40180,50 +41002,44 @@ type WebauthnSetting {
   """Reads a single `Schema` that is related to this `WebauthnSetting`."""
   schema: Schema
 
-  """
-  Schema containing WebAuthn auth procedures (FK to metaschema_public.schema)
-  """
+  """Schema containing WebAuthn auth procedures"""
   schemaId: UUID
 
   """Reads a single `Table` that is related to this `WebauthnSetting`."""
   sessionCredentialsTable: Table
 
-  """
-  Reference to the session_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the session_credentials table"""
   sessionCredentialsTableId: UUID
 
   """Reads a single `Schema` that is related to this `WebauthnSetting`."""
   sessionSecretsSchema: Schema
 
-  """Schema of the session_secrets table (FK to metaschema_public.schema)"""
+  """Schema of the session_secrets table"""
   sessionSecretsSchemaId: UUID
 
   """Reads a single `Table` that is related to this `WebauthnSetting`."""
   sessionSecretsTable: Table
 
-  """Reference to the session_secrets table (FK to metaschema_public.table)"""
+  """Reference to the session_secrets table"""
   sessionSecretsTableId: UUID
 
   """Reads a single `Schema` that is related to this `WebauthnSetting`."""
   sessionsSchema: Schema
 
-  """Schema of the sessions table (FK to metaschema_public.schema)"""
+  """Schema of the sessions table"""
   sessionsSchemaId: UUID
 
   """Reads a single `Table` that is related to this `WebauthnSetting`."""
   sessionsTable: Table
 
-  """Reference to the sessions table (FK to metaschema_public.table)"""
+  """Reference to the sessions table"""
   sessionsTableId: UUID
   updatedAt: Datetime
 
   """Reads a single `Field` that is related to this `WebauthnSetting`."""
   userField: Field
 
-  """
-  Reference to the user field on webauthn_credentials (FK to metaschema_public.field)
-  """
+  """Reference to the user field on webauthn_credentials"""
   userFieldId: UUID
 }
 
@@ -40392,14 +41208,10 @@ input WebauthnSettingInput {
   challengeExpirySeconds: BigInt
   createdAt: Datetime
 
-  """
-  Schema of the webauthn_credentials table (FK to metaschema_public.schema)
-  """
+  """Schema of the webauthn_credentials table"""
   credentialsSchemaId: UUID
 
-  """
-  Reference to the webauthn_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the webauthn_credentials table"""
   credentialsTableId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -40421,32 +41233,26 @@ input WebauthnSettingInput {
   """WebAuthn Relying Party display name"""
   rpName: String
 
-  """
-  Schema containing WebAuthn auth procedures (FK to metaschema_public.schema)
-  """
+  """Schema containing WebAuthn auth procedures"""
   schemaId: UUID
 
-  """
-  Reference to the session_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the session_credentials table"""
   sessionCredentialsTableId: UUID
 
-  """Schema of the session_secrets table (FK to metaschema_public.schema)"""
+  """Schema of the session_secrets table"""
   sessionSecretsSchemaId: UUID
 
-  """Reference to the session_secrets table (FK to metaschema_public.table)"""
+  """Reference to the session_secrets table"""
   sessionSecretsTableId: UUID
 
-  """Schema of the sessions table (FK to metaschema_public.schema)"""
+  """Schema of the sessions table"""
   sessionsSchemaId: UUID
 
-  """Reference to the sessions table (FK to metaschema_public.table)"""
+  """Reference to the sessions table"""
   sessionsTableId: UUID
   updatedAt: Datetime
 
-  """
-  Reference to the user field on webauthn_credentials (FK to metaschema_public.field)
-  """
+  """Reference to the user field on webauthn_credentials"""
   userFieldId: UUID
 }
 
@@ -40508,14 +41314,10 @@ input WebauthnSettingPatch {
   challengeExpirySeconds: BigInt
   createdAt: Datetime
 
-  """
-  Schema of the webauthn_credentials table (FK to metaschema_public.schema)
-  """
+  """Schema of the webauthn_credentials table"""
   credentialsSchemaId: UUID
 
-  """
-  Reference to the webauthn_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the webauthn_credentials table"""
   credentialsTableId: UUID
 
   """Database that owns this resource (database-scoped isolation)"""
@@ -40537,31 +41339,25 @@ input WebauthnSettingPatch {
   """WebAuthn Relying Party display name"""
   rpName: String
 
-  """
-  Schema containing WebAuthn auth procedures (FK to metaschema_public.schema)
-  """
+  """Schema containing WebAuthn auth procedures"""
   schemaId: UUID
 
-  """
-  Reference to the session_credentials table (FK to metaschema_public.table)
-  """
+  """Reference to the session_credentials table"""
   sessionCredentialsTableId: UUID
 
-  """Schema of the session_secrets table (FK to metaschema_public.schema)"""
+  """Schema of the session_secrets table"""
   sessionSecretsSchemaId: UUID
 
-  """Reference to the session_secrets table (FK to metaschema_public.table)"""
+  """Reference to the session_secrets table"""
   sessionSecretsTableId: UUID
 
-  """Schema of the sessions table (FK to metaschema_public.schema)"""
+  """Schema of the sessions table"""
   sessionsSchemaId: UUID
 
-  """Reference to the sessions table (FK to metaschema_public.table)"""
+  """Reference to the sessions table"""
   sessionsTableId: UUID
   updatedAt: Datetime
 
-  """
-  Reference to the user field on webauthn_credentials (FK to metaschema_public.field)
-  """
+  """Reference to the user field on webauthn_credentials"""
   userFieldId: UUID
 }
