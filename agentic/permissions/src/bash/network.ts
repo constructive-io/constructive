@@ -5,70 +5,12 @@
  */
 
 import { type Arg, literalStart } from './analyze';
-import { type CommandContext, firstOperand, generic, looksLikePath, parse, pathLikeArgs, restOf, textOf, valuesOf } from './args';
+import { type CommandContext, firstOperand, generic, looksLikePath, pathLikeArgs, restOf, textOf } from './args';
 import { hasOption, readArgs, valuesOf as valuesRead } from './options';
-import { RSYNC, SCP, SSH } from './programs';
+import { CURL, RSYNC, SCP, SSH, WGET } from './programs';
 import { applyEffects } from './scripts';
 import { isLoopbackHost, isRemoteSpec, isUrl } from './words';
 
-const CURL_WITH_VALUE = new Set([
-  '-d',
-  '-F',
-  '-T',
-  '-H',
-  '-o',
-  '-u',
-  '-X',
-  '-A',
-  '-e',
-  '-b',
-  '-c',
-  '-K',
-  '-E',
-  '-x',
-  '-w',
-  '-m',
-  '-y',
-  '-Y',
-  '-z',
-  '-C',
-  '-r',
-  '-Q',
-  '-D',
-  '-U',
-  '-t',
-  '--data',
-  '--data-binary',
-  '--data-raw',
-  '--data-ascii',
-  '--data-urlencode',
-  '--json',
-  '--form',
-  '--form-string',
-  '--upload-file',
-  '--header',
-  '--output',
-  '--config',
-  '--url',
-  '--user',
-  '--request',
-  '--cookie',
-  '--cookie-jar',
-  '--proxy',
-  '--cert',
-  '--key',
-  '--cacert',
-  '--dump-header',
-  '--write-out',
-  '--max-time',
-  '--connect-timeout',
-  '--retry',
-  '--referer',
-  '--user-agent',
-  '--range',
-  '--resolve',
-  '--output-dir'
-]);
 
 function isLocalUrl(url: string): boolean {
   const m = /^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^@/]*@)?(\[[^\]]*\]|[^:/?#]*)/i.exec(url);
@@ -77,11 +19,11 @@ function isLocalUrl(url: string): boolean {
 
 export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const p = parse(rest, CURL_WITH_VALUE);
+  const read = readArgs(CURL, rest);
   const say = (detail: string) => analyzer.flag('upload', `it uploads data: ${detail}`);
   let dataForms = false;
   for (const key of ['-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--json']) {
-    for (const v of p.values.get(key) ?? []) {
+    for (const v of valuesRead(read, key)) {
       dataForms = true;
       if (v.kind === 'unknown') say(`curl ${key} with a value from a variable or substitution`);
       if (literalStart(v).startsWith('@')) {
@@ -90,7 +32,7 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
       }
     }
   }
-  for (const v of p.values.get('--data-urlencode') ?? []) {
+  for (const v of valuesRead(read, '--data-urlencode')) {
     dataForms = true;
     const at = literalStart(v).indexOf('@');
     if (at >= 0) {
@@ -101,7 +43,7 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
       say('curl --data-urlencode with a value from a variable or substitution, which may name a file');
     }
   }
-  for (const v of valuesOf(p, '-F', '--form')) {
+  for (const v of valuesRead(read, '-F', '--form')) {
     dataForms = true;
     const m = /=([@<])([^;]*)/.exec(literalStart(v));
     if (m) {
@@ -111,12 +53,12 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
       say('curl -F with a value from a variable or substitution, which may name a file');
     }
   }
-  for (const v of valuesOf(p, '-T', '--upload-file')) {
+  for (const v of valuesRead(read, '-T', '--upload-file')) {
     dataForms = true;
     say(`curl -T ${v.raw} uploads a file`);
     if (textOf(v) !== '-' && textOf(v) !== '.') analyzer.addPath(v, 'read', true);
   }
-  for (const v of valuesOf(p, '-H', '--header')) {
+  for (const v of valuesRead(read, '-H', '--header')) {
     const start = literalStart(v);
     if (start.startsWith('@')) {
       say(`curl -H ${v.raw} sends headers from a file`);
@@ -125,19 +67,20 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
       say('curl -H with a value from a variable or substitution, which may name a file');
     }
   }
-  for (const v of valuesOf(p, '-K', '--config')) {
+  for (const v of valuesRead(read, '-K', '--config')) {
     analyzer.dynamic(`curl ${textOf(v) === '-' ? 'reads its options from stdin' : `reads its options from ${v.raw}`}`);
     if (textOf(v) !== '-') analyzer.addPath(v, 'read', true);
   }
-  for (const v of valuesOf(p, '-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header')) {
+  for (const v of valuesRead(read, '-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header', '--trace', '--trace-ascii', '--stderr', '--libcurl', '--etag-save', '--hsts', '--alt-svc')) {
     if (textOf(v) !== '-') analyzer.addPath(v, 'write', true);
   }
-  for (const v of valuesOf(p, '--output-dir')) analyzer.addPath(v, 'write', true);
-  for (const v of valuesOf(p, '-E', '--cert', '--key', '--cacert', '-b', '--cookie')) {
+  for (const v of valuesRead(read, '--output-dir')) analyzer.addPath(v, 'write', true);
+  for (const v of valuesRead(read, '--netrc-file', '--etag-compare')) analyzer.addPath(v, 'read', true);
+  for (const v of valuesRead(read, '-E', '--cert', '--key', '--cacert', '-b', '--cookie')) {
     if (looksLikePath(v)) analyzer.addPath(v, 'read', true);
   }
-  const urls = [...p.positionals, ...valuesOf(p, '--url')];
-  for (const u of p.positionals) {
+  const urls = [...read.positionals, ...valuesRead(read, '--url')];
+  for (const u of read.positionals) {
     const start = literalStart(u);
     if (!isUrl(start) && looksLikePath(u) && !/^[\w.-]+:\d/.test(start)) analyzer.operand(u);
   }
@@ -148,25 +91,22 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
 
 export function wget(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const p = parse(
-    rest,
-    new Set(['-O', '-o', '-a', '-P', '-i', '--post-file', '--body-file', '--post-data', '--body-data', '--output-document', '--input-file'])
-  );
-  for (const v of valuesOf(p, '--post-file', '--body-file')) {
+  const read = readArgs(WGET, rest);
+  for (const v of valuesRead(read, '--post-file', '--body-file')) {
     analyzer.flag('upload', `it uploads data: wget sends ${v.raw}`);
     analyzer.addPath(v, 'read', true);
   }
   // Like curl -d: a body built from a variable may carry anything.
   for (const key of ['--post-data', '--body-data']) {
-    for (const v of p.values.get(key) ?? []) {
+    for (const v of valuesRead(read, key)) {
       if (v.kind === 'unknown') analyzer.flag('upload', `it uploads data: wget ${key} with a value from a variable or substitution`);
     }
   }
-  for (const v of valuesOf(p, '-O', '--output-document', '-o', '-a', '-P')) {
+  for (const v of valuesRead(read, '-O', '--output-document', '-o', '--output-file', '-a', '--append-output', '-P', '--directory-prefix')) {
     if (textOf(v) !== '-') analyzer.addPath(v, 'write', true);
   }
-  for (const v of valuesOf(p, '-i', '--input-file')) if (textOf(v) !== '-') analyzer.addPath(v, 'read', true);
-  const remote = p.positionals.length === 0 || p.positionals.some((u) => u.kind === 'unknown' || !isLocalUrl(u.text));
+  for (const v of valuesRead(read, '-i', '--input-file')) if (textOf(v) !== '-') analyzer.addPath(v, 'read', true);
+  const remote = read.positionals.length === 0 || read.positionals.some((u) => u.kind === 'unknown' || !isLocalUrl(u.text));
   if (ctx.stdinFed && remote) analyzer.flag('upload', 'it uploads data: wget gets piped input and talks to a remote host');
 }
 

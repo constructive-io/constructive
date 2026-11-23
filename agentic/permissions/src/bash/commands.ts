@@ -17,17 +17,15 @@ import {
   knownTexts,
   leadingOptions,
   literalArg,
-  parse,
-  type Parsed,
+  operands,
   pathLikeArgs,
-  textOf,
-  valuesOf
+  textOf
 } from './args';
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
-import { hasOption, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
-import { MAPFILE, PRINTF, READ, TEXT_PROGRAMS, UNSET } from './programs';
+import { hasOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
+import { CD, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 
@@ -75,21 +73,6 @@ export const NO_OPERANDS = new Set([
  * An operand built from a variable is then a path, not a word: it asks in
  * every mode, as it may name any file.
  */
-const READERS = new Map<string, ReadonlySet<string>>([
-  ...['cat', 'less', 'more', 'bat', 'wc', 'nl', 'strings', 'file', 'stat', 'cmp', 'diff'].map((n) => [n, new Set<string>()] as const),
-  ['head', new Set(['-n', '-c'])],
-  ['tail', new Set(['-n', '-c', '-b'])],
-  ['uniq', new Set(['-f', '-s'])],
-  ['base64', new Set(['-b', '-i', '-o', '-w'])],
-  ['xxd', new Set(['-c', '-g', '-l', '-s', '-o'])],
-  ['od', new Set(['-A', '-j', '-N', '-t'])],
-  ['hexdump', new Set(['-e', '-f', '-n', '-s'])]
-]);
-
-/** Where a reader writes instead of stdout: `uniq IN OUT`. */
-function readerOutputs(name: string, p: Parsed): Arg[] {
-  return name === 'uniq' ? p.positionals.slice(1, 2) : [];
-}
 
 /** The test commands: `[` and `[[` are names here, not globs. */
 export const TESTS = new Set(['test', '[', '[[']);
@@ -117,7 +100,7 @@ const EVALUATING_BUILTINS: ReadonlySet<string> = new Set(['declare', 'local', 't
 function namedVariables(ctx: CommandContext, name: string, rest: readonly Arg[]): Arg[] {
   const operands = (spec: ProgramSpec) => {
     const read = readArgs(spec, rest);
-    return { read, names: rest.slice(read.next) };
+    return { read, names: operandWords(read, rest) };
   };
   if (name === 'printf') return valuesRead(readArgs(PRINTF, rest), '-v');
   if (name === 'read') {
@@ -280,12 +263,14 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return;
   }
   if (TESTS.has(name)) return test(name, ctx, rest);
-  const readerValues = READERS.get(name);
-  if (readerValues) {
-    const p = parse(rest, readerValues);
-    for (const v of p.positionals) if (v.kind === 'unknown') analyzer.addPath(v, 'read', true);
-    files(ctx, readerOutputs(name, p), 'write');
-    return generic(ctx, rest);
+  const reader = READERS.get(name);
+  if (reader) {
+    const read = readArgs(reader, rest);
+    applyEffects(ctx, name, reader, read);
+    const out = READER_OUTPUT.get(name);
+    operands(ctx, read.positionals.filter((_, k) => k !== out), 'read');
+    if (out !== undefined && read.positionals[out]) files(ctx, [read.positionals[out]], 'write');
+    return;
   }
   if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
   const hidden = EVALUATING_BUILTINS.has(name) ? hiddenLeadingOption(rest) : undefined;
@@ -295,7 +280,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   switch (name) {
   case 'cd':
   case 'pushd': {
-    const target = parse(rest).positionals[0];
+    const target = operandWords(readArgs(CD, rest), rest)[0];
     if (!target) {
       analyzer.moveTo({ kind: 'moved', dir: path.resolve(analyzer.ctx.homeDir) });
     } else if (target.kind === 'unknown' || /^[-+]\d*$/.test(target.text) || analyzer.searchesCdPath(target.text)) {
@@ -395,12 +380,19 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'mkdir':
   case 'mkfifo':
   case 'truncate':
-    return files(ctx, parse(rest, new Set(['-m', '--mode', '-s', '--size', '-r', '--reference', '-t', '-d'])).positionals, 'write');
+  {
+    const read = readArgs(MAKERS, rest);
+    applyEffects(ctx, name, MAKERS, read);
+    return operands(ctx, read.positionals, 'write');
+  }
   case 'tee':
     return tee(ctx, rest);
   case 'tree':
-    files(ctx, valuesOf(parse(rest, new Set(['-o', '-L', '-P', '-I', '-H', '-T'])), '-o'), 'write');
-    return generic(ctx, rest);
+  {
+    const read = readArgs(TREE, rest);
+    applyEffects(ctx, name, TREE, read);
+    return operands(ctx, read.positionals, 'read');
+  }
   case 'cp':
   case 'mv':
   case 'ln':

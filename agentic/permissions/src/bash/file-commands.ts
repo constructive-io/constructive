@@ -8,8 +8,11 @@ import * as path from 'node:path';
 
 import type { Access } from '../types';
 import { type Arg, literalStart } from './analyze';
-import { type CommandContext, files, has, literalArg, parse, restOf, textOf, valuesOf } from './args';
+import { type CommandContext, files, literalArg, operands, restOf, textOf } from './args';
 import type { Source } from './flows';
+import { hasOption, readArgs, valuesOf } from './options';
+import { AWK, CHANGERS, COPIERS, GREP, REMOVERS, SED, TEE } from './programs';
+import { applyEffects } from './scripts';
 
 /**
  * Record that the contents of `sources` (or of `stdin`) land in `dest`: a dir
@@ -29,7 +32,8 @@ function copies(ctx: CommandContext, what: string, sources: readonly Arg[], dest
 
 /** `tee file…`: stdin lands in each file. */
 export function tee(ctx: CommandContext, rest: readonly Arg[]): void {
-  const ops = parse(rest).positionals;
+  const read = readArgs(TEE, rest);
+  const ops = read.positionals;
   files(ctx, ops, 'write');
   for (const op of ops) copies(ctx, 'tee', [], op, false, ctx.analyzer.stdin.sources);
 }
@@ -80,81 +84,45 @@ export function find(ctx: CommandContext, rest: readonly Arg[]): void {
 }
 
 export function sed(ctx: CommandContext, rest: readonly Arg[]): void {
-  const p = parse(rest, new Set(['-e', '-f', '--expression', '--file', '-l']));
-  const inPlace = has(p, '-i', '--in-place') || [...p.flags].some((f) => f.startsWith('-i'));
-  let ops = p.positionals;
+  const read = readArgs(SED, rest);
+  applyEffects(ctx, 'sed', SED, read);
+  const inPlace = hasOption(read, '-i', '--in-place');
+  let ops = read.positionals;
   // BSD `sed -i '' …`: the empty word is the backup suffix.
   if (inPlace && textOf(ops[0]) === '') ops = ops.slice(1);
-  for (const f of valuesOf(p, '-f', '--file')) ctx.analyzer.addPath(f, 'read', true);
-  if (valuesOf(p, '-e', '--expression', '-f', '--file').length === 0) ops = ops.slice(1);
-  files(ctx, ops, inPlace ? 'write' : 'read');
+  if (valuesOf(read, '-e', '--expression', '-f', '--file').length === 0) ops = ops.slice(1);
+  operands(ctx, ops, inPlace ? 'write' : 'read');
 }
 
 export function grep(ctx: CommandContext, rest: readonly Arg[]): void {
-  const p = parse(
-    rest,
-    new Set([
-      '-e',
-      '-f',
-      '-m',
-      '-A',
-      '-B',
-      '-C',
-      '-g',
-      '-t',
-      '-T',
-      '-d',
-      '-D',
-      '--regexp',
-      '--file',
-      '--max-count',
-      '--glob',
-      '--type',
-      '--type-not',
-      '--include',
-      '--exclude',
-      '--exclude-dir',
-      '--context',
-      '--after-context',
-      '--before-context'
-    ])
-  );
-  for (const f of valuesOf(p, '-f', '--file')) ctx.analyzer.addPath(f, 'read', true);
-  const ops = valuesOf(p, '-e', '--regexp', '-f', '--file').length ? p.positionals : p.positionals.slice(1);
-  for (const op of ops) ctx.analyzer.operand(op);
+  const read = readArgs(GREP, rest);
+  applyEffects(ctx, 'grep', GREP, read);
+  const ops = valuesOf(read, '-e', '--regexp', '-f', '--file').length ? read.positionals : read.positionals.slice(1);
+  operands(ctx, ops, 'read');
 }
 
 export function awk(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
-  const p = parse(rest, new Set(['-f', '-v', '-F', '-i', '--file', '--include']));
-  let ops = p.positionals;
-  const progFiles = valuesOf(p, '-f', '--file');
-  for (const f of progFiles) ctx.analyzer.addPath(f, 'read', true);
-  if (progFiles.length === 0) {
-    const program = ops[0];
+  const read = readArgs(AWK, rest);
+  applyEffects(ctx, name, AWK, read);
+  let ops = read.positionals;
+  const programs = valuesOf(read, '-e', '--source');
+  if (!hasOption(read, '-f', '--file', '-E', '--exec') && programs.length === 0) {
+    programs.push(...ops.slice(0, 1));
     ops = ops.slice(1);
-    if (program && (program.kind === 'unknown' || /\bsystem\s*\(|\|/.test(program.text))) {
-      ctx.analyzer.dynamic(`its ${name} program runs commands`);
-    }
   }
-  const inPlace = valuesOf(p, '-i', '--include').some((v) => textOf(v) === 'inplace');
-  for (const op of ops) {
-    if (/^[A-Za-z_]\w*=/.test(literalStart(op))) continue;
-    if (inPlace) ctx.analyzer.addPath(op, 'write', true);
-    else ctx.analyzer.operand(op);
-  }
+  if (programs.some((p) => p.kind === 'unknown' || /\bsystem\s*\(|\|/.test(p.text))) ctx.analyzer.dynamic(`its ${name} program runs commands`);
+  const inPlace = valuesOf(read, '-i', '--include').some((v) => textOf(v) === 'inplace');
+  operands(ctx, ops.filter((op) => !/^[A-Za-z_]\w*=/.test(literalStart(op))), inPlace ? 'write' : 'read');
 }
 
 export function remove(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const p = parse(rest);
-  if (has(p, '--no-preserve-root')) analyzer.flag('destructive', `it runs ${name} --no-preserve-root`);
-  const forceful =
-    name === 'rimraf' ||
-    name === 'shred' ||
-    has(p, '-r', '-R', '-f', '--recursive', '--force');
-  for (const op of p.positionals) {
-    analyzer.addPath(op, 'write', true);
-    if (forceful) analyzer.destroy(op, `${name} ${[...p.flags].join(' ')}`.trim(), true);
+  const read = readArgs(REMOVERS, rest);
+  if (hasOption(read, '--no-preserve-root')) analyzer.flag('destructive', `it runs ${name} --no-preserve-root`);
+  const forceful = name === 'rimraf' || name === 'shred' || hasOption(read, '-r', '-R', '-f', '--recursive', '--force');
+  for (const op of read.positionals) {
+    files(ctx, [op], 'write');
+    if (forceful) analyzer.destroy(op, `${name} ${read.options.map((o) => o.name).join(' ')}`.trim(), true);
   }
   if (ctx.xargs && (name === 'rm' || name === 'rimraf' || name === 'shred' || name === 'unlink')) {
     analyzer.destroy(null, `xargs ${name}`);
@@ -163,15 +131,15 @@ export function remove(name: string, ctx: CommandContext, rest: readonly Arg[]):
 
 export function copyLike(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const p = parse(rest, new Set(['-t', '--target-directory', '-S', '--suffix', '-m', '--mode', '-o', '--owner', '-g', '--group']));
-  const targetDir = valuesOf(p, '-t', '--target-directory')[0];
-  const ops = p.positionals;
+  const read = readArgs(COPIERS, rest);
+  applyEffects(ctx, name, COPIERS, read);
+  const targetDir = valuesOf(read, '-t', '--target-directory')[0];
+  const ops = read.positionals;
   const sourceAccess: Access = name === 'mv' ? 'write' : 'read';
-  if (name === 'install' && has(p, '-d')) return files(ctx, ops, 'write');
+  if (name === 'install' && hasOption(read, '-d', '--directory')) return operands(ctx, ops, 'write');
   if (targetDir) {
-    analyzer.addPath(targetDir, 'write', true);
     if (name !== 'ln') copies(ctx, name, ops, targetDir, true);
-    return files(ctx, ops, sourceAccess);
+    return operands(ctx, ops, sourceAccess);
   }
   if (ops.length === 1 && name === 'ln') {
     const link = ops[0];
@@ -181,27 +149,20 @@ export function copyLike(name: string, ctx: CommandContext, rest: readonly Arg[]
   }
   if (ops.length === 0) return;
   const dest = ops[ops.length - 1];
-  files(ctx, ops.slice(0, -1), sourceAccess);
+  operands(ctx, ops.slice(0, -1), sourceAccess);
   analyzer.addPath(dest, 'write', true);
   if (name !== 'ln') copies(ctx, name, ops.slice(0, -1), dest, ops.length > 2 || literalStart(dest).endsWith('/'));
 }
 
 export function chmodLike(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
-  let recursive = false;
-  let reference = false;
-  const operands: Arg[] = [];
-  for (const arg of rest) {
-    const t = literalStart(arg);
-    if (/^-[RvcfhHLP]+$/.test(t) || t === '--recursive' || t.startsWith('--')) {
-      if (/^-[a-zA-Z]*R/.test(t) || t === '--recursive') recursive = true;
-      if (t.startsWith('--reference')) reference = true;
-      continue;
-    }
-    operands.push(arg);
-  }
-  // The first operand is the mode or owner (`755`, `+x`, `-w`, `user:group`).
-  for (const op of reference ? operands : operands.slice(1)) {
-    ctx.analyzer.addPath(op, 'write', true);
+  const read = readArgs(CHANGERS, rest);
+  applyEffects(ctx, name, CHANGERS, read);
+  const recursive = hasOption(read, '-R', '--recursive');
+  const ops = read.positionals;
+  // The first operand is the mode or owner (`755`, `+x`, `-w`, `user:group`); one from a variable may be any of them.
+  const targets = hasOption(read, '--reference') || ops[0]?.kind !== 'known' ? ops : ops.slice(1);
+  for (const op of targets) {
+    files(ctx, [op], 'write');
     if (recursive) ctx.analyzer.destroy(op, `${name} -R`);
   }
 }

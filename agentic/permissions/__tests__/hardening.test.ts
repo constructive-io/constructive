@@ -108,7 +108,20 @@ const rows: Row[] = [
   ['F=README.md; unset -v F; cat ${F-~/.ssh/id_ed25519}', 'deny', 'deny', 'hard-deny'],
   ['p=README.md; mapfile -t p <<< ~/.ssh/id_ed25519; cat $p', 'ask', 'ask', 'unresolvable-path'],
   ['p=README.md; readarray p < list.txt; cat $p', 'ask', 'ask', 'unresolvable-path'],
-  ['cat ~nobody/.ssh/id_ed25519', 'ask', 'ask', 'unresolvable-path']
+  ['cat ~nobody/.ssh/id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  // 13. every program reader uses the registry, and an unknown argument is a possible operand as well as a possible option
+  ['echo " $HOME/.ssh/id_ed25519" >/dev/null; cat --$_', 'ask', 'ask', 'unresolvable-path'],
+  ['echo " $HOME/.ssh/id_ed25519" >/dev/null; head -n 1 --$_', 'ask', 'ask', 'unresolvable-path'],
+  ['cd --$_; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  ['sed -n p --$_', 'ask', 'ask', 'unresolvable-path'],
+  ['grep -r key --$_', 'ask', 'ask', 'unresolvable-path'],
+  ['cp --$_ /tmp/x', 'ask', 'ask', 'unresolvable-path'],
+  ["awk -i $X '{print}' README.md", 'ask', 'ask', 'unresolvable-path'],
+  ['defaults -host localhost write com.x k -bool true', 'ask', 'allow', 'persistence'],
+  ['defaults -container com.x write com.x k v', 'ask', 'allow', 'persistence'],
+  ['echo ~/.ssh >/dev/null; env --chdir=$_ cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  ['git config --file ~/.aws/credentials --list', 'deny', 'deny', 'hard-deny'],
+  ['git config --file ~/.aws/credentials --get x.y', 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {

@@ -111,12 +111,16 @@ function add(ctx: CommandContext, read: ReadArgs): void {
 /** `git config`: a write to the file it edits, unless it only reads. */
 function config(ctx: CommandContext, read: ReadArgs, here: Arg, raw: string): void {
   const { analyzer } = ctx;
-  const reads = hasOption(read, '--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--show-origin');
+  // `git config get|list …` (git 2.46) reads; `set`, `unset`, `rename-section`, … edit.
+  const action = textOf(read.operands[0]);
+  const reads = hasOption(read, '--get', '--get-all', '--get-regexp', '--get-urlmatch', '--list', '-l', '--show-origin') || action === 'get' || action === 'list';
   const edits = hasOption(read, '--add', '--unset', '--unset-all', '--replace-all', '--rename-section', '--remove-section', '-e', '--edit');
-  if (reads || (!edits && read.operands.length < 2 && read.unknown.length === 0)) return;
+  const writes = !reads && (edits || read.operands.length >= 2 || read.unknown.length > 0);
+  // The file is read for a lookup and written for an edit.
   const file = valuesOf(read, '--file', '-f')[0];
-  if (file) analyzer.addPath(file, 'write', true);
-  else if (hasOption(read, '--global')) analyzer.addPath(literalArg(`${analyzer.ctx.homeDir}/.gitconfig`, raw), 'write', true);
+  if (file) analyzer.addPath(file, writes ? 'write' : 'read', true);
+  if (!writes || file) return;
+  if (hasOption(read, '--global')) analyzer.addPath(literalArg(`${analyzer.ctx.homeDir}/.gitconfig`, raw), 'write', true);
   else if (hasOption(read, '--system')) analyzer.addPath(literalArg('/etc/gitconfig', raw), 'write', true);
   else analyzer.addPath(analyzer.base === null ? here : literalArg('.git/config'), 'write', true);
 }

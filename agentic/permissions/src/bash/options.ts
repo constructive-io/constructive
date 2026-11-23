@@ -54,6 +54,8 @@ export interface ProgramSpec {
   readonly singleDash?: boolean;
   /** Option names match in any case (PowerShell). */
   readonly anyCase?: boolean;
+  /** A dash word is an option only when every letter in it is a listed one; otherwise it is an operand (`chmod -w f`). */
+  readonly strictShort?: boolean;
 }
 
 /** One option as the program reads it, with every option its spelling can be. */
@@ -158,6 +160,7 @@ export function optionsIn(spec: ProgramSpec, text: string): SpelledOption[] | nu
     return [{ name, spellings, specs, takesNext: valueOf(specs) === 'required' }];
   }
   if (!text.startsWith('-') || text.length < 2 || text === '--') return null;
+  if (spec.strictShort && [...text.slice(1)].some((c) => optionSpecs(spec, `-${c}`).length === 0)) return null;
   const spelled: SpelledOption[] = [];
   for (let c = 1; c < text.length; c++) {
     const name = `-${text[c]}`;
@@ -221,6 +224,14 @@ export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
     positionals.push(arg);
   }
   return { options, operands, unknown, positionals, next: k };
+}
+
+/**
+ * Every word that may be an operand: the ones read, and for a program whose
+ * options stop at its first operand, every word from there on.
+ */
+export function operandWords(read: ReadArgs, args: readonly Arg[]): Arg[] {
+  return [...read.positionals, ...args.slice(read.next)];
 }
 
 /** The effects the read options have; an argument that may be any option has every effect the program's options have. */

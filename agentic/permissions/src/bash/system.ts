@@ -10,6 +10,8 @@ import { KEYCHAIN_DIR } from '../roots';
 import { type Arg, literalStart } from './analyze';
 import { type CommandContext, firstOperand, generic, literalArg, pathLikeArgs, textOf } from './args';
 import type { Source } from './flows';
+import { operandWords, readArgs } from './options';
+import { DEFAULTS } from './programs';
 import { namesFromStdinIn } from './scripts';
 
 const LAUNCHCTL_LOADS = new Set(['load', 'bootstrap', 'submit', 'enable']);
@@ -27,8 +29,9 @@ export function persistence(name: string, ctx: CommandContext, rest: readonly Ar
     if (sub.kind === 'unknown') say(`launchctl ${sub.raw} may start a background service`);
     else if (LAUNCHCTL_LOADS.has(sub.text)) say(`launchctl ${sub.text} starts a background service`);
   }
-  if (name === 'defaults' && sub && (sub.kind === 'unknown' || sub.text === 'write' || sub.text === 'import')) {
-    say('defaults write changes app or system settings');
+  if (name === 'defaults') {
+    const action = operandWords(readArgs(DEFAULTS, rest), rest)[0];
+    if (action && (action.kind === 'unknown' || action.text === 'write' || action.text === 'import')) say('defaults write changes app or system settings');
   }
   generic(ctx, pathLikeArgs(rest));
 }

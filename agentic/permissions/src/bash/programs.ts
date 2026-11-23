@@ -198,6 +198,132 @@ export const PROGRAMS: ReadonlyMap<string, ProgramSpec> = new Map([
 const WHOLE = /^([\s\S]*)$/;
 const runsShell = (value: OptionSpec['value'], ...names: string[]): OptionSpec => ({ names, value, effect: 'runs-program', shell: WHOLE });
 
+/** GNU-style file tools: long options may be abbreviated, and options may follow operands. */
+const tool = (...options: (OptionSpec | OptionSpec[])[]): ProgramSpec => sub(...options);
+
+/**
+ * The file readers: each operand is a file they read. Their options that take
+ * a value are listed, so the value is not read as a file, and the ones that
+ * name a file say so.
+ */
+export const READERS: ReadonlyMap<string, ProgramSpec> = new Map([
+  // A flag read as an option that takes a value would hide the file after it, so only documented values are listed.
+  ...['cat', 'more'].map((n) => [n, tool()] as const),
+  ['nl', tool(value('-b', '-d', '-f', '-h', '-i', '-l', '-n', '-s', '-v', '-w'))],
+  ['strings', tool(value('-n', '--bytes', '-t', '--radix', '-e', '--encoding', '-T', '--target'))],
+  ['cmp', tool(value('-i', '--ignore-initial', '-n', '--bytes'))],
+  ['less', tool(does('writes-file', 'required', '-o', '-O', '--log-file', '--LOG-FILE'), does('reads-file', 'required', '-k', '--lesskey-file', '-T', '--tag-file'), value('-b', '-h', '-j', '-p', '-t', '-x', '-y', '-z', '-P'))],
+  ['bat', tool(value('-l', '--language', '--theme', '--style', '-r', '--line-range', '-H', '--highlight-line', '--map-syntax', '--tabs', '--wrap', '--color', '--paging', '--pager', '--terminal-width', '--decorations', '--italic-text', '--file-name'))],
+  ['wc', tool(does('reads-file', 'required', '--files0-from'))],
+  ['file', tool(does('reads-file', 'required', '-f', '--files-from', '-m', '--magic-file'), value('-F', '--separator', '-P', '--parameter', '-e', '--exclude'))],
+  ['stat', tool(value('-c', '--format', '--printf'))],
+  ['diff', tool(does('reads-file', 'required', '--from-file', '--to-file', '-X', '--exclude-from'), value('-x', '--exclude', '-I', '--ignore-matching-lines', '-U', '-C', '--label', '-L', '-W', '--width', '-F', '--show-function-line', '--line-format', '--old-line-format', '--new-line-format', '--unchanged-line-format', '--old-group-format', '--new-group-format', '--changed-group-format', '--unchanged-group-format', '--tabsize', '--horizon-lines', '--palette', '--color', '-S', '--starting-file'))],
+  ['head', tool(value('-n', '--lines', '-c', '--bytes'))],
+  ['tail', tool(value('-n', '--lines', '-c', '--bytes', '-b', '-s', '--sleep-interval', '--pid', '--max-unchanged-stats'))],
+  ['uniq', tool(value('-f', '--skip-fields', '-s', '--skip-chars', '-w', '--check-chars'), { names: ['--group', '--all-repeated'], value: 'optional' })],
+  ['base64', tool(does('reads-file', 'required', '-i', '--input'), does('writes-file', 'required', '-o', '--output'), value('-b', '--break', '-w', '--wrap'))],
+  ['xxd', tool(value('-c', '-cols', '-g', '-groupsize', '-l', '-len', '-s', '-seek', '-o', '-offset', '-n', '-name'))],
+  ['od', tool(value('-A', '--address-radix', '-j', '--skip-bytes', '-N', '--read-bytes', '-t', '--format', '-S'), { names: ['-w', '--width', '--strings'], value: 'optional' })],
+  ['hexdump', tool(does('reads-file', 'required', '-f'), value('-e', '-n', '-s'))]
+]);
+
+/** Readers whose operand at this index is a file they write (`uniq in out`, `xxd in out`). */
+export const READER_OUTPUT: ReadonlyMap<string, number> = new Map([
+  ['uniq', 1],
+  ['xxd', 1]
+]);
+
+/** `touch`, `mkdir`, `mkfifo`, `truncate`: each operand is a file they create or change. */
+export const MAKERS = tool(does('reads-file', 'required', '-r', '--reference'), value('-m', '--mode', '-s', '--size', '-t', '-d', '--date'));
+
+/** `tree`: its operands are dirs it reads; `-o` writes its listing. */
+export const TREE = tool(does('writes-file', 'required', '-o'), value('-L', '-P', '-I', '-H', '-T', '--charset', '--filelimit', '--timefmt', '--sort'));
+
+/** `tee file…`: each operand is a file it writes. */
+export const TEE = tool(flag('-a', '--append', '-i', '--ignore-interrupts', '-p'), { names: ['--output-error'], value: 'optional' });
+
+/** `sed`: a script from `-e`, `-f` or the first operand; `-i` edits the operands in place. */
+export const SED = tool(
+  value('-e', '--expression', '-l', '--line-length'),
+  does('reads-file', 'required', '-f', '--file'),
+  { names: ['-i', '--in-place'], value: 'optional' },
+  flag('-E', '-r', '--regexp-extended', '-n', '--quiet', '--silent', '-s', '--separate', '-u', '--unbuffered', '-z', '--null-data', '--posix', '--debug', '--sandbox', '--follow-symlinks')
+);
+
+/** grep and its kin: a pattern from `-e`, `-f` or the first operand, then the files they read. */
+export const GREP = tool(
+  // grep's -r, -E and -T are flags, so rg's value options of those letters are read as flags too: their value is then read as a file.
+  value('-e', '--regexp', '-m', '--max-count', '-A', '--after-context', '-B', '--before-context', '-C', '--context', '-g', '--glob', '-t', '--type', '--type-not', '-d', '--directories', '-D', '--devices'),
+  value('--include', '--exclude', '--exclude-dir', '--label', '--binary-files', '--threads', '--max-columns', '--max-depth', '--encoding', '--replace', '--sort', '--sortr', '--type-add', '--context-separator', '--field-match-separator'),
+  { names: ['--color', '--colour'], value: 'optional' },
+  does('reads-file', 'required', '-f', '--file', '--exclude-from', '--ignore-file'),
+  runsShell('required', '--pre')
+);
+
+/** awk: a program from `-f`/`-E` files or the first operand; gawk's `-i` adds a source file, `-i inplace` edits in place, and `-l` loads native code. */
+export const AWK = tool(
+  does('reads-file', 'required', '-f', '--file', '-E', '--exec'),
+  { names: ['-i', '--include'], value: 'required', effect: 'reads-file', when: /^(?!inplace$)/ },
+  does('runs-program', 'required', '-l', '--load'),
+  value('-e', '--source', '-v', '--assign', '-F', '--field-separator')
+);
+
+/** `rm` and its kin: every option is a flag, and each operand is a path they delete. */
+export const REMOVERS = tool(flag('-r', '-R', '--recursive', '-f', '--force', '-i', '-I', '-d', '--dir', '-v', '--verbose', '--no-preserve-root', '--preserve-root', '--one-file-system'));
+
+/** `cp`, `mv`, `install`, `ln`: sources and a destination, or a `-t` dir. */
+export const COPIERS = tool(
+  does('writes-file', 'required', '-t', '--target-directory'),
+  value('-S', '--suffix', '-m', '--mode', '-o', '--owner', '-g', '--group', '--strip-program', '--context'),
+  { names: ['--backup', '--preserve', '--no-preserve', '--sparse', '--reflink', '--update'], value: 'optional' }
+);
+
+/**
+ * `chmod`, `chown`, `chgrp`: a mode or owner, then the files they change. A
+ * mode may start with `-` (`chmod -w f`), so a dash word is an option only
+ * when every letter in it is one.
+ */
+export const CHANGERS: ProgramSpec = {
+  ...tool(flag('-R', '--recursive', '-v', '--verbose', '-c', '--changes', '-f', '--silent', '--quiet', '-h', '--no-dereference', '-H', '-L', '-P', '--dereference'), does('reads-file', 'required', '--reference'), value('--from')),
+  strictShort: true
+};
+
+/** `cd`/`pushd [-L|-P] [-e] [-@] [dir]`. */
+export const CD = builtin(flag('-L', '-P', '-e', '-@'));
+
+/** `defaults [-currentHost | -host name | -container name] action …`. */
+export const DEFAULTS: ProgramSpec = { abbreviations: false, stopAtOperand: true, singleDash: true, options: [flag('-currentHost'), value('-host', '-container')] };
+
+/** `env [-i] [-u name] [-C dir] [-S string] [-0] [-v] [name=value …] [command …]`. */
+export const ENV: ProgramSpec = {
+  ...sub(
+    flag('-i', '--ignore-environment', '-0', '--null', '-v', '--debug'),
+    value('-u', '--unset'),
+    does('changes-dir', 'required', '-C', '--chdir'),
+    does('runs-program', 'required', '-S', '--split-string'),
+    { names: ['--default-signal', '--ignore-signal', '--block-signal'], value: 'optional' }
+  ),
+  stopAtOperand: true
+};
+
+/** curl's options that take a value. curl reads options by their exact name. */
+export const CURL: ProgramSpec = {
+  abbreviations: false,
+  stopAtOperand: false,
+  options: [
+    value('-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--data-urlencode', '--json', '-F', '--form', '--form-string', '-T', '--upload-file', '-H', '--header', '-K', '--config'),
+    value('-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header', '--output-dir', '-E', '--cert', '--key', '--cacert', '--capath', '-b', '--cookie', '--url'),
+    value('--trace', '--trace-ascii', '--stderr', '--libcurl', '--etag-save', '--etag-compare', '--hsts', '--alt-svc', '--netrc-file', '-Q', '--quote', '-t', '--telnet-option', '-P', '--ftp-port', '--unix-socket', '--noproxy', '--mail-from', '--mail-rcpt', '--cert-type', '--key-type', '--ciphers', '--pass', '--aws-sigv4', '--variable'),
+    value('-X', '--request', '-u', '--user', '-A', '--user-agent', '-e', '--referer', '-r', '--range', '-m', '--max-time', '--connect-timeout', '--retry', '--resolve', '-w', '--write-out', '-x', '--proxy', '-U', '--proxy-user', '-z', '--time-cond', '-Y', '--speed-limit', '-y', '--speed-time', '-C', '--continue-at', '--limit-rate', '--max-filesize', '--interface', '--dns-servers', '--connect-to', '--oauth2-bearer')
+  ]
+};
+
+/** wget's options that take a value. */
+export const WGET = tool(
+  value('-O', '--output-document', '-o', '--output-file', '-a', '--append-output', '-P', '--directory-prefix', '-i', '--input-file', '--post-file', '--body-file', '--post-data', '--body-data'),
+  value('-U', '--user-agent', '--header', '-t', '--tries', '-T', '--timeout', '-w', '--wait', '-Q', '--quota', '-l', '--level', '-A', '--accept', '-R', '--reject', '-D', '--domains', '-e', '--execute', '--user', '--password', '--method', '--referer', '--limit-rate', '--load-cookies', '--save-cookies')
+);
+
 /** tar: the options that run a program or a shell command, and the ones that take a value. */
 export const TAR: ProgramSpec = sub(
   runsShell('required', '--to-command', '-I', '--use-compress-program', '--rsh-command', '--rmt-command', '-F', '--info-script', '--new-volume-script'),

@@ -1,4 +1,4 @@
-/** Option parsing and the generic operand rule, shared by the command rules. */
+/** Argument helpers and the generic operand rule, shared by the command rules. Options are read through the registry (`options.ts`). */
 
 import type { Access } from '../types';
 import { type Analyzer, type Arg, type KnownArg, literalStart } from './analyze';
@@ -56,57 +56,6 @@ export function restOf(arg: Arg, from: number): Arg {
   return arg.kind === 'known' ? { ...arg, text: arg.text.slice(from) } : { ...arg, knownPrefix: arg.knownPrefix.slice(from) };
 }
 
-export interface Parsed {
-  flags: Set<string>;
-  values: Map<string, Arg[]>;
-  positionals: Arg[];
-}
-
-/**
- * Split options from operands. `withValue` lists the options that take a value
- * (`-o`, `--output`); a short one may be glued (`-ofile`) or part of a cluster
- * (`-sSo file`), a long one may use `=`.
- */
-export function parse(rest: readonly Arg[], withValue: ReadonlySet<string> = new Set()): Parsed {
-  const flags = new Set<string>();
-  const values = new Map<string, Arg[]>();
-  const positionals: Arg[] = [];
-  const put = (key: string, value: Arg | undefined) => {
-    if (!value) return;
-    values.set(key, [...(values.get(key) ?? []), value]);
-  };
-  for (let k = 0; k < rest.length; k++) {
-    const arg = rest[k];
-    const t = literalStart(arg);
-    if (arg.kind === 'known' && t === '--') {
-      for (const arg of rest.slice(k + 1)) positionals.push(arg);
-      break;
-    }
-    if (t.startsWith('--')) {
-      const eq = t.indexOf('=');
-      const key = eq < 0 ? t : t.slice(0, eq);
-      flags.add(key);
-      if (eq >= 0) put(key, restOf(arg, eq + 1));
-      else if (withValue.has(key)) put(key, rest[++k]);
-      continue;
-    }
-    if (arg.kind === 'known' && t.startsWith('-') && t.length > 1) {
-      for (let c = 1; c < t.length; c++) {
-        const key = `-${t[c]}`;
-        flags.add(key);
-        if (withValue.has(key)) {
-          const glued = t.slice(c + 1);
-          put(key, glued ? { ...arg, text: glued } : rest[++k]);
-          break;
-        }
-      }
-      continue;
-    }
-    positionals.push(arg);
-  }
-  return { flags, values, positionals };
-}
-
 export interface LeadingOption {
   /** One option: `-c` out of a `-xc` cluster, `--eval` out of `--eval=X`. */
   key: string;
@@ -116,8 +65,8 @@ export interface LeadingOption {
 
 /**
  * A program's own options, up to its first operand (`node -r x main.js -e y`
- * stops at `main.js`: the rest belongs to the script). Reads every spelling
- * that `parse` reads. `next` is the index of the first operand; a word built
+ * stops at `main.js`: the rest belongs to the script). `next` is the index
+ * of the first operand; a word built
  * from a variable stops the scan, because it may be either. An option in
  * `stopAfter` ends the program's options (`python -c X`, `python -m X`).
  */
@@ -171,8 +120,6 @@ export function hiddenLeadingOption(rest: readonly Arg[]): Arg | undefined {
   return undefined;
 }
 
-export const has = (p: Parsed, ...keys: string[]) => keys.some((key) => p.flags.has(key));
-export const valuesOf = (p: Parsed, ...keys: string[]) => keys.flatMap((key) => p.values.get(key) ?? []);
 
 /** Options that load an env file into the program without printing it. */
 const ENV_FILE_OPTIONS = new Set(['--env-file', '--env-file-if-exists']);
@@ -186,6 +133,11 @@ export function generic(ctx: CommandContext, rest: readonly Arg[]): void {
     const t = literalStart(arg);
     if (arg.kind === 'known' && t === '--') {
       afterDashes = true;
+      continue;
+    }
+    if (!afterDashes && t.startsWith('-') && arg.kind === 'unknown') {
+      // It may be an option, and it may split into `--` and a path.
+      analyzer.operand(arg);
       continue;
     }
     if (!afterDashes && t.startsWith('-')) {
@@ -214,4 +166,16 @@ export function generic(ctx: CommandContext, rest: readonly Arg[]): void {
 
 export function files(ctx: CommandContext, list: readonly Arg[], access: Access): void {
   for (const arg of list) if (!isUrl(literalStart(arg))) ctx.analyzer.addPath(arg, access, true);
+}
+
+/**
+ * The operands a program reads or writes, from `readArgs(…).positionals`. One
+ * built from a variable is a path the analysis cannot place, also when it may
+ * be an option (`cat --$_`), so it is never dropped.
+ */
+export function operands(ctx: CommandContext, list: readonly Arg[], access: Access): void {
+  for (const arg of list) {
+    if (arg.kind === 'known' && access === 'read') ctx.analyzer.operand(arg);
+    else files(ctx, [arg], access);
+  }
 }

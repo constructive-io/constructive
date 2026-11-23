@@ -9,6 +9,8 @@ import * as path from 'node:path';
 import type { Analyzer, Arg, Cwd, KnownArg } from './analyze';
 import { knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
+import { isOption, readArgs } from './options';
+import { ENV } from './programs';
 
 /** How `xargs` feeds the command it runs. */
 export interface XargsInput {
@@ -81,7 +83,6 @@ function replaced(a: KnownArg, replace: string, w: Arg): Arg {
   return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw, splits: false };
 }
 
-const ENV_VALUE_OPTIONS = new Set(['-u', '--unset', '-C', '--chdir', '-S', '--split-string']);
 const RUNNER_VALUE_OPTIONS = new Set(['-c', '--call', '-p', '--package']);
 
 /**
@@ -147,19 +148,24 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     // `env -` is `env -i`.
     const from = textOf(args[i + 1]) === '-' ? i + 2 : i + 1;
     const rest = args.slice(from);
-    const { options, next } = leadingOptions(rest, ENV_VALUE_OPTIONS);
-    for (const { key, value } of options) {
-      if (key === '-S' || key === '--split-string') {
-        const words = knownTexts([value, ...rest.slice(next)].filter((a): a is Arg => a !== undefined));
+    const read = readArgs(ENV, rest);
+    for (const option of read.options) {
+      if (isOption(option, '-S', '--split-string')) {
+        const words = knownTexts([option.value, ...rest.slice(read.next)].filter((a): a is Arg => a !== undefined));
         if (words === null) analyzer.dynamic('it runs env -S with a string from a variable');
         else analyzer.nested(words.join(' '), 'it runs a string with env -S');
         return args.length;
       }
-      if (key === '-C' || key === '--chdir') {
-        analyzer.moveForOneCommand(scope, value?.kind === 'known' ? analyzer.dirAt(value.text) : { kind: 'unknown' });
+      if (isOption(option, '-C', '--chdir')) {
+        analyzer.moveForOneCommand(scope, option.value?.kind === 'known' ? analyzer.dirAt(option.value.text) : { kind: 'unknown' });
       }
     }
-    return from + next;
+    if (read.unknown.length > 0) {
+      // It may be `-C dir` or `-S string`.
+      analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+      analyzer.dynamic(`it passes env ${read.unknown[0].raw}, a value from a variable that may be an option that runs a string`);
+    }
+    return from + read.next;
   }
   case 'sudo':
   case 'doas':
