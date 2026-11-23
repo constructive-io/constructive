@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.15](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.14...@pgpmjs/slice@0.21.15) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
 ## [0.21.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.13...@pgpmjs/slice@0.21.14) (2026-11-23)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.2...graphile-llm@1.25.3) (2026-11-23)
+
+### Bug Fixes
+
+- **graphile-llm:** ragQuery embeds the prompt with the model the chunks vector column records ([#2066](https://github.com/constructive-io/constructive/issues/2066)) ([81b46b3](https://github.com/constructive-io/constructive/commit/81b46b39823cb4987a84b9c846c07f008babca73))
+
 ## [1.25.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.1...graphile-llm@1.25.2) (2026-11-23)
 
 **Note:** Version bump only for package graphile-llm

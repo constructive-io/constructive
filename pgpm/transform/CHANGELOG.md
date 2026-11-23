@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.10...@pgpmjs/transform@0.32.11) (2026-11-23)
+
+### Bug Fixes
+
+- **import:** slice statements by UTF-8 byte offset; handle scripts with no restructurable statements ([#1935](https://github.com/constructive-io/constructive/issues/1935)) ([6eb8ec4](https://github.com/constructive-io/constructive/commit/6eb8ec4079e3b2430d34eb3bb9b1dd5936d309ac))
+
 ## [0.32.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.9...@pgpmjs/transform@0.32.10) (2026-11-23)
 
 ### Bug Fixes

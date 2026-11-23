@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.31.1...agentic-server@0.31.2) (2026-11-23)
+
+### Bug Fixes
+
+- **agentic-server:** stop the upstream call when the caller hangs up ([#2062](https://github.com/constructive-io/constructive/issues/2062)) ([71b72e5](https://github.com/constructive-io/constructive/commit/71b72e5ce3d0bc15136278c821993bd7f5066408))
+
 ## [0.31.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.31.0...agentic-server@0.31.1) (2026-11-23)
 
 **Note:** Version bump only for package agentic-server

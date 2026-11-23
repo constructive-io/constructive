@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.32.17](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.16...graphile-settings@6.32.17) (2026-11-23)
+
+### Bug Fixes
+
+- **server:** resolve API roles by properties instead of names ([#2040](https://github.com/constructive-io/constructive/issues/2040)) ([2ca1630](https://github.com/constructive-io/constructive/commit/2ca163020ec9918a2a00b2f0f24c7f2373dfb729))
+
 ## [6.32.16](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.15...graphile-settings@6.32.16) (2026-11-23)
 
 ### Bug Fixes

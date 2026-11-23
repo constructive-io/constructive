@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.16](https://github.com/constructive-io/constructive/compare/supabase-test@3.18.15...supabase-test@3.18.16) (2026-11-23)
+
+### Bug Fixes
+
+- **supabase-test:** don't use inherited PGDATABASE as the test database name ([#2060](https://github.com/constructive-io/constructive/issues/2060)) ([94b3dbf](https://github.com/constructive-io/constructive/commit/94b3dbfb048a79c7f76a258acec28b5e15d50eba))
+
 ## [3.18.15](https://github.com/constructive-io/constructive/compare/supabase-test@3.18.14...supabase-test@3.18.15) (2026-11-23)
 
 **Note:** Version bump only for package supabase-test

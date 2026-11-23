@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.11](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.10...@constructive-io/graphql-server@5.36.11) (2026-11-23)
+
+### Bug Fixes
+
+- **server:** resolve API roles by properties instead of names ([#2040](https://github.com/constructive-io/constructive/issues/2040)) ([2ca1630](https://github.com/constructive-io/constructive/commit/2ca163020ec9918a2a00b2f0f24c7f2373dfb729))
+
 ## [5.36.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.9...@constructive-io/graphql-server@5.36.10) (2026-11-23)
 
 ### Bug Fixes

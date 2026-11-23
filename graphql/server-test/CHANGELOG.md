@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.2...graphql-server-test@3.43.3) (2026-11-23)
+
+### Bug Fixes
+
+- **storage:** sign uploads for server-allocated object keys ([#2014](https://github.com/constructive-io/constructive/issues/2014)) ([bf443e9](https://github.com/constructive-io/constructive/commit/bf443e955a92c46ded652f36162162a81767bfe5))
+
+### Reverts
+
+- Revert "fix(storage): sign uploads for server-allocated object keys (#2014)" (#2064) ([f2e1ca9](https://github.com/constructive-io/constructive/commit/f2e1ca9b1eea00678242974d2a9e991ce6ec1f64)), closes [#2014](https://github.com/constructive-io/constructive/issues/2014) [#2064](https://github.com/constructive-io/constructive/issues/2064)
+
 ## [3.43.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.1...graphql-server-test@3.43.2) (2026-11-23)
 
 **Note:** Version bump only for package graphql-server-test
