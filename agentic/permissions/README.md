@@ -144,7 +144,7 @@ A path that goes through a dangling symlink, a link loop or an entry that cannot
 | secret-file read | allow (redacted) | allow (redacted) | allow (redacted) |
 | unresolvable path | ask | ask | ask |
 
-Every `ask` and `deny` reason starts with `permissions: ` and names the path or the cause, for example `permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode)`.
+Every `ask` and `deny` reason starts with `permissions: ` and names the path or the cause, for example `permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode)`, and a deny, or an ask because the analysis did not read the whole command, ends with the model's next step (`src/guidance.ts`, the only place that wording lives): don't reach a blocked path another way and ask the user, or rewrite an unread command as simpler commands.
 
 ### Grants
 

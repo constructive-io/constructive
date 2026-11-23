@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 
 import { createPermissionEngine, nodeFsProbe, type PermissionVerdict } from '../src';
+import { NEXT_STEP } from '../src/guidance';
 import { canonicalize, resolveLikePi } from '../src/paths';
 import { makeSandbox, type Sandbox } from './sandbox';
 
@@ -67,10 +68,10 @@ describe('file tools per mode', () => {
 
   it('names what it blocks', async () => {
     const read = await sb.run('read', { path: '~/.ssh/id_ed25519' });
-    expect(read.reason).toBe('permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode)');
+    expect(read.reason).toBe(`permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode). ${NEXT_STEP.blocked}`);
     const write = await sb.run('write', { path: '.pi/extensions/x.ts', content: 'x' });
     expect(write.reason).toBe(
-      'permissions: writing .pi/extensions/x.ts is not allowed (agent extension dir; protected in every mode)'
+      `permissions: writing .pi/extensions/x.ts is not allowed (agent extension dir; protected in every mode). ${NEXT_STEP.blocked}`
     );
     const outside = await sb.run('write', { path: '/etc/hosts', content: 'x' });
     expect(outside.reason).toBe('permissions: writing /etc/hosts needs approval: /etc/hosts is outside the project');

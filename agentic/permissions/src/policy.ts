@@ -9,6 +9,7 @@
  */
 
 import { ACCESS_VERB, findGrants, grantOptionsFor, matchCovers } from './grants';
+import { NEXT_STEP } from './guidance';
 import { showPath } from './paths';
 import { buildPrompt, type PromptDisplay } from './prompt';
 import { SIGNAL_RULES } from './signals';
@@ -44,10 +45,10 @@ function denyReason(request: PermissionRequest, target: Target, ctx: PromptDispl
   const bash = request.toolName === 'bash';
   if (target.zone === 'hard-deny') {
     const what = bash ? `this command ${ACCESS_VERB[target.access]} ${shown}, which` : `${ING[target.access]} ${shown}`;
-    return `permissions: ${what} is not allowed (${target.label}; blocked in every mode)`;
+    return `permissions: ${what} is not allowed (${target.label}; blocked in every mode). ${NEXT_STEP.blocked}`;
   }
   const what = bash ? `this command writes ${shown}, which` : `writing ${shown}`;
-  return `permissions: ${what} is not allowed (${target.label}; protected in every mode)`;
+  return `permissions: ${what} is not allowed (${target.label}; protected in every mode). ${NEXT_STEP.blocked}`;
 }
 
 /** "a chat grant", "project grants", "chat and project grants". */
@@ -85,7 +86,7 @@ export function decide(request: PermissionRequest, ctx: PolicyContext): Permissi
   const blocked = blockedTarget(request);
   if (blocked) return deny(denyReason(request, blocked, ctx));
   if (ctx.rules?.deny?.some((m) => matchCovers(m, request))) {
-    return deny(`permissions: ${describe(request, ctx)} is blocked by a deny rule`);
+    return deny(`permissions: ${describe(request, ctx)} is blocked by a deny rule. ${NEXT_STEP.blocked}`);
   }
   const covering = findGrants(ctx.grants, request);
   if (covering.length > 0) return allow(`permissions: allowed by ${grantsPhrase(covering)}`);

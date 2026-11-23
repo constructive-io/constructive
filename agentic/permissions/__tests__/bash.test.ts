@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 
 import type { PermissionVerdict, Signal } from '../src';
+import { NEXT_STEP } from '../src/guidance';
 import { makeSandbox, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
@@ -111,7 +112,7 @@ describe('bash commands per mode', () => {
   it('names the denied path in the reason', async () => {
     const d = await sb.bash('cat ~/.ssh/id_ed25519');
     expect(d.reason).toBe(
-      'permissions: this command reads ~/.ssh/id_ed25519, which is not allowed (SSH keys; blocked in every mode)'
+      `permissions: this command reads ~/.ssh/id_ed25519, which is not allowed (SSH keys; blocked in every mode). ${NEXT_STEP.blocked}`
     );
   });
 });

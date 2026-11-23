@@ -14,6 +14,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { Findings } from '../findings';
+import { NEXT_STEP } from '../guidance';
 import type { Access, CommandKey, CommandPart, Signal } from '../types';
 import { unreachable } from '../unreachable';
 import { generic } from './args';
@@ -301,7 +302,7 @@ class Analyzer implements ExpansionScope {
 
   /** The analysis stopped at one of its own limits, or at text it cannot parse, so it has not read the whole command. */
   incomplete(limit: Limit, detail?: string): void {
-    this.unresolvable(detail ? `${LIMIT_REASONS[limit]} (${detail})` : LIMIT_REASONS[limit]);
+    this.unresolvable(`${LIMIT_REASONS[limit]}${detail ? ` (${detail})` : ''}. ${NEXT_STEP.unread}`);
   }
 
   /** `cd dir` looks `dir` up in `CDPATH` when the command set it and `dir` is not `/…`, `./…` or `../…`. */
