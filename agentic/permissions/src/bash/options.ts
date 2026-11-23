@@ -78,6 +78,8 @@ export interface ReadArgs {
   readonly positionals: readonly Arg[];
   /** The index of the first argument after the options when `stopAtOperand`, or the argument count. */
   readonly next: number;
+  /** A `--` ended the options. */
+  readonly ended: boolean;
 }
 
 /**
@@ -182,13 +184,15 @@ export function optionsIn(spec: ProgramSpec, text: string): SpelledOption[] | nu
  * the next word as the value, short options alone or in a cluster with a value
  * glued to them or in the next word, and `--` ending the options. An option
  * that takes a value takes the next word even when it is `--`, as git and
- * getopt do.
+ * getopt do. For a program whose options stop at its first operand, `next`
+ * is the word after the `--`, where its command or operands start.
  */
 export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
   const options: ReadOption[] = [];
   const operands: Arg[] = [];
   const unknown: Arg[] = [];
   const positionals: Arg[] = [];
+  let ended = false;
   let k = 0;
   for (; k < args.length; k++) {
     const arg = args[k];
@@ -205,6 +209,11 @@ export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
     }
     const t = arg.text;
     if (t === '--') {
+      ended = true;
+      if (spec.stopAtOperand) {
+        k++;
+        break;
+      }
       operands.push(...args.slice(k + 1));
       positionals.push(...args.slice(k + 1));
       k = args.length;
@@ -223,7 +232,7 @@ export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
     operands.push(arg);
     positionals.push(arg);
   }
-  return { options, operands, unknown, positionals, next: k };
+  return { options, operands, unknown, positionals, next: k, ended };
 }
 
 /**

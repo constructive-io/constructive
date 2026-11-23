@@ -218,7 +218,7 @@ export const READERS: ReadonlyMap<string, ProgramSpec> = new Map([
   ['wc', tool(does('reads-file', 'required', '--files0-from'))],
   ['file', tool(does('reads-file', 'required', '-f', '--files-from', '-m', '--magic-file'), value('-F', '--separator', '-P', '--parameter', '-e', '--exclude'))],
   ['stat', tool(value('-c', '--format', '--printf'))],
-  ['diff', tool(does('reads-file', 'required', '--from-file', '--to-file', '-X', '--exclude-from'), value('-x', '--exclude', '-I', '--ignore-matching-lines', '-U', '-C', '--label', '-L', '-W', '--width', '-F', '--show-function-line', '--line-format', '--old-line-format', '--new-line-format', '--unchanged-line-format', '--old-group-format', '--new-group-format', '--changed-group-format', '--unchanged-group-format', '--tabsize', '--horizon-lines', '--palette', '--color', '-S', '--starting-file'))],
+  ['diff', tool(does('reads-file', 'required', '--from-file', '--to-file', '-X', '--exclude-from'), value('-x', '--exclude', '-I', '--ignore-matching-lines', '-U', '-C', '--label', '-L', '-W', '--width', '-F', '--show-function-line', '--line-format', '--old-line-format', '--new-line-format', '--unchanged-line-format', '--old-group-format', '--new-group-format', '--changed-group-format', '--unchanged-group-format', '--tabsize', '--horizon-lines', '--palette', '-S', '--starting-file'), { names: ['--color'], value: 'optional' })],
   ['head', tool(value('-n', '--lines', '-c', '--bytes'))],
   ['tail', tool(value('-n', '--lines', '-c', '--bytes', '-b', '-s', '--sleep-interval', '--pid', '--max-unchanged-stats'))],
   ['uniq', tool(value('-f', '--skip-fields', '-s', '--skip-chars', '-w', '--check-chars'), { names: ['--group', '--all-repeated'], value: 'optional' })],
@@ -234,8 +234,17 @@ export const READER_OUTPUT: ReadonlyMap<string, number> = new Map([
   ['xxd', 1]
 ]);
 
-/** `touch`, `mkdir`, `mkfifo`, `truncate`: each operand is a file they create or change. */
-export const MAKERS = tool(does('reads-file', 'required', '-r', '--reference'), value('-m', '--mode', '-s', '--size', '-t', '-d', '--date'));
+/**
+ * `touch`, `mkdir`, `mkfifo`, `truncate`: each operand is a file they create
+ * or change. A letter means something else in each one (`touch -m` is a flag,
+ * `mkdir -m` takes a mode), so each has its own options, from GNU's and BSD's.
+ */
+export const MAKERS: ReadonlyMap<string, ProgramSpec> = new Map([
+  ['touch', tool(does('reads-file', 'required', '-r', '--reference'), value('-A', '-d', '--date', '-t', '--time'), flag('-a', '-c', '--no-create', '-f', '-h', '--no-dereference', '-m'))],
+  ['mkdir', tool(value('-m', '--mode'), flag('-p', '--parents', '-v', '--verbose', '-Z'), { names: ['--context'], value: 'optional' })],
+  ['mkfifo', tool(value('-m', '--mode'), flag('-Z'), { names: ['--context'], value: 'optional' })],
+  ['truncate', tool(does('reads-file', 'required', '-r', '--reference'), value('-s', '--size'), flag('-c', '--no-create', '-o', '--io-blocks'))]
+]);
 
 /** `tree`: its operands are dirs it reads; `-o` writes its listing. */
 export const TREE = tool(does('writes-file', 'required', '-o'), value('-L', '-P', '-I', '-H', '-T', '--charset', '--filelimit', '--timefmt', '--sort'));
@@ -275,8 +284,8 @@ export const REMOVERS = tool(flag('-r', '-R', '--recursive', '-f', '--force', '-
 /** `cp`, `mv`, `install`, `ln`: sources and a destination, or a `-t` dir. */
 export const COPIERS = tool(
   does('writes-file', 'required', '-t', '--target-directory'),
-  value('-S', '--suffix', '-m', '--mode', '-o', '--owner', '-g', '--group', '--strip-program', '--context'),
-  { names: ['--backup', '--preserve', '--no-preserve', '--sparse', '--reflink', '--update'], value: 'optional' }
+  value('-S', '--suffix', '-m', '--mode', '-o', '--owner', '-g', '--group', '--strip-program'),
+  { names: ['--backup', '--preserve', '--no-preserve', '--sparse', '--reflink', '--update', '--context'], value: 'optional' }
 );
 
 /**
@@ -332,7 +341,8 @@ export const TAR: ProgramSpec = sub(
   does('reads-file', 'required', '-T', '--files-from', '-X', '--exclude-from'),
   does('changes-dir', 'required', '-C', '--directory'),
   flag('-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete', '-x', '--extract', '--get', '-t', '--list', '-d', '--diff', '--compare'),
-  value('-f', '--file', '-b', '--blocking-factor', '-H', '--format', '-K', '-N', '-L', '-V', '--exclude', '--transform', '--owner', '--group', '--mode', '--mtime')
+  value('-f', '--file', '-b', '--blocking-factor', '-H', '--format', '-K', '-N', '-L', '-V', '--exclude', '--transform', '--owner', '--group', '--mode', '--mtime'),
+  { names: ['--checkpoint'], value: 'optional' }
 );
 
 /** zip: `-TT` names the command that tests the archive; zip runs it through a shell. */
@@ -410,7 +420,8 @@ export interface TextProgram {
   /**
    * Whether it reads text from stdin: never (`false`), or unless text in an
    * operand or one of these options makes it run that and exit (`psql -c`,
-   * `-f`, gdb's `-batch`). An option whose value is `-` still reads stdin.
+   * `-f`, gdb's `-batch`). Any of these options whose value is `-` reads
+   * stdin, whatever else the command passes (`psql -f - -c …`).
    */
   readonly stdin: false | { readonly unless: readonly string[] };
   /**
@@ -422,8 +433,10 @@ export interface TextProgram {
 
 const PSQL: TextProgram = {
   spec: sub(
-    { names: ['-o', '--output'], value: 'required', effect: 'runs-program', when: /^\s*\|/, shell: /^\s*\|\s*([\s\S]*)$/ },
-    { names: ['-o', '--output', '-L', '--log-file'], value: 'required', effect: 'writes-file', when: /^(?!\s*\|)/ },
+    // psql opens `-o` as a pipe only when its first character is `|`, and as a file otherwise; `-L` is always a file.
+    { names: ['-o', '--output'], value: 'required', effect: 'runs-program', when: /^\|/, shell: /^\|([\s\S]*)$/ },
+    { names: ['-o', '--output'], value: 'required', effect: 'writes-file', when: /^(?!\|)/ },
+    does('writes-file', 'required', '-L', '--log-file'),
     does('reads-file', 'required', '-f', '--file'),
     value('-c', '--command', '-d', '--dbname', '-h', '--host', '-p', '--port', '-U', '--username', '-v', '--set', '--variable'),
     value('-P', '--pset', '-F', '--field-separator', '-R', '--record-separator', '-T', '--table-attr')

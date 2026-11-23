@@ -91,9 +91,10 @@ function runText(ctx: CommandContext, name: string, program: TextProgram, text: 
   for (const command of shells) analyzer.nested(command, `it runs a shell command from ${name} ${where}`);
 }
 
-/** The program runs text from an operand or an option, and exits instead of reading stdin; `-` as the value still names stdin. */
-function runsInstead(read: ReadArgs, unless: readonly string[], operandText: boolean): boolean {
-  return operandText || read.options.some((o) => isOption(o, ...unless) && !(o.value?.kind === 'known' && o.value.text === '-'));
+/** The program reads stdin: an action option names it with `-`, or no action option and no operand text makes it run something else and exit. */
+function readsStdin(read: ReadArgs, unless: readonly string[], operandText: boolean): boolean {
+  const actions = read.options.filter((o) => isOption(o, ...unless));
+  return actions.some((o) => textOf(o.value) === '-') || (actions.length === 0 && !operandText);
 }
 
 /** A program with a command language of its own: its text from options, operands and stdin. */
@@ -113,7 +114,7 @@ function readText(name: string, program: TextProgram, spec: ProgramSpec, ctx: Co
   const textFrom = program.textFrom ?? operands.length;
   for (const arg of operands.slice(textFrom)) texts.push({ arg, where: 'in an argument' });
   for (const { arg, where } of texts) runText(ctx, name, program, arg, where);
-  if (program.stdin && ctx.stdinFed && !runsInstead(read, program.stdin.unless, operands.length > textFrom)) {
+  if (program.stdin && ctx.stdinFed && readsStdin(read, program.stdin.unless, operands.length > textFrom)) {
     const input = analyzer.stdin.texts();
     const { file } = analyzer.stdin;
     if (input !== null) for (const text of new Set(input)) runText(ctx, name, program, literalArg(text), 'on its input');

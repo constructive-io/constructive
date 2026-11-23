@@ -263,6 +263,12 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return;
   }
   if (TESTS.has(name)) return test(name, ctx, rest);
+  const maker = MAKERS.get(name);
+  if (maker) {
+    const read = readArgs(maker, rest);
+    applyEffects(ctx, name, maker, read);
+    return operands(ctx, read.positionals, 'write');
+  }
   const reader = READERS.get(name);
   if (reader) {
     const read = readArgs(reader, rest);
@@ -376,15 +382,6 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   case 'rimraf':
   case 'srm':
     return remove(name, ctx, rest);
-  case 'touch':
-  case 'mkdir':
-  case 'mkfifo':
-  case 'truncate':
-  {
-    const read = readArgs(MAKERS, rest);
-    applyEffects(ctx, name, MAKERS, read);
-    return operands(ctx, read.positionals, 'write');
-  }
   case 'tee':
     return tee(ctx, rest);
   case 'tree':

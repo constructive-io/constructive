@@ -136,8 +136,7 @@ export function remoteCopy(name: 'scp' | 'rsync', ctx: CommandContext, rest: rea
  */
 function sshArgs(rest: readonly Arg[]): ReadArgs {
   const before = readArgs(SSH, rest);
-  const ended = before.operands.length > 0;
-  if (ended || before.next >= rest.length - 1) return before;
+  if (before.ended || before.next >= rest.length - 1) return before;
   const after = readArgs(SSH, rest.slice(before.next + 1));
   return { ...after, options: [...before.options, ...after.options], unknown: [...before.unknown, ...after.unknown] };
 }

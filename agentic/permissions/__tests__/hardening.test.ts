@@ -149,7 +149,21 @@ const rows: Row[] = [
   ['cat {..{/../.ssh/id_ed25519,x}}', 'deny', 'deny', 'hard-deny'],
   ['cat {..x}{a,b}', 'ask', 'ask', 'unresolvable-path'],
   // a bash 4+ parameter transform, which bash 3.2 refuses, is still read as bash 4+ runs it
-  ['x=~/.ssh/id_ed25519; eval cat ${x@Q}', 'deny', 'deny', 'hard-deny']
+  ['x=~/.ssh/id_ed25519; eval cat ${x@Q}', 'deny', 'deny', 'hard-deny'],
+  // 18. option values and option ends as each program reads them: `--` ends env's options before the command, an optional value is glued only, each maker has its own options
+  ['env -- cat ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['env -i -- cat ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['diff --color ~/.ssh/id_ed25519 src/config.ts', 'deny', 'deny', 'hard-deny'],
+  ['cp --context ~/.ssh/id_ed25519 out.txt', 'deny', 'deny', 'hard-deny'],
+  ['tar -cf a.tar --checkpoint ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['touch -m .pi/ext.js', 'deny', 'deny'],
+  ['touch -m .git/hooks/pre-commit', 'ask', 'allow', 'ask-write'],
+  ['truncate -c -s 0 .pi/ext.js', 'deny', 'deny'],
+  // psql's log file is always a file, and psql reads stdin for any `-f -`
+  ["psql -L '|/../.pi/ext.js' -c 'select 1'", 'deny', 'deny'],
+  ["psql --log-file='|/../../../.bashrc' -c 'select 1'", 'ask', 'allow', 'outside-workspace'],
+  ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | psql -f - -c 'select 1'", 'deny', 'deny', 'hard-deny'],
+  ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | psql -f src/config.ts -f -", 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {
