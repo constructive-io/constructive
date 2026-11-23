@@ -238,7 +238,7 @@ function sudoShellLine(words: readonly string[]): string {
 /** A runner's `-c` string: analyzed as a nested command, or dynamic when it is not known. */
 function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
   if (!call || call.kind === 'unknown') analyzer.dynamic(`it runs ${what} with a string from a variable`);
-  else analyzer.nested(call.text, `it runs a string with ${what}`, true);
+  else analyzer.nested(call.text, `it runs a string with ${what}`, { inherits: true });
 }
 
 /**
@@ -323,7 +323,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     if (shellFlag && k < args.length) {
       const words = knownTexts(args.slice(k));
       if (words === null) analyzer.dynamic(`it runs a shell with ${name} -s on words from a variable`);
-      else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`, true);
+      else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`, { inherits: true });
       return args.length;
     }
     return k;
@@ -333,7 +333,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     analyzer.flag('sudo', 'it runs su to switch user');
     const c = args.findIndex((a, k) => k > i && (textOf(a) === '-c' || textOf(a) === '--command'));
     const script = c > 0 ? args[c + 1] : undefined;
-    if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c', true);
+    if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c', { inherits: true });
     else if (script) analyzer.dynamic('it runs su -c with a string from a variable');
     return args.length;
   }
@@ -343,7 +343,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     const k = opts(/^-[nqd]$|^--(interval|differences)$/, /^-/);
     const words = knownTexts(args.slice(k));
     if (words === null) analyzer.dynamic('it runs watch on words from a variable');
-    else analyzer.nested(words.join(' '), 'it runs a string with watch', true);
+    else analyzer.nested(words.join(' '), 'it runs a string with watch', { inherits: true });
     return args.length;
   }
   case 'npx':

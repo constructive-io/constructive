@@ -84,10 +84,22 @@ export interface Compound {
   redirects: Redirect[];
 }
 
+/**
+ * A subshell: `( … )`, each element of a pipeline, a background job, or a
+ * substitution. It runs on a copy of the shell's variables and dir, so what it
+ * assigns or the dir it moves to does not outlast it.
+ */
+export interface Subshell {
+  /** It is the last element of a pipeline, which bash runs in the shell itself under `shopt -s lastpipe`. */
+  lastElement: boolean;
+}
+
 export interface SimpleCommand {
   words: Word[];
   redirects: Redirect[];
   input: Input;
+  /** The subshells it runs in, outermost first. */
+  subshells: Subshell[];
 }
 
 export function heredocsOf(cmd: SimpleCommand): Heredoc[] {
@@ -137,7 +149,19 @@ interface PendingHeredoc {
 }
 
 function newCommand(): SimpleCommand {
-  return { words: [], redirects: [], input: { kind: 'inherited' } };
+  return { words: [], redirects: [], input: { kind: 'inherited' }, subshells: [] };
+}
+
+/**
+ * Where, in the commands lexed so far, the current pipeline element and
+ * and-or list of one nesting level start, whether a `|` came before this
+ * element, and how many subshells are open around the level.
+ */
+interface Level {
+  element: number;
+  list: number;
+  piped: boolean;
+  depth: number;
 }
 
 class Lexer {
@@ -155,6 +179,10 @@ class Lexer {
   private closed: Compound | null = null;
   /** The command so far is a function's name and `()`, or `function name`, so a `{` opens its body. */
   private functionHeader = false;
+  /** The `( … )` subshells open here, outermost first. */
+  private readonly subshells: Subshell[] = [];
+  /** The pipeline bookkeeping of each nesting level, innermost last: the top, and each open compound command. */
+  private readonly levels: Level[] = [{ element: 0, list: 0, piped: false, depth: 0 }];
   private i = 0;
 
   constructor(
@@ -173,7 +201,10 @@ class Lexer {
       } else if (ch === '\n') {
         this.i++;
         // A pipe may continue on the next line.
-        if (this.nextInput.kind === 'inherited' || this.current.words.length > 0 || this.current.redirects.length > 0) this.endCommand(false);
+        if (this.nextInput.kind === 'inherited' || this.current.words.length > 0 || this.current.redirects.length > 0) {
+          this.endCommand(false);
+          this.endPipeline(false, true);
+        }
         this.readHeredocs();
       } else if (ch === '#') {
         const nl = s.indexOf('\n', this.i);
@@ -188,6 +219,37 @@ class Lexer {
     }
     if (this.pending.length > 0) throw new LexError('unterminated heredoc');
     this.endCommand(false);
+    this.endPipeline(false, true);
+  }
+
+  /** The commands from `from` on run in a subshell of their own, inside the `depth` subshells open around them. */
+  private wrap(from: number, depth: number, lastElement = false): void {
+    if (from >= this.commands.length) return;
+    const subshell: Subshell = { lastElement };
+    for (let k = from; k < this.commands.length; k++) this.commands[k].subshells.splice(depth, 0, subshell);
+  }
+
+  /** A `|` ends a pipeline element, which bash runs in a subshell. */
+  private endElement(): void {
+    const level = this.levels[this.levels.length - 1];
+    this.wrap(level.element, level.depth);
+    level.piped = true;
+    level.element = this.commands.length;
+  }
+
+  /**
+   * A pipeline ends: its last element runs in a subshell too, as bash runs it
+   * unless `lastpipe` is on. `background` (`&`): the and-or list before it
+   * runs in one. `list`: the and-or list ends too (`;`, a newline, `&`, not
+   * `&&` or `||`).
+   */
+  private endPipeline(background: boolean, list: boolean): void {
+    const level = this.levels[this.levels.length - 1];
+    if (level.piped) this.wrap(level.element, level.depth, true);
+    if (background) this.wrap(level.list, level.depth);
+    level.piped = false;
+    level.element = this.commands.length;
+    if (list) level.list = this.commands.length;
   }
 
   /** A word of the current command. In command position (only keywords before it) it may open or close a compound command. */
@@ -214,17 +276,23 @@ class Lexer {
     return open ? { kind: 'compound', of: open.compound } : { kind: 'inherited' };
   }
 
-  /** A compound command opens: what would feed the next command feeds every command in it. */
+  /** A compound command opens: what would feed the next command feeds every command in it, and `(` opens a subshell. */
   private open(closer: string): void {
     this.compounds.push({ closer, compound: { input: this.inputNow(), redirects: [] } });
     this.nextInput = { kind: 'inherited' };
+    if (closer === ')') this.subshells.push({ lastElement: false });
+    const at = this.commands.length;
+    this.levels.push({ element: at, list: at, piped: false, depth: this.subshells.length });
   }
 
   /** The innermost compound command, when `closer` closes it. */
   private close(closer: string): Compound | null {
     const open = this.compounds[this.compounds.length - 1];
     if (open?.closer !== closer) return null;
+    this.endPipeline(false, true);
     this.compounds.pop();
+    this.levels.pop();
+    if (closer === ')') this.subshells.pop();
     return open.compound;
   }
 
@@ -239,6 +307,7 @@ class Lexer {
     const cmd = this.current;
     if (cmd.words.length > 0 || cmd.redirects.length > 0) {
       cmd.input = this.inputNow();
+      cmd.subshells = [...this.subshells];
       this.commands.push(cmd);
       // `( … ) < f`, `{ …; } <<< w`, `done < f`: the redirections belong to the compound command that just closed.
       if (this.closed) this.closed.redirects.push(...cmd.redirects);
@@ -263,12 +332,15 @@ class Lexer {
     if (two === '&&' || two === '||' || two === ';;' || two === ';&') {
       this.i += 2;
       this.endCommand(false);
+      this.endPipeline(false, two === ';;' || two === ';&');
     } else if (two === '|&') {
       this.i += 2;
       this.endCommand(true);
+      this.endElement();
     } else if (ch === '|') {
       this.i++;
       this.endCommand(true);
+      this.endElement();
     } else {
       // `;`, `&`, `(`, `)`
       const arithmetic = ch === '(' && s[this.i + 1] === '(' ? arithmeticEnd(s, this.i, 'command') : null;
@@ -294,6 +366,8 @@ class Lexer {
       }
       this.endCommand(false);
       if (ch === ')') this.closed = this.close(')');
+      // A `)` that closes no subshell ends a `case` pattern.
+      if (ch !== ')' || !this.closed) this.endPipeline(ch === '&', true);
     }
   }
 
@@ -427,6 +501,9 @@ class Lexer {
       this.dynamic.push(`a substitution it could not read (${error.message})`);
       this.limits.push('unparsed');
     }
+    // A substitution runs in a subshell, inside the ones open here.
+    const subshell: Subshell = { lastElement: false };
+    for (const cmd of sub.commands) cmd.subshells = [...this.subshells, subshell, ...cmd.subshells];
     this.commands.push(...sub.commands);
     this.dynamic.push(...sub.dynamic);
     this.limits.push(...sub.limits);

@@ -28,6 +28,9 @@ export const PRINTF = builtin(value('-v'));
 /** `mapfile`/`readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]`; the callback runs as code. */
 export const MAPFILE = builtin(value('-d', '-n', '-O', '-s', '-u', '-c'), does('runs-program', 'required', '-C'), flag('-t'));
 
+/** `trap [-lpP] [action] [condition …]`: `-l` and `-p` (and bash 5.3's `-P`) only list. */
+export const TRAP = builtin(flag('-l', '-p', '-P'));
+
 /** `unset [-f|-v|-n] name …`: `-f` unsets functions, the others variables. */
 export const UNSET = builtin(flag('-f', '-v', '-n'));
 

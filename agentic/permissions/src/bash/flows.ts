@@ -117,6 +117,7 @@ const NO_CONTENT = new Set([
   'git',
   'source',
   '.',
+  'trap',
   'cp',
   'mv',
   'install',

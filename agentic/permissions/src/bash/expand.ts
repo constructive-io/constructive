@@ -136,6 +136,11 @@ export class Variables {
     else this.vars.set(name, record);
   }
 
+  /** The names whose record differs from `before`'s, a copy taken earlier: what was assigned or unset since. */
+  changedFrom(before: Variables): string[] {
+    return [...new Set([...this.vars.keys(), ...before.vars.keys()])].filter((name) => this.vars.get(name) !== before.vars.get(name));
+  }
+
   /** The command set or unset it, so the environment does not decide it. */
   touched(name: string): boolean {
     const v = this.vars.get(name);

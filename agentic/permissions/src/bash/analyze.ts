@@ -23,7 +23,7 @@ import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EX
 import { type ContentFlow, FlowTracker, NO_INPUT, type Source, type Stdin, unseenInput } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
-import { heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type SimpleCommand, tokenize, type Word } from './tokenize';
+import { heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type SimpleCommand, type Subshell, tokenize, type Word } from './tokenize';
 import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsRuns } from './wrappers';
 
@@ -130,6 +130,35 @@ export function normalizeCommand(command: string): CommandKey {
 
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
 export type Cwd = { kind: 'start' } | { kind: 'moved'; dir: string } | { kind: 'unknown' };
+
+function sameCwd(a: Cwd, b: Cwd): boolean {
+  return a.kind === b.kind && (a.kind !== 'moved' || (b.kind === 'moved' && a.dir === b.dir));
+}
+
+/**
+ * A trap's action, which the shell runs later: at exit only (`EXIT`), or
+ * `anytime`, on a signal, before a command (`DEBUG`), on an error or a
+ * return. `vars`: the variables where the trap was set.
+ */
+interface Trap {
+  text: string;
+  anytime: boolean;
+  vars: Variables;
+}
+
+/** A subshell open where the analysis is: the variables and dir it started with, and the traps set in it, which run when it ends. */
+interface Frame {
+  subshell: Subshell;
+  vars: Variables;
+  cwd: Cwd;
+  traps: Trap[];
+}
+
+/** How a shell string runs: `inherits` the stdin of the command that runs it, and `shared`, in the current shell (`eval`, a trap). */
+export interface Nesting {
+  inherits?: boolean;
+  shared?: boolean;
+}
 
 /** The text an argument certainly starts with: all of it when known, its literal start otherwise. */
 export function literalStart(arg: Arg): string {
@@ -281,6 +310,18 @@ class Analyzer implements ExpansionScope {
   private readonly budget = new ExpansionBudget((limit) => this.incomplete(limit));
   /** The assignments that hold for the command being analyzed only. */
   private scope: CommandScope | null = null;
+  /** The subshells open in the shell string being analyzed, outermost first. */
+  private frames: Frame[] = [];
+  /** The traps set in the shell the analysis is in, outside any subshell. */
+  private traps: Trap[] = [];
+  /** Names a trap that may run before any later command assigns: unknown wherever they are read after it is set. */
+  private readonly trapAssigns = new Set<string>();
+  /** A trap that may run before any later command moves the shell, so no later relative path is known. */
+  private trapMovesDir = false;
+  /** Names unknown to the trap action being read at the end: the command assigned them after the trap was set. */
+  private trapUnknown: ReadonlySet<string> | null = null;
+  /** The command mentions `lastpipe`, which runs a pipeline's last element in the shell itself. */
+  lastpipe = false;
 
   /** The command's one text budget, for the texts the analysis builds beyond its words (printed output, heredocs). */
   get textBudget(): ExpansionBudget {
@@ -324,8 +365,12 @@ class Analyzer implements ExpansionScope {
     return this.vars.touched('CDPATH') && this.vars.get('CDPATH') !== undefined && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
   }
 
-  /** Analyze one shell string. Returns what it lexed to, or `null` when it was not lexed. */
-  analyzeString(command: string): Lexed | null {
+  /**
+   * Analyze one shell string. Returns what it lexed to, or `null` when it was
+   * not lexed. A `shared` string runs in the current shell (`eval`), so the
+   * traps it sets are the shell's.
+   */
+  analyzeString(command: string, shared = false): Lexed | null {
     if (this.depth > MAX_SHELL_STRING_DEPTH) {
       this.incomplete('shell-string-depth');
       return null;
@@ -339,13 +384,89 @@ class Analyzer implements ExpansionScope {
     if (lexed.error) this.incomplete('unparsed', lexed.error);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const limit of lexed.limits) this.incomplete(limit);
-    for (const cmd of lexed.commands) this.analyzeCommand(cmd);
+    const outerFrames = this.frames;
+    const outerTraps = this.traps;
+    if (shared) this.traps = this.trapList();
+    else this.traps = [];
+    this.frames = [];
+    for (const cmd of lexed.commands) {
+      this.enterSubshells(cmd.subshells);
+      this.analyzeCommand(cmd);
+    }
+    this.enterSubshells([]);
+    if (!shared) this.endTraps(this.traps);
+    this.frames = outerFrames;
+    this.traps = outerTraps;
     return lexed;
+  }
+
+  /** Leave the open subshells `chain` does not hold, innermost first, and open the ones it adds, outermost first. */
+  private enterSubshells(chain: readonly Subshell[]): void {
+    let keep = 0;
+    while (keep < this.frames.length && this.frames[keep].subshell === chain[keep]) keep++;
+    while (this.frames.length > keep) this.leaveSubshell(this.frames.pop());
+    for (const subshell of chain.slice(keep)) this.frames.push({ subshell, vars: this.vars.copy(), cwd: this.cwd, traps: [] });
+  }
+
+  /**
+   * A subshell ends: its traps run, then the shell's variables and dir are
+   * what they were when it started. Under `lastpipe` the last element of a
+   * pipeline ran in the shell itself, so a name it changed holds either value
+   * and a dir it moved to is unknown.
+   */
+  private leaveSubshell(frame: Frame): void {
+    this.endTraps(frame.traps);
+    if (frame.subshell.lastElement && this.lastpipe) {
+      for (const name of this.vars.changedFrom(frame.vars)) frame.vars.either(name, frame.vars.record(name));
+      if (!sameCwd(this.cwd, frame.cwd)) this.cwd = { kind: 'unknown' };
+    } else {
+      this.cwd = frame.cwd;
+    }
+    this.vars = frame.vars;
+  }
+
+  /** The traps of the shell or subshell the analysis is in. */
+  private trapList(): Trap[] {
+    return this.frames[this.frames.length - 1]?.traps ?? this.traps;
+  }
+
+  /**
+   * `trap ACTION CONDITION…`: the shell runs the action later, in itself. It
+   * is read here, in the shell as it is now, and again when its shell ends.
+   * One that may run before any later command (`anytime`) leaves each name it
+   * assigns unknown for the rest of the command, and the dir unknown when it
+   * moves it.
+   */
+  trapAction(text: string, anytime: boolean): void {
+    const trap: Trap = { text, anytime, vars: this.vars.copy() };
+    this.trapList().push(trap);
+    const vars = this.vars.copy();
+    const cwd = this.cwd;
+    this.nested(text, null, { shared: true });
+    if (anytime) {
+      for (const name of this.vars.changedFrom(vars)) this.trapAssigns.add(name);
+      if (!sameCwd(this.cwd, cwd)) this.trapMovesDir = true;
+    }
+    this.vars = vars;
+    this.cwd = cwd;
+  }
+
+  /** The traps of a shell or subshell that ends, read in its state there; one that may have run earlier does not know a name assigned after it was set. */
+  private endTraps(traps: readonly Trap[]): void {
+    for (const trap of [...traps]) {
+      const vars = this.vars.copy();
+      const cwd = this.cwd;
+      this.trapUnknown = trap.anytime ? new Set(this.vars.changedFrom(trap.vars)) : null;
+      this.nested(trap.text, null, { shared: true });
+      this.trapUnknown = null;
+      this.vars = vars;
+      this.cwd = cwd;
+    }
   }
 
   /** The working dir as an absolute path, or `null` when it cannot be known. */
   get base(): string | null {
-    return this.dirOf(this.cwd);
+    return this.trapMovesDir ? null : this.dirOf(this.cwd);
   }
 
   /** Every command so far ran in the start dir, so relative paths in its parts mean what they say. */
@@ -401,23 +522,27 @@ class Analyzer implements ExpansionScope {
   }
 
   /**
-   * A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own
-   * scope. `inherits`: it reads the stdin of the command that runs it (`sh
-   * -c`, `eval`, `sudo -s`); otherwise its stdin is one the analysis cannot
-   * see (a pager, tar's `--to-command`).
+   * A shell string run by `sh -c`, `eval`, `watch`, …, flagged with `why`
+   * when it is code the command hides. `inherits`: it reads the stdin of the
+   * command that runs it (`sh -c`, `eval`, `sudo -s`); otherwise its stdin is
+   * one the analysis cannot see (a pager, tar's `--to-command`). `shared`: it
+   * runs in the current shell (`eval`), so what it assigns and the dir it
+   * moves to hold after it; otherwise it runs in a shell of its own.
    */
-  nested(text: string, why: string, inherits = false): void {
-    this.dynamic(why);
+  nested(text: string, why: string | null, how: Nesting = {}): void {
+    if (why !== null) this.dynamic(why);
     const savedCwd = this.cwd;
     const savedVars = this.vars.copy();
     const savedStdin = this.stdin;
     const savedInherited = this.inheritedStdin;
-    this.inheritedStdin = inherits ? this.stdin : unseenInput();
+    this.inheritedStdin = how.inherits ? this.stdin : unseenInput();
     this.depth++;
-    this.analyzeString(text);
+    this.analyzeString(text, how.shared === true);
     this.depth--;
-    this.cwd = savedCwd;
-    this.vars = savedVars;
+    if (!how.shared) {
+      this.cwd = savedCwd;
+      this.vars = savedVars;
+    }
     this.stdin = savedStdin;
     this.inheritedStdin = savedInherited;
   }
@@ -516,6 +641,7 @@ class Analyzer implements ExpansionScope {
 
   /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
   lookup(name: string): string | null | undefined {
+    if (this.trapUnknown !== null ? this.trapUnknown.has(name) : this.trapAssigns.has(name)) return null;
     return this.vars.get(name);
   }
 
@@ -757,6 +883,7 @@ class Analyzer implements ExpansionScope {
  */
 export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Findings): BashAnalysis {
   const analyzer = new Analyzer(ctx, findings);
+  analyzer.lastpipe = /lastpipe/.test(command);
   const lexed = analyzer.analyzeString(command);
   for (const pattern of CRITICAL_PATTERNS) {
     if (pattern.test(command)) {

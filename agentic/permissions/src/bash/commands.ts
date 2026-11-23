@@ -25,7 +25,7 @@ import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './fi
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
 import { hasOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
-import { CD, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TREE, UNSET } from './programs';
+import { CD, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 
@@ -61,7 +61,6 @@ export const NO_OPERANDS = new Set([
   'whoami',
   'clear',
   'kill',
-  'trap',
   'read',
   'mapfile',
   'readarray',
@@ -133,6 +132,23 @@ function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void 
   else analyzer.assign(variable.text, '=', null);
 }
 
+/**
+ * `trap ACTION CONDITION…`: the shell runs the action later, in itself. There
+ * is none to read for a listing (`-l`, `-p`, no condition), a reset (`-`,
+ * one operand, or a number first, which POSIX reads as a condition), or an
+ * ignore (`''`). An action from a variable is code the analysis cannot see.
+ */
+function trap(ctx: CommandContext, rest: readonly Arg[]): void {
+  const read = readArgs(TRAP, rest);
+  if (hasOption(read, '-l', '-p', '-P')) return;
+  const [action, ...conditions] = operandWords(read, rest);
+  if (!action || conditions.length === 0) return;
+  if (action.kind === 'unknown') return ctx.analyzer.dynamic(`it sets a trap whose action comes from ${action.raw}, a value from a variable`);
+  if (action.text === '-' || action.text === '' || /^\d+$/.test(action.text)) return;
+  const exitOnly = conditions.every((c) => c.kind === 'known' && /^(EXIT|SIGEXIT|0)$/i.test(c.text));
+  ctx.analyzer.trapAction(action.text, !exitOnly);
+}
+
 /** Shell options that take a value; the `*file` ones name a script the shell loads. */
 const SHELL_VALUE_OPTIONS = new Set(['-o', '-O', '--rcfile', '--init-file', '--command', '--init-command']);
 const SHELL_LOADS = new Set(['--rcfile', '--init-file']);
@@ -163,7 +179,7 @@ function shell(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const script = inline ? inline.value : options.some((o) => o.key === '-c') ? (rest[next] ?? null) : undefined;
   if (script !== undefined) {
     if (!script || script.kind === 'unknown') analyzer.dynamic(`it runs ${name} -c with a string from a variable`);
-    else analyzer.nested(script.text, `it runs a shell string with ${name} -c`, true);
+    else analyzer.nested(script.text, `it runs a shell string with ${name} -c`, { inherits: true });
     return;
   }
   const file = rest[next];
@@ -328,11 +344,13 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
       if (m) analyzer.assign(m[1], m[2] ? '+=' : '=', arg.kind === 'known' ? m[3] : null);
     }
     return;
+  case 'trap':
+    return trap(ctx, rest);
   case 'eval':
     {
       const words = knownTexts(rest);
       if (words === null) analyzer.dynamic('it runs eval on a value from a variable');
-      else analyzer.nested(words.join(' '), 'it runs a string with eval', true);
+      else analyzer.nested(words.join(' '), 'it runs a string with eval', { inherits: true, shared: true });
     }
     return;
   case 'source':

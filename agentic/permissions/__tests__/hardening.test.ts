@@ -207,7 +207,25 @@ const rows: Row[] = [
   ['echo \'"../../.ssh/id_ed25519"\' | xargs cat', 'deny', 'deny', 'hard-deny'],
   ["printf '.pi/ext.js\\nfoo/../../x\\n' | xargs -I{} cp src/config.ts {}", 'deny', 'deny'],
   ["printf 'a\\n' | xargs -tI{} cp src/config.ts .pi/{}", 'deny', 'deny'],
-  ["printf 'a\\n' | xargs -J % cp % .pi/", 'deny', 'deny']
+  ["printf 'a\\n' | xargs -J % cp % .pi/", 'deny', 'deny'],
+  // 23. subshell scope: a subshell, each pipeline element, a background job and a substitution get a copy of the variables and the dir, and a
+  // brace group does not; eval and a trap's action run in the current shell
+  ['F=~/.ssh/id_ed25519; (F=src/config.ts); cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; F=src/config.ts | true; cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; true | F=src/config.ts; cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; F=src/config.ts & cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; echo $(F=src/config.ts); cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=src/config.ts; echo ~/.ssh/id_ed25519 | read F; cat $F', 'allow', 'allow'],
+  ['cd .pi; (cd ..); touch ext.js', 'deny', 'deny'],
+  ['cd .pi; cd .. | true; touch ext.js', 'deny', 'deny'],
+  ['cd .pi; echo $(cd ..); touch ext.js', 'deny', 'deny'],
+  ["F=src/config.ts; eval 'F=~/.ssh/id_ed25519'; cat $F", 'deny', 'deny', 'hard-deny'],
+  ["eval 'cd ~/work/..'; cat .ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["trap 'cat ~/.ssh/id_ed25519' EXIT", 'deny', 'deny', 'hard-deny'],
+  ["F=src/config.ts; trap 'cat $F' EXIT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["trap 'F=~/.ssh/id_ed25519' DEBUG; F=src/config.ts; cat $F", 'ask', 'ask', 'unresolvable-path'],
+  ['trap "$X" EXIT', 'ask', 'allow', 'shell-dynamic'],
+  ["trap 'cat .env' EXIT", 'allow', 'allow', 'secret-file']
 ];
 
 describe('hardening: bash per mode', () => {
