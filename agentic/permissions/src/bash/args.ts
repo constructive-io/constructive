@@ -2,6 +2,7 @@
 
 import type { Access } from '../types';
 import { type Analyzer, type Arg, type KnownArg, literalStart } from './analyze';
+import { mayBeOption } from './options';
 import { isPathLike, isUrl } from './words';
 
 export interface CommandContext {
@@ -158,21 +159,6 @@ export function leadingOptions(
 /** A long option and every abbreviation git and getopt accept for it: `--o`, `--ou`, …, `--output`. */
 export function longSpellings(option: string): string[] {
   return Array.from({ length: option.length - 2 }, (_, k) => option.slice(0, k + 3));
-}
-
-/**
- * `option` is `denied` as git and getopt read it: a short one also inside a
- * cluster (`-ix` holds `-x`), a long one also by an abbreviation (`--upl`).
- */
-export function optionMatches(option: string, denied: string): boolean {
-  if (!denied.startsWith('--')) return /^-[^-]/.test(option) && option.slice(1).includes(denied.slice(1));
-  const name = option.split('=')[0];
-  return option.startsWith('--') && name.length > 2 && (denied.startsWith(name) || name.startsWith(denied));
-}
-
-/** An argument whose value is not known and does not start with a literal, so it may be an option. */
-export function mayBeOption(arg: Arg): boolean {
-  return arg.kind === 'unknown' && !/^[\w./]/.test(arg.raw);
 }
 
 /** The first argument before the operands that may be an option the analysis cannot read, or `undefined`. */

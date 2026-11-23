@@ -6,7 +6,8 @@
  */
 
 import { normalizeCommand } from './bash/analyze';
-import { optionMatches } from './bash/args';
+import { type Effect, optionsIn } from './bash/options';
+import { gitSubcommand, PROGRAMS } from './bash/programs';
 import type { CommandPart, ListedPrefix } from './types';
 
 /**
@@ -124,47 +125,28 @@ export function prefixShortfall(words: readonly string[]): { unlisted: true } | 
 }
 
 /**
- * Options that make a listed program run another program or write a file the
- * analysis cannot place, by the program or by the program and subcommand. A
- * part that passes one is never covered by a prefix, and its card offers only
- * the exact command. A short option also matches inside a cluster (`-ix`), and
- * a long one by an abbreviation (`--upl`), because git and getopt accept both.
- * git's own `-c`, `--config-env` and `--exec-path` come before the subcommand,
- * where no git prefix can match; after it, `-c` means "create" or "count".
+ * The effects that keep a prefix from covering a part: an option that makes
+ * the program run another program, write a file, set config that runs one,
+ * move to another dir or send data elsewhere. A part that passes one is never
+ * covered by a prefix, and its card offers only the exact command. A read is
+ * not one of them: the analysis checks the file it reads like any other path.
  */
-const PACKAGE_MANAGER_RISKY = ['--script-shell', '--node-options', '--userconfig', '--globalconfig', '--config', '--prefix', '-C', '--dir', '--cwd'];
+const GUARDED: ReadonlySet<Effect> = new Set(['runs-program', 'writes-file', 'sets-config', 'changes-dir', 'sends-to']);
 
-const RISKY_OPTIONS: ReadonlyMap<string, readonly string[]> = new Map<string, readonly string[]>([
-  [
-    'git',
-    [
-      '--output',
-      '--ext-diff',
-      '--textconv',
-      '-O',
-      '--open-files-in-pager',
-      '-x',
-      '--exec',
-      '--upload-pack',
-      '--receive-pack',
-      '--repo',
-      '--config-env',
-      '--exec-path'
-    ]
-  ],
-  ['git fetch', ['-u']],
-  ['git pull', ['-u']],
-  ['npm', PACKAGE_MANAGER_RISKY],
-  ['pnpm', PACKAGE_MANAGER_RISKY],
-  ['yarn', PACKAGE_MANAGER_RISKY],
-  ['bun', ['--preload', '-r', '--require', '--config', '-c', '--cwd']]
-]);
-
-/** The part passes a risky option, or an option it cannot read. */
+/**
+ * The part passes an option with a guarded effect, or an option it cannot
+ * read. Its options are read with the program registry's spec, so every
+ * spelling the program accepts counts (`-ix` holds `-x`, `--upl` is
+ * `--upload-pack`). git's own options come before the subcommand, where no git
+ * prefix can match.
+ */
 function passesRiskyOption(part: CommandPart): boolean {
   if (part.options === null) return true;
-  const denied = [part.words[0], part.words.slice(0, 2).join(' ')].flatMap((key) => RISKY_OPTIONS.get(key) ?? []);
-  return part.options.some((option) => denied.some((d) => optionMatches(option, d)));
+  const spec = part.words[0] === 'git' ? gitSubcommand(part.words[1]) : PROGRAMS.get(part.words[0]);
+  if (!spec) return false;
+  return part.options.some((option) =>
+    (optionsIn(spec, option) ?? []).some(({ specs }) => specs.some((s) => s.effect !== undefined && GUARDED.has(s.effect)))
+  );
 }
 
 /** The prefix "always" saves for one part (`git status`), or `null` when only the exact command fits. */
