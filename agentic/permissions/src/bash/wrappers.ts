@@ -6,18 +6,21 @@
 
 import * as path from 'node:path';
 
-import type { Analyzer, Arg, Cwd, KnownArg } from './analyze';
+import { type Analyzer, type Arg, type Cwd, literalStart } from './analyze';
 import { generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
-import { isOption, readArgs } from './options';
-import { ENV } from './programs';
+import { hasOption, isOption, readArgs, valuesOf } from './options';
+import { ENV, XARGS } from './programs';
+import { applyEffects } from './scripts';
 
 /** How `xargs` feeds the command it runs. */
 export interface XargsInput {
-  /** `xargs -I {}`: the string each input line replaces. */
-  replace?: string;
-  /** `xargs -a file`: the input comes from a file, not stdin. */
-  fromFile: boolean;
+  /** `-I {}`: each input line is one item, put in place of this string in each word of a run of its own. */
+  readonly replace?: string;
+  /** BSD's `-J %`: every item goes in place of the first word that is exactly this string. */
+  readonly insert?: string;
+  /** The items come from a file (`-a`), or xargs splits them in a way the analysis does not read (`-0`, `-d`, an option from a variable). */
+  readonly unseen: boolean;
 }
 
 /** What the wrappers taken off so far change about the command they run. */
@@ -29,58 +32,118 @@ export interface WrapperScope {
   outerCwd: Cwd | null;
 }
 
-/** `xargs` options whose value is the next word (`-i`, `-e`, `-l` and `--replace` take only a glued one). */
-const XARGS_WITH_VALUE = /^-[InPLdEsa]$|^--(max-args|max-procs|max-lines|delimiter|eof|max-chars|arg-file)$/;
-
 function xargs(analyzer: Analyzer, args: Arg[], i: number, scope: WrapperScope): number {
-  const input = (scope.xargs ??= { fromFile: false });
-  let k = i + 1;
-  while (k < args.length) {
-    const t = textOf(args[k]);
-    if (t === undefined) break;
-    if (t === '--') return k + 1;
-    if (t === '-I') input.replace = textOf(args[k + 1]) ?? '{}';
-    else if (t === '-i' || t === '--replace') input.replace = '{}';
-    else if (/^-[Ii]./.test(t)) input.replace = t.slice(2);
-    else if (t.startsWith('--replace=')) input.replace = t.slice('--replace='.length);
-    if (t === '-a' || t === '--arg-file' || t.startsWith('--arg-file=')) {
-      input.fromFile = true;
-      const file = t.startsWith('--arg-file=') ? literalArg(t.slice('--arg-file='.length), args[k].raw) : args[k + 1];
-      if (file) analyzer.addPath(file, 'read', true);
-    }
-    if (XARGS_WITH_VALUE.test(t)) k += 2;
-    else if (t.startsWith('-') && t !== '-') k++;
-    else break;
-  }
-  return k;
+  const rest = args.slice(i + 1);
+  const read = readArgs(XARGS, rest);
+  applyEffects({ analyzer, stdinFed: false, xargs: false }, 'xargs', XARGS, read);
+  const replace = read.options.filter((o) => isOption(o, '-I', '-i', '--replace')).pop();
+  const replaceText = replace && (replace.value ? textOf(replace.value) : '{}');
+  const insert = valuesOf(read, '-J').pop();
+  const unseen =
+    read.unknown.length > 0 ||
+    (replace !== undefined && replaceText === undefined) ||
+    (insert !== undefined && insert.kind !== 'known') ||
+    hasOption(read, '-0', '--null', '-d', '--delimiter', '-a', '--arg-file');
+  scope.xargs = { replace: replaceText, insert: textOf(insert), unseen };
+  return i + 1 + read.next;
 }
 
 /**
- * The operands of the command `xargs` runs. The words on stdin join them when
- * they are known, and the roots of a file listing stand in for the names it
- * prints. Otherwise the names cannot be seen, which is a signal.
+ * The items xargs reads from one text: blanks and newlines separate them,
+ * quotes group, and a backslash escapes the next character. With `-I`
+ * (`lines`) each line is one item, from its first character that is no
+ * blank: GNU keeps the blanks in it, and BSD joins its words with one space,
+ * so a line where they differ gives both. `null` for an unmatched quote,
+ * which makes xargs stop with an error.
  */
-export function xargsOperands(analyzer: Analyzer, name: string, rest: Arg[], input: XargsInput): Arg[] {
-  const { replace } = input;
-  const { words, listedUnder } = input.fromFile ? { words: null, listedUnder: null } : analyzer.stdin;
-  if (words !== null) {
-    if (!replace) return [...rest, ...words];
-    return rest.flatMap((a) => (a.kind === 'known' && a.text.includes(replace) ? words.map((w) => replaced(a, replace, w)) : [a]));
+export function xargsItems(text: string, lines: boolean): string[] | null {
+  const items: string[] = [];
+  let words: string[] = [];
+  let word: string | null = null;
+  let line: string | null = null;
+  const take = (t: string) => {
+    word = (word ?? '') + t;
+    line = (line ?? '') + t;
+  };
+  const endWord = () => {
+    if (word !== null) words.push(word);
+    word = null;
+  };
+  const endLine = () => {
+    endWord();
+    if (!lines) items.push(...words);
+    else if (line !== null) items.push(...new Set([line, words.join(' ')]));
+    words = [];
+    line = null;
+  };
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '\n') {
+      endLine();
+    } else if (c === ' ' || c === '\t') {
+      endWord();
+      if (line !== null) line += c;
+    } else if (c === '\\') {
+      if (i + 1 >= text.length) return null;
+      take(text[++i]);
+    } else if (c === "'" || c === '"') {
+      const close = text.indexOf(c, i + 1);
+      const newline = text.indexOf('\n', i + 1);
+      if (close < 0 || (newline >= 0 && newline < close)) return null;
+      take(text.slice(i + 1, close));
+      i = close;
+    } else {
+      take(c);
+    }
   }
-  if (listedUnder !== null) {
-    if (!replace) return [...rest, ...listedUnder];
-    return rest.flatMap((a) => (a.kind === 'known' && a.text.includes(replace) ? listedUnder : [a]));
-  }
-  if (!NO_OPERANDS.has(name)) {
-    analyzer.flag('stdin-operands', `xargs gives ${name} file names from its input, which cannot be checked before it runs`);
-  }
-  return rest;
+  endLine();
+  return items;
 }
 
-/** `a` with every `replace` in it put back by the word `w` that xargs reads; unknown from there on when `w` is. */
-function replaced(a: KnownArg, replace: string, w: Arg): Arg {
+/** `a` with every `replace` in it put back by the item `w`. */
+function replaced(a: Arg, replace: string, w: Arg): Arg {
+  if (a.kind !== 'known' || !a.text.includes(replace)) return a;
   if (w.kind === 'known') return { ...a, text: a.text.split(replace).join(w.text) };
   return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw, splits: false };
+}
+
+/** The runs one list of items makes: one per item with `-I`, else one with the items at the `-J` word or after the other words. */
+function runsOf(rest: readonly Arg[], items: readonly Arg[], input: XargsInput): Arg[][] {
+  const { replace, insert } = input;
+  if (replace !== undefined) return items.map((item) => rest.map((a) => replaced(a, replace, item)));
+  const at = insert === undefined ? -1 : rest.findIndex((a) => a.kind === 'known' && a.text === insert);
+  return [at < 0 ? [...rest, ...items] : [...rest.slice(0, at), ...items, ...rest.slice(at + 1)]];
+}
+
+/**
+ * The argument lists of the runs xargs makes of its command. Each text stdin
+ * may carry gives its own items, and a file listing gives the roots its names
+ * lie under. Otherwise the items cannot be seen, which is a signal, and the
+ * command runs once with its own words.
+ */
+export function xargsRuns(analyzer: Analyzer, name: string, rest: Arg[], input: XargsInput): Arg[][] {
+  const { listedUnder } = input.unseen ? { listedUnder: null } : analyzer.stdin;
+  const texts = input.unseen ? null : analyzer.stdin.texts();
+  const lists: Arg[][] | null = texts !== null ? itemLists(texts, input.replace !== undefined) : listedUnder !== null ? [listedUnder] : null;
+  if (lists === null) {
+    if (!NO_OPERANDS.has(name)) analyzer.flag('stdin-operands', `xargs gives ${name} file names from its input, which cannot be checked before it runs`);
+    return [rest];
+  }
+  if (!analyzer.textBudget.takeWords(lists.reduce((n, list) => n + list.length, 0))) return [rest];
+  const runs = new Map<string, Arg[]>();
+  for (const list of lists) for (const run of runsOf(rest, list, input)) runs.set(JSON.stringify(run.map(literalStart)), run);
+  return runs.size > 0 ? [...runs.values()] : [rest];
+}
+
+/** The items of each text, or `null` when one has an unmatched quote. */
+function itemLists(texts: readonly string[], lines: boolean): Arg[][] | null {
+  const lists: Arg[][] = [];
+  for (const text of new Set(texts)) {
+    const items = xargsItems(text, lines);
+    if (items === null) return null;
+    lists.push(items.map((item) => literalArg(item)));
+  }
+  return lists;
 }
 
 const RUNNER_VALUE_OPTIONS = new Set(['-c', '--call', '-p', '--package']);
@@ -175,7 +238,7 @@ function sudoShellLine(words: readonly string[]): string {
 /** A runner's `-c` string: analyzed as a nested command, or dynamic when it is not known. */
 function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
   if (!call || call.kind === 'unknown') analyzer.dynamic(`it runs ${what} with a string from a variable`);
-  else analyzer.nested(call.text, `it runs a string with ${what}`);
+  else analyzer.nested(call.text, `it runs a string with ${what}`, true);
 }
 
 /**
@@ -260,7 +323,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     if (shellFlag && k < args.length) {
       const words = knownTexts(args.slice(k));
       if (words === null) analyzer.dynamic(`it runs a shell with ${name} -s on words from a variable`);
-      else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`);
+      else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`, true);
       return args.length;
     }
     return k;
@@ -270,7 +333,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     analyzer.flag('sudo', 'it runs su to switch user');
     const c = args.findIndex((a, k) => k > i && (textOf(a) === '-c' || textOf(a) === '--command'));
     const script = c > 0 ? args[c + 1] : undefined;
-    if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c');
+    if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c', true);
     else if (script) analyzer.dynamic('it runs su -c with a string from a variable');
     return args.length;
   }
@@ -280,7 +343,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     const k = opts(/^-[nqd]$|^--(interval|differences)$/, /^-/);
     const words = knownTexts(args.slice(k));
     if (words === null) analyzer.dynamic('it runs watch on words from a variable');
-    else analyzer.nested(words.join(' '), 'it runs a string with watch');
+    else analyzer.nested(words.join(' '), 'it runs a string with watch', true);
     return args.length;
   }
   case 'npx':

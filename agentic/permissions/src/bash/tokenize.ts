@@ -28,6 +28,7 @@ import {
   stripQuotes,
   unescapeBackticks
 } from './quoting';
+import { SHELL_KEYWORDS } from './words';
 
 /** One piece of a word. `quoted` pieces take no globbing, brace or tilde expansion. */
 export type Part =
@@ -66,8 +67,22 @@ export type Redirect =
   | { kind: 'heredoc'; fd: number | null; doc: Heredoc }
   | { kind: 'here-string'; fd: number | null; word: Word };
 
-/** Where a command's stdin comes from when no redirection sets it: the shell's, or the stdout of what pipes into it. */
-export type Input = { kind: 'inherited' } | { kind: 'pipe'; from: SimpleCommand } | { kind: 'group-pipe' };
+/**
+ * Where a command's stdin comes from when no redirection of its own sets it:
+ * the shell's, the stdout of the command or group that pipes into it, or the
+ * stdin of the compound command it is in.
+ */
+export type Input = { kind: 'inherited' } | { kind: 'pipe'; from: SimpleCommand } | { kind: 'group-pipe' } | { kind: 'compound'; of: Compound };
+
+/**
+ * A compound command (`( … )`, `{ …; }`, `if`, a loop, `case`): every command
+ * in it reads its stdin, which is what feeds it, unless the redirections
+ * after it closes (`( … ) < f`, `done <<< w`) set fd 0.
+ */
+export interface Compound {
+  input: Input;
+  redirects: Redirect[];
+}
 
 export interface SimpleCommand {
   words: Word[];
@@ -79,19 +94,9 @@ export function heredocsOf(cmd: SimpleCommand): Heredoc[] {
   return cmd.redirects.flatMap((r) => (r.kind === 'heredoc' ? [r.doc] : []));
 }
 
-/** The words after `<<<`. */
-export function hereStringsOf(cmd: SimpleCommand): Word[] {
-  return cmd.redirects.flatMap((r) => (r.kind === 'here-string' ? [r.word] : []));
-}
-
 /** stdin is a heredoc or a here-string. */
 export function readsStdinDoc(cmd: SimpleCommand): boolean {
   return cmd.redirects.some((r) => r.kind === 'heredoc' || r.kind === 'here-string');
-}
-
-/** stdin is the stdout of a command or group piped into this one. */
-export function isPipedIn(cmd: SimpleCommand): boolean {
-  return cmd.input.kind !== 'inherited';
 }
 
 export interface Lexed {
@@ -113,6 +118,18 @@ const OPERATOR_CHARS = new Set([';', '&', '|', '(', ')', '<', '>']);
 const NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const SPECIAL_PARAMS = new Set(['?', '$', '!', '#', '@', '*', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
+/** The words that open a compound command in command position, and the word that closes it. */
+const COMPOUND_CLOSER: ReadonlyMap<string, string> = new Map([
+  ['{', '}'],
+  ['if', 'fi'],
+  ['while', 'done'],
+  ['until', 'done'],
+  ['for', 'done'],
+  ['select', 'done'],
+  ['case', 'esac']
+]);
+const CLOSERS: ReadonlySet<string> = new Set(COMPOUND_CLOSER.values());
+
 interface PendingHeredoc {
   delim: string;
   stripTabs: boolean;
@@ -132,6 +149,12 @@ class Lexer {
   private pending: PendingHeredoc[] = [];
   /** The stdin the next command gets: after `|` the stdout of what came before. */
   private nextInput: Input = { kind: 'inherited' };
+  /** The compound commands open here, innermost last, with the word or `)` that closes each. */
+  private readonly compounds: { closer: string; compound: Compound }[] = [];
+  /** The compound command the last word or `)` closed: the redirections that follow it are its own. */
+  private closed: Compound | null = null;
+  /** The command so far is a function's name and `()`, or `function name`, so a `{` opens its body. */
+  private functionHeader = false;
   private i = 0;
 
   constructor(
@@ -160,11 +183,49 @@ class Lexer {
       } else {
         const start = this.i;
         const parts = this.readWord();
-        if (parts) this.current.words.push({ parts, raw: s.slice(start, this.i) });
+        if (parts) this.addWord({ parts, raw: s.slice(start, this.i) });
       }
     }
     if (this.pending.length > 0) throw new LexError('unterminated heredoc');
     this.endCommand(false);
+  }
+
+  /** A word of the current command. In command position (only keywords before it) it may open or close a compound command. */
+  private addWord(word: Word): void {
+    const raw = word.raw;
+    if (this.current.words.every((w) => SHELL_KEYWORDS.has(w.raw)) || (this.functionHeader && raw === '{')) {
+      const closer = COMPOUND_CLOSER.get(raw);
+      if (closer) {
+        this.open(closer);
+        this.functionHeader = false;
+      } else if (CLOSERS.has(raw)) {
+        this.closed = this.close(raw);
+      } else if (raw === 'function') {
+        this.functionHeader = true;
+      }
+    }
+    this.current.words.push(word);
+  }
+
+  /** The stdin a command starting here gets when no redirection of its own sets it. */
+  private inputNow(): Input {
+    if (this.nextInput.kind !== 'inherited') return this.nextInput;
+    const open = this.compounds[this.compounds.length - 1];
+    return open ? { kind: 'compound', of: open.compound } : { kind: 'inherited' };
+  }
+
+  /** A compound command opens: what would feed the next command feeds every command in it. */
+  private open(closer: string): void {
+    this.compounds.push({ closer, compound: { input: this.inputNow(), redirects: [] } });
+    this.nextInput = { kind: 'inherited' };
+  }
+
+  /** The innermost compound command, when `closer` closes it. */
+  private close(closer: string): Compound | null {
+    const open = this.compounds[this.compounds.length - 1];
+    if (open?.closer !== closer) return null;
+    this.compounds.pop();
+    return open.compound;
   }
 
   /** Skip a run of spaces and tabs between tokens, and note where it was. */
@@ -177,13 +238,17 @@ class Lexer {
   private endCommand(pipe: boolean): void {
     const cmd = this.current;
     if (cmd.words.length > 0 || cmd.redirects.length > 0) {
-      cmd.input = this.nextInput;
+      cmd.input = this.inputNow();
       this.commands.push(cmd);
+      // `( … ) < f`, `{ …; } <<< w`, `done < f`: the redirections belong to the compound command that just closed.
+      if (this.closed) this.closed.redirects.push(...cmd.redirects);
       this.nextInput = pipe ? { kind: 'pipe', from: cmd } : { kind: 'inherited' };
     } else {
       // `( … ) | x`: the group's output is piped on.
       this.nextInput = pipe ? { kind: 'group-pipe' } : { kind: 'inherited' };
     }
+    this.closed = null;
+    this.functionHeader = false;
     this.current = newCommand();
   }
 
@@ -215,11 +280,20 @@ class Lexer {
       if (ch === '(' && s[this.i + 1] === ')') {
         // `name()`: a function definition hides a body that runs later.
         this.dynamic.push('defines a shell function');
+        this.functionHeader = true;
         this.i += 2;
         return;
       }
       this.i++;
+      if (ch === '(') {
+        // Keywords before it (`! (`, `then (`) stay on the first command inside.
+        if (this.current.redirects.length > 0 || this.current.words.some((w) => !SHELL_KEYWORDS.has(w.raw))) this.endCommand(false);
+        this.open(')');
+        this.functionHeader = false;
+        return;
+      }
       this.endCommand(false);
+      if (ch === ')') this.closed = this.close(')');
     }
   }
 

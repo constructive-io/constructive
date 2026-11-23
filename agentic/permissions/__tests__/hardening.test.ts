@@ -188,7 +188,26 @@ const rows: Row[] = [
   ["env -S 'cat' '#' ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
   ['env -S "cat -n" src/config.ts', 'allow', 'allow'],
   ['env -S "$X" ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
-  ["sudo -s cat '#' ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny']
+  ["sudo -s cat '#' ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  // 22. stdin: the last redirection of fd 0 wins, a pipe or redirection into a compound command feeds every command in it, a shell string reads its
+  // runner's stdin, and xargs reads the text a program prints with its own quotes, one run per line with -I
+  ["mysql <<< '/*' <<< $'system cat ~/.aws/credentials\\n# */'", 'deny', 'deny', 'hard-deny'],
+  ['xargs cat <<< ~/.ssh/id_ed25519 <<< src/config.ts', 'allow', 'allow'],
+  ['exec 3<<< ~/.ssh/id_ed25519; xargs cat <&3', 'ask', 'allow', 'stdin-operands'],
+  ['echo ~/.ssh/id_ed25519 | (xargs cat)', 'deny', 'deny', 'hard-deny'],
+  ['echo ~/.ssh/id_ed25519 | (true; xargs cat)', 'deny', 'deny', 'hard-deny'],
+  ['echo ~/.ssh/id_ed25519 | { true; xargs cat; }', 'deny', 'deny', 'hard-deny'],
+  ['echo ~/.ssh/id_ed25519 | if true; then xargs cat; fi', 'deny', 'deny', 'hard-deny'],
+  ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | (psql)", 'deny', 'deny', 'hard-deny'],
+  ['(xargs cat) <<< ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['{ xargs cat; } <<< ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ["bash -c 'xargs cat' <<< ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["printf '.%s/../.ssh/id_ed25519\\n' . | xargs cat", 'deny', 'deny', 'hard-deny'],
+  ["echo -e '.\\x2e/../.ssh/id_ed25519' | xargs cat", 'deny', 'deny', 'hard-deny'],
+  ['echo \'"../../.ssh/id_ed25519"\' | xargs cat', 'deny', 'deny', 'hard-deny'],
+  ["printf '.pi/ext.js\\nfoo/../../x\\n' | xargs -I{} cp src/config.ts {}", 'deny', 'deny'],
+  ["printf 'a\\n' | xargs -tI{} cp src/config.ts .pi/{}", 'deny', 'deny'],
+  ["printf 'a\\n' | xargs -J % cp % .pi/", 'deny', 'deny']
 ];
 
 describe('hardening: bash per mode', () => {

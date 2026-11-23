@@ -304,6 +304,22 @@ export const CD = builtin(flag('-L', '-P', '-e', '-@'));
 /** `defaults [-currentHost | -host name | -container name] action …`. */
 export const DEFAULTS: ProgramSpec = { abbreviations: false, stopAtOperand: true, singleDash: true, options: [flag('-currentHost'), value('-host', '-container')] };
 
+/**
+ * xargs, with GNU's and BSD's options. Its options stop at the command: `-I`
+ * and `-i` put each input line in place of a string, BSD's `-J` puts every
+ * item at one word, `-0` and `-d` split on another delimiter, and `-a` reads
+ * the items from a file.
+ */
+export const XARGS: ProgramSpec = {
+  ...sub(
+    value('-I', '-J', '-n', '--max-args', '-L', '-P', '--max-procs', '-s', '--max-chars', '-E', '-d', '--delimiter', '-R', '-S', '--process-slot-var'),
+    { names: ['-i', '--replace', '-e', '--eof', '-l', '--max-lines'], value: 'optional' },
+    does('reads-file', 'required', '-a', '--arg-file'),
+    flag('-0', '--null', '-o', '--open-tty', '-p', '--interactive', '-r', '--no-run-if-empty', '-t', '--verbose', '-x', '--exit', '--show-limits')
+  ),
+  stopAtOperand: true
+};
+
 /** `env [-i] [-u name] [-C dir] [-S string] [-0] [-v] [name=value …] [command …]`. */
 export const ENV: ProgramSpec = {
   ...sub(

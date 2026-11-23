@@ -20,21 +20,12 @@ import { unreachable } from '../unreachable';
 import { generic } from './args';
 import { runCommand, TESTS } from './commands';
 import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, type VariableRecord, Variables, type WordUse } from './expand';
-import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
+import { type ContentFlow, FlowTracker, NO_INPUT, type Source, type Stdin, unseenInput } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
-import {
-  heredocsOf,
-  isPipedIn,
-  type Lexed,
-  MAX_SUBSTITUTION_DEPTH,
-  readsStdinDoc,
-  type SimpleCommand,
-  tokenize,
-  type Word
-} from './tokenize';
+import { heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type SimpleCommand, tokenize, type Word } from './tokenize';
 import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
-import { stripWrapper, type WrapperScope, xargsOperands } from './wrappers';
+import { stripWrapper, type WrapperScope, xargsRuns } from './wrappers';
 
 /** One argument after the expansions the analyzer can do. */
 /** One argument after the expansions the analyzer can do: its whole text, or only the literal start of it. */
@@ -107,10 +98,11 @@ export interface AnalyzeContext {
   homeDir: string;
 }
 
-/** The program a simple command runs, and its operands after the wrappers came off. */
+/** The program a simple command runs, and its operands after the wrappers came off: those of every run when xargs runs it. */
 export interface Run {
   name: string;
   rest: Arg[];
+  xargs: boolean;
 }
 
 /**
@@ -276,7 +268,9 @@ class Analyzer implements ExpansionScope {
   /** git remotes the command adds or points elsewhere (`git remote add`, `set-url`, `-c remote.x.url=`). */
   readonly gitRemotes = new Set<string>();
   /** What the command being analyzed reads on stdin. */
-  stdin: Stdin = { sources: [], words: [], texts: () => [''], file: false, listedUnder: null };
+  stdin: Stdin = NO_INPUT;
+  /** What a command reads when no pipe or redirection sets its stdin: nothing at the top, and in a shell string what its runner gave it. */
+  inheritedStdin: Stdin = NO_INPUT;
   /** Shell variables as the command has set them so far. */
   vars = new Variables((name) => this.outsideValue(name));
   /** The shell's working dir at this point of the command. */
@@ -406,18 +400,26 @@ class Analyzer implements ExpansionScope {
     }
   }
 
-  /** A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own scope. */
-  nested(text: string, why: string): void {
+  /**
+   * A shell string run by `sh -c`, `eval`, `watch`, …: analyze it in its own
+   * scope. `inherits`: it reads the stdin of the command that runs it (`sh
+   * -c`, `eval`, `sudo -s`); otherwise its stdin is one the analysis cannot
+   * see (a pager, tar's `--to-command`).
+   */
+  nested(text: string, why: string, inherits = false): void {
     this.dynamic(why);
     const savedCwd = this.cwd;
     const savedVars = this.vars.copy();
     const savedStdin = this.stdin;
+    const savedInherited = this.inheritedStdin;
+    this.inheritedStdin = inherits ? this.stdin : unseenInput();
     this.depth++;
     this.analyzeString(text);
     this.depth--;
     this.cwd = savedCwd;
     this.vars = savedVars;
     this.stdin = savedStdin;
+    this.inheritedStdin = savedInherited;
   }
 
   /**
@@ -622,13 +624,14 @@ class Analyzer implements ExpansionScope {
    * and redirections expand first, and its assignments hold for it only.
    */
   analyzeCommand(cmd: SimpleCommand): void {
+    // What feeds it, a compound command's redirections included, is expanded before anything in it runs.
+    const stdin = this.tracker.stdinOf(cmd);
+    const stdinFed = stdin.fed;
     const lead = assignmentLead(cmd.words);
     const prefix = cmd.words.slice(0, lead);
     const bare = lead === cmd.words.length;
     if (bare) this.assignPrefix(prefix, null);
     const args = this.expandWords(cmd.words.slice(lead));
-    const stdinFed = isPipedIn(cmd) || readsStdinDoc(cmd) || cmd.redirects.some((r) => r.kind === 'file' && r.op === '<');
-    const stdin = this.tracker.stdinOf(cmd);
     this.stdin = stdin;
     for (const doc of heredocsOf(cmd)) {
       if (!doc.quoted) for (const m of doc.body.matchAll(BODY_VAR_RE)) this.noteRef(m[1]);
@@ -733,9 +736,10 @@ class Analyzer implements ExpansionScope {
     }
     const name = path.basename(argv0.text);
     if (scope.sudo && name === 'rm') this.flag('destructive', 'it runs rm as root');
-    const rest = scope.xargs ? xargsOperands(this, name, args.slice(i + 1), scope.xargs) : args.slice(i + 1);
-    runCommand(name, rest, { analyzer: this, stdinFed, xargs: scope.xargs !== null });
-    return { name, rest };
+    const own = args.slice(i + 1);
+    const runs = scope.xargs ? xargsRuns(this, name, own, scope.xargs) : [own];
+    for (const rest of runs) runCommand(name, rest, { analyzer: this, stdinFed, xargs: scope.xargs !== null });
+    return { name, rest: runs.flat(), xargs: scope.xargs !== null };
   }
 
   /** A bare operand: a hard path when it looks like one, a soft one otherwise. URLs are skipped. */

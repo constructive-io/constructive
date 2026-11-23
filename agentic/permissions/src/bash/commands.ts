@@ -142,6 +142,14 @@ const SHELL_INLINE = new Set(['--command', '--init-command']);
 /** A word in a shell's option list that is not a plain letter cluster (`-ex`, `+o`). */
 const isOddShellOption = (text: string): boolean => /^[-+][^-]/.test(text) && !/^[-+][a-zA-Z]+$/.test(text);
 
+/** The names one per line on stdin (`tar -T -`, `zip -@`, `cpio -o`), in every text it may carry; `null` when stdin cannot be seen. */
+function stdinLines(analyzer: CommandContext['analyzer']): Arg[] | null {
+  const texts = analyzer.stdin.texts();
+  if (texts === null) return null;
+  const names = [...new Set(texts.flatMap((t) => t.split('\n').filter(Boolean)))];
+  return analyzer.textBudget.takeWords(names.length) ? names.map((n) => literalArg(n)) : null;
+}
+
 function shell(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   // `+x`, `+o name`: the same options, turned off.
@@ -155,7 +163,7 @@ function shell(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
   const script = inline ? inline.value : options.some((o) => o.key === '-c') ? (rest[next] ?? null) : undefined;
   if (script !== undefined) {
     if (!script || script.kind === 'unknown') analyzer.dynamic(`it runs ${name} -c with a string from a variable`);
-    else analyzer.nested(script.text, `it runs a shell string with ${name} -c`);
+    else analyzer.nested(script.text, `it runs a shell string with ${name} -c`, true);
     return;
   }
   const file = rest[next];
@@ -241,9 +249,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   const { analyzer } = ctx;
   publishes(name, ctx, rest);
   if (ctx.stdinFed && namesFromStdin(name, rest)) {
-    const words = analyzer.stdin.words;
-    if (words === null) analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
-    else for (const w of words) analyzer.addPath(w, 'read', true);
+    const names = stdinLines(analyzer);
+    if (names === null) analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
+    else for (const n of names) analyzer.addPath(n, 'read', true);
   }
   if (SHELLS.has(name)) return shell(name, ctx, rest);
   const language = TEXT_PROGRAMS.get(name);
@@ -324,7 +332,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     {
       const words = knownTexts(rest);
       if (words === null) analyzer.dynamic('it runs eval on a value from a variable');
-      else analyzer.nested(words.join(' '), 'it runs a string with eval');
+      else analyzer.nested(words.join(' '), 'it runs a string with eval', true);
     }
     return;
   case 'source':
