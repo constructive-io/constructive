@@ -125,6 +125,8 @@ export * from './usePlansModulesQuery';
 export * from './usePlansModuleQuery';
 export * from './usePrincipalAuthModulesQuery';
 export * from './usePrincipalAuthModuleQuery';
+export * from './usePrincipalsModulesQuery';
+export * from './usePrincipalsModuleQuery';
 export * from './useProfilesModulesQuery';
 export * from './useProfilesModuleQuery';
 export * from './useRateLimitMetersModulesQuery';

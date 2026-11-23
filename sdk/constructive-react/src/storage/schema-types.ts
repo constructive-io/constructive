@@ -1316,10 +1316,14 @@ export interface MetaEnum {
 }
 /** How a field holds files */
 export interface MetaFileField {
+  /** Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one */
+  bucketKey?: string | null;
   /** GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise */
   filesType?: string | null;
   /** Whether the field holds a list of files */
   isMultiple: boolean;
+  /** Whether the bound bucket must be public (true) or private (false); null when the binding does not say */
+  isPublic?: boolean | null;
   /** image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file. */
   kind: string;
 }

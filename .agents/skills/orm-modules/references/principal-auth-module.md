@@ -2,7 +2,7 @@
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Provisions the principals subsystem: a principals table, a principal_entities junction table, create/delete mutations, and org API key management. Supports both human-owned principals (AuthzDirectOwner, AuthzHumanOnly) and org-owned principals (AuthzEntityMembership with is_admin). Org principal and org API key functions are only generated when an org-scoped memberships_module exists for the database.
+Provisions credentials for principals on top of principals_module: API keys, child sessions, delegation and token exchange, and org API key management. Requires the built-in auth stack (sessions_module, user_auth_module); installing it provisions principals_module first when the database does not have it. Org API key functions are only generated when an org-scoped memberships_module exists for the database.
 
 ## Usage
 

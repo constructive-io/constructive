@@ -1465,15 +1465,15 @@ export interface PubkeySetting {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   id: string;
-  /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
+  /** Schema containing the crypto auth functions */
   schemaId?: string | null;
-  /** Reference to the sign-in failure recording function (FK to metaschema_public.function) */
+  /** Reference to the sign-in failure recording function */
   signInRecordFailureFunctionId?: string | null;
-  /** Reference to the sign-in challenge request function (FK to metaschema_public.function) */
+  /** Reference to the sign-in challenge request function */
   signInRequestChallengeFunctionId?: string | null;
-  /** Reference to the sign-in-with-challenge function (FK to metaschema_public.function) */
+  /** Reference to the sign-in-with-challenge function */
   signInWithChallengeFunctionId?: string | null;
-  /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
+  /** Reference to the sign-up-with-key function */
   signUpWithKeyFunctionId?: string | null;
   updatedAt?: string | null;
   /** Field name used to identify the user in crypto auth functions */
@@ -1501,25 +1501,25 @@ export interface Redirect {
 }
 /** RLS module runtime configuration; typed references to the authenticate/current_role function plumbing */
 export interface RlsSetting {
-  /** Reference to the authenticate function (FK to metaschema_public.function) */
+  /** Reference to the authenticate function */
   authenticateFunctionId?: string | null;
-  /** Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema) */
+  /** Schema containing authenticate/authenticate_strict functions */
   authenticateSchemaId?: string | null;
-  /** Reference to the strict authenticate function (FK to metaschema_public.function) */
+  /** Reference to the strict authenticate function */
   authenticateStrictFunctionId?: string | null;
   createdAt?: string | null;
-  /** Reference to the current_ip_address function (FK to metaschema_public.function) */
+  /** Reference to the current_ip_address function */
   currentIpAddressFunctionId?: string | null;
-  /** Reference to the current_role function (FK to metaschema_public.function) */
+  /** Reference to the current_role function */
   currentRoleFunctionId?: string | null;
-  /** Reference to the current_role_id function (FK to metaschema_public.function) */
+  /** Reference to the current_role_id function */
   currentRoleIdFunctionId?: string | null;
-  /** Reference to the current_user_agent function (FK to metaschema_public.function) */
+  /** Reference to the current_user_agent function */
   currentUserAgentFunctionId?: string | null;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
   id: string;
-  /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
+  /** Schema containing current_role and related functions */
   roleSchemaId?: string | null;
   updatedAt?: string | null;
 }
@@ -1979,9 +1979,9 @@ export interface WebauthnSetting {
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string | null;
   createdAt?: string | null;
-  /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
+  /** Schema of the webauthn_credentials table */
   credentialsSchemaId?: string | null;
-  /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
+  /** Reference to the webauthn_credentials table */
   credentialsTableId?: string | null;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId?: string | null;
@@ -1996,20 +1996,20 @@ export interface WebauthnSetting {
   rpId?: string | null;
   /** WebAuthn Relying Party display name */
   rpName?: string | null;
-  /** Schema containing WebAuthn auth procedures (FK to metaschema_public.schema) */
+  /** Schema containing WebAuthn auth procedures */
   schemaId?: string | null;
-  /** Reference to the session_credentials table (FK to metaschema_public.table) */
+  /** Reference to the session_credentials table */
   sessionCredentialsTableId?: string | null;
-  /** Schema of the session_secrets table (FK to metaschema_public.schema) */
+  /** Schema of the session_secrets table */
   sessionSecretsSchemaId?: string | null;
-  /** Reference to the session_secrets table (FK to metaschema_public.table) */
+  /** Reference to the session_secrets table */
   sessionSecretsTableId?: string | null;
-  /** Schema of the sessions table (FK to metaschema_public.schema) */
+  /** Schema of the sessions table */
   sessionsSchemaId?: string | null;
-  /** Reference to the sessions table (FK to metaschema_public.table) */
+  /** Reference to the sessions table */
   sessionsTableId?: string | null;
   updatedAt?: string | null;
-  /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
+  /** Reference to the user field on webauthn_credentials */
   userFieldId?: string | null;
 }
 // ============ Relation Helper Types ============
@@ -2155,6 +2155,7 @@ export interface FieldRelations {
   partitionsByPartitionKeyId?: ConnectionResult<Partition>;
   spatialRelations?: ConnectionResult<SpatialRelation>;
   spatialRelationsByRefFieldId?: ConnectionResult<SpatialRelation>;
+  webauthnSettingsByUserFieldId?: ConnectionResult<WebauthnSetting>;
 }
 export interface ForeignKeyConstraintBehaviorRelations {
   database?: Database | null;
@@ -2173,6 +2174,16 @@ export interface FullTextSearchRelations {
 export interface FunctionRelations {
   database?: Database | null;
   schema?: Schema | null;
+  pubkeySettingsBySignInRecordFailureFunctionId?: ConnectionResult<PubkeySetting>;
+  pubkeySettingsBySignInRequestChallengeFunctionId?: ConnectionResult<PubkeySetting>;
+  pubkeySettingsBySignInWithChallengeFunctionId?: ConnectionResult<PubkeySetting>;
+  pubkeySettingsBySignUpWithKeyFunctionId?: ConnectionResult<PubkeySetting>;
+  rlsSettingsByAuthenticateFunctionId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByAuthenticateStrictFunctionId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByCurrentIpAddressFunctionId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByCurrentRoleFunctionId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByCurrentRoleIdFunctionId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByCurrentUserAgentFunctionId?: ConnectionResult<RlsSetting>;
   triggers?: ConnectionResult<Trigger>;
 }
 export interface GetSitePreviewsRecordRelations {}
@@ -2325,9 +2336,16 @@ export interface SchemaRelations {
   enums?: ConnectionResult<Enum>;
   functions?: ConnectionResult<Function>;
   platformApiSchemas?: ConnectionResult<PlatformApiSchema>;
+  pubkeySettings?: ConnectionResult<PubkeySetting>;
+  rlsSettingsByAuthenticateSchemaId?: ConnectionResult<RlsSetting>;
+  rlsSettingsByRoleSchemaId?: ConnectionResult<RlsSetting>;
   schemaGrants?: ConnectionResult<SchemaGrant>;
   tables?: ConnectionResult<Table>;
   views?: ConnectionResult<View>;
+  webauthnSettings?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsByCredentialsSchemaId?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsBySessionSecretsSchemaId?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsBySessionsSchemaId?: ConnectionResult<WebauthnSetting>;
 }
 export interface SchemaGrantRelations {
   database?: Database | null;
@@ -2409,6 +2427,10 @@ export interface TableRelations {
   uniqueConstraints?: ConnectionResult<UniqueConstraint>;
   viewTables?: ConnectionResult<ViewTable>;
   views?: ConnectionResult<View>;
+  webauthnSettingsByCredentialsTableId?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsBySessionCredentialsTableId?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsBySessionSecretsTableId?: ConnectionResult<WebauthnSetting>;
+  webauthnSettingsBySessionsTableId?: ConnectionResult<WebauthnSetting>;
 }
 export interface TableGrantRelations {
   database?: Database | null;
@@ -3356,6 +3378,12 @@ export type FieldSelect = {
     filter?: SpatialRelationFilter;
     orderBy?: SpatialRelationOrderBy[];
   };
+  webauthnSettingsByUserFieldId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
 };
 export type ForeignKeyConstraintBehaviorSelect = {
   createdAt?: boolean;
@@ -3451,6 +3479,66 @@ export type FunctionSelect = {
   };
   schema?: {
     select: SchemaSelect;
+  };
+  pubkeySettingsBySignInRecordFailureFunctionId?: {
+    select: PubkeySettingSelect;
+    first?: number;
+    filter?: PubkeySettingFilter;
+    orderBy?: PubkeySettingOrderBy[];
+  };
+  pubkeySettingsBySignInRequestChallengeFunctionId?: {
+    select: PubkeySettingSelect;
+    first?: number;
+    filter?: PubkeySettingFilter;
+    orderBy?: PubkeySettingOrderBy[];
+  };
+  pubkeySettingsBySignInWithChallengeFunctionId?: {
+    select: PubkeySettingSelect;
+    first?: number;
+    filter?: PubkeySettingFilter;
+    orderBy?: PubkeySettingOrderBy[];
+  };
+  pubkeySettingsBySignUpWithKeyFunctionId?: {
+    select: PubkeySettingSelect;
+    first?: number;
+    filter?: PubkeySettingFilter;
+    orderBy?: PubkeySettingOrderBy[];
+  };
+  rlsSettingsByAuthenticateFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByAuthenticateStrictFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByCurrentIpAddressFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByCurrentRoleFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByCurrentRoleIdFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByCurrentUserAgentFunctionId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
   };
   triggers?: {
     select: TriggerSelect;
@@ -4296,6 +4384,24 @@ export type SchemaSelect = {
     filter?: PlatformApiSchemaFilter;
     orderBy?: PlatformApiSchemaOrderBy[];
   };
+  pubkeySettings?: {
+    select: PubkeySettingSelect;
+    first?: number;
+    filter?: PubkeySettingFilter;
+    orderBy?: PubkeySettingOrderBy[];
+  };
+  rlsSettingsByAuthenticateSchemaId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
+  rlsSettingsByRoleSchemaId?: {
+    select: RlsSettingSelect;
+    first?: number;
+    filter?: RlsSettingFilter;
+    orderBy?: RlsSettingOrderBy[];
+  };
   schemaGrants?: {
     select: SchemaGrantSelect;
     first?: number;
@@ -4313,6 +4419,30 @@ export type SchemaSelect = {
     first?: number;
     filter?: ViewFilter;
     orderBy?: ViewOrderBy[];
+  };
+  webauthnSettings?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsByCredentialsSchemaId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsBySessionSecretsSchemaId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsBySessionsSchemaId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
   };
 };
 export type SchemaGrantSelect = {
@@ -4782,6 +4912,30 @@ export type TableSelect = {
     first?: number;
     filter?: ViewFilter;
     orderBy?: ViewOrderBy[];
+  };
+  webauthnSettingsByCredentialsTableId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsBySessionCredentialsTableId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsBySessionSecretsTableId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
+  };
+  webauthnSettingsBySessionsTableId?: {
+    select: WebauthnSettingSelect;
+    first?: number;
+    filter?: WebauthnSettingFilter;
+    orderBy?: WebauthnSettingOrderBy[];
   };
 };
 export type TableGrantSelect = {
@@ -6189,6 +6343,10 @@ export interface FieldFilter {
   type?: JSONFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webauthnSettingsByUserFieldId` relation. */
+  webauthnSettingsByUserFieldId?: FieldToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByUserFieldId` exist. */
+  webauthnSettingsByUserFieldIdExist?: boolean;
 }
 export interface ForeignKeyConstraintBehaviorFilter {
   /** Checks for all expressions in this list. */
@@ -6339,8 +6497,48 @@ export interface FunctionFilter {
   not?: FunctionFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionFilter[];
+  /** Filter by the object’s `pubkeySettingsBySignInRecordFailureFunctionId` relation. */
+  pubkeySettingsBySignInRecordFailureFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInRecordFailureFunctionId` exist. */
+  pubkeySettingsBySignInRecordFailureFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignInRequestChallengeFunctionId` relation. */
+  pubkeySettingsBySignInRequestChallengeFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInRequestChallengeFunctionId` exist. */
+  pubkeySettingsBySignInRequestChallengeFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignInWithChallengeFunctionId` relation. */
+  pubkeySettingsBySignInWithChallengeFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInWithChallengeFunctionId` exist. */
+  pubkeySettingsBySignInWithChallengeFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignUpWithKeyFunctionId` relation. */
+  pubkeySettingsBySignUpWithKeyFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignUpWithKeyFunctionId` exist. */
+  pubkeySettingsBySignUpWithKeyFunctionIdExist?: boolean;
   /** Filter by the object’s `returns` field. */
   returns?: JSONFilter;
+  /** Filter by the object’s `rlsSettingsByAuthenticateFunctionId` relation. */
+  rlsSettingsByAuthenticateFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateFunctionId` exist. */
+  rlsSettingsByAuthenticateFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByAuthenticateStrictFunctionId` relation. */
+  rlsSettingsByAuthenticateStrictFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateStrictFunctionId` exist. */
+  rlsSettingsByAuthenticateStrictFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentIpAddressFunctionId` relation. */
+  rlsSettingsByCurrentIpAddressFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentIpAddressFunctionId` exist. */
+  rlsSettingsByCurrentIpAddressFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentRoleFunctionId` relation. */
+  rlsSettingsByCurrentRoleFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentRoleFunctionId` exist. */
+  rlsSettingsByCurrentRoleFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentRoleIdFunctionId` relation. */
+  rlsSettingsByCurrentRoleIdFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentRoleIdFunctionId` exist. */
+  rlsSettingsByCurrentRoleIdFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentUserAgentFunctionId` relation. */
+  rlsSettingsByCurrentUserAgentFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentUserAgentFunctionId` exist. */
+  rlsSettingsByCurrentUserAgentFunctionIdExist?: boolean;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
@@ -7731,6 +7929,18 @@ export interface SchemaFilter {
   platformApiSchemas?: SchemaToManyPlatformApiSchemaFilter;
   /** `platformApiSchemas` exist. */
   platformApiSchemasExist?: boolean;
+  /** Filter by the object’s `pubkeySettings` relation. */
+  pubkeySettings?: SchemaToManyPubkeySettingFilter;
+  /** `pubkeySettings` exist. */
+  pubkeySettingsExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByAuthenticateSchemaId` relation. */
+  rlsSettingsByAuthenticateSchemaId?: SchemaToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateSchemaId` exist. */
+  rlsSettingsByAuthenticateSchemaIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByRoleSchemaId` relation. */
+  rlsSettingsByRoleSchemaId?: SchemaToManyRlsSettingFilter;
+  /** `rlsSettingsByRoleSchemaId` exist. */
+  rlsSettingsByRoleSchemaIdExist?: boolean;
   /** Filter by the object’s `schemaGrants` relation. */
   schemaGrants?: SchemaToManySchemaGrantFilter;
   /** `schemaGrants` exist. */
@@ -7751,6 +7961,22 @@ export interface SchemaFilter {
   views?: SchemaToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `webauthnSettings` relation. */
+  webauthnSettings?: SchemaToManyWebauthnSettingFilter;
+  /** Filter by the object’s `webauthnSettingsByCredentialsSchemaId` relation. */
+  webauthnSettingsByCredentialsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByCredentialsSchemaId` exist. */
+  webauthnSettingsByCredentialsSchemaIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionSecretsSchemaId` relation. */
+  webauthnSettingsBySessionSecretsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionSecretsSchemaId` exist. */
+  webauthnSettingsBySessionSecretsSchemaIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionsSchemaId` relation. */
+  webauthnSettingsBySessionsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionsSchemaId` exist. */
+  webauthnSettingsBySessionsSchemaIdExist?: boolean;
+  /** `webauthnSettings` exist. */
+  webauthnSettingsExist?: boolean;
 }
 export interface SchemaGrantFilter {
   /** Checks for all expressions in this list. */
@@ -8349,6 +8575,22 @@ export interface TableFilter {
   views?: TableToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsByCredentialsTableId` relation. */
+  webauthnSettingsByCredentialsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByCredentialsTableId` exist. */
+  webauthnSettingsByCredentialsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionCredentialsTableId` relation. */
+  webauthnSettingsBySessionCredentialsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionCredentialsTableId` exist. */
+  webauthnSettingsBySessionCredentialsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionSecretsTableId` relation. */
+  webauthnSettingsBySessionSecretsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionSecretsTableId` exist. */
+  webauthnSettingsBySessionSecretsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionsTableId` relation. */
+  webauthnSettingsBySessionsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionsTableId` exist. */
+  webauthnSettingsBySessionsTableIdExist?: boolean;
 }
 export interface TableGrantFilter {
   /** Checks for all expressions in this list. */
@@ -14415,11 +14657,22 @@ export const connectionFieldsMap = {
     partitionsByPartitionKeyId: 'Partition',
     spatialRelations: 'SpatialRelation',
     spatialRelationsByRefFieldId: 'SpatialRelation',
+    webauthnSettingsByUserFieldId: 'WebauthnSetting',
   },
   ForeignKeyConstraint: {
     foreignKeyConstraintBehaviors: 'ForeignKeyConstraintBehavior',
   },
   Function: {
+    pubkeySettingsBySignInRecordFailureFunctionId: 'PubkeySetting',
+    pubkeySettingsBySignInRequestChallengeFunctionId: 'PubkeySetting',
+    pubkeySettingsBySignInWithChallengeFunctionId: 'PubkeySetting',
+    pubkeySettingsBySignUpWithKeyFunctionId: 'PubkeySetting',
+    rlsSettingsByAuthenticateFunctionId: 'RlsSetting',
+    rlsSettingsByAuthenticateStrictFunctionId: 'RlsSetting',
+    rlsSettingsByCurrentIpAddressFunctionId: 'RlsSetting',
+    rlsSettingsByCurrentRoleFunctionId: 'RlsSetting',
+    rlsSettingsByCurrentRoleIdFunctionId: 'RlsSetting',
+    rlsSettingsByCurrentUserAgentFunctionId: 'RlsSetting',
     triggers: 'Trigger',
   },
   ManagedDomain: {
@@ -14462,9 +14715,16 @@ export const connectionFieldsMap = {
     enums: 'Enum',
     functions: 'Function',
     platformApiSchemas: 'PlatformApiSchema',
+    pubkeySettings: 'PubkeySetting',
+    rlsSettingsByAuthenticateSchemaId: 'RlsSetting',
+    rlsSettingsByRoleSchemaId: 'RlsSetting',
     schemaGrants: 'SchemaGrant',
     tables: 'Table',
     views: 'View',
+    webauthnSettings: 'WebauthnSetting',
+    webauthnSettingsByCredentialsSchemaId: 'WebauthnSetting',
+    webauthnSettingsBySessionSecretsSchemaId: 'WebauthnSetting',
+    webauthnSettingsBySessionsSchemaId: 'WebauthnSetting',
   },
   Site: {
     pages: 'Page',
@@ -14498,6 +14758,10 @@ export const connectionFieldsMap = {
     uniqueConstraints: 'UniqueConstraint',
     viewTables: 'ViewTable',
     views: 'View',
+    webauthnSettingsByCredentialsTableId: 'WebauthnSetting',
+    webauthnSettingsBySessionCredentialsTableId: 'WebauthnSetting',
+    webauthnSettingsBySessionSecretsTableId: 'WebauthnSetting',
+    webauthnSettingsBySessionsTableId: 'WebauthnSetting',
   },
   UniqueConstraint: {
     uniqueConstraintBehaviors: 'UniqueConstraintBehavior',
@@ -15141,6 +15405,15 @@ export interface FieldToManySpatialRelationFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: SpatialRelationFilter;
 }
+/** A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldToManyWebauthnSettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebauthnSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebauthnSettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebauthnSettingFilter;
+}
 /** A filter to be used against many `ForeignKeyConstraintBehavior` object types. All fields are combined with a logical ‘and.’ */
 export interface ForeignKeyConstraintToManyForeignKeyConstraintBehaviorFilter {
   /** Filters to entities where every related entity matches. */
@@ -15149,6 +15422,24 @@ export interface ForeignKeyConstraintToManyForeignKeyConstraintBehaviorFilter {
   none?: ForeignKeyConstraintBehaviorFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ForeignKeyConstraintBehaviorFilter;
+}
+/** A filter to be used against many `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionToManyPubkeySettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PubkeySettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PubkeySettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PubkeySettingFilter;
+}
+/** A filter to be used against many `RlsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface FunctionToManyRlsSettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RlsSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RlsSettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RlsSettingFilter;
 }
 /** A filter to be used against many `Trigger` object types. All fields are combined with a logical ‘and.’ */
 export interface FunctionToManyTriggerFilter {
@@ -15426,6 +15717,24 @@ export interface SchemaToManyPlatformApiSchemaFilter {
   /** Filters to entities where at least one related entity matches. */
   some?: PlatformApiSchemaFilter;
 }
+/** A filter to be used against many `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyPubkeySettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: PubkeySettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PubkeySettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: PubkeySettingFilter;
+}
+/** A filter to be used against many `RlsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyRlsSettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: RlsSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RlsSettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: RlsSettingFilter;
+}
 /** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface SchemaToManySchemaGrantFilter {
   /** Filters to entities where every related entity matches. */
@@ -15452,6 +15761,15 @@ export interface SchemaToManyViewFilter {
   none?: ViewFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ViewFilter;
+}
+/** A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyWebauthnSettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebauthnSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebauthnSettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebauthnSettingFilter;
 }
 /** A filter to be used against many `Page` object types. All fields are combined with a logical ‘and.’ */
 export interface SiteToManyPageFilter {
@@ -15677,6 +15995,15 @@ export interface TableToManyViewFilter {
   none?: ViewFilter;
   /** Filters to entities where at least one related entity matches. */
   some?: ViewFilter;
+}
+/** A filter to be used against many `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyWebauthnSettingFilter {
+  /** Filters to entities where every related entity matches. */
+  every?: WebauthnSettingFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: WebauthnSettingFilter;
+  /** Filters to entities where at least one related entity matches. */
+  some?: WebauthnSettingFilter;
 }
 /** A filter to be used against many `UniqueConstraintBehavior` object types. All fields are combined with a logical ‘and.’ */
 export interface UniqueConstraintToManyUniqueConstraintBehaviorFilter {
@@ -16924,15 +17251,15 @@ export interface PubkeySettingInput {
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   id?: string;
-  /** Schema containing the crypto auth functions (FK to metaschema_public.schema) */
+  /** Schema containing the crypto auth functions */
   schemaId?: string;
-  /** Reference to the sign-in failure recording function (FK to metaschema_public.function) */
+  /** Reference to the sign-in failure recording function */
   signInRecordFailureFunctionId?: string;
-  /** Reference to the sign-in challenge request function (FK to metaschema_public.function) */
+  /** Reference to the sign-in challenge request function */
   signInRequestChallengeFunctionId?: string;
-  /** Reference to the sign-in-with-challenge function (FK to metaschema_public.function) */
+  /** Reference to the sign-in-with-challenge function */
   signInWithChallengeFunctionId?: string;
-  /** Reference to the sign-up-with-key function (FK to metaschema_public.function) */
+  /** Reference to the sign-up-with-key function */
   signUpWithKeyFunctionId?: string;
   updatedAt?: string;
   /** Field name used to identify the user in crypto auth functions */
@@ -16960,25 +17287,25 @@ export interface RedirectInput {
 }
 /** An input for mutations affecting `RlsSetting` */
 export interface RlsSettingInput {
-  /** Reference to the authenticate function (FK to metaschema_public.function) */
+  /** Reference to the authenticate function */
   authenticateFunctionId?: string;
-  /** Schema containing authenticate/authenticate_strict functions (FK to metaschema_public.schema) */
+  /** Schema containing authenticate/authenticate_strict functions */
   authenticateSchemaId?: string;
-  /** Reference to the strict authenticate function (FK to metaschema_public.function) */
+  /** Reference to the strict authenticate function */
   authenticateStrictFunctionId?: string;
   createdAt?: string;
-  /** Reference to the current_ip_address function (FK to metaschema_public.function) */
+  /** Reference to the current_ip_address function */
   currentIpAddressFunctionId?: string;
-  /** Reference to the current_role function (FK to metaschema_public.function) */
+  /** Reference to the current_role function */
   currentRoleFunctionId?: string;
-  /** Reference to the current_role_id function (FK to metaschema_public.function) */
+  /** Reference to the current_role_id function */
   currentRoleIdFunctionId?: string;
-  /** Reference to the current_user_agent function (FK to metaschema_public.function) */
+  /** Reference to the current_user_agent function */
   currentUserAgentFunctionId?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
   id?: string;
-  /** Schema containing current_role and related functions (FK to metaschema_public.schema) */
+  /** Schema containing current_role and related functions */
   roleSchemaId?: string;
   updatedAt?: string;
 }
@@ -17420,9 +17747,9 @@ export interface WebauthnSettingInput {
   /** Challenge TTL in seconds (default 300 = 5 minutes) */
   challengeExpirySeconds?: string;
   createdAt?: string;
-  /** Schema of the webauthn_credentials table (FK to metaschema_public.schema) */
+  /** Schema of the webauthn_credentials table */
   credentialsSchemaId?: string;
-  /** Reference to the webauthn_credentials table (FK to metaschema_public.table) */
+  /** Reference to the webauthn_credentials table */
   credentialsTableId?: string;
   /** Database that owns this resource (database-scoped isolation) */
   databaseId: string;
@@ -17437,20 +17764,20 @@ export interface WebauthnSettingInput {
   rpId?: string;
   /** WebAuthn Relying Party display name */
   rpName?: string;
-  /** Schema containing WebAuthn auth procedures (FK to metaschema_public.schema) */
+  /** Schema containing WebAuthn auth procedures */
   schemaId?: string;
-  /** Reference to the session_credentials table (FK to metaschema_public.table) */
+  /** Reference to the session_credentials table */
   sessionCredentialsTableId?: string;
-  /** Schema of the session_secrets table (FK to metaschema_public.schema) */
+  /** Schema of the session_secrets table */
   sessionSecretsSchemaId?: string;
-  /** Reference to the session_secrets table (FK to metaschema_public.table) */
+  /** Reference to the session_secrets table */
   sessionSecretsTableId?: string;
-  /** Schema of the sessions table (FK to metaschema_public.schema) */
+  /** Schema of the sessions table */
   sessionsSchemaId?: string;
-  /** Reference to the sessions table (FK to metaschema_public.table) */
+  /** Reference to the sessions table */
   sessionsTableId?: string;
   updatedAt?: string;
-  /** Reference to the user field on webauthn_credentials (FK to metaschema_public.field) */
+  /** Reference to the user field on webauthn_credentials */
   userFieldId?: string;
 }
 /** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
@@ -17979,6 +18306,10 @@ export interface FieldFilter {
   type?: JSONFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `webauthnSettingsByUserFieldId` relation. */
+  webauthnSettingsByUserFieldId?: FieldToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByUserFieldId` exist. */
+  webauthnSettingsByUserFieldIdExist?: boolean;
 }
 /** A filter to be used against `ForeignKeyConstraintBehavior` object types. All fields are combined with a logical ‘and.’ */
 export interface ForeignKeyConstraintBehaviorFilter {
@@ -18133,8 +18464,48 @@ export interface FunctionFilter {
   not?: FunctionFilter;
   /** Checks for any expressions in this list. */
   or?: FunctionFilter[];
+  /** Filter by the object’s `pubkeySettingsBySignInRecordFailureFunctionId` relation. */
+  pubkeySettingsBySignInRecordFailureFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInRecordFailureFunctionId` exist. */
+  pubkeySettingsBySignInRecordFailureFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignInRequestChallengeFunctionId` relation. */
+  pubkeySettingsBySignInRequestChallengeFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInRequestChallengeFunctionId` exist. */
+  pubkeySettingsBySignInRequestChallengeFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignInWithChallengeFunctionId` relation. */
+  pubkeySettingsBySignInWithChallengeFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignInWithChallengeFunctionId` exist. */
+  pubkeySettingsBySignInWithChallengeFunctionIdExist?: boolean;
+  /** Filter by the object’s `pubkeySettingsBySignUpWithKeyFunctionId` relation. */
+  pubkeySettingsBySignUpWithKeyFunctionId?: FunctionToManyPubkeySettingFilter;
+  /** `pubkeySettingsBySignUpWithKeyFunctionId` exist. */
+  pubkeySettingsBySignUpWithKeyFunctionIdExist?: boolean;
   /** Filter by the object’s `returns` field. */
   returns?: JSONFilter;
+  /** Filter by the object’s `rlsSettingsByAuthenticateFunctionId` relation. */
+  rlsSettingsByAuthenticateFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateFunctionId` exist. */
+  rlsSettingsByAuthenticateFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByAuthenticateStrictFunctionId` relation. */
+  rlsSettingsByAuthenticateStrictFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateStrictFunctionId` exist. */
+  rlsSettingsByAuthenticateStrictFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentIpAddressFunctionId` relation. */
+  rlsSettingsByCurrentIpAddressFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentIpAddressFunctionId` exist. */
+  rlsSettingsByCurrentIpAddressFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentRoleFunctionId` relation. */
+  rlsSettingsByCurrentRoleFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentRoleFunctionId` exist. */
+  rlsSettingsByCurrentRoleFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentRoleIdFunctionId` relation. */
+  rlsSettingsByCurrentRoleIdFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentRoleIdFunctionId` exist. */
+  rlsSettingsByCurrentRoleIdFunctionIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByCurrentUserAgentFunctionId` relation. */
+  rlsSettingsByCurrentUserAgentFunctionId?: FunctionToManyRlsSettingFilter;
+  /** `rlsSettingsByCurrentUserAgentFunctionId` exist. */
+  rlsSettingsByCurrentUserAgentFunctionIdExist?: boolean;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `schemaId` field. */
@@ -18423,6 +18794,18 @@ export interface SchemaFilter {
   platformApiSchemas?: SchemaToManyPlatformApiSchemaFilter;
   /** `platformApiSchemas` exist. */
   platformApiSchemasExist?: boolean;
+  /** Filter by the object’s `pubkeySettings` relation. */
+  pubkeySettings?: SchemaToManyPubkeySettingFilter;
+  /** `pubkeySettings` exist. */
+  pubkeySettingsExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByAuthenticateSchemaId` relation. */
+  rlsSettingsByAuthenticateSchemaId?: SchemaToManyRlsSettingFilter;
+  /** `rlsSettingsByAuthenticateSchemaId` exist. */
+  rlsSettingsByAuthenticateSchemaIdExist?: boolean;
+  /** Filter by the object’s `rlsSettingsByRoleSchemaId` relation. */
+  rlsSettingsByRoleSchemaId?: SchemaToManyRlsSettingFilter;
+  /** `rlsSettingsByRoleSchemaId` exist. */
+  rlsSettingsByRoleSchemaIdExist?: boolean;
   /** Filter by the object’s `schemaGrants` relation. */
   schemaGrants?: SchemaToManySchemaGrantFilter;
   /** `schemaGrants` exist. */
@@ -18443,6 +18826,22 @@ export interface SchemaFilter {
   views?: SchemaToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `webauthnSettings` relation. */
+  webauthnSettings?: SchemaToManyWebauthnSettingFilter;
+  /** Filter by the object’s `webauthnSettingsByCredentialsSchemaId` relation. */
+  webauthnSettingsByCredentialsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByCredentialsSchemaId` exist. */
+  webauthnSettingsByCredentialsSchemaIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionSecretsSchemaId` relation. */
+  webauthnSettingsBySessionSecretsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionSecretsSchemaId` exist. */
+  webauthnSettingsBySessionSecretsSchemaIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionsSchemaId` relation. */
+  webauthnSettingsBySessionsSchemaId?: SchemaToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionsSchemaId` exist. */
+  webauthnSettingsBySessionsSchemaIdExist?: boolean;
+  /** `webauthnSettings` exist. */
+  webauthnSettingsExist?: boolean;
 }
 /** A filter to be used against `SpatialRelation` object types. All fields are combined with a logical ‘and.’ */
 export interface SpatialRelationFilter {
@@ -18703,6 +19102,22 @@ export interface TableFilter {
   views?: TableToManyViewFilter;
   /** `views` exist. */
   viewsExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsByCredentialsTableId` relation. */
+  webauthnSettingsByCredentialsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsByCredentialsTableId` exist. */
+  webauthnSettingsByCredentialsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionCredentialsTableId` relation. */
+  webauthnSettingsBySessionCredentialsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionCredentialsTableId` exist. */
+  webauthnSettingsBySessionCredentialsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionSecretsTableId` relation. */
+  webauthnSettingsBySessionSecretsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionSecretsTableId` exist. */
+  webauthnSettingsBySessionSecretsTableIdExist?: boolean;
+  /** Filter by the object’s `webauthnSettingsBySessionsTableId` relation. */
+  webauthnSettingsBySessionsTableId?: TableToManyWebauthnSettingFilter;
+  /** `webauthnSettingsBySessionsTableId` exist. */
+  webauthnSettingsBySessionsTableIdExist?: boolean;
 }
 /** A filter to be used against `TriggerFunction` object types. All fields are combined with a logical ‘and.’ */
 export interface TriggerFunctionFilter {
@@ -19249,6 +19664,207 @@ export interface EmailIdentityFilter {
   supportAddress?: StringFilter;
   /** Filter by the object’s `transportMode` field. */
   transportMode?: StringFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+}
+/** A filter to be used against `WebauthnSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface WebauthnSettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: WebauthnSettingFilter[];
+  /** Filter by the object’s `attestationType` field. */
+  attestationType?: StringFilter;
+  /** Filter by the object’s `challengeExpirySeconds` field. */
+  challengeExpirySeconds?: BigIntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `credentialsSchema` relation. */
+  credentialsSchema?: SchemaFilter;
+  /** A related `credentialsSchema` exists. */
+  credentialsSchemaExists?: boolean;
+  /** Filter by the object’s `credentialsSchemaId` field. */
+  credentialsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `credentialsTable` relation. */
+  credentialsTable?: TableFilter;
+  /** A related `credentialsTable` exists. */
+  credentialsTableExists?: boolean;
+  /** Filter by the object’s `credentialsTableId` field. */
+  credentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: WebauthnSettingFilter;
+  /** Checks for any expressions in this list. */
+  or?: WebauthnSettingFilter[];
+  /** Filter by the object’s `originAllowlist` field. */
+  originAllowlist?: StringListFilter;
+  /** Filter by the object’s `requireUserVerification` field. */
+  requireUserVerification?: BooleanFilter;
+  /** Filter by the object’s `residentKey` field. */
+  residentKey?: StringFilter;
+  /** Filter by the object’s `rpId` field. */
+  rpId?: StringFilter;
+  /** Filter by the object’s `rpName` field. */
+  rpName?: StringFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** A related `schema` exists. */
+  schemaExists?: boolean;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** A related `sessionCredentialsTable` exists. */
+  sessionCredentialsTableExists?: boolean;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionSecretsSchema` relation. */
+  sessionSecretsSchema?: SchemaFilter;
+  /** A related `sessionSecretsSchema` exists. */
+  sessionSecretsSchemaExists?: boolean;
+  /** Filter by the object’s `sessionSecretsSchemaId` field. */
+  sessionSecretsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionSecretsTable` relation. */
+  sessionSecretsTable?: TableFilter;
+  /** A related `sessionSecretsTable` exists. */
+  sessionSecretsTableExists?: boolean;
+  /** Filter by the object’s `sessionSecretsTableId` field. */
+  sessionSecretsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsSchema` relation. */
+  sessionsSchema?: SchemaFilter;
+  /** A related `sessionsSchema` exists. */
+  sessionsSchemaExists?: boolean;
+  /** Filter by the object’s `sessionsSchemaId` field. */
+  sessionsSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** A related `sessionsTable` exists. */
+  sessionsTableExists?: boolean;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `userField` relation. */
+  userField?: FieldFilter;
+  /** A related `userField` exists. */
+  userFieldExists?: boolean;
+  /** Filter by the object’s `userFieldId` field. */
+  userFieldId?: UUIDFilter;
+}
+/** A filter to be used against `PubkeySetting` object types. All fields are combined with a logical ‘and.’ */
+export interface PubkeySettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: PubkeySettingFilter[];
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PubkeySettingFilter;
+  /** Checks for any expressions in this list. */
+  or?: PubkeySettingFilter[];
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** A related `schema` exists. */
+  schemaExists?: boolean;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `signInRecordFailureFunction` relation. */
+  signInRecordFailureFunction?: FunctionFilter;
+  /** A related `signInRecordFailureFunction` exists. */
+  signInRecordFailureFunctionExists?: boolean;
+  /** Filter by the object’s `signInRecordFailureFunctionId` field. */
+  signInRecordFailureFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signInRequestChallengeFunction` relation. */
+  signInRequestChallengeFunction?: FunctionFilter;
+  /** A related `signInRequestChallengeFunction` exists. */
+  signInRequestChallengeFunctionExists?: boolean;
+  /** Filter by the object’s `signInRequestChallengeFunctionId` field. */
+  signInRequestChallengeFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signInWithChallengeFunction` relation. */
+  signInWithChallengeFunction?: FunctionFilter;
+  /** A related `signInWithChallengeFunction` exists. */
+  signInWithChallengeFunctionExists?: boolean;
+  /** Filter by the object’s `signInWithChallengeFunctionId` field. */
+  signInWithChallengeFunctionId?: UUIDFilter;
+  /** Filter by the object’s `signUpWithKeyFunction` relation. */
+  signUpWithKeyFunction?: FunctionFilter;
+  /** A related `signUpWithKeyFunction` exists. */
+  signUpWithKeyFunctionExists?: boolean;
+  /** Filter by the object’s `signUpWithKeyFunctionId` field. */
+  signUpWithKeyFunctionId?: UUIDFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `userField` field. */
+  userField?: StringFilter;
+}
+/** A filter to be used against `RlsSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface RlsSettingFilter {
+  /** Checks for all expressions in this list. */
+  and?: RlsSettingFilter[];
+  /** Filter by the object’s `authenticateFunction` relation. */
+  authenticateFunction?: FunctionFilter;
+  /** A related `authenticateFunction` exists. */
+  authenticateFunctionExists?: boolean;
+  /** Filter by the object’s `authenticateFunctionId` field. */
+  authenticateFunctionId?: UUIDFilter;
+  /** Filter by the object’s `authenticateSchema` relation. */
+  authenticateSchema?: SchemaFilter;
+  /** A related `authenticateSchema` exists. */
+  authenticateSchemaExists?: boolean;
+  /** Filter by the object’s `authenticateSchemaId` field. */
+  authenticateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `authenticateStrictFunction` relation. */
+  authenticateStrictFunction?: FunctionFilter;
+  /** A related `authenticateStrictFunction` exists. */
+  authenticateStrictFunctionExists?: boolean;
+  /** Filter by the object’s `authenticateStrictFunctionId` field. */
+  authenticateStrictFunctionId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `currentIpAddressFunction` relation. */
+  currentIpAddressFunction?: FunctionFilter;
+  /** A related `currentIpAddressFunction` exists. */
+  currentIpAddressFunctionExists?: boolean;
+  /** Filter by the object’s `currentIpAddressFunctionId` field. */
+  currentIpAddressFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentRoleFunction` relation. */
+  currentRoleFunction?: FunctionFilter;
+  /** A related `currentRoleFunction` exists. */
+  currentRoleFunctionExists?: boolean;
+  /** Filter by the object’s `currentRoleFunctionId` field. */
+  currentRoleFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentRoleIdFunction` relation. */
+  currentRoleIdFunction?: FunctionFilter;
+  /** A related `currentRoleIdFunction` exists. */
+  currentRoleIdFunctionExists?: boolean;
+  /** Filter by the object’s `currentRoleIdFunctionId` field. */
+  currentRoleIdFunctionId?: UUIDFilter;
+  /** Filter by the object’s `currentUserAgentFunction` relation. */
+  currentUserAgentFunction?: FunctionFilter;
+  /** A related `currentUserAgentFunction` exists. */
+  currentUserAgentFunctionExists?: boolean;
+  /** Filter by the object’s `currentUserAgentFunctionId` field. */
+  currentUserAgentFunctionId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: RlsSettingFilter;
+  /** Checks for any expressions in this list. */
+  or?: RlsSettingFilter[];
+  /** Filter by the object’s `roleSchema` relation. */
+  roleSchema?: SchemaFilter;
+  /** A related `roleSchema` exists. */
+  roleSchemaExists?: boolean;
+  /** Filter by the object’s `roleSchemaId` field. */
+  roleSchemaId?: UUIDFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
 }
@@ -20545,6 +21161,31 @@ export interface EmailProviderAccountFilter {
   /** Filter by the object’s `webhookSigningSecretName` field. */
   webhookSigningSecretName?: StringFilter;
 }
+/** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
+export interface BigIntFilter {
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not included in the specified list. */
+  notIn?: string[];
+}
 /** A filter to be used against `PlatformApi` object types. All fields are combined with a logical ‘and.’ */
 export interface PlatformApiFilter {
   /** Checks for all expressions in this list. */
@@ -21146,31 +21787,6 @@ export interface PlatformSiteWebConfigFilter {
   spaFallback?: BooleanFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-}
-/** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
-export interface BigIntFilter {
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not included in the specified list. */
-  notIn?: string[];
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface AcceptDatabaseTransferPayload {

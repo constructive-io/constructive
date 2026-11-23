@@ -7,6 +7,7 @@ const mockCreateGrafastCacheLimitsPreset = jest.fn();
 jest.mock('graphile-cache', () => ({
   cacheGraphileInstance: mockCacheGraphileInstance,
   createGraphileInstance: mockCreateGraphileInstance,
+  disposeUncachedEntry: jest.requireActual('graphile-cache').disposeUncachedEntry,
   graphileCache: {
     get: mockCacheGet,
     delete: jest.fn(), clear: jest.fn()

@@ -1388,6 +1388,22 @@ export interface PrincipalAuthModule {
   sweepExpiredPrincipalsFunction: string | null;
   usersTableId: string | null;
 }
+export interface PrincipalsModule {
+  createOrgPrincipalFunction: string | null;
+  createPrincipalFunction: string | null;
+  databaseId: string | null;
+  deleteOrgPrincipalFunction: string | null;
+  deletePrincipalFunction: string | null;
+  id: string | null;
+  principalEntitiesTableId: string | null;
+  principalScopeOverridesTableId: string | null;
+  principalsTableId: string | null;
+  principalsTableName: string | null;
+  privateSchemaId: string | null;
+  schemaId: string | null;
+  sweepExpiredPrincipalsFunction: string | null;
+  usersTableId: string | null;
+}
 export interface ProfilesModule {
   actorTableId: string | null;
   apiName: string | null;

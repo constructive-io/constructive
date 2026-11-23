@@ -66,6 +66,7 @@ import type {
   PhoneNumbersModule,
   PlansModule,
   PrincipalAuthModule,
+  PrincipalsModule,
   ProfilesModule,
   RateLimitMetersModule,
   RateLimitsModule,
@@ -2938,6 +2939,39 @@ export type PrincipalAuthModuleOrderBy =
   | 'SESSIONS_TABLE_ID_DESC'
   | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
   | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
+  | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_ASC'
+  | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_DESC'
+  | 'USERS_TABLE_ID_ASC'
+  | 'USERS_TABLE_ID_DESC';
+/** Methods to use when ordering `PrincipalsModule`. */
+export type PrincipalsModuleOrderBy =
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'CREATE_PRINCIPAL_FUNCTION_ASC'
+  | 'CREATE_PRINCIPAL_FUNCTION_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_ORG_PRINCIPAL_FUNCTION_DESC'
+  | 'DELETE_PRINCIPAL_FUNCTION_ASC'
+  | 'DELETE_PRINCIPAL_FUNCTION_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'PRINCIPALS_TABLE_ID_ASC'
+  | 'PRINCIPALS_TABLE_ID_DESC'
+  | 'PRINCIPALS_TABLE_NAME_ASC'
+  | 'PRINCIPALS_TABLE_NAME_DESC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_ASC'
+  | 'PRINCIPAL_ENTITIES_TABLE_ID_DESC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_ASC'
+  | 'PRINCIPAL_SCOPE_OVERRIDES_TABLE_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
   | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_ASC'
   | 'SWEEP_EXPIRED_PRINCIPALS_FUNCTION_DESC'
   | 'USERS_TABLE_ID_ASC'
@@ -6360,6 +6394,11 @@ export interface CreatePrincipalAuthModuleInput {
   /** The `PrincipalAuthModule` to be created by this mutation. */
   principalAuthModule: PrincipalAuthModuleInput;
 }
+export interface CreatePrincipalsModuleInput {
+  clientMutationId?: string;
+  /** The `PrincipalsModule` to be created by this mutation. */
+  principalsModule: PrincipalsModuleInput;
+}
 export interface CreateProfilesModuleInput {
   clientMutationId?: string;
   /** The `ProfilesModule` to be created by this mutation. */
@@ -7538,6 +7577,10 @@ export interface DeletePlansModuleInput {
   id: string;
 }
 export interface DeletePrincipalAuthModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeletePrincipalsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -11872,6 +11915,77 @@ export interface PrincipalAuthModulePatch {
   sweepExpiredPrincipalsFunction?: string;
   usersTableId?: string;
 }
+/** A filter to be used against `PrincipalsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PrincipalsModuleFilter {
+  /** Checks for all expressions in this list. */
+  and?: PrincipalsModuleFilter[];
+  /** Filter by the object’s `createOrgPrincipalFunction` field. */
+  createOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `createPrincipalFunction` field. */
+  createPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `deleteOrgPrincipalFunction` field. */
+  deleteOrgPrincipalFunction?: StringFilter;
+  /** Filter by the object’s `deletePrincipalFunction` field. */
+  deletePrincipalFunction?: StringFilter;
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Negates the expression. */
+  not?: PrincipalsModuleFilter;
+  /** Checks for any expressions in this list. */
+  or?: PrincipalsModuleFilter[];
+  /** Filter by the object’s `principalEntitiesTableId` field. */
+  principalEntitiesTableId?: UUIDFilter;
+  /** Filter by the object’s `principalScopeOverridesTableId` field. */
+  principalScopeOverridesTableId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableId` field. */
+  principalsTableId?: UUIDFilter;
+  /** Filter by the object’s `principalsTableName` field. */
+  principalsTableName?: StringFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `sweepExpiredPrincipalsFunction` field. */
+  sweepExpiredPrincipalsFunction?: StringFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+}
+/** An input for mutations affecting `PrincipalsModule` */
+export interface PrincipalsModuleInput {
+  createOrgPrincipalFunction?: string;
+  createPrincipalFunction?: string;
+  databaseId: string;
+  deleteOrgPrincipalFunction?: string;
+  deletePrincipalFunction?: string;
+  id?: string;
+  principalEntitiesTableId?: string;
+  principalScopeOverridesTableId?: string;
+  principalsTableId?: string;
+  principalsTableName?: string;
+  privateSchemaId?: string;
+  schemaId?: string;
+  sweepExpiredPrincipalsFunction?: string;
+  usersTableId?: string;
+}
+/** Represents an update to a `PrincipalsModule`. Fields that are set will be updated. */
+export interface PrincipalsModulePatch {
+  createOrgPrincipalFunction?: string;
+  createPrincipalFunction?: string;
+  databaseId?: string;
+  deleteOrgPrincipalFunction?: string;
+  deletePrincipalFunction?: string;
+  id?: string;
+  principalEntitiesTableId?: string;
+  principalScopeOverridesTableId?: string;
+  principalsTableId?: string;
+  principalsTableName?: string;
+  privateSchemaId?: string;
+  schemaId?: string;
+  sweepExpiredPrincipalsFunction?: string;
+  usersTableId?: string;
+}
 /** A filter to be used against `ProfilesModule` object types. All fields are combined with a logical ‘and.’ */
 export interface ProfilesModuleFilter {
   /** Filter by the object’s `actorTableId` field. */
@@ -14354,6 +14468,12 @@ export interface UpdatePrincipalAuthModuleInput {
   /** An object where the defined keys will be set on the `PrincipalAuthModule` being updated. */
   principalAuthModulePatch: PrincipalAuthModulePatch;
 }
+export interface UpdatePrincipalsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `PrincipalsModule` being updated. */
+  principalsModulePatch: PrincipalsModulePatch;
+}
 export interface UpdateProfilesModuleInput {
   clientMutationId?: string;
   id: string;
@@ -15566,6 +15686,13 @@ export interface PrincipalAuthModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `PrincipalsModule` values. */
+export interface PrincipalsModuleConnection {
+  edges: PrincipalsModuleEdge[];
+  nodes: PrincipalsModule[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `ProfilesModule` values. */
 export interface ProfilesModuleConnection {
   edges: ProfilesModuleEdge[];
@@ -16129,6 +16256,12 @@ export interface CreatePrincipalAuthModulePayload {
   principalAuthModule?: PrincipalAuthModule | null;
   principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
 }
+export interface CreatePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was created by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
+}
 export interface CreateProfilesModulePayload {
   clientMutationId?: string | null;
   /** The `ProfilesModule` that was created by this mutation. */
@@ -16656,6 +16789,12 @@ export interface DeletePrincipalAuthModulePayload {
   /** The `PrincipalAuthModule` that was deleted by this mutation. */
   principalAuthModule?: PrincipalAuthModule | null;
   principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
+}
+export interface DeletePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was deleted by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
 }
 export interface DeleteProfilesModulePayload {
   clientMutationId?: string | null;
@@ -17193,6 +17332,12 @@ export interface UpdatePrincipalAuthModulePayload {
   /** The `PrincipalAuthModule` that was updated by this mutation. */
   principalAuthModule?: PrincipalAuthModule | null;
   principalAuthModuleEdge?: PrincipalAuthModuleEdge | null;
+}
+export interface UpdatePrincipalsModulePayload {
+  clientMutationId?: string | null;
+  /** The `PrincipalsModule` that was updated by this mutation. */
+  principalsModule?: PrincipalsModule | null;
+  principalsModuleEdge?: PrincipalsModuleEdge | null;
 }
 export interface UpdateProfilesModulePayload {
   clientMutationId?: string | null;
@@ -17766,6 +17911,12 @@ export interface PrincipalAuthModuleEdge {
   /** The `PrincipalAuthModule` at the end of the edge. */
   node?: PrincipalAuthModule | null;
 }
+/** A `PrincipalsModule` edge in the connection. */
+export interface PrincipalsModuleEdge {
+  cursor?: string | null;
+  /** The `PrincipalsModule` at the end of the edge. */
+  node?: PrincipalsModule | null;
+}
 /** A `ProfilesModule` edge in the connection. */
 export interface ProfilesModuleEdge {
   cursor?: string | null;
@@ -18079,10 +18230,14 @@ export interface MetaEnum {
 }
 /** How a field holds files */
 export interface MetaFileField {
+  /** Bucket key the field is bound to; uploads for it must go to this bucket. Null when the field is not bound to one */
+  bucketKey?: string | null;
   /** GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise */
   filesType?: string | null;
   /** Whether the field holds a list of files */
   isMultiple: boolean;
+  /** Whether the bound bucket must be public (true) or private (false); null when the binding does not say */
+  isPublic?: boolean | null;
   /** image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file. */
   kind: string;
 }
