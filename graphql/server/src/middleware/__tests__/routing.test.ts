@@ -154,7 +154,9 @@ describe('routeToApiStructure', () => {
         { code: 'API_ROLE_FORBIDDEN', column, apiId: 'api-1' }
       );
       expect(query).toHaveBeenCalledTimes(1);
-      expect(query).toHaveBeenCalledWith(expect.stringContaining('(rolsuper OR rolbypassrls)'), [expect.arrayContaining(['privileged_role'])]);
+      expect(query).toHaveBeenCalledWith(expect.stringContaining('(rolsuper OR rolbypassrls)'), [
+        expect.arrayContaining(['privileged_role']), routeToApiStructure(route, opts)!.schema
+      ]);
     }
   );
 });

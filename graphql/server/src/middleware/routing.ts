@@ -45,15 +45,24 @@ export const requireApiRole = (
 
 export const validateApiRoles = async (pool: Pool, api: ApiStructure): Promise<void> => {
   const { rows } = await pool.query<{ rolname: string }>(
-    'SELECT rolname FROM pg_roles WHERE rolname = ANY($1::text[]) AND (rolsuper OR rolbypassrls)',
-    [[api.roleName, api.anonRole]]
+    `SELECT configured.rolname FROM pg_roles AS configured
+      WHERE configured.rolname = ANY($1::text[])
+        AND ((rolsuper OR rolbypassrls) OR EXISTS (
+          SELECT 1
+            FROM pg_class AS relation
+            JOIN pg_namespace AS namespace ON namespace.oid = relation.relnamespace
+           WHERE namespace.nspname = ANY($2::text[])
+             AND relation.relrowsecurity AND NOT relation.relforcerowsecurity
+             AND pg_has_role(configured.oid, relation.relowner, 'USAGE')
+        ))`,
+    [[api.roleName, api.anonRole], api.schema]
   );
   for (const column of ['role_name', 'anon_role'] as const) {
     const value = column === 'role_name' ? api.roleName : api.anonRole;
     if (!rows.some((row) => row.rolname === value)) continue;
     const apiId = api.apiId;
     const error = new Error(
-      `API ${apiId ?? '<unknown>'} ${column} is superuser or BYPASSRLS; APIs serve as request roles under RLS.`
+      `API ${apiId ?? '<unknown>'} ${column} can bypass RLS (superuser, BYPASSRLS, or ownership of a served RLS table).`
     ) as Error & { code?: string; column?: string; apiId?: string };
     error.code = 'API_ROLE_FORBIDDEN';
     error.column = column;

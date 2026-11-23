@@ -242,4 +242,40 @@ describe('API resolution across listener recovery', () => {
     expect(await pending).toMatchObject({ schema: ['new_schema'] });
     expect(svcCache.get(req.svc_key!)).toMatchObject({ schema: ['new_schema'] });
   });
+
+  it.each([false, true])(
+    'retries when recovery happens during role validation (old role forbidden: %s)',
+    async (oldRoleForbidden) => {
+      let startValidation!: () => void;
+      const validationStarted = new Promise<void>(resolve => { startValidation = resolve; });
+      let finishValidation!: (value: { rows: { rolname: string }[] }) => void;
+      const firstValidation = new Promise<{ rows: { rolname: string }[] }>(resolve => { finishValidation = resolve; });
+      let reads = 0;
+      let validations = 0;
+      const query = jest.fn(async (sql: string) => {
+        if (sql.includes('FROM pg_roles')) {
+          if (++validations !== 1) return { rows: [] };
+          startValidation();
+          return firstValidation;
+        }
+        if (sql.includes('information_schema.schemata')) return { rows: [{ schema_name: 'metaschema_public' }] };
+        const version = ++reads === 1 ? 'old' : 'new';
+        return { rows: [{
+          api_id: 'api-123', database_id: 'db-123', role_name: `${version}_role`,
+          anon_role: 'anonymous', is_public: false, schemas: [`${version}_schema`]
+        }] };
+      });
+      mockGetPgPool.mockReturnValue({ query } as unknown as Pool);
+      const req = createRequest({ host: 'admin.localhost', 'X-Database-Id': 'db-123', 'X-Api-Name': 'customer-api' });
+      const pending = getApiConfig(createPrivateOptions(), req);
+
+      await validationStarted;
+      evictAllServiceKeys();
+      finishValidation({ rows: oldRoleForbidden ? [{ rolname: 'old_role' }] : [] });
+
+      expect(await pending).toMatchObject({ roleName: 'new_role', schema: ['new_schema'] });
+      expect(svcCache.get(req.svc_key!)).toMatchObject({ roleName: 'new_role', schema: ['new_schema'] });
+      expect(validations).toBe(2);
+    }
+  );
 });

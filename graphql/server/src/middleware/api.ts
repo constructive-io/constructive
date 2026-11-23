@@ -473,7 +473,11 @@ const resolveApiConfig = async (
   // Cache successful results
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
-    await validateApiRoles(result.tenantPool, result);
+    try {
+      await validateApiRoles(result.tenantPool, result);
+    } catch (error) {
+      if (generationOf(cacheKey) === startedUnder) throw error;
+    }
     if (generationOf(cacheKey) !== startedUnder) {
       if (retries === 0) throw new Error('API configuration kept changing during resolution');
       return resolveApiConfig(opts, req, retries - 1);
@@ -522,6 +526,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'MISSING_API_ROLE') {
         log.error('[api-middleware] resolved API row has no served role:', err.message);
+        res.status(500).send(errorPage50x);
+        return;
+      }
+
+      if (err.code === 'API_ROLE_FORBIDDEN') {
+        log.error('[api-middleware] API_ROLE_FORBIDDEN:', err.message);
         res.status(500).send(errorPage50x);
         return;
       }
