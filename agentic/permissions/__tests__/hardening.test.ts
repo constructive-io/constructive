@@ -256,7 +256,11 @@ const rows: Row[] = [
   ['HOME=.pi; touch ~/ext.js', 'deny', 'deny'],
   ['read -r HOME <<< x; cd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
   ['HOME=~/.ssh; pushd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
-  ['unset HOME; cd; cat src/config.ts', 'allow', 'allow']
+  ['unset HOME; cd; cat src/config.ts', 'allow', 'allow'],
+  // 28. a shell that reads its script from stdin runs the text the analysis can see there as a script of its own
+  ["sh <<< 'cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
+  ["echo 'cat ~/.ssh/id_ed25519' | bash", 'deny', 'deny', 'hard-deny'],
+  ["bash -s <<'EOF'\ncat ~/.ssh/id_ed25519\nEOF", 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {

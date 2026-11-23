@@ -182,13 +182,23 @@ function shell(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
     else analyzer.nested(script.text, `it runs a shell string with ${name} -c`, { inherits: true });
     return;
   }
-  const file = rest[next];
-  if (file && textOf(file) !== '-') {
+  // `-s` reads the script from stdin and makes every operand an argument; a `-` ends the options.
+  const at = textOf(rest[next]) === '-' ? next + 1 : next;
+  const file = options.some((o) => o.key === '-s') ? undefined : rest[at];
+  if (file) {
     analyzer.addPath(file, 'read', true);
-    generic(ctx, rest.slice(next + 1));
-  } else if (ctx.stdinFed) {
-    analyzer.dynamic(`it pipes a script into ${name}`);
+    generic(ctx, rest.slice(at + 1));
+    return;
   }
+  generic(ctx, rest.slice(at));
+  if (ctx.stdinFed) stdinScript(name, analyzer);
+}
+
+/** A shell reads its script from stdin: each text the analysis can see there runs as a script in a shell of its own, and other input it cannot read. */
+function stdinScript(name: string, analyzer: CommandContext['analyzer']): void {
+  const texts = analyzer.stdin.texts();
+  if (texts === null) return analyzer.dynamic(`it pipes a script into ${name}`);
+  for (const text of new Set(texts)) analyzer.nested(text, `it runs a script ${name} reads from its input`);
 }
 
 /**
