@@ -207,6 +207,39 @@ describe('site release requested before the deploy was canceled', () => {
     expect(generatePresignedPutUrl).not.toHaveBeenCalled();
   });
 
+  it('signs both copies of the same asset in a batch with a one-second lifetime', async () => {
+    const createdAt = new Date('2026-01-01T00:00:00.000Z');
+    const clock = jest.spyOn(Date, 'now').mockReturnValue(createdAt.getTime());
+    const key = `originals/${NEW_FILE_ID}`;
+    const txClient = {
+      query: jest.fn()
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ id: NEW_FILE_ID, key }] })
+        .mockResolvedValueOnce({
+          rows: [{ id: NEW_FILE_ID, key, status: 'requested', mime_type: 'text/html', size: '16',
+            filename: 'index.html', created_at: createdAt }],
+        }),
+    };
+    const config = storageConfig({ uploadUrlExpirySeconds: 1 });
+    const s3 = fakeS3();
+    const request = (filename: string) => processSingleFile(options, txClient, config, 'db', bucket, s3,
+      { contentHash: HASH, contentType: 'text/html', size: 16, filename },
+      { release: true, checkOnly: false });
+    try {
+      const first = await request('index.html');
+      clock.mockReturnValue(createdAt.getTime() + 50);
+      const second = await request('copy.html');
+
+      expect(first).toMatchObject({ fileId: NEW_FILE_ID, key, uploadUrl: 'https://s3.example.com/put' });
+      expect(second).toMatchObject({ fileId: NEW_FILE_ID, key, uploadUrl: first.uploadUrl, expiresAt: first.expiresAt });
+      expect(txClient.query).toHaveBeenCalledTimes(4);
+      expect(generatePresignedPutUrl).toHaveBeenNthCalledWith(2, s3, key, 'text/html', 16, 1, HASH, NEW_FILE_ID);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
   it('does not reissue a PUT after the original confirmation deadline', async () => {
     await expect(retry(false, 900)).rejects.toThrow('SITE_RELEASE_UPLOAD_EXPIRED');
     expect(generatePresignedPutUrl).not.toHaveBeenCalled();

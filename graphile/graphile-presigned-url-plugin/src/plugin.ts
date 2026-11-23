@@ -691,10 +691,11 @@ export async function processSingleFile(
     if (row) {
       if (row.status === 'requested' && !siteUpload.checkOnly) {
         const deadline = new Date(row.created_at).getTime() + storageConfig.uploadUrlExpirySeconds * 1000;
-        const remainingSeconds = Math.floor((deadline - Date.now()) / 1000);
-        if (remainingSeconds <= 0) throw new Error('SITE_RELEASE_UPLOAD_EXPIRED');
+        const remainingMs = deadline - Date.now();
+        if (remainingMs <= 0) throw new Error('SITE_RELEASE_UPLOAD_EXPIRED');
         return {
-          ...await signUpload(row.id, row.key, row.mime_type, Number(row.size), remainingSeconds),
+          ...await signUpload(row.id, row.key, row.mime_type, Number(row.size), Math.ceil(remainingMs / 1000)),
+          expiresAt: new Date(deadline).toISOString(),
           fileId: row.id, key: row.key, logicalKey,
           deduplicated: false, pending: false,
           file: buildFileProjection({
