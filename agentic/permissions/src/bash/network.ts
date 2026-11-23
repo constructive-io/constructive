@@ -6,7 +6,7 @@
 
 import { type Arg, literalStart } from './analyze';
 import { type CommandContext, firstOperand, generic, looksLikePath, pathLikeArgs, restOf, textOf } from './args';
-import { hasOption, readArgs, valuesOf as valuesRead } from './options';
+import { hasOption, type ReadArgs, readArgs, valuesOf as valuesRead } from './options';
 import { CURL, RSYNC, SCP, SSH, WGET } from './programs';
 import { applyEffects } from './scripts';
 import { isLoopbackHost, isRemoteSpec, isUrl } from './words';
@@ -129,9 +129,22 @@ export function remoteCopy(name: 'scp' | 'rsync', ctx: CommandContext, rest: rea
   for (const s of sources) if (s.kind === 'unknown' || !isRemoteSpec(s.text)) analyzer.addPath(s, 'read', true);
 }
 
+/**
+ * ssh's options as OpenSSH reads them: getopt up to the destination, then
+ * again after it up to the first word of the remote command, unless `--`
+ * ended the options.
+ */
+function sshArgs(rest: readonly Arg[]): ReadArgs {
+  const before = readArgs(SSH, rest);
+  const ended = before.operands.length > 0;
+  if (ended || before.next >= rest.length - 1) return before;
+  const after = readArgs(SSH, rest.slice(before.next + 1));
+  return { ...after, options: [...before.options, ...after.options], unknown: [...before.unknown, ...after.unknown] };
+}
+
 export function ssh(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const read = readArgs(SSH, rest);
+  const read = sshArgs(rest);
   applyEffects(ctx, 'ssh', SSH, read);
   if (hasOption(read, '-R')) expose(ctx, 'ssh -R forwards a port from a remote host to this machine');
   if (ctx.stdinFed) analyzer.flag('upload', 'it uploads data: ssh gets piped input');

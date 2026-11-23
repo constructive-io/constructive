@@ -131,7 +131,12 @@ const rows: Row[] = [
   ['tar -C ~/.ssh -cf out.tar id_ed25519', 'deny', 'deny', 'hard-deny'],
   ['tar -C ~ -C .ssh -cf out.tar id_ed25519', 'deny', 'deny', 'hard-deny'],
   ['git -C ~ -C .ssh status', 'deny', 'deny', 'hard-deny'],
-  ['git -C ~ --git-dir=.ssh status', 'deny', 'deny', 'hard-deny']
+  ['git -C ~ --git-dir=.ssh status', 'deny', 'deny', 'hard-deny'],
+  // 15. ssh as OpenSSH parses it: options go on after the destination, and an -o key ends at whitespace or `=`
+  ["ssh -o $'ProxyCommand\ttouch m' h", 'ask', 'allow', 'shell-dynamic'],
+  ["ssh h -o 'ProxyCommand=touch m'", 'ask', 'allow', 'shell-dynamic'],
+  ["ssh h -o 'ProxyCommand=cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
+  ['ssh h -R 8080:localhost:80', 'ask', 'allow', 'network-exposure']
 ];
 
 describe('hardening: bash per mode', () => {

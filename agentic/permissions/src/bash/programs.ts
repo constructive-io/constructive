@@ -351,13 +351,14 @@ export const SORT: ProgramSpec = sub(
 );
 
 /** ssh's `-o` keys whose value is a command ssh runs on this machine through a shell. */
-const SSH_COMMAND_KEYS = /^\s*(ProxyCommand|LocalCommand|KnownHostsCommand)\s*[= ]/i;
+// OpenSSH ends a key at whitespace or one `=` (with whitespace around it), in any case.
+const SSH_COMMAND_KEYS = /^\s*(ProxyCommand|LocalCommand|KnownHostsCommand)(?:\s*=|\s)/i;
 const SSH_OPTION: OptionSpec = {
   names: ['-o'],
   value: 'required',
   effect: 'runs-program',
   when: SSH_COMMAND_KEYS,
-  shell: /^\s*(?:ProxyCommand|LocalCommand|KnownHostsCommand)\s*[= ]\s*([\s\S]*)$/i
+  shell: /^\s*(?:ProxyCommand|LocalCommand|KnownHostsCommand)(?:\s*=\s*|\s+)([\s\S]*)$/i
 };
 
 /** ssh: `-o ProxyCommand=…` runs a command here, `-F` loads a config file, `-i` reads a key. */
@@ -367,7 +368,8 @@ export const SSH: ProgramSpec = {
   options: [
     SSH_OPTION,
     does('reads-file', 'required', '-i', '-F'),
-    value('-J', '-L', '-R', '-D', '-p', '-l', '-E', '-S', '-W', '-b', '-B', '-c', '-e', '-I', '-m', '-O', '-P', '-Q', '-w')
+    does('writes-file', 'required', '-E'),
+    value('-J', '-L', '-R', '-D', '-p', '-l', '-S', '-W', '-b', '-B', '-c', '-e', '-I', '-m', '-O', '-P', '-Q', '-w')
   ]
 };
 
