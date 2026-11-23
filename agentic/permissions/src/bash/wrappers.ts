@@ -7,7 +7,7 @@
 import * as path from 'node:path';
 
 import type { Analyzer, Arg, Cwd, KnownArg } from './analyze';
-import { knownTexts, leadingOptions, literalArg, textOf } from './args';
+import { generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
 import { isOption, readArgs } from './options';
 import { ENV } from './programs';
@@ -95,6 +95,83 @@ function runnerOptions(args: Arg[], from: number): { call: Arg | null | undefine
   return { call: call ? (call.value ?? null) : undefined, next: from + next };
 }
 
+/** One escape `env -S` reads after a backslash, or `null` for one env refuses. `\_` is a space only in double quotes; outside them the caller splits on it. */
+function envEscape(c: string | undefined, quoted: boolean): string | null {
+  const simple: Readonly<Record<string, string>> = { f: '\f', n: '\n', r: '\r', t: '\t', v: '\v', '#': '#', $: '$', '"': '"', "'": "'", '\\': '\\' };
+  if (c === '_' && quoted) return ' ';
+  return c !== undefined && c in simple ? simple[c] : null;
+}
+
+/**
+ * The words `env -S` splits its string into, as GNU and BSD env do: blanks
+ * and an unquoted `\_` separate them, quotes group, an unquoted `#` at the
+ * start of a word starts a comment, and `\c` ends the string. `null` for a
+ * `$`, which env expands from its environment, or a string env refuses.
+ */
+export function envSplit(text: string): string[] | null {
+  const words: string[] = [];
+  let word: string | null = null;
+  const end = () => {
+    if (word !== null) words.push(word);
+    word = null;
+  };
+  let i = 0;
+  while (i < text.length) {
+    const c = text[i];
+    if (/[ \t\n\v\f\r]/.test(c)) {
+      end();
+      i++;
+    } else if (c === '#' && word === null) {
+      break;
+    } else if (c === '$') {
+      return null;
+    } else if (c === '\\') {
+      if (text[i + 1] === 'c') break;
+      if (text[i + 1] === '_') {
+        end();
+        i += 2;
+        continue;
+      }
+      const e = envEscape(text[i + 1], false);
+      if (e === null) return null;
+      word = (word ?? '') + e;
+      i += 2;
+    } else if (c === "'" || c === '"') {
+      word ??= '';
+      i++;
+      while (text[i] !== c) {
+        const d = text[i];
+        if (d === undefined || (c === '"' && d === '$')) return null;
+        if (d !== '\\') {
+          word += d;
+          i++;
+        } else if (c === "'") {
+          // In single quotes only `\'` and `\\` are escapes.
+          const quoted = text[i + 1] === "'" || text[i + 1] === '\\';
+          word += quoted ? text[i + 1] : '\\';
+          i += quoted ? 2 : 1;
+        } else {
+          const e = envEscape(text[i + 1], true);
+          if (e === null) return null;
+          word += e;
+          i += 2;
+        }
+      }
+      i++;
+    } else {
+      word = (word ?? '') + c;
+      i++;
+    }
+  }
+  end();
+  return words;
+}
+
+/** The command line `sudo -s` and `sudo -i` give the shell: each word with every character but a letter, digit, `_`, `-` or `$` escaped by a backslash. */
+function sudoShellLine(words: readonly string[]): string {
+  return words.map((w) => w.replace(/[^A-Za-z0-9_$-]/g, (c) => `\\${c}`)).join(' ');
+}
+
 /** A runner's `-c` string: analyzed as a nested command, or dynamic when it is not known. */
 function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
   if (!call || call.kind === 'unknown') analyzer.dynamic(`it runs ${what} with a string from a variable`);
@@ -103,9 +180,10 @@ function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
 
 /**
  * Take one wrapper off the front of the command. Returns the index of the
- * next word, or `i` when `args[i]` is not a wrapper.
+ * next word, `i` when `args[i]` is not a wrapper, or the words the command
+ * runs from here when the wrapper builds new ones (`env -S`).
  */
-export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: WrapperScope): number {
+export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: WrapperScope): number | { argv: Arg[] } {
   const program = textOf(args[i]);
   if (program === undefined) return i;
   const name = path.basename(program);
@@ -151,9 +229,14 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     const read = readArgs(ENV, rest);
     for (const option of read.options) {
       if (isOption(option, '-S', '--split-string')) {
-        const words = knownTexts([option.value, ...rest.slice(read.next)].filter((a): a is Arg => a !== undefined));
-        if (words === null) analyzer.dynamic('it runs env -S with a string from a variable');
-        else analyzer.nested(words.join(' '), 'it runs a string with env -S');
+        // env reads the split words, and the words after the option, as its arguments again.
+        const at = rest.indexOf(option.arg);
+        const after = rest.slice(option.value !== undefined && option.value === rest[at + 1] ? at + 2 : at + 1);
+        const text = textOf(option.value);
+        const words = text === undefined ? null : envSplit(text);
+        if (words !== null) return { argv: [args[i], ...words.map((w) => literalArg(w, option.arg.raw)), ...after] };
+        analyzer.dynamic(`it runs env -S ${option.value?.raw ?? ''}, a string the analysis cannot split`.trimEnd());
+        generic({ analyzer, stdinFed: false, xargs: false }, after);
         return args.length;
       }
       if (isOption(option, '-C', '--chdir')) {
@@ -177,7 +260,7 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     if (shellFlag && k < args.length) {
       const words = knownTexts(args.slice(k));
       if (words === null) analyzer.dynamic(`it runs a shell with ${name} -s on words from a variable`);
-      else analyzer.nested(words.join(' '), `it runs a shell with ${name} -s`);
+      else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`);
       return args.length;
     }
     return k;

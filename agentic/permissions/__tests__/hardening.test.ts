@@ -183,7 +183,12 @@ const rows: Row[] = [
   ['REPLY=src/config.ts; read -r <<< ~/.ssh/id_ed25519; cat "$REPLY"', 'ask', 'ask', 'unresolvable-path'],
   ['X=; Y=${X:=~/.ssh/id_ed25519}; cat $X', 'deny', 'deny', 'hard-deny'],
   ['unset X; : ${X=~/.ssh/id_ed25519}; cat $X', 'deny', 'deny', 'hard-deny'],
-  ['D=src; for D in .ssh; do cat ~/$D/id_ed25519; done', 'ask', 'ask', 'unresolvable-path']
+  ['D=src; for D in .ssh; do cat ~/$D/id_ed25519; done', 'ask', 'ask', 'unresolvable-path'],
+  // 21. `env -S` splits its value by env's own rules and keeps the words after it; `sudo -s` escapes each word for the shell, as sudo does
+  ["env -S 'cat' '#' ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ['env -S "cat -n" src/config.ts', 'allow', 'allow'],
+  ['env -S "$X" ~/.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ["sudo -s cat '#' ~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {

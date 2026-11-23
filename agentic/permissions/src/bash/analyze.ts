@@ -679,7 +679,8 @@ class Analyzer implements ExpansionScope {
     }
   }
 
-  private run(args: Arg[], stdinFed: boolean, scope: WrapperScope): Run | null {
+  private run(words: Arg[], stdinFed: boolean, scope: WrapperScope): Run | null {
+    let args = words;
     let i = 0;
     while (i < args.length) {
       const arg = args[i];
@@ -708,8 +709,14 @@ class Analyzer implements ExpansionScope {
       }
       if (arg.raw === 'case') return null;
       const next = stripWrapper(this, args, i, scope);
-      if (next === i) break;
-      i = next;
+      if (typeof next !== 'number') {
+        args = next.argv;
+        i = 0;
+      } else if (next === i) {
+        break;
+      } else {
+        i = next;
+      }
     }
     if (i >= args.length) return null;
 
