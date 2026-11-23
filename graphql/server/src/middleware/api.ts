@@ -16,7 +16,7 @@ import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
 import { generationOf } from './cache-generation';
-import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool } from './routing';
+import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool, validateApiRoles } from './routing';
 
 const log = new Logger('api');
 
@@ -255,8 +255,8 @@ const createAdminStructure = (
   databaseId?: string
 ): ApiStructure => ({
   tenantPool: servedDatabasePool(opts),
-  anonRole: 'anonymous',
-  roleName: 'authenticated',
+  anonRole: requireApiRole('anon_role', opts.api?.anonRole, undefined),
+  roleName: requireApiRole('role_name', opts.api?.roleName, undefined),
   schema: schemas,
   domains: [],
   databaseId,
@@ -473,6 +473,15 @@ const resolveApiConfig = async (
   // Cache successful results
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
+    try {
+      await validateApiRoles(result.tenantPool, result);
+    } catch (error) {
+      if (generationOf(cacheKey) === startedUnder) throw error;
+    }
+    if (generationOf(cacheKey) !== startedUnder) {
+      if (retries === 0) throw new Error('API configuration kept changing during resolution');
+      return resolveApiConfig(opts, req, retries - 1);
+    }
     svcCache.set(cacheKey, result);
   }
 
@@ -517,6 +526,12 @@ export const createApiMiddleware = (opts: ApiOptions) => {
 
       if (err.code === 'MISSING_API_ROLE') {
         log.error('[api-middleware] resolved API row has no served role:', err.message);
+        res.status(500).send(errorPage50x);
+        return;
+      }
+
+      if (err.code === 'API_ROLE_FORBIDDEN') {
+        log.error('[api-middleware] API_ROLE_FORBIDDEN:', err.message);
         res.status(500).send(errorPage50x);
         return;
       }

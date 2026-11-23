@@ -16,7 +16,7 @@ import { getPgPool } from 'pg-cache';
 
 import type { ApiOptions } from '../../types';
 import { getApiConfig } from '../api';
-import { ResolvedRoute, resolveRoute, routeToApiStructure } from '../routing';
+import { ResolvedRoute, resolveRoute, routeToApiStructure, validateApiRoles } from '../routing';
 
 const mockGetPgPool = getPgPool as jest.MockedFunction<typeof getPgPool>;
 const SERVED_DATABASE = 'constructive';
@@ -144,14 +144,19 @@ describe('routeToApiStructure', () => {
   });
 
   it.each(['role_name', 'anon_role'] as const)(
-    'throws API_ROLE_FORBIDDEN when %s is administrator',
-    (column) => {
+    'throws API_ROLE_FORBIDDEN when %s bypasses RLS',
+    async (column) => {
       const route = matchedRoute({
-        resolved_config: { ...(matchedRoute().resolved_config as Record<string, unknown>), [column]: 'administrator' }
+        resolved_config: { ...(matchedRoute().resolved_config as Record<string, unknown>), [column]: 'privileged_role' }
       });
-      expect(() => routeToApiStructure(route, opts)).toThrow(
-        expect.objectContaining({ code: 'API_ROLE_FORBIDDEN', column, apiId: 'api-1' })
+      const query = jest.fn().mockResolvedValue({ rows: [{ rolname: 'privileged_role' }] });
+      await expect(validateApiRoles(createPool(query), routeToApiStructure(route, opts)!)).rejects.toMatchObject(
+        { code: 'API_ROLE_FORBIDDEN', column, apiId: 'api-1' }
       );
+      expect(query).toHaveBeenCalledTimes(1);
+      expect(query).toHaveBeenCalledWith(expect.stringContaining('(rolsuper OR rolbypassrls)'), [
+        expect.arrayContaining(['privileged_role']), routeToApiStructure(route, opts)!.schema
+      ]);
     }
   );
 });
@@ -200,6 +205,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
   it('resolves via resolve_route (host only) as the sole resolver', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('function_resolution.routing_planes()')) return { rows: [ownPlane] };
       if (sql.includes('resolve_route')) return { rows: [matchedRoute()] };
@@ -220,6 +226,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
   it('returns null (no fallback) when resolve_route has no match', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('function_resolution.routing_planes()')) return { rows: [ownPlane] };
       if (sql.includes('resolve_route')) return { rows: [noMatchRoute()] };
@@ -235,6 +242,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
   it('throws ROUTING_PLANE_INCOMPLETE when a database plane names no resolver', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('resolve_route')) return { rows: [noMatchRoute()] };
       if (sql.includes('function_resolution.routing_planes()')) {
@@ -258,6 +266,7 @@ describe('getApiConfig with scoped routing enabled', () => {
 
   it('throws ROUTING_PLANE_INCOMPLETE when a plane names no resolver schema', async () => {
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('function_resolution.routing_planes()')) {
         return { rows: [{ ...ownPlane, resolver_schema_name: null as string | null }] };
@@ -280,6 +289,7 @@ describe('getApiConfig with scoped routing enabled', () => {
       resolver_function_name: 'resolve_route'
     };
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('function_resolution.routing_planes()')) return { rows: [ownPlane, tenantPlane] };
       if (sql.includes('"routing_private".resolve_route')) return { rows: [noMatchRoute()] };
@@ -307,6 +317,7 @@ describe('getApiConfig with scoped routing enabled', () => {
       }
     });
     const query = jest.fn(async (sql: string, params: unknown[]) => {
+      if (sql.includes('FROM pg_roles')) return { rows: [] };
       if (sql.includes('information_schema.schemata')) return schemaValidationRows(params);
       if (sql.includes('function_resolution.routing_planes()')) return { rows: [ownPlane] };
       if (sql.includes('resolve_route')) return { rows: [routeWithoutDbId] };
