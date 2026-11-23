@@ -19,6 +19,9 @@ export const cleanTree = (tree: any): any => {
     stmt_len: noop,
     stmt_location: noop,
     location: noop,
+    arg_location: noop,
+    payload_location: noop,
+    conninfo_location: noop,
   });
 };
 
