@@ -29,7 +29,6 @@ import type {
   ResourcesResolvedRequirementSelect,
   ResourcesResolvedRequirementFilter,
   ResourcesResolvedRequirementOrderBy,
-  CreateResourcesResolvedRequirementInput,
   UpdateResourcesResolvedRequirementInput,
   ResourcesResolvedRequirementPatch,
 } from '../input-types';
@@ -115,33 +114,6 @@ export class ResourcesResolvedRequirementModel {
       }) => ({
         resourcesResolvedRequirement: data.resourcesResolvedRequirements?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends ResourcesResolvedRequirementSelect>(
-    args: CreateArgs<S, CreateResourcesResolvedRequirementInput['resourcesResolvedRequirement']> & {
-      select: S;
-    } & StrictSelect<S, ResourcesResolvedRequirementSelect>
-  ): QueryBuilder<{
-    createResourcesResolvedRequirement: {
-      resourcesResolvedRequirement: InferSelectResult<ResourcesResolvedRequirementWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'ResourcesResolvedRequirement',
-      'createResourcesResolvedRequirement',
-      'resourcesResolvedRequirement',
-      args.select,
-      args.data,
-      'CreateResourcesResolvedRequirementInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'ResourcesResolvedRequirement',
-      fieldName: 'createResourcesResolvedRequirement',
-      document,
-      variables,
     });
   }
 }

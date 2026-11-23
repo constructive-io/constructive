@@ -59,9 +59,12 @@ export function buildPgSettings(input: PgSettingsInput): Record<string, string> 
     settings['jwt.claims.intent'] = token.intent;
   }
 
-  // Principal identity (service accounts / bots)
-  if (token?.principal_id) {
-    settings['jwt.claims.principal_id'] = token.principal_id;
+  // Acting principal: a service account or bot when the credential names one,
+  // otherwise the user. Policies generated over `current_principal_id()` admit
+  // nobody when this claim is absent, so a signed-in user always carries it.
+  const principalId = token?.principal_id || token?.user_id;
+  if (principalId) {
+    settings['jwt.claims.principal_id'] = principalId;
   }
 
   // Database context

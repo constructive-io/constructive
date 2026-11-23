@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.15](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.14...@constructive-io/query-builder@3.18.15) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [3.18.14](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.13...@constructive-io/query-builder@3.18.14) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.13](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.12...@constructive-io/query-builder@3.18.13) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.12](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.11...@constructive-io/query-builder@3.18.12) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.11](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.10...@constructive-io/query-builder@3.18.11) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.10](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.9...@constructive-io/query-builder@3.18.10) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.9](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.8...@constructive-io/query-builder@3.18.9) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [3.18.8](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.7...@constructive-io/query-builder@3.18.8) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.7](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.6...@constructive-io/query-builder@3.18.7) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.6](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.5...@constructive-io/query-builder@3.18.6) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.5](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.4...@constructive-io/query-builder@3.18.5) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.4](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.3...@constructive-io/query-builder@3.18.4) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
+## [3.18.3](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.2...@constructive-io/query-builder@3.18.3) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/query-builder
+
 ## [3.18.2](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.1...@constructive-io/query-builder@3.18.2) (2026-11-01)
 
 **Note:** Version bump only for package @constructive-io/query-builder

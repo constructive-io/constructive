@@ -3,6 +3,160 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.47](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.46...@constructive-io/react@1.21.47) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.46](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.45...@constructive-io/react@1.21.46) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.45](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.44...@constructive-io/react@1.21.45) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.44](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.43...@constructive-io/react@1.21.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.43](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.42...@constructive-io/react@1.21.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.42](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.41...@constructive-io/react@1.21.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.41](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.40...@constructive-io/react@1.21.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.40](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.39...@constructive-io/react@1.21.40) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.39](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.38...@constructive-io/react@1.21.39) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.38](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.37...@constructive-io/react@1.21.38) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.37](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.36...@constructive-io/react@1.21.37) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.36](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.35...@constructive-io/react@1.21.36) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.35](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.34...@constructive-io/react@1.21.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.34](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.33...@constructive-io/react@1.21.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.33](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.32...@constructive-io/react@1.21.33) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.32](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.31...@constructive-io/react@1.21.32) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.31](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.30...@constructive-io/react@1.21.31) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.30](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.29...@constructive-io/react@1.21.30) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.29](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.28...@constructive-io/react@1.21.29) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.28](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.27...@constructive-io/react@1.21.28) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.27](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.26...@constructive-io/react@1.21.27) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
+## [1.21.26](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.25...@constructive-io/react@1.21.26) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.25](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.24...@constructive-io/react@1.21.25) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.24](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.23...@constructive-io/react@1.21.24) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.23](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.22...@constructive-io/react@1.21.23) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.22](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.21...@constructive-io/react@1.21.22) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.21](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.20...@constructive-io/react@1.21.21) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.20](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.19...@constructive-io/react@1.21.20) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.19](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.18...@constructive-io/react@1.21.19) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.18](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.17...@constructive-io/react@1.21.18) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.17](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.16...@constructive-io/react@1.21.17) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.16](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.15...@constructive-io/react@1.21.16) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.15](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.14...@constructive-io/react@1.21.15) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.14](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.13...@constructive-io/react@1.21.14) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.13](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.12...@constructive-io/react@1.21.13) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.12](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.11...@constructive-io/react@1.21.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.11](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.10...@constructive-io/react@1.21.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/react
+
+## [1.21.10](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.9...@constructive-io/react@1.21.10) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/react
+
 ## [1.21.9](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.8...@constructive-io/react@1.21.9) (2026-11-04)
 
 **Note:** Version bump only for package @constructive-io/react

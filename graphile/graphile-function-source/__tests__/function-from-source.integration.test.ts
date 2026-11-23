@@ -24,7 +24,7 @@ const CREATE = `
   mutation ($input: CreateFunctionFromSourceInput!) {
     createFunctionFromSource(input: $input) {
       clientMutationId
-      function { id databaseId schemaId name kind volatility returns arguments apiExposed }
+      function { rowId databaseId schemaId name kind volatility returns arguments apiExposed }
     }
   }
 `;

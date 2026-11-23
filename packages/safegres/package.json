@@ -1,6 +1,6 @@
 {
   "name": "safegres",
-  "version": "1.30.3",
+  "version": "1.30.16",
   "author": "Constructive <developers@constructive.io>",
   "description": "Postgres security and performance auditor: RLS, grants and effective-access analysis plus index and policy-cost checks, scored on two independent axes. One connection, no framework.",
   "main": "index.js",
@@ -59,16 +59,16 @@
   "dependencies": {
     "@inquirerer/utils": "^3.3.13",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/lint": "^18.3.3",
-    "@pgsql/traverse": "^18.8.2",
+    "@pgsql/lint": "^18.3.13",
+    "@pgsql/traverse": "^18.8.11",
     "@pgsql/types": "^18.0.0",
     "confstash": "^0.1.2",
     "inquirerer": "^4.9.4",
-    "libpg-query": "^18.2.0",
+    "libpg-query": "^18.2.5",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",
-    "pgsql-deparser": "^18.4.2",
-    "pgsql-parser": "^18.3.2",
+    "pgsql-deparser": "^18.5.4",
+    "pgsql-parser": "^18.4.4",
     "yanse": "^0.2.2"
   },
   "peerDependencies": {

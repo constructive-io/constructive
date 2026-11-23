@@ -19,7 +19,6 @@ const databaseSettingsSql = `
     enable_aggregates AS resolved_enable_aggregates,
     enable_postgis AS resolved_enable_postgis,
     enable_search AS resolved_enable_search,
-    enable_direct_uploads AS resolved_enable_direct_uploads,
     enable_presigned_uploads AS resolved_enable_presigned_uploads,
     enable_many_to_many AS resolved_enable_many_to_many,
     enable_connection_filter AS resolved_enable_connection_filter,
@@ -37,7 +36,6 @@ interface DatabaseSettingsRow {
   resolved_enable_aggregates: boolean;
   resolved_enable_postgis: boolean;
   resolved_enable_search: boolean;
-  resolved_enable_direct_uploads: boolean;
   resolved_enable_presigned_uploads: boolean;
   resolved_enable_many_to_many: boolean;
   resolved_enable_connection_filter: boolean;
@@ -67,7 +65,6 @@ export const databaseSettingsLoader: ModuleLoader<DatabaseSettings> = createModu
       enableAggregates: row.resolved_enable_aggregates,
       enablePostgis: row.resolved_enable_postgis,
       enableSearch: row.resolved_enable_search,
-      enableDirectUploads: row.resolved_enable_direct_uploads,
       enablePresignedUploads: row.resolved_enable_presigned_uploads,
       enableManyToMany: row.resolved_enable_many_to_many,
       enableConnectionFilter: row.resolved_enable_connection_filter,

@@ -751,6 +751,25 @@ describe('Mutation Operation Matching', () => {
     expect(tables[0].query?.create).toBe('createUser');
   });
 
+  it('leaves create null when the schema exposes no create mutation', () => {
+    const introspection = createIntrospection(
+      [
+        {
+          name: 'User',
+          kind: 'OBJECT',
+          fields: [{ name: 'id', type: nonNull(scalar('UUID')) }],
+        },
+        { name: 'UsersConnection', kind: 'OBJECT', fields: [] },
+      ],
+      [{ name: 'users', type: object('UsersConnection') }],
+      [],
+    );
+
+    const tables = inferTablesFromIntrospection(introspection);
+
+    expect(tables[0].query?.create).toBeNull();
+  });
+
   it('matches update and delete mutations', () => {
     const introspection = createIntrospection(
       [

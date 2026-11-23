@@ -29,6 +29,16 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   let ctx: GetConnectionsResult;
   let wsClient: ReturnType<GetConnectionsResult['ws']['createClient']>;
 
+  async function createRows(ids: string[]) {
+    await ctx.db.query('INSERT INTO realtime_test.items (id, name) SELECT id, id::text FROM unnest($1::uuid[]) AS rows(id)', [ids]);
+    await ctx.db.publish();
+  }
+
+  async function received(events: unknown[], count: number) {
+    for (let i = 0; i < 200 && events.length < count; i++) await delay(25);
+    expect(events).toHaveLength(count);
+  }
+
   beforeAll(async () => {
     ctx = await getConnections(
       {
@@ -47,6 +57,9 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
       await ctx.teardown();
     }
   }, 15000);
+
+  beforeEach(async () => { await ctx.pg.beforeEach(); await ctx.db.beforeEach(); });
+  afterEach(async () => { await ctx.db.afterEach(); await ctx.pg.afterEach(); });
 
   // ─── Direct grafast.subscribe sanity check ─────────────────────────────
 
@@ -73,6 +86,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
   it('establishes a WebSocket connection and receives INSERT events', async () => {
     const testId = randomUUID();
+    await createRows([testId]);
 
     const eventPromise = ctx.ws.nextEvent<{
       onItemChanged: { event: string; rowId: string; overflow: boolean };
@@ -89,6 +103,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
     await delay(300);
     await ctx.notifyChange('items', 'INSERT', [testId]);
+    await ctx.pg.publish();
 
     const data = await eventPromise;
     expect(data).toBeDefined();
@@ -100,51 +115,50 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   // ─── Multiple DML operations ──────────────────────────────────────────
 
   it('delivers UPDATE and DELETE events over WebSocket', async () => {
-    // UPDATE
-    const updateId = randomUUID();
-    const updatePromise = ctx.ws.nextEvent<{
-      onItemChanged: { event: string; overflow: boolean };
-    }>(
-      wsClient,
-      `subscription { onItemChanged { event overflow } }`,
+    const id = randomUUID();
+    await createRows([id]);
+    const { events, unsubscribe } = ctx.ws.collectEvents<{ onItemChanged: { event: string; rowId: string; overflow: boolean } }>(
+      wsClient, 'subscription { onItemChanged { event rowId overflow item { name } } }'
     );
-    await delay(300);
-    await ctx.notifyChange('items', 'UPDATE', [updateId]);
-    const updateData = await updatePromise;
-    expect(updateData.onItemChanged.event).toBe('UPDATE');
-    expect(updateData.onItemChanged.overflow).toBe(false);
-
-    // DELETE
-    const deleteId = randomUUID();
-    const deletePromise = ctx.ws.nextEvent<{
-      onItemChanged: { event: string; overflow: boolean };
-    }>(
-      wsClient,
-      `subscription { onItemChanged { event overflow } }`,
-    );
-    await delay(300);
-    await ctx.notifyChange('items', 'DELETE', [deleteId]);
-    const deleteData = await deletePromise;
-    expect(deleteData.onItemChanged.event).toBe('DELETE');
-    expect(deleteData.onItemChanged.overflow).toBe(false);
+    try {
+      await delay(300);
+      await ctx.notifyChange('items', 'UPDATE', [id]);
+      await ctx.pg.publish();
+      await received(events, 1);
+      await ctx.db.query('DELETE FROM realtime_test.items WHERE id = $1', [id]);
+      await ctx.db.publish();
+      await ctx.notifyChange('items', 'DELETE', [id]);
+      await ctx.pg.publish();
+      await received(events, 2);
+      expect(events).toEqual([
+        { onItemChanged: { event: 'UPDATE', rowId: id, overflow: false, item: { name: id } } },
+        { onItemChanged: { event: 'DELETE', rowId: id, overflow: false, item: null } }
+      ]);
+    } finally {
+      unsubscribe();
+    }
   }, 15000);
 
-  // ─── INVALIDATE (overflow) ────────────────────────────────────────────
+  // ─── Authorized overflow ─────────────────────────────────────────────
 
-  it('delivers INVALIDATE (overflow) events via WebSocket', async () => {
-    const eventPromise = ctx.ws.nextEvent<{
-      onItemChanged: { event: string; overflow: boolean };
-    }>(
-      wsClient,
-      `subscription { onItemChanged { event overflow } }`,
+  it('delivers 50 visible events and one id-less overflow for a 61-row batch', async () => {
+    const ids = Array.from({ length: 61 }, () => randomUUID());
+    await createRows(ids);
+    const { events, unsubscribe } = ctx.ws.collectEvents<{ onItemChanged: { event: string; rowId: string | null; overflow: boolean } }>(
+      wsClient, 'subscription { onItemChanged { event rowId overflow item { name } } }'
     );
-
-    await delay(300);
-    await ctx.notifyInvalidate('items');
-
-    const data = await eventPromise;
-    expect(data.onItemChanged.event).toBe('INVALIDATE');
-    expect(data.onItemChanged.overflow).toBe(true);
+    try {
+      await delay(300);
+      await ctx.notifyChange('items', 'INSERT', ids);
+      await ctx.pg.publish();
+      await received(events, 51);
+      expect(events.slice(0, 50)).toEqual(ids.slice(0, 50).map(id => ({
+        onItemChanged: { event: 'INSERT', rowId: id, overflow: false, item: { name: id } }
+      })));
+      expect(events[50]).toEqual({ onItemChanged: { event: 'INSERT', rowId: null, overflow: true, item: null } });
+    } finally {
+      unsubscribe();
+    }
   }, 15000);
 
   // ─── Sparse set filtering ────────────────────────────────────────────
@@ -152,6 +166,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
   it('filters events by ids argument (sparse set) over WebSocket', async () => {
     const watchedId = randomUUID();
     const unwatchedId = randomUUID();
+    await createRows([watchedId, unwatchedId]);
 
     const { events, unsubscribe } = ctx.ws.collectEvents<{
       onItemChanged: { event: string; rowId: string | null; overflow: boolean };
@@ -170,9 +185,11 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     await delay(300);
 
     await ctx.notifyChange('items', 'UPDATE', [unwatchedId]);
+    await ctx.pg.publish();
     await delay(200);
 
     await ctx.notifyChange('items', 'INSERT', [watchedId]);
+    await ctx.pg.publish();
     await delay(500);
 
     unsubscribe();
@@ -190,6 +207,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
   it('delivers events to multiple concurrent WebSocket subscribers', async () => {
     const testId = randomUUID();
+    await createRows([testId]);
 
     const promise1 = ctx.ws.nextEvent<{
       onItemChanged: { event: string };
@@ -208,6 +226,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
     await delay(300);
     await ctx.notifyChange('items', 'INSERT', [testId]);
+    await ctx.pg.publish();
 
     const [data1, data2] = await Promise.all([promise1, promise2]);
 
@@ -221,6 +240,7 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
 
   it('handles raw NOTIFY payloads via WebSocket', async () => {
     const testId = randomUUID();
+    await createRows([testId]);
 
     const eventPromise = ctx.ws.nextEvent<{
       onItemChanged: { event: string; rowId: string; overflow: boolean };
@@ -236,10 +256,12 @@ describe('realtime WebSocket E2E (real graphql-ws over ws)', () => {
     );
 
     await delay(300);
-    await ctx.notify('items', `DELETE:${testId}`);
+    await ctx.notify('items', `UPDATE:${testId}`);
+    await ctx.pg.publish();
 
     const data = await eventPromise;
-    expect(data.onItemChanged.event).toBe('DELETE');
+    expect(data.onItemChanged.event).toBe('UPDATE');
+    expect(data.onItemChanged.rowId).toBe(testId);
     expect(data.onItemChanged.overflow).toBe(false);
   }, 15000);
 });

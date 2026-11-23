@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.9...@pgpmjs/import@0.11.10) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.8...@pgpmjs/import@0.11.9) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.7...@pgpmjs/import@0.11.8) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.6...@pgpmjs/import@0.11.7) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.5...@pgpmjs/import@0.11.6) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.4...@pgpmjs/import@0.11.5) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.3...@pgpmjs/import@0.11.4) (2026-11-14)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.2...@pgpmjs/import@0.11.3) (2026-11-09)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.1...@pgpmjs/import@0.11.2) (2026-11-08)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.0...@pgpmjs/import@0.11.1) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.3...@pgpmjs/import@0.11.0) (2026-11-05)
+
+### Bug Fixes
+
+- **import:** deploy misc/statements last, requiring every schema change ([f903187](https://github.com/constructive-io/constructive/commit/f9031870b86dad82008855896740e46ae90a2a2a))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
+## [0.10.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.2...@pgpmjs/import@0.10.3) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.10.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.1...@pgpmjs/import@0.10.2) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/import
+
 ## [0.10.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.10.0...@pgpmjs/import@0.10.1) (2026-11-01)
 
 **Note:** Version bump only for package @pgpmjs/import
@@ -151,7 +209,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 
 ## 0.1.1 (2026-08-01)
 

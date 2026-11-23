@@ -36,6 +36,11 @@ describe('getEnvVars', () => {
     expect(result.embedding).toBeUndefined();
   });
 
+  it('returns the gateway when AGENTIC_SERVER_URL is set', () => {
+    const result = getEnvVars({ AGENTIC_SERVER_URL: 'http://agentic-server-svc:7777' });
+    expect(result).toEqual({ gateway: { url: 'http://agentic-server-svc:7777' } });
+  });
+
   it('returns both embedding and chat when both are set', () => {
     const result = getEnvVars({
       EMBEDDER_MODEL: 'nomic-embed-text',
@@ -80,6 +85,12 @@ describe('getEnvOptions', () => {
     expect(result.embedding.provider).toBe('ollama');
   });
 
+  it('has no gateway unless AGENTIC_SERVER_URL or an override names one', () => {
+    expect(getEnvOptions({}, {}).gateway).toEqual({});
+    expect(getEnvOptions({}, { AGENTIC_SERVER_URL: 'http://gateway:7777' }).gateway.url).toBe('http://gateway:7777');
+    expect(getEnvOptions({ gateway: { url: 'http://override' } }, { AGENTIC_SERVER_URL: 'http://env' }).gateway.url).toBe('http://override');
+  });
+
   it('chat overrides apply correctly', () => {
     const result = getEnvOptions(
       { chat: { provider: 'anthropic', model: 'claude-4' } },
@@ -102,14 +113,14 @@ describe('getLlmEnvOptions (backward compat)', () => {
       EMBEDDER_PROVIDER: 'openai',
     });
     expect(result.embedding.provider).toBe('openai');
-    expect(result.embedding.model).toBe('nomic-embed-text');
+    expect(result.embedding.model).toBe('embeddinggemma-2:440m');
   });
 });
 
 describe('llmDefaults', () => {
   it('exports default values', () => {
     expect(llmDefaults.embedding.provider).toBe('ollama');
-    expect(llmDefaults.embedding.model).toBe('nomic-embed-text');
+    expect(llmDefaults.embedding.model).toBe('embeddinggemma-2:440m');
     expect(llmDefaults.embedding.baseUrl).toBe('http://localhost:11434');
     expect(llmDefaults.chat.provider).toBe('ollama');
     expect(llmDefaults.chat.model).toBe('llama3');

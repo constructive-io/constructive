@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.17](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.16...graphile-bulk-mutations@1.19.17) (2026-11-23)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.16](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.15...graphile-bulk-mutations@1.19.16) (2026-11-23)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.15](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.14...graphile-bulk-mutations@1.19.15) (2026-11-21)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.14](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.13...graphile-bulk-mutations@1.19.14) (2026-11-21)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.13](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.12...graphile-bulk-mutations@1.19.13) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
+## [1.19.12](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.11...graphile-bulk-mutations@1.19.12) (2026-11-19)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.11](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.10...graphile-bulk-mutations@1.19.11) (2026-11-17)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.10](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.9...graphile-bulk-mutations@1.19.10) (2026-11-14)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.9](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.8...graphile-bulk-mutations@1.19.9) (2026-11-09)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.8](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.7...graphile-bulk-mutations@1.19.8) (2026-11-08)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.7](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.6...graphile-bulk-mutations@1.19.7) (2026-11-06)
+
+### Bug Fixes
+
+- **graphile-test:** validate the document before executing it ([9ea5e41](https://github.com/constructive-io/constructive/commit/9ea5e411d5c451adeafa36b23cbb7dc827c27cee))
+
+## [1.19.6](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.5...graphile-bulk-mutations@1.19.6) (2026-11-05)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.5](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.4...graphile-bulk-mutations@1.19.5) (2026-11-05)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.4](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.3...graphile-bulk-mutations@1.19.4) (2026-11-05)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
+## [1.19.3](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.2...graphile-bulk-mutations@1.19.3) (2026-11-05)
+
+**Note:** Version bump only for package graphile-bulk-mutations
+
 ## [1.19.2](https://github.com/constructive-io/constructive/compare/graphile-bulk-mutations@1.19.1...graphile-bulk-mutations@1.19.2) (2026-11-01)
 
 **Note:** Version bump only for package graphile-bulk-mutations

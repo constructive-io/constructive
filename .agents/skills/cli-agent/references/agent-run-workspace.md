@@ -12,8 +12,8 @@ csdk agent-run-workspace list --where.<field>.<op> <value> --orderBy <values>
 csdk agent-run-workspace list --limit 10 --after <cursor>
 csdk agent-run-workspace find-first --where.<field>.<op> <value>
 csdk agent-run-workspace get --id <UUID>
-csdk agent-run-workspace create --baseBranch <String> --branch <String> --provider <String> --repo <String> --runId <UUID> [--artifacts <JSON>] [--baseCommit <String>] [--clonedAt <Datetime>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--publication <String>] [--repositoryId <UUID>] [--state <String>]
-csdk agent-run-workspace update --id <UUID> [--artifacts <JSON>] [--baseBranch <String>] [--baseCommit <String>] [--branch <String>] [--clonedAt <Datetime>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--provider <String>] [--publication <String>] [--repo <String>] [--repositoryId <UUID>] [--runId <UUID>] [--state <String>]
+csdk agent-run-workspace create --actorId <UUID> --baseBranch <String> --branch <String> --databaseId <UUID> --provider <String> --repo <String> --runId <UUID> --visibility <String> [--artifacts <JSON>] [--baseCommit <String>] [--clonedAt <Datetime>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--publication <String>] [--repositoryId <UUID>] [--state <String>]
+csdk agent-run-workspace update --id <UUID> [--actorId <UUID>] [--artifacts <JSON>] [--baseBranch <String>] [--baseCommit <String>] [--branch <String>] [--clonedAt <Datetime>] [--databaseId <UUID>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--provider <String>] [--publication <String>] [--repo <String>] [--repositoryId <UUID>] [--runId <UUID>] [--state <String>] [--visibility <String>]
 csdk agent-run-workspace delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk agent-run-workspace list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a agentRunWorkspace
 
 ```bash
-csdk agent-run-workspace create --baseBranch <String> --branch <String> --provider <String> --repo <String> --runId <UUID> [--artifacts <JSON>] [--baseCommit <String>] [--clonedAt <Datetime>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--publication <String>] [--repositoryId <UUID>] [--state <String>]
+csdk agent-run-workspace create --actorId <UUID> --baseBranch <String> --branch <String> --databaseId <UUID> --provider <String> --repo <String> --runId <UUID> --visibility <String> [--artifacts <JSON>] [--baseCommit <String>] [--clonedAt <Datetime>] [--headCommit <String>] [--lastUsedAt <Datetime>] [--ordinal <Int>] [--publication <String>] [--repositoryId <UUID>] [--state <String>]
 ```
 
 ### Get a agentRunWorkspace by id

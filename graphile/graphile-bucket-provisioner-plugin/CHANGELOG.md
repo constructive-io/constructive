@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.6](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.5...graphile-bucket-provisioner-plugin@1.19.6) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [1.19.5](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.4...graphile-bucket-provisioner-plugin@1.19.5) (2026-11-23)
+
+**Note:** Version bump only for package graphile-bucket-provisioner-plugin
+
+## [1.19.4](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.3...graphile-bucket-provisioner-plugin@1.19.4) (2026-11-16)
+
+**Note:** Version bump only for package graphile-bucket-provisioner-plugin
+
+## [1.19.3](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.2...graphile-bucket-provisioner-plugin@1.19.3) (2026-11-11)
+
+**Note:** Version bump only for package graphile-bucket-provisioner-plugin
+
+## [1.19.2](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.1...graphile-bucket-provisioner-plugin@1.19.2) (2026-11-10)
+
+**Note:** Version bump only for package graphile-bucket-provisioner-plugin
+
+## [1.19.1](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.19.0...graphile-bucket-provisioner-plugin@1.19.1) (2026-11-09)
+
+**Note:** Version bump only for package graphile-bucket-provisioner-plugin
+
 # [1.19.0](https://github.com/constructive-io/constructive/compare/graphile-bucket-provisioner-plugin@1.18.1...graphile-bucket-provisioner-plugin@1.19.0) (2026-10-17)
 
 ### Bug Fixes

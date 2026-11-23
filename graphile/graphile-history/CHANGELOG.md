@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.16](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.15...graphile-history@1.11.16) (2026-11-23)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.15](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.14...graphile-history@1.11.15) (2026-11-23)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.14](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.13...graphile-history@1.11.14) (2026-11-21)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.13](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.12...graphile-history@1.11.13) (2026-11-21)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.12](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.11...graphile-history@1.11.12) (2026-11-19)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.11](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.10...graphile-history@1.11.11) (2026-11-17)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.10](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.9...graphile-history@1.11.10) (2026-11-14)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.9](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.8...graphile-history@1.11.9) (2026-11-09)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.8](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.7...graphile-history@1.11.8) (2026-11-08)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.7](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.6...graphile-history@1.11.7) (2026-11-06)
+
+### Bug Fixes
+
+- **graphile-test:** validate the document before executing it ([9ea5e41](https://github.com/constructive-io/constructive/commit/9ea5e411d5c451adeafa36b23cbb7dc827c27cee))
+
+## [1.11.6](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.5...graphile-history@1.11.6) (2026-11-05)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.5](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.4...graphile-history@1.11.5) (2026-11-05)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.4](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.3...graphile-history@1.11.4) (2026-11-05)
+
+**Note:** Version bump only for package graphile-history
+
+## [1.11.3](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.2...graphile-history@1.11.3) (2026-11-05)
+
+**Note:** Version bump only for package graphile-history
+
 ## [1.11.2](https://github.com/constructive-io/constructive/compare/graphile-history@1.11.1...graphile-history@1.11.2) (2026-11-01)
 
 **Note:** Version bump only for package graphile-history

@@ -14,14 +14,15 @@
 
 <p align="center"><strong>Safe <em>and</em> fast Postgres. Graded.</strong></p>
 
-safegres is a static analyzer for a live PostgreSQL database. It reads the system catalog and
-parses every policy predicate and function body into an AST, then answers two questions the
-catalog already contains the answers to — *who can actually reach this row*, and *what does
-checking that cost per row* — and scores them on **two independent axes**.
+## Agent skill
 
-Two scores, never mixed. Hardening a table can't show up as a performance regression; adding an
-index can't show up as a security win. That is the whole design: the trade you make between them
-becomes visible instead of netting out to a single number.
+The fastest start: give your coding agent the safegres skill and ask it to audit your database.
+
+```bash
+npx skills add constructive-io/constructive --skill safegres
+```
+
+## Install
 
 ```bash
 npm i -D safegres
@@ -79,6 +80,15 @@ Also available as `--format json`, `json-pretty`, `markdown` (job summaries and 
 `sarif` (GitHub code scanning).
 
 ## How it works
+
+safegres is a static analyzer for a live PostgreSQL database. It reads the system catalog and
+parses every policy predicate and function body into an AST, then answers two questions the
+catalog already contains the answers to — *who can actually reach this row*, and *what does
+checking that cost per row* — and scores them on **two independent axes**.
+
+Two scores, never mixed. Hardening a table can't show up as a performance regression; adding an
+index can't show up as a security win. That is the whole design: the trade you make between them
+becomes visible instead of netting out to a single number.
 
 Three analyses over three different representations. None of them run your queries.
 

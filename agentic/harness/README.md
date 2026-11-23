@@ -100,4 +100,3 @@ The same harness powers multiple hosts:
 
 - [`@agentic-kit/cli`](https://www.npmjs.com/package/@agentic-kit/cli) — `agent`, a local, secure-by-default coding agent built on this harness.
 - [`agentic-kit`](https://www.npmjs.com/package/agentic-kit) — the umbrella package (chat + agent + harness).
-- Planning: [constructive-planning#1273](https://github.com/constructive-io/constructive-planning/issues/1273), [#1274](https://github.com/constructive-io/constructive-planning/issues/1274), [#1277](https://github.com/constructive-io/constructive-planning/issues/1277).

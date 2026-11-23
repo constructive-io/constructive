@@ -20,6 +20,8 @@
  *   registry.register(identityProvidersLoader);
  */
 
+import { escapeIdentifier } from 'pg';
+
 import type { IdentityProviderConfig, IdentityProvidersModule } from '../types';
 import { createModuleLoader } from './create-loader';
 import type { LoaderContext, ModuleLoader } from './types';
@@ -68,7 +70,7 @@ const buildProvidersQuery = (providers: DiscoveredLocation, secrets: DiscoveredL
     p.client_id,
     CASE
       WHEN p.client_secret_id IS NULL THEN NULL
-      ELSE "${secrets.schema_name}"."${secrets.table_name}_get"(
+      ELSE ${escapeIdentifier(secrets.schema_name)}.${escapeIdentifier(`${secrets.table_name}_get`)}(
         p.slug || '/client-secret',
         uuid_nil()
       )
@@ -88,7 +90,7 @@ const buildProvidersQuery = (providers: DiscoveredLocation, secrets: DiscoveredL
     p.allow_link_by_email,
     p.skip_nonce_check,
     p.pkce_enabled
-  FROM "${providers.schema_name}"."${providers.table_name}" p
+  FROM ${escapeIdentifier(providers.schema_name)}.${escapeIdentifier(providers.table_name)} p
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────

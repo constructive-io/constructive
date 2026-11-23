@@ -5,6 +5,7 @@
  */
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
+export type FileVersion = unknown;
 export interface AppAdminGrant {
   actorId: string | null;
   createdAt: string | null;
@@ -232,6 +233,8 @@ export interface OrgMemberProfile {
   id: string | null;
   membershipId: string | null;
   profilePicture: ConstructiveInternalTypeImage | null;
+  profilePictureUrl: string | null;
+  profilePictureVersions: FileVersion[] | null;
   title: string | null;
   updatedAt: string | null;
 }

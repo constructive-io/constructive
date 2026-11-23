@@ -6,7 +6,7 @@
  *   - Smart tag injection generates subscription fields
  *   - grafast.subscribe() returns an async iterator
  *   - pg_notify payloads flow through to subscription events
- *   - INVALIDATE (overflow) payloads are handled correctly
+ *   - Authorized row batches produce events and id-less overflow
  *   - Sparse set filtering (ids argument) works
  */
 
@@ -94,6 +94,11 @@ describe('notify helpers', () => {
 describe('subscription event flow', () => {
   let ctx: RealtimeTestContext;
 
+  async function createRows(ids: string[]) {
+    await ctx.db.query('INSERT INTO realtime_test.items (id, name) SELECT id, id::text FROM unnest($1::uuid[]) AS rows(id)', [ids]);
+    await ctx.db.publish();
+  }
+
   beforeAll(async () => {
     ctx = await createRealtimeTestContext(
       {
@@ -109,6 +114,9 @@ describe('subscription event flow', () => {
   afterAll(async () => {
     if (ctx) await ctx.teardown();
   });
+
+  beforeEach(async () => { await ctx.pg.beforeEach(); await ctx.db.beforeEach(); });
+  afterEach(async () => { await ctx.db.afterEach(); await ctx.pg.afterEach(); });
 
   it('subscribe() returns an async iterator (not an error result)', async () => {
     const result = await ctx.subscribe(`
@@ -129,6 +137,8 @@ describe('subscription event flow', () => {
   });
 
   it('delivers INSERT event via pg_notify', async () => {
+    const testId = randomUUID();
+    await createRows([testId]);
     const iterator = (await ctx.subscribe(`
       subscription {
         onItemChanged {
@@ -142,8 +152,8 @@ describe('subscription event flow', () => {
     // Small delay to let the pgSubscriber establish the LISTEN
     await new Promise((r) => setTimeout(r, 100));
 
-    const testId = randomUUID();
     await ctx.notifyChange('items', 'INSERT', [testId]);
+    await ctx.pg.publish();
 
     const event = await waitForEvent(iterator, 5000);
     expect(event.data).toBeDefined();
@@ -155,33 +165,42 @@ describe('subscription event flow', () => {
     await iterator.return?.();
   });
 
-  it('delivers INVALIDATE (overflow) event', async () => {
+  it('delivers 50 visible events and one id-less overflow for a 61-row batch', async () => {
+    const ids = Array.from({ length: 61 }, () => randomUUID());
+    await createRows(ids);
     const iterator = (await ctx.subscribe(`
       subscription {
         onItemChanged {
           event
+          rowId
           overflow
+          item { name }
         }
       }
     `)) as AsyncIterableIterator<ExecutionResult>;
 
     await new Promise((r) => setTimeout(r, 100));
 
-    await ctx.notifyInvalidate('items');
-
-    const event = await waitForEvent(iterator, 5000);
-    expect(event.data).toBeDefined();
-
-    const payload = (event.data as any).onItemChanged;
-    expect(payload.event).toBe('INVALIDATE');
-    expect(payload.overflow).toBe(true);
-
-    await iterator.return?.();
+    try {
+      await ctx.notifyChange('items', 'INSERT', ids);
+      await ctx.pg.publish();
+      for (const id of ids.slice(0, 50)) {
+        const event = await waitForEvent(iterator, 5000);
+        expect(event.errors).toBeUndefined();
+        expect((event.data as any).onItemChanged).toEqual({ event: 'INSERT', rowId: id, overflow: false, item: { name: id } });
+      }
+      const event = await waitForEvent(iterator, 5000);
+      expect(event.errors).toBeUndefined();
+      expect((event.data as any).onItemChanged).toEqual({ event: 'INSERT', rowId: null, overflow: true, item: null });
+    } finally {
+      await iterator.return?.();
+    }
   });
 
   it('sparse set: delivers only matching row IDs', async () => {
     const watchedId = randomUUID();
     const unwatchedId = randomUUID();
+    await createRows([watchedId, unwatchedId]);
 
     const iterator = (await ctx.subscribe(
       `subscription($ids: [UUID!]) {
@@ -198,9 +217,11 @@ describe('subscription event flow', () => {
 
     // Fire a NOTIFY for the unwatched ID — should be filtered out
     await ctx.notifyChange('items', 'UPDATE', [unwatchedId]);
+    await ctx.pg.publish();
 
     // Fire a NOTIFY for the watched ID — should be delivered
     await ctx.notifyChange('items', 'UPDATE', [watchedId]);
+    await ctx.pg.publish();
 
     const event = await waitForEvent(iterator, 5000);
     expect(event.data).toBeDefined();

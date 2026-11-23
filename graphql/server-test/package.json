@@ -1,6 +1,6 @@
 {
   "name": "graphql-server-test",
-  "version": "3.36.3",
+  "version": "3.43.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
   "main": "index.js",
@@ -25,7 +25,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
@@ -39,12 +39,20 @@
     "@types/express": "^5.0.6",
     "@types/pg": "^8.20.4",
     "@types/supertest": "^7.2.1",
+    "@types/ws": "^8.18.1",
+    "agentic-server": "workspace:^",
     "appstash": "^0.8.0",
     "gql-ast": "workspace:^",
+    "grafast": "1.1.2",
     "graphile-cache": "workspace:^",
+    "graphile-llm": "workspace:^",
+    "graphile-utils": "5.0.3",
+    "graphql-ws": "^6.0.8",
     "inquirerer": "^4.9.4",
     "makage": "^0.8.0",
-    "nested-obj": "^0.2.3"
+    "nested-obj": "^0.2.3",
+    "postgraphile": "5.1.4",
+    "ws": "^8.21.3"
   },
   "dependencies": {
     "@constructive-io/express-context": "workspace:^",

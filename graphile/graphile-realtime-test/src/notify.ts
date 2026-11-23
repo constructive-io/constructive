@@ -1,10 +1,11 @@
+import { realtimeChannel } from 'graphile-realtime-subscriptions';
 import type { Client } from 'pg';
 
 /**
  * Fire a pg_notify on the realtime channel for a given schema.table.
  *
  * The channel format matches what emit_change uses:
- *   `realtime:<schema>.<table>`
+ *   `realtime:` plus the hash of the length-framed schema and table names.
  *
  * @param client - A pg Client (or PoolClient) to run the NOTIFY on
  * @param schema - The PostgreSQL schema name (e.g. 'public')
@@ -17,7 +18,7 @@ export async function notify(
   table: string,
   payload: string
 ): Promise<void> {
-  const channel = `realtime:${schema}.${table}`;
+  const channel = realtimeChannel(schema, table);
   await client.query(`SELECT pg_notify($1, $2)`, [channel, payload]);
 }
 
@@ -39,7 +40,7 @@ export function buildPayload(
 }
 
 /**
- * Build an INVALIDATE (overflow) payload.
+ * Build a legacy INVALIDATE payload for protocol rejection tests.
  */
 export function buildInvalidatePayload(): string {
   return 'INVALIDATE';
@@ -65,7 +66,7 @@ export async function notifyChange(
 }
 
 /**
- * Convenience: fire an INVALIDATE NOTIFY for a table.
+ * Fire a legacy INVALIDATE NOTIFY for protocol rejection tests.
  */
 export async function notifyInvalidate(
   client: Client,

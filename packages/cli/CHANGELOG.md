@@ -3,6 +3,162 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.23.49](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.48...@constructive-io/cli@8.23.49) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.48](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.47...@constructive-io/cli@8.23.48) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.47](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.46...@constructive-io/cli@8.23.47) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.46](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.45...@constructive-io/cli@8.23.46) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.45](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.44...@constructive-io/cli@8.23.45) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.44](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.43...@constructive-io/cli@8.23.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.43](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.42...@constructive-io/cli@8.23.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.42](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.41...@constructive-io/cli@8.23.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.41](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.40...@constructive-io/cli@8.23.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.40](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.39...@constructive-io/cli@8.23.40) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.39](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.38...@constructive-io/cli@8.23.39) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.38](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.37...@constructive-io/cli@8.23.38) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.37](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.36...@constructive-io/cli@8.23.37) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.36](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.35...@constructive-io/cli@8.23.36) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.35](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.34...@constructive-io/cli@8.23.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.34](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.33...@constructive-io/cli@8.23.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.33](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.32...@constructive-io/cli@8.23.33) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.32](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.31...@constructive-io/cli@8.23.32) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.31](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.30...@constructive-io/cli@8.23.31) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.30](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.29...@constructive-io/cli@8.23.30) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.29](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.28...@constructive-io/cli@8.23.29) (2026-11-12)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.28](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.27...@constructive-io/cli@8.23.28) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.27](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.26...@constructive-io/cli@8.23.27) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.26](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.25...@constructive-io/cli@8.23.26) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.25](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.24...@constructive-io/cli@8.23.25) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.24](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.23...@constructive-io/cli@8.23.24) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.23](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.22...@constructive-io/cli@8.23.23) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.22](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.21...@constructive-io/cli@8.23.22) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.21](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.20...@constructive-io/cli@8.23.21) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.20](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.19...@constructive-io/cli@8.23.20) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.19](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.18...@constructive-io/cli@8.23.19) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.18](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.17...@constructive-io/cli@8.23.18) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.17](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.16...@constructive-io/cli@8.23.17) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.16](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.15...@constructive-io/cli@8.23.16) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.15](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.14...@constructive-io/cli@8.23.15) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.14](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.13...@constructive-io/cli@8.23.14) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.13](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.12...@constructive-io/cli@8.23.13) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.12](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.11...@constructive-io/cli@8.23.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/cli
+
+## [8.23.11](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.10...@constructive-io/cli@8.23.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/cli
+
 ## [8.23.10](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.9...@constructive-io/cli@8.23.10) (2026-11-04)
 
 **Note:** Version bump only for package @constructive-io/cli

@@ -16,7 +16,7 @@ import type {
   Table,
   TypeRegistry,
 } from '../../types/schema';
-import { scalarToFilterType, scalarToTsType } from './scalars';
+import { SCALAR_NAMES, scalarToFilterType, scalarToTsType } from './scalars';
 
 // Re-export string manipulation helpers from inflekt (single source of truth)
 export { lcFirst, toCamelCase, toConstantCase, toPascalCase, ucFirst };  
@@ -187,6 +187,22 @@ export function getSingleRowQueryName(table: Table): string {
   return (
     table.query?.one || table.inflection?.tableFieldName || lcFirst(table.name)
   );
+}
+
+/**
+ * Whether the schema exposes a create mutation for the table
+ */
+export function hasCreateMutation(table: Table): boolean {
+  return table.query?.create !== null;
+}
+
+/** Bulk create/upsert take `Create<Table>Input`, so a table without create has neither. */
+export function getBulkInsertMutationName(table: Table): string | null {
+  return hasCreateMutation(table) ? table.query?.bulkInsert ?? null : null;
+}
+
+export function getBulkUpsertMutationName(table: Table): string | null {
+  return hasCreateMutation(table) ? table.query?.bulkUpsert ?? null : null;
 }
 
 /**
@@ -450,28 +466,79 @@ export function resolveInnerInputType(
 }
 
 /**
- * Get the set of field names that actually exist in the create input type.
- * Fields not in this set (e.g. computed fields like searchTsvRank, hashUuid)
- * are plugin-added computed fields that don't correspond to real database columns.
- * Returns null when no typeRegistry is provided (caller should treat as "no filtering").
+ * Field names of the create input type (`CreateXInput.x`), or null when the
+ * schema has no such type (no create mutation) or no typeRegistry is given.
  */
-export function getWritableFieldNames(
+export function getCreateInputFieldNames(
   table: Table,
   typeRegistry?: TypeRegistry,
 ): Set<string> | null {
   if (!typeRegistry) return null;
-
-  const createInputTypeName = getCreateInputTypeName(table);
-  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
+  const resolved = resolveInnerInputType(getCreateInputTypeName(table), typeRegistry);
   return resolved?.fields ?? null;
 }
 
 /**
+ * Field names of the patch input type (`XPatch`), or null when the schema has
+ * no such type (no update mutation) or no typeRegistry is given.
+ */
+export function getPatchFieldNames(
+  table: Table,
+  typeRegistry?: TypeRegistry,
+): Set<string> | null {
+  if (!typeRegistry) return null;
+  const patchType = typeRegistry.get(getPatchTypeName(table));
+  if (patchType?.kind !== 'INPUT_OBJECT' || !patchType.inputFields) return null;
+  return new Set(patchType.inputFields.map((f) => f.name));
+}
+
+/**
+ * Get the set of field names the schema accepts as input for a table.
+ * - `'create'`: fields of the create input type
+ * - `'update'`: fields of the patch type
+ * - omitted: fields of either (the table's columns, as far as its inputs show)
+ * Fields outside this set (e.g. searchTsvRank, downloadUrl) are computed fields
+ * that exist on the entity type but cannot be written.
+ * Returns null when the schema has no matching input type or no typeRegistry
+ * is provided (caller should treat as "no filtering").
+ */
+export function getWritableFieldNames(
+  table: Table,
+  typeRegistry?: TypeRegistry,
+  operation?: 'create' | 'update',
+): Set<string> | null {
+  if (operation === 'create') return getCreateInputFieldNames(table, typeRegistry);
+  if (operation === 'update') return getPatchFieldNames(table, typeRegistry);
+
+  const createFields = getCreateInputFieldNames(table, typeRegistry);
+  const patchFields = getPatchFieldNames(table, typeRegistry);
+  if (!createFields && !patchFields) return null;
+  return new Set([...(createFields ?? []), ...(patchFields ?? [])]);
+}
+
+/**
+ * Whether a field can be selected as a bare `field: true`.
+ * A field that takes arguments needs `{ args }`, and a field returning an
+ * object type needs a sub-selection, so neither qualifies.
+ */
+export function isPlainSelectableField(
+  field: Field,
+  typeRegistry?: TypeRegistry,
+): boolean {
+  if (field.args && field.args.length > 0) return false;
+  const gqlType = field.type.gqlType.replace(/[![\]]/g, '');
+  // Types mapped to a TS scalar (e.g. Interval -> string) are selected as scalars
+  if (SCALAR_NAMES.has(gqlType)) return true;
+  return typeRegistry?.get(gqlType)?.kind !== 'OBJECT';
+}
+
+/**
  * Get scalar fields that represent actual database columns (not computed/plugin-added).
- * When a TypeRegistry is provided, filters out fields that don't exist in the
- * create input type — these are computed fields added by plugins (e.g. search scores,
- * hash UUIDs) that aren't real columns and shouldn't appear in default selections.
- * Without a TypeRegistry, falls back to all scalar fields.
+ * When a TypeRegistry is provided, filters out fields that are in neither the
+ * create input nor the patch type — these are computed fields added by plugins
+ * (e.g. search scores, file URLs) that aren't real columns and shouldn't appear
+ * in default selections. Fields that cannot be selected as `field: true` are
+ * always left out.
  */
 export function getSelectableScalarFields(
   table: Table,
@@ -479,7 +546,9 @@ export function getSelectableScalarFields(
 ): Field[] {
   const writableFields = getWritableFieldNames(table, typeRegistry);
   return getScalarFields(table).filter(
-    (f) => writableFields === null || writableFields.has(f.name),
+    (f) =>
+      isPlainSelectableField(f, typeRegistry) &&
+      (writableFields === null || writableFields.has(f.name)),
   );
 }
 

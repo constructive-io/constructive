@@ -70,10 +70,32 @@ Runs an Express server that wires CORS, uploads, domain parsing, auth, and PostG
 - Automatic GraphQL API generation from PostgreSQL schemas
 - RLS-aware authentication and per-request `pgSettings`
 - Meta-schema routing by domain + subdomain
-- File uploads via `graphql-upload`
 - GraphiQL and health check endpoints
 - Schema cache flush via `/flush` or database notifications
 - Opt-in observability for memory, DB activity, and Graphile build debugging
+
+## Schema notification recovery
+
+`GraphQLServer()` starts a dedicated `LISTEN "schema:update"` session. When
+embedding `Server` directly, call `addEventListener()` once; repeated calls
+coalesce. Close it with `await server.close()` during shutdown.
+
+The listener reconnects after connection errors, connection end, or a stalled
+query. It probes the held session every 30 seconds, gives LISTEN and each probe
+5 seconds to finish, and retries connections after 5 seconds. Failed sessions
+are destroyed instead of returned to the query pool. Shutdown cancels retries
+and does not wait for an unresponsive session to acknowledge UNLISTEN.
+
+After LISTEN succeeds, the process invalidates all routing, GraphQL handler,
+and storage discovery caches. PostgreSQL does not replay notifications missed
+while disconnected. In-flight lookups and handler builds from before the
+invalidation cannot repopulate those caches; affected requests resolve again.
+Recovery can therefore cause a temporary burst of schema rebuilds.
+
+A `connected and listening for changes; invalidated all services` log confirms
+successful subscription and invalidation. Subsequent `schema:update` messages
+use the normal per-database flush. If that flush fails, all caches are
+invalidated conservatively and the failure is logged.
 
 ## Observability
 
@@ -101,7 +123,6 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 - `GET /healthz` -> health check
 - `GET /graphiql` -> GraphiQL UI
 - `GET /graphql` / `POST /graphql` -> GraphQL endpoint
-- `POST /graphql` (multipart) -> file uploads
 - `POST /flush` -> clears cached Graphile schema for the current API; mounted only when `API_FLUSH_TOKEN` is set, and requires `Authorization: Bearer $API_FLUSH_TOKEN`. Without the variable the route is not served (404) — operators deploying a schema-cache flush must set it on the server and on every caller. The `LISTEN/NOTIFY` invalidation path is unaffected.
 - `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
 - `GET /debug/db` -> PostgreSQL activity/locks/pool debug snapshot when observability is enabled

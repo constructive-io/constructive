@@ -13,8 +13,10 @@ import type { PgCodec } from './types';
  * output type isn't in the schema exposes nothing.
  *
  * Without a final schema (registry-only builds) every column counts, with a
- * null type name. Everything `_meta` adds about columns goes through this, so
- * a column hidden from the API contributes nothing anywhere.
+ * null type name. A table's `fields` (with the facts set on them) and junction
+ * detection go through this, so a hidden column contributes nothing there. The
+ * key lists of indexes, constraints and relations name their columns as they
+ * are (see the README's form and grid metadata).
  */
 export function exposedColumns(
   codec: PgCodec,

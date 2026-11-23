@@ -13,11 +13,14 @@ import {
   CHANGE_GRANULARITIES,
   ChangeGranularity,
   diffChangeSets,
+  DiffPolicyError,
   EXPORT_GRANULARITIES,
   ExportGranularity,
   isChangeGranularity,
   isExportGranularity,
   loadModule,
+  parseRenameDeclaration,
+  RenameDeclaration,
   SemanticDiffResult,
   SemanticObjectDiff,
   withoutColumnOrder,
@@ -66,9 +69,10 @@ Options:
                            requires) into <dir>/<pkg>
   --emit-module <dir>      Alias of --emit-migration
   --append-module <dir>    Append the delta into an EXISTING pgpm module at
-                           <dir> (new changes only; existing changes, scripts,
-                           and .control are left untouched). Standalone: not
-                           combinable with --emit-*/--verify.
+                           <dir>: existing changes, scripts and .control are
+                           left untouched; a change reworking an existing name
+                           is appended as <name>-N. Standalone: not combinable
+                           with --emit-*/--verify.
   --emit-sql <file|->      Also project the delta to a single consolidated SQL
                            file (deparsed in plan order); - writes to stdout
   --emit-bundle <file>     Also project the delta to a content-addressed
@@ -90,6 +94,19 @@ Options:
                            Change-level distribution for emitted changes:
                            alteration | object | single (default: object)
   --naming <style>         Change path naming style: directory | flat (default: directory)
+  --rename <from>=<to>     Declare a rename (repeatable) so the delta emits
+                           ALTER .. RENAME instead of DROP + ADD:
+                           schema.table=schema.table or
+                           schema.table.column=schema.table.column.
+                           Renames are never inferred.
+  --using <col>=<expr>     USING expression for a column type change
+                           (schema.table.column=<expr>; default <column>::<newtype>)
+  --allow-data-loss        Accept steps that can lose data (DROP TABLE/COLUMN/
+                           SCHEMA/SEQUENCE, column type changes, replaced types).
+                           Without it the diff fails and lists them.
+  --allow-incomplete       Accept steps whose DROP or inverse pgpm cannot
+                           derive; they are emitted with a "-- pgpm:" marker
+                           and reported. Without it the diff fails and lists them.
   --json                   Machine-readable output
   --verify                 Oracle mode: deploy A plus the emitted migration into
                            a scratch database and assert catalog equivalence
@@ -131,9 +148,32 @@ const applySide = async (config: PgConfig, side: DiffSide, spec: string, cwd: st
     }
     return;
   }
+  // A .sql / database side is replayed as authored (pg_dump order: functions
+  // before the tables their bodies name), so function bodies are not checked
+  // at creation — exactly what pg_dump's own preamble does.
   const pool = getPgPool(config);
-  const sql = side.changes.map(c => c.deploy).filter(Boolean).join('\n\n');
-  if (sql.trim()) await pool.query(sql);
+  const sql = inDependencyOrder(side.changes).map(c => c.deploy).filter(Boolean).join('\n\n');
+  if (sql.trim()) await pool.query(`SET check_function_bodies = false;\n\n${sql}`);
+};
+
+/** Changes in an order that satisfies their `dependencies`; source order breaks ties. */
+const inDependencyOrder = <T extends { name: string; dependencies?: string[] }>(changes: T[]): T[] => {
+  const byName = new Map(changes.map(c => [c.name, c]));
+  const placed = new Set<string>();
+  const out: T[] = [];
+  const visit = (c: T, trail: Set<string>): void => {
+    if (placed.has(c.name)) return;
+    if (trail.has(c.name)) throw new Error(`pgpm diff: dependency cycle among changes at ${c.name}`);
+    trail.add(c.name);
+    for (const dep of c.dependencies ?? []) {
+      const target = byName.get(dep);
+      if (target) visit(target, trail);
+    }
+    placed.add(c.name);
+    out.push(c);
+  };
+  for (const c of changes) visit(c, new Set());
+  return out;
 };
 
 /**
@@ -252,6 +292,26 @@ export default async (
 
   const cwd = (argv.cwd as string) || process.cwd();
   const json = Boolean(argv.json);
+  const listOf = (value: unknown): string[] =>
+    (Array.isArray(value) ? value : value === undefined ? [] : [value]).map(String).filter(Boolean);
+  const allowDataLoss = Boolean(argv['allow-data-loss'] ?? argv.allowDataLoss);
+  const allowIncomplete = Boolean(argv['allow-incomplete'] ?? argv.allowIncomplete);
+  let renames: RenameDeclaration[] = [];
+  const casts: Record<string, string> = {};
+  try {
+    renames = listOf(argv.rename).map(parseRenameDeclaration);
+    for (const spec of listOf(argv.using)) {
+      const at = spec.indexOf('=');
+      const target = at > 0 ? spec.slice(0, at) : '';
+      const expr = at > 0 ? spec.slice(at + 1) : '';
+      if (!target || !expr || target.split('.').length !== 3) {
+        throw new DiffPolicyError('incomplete', `--using expects schema.table.column=<expression>, got "${spec}"`);
+      }
+      casts[target] = expr;
+    }
+  } catch (err) {
+    await cliExitWithError(err instanceof Error ? err.message : String(err));
+  }
   const verify = Boolean(argv.verify);
   const emitModuleRaw = argv['emit-migration'] ?? argv.emitMigration ?? argv['emit-module'] ?? argv.emitModule;
   const emitModuleDir = typeof emitModuleRaw === 'string' && emitModuleRaw
@@ -284,9 +344,9 @@ export default async (
     await cliExitWithError('--ledger requires side B to be a pgpm workspace or module directory (it needs a plan to classify).');
   }
 
-  if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || verify)) {
+  if (appendModuleDir && (emitModuleDir || emitSql || emitBundle || emitLedgerTarget || verify)) {
     await cliExitWithError(
-      '--append-module is standalone; it cannot be combined with --emit-migration/--emit-module/--emit-sql/--emit-bundle/--verify.'
+      '--append-module is standalone; it cannot be combined with --emit-migration/--emit-module/--emit-sql/--emit-bundle/--emit-ledger/--verify.'
     );
   }
 
@@ -302,7 +362,18 @@ export default async (
     return;
   }
 
-  const result = diffChangeSets(sideA.changes, sideB.changes, { granularity, changeGranularity, style: naming });
+  let result: ReturnType<typeof diffChangeSets>;
+  try {
+    result = diffChangeSets(sideA.changes, sideB.changes, {
+      granularity, changeGranularity, style: naming, renames, casts, allowDataLoss, allowIncomplete
+    });
+  } catch (err) {
+    if (err instanceof DiffPolicyError) {
+      await cliExitWithError(err.message);
+      return;
+    }
+    throw err;
+  }
   const warnings = [
     ...sideA.warnings.map(w => `${sideA.label}: ${w}`),
     ...sideB.warnings.map(w => `${sideB.label}: ${w}`),

@@ -29,7 +29,6 @@ import type {
   OrgGetManagersRecordSelect,
   OrgGetManagersRecordFilter,
   OrgGetManagersRecordsOrderBy,
-  CreateOrgGetManagersRecordInput,
   UpdateOrgGetManagersRecordInput,
   OrgGetManagersRecordPatch,
 } from '../input-types';
@@ -102,33 +101,6 @@ export class OrgGetManagersRecordModel {
       }) => ({
         orgGetManagersRecord: data.orgGetManagers?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends OrgGetManagersRecordSelect>(
-    args: CreateArgs<S, CreateOrgGetManagersRecordInput['orgGetManagersRecord']> & {
-      select: S;
-    } & StrictSelect<S, OrgGetManagersRecordSelect>
-  ): QueryBuilder<{
-    createOrgGetManagersRecord: {
-      orgGetManagersRecord: InferSelectResult<OrgGetManagersRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'OrgGetManagersRecord',
-      'createOrgGetManagersRecord',
-      'orgGetManagersRecord',
-      args.select,
-      args.data,
-      'CreateOrgGetManagersRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'OrgGetManagersRecord',
-      fieldName: 'createOrgGetManagersRecord',
-      document,
-      variables,
     });
   }
 }

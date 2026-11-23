@@ -8,7 +8,6 @@ React Query hooks for PlatformInfraGetAllTreeNodesRecord data operations
 
 ```typescript
 usePlatformInfraGetAllTreeNodesQuery({ selection: { fields: { data: true, path: true } } })
-useCreatePlatformInfraGetAllTreeNodesRecordMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreatePlatformInfraGetAllTreeNodesRecordMutation({ selection: { fields: { id:
 const { data, isLoading } = usePlatformInfraGetAllTreeNodesQuery({
   selection: { fields: { data: true, path: true } },
 });
-```
-
-### Create a platformInfraGetAllTreeNodesRecord
-
-```typescript
-const { mutate } = useCreatePlatformInfraGetAllTreeNodesRecordMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ data: '<JSON>', path: '<String>' });
 ```

@@ -49,17 +49,60 @@ describe('authSettingsLoader', () => {
   it('discovers the settings table for the context database only', async () => {
     const { pool, calls } = fakePool([
       { rows: [{ schema_name: 'tenant_a_auth', table_name: 'auth_settings' }] },
-      { rows: [{ cookie_secure: true, cookie_samesite: 'lax', cookie_path: '/' }] }
+      {
+        rows: [
+          {
+            policy: {
+              cookie_secure: true,
+              cookie_samesite: 'lax',
+              cookie_path: '/',
+              cookie_max_age_seconds: 3600,
+              remember_me_duration_seconds: null
+            }
+          }
+        ]
+      }
     ]);
 
     const settings = await authSettingsLoader.resolve(ctx(pool, 'db-a'));
 
     expect(calls[0].values).toEqual(['db-a']);
-    expect(calls[0].text).toMatch(/WHERE sm\.database_id = \$1/);
+    expect(calls[0].text).toMatch(/FROM function_resolution\.sessions_module_registrations\(\$1\)/);
     // Step 2 reads out of the schema step 1 resolved — which is precisely why
     // step 1 being keyed matters.
-    expect(calls[1].text).toContain('"tenant_a_auth"."auth_settings"');
-    expect(settings).toMatchObject({ cookieSecure: true, cookieSamesite: 'lax' });
+    expect(calls[1].text).toContain('"tenant_a_auth"."auth_settings_request_policy"()');
+    expect(settings).toMatchObject({
+      cookieSecure: true,
+      cookieSamesite: 'lax',
+      cookieMaxAge: '3600',
+      rememberMeDuration: null
+    });
+  });
+
+  it('reads neither the registration nor the settings row with a plain table read', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'tenant_a_auth', table_name: 'auth_settings' }] },
+      { rows: [{ policy: null }] }
+    ]);
+
+    await expect(authSettingsLoader.resolve(ctx(pool))).resolves.toBeUndefined();
+
+    // The server's own connection is held to row-level security, so a plain
+    // read answers no rows and the tenant's settings would silently not load.
+    for (const { text } of calls) {
+      expect(text).not.toMatch(/FROM\s+(metaschema_modules_public|metaschema_public|"tenant_a_auth"\."auth_settings"\s)/);
+    }
+  });
+
+  it('quotes the discovered coordinates as identifiers, never as SQL', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'x"; DROP SCHEMA y; --', table_name: 't" UNION SELECT "1' }] },
+      { rows: [] }
+    ]);
+
+    await authSettingsLoader.resolve(ctx(pool));
+
+    expect(calls[1].text).toContain('SELECT "x""; DROP SCHEMA y; --"."t"" UNION SELECT ""1_request_policy"()');
   });
 
   it('is undefined when the tenant provisions no sessions module', async () => {
@@ -103,13 +146,13 @@ describe('authSurfaceLoader', () => {
     });
   });
 
-  it('joins the companion modules within the same tenant', async () => {
+  it('reads the surface through the login-only reader, never the tables', async () => {
     const { pool, calls } = fakePool([{ rows: [] }]);
     await authSurfaceLoader.resolve(ctx(pool));
-    // A join on schema id alone would pair one tenant's providers with
-    // another's connected accounts and still return a plausible row.
-    expect(calls[0].text).toMatch(/connected\.database_id = providers\.database_id/);
-    expect(calls[0].text).toMatch(/emails\.database_id = providers\.database_id/);
+    // The server's own connection is held to row-level security: a plain read
+    // of the registrations answers no rows and the surface would not load.
+    expect(calls[0].text).toMatch(/FROM function_resolution\.auth_surface_entry\(\$1\)/);
+    expect(calls[0].text).not.toMatch(/metaschema_modules_public|metaschema_public/);
   });
 });
 
@@ -159,6 +202,19 @@ describe('identityProvidersLoader', () => {
       clientSecret: 'shh',
       issuerUrl: 'https://accounts.google.com'
     });
+  });
+
+  it('quotes the discovered coordinates as identifiers, never as SQL', async () => {
+    const { pool, calls } = fakePool([
+      { rows: [{ schema_name: 'p"."x', table_name: 'idp" --' }] },
+      { rows: [{ schema_name: 's"."x', table_name: 'sec"(' }] },
+      { rows: [] }
+    ]);
+
+    await identityProvidersLoader.resolve(ctx(pool));
+
+    expect(calls[2].text).toContain('FROM "p"".""x"."idp"" --" p');
+    expect(calls[2].text).toContain('ELSE "s"".""x"."sec""(_get"(');
   });
 
   it('defaults an unset nonce/PKCE policy to the safe side', async () => {

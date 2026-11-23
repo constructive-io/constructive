@@ -327,6 +327,12 @@ export const registry = {
     http: 401,
     message: 'You must be signed in to do that.'
   }),
+  STRICT_AUTH_UNAVAILABLE: defineError({
+    code: 'STRICT_AUTH_UNAVAILABLE',
+    class: 'internal',
+    http: 503,
+    message: 'Strict authentication is enabled but this API has no strict authentication function, so the request was refused.'
+  }),
   CAPTCHA_REQUIRED: defineError({
     code: 'CAPTCHA_REQUIRED',
     class: 'public',
@@ -368,6 +374,46 @@ export const registry = {
     class: 'public',
     http: 403,
     message: 'Additional verification is required to continue.'
+  }),
+  // Passwordless owner hand-off (planning#2511). Expected refusals from the
+  // platform mutation; the public entries are safe to surface, the two
+  // deployment-state entries are internal on purpose.
+  NOT_DATABASE_OWNER: defineError({
+    code: 'NOT_DATABASE_OWNER',
+    class: 'public',
+    http: 403,
+    message: 'Only the owner of this database can sign in to its app session.'
+  }),
+  OWNER_MISMATCH: defineError({
+    code: 'OWNER_MISMATCH',
+    class: 'public',
+    http: 403,
+    message: 'The identity the platform proved does not belong to this account.'
+  }),
+  TENANT_AUTH_NOT_PROVISIONED: defineError({
+    code: 'TENANT_AUTH_NOT_PROVISIONED',
+    class: 'public',
+    http: 409,
+    message: 'This app database has no sign-in module yet.'
+  }),
+  TENANT_SIGN_IN_FAILED: defineError({
+    code: 'TENANT_SIGN_IN_FAILED',
+    class: 'public',
+    http: 400,
+    message: 'The app database could not sign in this account. Try again.'
+  }),
+  PLATFORM_AUTH_NOT_PROVISIONED: defineError({
+    code: 'PLATFORM_AUTH_NOT_PROVISIONED',
+    class: 'internal',
+    http: 503,
+    message: 'The platform auth realm is not provisioned.'
+  }),
+  TENANT_AUTH_NOT_IN_SERVED_DATABASE: defineError({
+    code: 'TENANT_AUTH_NOT_IN_SERVED_DATABASE',
+    class: 'internal',
+    http: 503,
+    message:
+      'The app database is not served by this server. The deployment must serve both from the same Postgres instance.'
   }),
   MFA_REQUIRED: defineError({
     code: 'MFA_REQUIRED',
@@ -679,11 +725,18 @@ export const registry = {
     message: ({ operation }) =>
       `Cannot perform non-recursive ${operation} on workspace. Use recursive=true or specify a target module.`
   }),
+  /**
+   * One code, two producers. pgpm raises it for a path on disk, with
+   * `{ filePath, type }` — the typed shape here. constructive-db's storage
+   * writers raise the same code for a file row that is gone, with
+   * `{ file_id }` and no path, so the copy must not assume `filePath`.
+   */
   FILE_NOT_FOUND: defineError<{ filePath: string; type?: string }>({
     code: 'FILE_NOT_FOUND',
     class: 'internal',
     http: 404,
-    message: ({ filePath, type }) => `${type ? `${type} file` : 'File'} not found: ${filePath}`
+    message: ({ filePath, type }) =>
+      filePath ? `${type ? `${type} file` : 'File'} not found: ${filePath}` : 'File not found.'
   })
 } as const;
 

@@ -3,6 +3,158 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.47](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.46...@constructive-io/examples-codegen-integration@2.20.47) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.46](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.45...@constructive-io/examples-codegen-integration@2.20.46) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.45](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.44...@constructive-io/examples-codegen-integration@2.20.45) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.44](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.43...@constructive-io/examples-codegen-integration@2.20.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.43](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.42...@constructive-io/examples-codegen-integration@2.20.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.42](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.41...@constructive-io/examples-codegen-integration@2.20.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.41](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.40...@constructive-io/examples-codegen-integration@2.20.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.40](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.39...@constructive-io/examples-codegen-integration@2.20.40) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.39](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.38...@constructive-io/examples-codegen-integration@2.20.39) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.38](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.37...@constructive-io/examples-codegen-integration@2.20.38) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.37](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.36...@constructive-io/examples-codegen-integration@2.20.37) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.36](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.35...@constructive-io/examples-codegen-integration@2.20.36) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.35](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.34...@constructive-io/examples-codegen-integration@2.20.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.34](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.33...@constructive-io/examples-codegen-integration@2.20.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.33](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.32...@constructive-io/examples-codegen-integration@2.20.33) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.32](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.31...@constructive-io/examples-codegen-integration@2.20.32) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.31](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.30...@constructive-io/examples-codegen-integration@2.20.31) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.30](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.29...@constructive-io/examples-codegen-integration@2.20.30) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.29](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.28...@constructive-io/examples-codegen-integration@2.20.29) (2026-11-16)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.28](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.27...@constructive-io/examples-codegen-integration@2.20.28) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.27](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.26...@constructive-io/examples-codegen-integration@2.20.27) (2026-11-12)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.26](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.25...@constructive-io/examples-codegen-integration@2.20.26) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.25](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.24...@constructive-io/examples-codegen-integration@2.20.25) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.24](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.23...@constructive-io/examples-codegen-integration@2.20.24) (2026-11-11)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.23](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.22...@constructive-io/examples-codegen-integration@2.20.23) (2026-11-10)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.22](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.21...@constructive-io/examples-codegen-integration@2.20.22) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.21](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.20...@constructive-io/examples-codegen-integration@2.20.21) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.20](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.19...@constructive-io/examples-codegen-integration@2.20.20) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.19](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.18...@constructive-io/examples-codegen-integration@2.20.19) (2026-11-06)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.18](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.17...@constructive-io/examples-codegen-integration@2.20.18) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.17](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.16...@constructive-io/examples-codegen-integration@2.20.17) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.16](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.15...@constructive-io/examples-codegen-integration@2.20.16) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.15](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.14...@constructive-io/examples-codegen-integration@2.20.15) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.14](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.13...@constructive-io/examples-codegen-integration@2.20.14) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.13](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.12...@constructive-io/examples-codegen-integration@2.20.13) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.12](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.11...@constructive-io/examples-codegen-integration@2.20.12) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.11](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.10...@constructive-io/examples-codegen-integration@2.20.11) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
+## [2.20.10](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.9...@constructive-io/examples-codegen-integration@2.20.10) (2026-11-04)
+
+**Note:** Version bump only for package @constructive-io/examples-codegen-integration
+
 ## [2.20.9](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-codegen-integration@2.20.8...@constructive-io/examples-codegen-integration@2.20.9) (2026-11-04)
 
 **Note:** Version bump only for package @constructive-io/examples-codegen-integration

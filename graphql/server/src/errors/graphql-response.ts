@@ -12,7 +12,7 @@
  */
 
 import type { ConstructiveError } from '@constructive-io/errors';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 /** Transport-level overrides for a short-circuited response. */
 export interface GraphQLErrorResponseInit {
@@ -43,5 +43,31 @@ export function respondWithGraphQLError(
   if (init.headers) res.set(init.headers);
   res.status(init.status ?? 200).json({
     errors: [{ message: error.message, extensions: error.toExtensions() }],
+  });
+}
+
+/**
+ * Send a {@link ConstructiveError} from middleware that runs ahead of every
+ * route, in the shape the route's callers read.
+ *
+ * `/graphql` gets the GraphQL response above, unchanged. Every other path
+ * (`/v1`, `/fn`, `/upload`, `/flush`, ...) is plain HTTP: its callers branch on
+ * the status code, and a 200 carrying a GraphQL error body reads as success.
+ * Those get the error's registered status and the JSON error body the error
+ * handler already answers them with.
+ */
+export function respondWithError(
+  req: Request,
+  res: Response,
+  error: ConstructiveError,
+  init: GraphQLErrorResponseInit = {}
+): void {
+  if (req.path === '/graphql') {
+    respondWithGraphQLError(res, error, init);
+    return;
+  }
+  if (init.headers) res.set(init.headers);
+  res.status(init.status ?? error.http).json({
+    error: { code: error.code, message: error.message, requestId: req.requestId },
   });
 }

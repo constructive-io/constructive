@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.8](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.7...pg-ast@3.15.8) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [3.15.7](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.6...pg-ast@3.15.7) (2026-11-23)
+
+**Note:** Version bump only for package pg-ast
+
+## [3.15.6](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.5...pg-ast@3.15.6) (2026-11-21)
+
+**Note:** Version bump only for package pg-ast
+
+## [3.15.5](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.4...pg-ast@3.15.5) (2026-11-21)
+
+**Note:** Version bump only for package pg-ast
+
+## [3.15.4](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.3...pg-ast@3.15.4) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [3.15.3](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.2...pg-ast@3.15.3) (2026-11-08)
+
+**Note:** Version bump only for package pg-ast
+
+## [3.15.2](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.1...pg-ast@3.15.2) (2026-11-05)
+
+**Note:** Version bump only for package pg-ast
+
 ## [3.15.1](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.0...pg-ast@3.15.1) (2026-11-01)
 
 **Note:** Version bump only for package pg-ast

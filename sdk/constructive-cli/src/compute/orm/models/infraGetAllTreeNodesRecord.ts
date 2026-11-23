@@ -29,7 +29,6 @@ import type {
   InfraGetAllTreeNodesRecordSelect,
   InfraGetAllTreeNodesRecordFilter,
   InfraGetAllTreeNodesRecordsOrderBy,
-  CreateInfraGetAllTreeNodesRecordInput,
   UpdateInfraGetAllTreeNodesRecordInput,
   InfraGetAllTreeNodesRecordPatch,
 } from '../input-types';
@@ -107,33 +106,6 @@ export class InfraGetAllTreeNodesRecordModel {
       }) => ({
         infraGetAllTreeNodesRecord: data.infraGetAllTreeNodes?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends InfraGetAllTreeNodesRecordSelect>(
-    args: CreateArgs<S, CreateInfraGetAllTreeNodesRecordInput['infraGetAllTreeNodesRecord']> & {
-      select: S;
-    } & StrictSelect<S, InfraGetAllTreeNodesRecordSelect>
-  ): QueryBuilder<{
-    createInfraGetAllTreeNodesRecord: {
-      infraGetAllTreeNodesRecord: InferSelectResult<InfraGetAllTreeNodesRecordWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'InfraGetAllTreeNodesRecord',
-      'createInfraGetAllTreeNodesRecord',
-      'infraGetAllTreeNodesRecord',
-      args.select,
-      args.data,
-      'CreateInfraGetAllTreeNodesRecordInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'InfraGetAllTreeNodesRecord',
-      fieldName: 'createInfraGetAllTreeNodesRecord',
-      document,
-      variables,
     });
   }
 }

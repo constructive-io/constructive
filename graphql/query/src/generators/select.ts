@@ -139,7 +139,7 @@ export function generateIntrospectionSchema(
       `${modelName}Patch`;
 
     // Add create mutation
-    schema[createMutationName] = {
+    if (table.query?.create !== null) schema[createMutationName] = {
       qtype: 'mutation',
       mutationType: 'create',
       model: modelName,

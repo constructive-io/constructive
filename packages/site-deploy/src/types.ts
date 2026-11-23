@@ -104,6 +104,13 @@ export type PutObject = (
   body: Uint8Array,
   contentType: string,
   signal?: AbortSignal,
+  /** Hex SHA-256 of `body`; the presigned URL is signed over it as `x-amz-checksum-sha256`. */
+  contentHash?: string,
+  /**
+   * The `uploadHeaders` the upload mutation returned: Content-Type and every
+   * header the URL is signed over (checksum, upload id). Send them as-is.
+   */
+  headers?: Record<string, string>,
 ) => Promise<void>;
 
 export interface DeploySiteOptions {

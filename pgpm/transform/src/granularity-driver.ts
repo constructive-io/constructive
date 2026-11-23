@@ -21,15 +21,18 @@ import type { ObjectIdentity as NamingIdentity } from '@pgpmjs/naming-spec';
 import { pathFor } from '@pgpmjs/naming-spec';
 import { revertFor, verifyFor } from '@pgsql/scripts';
 import type { StatementFacts } from '@pgsql/semantics';
-import { classifyStatements } from '@pgsql/semantics';
 import type { Granularity } from '@pgsql/transform';
 import {
   buildStatementGraph,
-  identityOf,
   restructureSql
 } from '@pgsql/transform';
+import { parseSync } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
+import { classifyStatements } from './facts';
+import { identityOf } from './facts';
+import { SubObjectKey, subObjectKeyOf } from './keys';
+import { nodesOnCycles, topologicalOrder } from './order';
 import { nameUnnamedConstraints, subObjectIdentityOf } from './sub-object';
 
 export type { Granularity } from '@pgsql/transform';
@@ -108,7 +111,7 @@ export interface RestructureModuleOptions {
    * (creating) statement. Defaults to {@link defaultChangeName}: naming spec
    * v1 paths (`identityOf` + `pathFor`).
    */
-  changeName?: (facts: StatementFacts) => string;
+  changeName?: (facts: StatementFacts, text: string) => string;
 }
 
 export interface RestructureModuleResult {
@@ -135,6 +138,31 @@ const KIND_DIRS: Partial<Record<StatementFacts['kind'], string>> = {
  * `@pgsql/transform`) rendered through `pathFor` (`@pgpmjs/naming-spec`).
  * Paths are pure projections of identity, never authored.
  */
+/**
+ * Split `ALTER TABLE .. ADD CONSTRAINT .. NOT VALID` statements out of a
+ * program: they must stay standalone ALTERs (NOT VALID is not expressible in
+ * CREATE TABLE), so the restructurer never sees them.
+ */
+export function holdOutNotValid(sql: string): { program: string; heldOut: string[] } {
+  const facts = classifyStatements(sql);
+  const bytes = sqlSourceBytes(sql);
+  const kept: string[] = [];
+  const heldOut: string[] = [];
+  for (const f of facts) {
+    const text = sliceStatementBytes(bytes, f.span.start, f.span.len).trim();
+    if (!text) continue;
+    let notValid = false;
+    if (f.nodeTag === 'AlterTableStmt') {
+      const stmt = parseSync(text).sql.stmts[0]?.stmt as unknown as
+        { AlterTableStmt?: { cmds?: { AlterTableCmd?: { subtype?: string; def?: { Constraint?: { skip_validation?: boolean } } } }[] } } | undefined;
+      const cmds = stmt?.AlterTableStmt?.cmds ?? [];
+      notValid = cmds.length > 0 && cmds.every(c => c.AlterTableCmd?.subtype === 'AT_AddConstraint' && c.AlterTableCmd.def?.Constraint?.skip_validation === true);
+    }
+    (notValid ? heldOut : kept).push(text.endsWith(';') ? text : `${text};`);
+  }
+  return { program: kept.join('\n\n'), heldOut };
+}
+
 export function defaultChangeName(facts: StatementFacts): string {
   const identity = identityOf(facts);
   if (identity) return pathFor(identity);
@@ -155,6 +183,7 @@ export function restructureChanges(
   options: RestructureModuleOptions
 ): RestructureModuleResult {
   const nameFor = options.changeName ?? defaultChangeName;
+  const textOf = (f: StatementFacts): string => sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
   const subNameFor = options.subObjectName ?? ((identity: NamingIdentity): string => pathFor(identity));
   const alteration = options.changeGranularity === 'alteration';
 
@@ -163,11 +192,16 @@ export function restructureChanges(
     .filter(Boolean)
     .join('\n\n');
 
-  const restructured = restructureSql(flattened, {
+  // `ADD CONSTRAINT .. NOT VALID` cannot be folded into CREATE TABLE (the
+  // catalog would validate it), so those statements are held out of the
+  // restructuring and re-appended after it.
+  const { program, heldOut } = holdOutNotValid(flattened);
+  const restructured = restructureSql(program, {
     granularity: options.granularity
   });
   const warnings = restructured.warnings;
-  const sql = alteration ? nameUnnamedConstraints(restructured.sql) : restructured.sql;
+  const rejoined = heldOut.length > 0 ? `${restructured.sql}\n\n${heldOut.join('\n\n')}` : restructured.sql;
+  const sql = alteration ? nameUnnamedConstraints(rejoined) : rejoined;
 
   // Re-classify the emitted script; group statements by the object they
   // target (creates[0]), so a table's CREATE and its remaining ALTERs land
@@ -208,6 +242,18 @@ export function restructureChanges(
   const groupSubName: (string | null)[] = [];
   /** For alteration groups: the object-group key of the owning table. */
   const groupOwnerKey: (string | null)[] = [];
+  /** For alteration groups: the typed sub-object the group is keyed by. */
+  const groupSub: (SubObjectKey | null)[] = [];
+  const addGroup = (key: string, f: StatementFacts, sub: SubObjectKey | null): number => {
+    const g = groupKeys.length;
+    groupKeys.push(key);
+    groupFacts.push(f);
+    groupSubName.push(sub ? subNameFor(sub) : null);
+    groupOwnerKey.push(sub ? `${sub.schema ?? ''}.${sub.table}` : null);
+    groupSub.push(sub);
+    groupKeyToIndex.set(key, g);
+    return g;
+  };
 
   facts.forEach((f, i) => {
     const created = f.creates[0];
@@ -220,37 +266,21 @@ export function restructureChanges(
     if (alteration) {
       const sub = subObjectIdentityOf(f);
       if (sub) {
-        const key = `sub\u0000${sub.kind}\u0000${sub.schema ?? ''}\u0000${sub.table}\u0000${sub.name}`;
-        let g = groupKeyToIndex.get(key);
-        if (g === undefined) {
-          g = groupKeys.length;
-          groupKeys.push(key);
-          groupFacts.push(f);
-          groupSubName.push(subNameFor(sub));
-          groupOwnerKey.push(`${sub.schema ?? ''}.${sub.table}`);
-          groupKeyToIndex.set(key, g);
-        }
-        groupOf[i] = g;
+        const key = subObjectKeyOf(sub);
+        groupOf[i] = groupKeyToIndex.get(key) ?? addGroup(key, f, sub);
         return;
       }
     }
     const key = `${created.schema ?? ''}.${created.name}`;
     let g = groupKeyToIndex.get(key);
     if (g === undefined) {
-      g = groupKeys.length;
-      groupKeys.push(key);
-      groupFacts.push(f);
-      groupSubName.push(null);
-      groupOwnerKey.push(null);
-      groupKeyToIndex.set(key, g);
+      g = addGroup(key, f, null);
     } else if (!(groupFacts[g].kind in KIND_DIRS) && groupFacts[g].kind !== 'schema' && (f.kind in KIND_DIRS || f.kind === 'schema')) {
       // Prefer naming the group after its creating statement over an ALTER.
       groupFacts[g] = f;
     }
     groupOf[i] = g;
   });
-
-  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f));
 
   // Schema producers, for schema-level change dependencies.
   const schemaGroup = new Map<string, number>();
@@ -260,11 +290,77 @@ export function restructureChanges(
     }
   });
 
-  // Slice statement text per group, in the emitted (topological) order,
-  // and collect each group's facts for revert/verify generation.
+  // Change dependencies = statement edges projected onto groups, plus
+  // schema references (an object change depends on its schema's change).
+  // A reference bound to an ADD CONSTRAINT statement targets the table that
+  // constraint belongs to: a constraint change never makes anything else
+  // resolvable, and treating it as the producer would cycle a split-out FK
+  // with the table it references.
+  const producerGroup = (stmt: number): number => {
+    const g = groupOf[stmt];
+    if (g === -1 || groupOwnerKey[g] === null) return g;
+    if (groupSub[g]?.kind !== 'constraint') return g;
+    return groupKeyToIndex.get(groupOwnerKey[g]!) ?? g;
+  };
+  const buildGroupDeps = (): Set<number>[] => {
+    const deps: Set<number>[] = groupKeys.map((): Set<number> => new Set<number>());
+    for (const edge of graph.edges) {
+      if (edge.kind === 'late') continue;
+      const from = groupOf[edge.from];
+      const to = producerGroup(edge.to);
+      if (from !== -1 && to !== -1 && from !== to) deps[from].add(to);
+    }
+    facts.forEach((f, i) => {
+      const from = groupOf[i];
+      if (from === -1) return;
+      const schemas = new Set<string>(f.referencedSchemas);
+      for (const created of f.creates) {
+        if (created.schema) schemas.add(created.schema);
+      }
+      for (const schema of schemas) {
+        const to = schemaGroup.get(schema);
+        if (to !== undefined && to !== from) deps[from].add(to);
+      }
+    });
+    return deps;
+  };
+
+  // Folding a constraint into its table's change can close a cycle (two new
+  // tables whose foreign keys point at each other, one of them added by
+  // ALTER TABLE). A constraint sitting on such a cycle gets its own change,
+  // which then follows both tables. A cycle no constraint split can break
+  // is an error, never an unordered plan.
+  let groupDeps = buildGroupDeps();
+  for (;;) {
+    const cyclic = nodesOnCycles(groupDeps);
+    if (cyclic.size === 0) break;
+    let moved = false;
+    facts.forEach((f, i) => {
+      const g = groupOf[i];
+      if (g === -1 || !cyclic.has(g) || groupFacts[g] === f) return;
+      const sub = subObjectIdentityOf(f);
+      if (!sub || sub.kind !== 'constraint') return;
+      const closesCycle = graph.edges.some(
+        e => e.from === i && e.kind !== 'late' && groupOf[e.to] !== -1 && groupOf[e.to] !== g && cyclic.has(groupOf[e.to])
+      );
+      if (!closesCycle) return;
+      const key = subObjectKeyOf(sub);
+      groupOf[i] = groupKeyToIndex.get(key) ?? addGroup(key, f, sub);
+      moved = true;
+    });
+    if (!moved) {
+      const names = [...cyclic].map(g => groupSubName[g] ?? nameFor(groupFacts[g], textOf(groupFacts[g]))).sort();
+      throw new Error(`restructure: dependency cycle among changes; cannot order: ${names.join(', ')}`);
+    }
+    groupDeps = buildGroupDeps();
+  }
+
+  const groupNames = groupFacts.map((f, g) => groupSubName[g] ?? nameFor(f, textOf(f)));
+
+  // Slice statement text per group and collect each group's facts for
+  // revert/verify generation.
   const groupSql: string[][] = groupNames.map((): string[] => []);
   const groupStatements: StatementFacts[][] = groupNames.map((): StatementFacts[] => []);
-
   facts.forEach((f, i) => {
     const text = sliceStatementBytes(sqlBytes, f.span.start, f.span.len).trim();
     const g = groupOf[i];
@@ -274,46 +370,21 @@ export function restructureChanges(
     }
   });
 
-  // Change dependencies = statement edges projected onto groups, plus
-  // schema references (an object change depends on its schema's change).
-  const groupDeps: Set<number>[] = groupNames.map((): Set<number> => new Set<number>());
-  for (const edge of graph.edges) {
-    if (edge.kind === 'late') continue;
-    const from = groupOf[edge.from];
-    const to = groupOf[edge.to];
-    if (from !== -1 && to !== -1 && from !== to) groupDeps[from].add(to);
-  }
-  facts.forEach((f, i) => {
-    const from = groupOf[i];
-    if (from === -1) return;
-    const schemas = new Set<string>(f.referencedSchemas);
-    for (const created of f.creates) {
-      if (created.schema) schemas.add(created.schema);
-    }
-    for (const schema of schemas) {
-      const to = schemaGroup.get(schema);
-      if (to !== undefined && to !== from) groupDeps[from].add(to);
-    }
-  });
-
-  // Alteration groups depend on their table's own change, and constraint
-  // groups additionally on the column changes they key on — the statement
-  // graph keys everything by the table, so these finer edges are added here.
-  if (alteration) {
+  // Alteration (and split-out constraint) groups depend on their table's own
+  // change, and constraint groups additionally on the column changes they
+  // key on — the statement graph keys everything by the table, so these
+  // finer edges are added here.
+  {
     const columnGroup = new Map<string, number>();
-    groupKeys.forEach((key, g) => {
-      const parts = key.split('\u0000');
-      if (parts[0] === 'sub' && parts[1] === 'column') {
-        columnGroup.set(`${parts[2]}.${parts[3]}.${parts[4]}`, g);
-      }
+    groupSub.forEach((sub, g) => {
+      if (sub?.kind === 'column') columnGroup.set(`${sub.schema ?? ''}.${sub.table}.${sub.name}`, g);
     });
-    groupKeys.forEach((key, g) => {
+    groupSub.forEach((sub, g) => {
       const owner = groupOwnerKey[g];
       if (owner === null) return;
       const tableGroup = groupKeyToIndex.get(owner);
       if (tableGroup !== undefined && tableGroup !== g) groupDeps[g].add(tableGroup);
-      const parts = key.split('\u0000');
-      if (parts[1] !== 'constraint') return;
+      if (sub?.kind !== 'constraint') return;
       const constraint = (groupFacts[g].stmt?.AlterTableStmt as {
         cmds?: { AlterTableCmd?: { def?: { Constraint?: {
           keys?: { String?: { sval?: string } }[];
@@ -330,11 +401,12 @@ export function restructureChanges(
     });
   }
 
-  // Emit groups in first-statement order (already topological).
-  const order = [...groupNames.keys()].sort((a, b) => {
-    const firstA = groupOf.indexOf(a);
-    const firstB = groupOf.indexOf(b);
-    return firstA - firstB;
+  // Emit groups in topological order of their dependencies; first-statement
+  // order (already topological for unsplit groups) breaks ties.
+  const rank = groupNames.map((_, g) => groupOf.indexOf(g));
+  const order = topologicalOrder(groupDeps, {
+    priority: (a, b) => rank[a] - rank[b] || a - b,
+    onCycle: () => new Error('restructure: dependency cycle among changes; cannot order')
   });
 
   const result: RestructuredChange[] = order
@@ -359,3 +431,4 @@ export function restructureChanges(
 
   return { changes: result, warnings };
 }
+

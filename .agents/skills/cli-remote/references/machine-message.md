@@ -12,8 +12,8 @@ csdk machine-message list --where.<field>.<op> <value> --orderBy <values>
 csdk machine-message list --limit 10 --after <cursor>
 csdk machine-message find-first --where.<field>.<op> <value>
 csdk machine-message get --id <UUID>
-csdk machine-message create --actorId <UUID> --kind <String> --seq <BigInt> --sessionId <UUID> [--content <JSON>] [--createdByPrincipal <UUID>] [--recordedAt <Datetime>]
-csdk machine-message update --id <UUID> [--actorId <UUID>] [--content <JSON>] [--createdByPrincipal <UUID>] [--kind <String>] [--recordedAt <Datetime>] [--seq <BigInt>] [--sessionId <UUID>]
+csdk machine-message create --actorId <UUID> --entityId <UUID> --kind <String> --ownerId <UUID> --seq <BigInt> --sessionId <UUID> [--content <JSON>] [--createdByPrincipal <UUID>] [--recordedAt <Datetime>]
+csdk machine-message update --id <UUID> [--actorId <UUID>] [--content <JSON>] [--createdByPrincipal <UUID>] [--entityId <UUID>] [--kind <String>] [--ownerId <UUID>] [--recordedAt <Datetime>] [--seq <BigInt>] [--sessionId <UUID>]
 csdk machine-message delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk machine-message list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a machineMessage
 
 ```bash
-csdk machine-message create --actorId <UUID> --kind <String> --seq <BigInt> --sessionId <UUID> [--content <JSON>] [--createdByPrincipal <UUID>] [--recordedAt <Datetime>]
+csdk machine-message create --actorId <UUID> --entityId <UUID> --kind <String> --ownerId <UUID> --seq <BigInt> --sessionId <UUID> [--content <JSON>] [--createdByPrincipal <UUID>] [--recordedAt <Datetime>]
 ```
 
 ### Get a machineMessage by id

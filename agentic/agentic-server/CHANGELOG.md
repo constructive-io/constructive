@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.31.0...agentic-server@0.31.1) (2026-11-23)
+
+**Note:** Version bump only for package agentic-server
+
+# [0.31.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.3...agentic-server@0.31.0) (2026-11-17)
+
+### Features
+
+- **agentic-server:** GET /v1/models lists served models by id and name; /healthz reports liveness only ([#2013](https://github.com/constructive-io/constructive/issues/2013)) ([31c4aaf](https://github.com/constructive-io/constructive/commit/31c4aaf1abf1720e422d2b9712ab7a38998f752a))
+
+## [0.30.3](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.2...agentic-server@0.30.3) (2026-11-16)
+
+### Bug Fixes
+
+- **agentic-server:** accept JSON bodies large enough to carry an image (bodyLimit, default 32mb) ([5cd773e](https://github.com/constructive-io/constructive/commit/5cd773e471f578c2f12e8f47c1807bfae65153bf))
+
+## [0.30.2](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.1...agentic-server@0.30.2) (2026-11-16)
+
+### Bug Fixes
+
+- **agentic-server:** embed image data urls with parameters or uppercase encoding as images; an ollama embed answer with no embedding throws ([e521ce7](https://github.com/constructive-io/constructive/commit/e521ce79c9c25b68c5d37a8d9528937ca1e77974))
+- **agentic-server:** send data-url embed inputs to ollama as images; pass dimensions through ([440e430](https://github.com/constructive-io/constructive/commit/440e430e70084e9aa814f2747f70a333b75c32d5))
+
+## [0.30.1](https://github.com/constructive-io/constructive/compare/agentic-server@0.30.0...agentic-server@0.30.1) (2026-11-09)
+
+### Bug Fixes
+
+- **agentic-server:** forward tools, format, think, keep_alive and num_ctx on the ollama route; select providers by name; route gpt-oss to ollama ([a753a87](https://github.com/constructive-io/constructive/commit/a753a87a90f33325ec61f83850767095fa826de7))
+- **agentic-server:** reject an unknown X-LLM-Provider and malformed request bodies with 400; report a truncated tool call as length ([3101a41](https://github.com/constructive-io/constructive/commit/3101a41a4fcb1a071ad9784bebeb158e71871e8a))
+
+# [0.30.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.29.0...agentic-server@0.30.0) (2026-11-05)
+
+### Bug Fixes
+
+- **graphile-llm:** RAG and embedText resolve the full request scope; gateway forwards max_tokens to Ollama ([3f2920c](https://github.com/constructive-io/constructive/commit/3f2920cfd7ead170e3c01c45aa62e8694dd006cd))
+
+### Features
+
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
 # [0.29.0](https://github.com/constructive-io/constructive/compare/agentic-server@0.28.0...agentic-server@0.29.0) (2026-10-14)
 
 **Note:** Version bump only for package agentic-server

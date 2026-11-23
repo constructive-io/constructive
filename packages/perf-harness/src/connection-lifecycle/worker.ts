@@ -159,6 +159,7 @@ const run = async (): Promise<void> => {
             return;
           }
           const failure = new Error('intentional lifecycle build failure');
+          if (config.mode === 'failed-build') await subscribe(service, id);
           const entry = await createGraphileInstance({
             cacheKey: `cperf_${index}`,
             preset: {

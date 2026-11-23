@@ -76,7 +76,8 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     pgpm(work, [
       'diff', path.join(work, 'blog'), path.join(work, 'blog-v2'),
       '--emit-migration', work, '--pkg', 'blog-migration',
-      '--emit-sql', path.join(work, 'migration.sql')
+      '--emit-sql', path.join(work, 'migration.sql'),
+      '--allow-data-loss'
     ]);
   });
 
@@ -142,7 +143,8 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
   it('derives the v1 -> v2 migration: exactly the real changes, nothing guessed', () => {
     const result = diffChangeSets(
       changesOf(path.join(work, 'blog')),
-      changesOf(path.join(work, 'blog-v2'))
+      changesOf(path.join(work, 'blog-v2')),
+      { allowDataLoss: true }
     );
     expect(result.identical).toBe(false);
     const byDelta = (delta: string): string[] =>
@@ -166,14 +168,15 @@ describe('pgpm projections: one schema, every shape, one meaning', () => {
     // module projection
     expect(fs.existsSync(path.join(work, 'blog-migration', 'pgpm.plan'))).toBe(true);
 
-    // linear SQL projection: statements in dependency order, no CREATE OR REPLACE
+    // linear SQL projection: statements in dependency order; the same-signature
+    // function body change is the one CREATE OR REPLACE (dependents stay bound)
     const sql = fs.readFileSync(path.join(work, 'migration.sql'), 'utf-8');
     expect(sql).toMatch(/CREATE TABLE blog_app\.tags/);
     expect(sql).toMatch(/CREATE TABLE blog_app\.post_tags/);
     expect(sql).toMatch(/ADD COLUMN slug/);
     expect(sql).toMatch(/DROP COLUMN word_count/);
-    expect(sql).toMatch(/DROP FUNCTION blog_app\.published_post_count/);
+    expect(sql).toMatch(/CREATE OR REPLACE FUNCTION blog_app\.published_post_count/);
+    expect(sql).not.toMatch(/DROP FUNCTION/);
     expect(sql).toMatch(/CREATE POLICY audit_log_insert/);
-    expect(sql).not.toMatch(/CREATE OR REPLACE/i);
   });
 });

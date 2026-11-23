@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.26.0...@constructive-io/errors@0.26.1) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/errors
+
+# [0.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.2...@constructive-io/errors@0.26.0) (2026-11-19)
+
+### Bug Fixes
+
+- **errors:** register DATA_JOB_TRIGGER_LANE_OWNER_CONFLICT ([#2032](https://github.com/constructive-io/constructive/issues/2032)) ([bf88646](https://github.com/constructive-io/constructive/commit/bf886467342ce1053035c3d98ea68a76d55b5904))
+- **errors:** register the ProcessExtraction routes refusals constructive-db main raises ([#2031](https://github.com/constructive-io/constructive/issues/2031)) ([8624c22](https://github.com/constructive-io/constructive/commit/8624c220a25f4ab89ec0faede73b73ea2f599546))
+
+### Features
+
+- **server:** mintTenantOwnerHandoff for passwordless owner builds (planning[#2511](https://github.com/constructive-io/constructive/issues/2511)) ([#1997](https://github.com/constructive-io/constructive/issues/1997)) ([784f1aa](https://github.com/constructive-io/constructive/commit/784f1aacf5bfc8106cb65604dd043598ae66e380)), closes [constructive-db#4356](https://github.com/constructive-db/issues/4356)
+
+## [0.25.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.1...@constructive-io/errors@0.25.2) (2026-11-17)
+
+### Bug Fixes
+
+- **errors:** register the codes constructive-db main raises, including ones handed to raise helpers ([#2017](https://github.com/constructive-io/constructive/issues/2017)) ([d92dd40](https://github.com/constructive-io/constructive/commit/d92dd40765cbedf00ba8e031ffca926cccf78020))
+
+## [0.25.1](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.25.0...@constructive-io/errors@0.25.1) (2026-11-09)
+
+### Bug Fixes
+
+- **graphql-server:** decide CORS per routed API and fail strictAuth closed ([04af3fd](https://github.com/constructive-io/constructive/commit/04af3fdde53d23ec1fe2bbc0b07b721dea6ca226))
+
 # [0.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.24.0...@constructive-io/errors@0.25.0) (2026-10-14)
 
 **Note:** Version bump only for package @constructive-io/errors

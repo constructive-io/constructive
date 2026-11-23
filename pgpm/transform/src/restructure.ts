@@ -8,9 +8,12 @@
 import { PgpmRow } from '@pgpmjs/ast';
 import { alterationPathFor, pathFor, PathStyle } from '@pgpmjs/naming-spec';
 import { StatementFacts } from '@pgsql/semantics';
-import { Granularity, identityOf } from '@pgsql/transform';
+import {
+  Granularity
+} from '@pgsql/transform';
 import { loadModule } from 'plpgsql-parser';
 
+import { identityOf } from './facts';
 import { ChangeGranularity, restructureChanges } from './granularity-driver';
 
 export type ExportGranularity = Granularity;

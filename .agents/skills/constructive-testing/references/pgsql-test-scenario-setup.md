@@ -163,43 +163,29 @@ beforeEach(() => db.beforeEach());
 afterEach(() => db.afterEach());
 ```
 
-### Pattern 2: Complex Setup with Transactions
+### Pattern 2: Setup That Needs RLS Context
 
-For setup that requires multiple steps with intermediate commits:
+`pg` statements in `beforeAll` auto-commit, so `db` sees them immediately. `setContext()` is transaction-local, so setup that runs *as a user* needs an explicit transaction:
 
 ```typescript
 beforeAll(async () => {
   ({ db, pg, teardown } = await getConnections());
 
-  // Start transaction on pg for setup
-  await pg.begin();
-  await pg.savepoint();
-
-  // Create users
+  // Auto-committed, visible to db
   await pg.query(`INSERT INTO users (id, name) VALUES ($1, 'Alice')`, [USER_1]);
   await pg.query(`INSERT INTO users (id, name) VALUES ($1, 'Bob')`, [USER_2]);
 
-  // Commit pg's work so db can see it
-  await pg.commit();
-  await pg.begin();
-  await pg.savepoint();
-
-  // Now db can work with the users
+  // Setup that runs as a user, committed so every test sees it
   await db.begin();
-  await db.savepoint();
-
   db.setContext({ role: 'authenticated', 'jwt.claims.user_id': USER_1 });
   // ... additional setup with RLS context
-
   await db.commit();
-  await db.begin();
-  await db.savepoint();
 });
 ```
 
 ### Pattern 3: Per-Describe Setup
 
-For describe blocks that need their own isolated setup:
+Data a `describe` block's `beforeAll` writes with auto-committed `pg` queries stays for the rest of the file, including later blocks:
 
 ```typescript
 describe('Admin scenarios', () => {
@@ -220,6 +206,29 @@ describe('Admin scenarios', () => {
     db.setContext({ role: 'authenticated', 'jwt.claims.user_id': adminId });
     // ...
   });
+});
+```
+
+### Pattern 4: Per-Describe Fixtures That Roll Back
+
+To share fixtures across one block's tests and remove them afterwards, hold a transaction open for the block with a named savepoint, and give each test its own inner savepoint. Jest runs outer hooks for nested tests too, so keep the file-level `beforeEach()`/`afterEach()` in a sibling `describe`: around this block they would commit its transaction:
+
+```typescript
+describe('with a group-only admin', () => {
+  beforeAll(async () => {
+    await db.begin();
+    db.setContext({ role: 'administrator' });
+    await db.query(`INSERT INTO users (id, name, is_admin) VALUES ($1, 'Admin', true)`, [ADMIN_ID]);
+    await db.savepoint('group');
+  });
+  afterAll(async () => {
+    await db.rollback('group');
+    await db.query('ROLLBACK');
+  });
+  beforeEach(() => db.savepoint('test'));
+  afterEach(() => db.rollback('test'));
+
+  it('sees the admin', async () => { /* ... */ });
 });
 ```
 

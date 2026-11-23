@@ -72,12 +72,36 @@ it('sees the physical name the reconciler records after a pre-reconcile read', a
 it('serves a reconciled bucket from the cache', async () => {
   const { clearBucketCache, getBucketConfig } = await import('../src/storage-module-cache');
   clearBucketCache();
+  const table = bucketTable(bucketRow({ physical_name: 'cnst-app-documents-0001', max_file_size: 100 }));
+
+  await getBucketConfig(table, storageConfig(), DATABASE_ID, 'documents');
+  table.row = bucketRow({ physical_name: 'cnst-app-documents-0001', max_file_size: 200 });
+  const second = await getBucketConfig(table, storageConfig(), DATABASE_ID, 'documents');
+
+  expect(second?.max_file_size).toBe(100);
+});
+
+it('does not serve a cached bucket to a caller whose RLS hides it', async () => {
+  const { clearBucketCache, getBucketConfig } = await import('../src/storage-module-cache');
+  clearBucketCache();
+  const member = bucketTable(bucketRow({ physical_name: 'cnst-app-documents-0001' }));
+  const stranger = { async query() { return { rows: [] as unknown[] }; } };
+
+  await getBucketConfig(member, storageConfig(), DATABASE_ID, 'documents');
+
+  expect(await getBucketConfig(stranger, storageConfig(), DATABASE_ID, 'documents')).toBeNull();
+});
+
+it('reloads when the visible bucket under the key is not the cached one', async () => {
+  const { clearBucketCache, getBucketConfig } = await import('../src/storage-module-cache');
+  clearBucketCache();
   const table = bucketTable(bucketRow({ physical_name: 'cnst-app-documents-0001' }));
 
   await getBucketConfig(table, storageConfig(), DATABASE_ID, 'documents');
-  await getBucketConfig(table, storageConfig(), DATABASE_ID, 'documents');
+  table.row = bucketRow({ id: '44444444-4444-4444-4444-444444444444', physical_name: 'cnst-app-documents-0002' });
+  const after = await getBucketConfig(table, storageConfig(), DATABASE_ID, 'documents');
 
-  expect(table.reads).toBe(1);
+  expect(after).toMatchObject({ id: '44444444-4444-4444-4444-444444444444', physical_name: 'cnst-app-documents-0002' });
 });
 
 it('re-reads a changed bucket row once its TTL passes, even under steady traffic', async () => {

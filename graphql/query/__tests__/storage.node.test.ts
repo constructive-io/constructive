@@ -110,14 +110,15 @@ interface PutCall {
   url: string;
   contentType: string;
   size: number;
+  headers?: Record<string, string>;
 }
 
 function fakeTransport(puts: PutCall[] = []): StorageTransport {
   return {
     hashFile: async (file) =>
       createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex'),
-    putObject: async (url, body, contentType) => {
-      puts.push({ url, contentType, size: body.byteLength });
+    putObject: async (url, body, contentType, _signal, _contentHash, headers) => {
+      puts.push({ url, contentType, size: body.byteLength, ...(headers ? { headers } : {}) });
     },
   };
 }
@@ -207,7 +208,7 @@ describe('buildUploadDocument()', () => {
     expect(document).toContain('mutation UploadFileMutation($input: UploadFileInput!)');
     expect(document).toContain('uploadFile(input: $input)');
     expect(document).toContain('uploadUrl');
-    expect(document).toContain('previousVersionId');
+    expect(document).toContain('uploadHeaders');
   });
 });
 
@@ -277,7 +278,6 @@ describe('createStorageClient()', () => {
           key: 'abc123',
           deduplicated: true,
           expiresAt: null,
-          previousVersionId: null,
         },
       },
       calls,
@@ -290,7 +290,6 @@ describe('createStorageClient()', () => {
       key: 'abc123',
       deduplicated: true,
       expiresAt: null,
-      previousVersionId: null,
     });
 
     const mutationCall = calls.find((c) => c.query.includes('uploadFile(input: $input)'))!;
@@ -312,7 +311,6 @@ describe('createStorageClient()', () => {
         key: 'abc123',
         deduplicated: false,
         expiresAt: null,
-        previousVersionId: null,
       },
     });
 
@@ -343,7 +341,6 @@ describe('createStorageClient()', () => {
         key: 'def456',
         deduplicated: false,
         expiresAt: '2030-01-01T00:00:00Z',
-        previousVersionId: null,
       },
     });
 
@@ -352,6 +349,30 @@ describe('createStorageClient()', () => {
     expect(result.fileId).toBe('file-2');
     expect(puts).toEqual([
       { url: 'https://s3.example/presigned', contentType: 'text/plain', size: 11 },
+    ]);
+  });
+
+  it('hands the transport the exact uploadHeaders the server returned', async () => {
+    const uploadHeaders = {
+      'Content-Type': 'text/plain',
+      'x-amz-checksum-sha256': 'base64digest=',
+      'x-amz-meta-upload-id': 'file-3',
+    };
+    const { client, puts } = clientWith({
+      uploadFile: {
+        uploadUrl: 'https://s3.example/presigned',
+        uploadHeaders,
+        fileId: 'file-3',
+        key: 'ghi789',
+        deduplicated: false,
+        expiresAt: '2030-01-01T00:00:00Z',
+      },
+    });
+
+    await client.upload({ filesTable: 'files' }, { file: fakeFile() });
+
+    expect(puts).toEqual([
+      { url: 'https://s3.example/presigned', contentType: 'text/plain', size: 11, headers: uploadHeaders },
     ]);
   });
 

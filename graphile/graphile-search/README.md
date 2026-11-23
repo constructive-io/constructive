@@ -48,15 +48,47 @@ const preset = {
 };
 ```
 
+### Request language
+
+Without an explicit configuration, tsvector filters, `unifiedSearch`, and
+`FullText.matches` use the request context's ordered `langCodes`. The first
+supported primary subtag selects a PostgreSQL configuration (`fr-CA` → `french`,
+`de-DE` → `german`); built-in configuration names such as `french` also work.
+Missing, empty, or entirely unsupported preferences retain the English default.
+The server supplies these preferences from HTTP and WebSocket `Accept-Language`.
+
+An explicit column `@tsConfig` tag takes precedence over adapter `tsConfig`,
+then preset `tsConfig`, then request preferences. Configuration names and query
+text are SQL parameters; request preferences can select only built-in names
+from the language mapping.
+
+Vector search follows the same request languages on a table tagged
+`@i18n <translations table>` whose translations table has a vector column of
+the same name (with `<table>_id` and `lang_code` columns). A row is compared
+with the query through its translation in the first requested language it has
+an embedded translation for, and through its own vector otherwise. Without
+request languages, or for a language the row has no translation in, only the
+row's own vector is compared, so another language's translation never matches.
+
 ## Features
 
 - **4 search algorithms** via adapters: tsvector (ts_rank), BM25 (pg_textsearch), pg_trgm (similarity), pgvector (distance)
 - **Per-algorithm score fields**: `{column}{Algorithm}{Metric}` (e.g. `bodyBm25Score`, `titleTrgmSimilarity`)
 - **Composite `searchScore`**: Normalized 0..1 aggregating all active search signals
-- **OrderBy enums**: `{COLUMN}_{ALGORITHM}_{METRIC}_ASC/DESC` + `SEARCH_SCORE_ASC/DESC`
+- **OrderBy enums**: `{COLUMN}_{ALGORITHM}_{METRIC}_ASC/DESC` + `SEARCH_SCORE_ASC/DESC` (see [Ordering by a score](#ordering-by-a-score))
 - **Filter fields**: `{algorithm}{Column}` on connection filter input types
 - **Hybrid search**: Combine multiple algorithms in a single query
 - **Zero config**: Auto-discovers columns and indexes per adapter
+
+## Ordering by a score
+
+A search orderBy sorts by the score its filter computes, so it needs that filter in `where`: `BODY_BM25_SCORE_ASC` needs `bm25Body` (or `unifiedSearch`), `SEARCH_SCORE_DESC` needs any search filter. A search orderBy without its filter is an error that names the filter to add.
+
+`SEARCH_SCORE_ASC/DESC` orders by the same Reciprocal Rank Fusion sum that `searchScore` displays. The ranks are computed once, in a subquery over the table's matching rows that is joined to the query on the primary key, so the order is a plain column and `first`/`after` and `last`/`before` cursors work; tied scores (equal evidence shares a rank) are separated by the primary key.
+
+When a column is scored by both its own filter (e.g. `bm25Body`) and `unifiedSearch`, the explicit filter's score is the one displayed and ordered by; the column is scored once per query.
+
+Mixed column and search terms are applied in list order, whether `orderBy` is a literal or a GraphQL variable. For example, `[EMBEDDING_VECTOR_DISTANCE_ASC, ROW_ID_ASC]` sorts by distance first and breaks ties by row ID.
 
 ## Architecture
 

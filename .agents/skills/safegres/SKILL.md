@@ -85,12 +85,12 @@ The score only improves by being **explicit** (declaring exposure and intent) or
 | R1 | critical | fail-open | An **untrusted role** holds a write privilege |
 | R2 | high | fail-open | Permissive write policy applies to untrusted role or PUBLIC |
 | R3 | medium | fail-open | RLS table has grants **TO PUBLIC** |
-| L1 | medium | fail-open | **Indirect access** — an untrusted role reaches a table via PUBLIC or role inheritance, not a direct grant |
+| L1 | low | fail-closed | **Dead indirect grant** — a PUBLIC or inherited privilege on an RLS-enabled table has no permitting policy |
 | L2 | low | fail-closed | **Dead policy** — the policy's role holds no grant the policy could mediate |
 | L3 | low | fail-closed | **Unreachable grant** — the grant's role can never authenticate or be assumed |
-| L4 | low | fail-closed | **Dead schema `USAGE`** — the role reaches no table *or view* in the schema |
-| L5 | high | fail-open | **Indirect coverage gap** — inherited/PUBLIC reach lands on a table with no covering policy |
-| L6 | low | fail-closed | **Unaddressable grant** — no exposed API can name the relation, and no policy references it |
+| L4 | info | neutral | **Dead schema `USAGE`** — the role reaches no relation and can execute no function in the schema |
+| L5 | info | fail-open | **Untrusted indirect access** — an untrusted role reaches an RLS-disabled table via PUBLIC or inheritance |
+| L6 | info | neutral | **Unaddressable grant** — an API role holds privileges on a relation its API cannot name, and no policy references the relation |
 | L7 | info | fail-open | **`SET ROLE` reach** — a membership confers `set_option` without `INHERIT`, so a role assumes privileges it does not passively hold |
 | L8 | info | fail-open | **DEFINER-view bypass** — a non-`security_invoker` view reads its base relations as the *owner*, naming the columns that escape |
 | L9 | info | fail-open | **DEFINER-view write** — an auto-updatable definer view writes a base relation as its owner |
@@ -224,7 +224,7 @@ Turns catalog inference into evidence: each probeable finding's query shape is p
 | --- | --- |
 | `safegres:recommended` | Every rule at its default severity (no-config behavior) |
 | `safegres:strict` | Everything escalated; fail-closed counts 25%; `failOn: high` |
-| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; A2/P5 critical; A3 off; `pg_partman` ignored |
+| `safegres:constructive` | Auto-resolves exposure from the routing plane; R1/R2 watch `anonymous`; A2/P5 critical; A3 info; `pg_partman` ignored |
 | `safegres:minimal` | Structural flags only (A1–A3) — fast CI smoke check |
 | `safegres:postgrest` | Surface from `pgrst.db_schemas`; untrusted role from `pgrst.db_anon_role` |
 | `safegres:supabase` | PostgREST + Supabase's fixed roles: **both** `anon` and `authenticated` untrusted (anyone can sign up) |
@@ -380,11 +380,19 @@ Report-only first, gate after a week of stable scores. Never write a bespoke aud
 }
 ```
 
-Inside Actions the job summary, annotations and PR comment are emitted automatically (`report.github` configures them). The step itself can be the first-party composite action, `uses: constructive-io/constructive/packages/safegres@safegres-action-v1` (`packages/safegres/action.yml`): it installs the CLI, runs that config with `--github`, and takes only the inputs that legitimately differ between jobs sharing one config (`database`/`pgpm`, `fail-on-grade`, `report-only`, `out`, `comment`, `upload-sarif`, `upload-reports`, `compare`), exporting `security-score`/`security-grade`/`perf-score` as step outputs even on a gate failure. Anything you would pass every run belongs in the config file, not in `with:`. Add `failOn.grade` only once the baseline is stable. A second job that needs the same surface but different gates extends this file rather than copying it — `{ "extends": "../../.safegresrc.json", "failOn": { "grade": "D" } }`.
+Inside Actions the job summary and annotations are emitted automatically; the PR comment is opt-in (`report.github` configures the output). The step itself can be the first-party composite action, `uses: constructive-io/constructive/packages/safegres@safegres-action-v1` (`packages/safegres/action.yml`): it installs the CLI, runs that config with `--github`, and takes only the inputs that legitimately differ between jobs sharing one config (`database`/`pgpm`, `fail-on-grade`, `report-only`, `out`, `comment`, `upload-sarif`, `upload-reports`, `compare`), exporting `security-score`/`security-grade`/`perf-score` as step outputs even on a gate failure. Anything you would pass every run belongs in the config file, not in `with:`. Add `failOn.grade` only once the baseline is stable. A second job that needs the same surface but different gates extends this file rather than copying it — `{ "extends": "../../.safegresrc.json", "failOn": { "grade": "D" } }`.
+
+### PR audit card
+
+The [PR audit card](https://github.com/constructive-io/safegres-course-test/pull/1#issuecomment-7093536673) is one sticky comment, updated in place on each PR run. By default it shows security and performance score/grade badges, exposure (reachable vs. total tables, or an unknown-exposure warning), the comparison base (branch, commit, linked run and age), and score deltas (before → after, with grade changes). With a perf baseline it shows how many findings are new, accepted and resolved, and lists up to 10 new performance findings. The full findings are in the job summary.
+
+Enable it with `comment: true` and `pull-requests: write` only for trusted same-repository `pull_request` runs (see the conditional `comment` input below). Fork PRs still get the check and job summary, without the comment. Keep write tokens out of fork runs; don't use `pull_request_target` to run fork code or migrations.
+
+`compare: auto` (the default) looks for the newest successful base-branch run within 48 hours by default whose commit is an ancestor of the PR's merge base and whose report artifact is readable. It needs `actions: read` and reports uploaded by the base branch. No match means no delta, not a failed audit: the current scores still show, and the absolute score and perf baseline gates still apply. The comparison describes score movement; the separate perf baseline ratchets new debt.
 
 ### Every PR, like constructive-db
 
-This is the job constructive-db runs on every pull request (and the boilerplate scaffolds). Run it on `pull_request` **and** on `push` to `main`: the push run uploads the `safegres-reports` artifact that the next PR's delta (`compare: auto`) is measured against — without it the newest baseline is whatever the last PR uploaded, and it ages.
+This follows the job constructive-db runs on every pull request (and the boilerplate scaffolds). Run it on `pull_request` **and** on `push` to `main`: the push run uploads the `safegres-reports` artifact that the next PR's delta (`compare: auto`) is measured against.
 
 ```yaml
 on:
@@ -427,7 +435,7 @@ jobs:
       - uses: constructive-io/constructive/packages/safegres@safegres-action-v1
         with:
           version: local    # source.pgpm deploys through pgsql-test, which only the local install resolves
-          comment: true
+          comment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
 ```
 
 The job owns only what the database needs to exist (Postgres, roles); the deploy, both gates, the summary, annotations, comment, SARIF and the reports artifact are the action plus the config file. Seed whatever extra roles your grants name in the bootstrap step (constructive-db adds `--client` and `platform_service`). Accepting perf debt is `safegres audit --write-perf-baseline <file>` and a commit — never a YAML change.

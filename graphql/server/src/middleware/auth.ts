@@ -1,13 +1,13 @@
 import './types'; // for Request type
 
-import { errors } from '@constructive-io/errors';
+import { type ConstructiveError, errors } from '@constructive-io/errors';
 import { getNodeEnv } from '@pgpmjs/env';
 import { Logger } from '@pgpmjs/logger';
 import { PgpmOptions } from '@pgpmjs/types';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import pgQueryContext from 'pg-query-context';
 
-import { respondWithGraphQLError } from '../errors/graphql-response';
+import { respondWithError } from '../errors/graphql-response';
 
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';
@@ -38,123 +38,134 @@ export const getBearerToken = (req: Request): string | undefined => {
   return authType?.toLowerCase() === 'bearer' && authToken ? authToken : undefined;
 };
 
-export const createAuthenticateMiddleware = (
+export const authenticateRequest = async (
+  req: Request,
   opts: PgpmOptions
-): RequestHandler => {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    const api = req.api;
-    log.info(`[auth] middleware called, api=${api ? 'present' : 'missing'}`);
-    if (!api) {
-      res.status(500).send('Missing API info');
-      return;
-    }
+): Promise<{ error: ConstructiveError; status?: number } | undefined> => {
+  const api = req.api;
+  log.info(`[auth] middleware called, api=${api ? 'present' : 'missing'}`);
+  if (!api) {
+    throw new Error('Missing API info');
+  }
 
-    const pool = api.tenantPool;
-    const rlsModule = api.rlsModule;
+  const pool = api.tenantPool;
+  const rlsModule = api.rlsModule;
 
-    log.info(
-      `[auth] rlsModule=${rlsModule ? 'present' : 'missing'}, ` +
+  log.info(
+    `[auth] rlsModule=${rlsModule ? 'present' : 'missing'}, ` +
         `authenticate=${rlsModule?.authenticate ?? 'none'}, ` +
         `authenticateStrict=${rlsModule?.authenticateStrict ?? 'none'}, ` +
         `privateSchema=${rlsModule?.privateSchema?.schemaName ?? 'none'}`
-    );
+  );
 
-    if (!rlsModule) {
-      log.info('[auth] No RLS module configured, skipping auth');
-      return next();
-    }
+  if (
+    opts.server?.strictAuth &&
+      !(rlsModule?.authenticateStrict && rlsModule.privateSchema?.schemaName)
+  ) {
+    log.error(`[auth] strictAuth is on but API ${api.apiId ?? 'unknown'} has no authenticateStrict; refusing`);
+    return { error: errors.STRICT_AUTH_UNAVAILABLE(), status: 503 };
+  }
 
-    const authFn = opts.server?.strictAuth
-      ? rlsModule.authenticateStrict
-      : rlsModule.authenticate;
+  if (!rlsModule) {
+    log.info('[auth] No RLS module configured, skipping auth');
+    return;
+  }
+
+  const authFn = opts.server?.strictAuth
+    ? rlsModule.authenticateStrict
+    : rlsModule.authenticate;
+
+  log.info(
+    `[auth] strictAuth=${opts.server?.strictAuth ?? false}, authFn=${authFn ?? 'none'}`
+  );
+
+  if (authFn && rlsModule.privateSchema.schemaName) {
+    const { authorization = '' } = req.headers;
+    const [authType] = authorization.split(' ');
+    const bearerToken = getBearerToken(req);
+    let token: any = {};
 
     log.info(
-      `[auth] strictAuth=${opts.server?.strictAuth ?? false}, authFn=${authFn ?? 'none'}`
+      `[auth] authorization header present=${!!authorization}, ` +
+          `authType=${authType ?? 'none'}, hasToken=${!!bearerToken}`
     );
 
-    if (authFn && rlsModule.privateSchema.schemaName) {
-      const { authorization = '' } = req.headers;
-      const [authType] = authorization.split(' ');
-      const bearerToken = getBearerToken(req);
-      let token: any = {};
+    // Resolve the credential: prefer Bearer header, fall back to session cookie
+    const cookieToken = parseCookieToken(req, SESSION_COOKIE_NAME);
+    const effectiveToken = bearerToken ?? cookieToken;
+    const tokenSource = bearerToken ? 'bearer' : (cookieToken ? 'cookie' : 'none');
 
-      log.info(
-        `[auth] authorization header present=${!!authorization}, ` +
-          `authType=${authType ?? 'none'}, hasToken=${!!bearerToken}`
-      );
+    if (effectiveToken) {
+      log.info(`[auth] Processing ${tokenSource} authentication`);
+      const context: Record<string, any> = {
+        'jwt.claims.ip_address': req.clientIp,
+      };
 
-      // Resolve the credential: prefer Bearer header, fall back to session cookie
-      const cookieToken = parseCookieToken(req, SESSION_COOKIE_NAME);
-      const effectiveToken = bearerToken ?? cookieToken;
-      const tokenSource = bearerToken ? 'bearer' : (cookieToken ? 'cookie' : 'none');
-
-      if (effectiveToken) {
-        log.info(`[auth] Processing ${tokenSource} authentication`);
-        const context: Record<string, any> = {
-          'jwt.claims.ip_address': req.clientIp,
-        };
-
-        if (req.get('origin')) {
-          context['jwt.claims.origin'] = req.get('origin');
-        }
-        if (req.get('User-Agent')) {
-          context['jwt.claims.user_agent'] = req.get('User-Agent');
-        }
-
-        const authQuery = `SELECT * FROM "${rlsModule.privateSchema.schemaName}"."${authFn}"($1)`;
-        log.info(`[auth] Executing auth query: ${authQuery}`);
-
-        try {
-          const result = await pgQueryContext({
-            client: pool,
-            context,
-            query: authQuery,
-            variables: [effectiveToken],
-          });
-
-          log.info(`[auth] Query result: rowCount=${result?.rowCount}`);
-
-          if (result?.rowCount === 0) {
-            log.info('[auth] No rows returned, returning UNAUTHENTICATED');
-            respondWithGraphQLError(res, errors.UNAUTHENTICATED());
-            return;
-          }
-
-          token = result.rows[0];
-          log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
-        } catch (e: any) {
-          log.error('[auth] Auth error:', e.message);
-          respondWithGraphQLError(
-            res,
-            errors.INTERNAL_FAILURE({
-              details: isDev() ? e.message : 'authentication failed',
-            })
-          );
-          return;
-        }
-      } else {
-        log.info('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
+      if (req.get('origin')) {
+        context['jwt.claims.origin'] = req.get('origin');
+      }
+      if (req.get('User-Agent')) {
+        context['jwt.claims.user_agent'] = req.get('User-Agent');
       }
 
-      req.token = token;
+      const authQuery = `SELECT * FROM "${rlsModule.privateSchema.schemaName}"."${authFn}"($1)`;
+      log.info(`[auth] Executing auth query: ${authQuery}`);
+
+      try {
+        const result = await pgQueryContext({
+          client: pool,
+          context,
+          query: authQuery,
+          variables: [effectiveToken],
+        });
+
+        log.info(`[auth] Query result: rowCount=${result?.rowCount}`);
+
+        if (result?.rowCount === 0) {
+          log.info('[auth] No rows returned, returning UNAUTHENTICATED');
+          return { error: errors.UNAUTHENTICATED() };
+        }
+
+        token = result.rows[0];
+        log.info(`[auth] Auth success: role=${token.role}, user_id=${token.user_id}`);
+      } catch (e: any) {
+        log.error('[auth] Auth error:', e.message);
+        return { error: errors.INTERNAL_FAILURE({
+          details: isDev() ? e.message : 'authentication failed',
+        }) };
+      }
     } else {
-      log.info(
-        `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +
+      log.info('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
+    }
+
+    req.token = token;
+  } else {
+    log.info(
+      `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +
           `privateSchema=${rlsModule.privateSchema?.schemaName ?? 'none'}`
-      );
-    }
+    );
+  }
 
-    // Read device token cookie for trusted device tracking
-    const deviceToken = parseCookieToken(req, DEVICE_TOKEN_COOKIE_NAME);
-    if (deviceToken) {
-      req.deviceToken = deviceToken;
-      log.info('[auth] Device token cookie present');
-    }
+  // Read device token cookie for trusted device tracking
+  const deviceToken = parseCookieToken(req, DEVICE_TOKEN_COOKIE_NAME);
+  if (deviceToken) {
+    req.deviceToken = deviceToken;
+    log.info('[auth] Device token cookie present');
+  }
 
+};
+
+export const createAuthenticateMiddleware = (opts: PgpmOptions): RequestHandler => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.api) {
+      res.status(500).send('Missing API info');
+      return;
+    }
+    const failure = await authenticateRequest(req, opts);
+    if (failure) {
+      respondWithError(req, res, failure.error, { status: failure.status });
+      return;
+    }
     next();
   };
 };

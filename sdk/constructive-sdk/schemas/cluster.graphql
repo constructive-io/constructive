@@ -12,6 +12,11 @@ type MetaBelongsToRelation {
   fieldName: String
   isUnique: Boolean!
   keys: [MetaField!]!
+
+  """
+  Fields on the referenced table that keys point at, in the same order as keys
+  """
+  refKeys: [MetaField!]!
   references: MetaRefTable!
   type: String
 }
@@ -34,20 +39,64 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """
+  Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only.
+  """
+  allowedValues: [String!]
+
   """PostgreSQL column name"""
   columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
   enumValues: MetaEnum
+
+  """
+  Set when the field holds files; null otherwise. Set on a table's own fields only.
+  """
+  file: MetaFileField
   hasDefault: Boolean!
+
+  """
+  Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only.
+  """
+  isComputed: Boolean
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
 
+  """
+  Whether a create must provide this field. Set on a table's own fields only.
+  """
+  isRequiredOnCreate: Boolean
+
+  """Whether a create may set this field. Set on a table's own fields only."""
+  isWritableOnCreate: Boolean
+
+  """
+  Whether an update may change this field. Set on a table's own fields only.
+  """
+  isWritableOnUpdate: Boolean
+
   """Final GraphQL field name"""
   name: String!
   type: MetaType!
+}
+
+"""How a field holds files"""
+type MetaFileField {
+  """
+  GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise
+  """
+  filesType: String
+
+  """Whether the field holds a list of files"""
+  isMultiple: Boolean!
+
+  """
+  image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.
+  """
+  kind: String!
 }
 
 """Information about a foreign key constraint"""
@@ -66,10 +115,15 @@ type MetaHasRelation {
   isUnique: Boolean!
   keys: [MetaField!]!
   referencedBy: MetaRefTable!
+
+  """
+  Fields on the related table that point at this table, in the same order as keys
+  """
+  remoteKeys: [MetaField!]!
   type: String
 }
 
-"""i18n metadata for a table with @i18n tag"""
+"""i18n metadata for a translatable table"""
 type MetaI18n {
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
@@ -96,7 +150,7 @@ type MetaIndex {
   name: String!
 }
 
-"""Table inflection names"""
+"""Type and field names generated for this table"""
 type MetaInflection {
   allRows: String!
   conditionType: String!
@@ -141,7 +195,7 @@ type MetaQuery {
   update: String
 }
 
-"""Realtime metadata for a table with @realtime tag"""
+"""Realtime metadata for a table with change subscriptions"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
@@ -162,13 +216,15 @@ type MetaRelations {
 }
 
 """
-How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.
 """
 type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
   dimensions: Int
 
-  """For 'ltree': values are dot-separated path strings."""
+  """
+  For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c').
+  """
   dotPath: Boolean
 
   """For 'vector': element scalar (e.g. 'float')."""
@@ -193,11 +249,11 @@ type MetaSchema {
 
 """Provisioning scope metadata for a table"""
 type MetaScope {
-  """SQL name of the entity table for entity scopes, else null"""
+  """Name of the entity table for entity scopes, else null"""
   entityTable: String
 
   """
-  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  Field name of the scope key (e.g. databaseId, orgId), null for global tiers
   """
   keyColumn: String
 
@@ -206,7 +262,7 @@ type MetaScope {
   """
   scope: String!
 
-  """Provenance of the scope metadata (always 'smartTag')"""
+  """Where this scope metadata comes from"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -237,7 +293,7 @@ type MetaSearchColumn {
   name: String!
 }
 
-"""Per-table search configuration from @searchConfig smart tag"""
+"""Per-table search configuration"""
 type MetaSearchConfig {
   """Exponential decay factor per day"""
   boostRecencyDecay: Float
@@ -254,7 +310,7 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
-  """GraphQL type name of the plane's buckets table"""
+  """GraphQL type name of the paired buckets table"""
   bucketsType: String!
 
   """
@@ -262,7 +318,7 @@ type MetaStorage {
   """
   downloadUrlField: String
 
-  """GraphQL type name of the plane's files table"""
+  """GraphQL type name of the paired files table"""
   filesType: String!
 
   """Whether this table is a storage buckets table"""
@@ -271,13 +327,11 @@ type MetaStorage {
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
 
-  """The plane's GraphQL upload surface"""
+  """Upload mutations and types for this storage"""
   upload: MetaStorageUpload!
 }
 
-"""
-The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
-"""
+"""The upload mutations and types for a storage table pair"""
 type MetaStorageUpload {
   """Per-file input type inside the bulk input"""
   bulkFileInputType: String!
@@ -303,32 +357,45 @@ type MetaStorageUpload {
   """Payload type of the single upload mutation"""
   payloadType: String!
 
-  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  """Whether the upload input requires ownerId"""
   requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
 type MetaTable {
   constraints: MetaConstraints!
+
+  """Description written for this table, or null"""
+  description: String
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
-  """i18n metadata (null if no @i18n tag)"""
+  """i18n metadata (null if the table is not translatable)"""
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """
+  Whether this table only links rows of two other tables; the link appears in their manyToMany relations
+  """
+  isJunction: Boolean!
+
+  """
+  'table' when rows are stored in this table, 'view' when they come from a view of other tables
+  """
+  kind: String!
 
   """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
 
-  """Realtime metadata (null if no @realtime tag)"""
+  """Realtime metadata (null if the table has no change subscriptions)"""
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag)"""
+  """Provisioning scope metadata (null if the table has no scope)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
@@ -350,7 +417,22 @@ type MetaType {
   hasDefault: Boolean
   isArray: Boolean!
   isNotNull: Boolean
+
+  """
+  Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded.
+  """
+  maxLength: Int
   pgType: String!
+
+  """
+  Most significant digits a decimal number may hold. Null when unbounded.
+  """
+  precision: Int
+
+  """
+  Digits a decimal number keeps after the decimal point. Null when unbounded.
+  """
+  scale: Int
   subtype: String
 }
 

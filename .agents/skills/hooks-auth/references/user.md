@@ -30,5 +30,5 @@ const { data, isLoading } = useUsersQuery({
 const { mutate } = useCreateUserMutation({
   selection: { fields: { id: true } },
 });
-mutate({ displayName: '<String>', displayNameTrgmSimilarity: '<Float>', profilePicture: '<Image>', searchScore: '<Float>', searchTsv: '<FullText>', searchTsvRank: '<Float>', type: '<Int>', username: '<String>' });
+mutate({ displayName: '<String>', profilePicture: '<Image>', type: '<Int>', username: '<String>' });
 ```

@@ -248,12 +248,9 @@ export function resolveStorageConfigFromCodec(
  * LRU cache for per-database bucket metadata.
  *
  * Buckets are essentially static config — created once and rarely changed.
- * Caching avoids a DB query on every requestUploadUrl call. The bucket
- * lookup in the plugin runs under RLS, but since AuthzEntityMembership
- * grants all org members access to all org buckets, and the cached data
- * is just config (mime types, size limits), bypassing RLS on cache hits
- * is safe. The important RLS is on the files table (INSERT/UPDATE),
- * which is never cached.
+ * A cache hit still reads the bucket's id under the caller's RLS: callers of
+ * the same database do not all see the same buckets (an unapproved user sees
+ * none), so the cached config is returned only when that visible id matches.
  *
  * Only reconciled rows are cached: a row without a recorded `physical_name`
  * is still waiting on the reconciler, so it is re-read until the name lands
@@ -310,13 +307,15 @@ export function storedPhysicalName(row: { physical_name?: string | null }): stri
  * Resolve bucket metadata for a given database + bucket key, using the LRU cache.
  *
  * On cache miss, queries the bucket table (RLS-enforced via pgSettings on
- * the pgClient). On cache hit, returns the cached metadata directly.
+ * the pgClient). On cache hit, returns the cached metadata only if the caller
+ * can see a bucket with the cached id under the same key.
  *
  * @param pgClient - A pg client from the Graphile context
  * @param storageConfig - The resolved StorageModuleConfig for this database/scope
  * @param databaseId - The metaschema database UUID (used as cache key prefix)
  * @param bucketKey - The bucket key (e.g., "public", "private")
  * @param ownerId - Optional owner entity ID for entity-scoped bucket lookup
+ * @param byDatabase - The plane is database-keyed: read the bucket of `databaseId` only
  * @returns BucketConfig or null if the bucket doesn't exist / isn't accessible
  */
 export async function getBucketConfig(
@@ -325,31 +324,38 @@ export async function getBucketConfig(
   databaseId: string,
   bucketKey: string,
   ownerId?: string,
+  byDatabase = false,
 ): Promise<BucketConfig | null> {
   const cacheKey = `bucket:${databaseId}:${storageConfig.id}:${bucketKey}${ownerId ? `:${ownerId}` : ''}`;
+  // Entity-keyed planes (the module records an entity table) use the
+  // (owner_id, key) composite lookup; app- and database-scope planes just use key.
+  // Database-keyed planes hold every database's buckets under the same keys.
+  const isEntityScoped = storageConfig.entityTableId !== null;
+  const hasOwner = ownerId && isEntityScoped;
+  const scopeFilter = byDatabase ? ` AND database_id = $${hasOwner ? 3 : 2}` : '';
+  const where = `${hasOwner ? 'key = $1 AND owner_id = $2' : 'key = $1'}${scopeFilter}`;
+  const values = [bucketKey, ...(hasOwner ? [ownerId] : []), ...(byDatabase ? [databaseId] : [])];
+
   const cached = bucketCache.get(cacheKey);
   if (cached) {
-    return cached;
+    const visible = await pgClient.query({
+      text: `SELECT id FROM ${storageConfig.bucketsQualifiedName} WHERE ${where} LIMIT 1`,
+      values,
+    });
+    const visibleId = (visible.rows[0] as { id?: string } | undefined)?.id;
+    if (!visibleId) return null;
+    if (visibleId === cached.id) return cached;
   }
 
   log.debug(`Bucket cache miss for ${databaseId}:${bucketKey}${ownerId ? ` (owner=${ownerId})` : ''}, querying DB...`);
 
   return readAndCache(databaseId, 'bucket', async () => {
-    // Entity-keyed planes (the module records an entity table) use the
-    // (owner_id, key) composite lookup; app- and database-scope planes just use key.
-    const isEntityScoped = storageConfig.entityTableId !== null;
-    const hasOwner = ownerId && isEntityScoped;
     const result = await pgClient.query({
-      text: hasOwner
-        ? `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size, allow_custom_keys, physical_name
+      text: `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys, physical_name
            FROM ${storageConfig.bucketsQualifiedName}
-           WHERE key = $1 AND owner_id = $2
-           LIMIT 1`
-        : `SELECT id, key, type, is_public, ${isEntityScoped ? 'owner_id,' : ''} allowed_mime_types, max_file_size, allow_custom_keys, physical_name
-           FROM ${storageConfig.bucketsQualifiedName}
-           WHERE key = $1
+           WHERE ${where}
            LIMIT 1`,
-      values: hasOwner ? [bucketKey, ownerId] : [bucketKey],
+      values,
     });
 
     if (result.rows.length === 0) {

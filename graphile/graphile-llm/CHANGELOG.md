@@ -3,6 +3,158 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.1...graphile-llm@1.25.2) (2026-11-23)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.25.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.0...graphile-llm@1.25.1) (2026-11-23)
+
+**Note:** Version bump only for package graphile-llm
+
+# [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.9...graphile-llm@1.25.0) (2026-11-22)
+
+### Features
+
+- **graphile-search:** vector search in the request language on tables with translations ([#2048](https://github.com/constructive-io/constructive/issues/2048)) ([ebf6839](https://github.com/constructive-io/constructive/commit/ebf68391bcc0f54d8e36cf8da37b05a5c304e04b))
+
+## [1.24.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.8...graphile-llm@1.24.9) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.7...graphile-llm@1.24.8) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.6...graphile-llm@1.24.7) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.5...graphile-llm@1.24.6) (2026-11-19)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.4...graphile-llm@1.24.5) (2026-11-19)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.3...graphile-llm@1.24.4) (2026-11-18)
+
+### Bug Fixes
+
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+
+## [1.24.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.2...graphile-llm@1.24.3) (2026-11-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.1...graphile-llm@1.24.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.0...graphile-llm@1.24.1) (2026-11-17)
+
+### Bug Fixes
+
+- **graphile-llm:** add `{col}Text` only to inputs that carry `{col}` ([#2006](https://github.com/constructive-io/constructive/issues/2006)) ([14d3e8d](https://github.com/constructive-io/constructive/commit/14d3e8d8c680d7c28dce748ddf49114a2fb2d95b))
+
+# [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.10...graphile-llm@1.24.0) (2026-11-16)
+
+### Bug Fixes
+
+- **llm:** stamp the model beside a vector embedded on a write; label an embedded text with its own model ([c4f034b](https://github.com/constructive-io/constructive/commit/c4f034be008210d53774587b53b4f2d3db6637cb))
+
+### Features
+
+- **search:** search each vector column with its own model, against rows of that model only ([9c3f82e](https://github.com/constructive-io/constructive/commit/9c3f82eafbcb4573db86b63cbf0e04064e22be36))
+
+## [1.23.10](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.9...graphile-llm@1.23.10) (2026-11-16)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.8...graphile-llm@1.23.9) (2026-11-16)
+
+### Bug Fixes
+
+- **graphile-search:** unifiedSearch leaves out a vector column of another length than the query vector ([54b4cbd](https://github.com/constructive-io/constructive/commit/54b4cbd877570baff4fa13de553db59bbe421d02))
+
+## [1.23.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.7...graphile-llm@1.23.8) (2026-11-14)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.6...graphile-llm@1.23.7) (2026-11-12)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.5...graphile-llm@1.23.6) (2026-11-09)
+
+### Bug Fixes
+
+- **graphile-llm:** treat blank VectorNearbyInput text as not given ([e7239cf](https://github.com/constructive-io/constructive/commit/e7239cf436eb5aa274753c9c21579d10ba6882f1))
+
+## [1.23.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.4...graphile-llm@1.23.5) (2026-11-08)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.3...graphile-llm@1.23.4) (2026-11-06)
+
+### Bug Fixes
+
+- **graphile-test:** validate the document before executing it ([9ea5e41](https://github.com/constructive-io/constructive/commit/9ea5e411d5c451adeafa36b23cbb7dc827c27cee))
+
+## [1.23.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.2...graphile-llm@1.23.3) (2026-11-05)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.1...graphile-llm@1.23.2) (2026-11-05)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.23.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.0...graphile-llm@1.23.1) (2026-11-05)
+
+**Note:** Version bump only for package graphile-llm
+
+# [1.23.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.22.1...graphile-llm@1.23.0) (2026-11-05)
+
+### Bug Fixes
+
+- **graphile-llm:** RAG and embedText resolve the full request scope; gateway forwards max_tokens to Ollama ([3f2920c](https://github.com/constructive-io/constructive/commit/3f2920cfd7ead170e3c01c45aa62e8694dd006cd))
+
+### Features
+
+- **graphile-llm:** every model call goes through the gateway; no direct provider route ([81ec4f2](https://github.com/constructive-io/constructive/commit/81ec4f2e142e35cbe3ad1384ca4aacf8abc6d4a5))
+- **graphile-llm:** route server-side embeddings and completions through the metered gateway ([037c1ed](https://github.com/constructive-io/constructive/commit/037c1ede0dab34c044e8af809f4487e3b7ab8093))
+
+## [1.22.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.22.0...graphile-llm@1.22.1) (2026-11-05)
+
+**Note:** Version bump only for package graphile-llm
+
+# [1.22.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.9...graphile-llm@1.22.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+## [1.21.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.8...graphile-llm@1.21.9) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of a vector column or its text companion on create/update ([e4d9350](https://github.com/constructive-io/constructive/commit/e4d93504f65ec8d3eaac6cff51149055192b226e))
+
+## [1.21.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.7...graphile-llm@1.21.8) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** require exactly one of vector or text on VectorNearbyInput ([a20df3d](https://github.com/constructive-io/constructive/commit/a20df3dc0bfdbfd55c0da0fd46e9e42a327fef63))
+
+## [1.21.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.6...graphile-llm@1.21.7) (2026-11-04)
+
+### Bug Fixes
+
+- **graphile-llm:** compute embed reachability as a fixed point over cyclic filter types ([c1402b6](https://github.com/constructive-io/constructive/commit/c1402b65c9111ebca14bcdba7730662aa5d01a10))
+- **graphile-llm:** embed text inputs at plan time so Grafast sends vectors to SQL ([046aa88](https://github.com/constructive-io/constructive/commit/046aa88a66a56396ef919a43b98c8edb23da15c6))
+- **graphile-llm:** keep exporting embedTextInWhere ([047e503](https://github.com/constructive-io/constructive/commit/047e503742ab60c0ea0b4b5ca7f05b8fe4ab5e07))
+- **graphile-llm:** treat an empty embedding as a failed embed ([54f3648](https://github.com/constructive-io/constructive/commit/54f3648ee250ef3bd26e3ce17d070ee3e2fe56d9))
+
 ## [1.21.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.21.5...graphile-llm@1.21.6) (2026-11-01)
 
 **Note:** Version bump only for package graphile-llm

@@ -3,6 +3,162 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.32.16](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.15...graphile-settings@6.32.16) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [6.32.15](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.14...graphile-settings@6.32.15) (2026-11-23)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.14](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.13...graphile-settings@6.32.14) (2026-11-22)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.13](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.12...graphile-settings@6.32.13) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
+## [6.32.12](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.11...graphile-settings@6.32.12) (2026-11-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.11](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.10...graphile-settings@6.32.11) (2026-11-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.10](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.9...graphile-settings@6.32.10) (2026-11-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.9](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.8...graphile-settings@6.32.9) (2026-11-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.8](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.7...graphile-settings@6.32.8) (2026-11-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.7](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.6...graphile-settings@6.32.7) (2026-11-19)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.6](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.5...graphile-settings@6.32.6) (2026-11-19)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.5](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.4...graphile-settings@6.32.5) (2026-11-18)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.3...graphile-settings@6.32.4) (2026-11-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.2...graphile-settings@6.32.3) (2026-11-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.1...graphile-settings@6.32.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.32.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.0...graphile-settings@6.32.1) (2026-11-16)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.32.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.15...graphile-settings@6.32.0) (2026-11-16)
+
+### Bug Fixes
+
+- **graphile-settings:** give every enum label a valid, stable GraphQL name ([642df68](https://github.com/constructive-io/constructive/commit/642df68e928fa62ee3e7db21a0e3191aca87975a))
+
+### Features
+
+- **graphile-meta:** grid metadata for keys, relations, files and type limits ([4c15806](https://github.com/constructive-io/constructive/commit/4c15806bab797746149640edea0c3967689f8b03))
+
+## [6.31.15](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.14...graphile-settings@6.31.15) (2026-11-16)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.14](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.13...graphile-settings@6.31.14) (2026-11-14)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.13](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.12...graphile-settings@6.31.13) (2026-11-12)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.12](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.11...graphile-settings@6.31.12) (2026-11-11)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.11](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.10...graphile-settings@6.31.11) (2026-11-11)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.10](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.9...graphile-settings@6.31.10) (2026-11-10)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.9](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.8...graphile-settings@6.31.9) (2026-11-09)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.8](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.7...graphile-settings@6.31.8) (2026-11-09)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.7](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.6...graphile-settings@6.31.7) (2026-11-08)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.6](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.5...graphile-settings@6.31.6) (2026-11-06)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.5](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.4...graphile-settings@6.31.5) (2026-11-05)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.3...graphile-settings@6.31.4) (2026-11-05)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.2...graphile-settings@6.31.3) (2026-11-05)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.2](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.1...graphile-settings@6.31.2) (2026-11-05)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.31.1](https://github.com/constructive-io/constructive/compare/graphile-settings@6.31.0...graphile-settings@6.31.1) (2026-11-05)
+
+**Note:** Version bump only for package graphile-settings
+
+# [6.31.0](https://github.com/constructive-io/constructive/compare/graphile-settings@6.30.6...graphile-settings@6.31.0) (2026-11-05)
+
+### Features
+
+- **graphile:** remove multipart uploads and graphile-llm metering ([81d8c5f](https://github.com/constructive-io/constructive/commit/81d8c5fde4f2f1fb13197f3bb5fb5c419f988d27))
+
+## [6.30.6](https://github.com/constructive-io/constructive/compare/graphile-settings@6.30.5...graphile-settings@6.30.6) (2026-11-04)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.30.5](https://github.com/constructive-io/constructive/compare/graphile-settings@6.30.4...graphile-settings@6.30.5) (2026-11-04)
+
+**Note:** Version bump only for package graphile-settings
+
+## [6.30.4](https://github.com/constructive-io/constructive/compare/graphile-settings@6.30.3...graphile-settings@6.30.4) (2026-11-04)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [6.30.3](https://github.com/constructive-io/constructive/compare/graphile-settings@6.30.2...graphile-settings@6.30.3) (2026-11-04)
 
 ### Bug Fixes

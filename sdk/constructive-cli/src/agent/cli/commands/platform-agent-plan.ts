@@ -85,6 +85,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<PlatformAgentPlanSelect, PlatformAgentPlanFilter, PlatformAgentPlanOrderBy> & {
@@ -113,6 +114,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       threadId: true,
       title: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<PlatformAgentPlanSelect, PlatformAgentPlanFilter, PlatformAgentPlanOrderBy> & {
@@ -153,6 +155,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -226,6 +229,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -280,6 +284,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'title',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PlatformAgentPlanPatch;
@@ -295,6 +305,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           status: cleanedData.status,
           threadId: cleanedData.threadId,
           title: cleanedData.title,
+          visibility: cleanedData.visibility,
         },
         select: {
           createdAt: true,
@@ -305,6 +316,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           threadId: true,
           title: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

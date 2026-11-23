@@ -35,21 +35,12 @@ import { requireDatabaseId } from './types';
  */
 const AUTH_SURFACE_SQL = `
   SELECT
-    auth_private.schema_name AS private_schema,
-    auth_public.schema_name AS public_schema,
-    identifiers_public.schema_name AS identifiers_public_schema,
-    emails.table_name AS emails_table,
-    'user_' || connected.table_name AS connected_accounts_view
-  FROM metaschema_modules_public.identity_providers_module providers
-  JOIN metaschema_public.schema auth_private ON auth_private.id = providers.private_schema_id
-  JOIN metaschema_public.schema auth_public ON auth_public.id = providers.schema_id
-  JOIN metaschema_modules_public.connected_accounts_module connected
-    ON connected.database_id = providers.database_id
-  JOIN metaschema_public.schema identifiers_public ON identifiers_public.id = connected.schema_id
-  JOIN metaschema_modules_public.emails_module emails
-    ON emails.database_id = providers.database_id
-  WHERE providers.database_id = $1
-  LIMIT 1
+    private_schema,
+    public_schema,
+    identifiers_public_schema,
+    emails_table,
+    connected_accounts_view
+  FROM function_resolution.auth_surface_entry($1)
 `;
 
 // ─── Row Types ──────────────────────────────────────────────────────────────

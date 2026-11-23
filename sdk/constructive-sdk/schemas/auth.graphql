@@ -400,6 +400,31 @@ input BooleanFilter {
   notIn: [Boolean!]
 }
 
+"""All input for the `cancelSignUpHandoff` mutation."""
+input CancelSignUpHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  codeChallenge: String
+  email: String
+}
+
+"""The output of our `cancelSignUpHandoff` mutation."""
+type CancelSignUpHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `checkPassword` mutation."""
 input CheckPasswordInput {
   """
@@ -2250,6 +2275,67 @@ type EnableTotpPayload {
   result: String
 }
 
+"""All input for the `ensureAuthCsrf` mutation."""
+input EnsureAuthCsrfInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  existingToken: String
+}
+
+"""The output of our `ensureAuthCsrf` mutation."""
+type EnsureAuthCsrfPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: String
+}
+
+"""All input for the `exchangeNativeHandoff` mutation."""
+input ExchangeNativeHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  code: String
+  codeVerifier: String
+  credentialKind: String
+}
+
+"""The output of our `exchangeNativeHandoff` mutation."""
+type ExchangeNativeHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: ExchangeNativeHandoffRecord
+}
+
+type ExchangeNativeHandoffRecord {
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  id: UUID
+  isVerified: Boolean
+  totpEnabled: Boolean
+  userId: UUID
+}
+
 """All input for the `extendTokenExpires` mutation."""
 input ExtendTokenExpiresInput {
   amount: IntervalInput
@@ -2280,6 +2366,17 @@ type ExtendTokenExpiresRecord {
   expiresAt: Datetime
   id: UUID
   sessionId: UUID
+}
+
+"""One version rendered beside a file, with a URL to fetch it."""
+type FileVersion {
+  format: String
+  height: Int
+  key: String!
+  name: String
+  size: Int
+  url: String!
+  width: Int
 }
 
 """All input for the `forgotPassword` mutation."""
@@ -2714,9 +2811,7 @@ input LinkIdentityInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  details: JSON
-  identifier: String!
-  service: String!
+  ticket: String
 }
 
 """The output of our `linkIdentity` mutation."""
@@ -2731,7 +2826,7 @@ type LinkIdentityPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: Boolean
+  result: JSON
 }
 
 """A belongs-to (forward FK) relation"""
@@ -2739,6 +2834,11 @@ type MetaBelongsToRelation {
   fieldName: String
   isUnique: Boolean!
   keys: [MetaField!]!
+
+  """
+  Fields on the referenced table that keys point at, in the same order as keys
+  """
+  refKeys: [MetaField!]!
   references: MetaRefTable!
   type: String
 }
@@ -2761,20 +2861,64 @@ type MetaEnum {
 
 """Information about a table field/column"""
 type MetaField {
+  """
+  Values this field accepts, when the set is fixed; null otherwise. Set on a table's own fields only.
+  """
+  allowedValues: [String!]
+
   """PostgreSQL column name"""
   columnName: String!
   description: String
 
   """Enum metadata if this field has an enum type"""
   enumValues: MetaEnum
+
+  """
+  Set when the field holds files; null otherwise. Set on a table's own fields only.
+  """
+  file: MetaFileField
   hasDefault: Boolean!
+
+  """
+  Whether the value is always computed and cannot be written, even when a create or update input offers the field. Set on a table's own fields only.
+  """
+  isComputed: Boolean
   isForeignKey: Boolean!
   isNotNull: Boolean!
   isPrimaryKey: Boolean!
 
+  """
+  Whether a create must provide this field. Set on a table's own fields only.
+  """
+  isRequiredOnCreate: Boolean
+
+  """Whether a create may set this field. Set on a table's own fields only."""
+  isWritableOnCreate: Boolean
+
+  """
+  Whether an update may change this field. Set on a table's own fields only.
+  """
+  isWritableOnUpdate: Boolean
+
   """Final GraphQL field name"""
   name: String!
   type: MetaType!
+}
+
+"""How a field holds files"""
+type MetaFileField {
+  """
+  GraphQL type name of the files table uploads are recorded in, when this API has exactly one; null otherwise
+  """
+  filesType: String
+
+  """Whether the field holds a list of files"""
+  isMultiple: Boolean!
+
+  """
+  image, upload, or attachment. An image or upload holds a file document; an attachment holds a link to a file.
+  """
+  kind: String!
 }
 
 """Information about a foreign key constraint"""
@@ -2793,10 +2937,15 @@ type MetaHasRelation {
   isUnique: Boolean!
   keys: [MetaField!]!
   referencedBy: MetaRefTable!
+
+  """
+  Fields on the related table that point at this table, in the same order as keys
+  """
+  remoteKeys: [MetaField!]!
   type: String
 }
 
-"""i18n metadata for a table with @i18n tag"""
+"""i18n metadata for a translatable table"""
 type MetaI18n {
   """Fields that are translatable"""
   translatableFields: [MetaI18nField!]!
@@ -2823,7 +2972,7 @@ type MetaIndex {
   name: String!
 }
 
-"""Table inflection names"""
+"""Type and field names generated for this table"""
 type MetaInflection {
   allRows: String!
   conditionType: String!
@@ -2868,7 +3017,7 @@ type MetaQuery {
   update: String
 }
 
-"""Realtime metadata for a table with @realtime tag"""
+"""Realtime metadata for a table with change subscriptions"""
 type MetaRealtime {
   """The generated subscription field name (e.g. onPostChanged)"""
   subscriptionFieldName: String!
@@ -2889,13 +3038,15 @@ type MetaRelations {
 }
 
 """
-How a client must serialize/parse a scalar — the one field-type detail standard GraphQL introspection cannot describe. Null for plain scalars whose wire format is obvious from gqlType.
+How a client must serialize and parse a scalar whose wire format gqlType alone does not settle. Null for plain scalars whose wire format is obvious from gqlType.
 """
 type MetaScalarEncoding {
   """For 'vector': declared length, else null."""
   dimensions: Int
 
-  """For 'ltree': values are dot-separated path strings."""
+  """
+  For 'ltree': true when values are dot-separated paths ('a.b.c'), false when they are slash-separated paths ('/a/b/c').
+  """
   dotPath: Boolean
 
   """For 'vector': element scalar (e.g. 'float')."""
@@ -2920,11 +3071,11 @@ type MetaSchema {
 
 """Provisioning scope metadata for a table"""
 type MetaScope {
-  """SQL name of the entity table for entity scopes, else null"""
+  """Name of the entity table for entity scopes, else null"""
   entityTable: String
 
   """
-  Inflected scope key column (e.g. databaseId, orgId), null for global tiers
+  Field name of the scope key (e.g. databaseId, orgId), null for global tiers
   """
   keyColumn: String
 
@@ -2933,7 +3084,7 @@ type MetaScope {
   """
   scope: String!
 
-  """Provenance of the scope metadata (always 'smartTag')"""
+  """Where this scope metadata comes from"""
   source: String!
 
   """Coarse bucket: 'global', 'database', or 'entity'"""
@@ -2964,7 +3115,7 @@ type MetaSearchColumn {
   name: String!
 }
 
-"""Per-table search configuration from @searchConfig smart tag"""
+"""Per-table search configuration"""
 type MetaSearchConfig {
   """Exponential decay factor per day"""
   boostRecencyDecay: Float
@@ -2981,7 +3132,7 @@ type MetaSearchConfig {
 
 """Storage metadata for a table"""
 type MetaStorage {
-  """GraphQL type name of the plane's buckets table"""
+  """GraphQL type name of the paired buckets table"""
   bucketsType: String!
 
   """
@@ -2989,7 +3140,7 @@ type MetaStorage {
   """
   downloadUrlField: String
 
-  """GraphQL type name of the plane's files table"""
+  """GraphQL type name of the paired files table"""
   filesType: String!
 
   """Whether this table is a storage buckets table"""
@@ -2998,13 +3149,11 @@ type MetaStorage {
   """Whether this table is a storage files table"""
   isFilesTable: Boolean!
 
-  """The plane's GraphQL upload surface"""
+  """Upload mutations and types for this storage"""
   upload: MetaStorageUpload!
 }
 
-"""
-The GraphQL upload surface of a storage plane, derived from the registry facts the presigned-url plugin emits from
-"""
+"""The upload mutations and types for a storage table pair"""
 type MetaStorageUpload {
   """Per-file input type inside the bulk input"""
   bulkFileInputType: String!
@@ -3030,32 +3179,45 @@ type MetaStorageUpload {
   """Payload type of the single upload mutation"""
   payloadType: String!
 
-  """Whether the upload input requires ownerId (entity-keyed plane)"""
+  """Whether the upload input requires ownerId"""
   requiresOwnerId: Boolean!
 }
 
 """Information about a database table"""
 type MetaTable {
   constraints: MetaConstraints!
+
+  """Description written for this table, or null"""
+  description: String
   fields: [MetaField!]!
   foreignKeyConstraints: [MetaForeignKeyConstraint!]!
 
-  """i18n metadata (null if no @i18n tag)"""
+  """i18n metadata (null if the table is not translatable)"""
   i18n: MetaI18n
   indexes: [MetaIndex!]!
   inflection: MetaInflection!
+
+  """
+  Whether this table only links rows of two other tables; the link appears in their manyToMany relations
+  """
+  isJunction: Boolean!
+
+  """
+  'table' when rows are stored in this table, 'view' when they come from a view of other tables
+  """
+  kind: String!
 
   """Final GraphQL output type name"""
   name: String!
   primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
   query: MetaQuery!
 
-  """Realtime metadata (null if no @realtime tag)"""
+  """Realtime metadata (null if the table has no change subscriptions)"""
   realtime: MetaRealtime
   relations: MetaRelations!
   schemaName: String!
 
-  """Provisioning scope metadata (null if no @scope tag)"""
+  """Provisioning scope metadata (null if the table has no scope)"""
   scope: MetaScope
 
   """Search metadata (null if no search configured)"""
@@ -3077,7 +3239,22 @@ type MetaType {
   hasDefault: Boolean
   isArray: Boolean!
   isNotNull: Boolean
+
+  """
+  Most characters a text value may hold, or most bits a bit string may hold; for a list, each item. Null when unbounded.
+  """
+  maxLength: Int
   pgType: String!
+
+  """
+  Most significant digits a decimal number may hold. Null when unbounded.
+  """
+  precision: Int
+
+  """
+  Digits a decimal number keeps after the decimal point. Null when unbounded.
+  """
+  scale: Int
   subtype: String
 }
 
@@ -3134,6 +3311,12 @@ type Mutation {
     """
     input: ApproveDeviceInput!
   ): ApproveDevicePayload
+  cancelSignUpHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CancelSignUpHandoffInput!
+  ): CancelSignUpHandoffPayload
   checkPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3158,6 +3341,10 @@ type Mutation {
     """
     input: ConfirmTotpSetupInput!
   ): ConfirmTotpSetupPayload
+
+  """
+  Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
+  """
   createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3392,6 +3579,18 @@ type Mutation {
     """
     input: EnableTotpInput!
   ): EnableTotpPayload
+  ensureAuthCsrf(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: EnsureAuthCsrfInput!
+  ): EnsureAuthCsrfPayload
+  exchangeNativeHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ExchangeNativeHandoffInput!
+  ): ExchangeNativeHandoffPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3449,6 +3648,12 @@ type Mutation {
     """
     input: RequestCrossOriginTokenInput!
   ): RequestCrossOriginTokenPayload
+  requestDeviceApproval(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestDeviceApprovalInput!
+  ): RequestDeviceApprovalPayload
   requestMagicLink(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3667,6 +3872,12 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  verifyEmailHandoff(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyEmailHandoffInput!
+  ): VerifyEmailHandoffPayload
   verifyPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4930,6 +5141,7 @@ type Query {
     """
     where: RoleTypeFilter
   ): RoleTypeConnection
+  signInOptions: SignInOptionsRecord
 
   """Reads and enables pagination through a set of `UserConnectedAccount`."""
   userConnectedAccounts(
@@ -5139,6 +5351,33 @@ type RequestCrossOriginTokenPayload {
   result: String
 }
 
+"""All input for the `requestDeviceApproval` mutation."""
+input RequestDeviceApprovalInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  deviceToken: String
+  next: String
+  userId: UUID
+}
+
+"""The output of our `requestDeviceApproval` mutation."""
+type RequestDeviceApprovalPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: Boolean
+}
+
 """All input for the `requestMagicLink` mutation."""
 input RequestMagicLinkInput {
   """
@@ -5146,7 +5385,9 @@ input RequestMagicLinkInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  codeChallenge: String
   email: String
+  nativeRedirectUri: String
   next: String
 }
 
@@ -5503,6 +5744,7 @@ input SetPasswordInput {
   clientMutationId: String
   currentPassword: String
   newPassword: String
+  signOutOtherSessions: Boolean
 }
 
 """The output of our `setPassword` mutation."""
@@ -5658,11 +5900,35 @@ type SignInMagicLinkPayload {
 type SignInMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  codeChallenge: String
   deviceApprovalRequired: Boolean
   mfaChallengeToken: String
   mfaRequired: Boolean
+  nativeRedirectUri: String
   outDeviceToken: String
   userId: UUID
+}
+
+type SignInOptionsRecord {
+  allowAnonymousSessions: Boolean
+  allowEmailOtpSignIn: Boolean
+  allowIdentitySignIn: Boolean
+  allowIdentitySignUp: Boolean
+  allowMagicLinkSignIn: Boolean
+  allowMagicLinkSignUp: Boolean
+  allowPasswordSignIn: Boolean
+  allowPasswordSignUp: Boolean
+  allowSignUp: Boolean
+  allowSmsSignIn: Boolean
+  allowSmsSignUp: Boolean
+  allowWebauthnSignIn: Boolean
+  allowWebauthnSignUp: Boolean
+  allowWebauthnUsernameless: Boolean
+  enableCaptcha: Boolean
+  identityProviders: JSON
+  nativeSignUpHandoff: Boolean
+  requireMfa: Boolean
+  signUpRequiresInvite: Boolean
 }
 
 """The output of our `signIn` mutation."""
@@ -5763,9 +6029,11 @@ input SignUpInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  codeChallenge: String
   csrfToken: String
   email: String
   inviteToken: String
+  nativeRedirectUri: String
   password: String
 }
 
@@ -5801,6 +6069,8 @@ type SignUpMagicLinkPayload {
 type SignUpMagicLinkRecord {
   accessToken: String
   accessTokenExpiresAt: Datetime
+  codeChallenge: String
+  nativeRedirectUri: String
   outDeviceToken: String
   userId: UUID
 }
@@ -6631,9 +6901,6 @@ type UpdateWebauthnCredentialPayload {
   ): WebauthnCredentialEdge
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 type User {
   """Reads and enables pagination through a set of `AuditLogAuth`."""
   authAuditLog(
@@ -6794,6 +7061,21 @@ type User {
     where: PrincipalFilter
   ): PrincipalConnection!
   profilePicture: ConstructiveInternalTypeImage
+
+  """
+  URL to fetch `profilePicture`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch.
+  """
+  profilePictureUrl(
+    """
+    The width the file will be shown at, in device pixels. Without a version that wide, the source.
+    """
+    width: Int
+  ): String
+
+  """
+  The versions rendered beside `profilePicture`, narrowest first, each with a URL. Empty when there are none.
+  """
+  profilePictureVersions: [FileVersion!]
 
   """Reads a single `RoleType` that is related to this `User`."""
   roleType: RoleType
@@ -7151,9 +7433,6 @@ input UserPatch {
   displayName: String
   id: UUID
   profilePicture: ConstructiveInternalTypeImage
-
-  """File upload for the `profilePicture` field."""
-  profilePictureUpload: Upload
   type: Int
   updatedAt: Datetime
   username: String
@@ -7542,6 +7821,40 @@ input UserToManyWebauthnCredentialFilter {
   some: WebauthnCredentialFilter
 }
 
+"""All input for the `verifyEmailHandoff` mutation."""
+input VerifyEmailHandoffInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  emailId: UUID
+  password: String
+  token: String
+}
+
+"""The output of our `verifyEmailHandoff` mutation."""
+type VerifyEmailHandoffPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+  result: VerifyEmailHandoffRecord
+}
+
+type VerifyEmailHandoffRecord {
+  codeChallenge: String
+  email: String
+  nativeRedirectUri: String
+  result: Boolean
+}
+
 """All input for the `verifyEmail` mutation."""
 input VerifyEmailInput {
   """
@@ -7550,6 +7863,7 @@ input VerifyEmailInput {
   """
   clientMutationId: String
   emailId: UUID
+  password: String
   token: String
 }
 

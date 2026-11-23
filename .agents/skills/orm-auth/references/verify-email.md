@@ -7,7 +7,7 @@ Execute the verifyEmail mutation
 ## Usage
 
 ```typescript
-db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).execute()
+db.mutation.verifyEmail({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).exe
 ### Run verifyEmail
 
 ```typescript
-const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).execute();
+const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', password: '<String>', token: '<String>' } }).execute();
 ```

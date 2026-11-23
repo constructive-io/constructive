@@ -3,10 +3,9 @@
  */
 export interface RealtimeSubscriptionsPluginOptions {
   /**
-   * Maximum number of events per table per second before switching to
-   * overflow (INVALIDATE) mode. When exceeded, the subscription sends
-   * a single { event: 'INVALIDATE', overflow: true } instead of
-   * individual row events, signaling the client to refetch.
+   * Maximum number of authorized row events per subscription per second.
+   * When exceeded, sends one overflow frame without a row or row ID,
+   * preserving the triggering operation and signaling the client to refetch.
    *
    * Default: 50
    */
@@ -56,10 +55,10 @@ export interface CursorTrackerOptions {
   nodeId?: string;
 
   /**
-   * The realtime_public schema name where drain_changes(),
+   * The private realtime schema name where drain_changes(),
    * touch_listener(), and cleanup_ephemeral() live.
    *
-   * Default: 'realtime_public'
+   * Default: 'realtime_private'
    */
   schema?: string;
 
@@ -131,10 +130,10 @@ export interface RealtimeManagerOptions {
   nodeId?: string;
 
   /**
-   * The realtime_public schema name where drain_changes(),
+   * The private realtime schema name where drain_changes(),
    * touch_listener(), and cleanup_ephemeral() live.
    *
-   * Default: 'realtime_public'
+   * Default: 'realtime_private'
    */
   schema?: string;
 

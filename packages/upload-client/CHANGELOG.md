@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.3](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.31.2...@constructive-io/upload-client@0.31.3) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/upload-client
+
+## [0.31.2](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.31.1...@constructive-io/upload-client@0.31.2) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/upload-client
+
+## [0.31.1](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.31.0...@constructive-io/upload-client@0.31.1) (2026-11-12)
+
+### Bug Fixes
+
+- **presigned-url:** a custom key is one object — re-upload replaces the row, no previousVersionId ([789108c](https://github.com/constructive-io/constructive/commit/789108cc9fdf2115703bf8abd9dd9b63e87964f1))
+
+# [0.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.30.0...@constructive-io/upload-client@0.31.0) (2026-11-11)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file row (x-amz-meta-upload-id) and return uploadHeaders ([7a879d3](https://github.com/constructive-io/constructive/commit/7a879d3840bb1cbea7829652678fd31ae72c6ead))
+
+# [0.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.29.0...@constructive-io/upload-client@0.30.0) (2026-11-10)
+
+### Features
+
+- **uploads:** bind presigned PUT URLs to the file's SHA-256 checksum ([8df8ea6](https://github.com/constructive-io/constructive/commit/8df8ea64be5fb97ac29223ba32e35c0e507fea94))
+
 # [0.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/upload-client@0.28.0...@constructive-io/upload-client@0.29.0) (2026-10-14)
 
 **Note:** Version bump only for package @constructive-io/upload-client

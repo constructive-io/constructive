@@ -9,7 +9,7 @@ import type {
   OperationDefinitionNode,
   SelectionNode,
 } from 'graphql';
-import { Kind,parse, print } from 'graphql';
+import { Kind, parse, print, validate } from 'graphql';
 import type { Client, Pool } from 'pg';
 import type { GetConnectionOpts, GetConnectionResult } from 'pgsql-test';
 import { makePgService } from 'postgraphile/adaptors/pg';
@@ -249,6 +249,13 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
     // graphql-tag doesn't preserve location info by default
     const source = print(query);
     document = parse(source);
+  }
+
+  // grafserv validates before it plans; grafast's execute() alone does not,
+  // so without this a test could pass a document the server would reject.
+  const validationErrors = validate(schema, document);
+  if (validationErrors.length > 0) {
+    return normalizeResult<T>({ errors: validationErrors }, document);
   }
 
   // Build context with pgSettings and withPgClient

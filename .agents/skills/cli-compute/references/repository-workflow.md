@@ -12,8 +12,8 @@ csdk repository-workflow list --where.<field>.<op> <value> --orderBy <values>
 csdk repository-workflow list --limit 10 --after <cursor>
 csdk repository-workflow find-first --where.<field>.<op> <value>
 csdk repository-workflow get --id <UUID>
-csdk repository-workflow create --eventType <String> --name <String> --repositoryId <UUID> --slug <String> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--refPattern <String>] [--requiredSecrets <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
-csdk repository-workflow update --id <UUID> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--eventType <String>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--name <String>] [--refPattern <String>] [--repositoryId <UUID>] [--requiredSecrets <String>] [--slug <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk repository-workflow create --databaseId <UUID> --eventType <String> --name <String> --repositoryId <UUID> --slug <String> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--refPattern <String>] [--requiredSecrets <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk repository-workflow update --id <UUID> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--eventType <String>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--name <String>] [--refPattern <String>] [--repositoryId <UUID>] [--requiredSecrets <String>] [--slug <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 csdk repository-workflow delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk repository-workflow list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a repositoryWorkflow
 
 ```bash
-csdk repository-workflow create --eventType <String> --name <String> --repositoryId <UUID> --slug <String> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--refPattern <String>] [--requiredSecrets <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
+csdk repository-workflow create --databaseId <UUID> --eventType <String> --name <String> --repositoryId <UUID> --slug <String> [--cancelInProgress <Boolean>] [--concurrencyKey <String>] [--createdBy <UUID>] [--createdByPrincipal <UUID>] [--graphId <UUID>] [--inputs <JSON>] [--isEnabled <Boolean>] [--refPattern <String>] [--requiredSecrets <String>] [--updatedBy <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a repositoryWorkflow by id

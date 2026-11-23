@@ -39,3 +39,30 @@ SELECT setval('i18n_test.posts_id_seq', 10);
 -- Grant access so withPgClient pool can query
 GRANT ALL ON ALL TABLES IN SCHEMA i18n_test TO PUBLIC;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA i18n_test TO PUBLIC;
+
+CREATE SCHEMA "i18n-quoted""schema";
+GRANT USAGE ON SCHEMA "i18n-quoted""schema" TO PUBLIC;
+
+CREATE TABLE "i18n-quoted""schema".snake_posts (
+  id serial PRIMARY KEY,
+  title text NOT NULL,
+  body text
+);
+COMMENT ON TABLE "i18n-quoted""schema".snake_posts IS E'@i18n snake_posts_translations';
+
+CREATE TABLE "i18n-quoted""schema".snake_posts_translations (
+  id serial PRIMARY KEY,
+  snake_posts_id int NOT NULL REFERENCES "i18n-quoted""schema".snake_posts(id),
+  lang_code text NOT NULL,
+  title text NOT NULL,
+  body text,
+  UNIQUE (snake_posts_id, lang_code)
+);
+
+INSERT INTO "i18n-quoted""schema".snake_posts (id, title, body) VALUES
+  (1, 'Source title', 'Source body'),
+  (2, 'Untranslated title', NULL);
+INSERT INTO "i18n-quoted""schema".snake_posts_translations (snake_posts_id, lang_code, title, body) VALUES
+  (1, 'fr', 'Titre traduit', 'Corps traduit');
+
+GRANT SELECT ON ALL TABLES IN SCHEMA "i18n-quoted""schema" TO PUBLIC;

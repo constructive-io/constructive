@@ -114,6 +114,8 @@ export interface AgentResource {
   description: string | null;
   descriptionTrgmSimilarity: number | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;
@@ -324,6 +326,8 @@ export interface PlatformAgentResource {
   description: string | null;
   descriptionTrgmSimilarity: number | null;
   embedding: number[] | null;
+  embeddingModel: string | null;
+  embeddingModelTrgmSimilarity: number | null;
   embeddingUpdatedAt: string | null;
   embeddingVectorDistance: number | null;
   id: string | null;

@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.15](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.14...@constructive-io/examples-pglite-socket@1.17.15) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.14](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.13...@constructive-io/examples-pglite-socket@1.17.14) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.13](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.12...@constructive-io/examples-pglite-socket@1.17.13) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.12](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.11...@constructive-io/examples-pglite-socket@1.17.12) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.11](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.10...@constructive-io/examples-pglite-socket@1.17.11) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.10](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.9...@constructive-io/examples-pglite-socket@1.17.10) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.9](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.8...@constructive-io/examples-pglite-socket@1.17.9) (2026-11-14)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.8](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.7...@constructive-io/examples-pglite-socket@1.17.8) (2026-11-09)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.7](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.6...@constructive-io/examples-pglite-socket@1.17.7) (2026-11-08)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.6](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.5...@constructive-io/examples-pglite-socket@1.17.6) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.5](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.4...@constructive-io/examples-pglite-socket@1.17.5) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.4](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.3...@constructive-io/examples-pglite-socket@1.17.4) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
+## [1.17.3](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.2...@constructive-io/examples-pglite-socket@1.17.3) (2026-11-05)
+
+**Note:** Version bump only for package @constructive-io/examples-pglite-socket
+
 ## [1.17.2](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pglite-socket@1.17.1...@constructive-io/examples-pglite-socket@1.17.2) (2026-11-01)
 
 **Note:** Version bump only for package @constructive-io/examples-pglite-socket

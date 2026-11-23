@@ -43,7 +43,7 @@ export interface TsvectorAdapterOptions {
 export function createTsvectorAdapter(
   options: TsvectorAdapterOptions = {}
 ): SearchAdapter {
-  const { filterPrefix = 'tsv', tsConfig = 'english' } = options;
+  const { filterPrefix = 'tsv', tsConfig } = options;
 
   return {
     name: 'tsv',
@@ -75,9 +75,12 @@ export function createTsvectorAdapter(
           const chunksInfo = getChunksInfo(codec);
           const hasChunkFulltext = chunksInfo?.searchField &&
             chunksInfo.searchIndexes.includes('fulltext');
+          const columnConfig = attribute.extensions?.tags?.tsConfig;
           columns.push({
             attributeName,
-            adapterData: hasChunkFulltext ? chunksInfo : undefined,
+            adapterData: hasChunkFulltext || typeof columnConfig === 'string'
+              ? { ...(hasChunkFulltext ? chunksInfo : {}), ...(typeof columnConfig === 'string' && { tsConfig: columnConfig }) }
+              : undefined,
           });
         }
       }
@@ -112,7 +115,9 @@ export function createTsvectorAdapter(
       }
       if (val.trim().length === 0) return null;
 
-      const tsquery = sql`websearch_to_tsquery(${sql.literal(tsConfig)}, ${sql.value(val)})`;
+      const data = column.adapterData as { tsConfig?: string; requestTsConfig?: string } | undefined;
+      const config = data?.tsConfig ?? tsConfig ?? data?.requestTsConfig ?? 'english';
+      const tsquery = sql`websearch_to_tsquery(${sql.value(config)}::regconfig, ${sql.value(val)})`;
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
 
       // Check for chunk-aware querying

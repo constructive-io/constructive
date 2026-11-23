@@ -235,3 +235,43 @@ describe('restructureChanges', () => {
     expect(result.changes.map(c => c.name)).toEqual(['obj/app', 'obj/users', 'obj/orders']);
   });
 });
+
+describe('restructureChanges: foreign-key cycles', () => {
+  const sql = [
+    'CREATE SCHEMA inv;',
+    'CREATE TABLE inv.warehouse (id int PRIMARY KEY, main_item_id int);',
+    'CREATE TABLE inv.item (id int PRIMARY KEY, warehouse_id int REFERENCES inv.warehouse (id));',
+    'ALTER TABLE inv.warehouse ADD CONSTRAINT warehouse_main_item_fk FOREIGN KEY (main_item_id) REFERENCES inv.item (id);'
+  ].join('\n');
+
+  it('splits an ALTER TABLE foreign key out of its table when folding it would close a cycle', () => {
+    const { changes } = restructureChanges(
+      [{ name: 'all', dependencies: [], deploy: sql }],
+      { granularity: 'object' }
+    );
+    const names = changes.map(c => c.name);
+    const warehouse = changes.find(c => c.name === 'schemas/inv/tables/warehouse/table')!;
+    const item = changes.find(c => c.name === 'schemas/inv/tables/item/table')!;
+    const fk = changes.find(c => c.deploy.includes('warehouse_main_item_fk'))!;
+    expect(warehouse.deploy).not.toContain('warehouse_main_item_fk');
+    expect(warehouse.dependencies).not.toContain('schemas/inv/tables/item/table');
+    expect(item.dependencies).toContain('schemas/inv/tables/warehouse/table');
+    expect(fk.name).toBe('schemas/inv/tables/warehouse/constraints/warehouse_main_item_fk/constraint');
+    expect(fk.dependencies).toEqual(
+      expect.arrayContaining(['schemas/inv/tables/warehouse/table', 'schemas/inv/tables/item/table'])
+    );
+    expect(names.indexOf(fk.name)).toBeGreaterThan(names.indexOf(item.name));
+    expect(names.indexOf(fk.name)).toBeGreaterThan(names.indexOf(warehouse.name));
+    expect(fk.revert).toContain('DROP CONSTRAINT warehouse_main_item_fk');
+  });
+
+  it('throws on a cycle no constraint split can break', () => {
+    const cyclic = [
+      'CREATE SCHEMA app;',
+      'CREATE VIEW app.a AS SELECT * FROM app.b;',
+      'CREATE VIEW app.b AS SELECT * FROM app.a;'
+    ].join('\n');
+    expect(() => restructureChanges([{ name: 'all', dependencies: [], deploy: cyclic }], { granularity: 'object' }))
+      .toThrow(/dependency cycle/);
+  });
+});

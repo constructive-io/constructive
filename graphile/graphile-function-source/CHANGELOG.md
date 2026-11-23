@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.16](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.15...graphile-function-source@0.3.16) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [0.3.15](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.14...graphile-function-source@0.3.15) (2026-11-23)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.14](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.13...graphile-function-source@0.3.14) (2026-11-21)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.13](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.12...graphile-function-source@0.3.13) (2026-11-21)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.12](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.11...graphile-function-source@0.3.12) (2026-11-19)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.11](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.10...graphile-function-source@0.3.11) (2026-11-17)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.10](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.9...graphile-function-source@0.3.10) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [0.3.9](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.8...graphile-function-source@0.3.9) (2026-11-09)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.8](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.7...graphile-function-source@0.3.8) (2026-11-08)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.7](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.6...graphile-function-source@0.3.7) (2026-11-06)
+
+### Bug Fixes
+
+- **graphile-test:** validate the document before executing it ([9ea5e41](https://github.com/constructive-io/constructive/commit/9ea5e411d5c451adeafa36b23cbb7dc827c27cee))
+
+## [0.3.6](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.5...graphile-function-source@0.3.6) (2026-11-05)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.5](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.4...graphile-function-source@0.3.5) (2026-11-05)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.4](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.3...graphile-function-source@0.3.4) (2026-11-05)
+
+**Note:** Version bump only for package graphile-function-source
+
+## [0.3.3](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.2...graphile-function-source@0.3.3) (2026-11-05)
+
+**Note:** Version bump only for package graphile-function-source
+
 ## [0.3.2](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.1...graphile-function-source@0.3.2) (2026-11-01)
 
 **Note:** Version bump only for package graphile-function-source

@@ -9,6 +9,9 @@ import { graphileCache } from 'graphile-cache';
 import { clearStorageModuleCache } from 'graphile-presigned-url-plugin';
 import { getPgPool } from 'pg-cache';
 
+import { invalidateApiSettings } from './api';
+import { evictAllServiceKeys, evictServiceKey } from './cache-generation';
+
 
 const log = new Logger('flush');
 
@@ -62,11 +65,21 @@ export const createFlushMiddleware = (
     }
 
     const databaseId = req.databaseId ?? req.api?.databaseId;
-    if (databaseId) clearStorageModuleCache(databaseId);
-    graphileCache.delete((req as any).svc_key);
-    svcCache.delete((req as any).svc_key);
+    if (databaseId) {
+      clearStorageModuleCache(databaseId);
+      invalidateApiSettings(databaseId);
+    }
+    evictServiceKey((req as any).svc_key);
     res.status(200).send('OK');
   };
+};
+
+// NOTIFY is not replayed after a disconnect. Re-subscribing must invalidate
+// every service, including hosts deleted while the listener was unavailable.
+export const flushAllServices = (): void => {
+  clearStorageModuleCache();
+  invalidateApiSettings();
+  evictAllServiceKeys();
 };
 
 export const flushService = async (
@@ -74,8 +87,11 @@ export const flushService = async (
   databaseId: string
 ): Promise<void> => {
   // Do this before the routing lookup: an empty/removed domain must not leave
-  // module discovery alive after its schema has changed.
+  // module discovery alive after its schema has changed. The settings go
+  // before the hosts too, so a host rebuilt after its eviction reads them
+  // again instead of taking the loaders' cached copy.
   clearStorageModuleCache(databaseId);
+  invalidateApiSettings(databaseId);
   const pgPool = getPgPool(opts.pg);
   log.info('flushing db ' + databaseId);
 
@@ -86,10 +102,20 @@ export const flushService = async (
   if (!opts.api.isPublic) {
     graphileCache.forEach((_, k: string) => {
       if (api.test(k) || schemata.test(k) || meta.test(k)) {
-        graphileCache.delete(k);
-        svcCache.delete(k);
+        evictServiceKey(k);
       }
     });
+  }
+
+  // Every entry this database resolved to goes, by the id the entry carries:
+  // a hostname whose row was removed is no longer listed below, and its key
+  // must not outlive the row.
+  const resolved: string[] = [];
+  svcCache.forEach((entry: { databaseId?: string } | undefined, key: string) => {
+    if (entry?.databaseId === databaseId) resolved.push(key);
+  });
+  for (const key of resolved) {
+    evictServiceKey(key);
   }
 
   // The domains plane sits behind member RLS; the login reads it through the
@@ -104,8 +130,7 @@ export const flushService = async (
   for (const row of svc.rows) {
     const key: string | undefined = row.hostname || undefined;
     if (key) {
-      graphileCache.delete(key);
-      svcCache.delete(key);
+      evictServiceKey(key);
     }
   }
 };

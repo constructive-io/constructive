@@ -1,4 +1,5 @@
 jest.mock('pg-cache', () => ({
+  ...jest.requireActual('pg-cache'),
   getPgPool: jest.fn()
 }));
 

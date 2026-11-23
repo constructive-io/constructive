@@ -21,6 +21,7 @@ interface GraphileInstanceOptions {
    * pgServices (managed by pg-cache) rather than passed separately.
    */
   enableRealtime?: boolean;
+  realtimeSchema?: string;
 }
 
 /**
@@ -46,7 +47,7 @@ interface GraphileInstanceOptions {
 export const createGraphileInstance = async (
   opts: GraphileInstanceOptions
 ): Promise<GraphileCacheEntry> => {
-  const { preset, cacheKey, enableRealtime = false } = opts;
+  const { preset, cacheKey, enableRealtime = false, realtimeSchema } = opts;
 
   const heapBefore = process.memoryUsage().heapUsed;
   const pgl = postgraphile(preset);
@@ -106,7 +107,7 @@ export const createGraphileInstance = async (
     releasePresetServices
   };
 
-  if (enableRealtime) {
+  if (enableRealtime && realtimeSchema) {
     try {
       // Extract PgSubscriber and pool from the resolved preset's pgServices.
       // The pool is the same instance managed by pg-cache (via getPgPool)
@@ -116,15 +117,15 @@ export const createGraphileInstance = async (
       const pool = pgService?.adaptorSettings?.pool ?? null;
 
       if (!pgSubscriber) {
-        throw new Error('Realtime requires a PostgreSQL subscriber');
+        throw new Error(`PostGraphile[${cacheKey}] has no pgSubscriber for realtime`);
       } else if (!pool) {
-        throw new Error('Realtime requires a PostgreSQL pool');
+        throw new Error(`PostGraphile[${cacheKey}] has no pool in pgService for realtime`);
       } else {
         const manager = new RealtimeManager({
           pgSubscriber,
           pool,
           nodeId: `graphile-cache:${cacheKey}`,
-          schema: 'realtime_public',
+          schema: realtimeSchema,
         });
 
         entry.realtimeManager = manager;
@@ -135,7 +136,7 @@ export const createGraphileInstance = async (
       try {
         await disposeUncachedEntry(entry);
       } catch (cleanupError) {
-        throw new AggregateError([err, cleanupError], 'Realtime startup and cleanup failed', { cause: err });
+        throw new AggregateError([err, cleanupError], `Realtime startup and cleanup failed for PostGraphile[${cacheKey}]`, { cause: err });
       }
       throw err;
     }

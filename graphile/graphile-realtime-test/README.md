@@ -91,7 +91,7 @@ Fires a DML NOTIFY with the standard payload format.
 
 ### `notifyInvalidate(client, schema, table)`
 
-Fires an INVALIDATE (overflow) NOTIFY.
+Fires a legacy INVALIDATE NOTIFY for protocol rejection tests. Valid overflow is produced only after a batch of visible row IDs exceeds the subscriber's throttle limit.
 
 ### `buildPayload(operation, rowIds)`
 

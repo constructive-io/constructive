@@ -6,7 +6,8 @@
  *
  * Moves the embedding logic from the client (CLI --auto-embed) into the
  * Graphile server layer so clients work with text/prompts instead of raw
- * float vectors.
+ * float vectors. Every model call goes through the metered gateway at
+ * `AGENTIC_SERVER_URL`, under the identity the request's claims carry.
  *
  * @example
  * ```typescript
@@ -43,40 +44,27 @@ export { createLlmRagPlugin } from './plugins/rag-plugin';
 export { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
 export { createLlmTextSearchPlugin, embedTextInWhere } from './plugins/text-search-plugin';
 
-// Metering plugin (opt-in billing integration)
-export { createLlmMeteringPlugin } from './plugins/metering-plugin';
-
-// Agent discovery (queries agent_chat_module config table at runtime)
-export type { AgentDiscovery,AgentTableInfo } from './plugins/agent-discovery-plugin';
-export { clearAgentDiscoveryCache,getAgentDiscovery } from './plugins/agent-discovery-plugin';
+// Plan-time embedding of tagged input fields
+export type { EmbedRule } from './embed-inputs';
+export { embedField, planTimeEmbedding } from './embed-inputs';
 
 // Embedder utilities
-export type { LlmConfigOverrides } from './embedder';
+export type { LlmRequestScope } from './embedder';
 export {
   buildEmbedder,
   buildEmbedderFromEnv,
-  buildEmbedderFromModule,
-  llmConfigStore
+  createGatewayEmbedder,
+  identityFromClaims,
+  llmConfigStore,
+  resolveRequestScope
 } from './embedder';
 
 // Chat completion utilities
 export {
   buildChatCompleter,
   buildChatCompleterFromEnv,
-  buildChatCompleterFromModule
+  createGatewayChatCompleter
 } from './chat';
-
-// Metering utilities (for custom integration)
-export type { InferenceLogEntry,MeteringContext, MeteringOptions, MeterResult, WithPgClient } from './metering';
-export { logInferenceUsage, meteredChat, meteredEmbed, QuotaExceededError } from './metering';
-
-// Config cache (for custom integration)
-export type { BillingConfig, InferenceLogConfig, LlmBillingCacheEntry, PgClient } from './config-cache';
-export {
-  getLlmBillingCacheStats,
-  getLlmBillingConfig,
-  invalidateLlmBillingConfig
-} from './config-cache';
 
 // Types
 export type {
@@ -92,6 +80,5 @@ export type {
   GraphileLlmOptions,
   LlmModuleData,
   LlmUsage,
-  MeteringConfig,
   RagDefaults
 } from './types';

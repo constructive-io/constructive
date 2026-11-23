@@ -36,8 +36,6 @@ export interface StorageUploadResult {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
-  /** ID of the previous version (when uploading a new version of a custom-keyed file) */
-  previousVersionId: string | null;
 }
 
 export interface UploadToSurfaceContext {
@@ -94,7 +92,7 @@ export async function uploadToSurface(
   }
 
   const payload = data?.[surface.upload.mutation] as
-    | (StorageUploadResult & { uploadUrl: string | null })
+    | (StorageUploadResult & { uploadUrl: string | null; uploadHeaders?: Record<string, string> | null })
     | undefined;
   if (!payload) {
     throw new StorageError(
@@ -114,7 +112,14 @@ export async function uploadToSurface(
   }
 
   checkAborted(signal);
-  await transport.putObject(payload.uploadUrl, await file.arrayBuffer(), contentType, signal);
+  await transport.putObject(
+    payload.uploadUrl,
+    await file.arrayBuffer(),
+    contentType,
+    signal,
+    contentHash,
+    payload.uploadHeaders ?? undefined,
+  );
 
   return toResult(payload);
 }
@@ -125,7 +130,6 @@ function toResult(payload: StorageUploadResult): StorageUploadResult {
     key: payload.key,
     deduplicated: payload.deduplicated,
     expiresAt: payload.expiresAt ?? null,
-    previousVersionId: payload.previousVersionId ?? null,
   };
 }
 

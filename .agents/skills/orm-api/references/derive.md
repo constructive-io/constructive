@@ -9,8 +9,8 @@ ORM operations for Derive records
 ```typescript
 db.derive.findMany({ select: { id: true } }).execute()
 db.derive.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.derive.create({ data: { databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' }, select: { id: true } }).execute()
-db.derive.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute()
+db.derive.create({ data: { data: '<JSON>', databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' }, select: { id: true } }).execute()
+db.derive.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute()
 db.derive.delete({ where: { id: '<UUID>' } }).execute()
 ```
 
@@ -20,7 +20,7 @@ db.derive.delete({ where: { id: '<UUID>' } }).execute()
 
 ```typescript
 const items = await db.derive.findMany({
-  select: { id: true, databaseId: true }
+  select: { id: true, data: true }
 }).execute();
 ```
 
@@ -28,7 +28,7 @@ const items = await db.derive.findMany({
 
 ```typescript
 const item = await db.derive.create({
-  data: { databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' },
+  data: { data: '<JSON>', databaseId: '<UUID>', includeGrants: '<Boolean>', includeMutations: '<Boolean>', kind: '<String>', policyPrefix: '<String>', sourceTableId: '<UUID>', tableId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

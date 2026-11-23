@@ -6,6 +6,8 @@ import { generateCode } from '../babel-ast';
 import type { SpecialFieldGroup } from '../docs-utils';
 import { categorizeSpecialFields } from '../docs-utils';
 import {
+  getBulkInsertMutationName,
+  getBulkUpsertMutationName,
   getCreateInputTypeName,
   getDeleteInputTypeName,
   getExtraInputKeys,
@@ -1088,9 +1090,11 @@ function buildMutationHandler(
   const allWhereFieldNames = new Set([...pkFieldNames, ...extraKeys.map((ek) => ek.name)]);
 
   // Get the set of writable field names from the type registry
-  // This filters out computed fields (e.g. searchTsvRank, hashUuid) that exist
-  // on the entity type but not on the create/update input type.
-  const writableFields = getWritableFieldNames(table, typeRegistry);
+  // This filters out computed fields (e.g. searchTsvRank, downloadUrl) that exist
+  // on the entity type but not on this operation's input type (create input for
+  // create, patch for update).
+  const writableFields =
+    operation === 'delete' ? null : getWritableFieldNames(table, typeRegistry, operation);
 
   // Get fields that have defaults from introspection (for create operations)
   const fieldsWithDefaults = getFieldsWithDefaults(table, typeRegistry);
@@ -1111,7 +1115,9 @@ function buildMutationHandler(
       // Always exclude ORM-excluded fields (except where-clause fields handled above)
       (allWhereFieldNames.has(f.name) || !ORM_EXCLUDED_FIELDS.includes(f.name)) &&
       // If we have type registry info, only include fields that exist in the input type
-      (writableFields === null || writableFields.has(f.name)),
+      (writableFields === null || writableFields.has(f.name)) &&
+      // Without it, a field taking arguments is still never a column
+      !(f.args && f.args.length > 0),
   );
 
   const questions: t.Expression[] = [];
@@ -1683,7 +1689,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const orderByTypeName = getOrderByTypeName(table);
   statements.push(
     createImportDeclaration(inputTypesPath, [
-      createInputTypeName,
+      ...(table.query?.create !== null ? [createInputTypeName] : []),
       patchTypeName,
       selectTypeName,
       whereTypeName,
@@ -1723,6 +1729,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   // read-only record type with no `findOne`.
   const hasUpdate = table.query?.update !== undefined && table.query?.update !== null;
   const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
+  const hasCreate = table.query?.create !== null;
   const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
 
   // Detect whether this table has search-capable fields (tsvector, BM25, trgm, vector embedding)
@@ -1751,15 +1758,15 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   }
 
   // Detect bulk mutations
-  const hasBulkCreate = !!table.query?.bulkInsert;
-  const hasBulkUpsert = !!table.query?.bulkUpsert;
+  const hasBulkCreate = !!getBulkInsertMutationName(table);
+  const hasBulkUpsert = !!getBulkUpsertMutationName(table);
   const hasBulkUpdate = !!table.query?.bulkUpdate;
   const hasBulkDelete = !!table.query?.bulkDelete;
 
   const subcommands: string[] = ['list', 'find-first'];
   if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
-  subcommands.push('create');
+  if (hasCreate) subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
   if (hasDelete) subcommands.push('delete');
   if (hasBulkCreate) subcommands.push('bulk-create');
@@ -2007,7 +2014,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
   if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
-  statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
+  if (hasCreate) statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasDelete) statements.push(buildMutationHandler(table, 'delete', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasBulkCreate) statements.push(buildBulkMutationHandler(table, 'bulk-create', tn));

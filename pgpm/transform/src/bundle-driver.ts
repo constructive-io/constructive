@@ -8,7 +8,6 @@
  * stays a pure function factory over `transformSql` and `classifyStatements`.
  */
 
-import { classifyStatements } from '@pgsql/semantics';
 import {
   createExtensionResult,
   createRoleResult,
@@ -27,6 +26,8 @@ import {
   transformSql,
   TransformSqlOptions
 } from '@pgsql/transform';
+
+import { classifyStatements } from './facts';
 
 /** Identity of the script being transformed/validated (matches the bundle seams). */
 export interface BundleScriptContext {

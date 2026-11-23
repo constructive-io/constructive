@@ -15,6 +15,7 @@ import {
   getSingleQueryHookName,
   getSubscriptionHookName,
   getUpdateMutationHookName,
+  hasCreateMutation,
   hasValidPrimaryKey,
 } from './utils';
 
@@ -63,9 +64,9 @@ export function generateMutationsBarrel(tables: Table[]): string {
 
   // Export all mutation hooks
   for (const table of tables) {
-    const createHookName = getCreateMutationHookName(table);
-
-    statements.push(exportAllFrom(`./${createHookName}`));
+    if (hasCreateMutation(table)) {
+      statements.push(exportAllFrom(`./${getCreateMutationHookName(table)}`));
+    }
 
     // Only add update/delete if they exist AND table has valid PK
     if (table.query?.update !== null && hasValidPrimaryKey(table)) {
@@ -383,7 +384,7 @@ export function generateCustomMutationsBarrel(
   // Export all table mutation hooks
   for (const table of tables) {
     const createHookName = getCreateMutationHookName(table);
-    if (!exportedHooks.has(createHookName)) {
+    if (hasCreateMutation(table) && !exportedHooks.has(createHookName)) {
       statements.push(exportAllFrom(`./${createHookName}`));
       exportedHooks.add(createHookName);
     }

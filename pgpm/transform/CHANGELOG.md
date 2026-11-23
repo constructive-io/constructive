@@ -3,6 +3,91 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.9...@pgpmjs/transform@0.32.10) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [0.32.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.8...@pgpmjs/transform@0.32.9) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.7...@pgpmjs/transform@0.32.8) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.6...@pgpmjs/transform@0.32.7) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.5...@pgpmjs/transform@0.32.6) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.4...@pgpmjs/transform@0.32.5) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.3...@pgpmjs/transform@0.32.4) (2026-11-14)
+
+### Bug Fixes
+
+- **deps:** pgsql-parser 18.3.4 family, libpg-query ^18.2.4 (Cloudflare Workers loadModule fix) ([236db15](https://github.com/constructive-io/constructive/commit/236db1534b722dcded1fedeb66d969d4078a9532))
+- **deps:** pgsql-parser 18.3.5 / pgsql-deparser 18.4.5 family ([caadf88](https://github.com/constructive-io/constructive/commit/caadf8880241761c01b116bb80a8ead3fe957648))
+
+## [0.32.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.2...@pgpmjs/transform@0.32.3) (2026-11-09)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.1...@pgpmjs/transform@0.32.2) (2026-11-08)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
+## [0.32.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.0...@pgpmjs/transform@0.32.1) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** alter reloptions, persistence, inheritance, partition bounds, storage/compression and trigger enable/disable in place ([2bee2e3](https://github.com/constructive-io/constructive/commit/2bee2e361e70df58c90e3ebe40cdb1c63ef37b93))
+- **diff:** an explicit REVOKE .. FROM PUBLIC restores only PUBLIC's default privileges in both directions (EXECUTE, USAGE, CONNECT/TEMPORARY on databases; nothing on schemas/tables), never GRANT ALL ([3530612](https://github.com/constructive-io/constructive/commit/3530612f3f210cd31c837072d9edde073b93a20e))
+- **diff:** attach GRANT ON FUNCTION/TYPE/DOMAIN and ALL ... IN SCHEMA grants to their own objects instead of the preceding statement's unit ([c5f5098](https://github.com/constructive-io/constructive/commit/c5f50984fd28cb9f74942c5a943c2b69efa1bec3))
+- **diff:** bridge composite-typed columns only around ALTER ATTRIBUTE ... TYPE; ADD/DROP ATTRIBUTE work in place ([6f28752](https://github.com/constructive-io/constructive/commit/6f2875210bc5abe215db1c280528d764ad981ae3))
+- **diff:** enum ADD VALUE neighbors and same-migration use, composite mid-list insert, sequence START after MINVALUE/MAXVALUE drop, --using single expression, -token privilege state, column rename on a renamed table, rename references and implicit constraint names ([abb4284](https://github.com/constructive-io/constructive/commit/abb428434563d9b640315e06e6fe6e607cb6d487))
+- **diff:** fold ALTER SEQUENCE into the sequence definition and order OWNED BY around its column ([0200238](https://github.com/constructive-io/constructive/commit/0200238fee9069e4e4b979d236eab871adb09c6e))
+- **diff:** identify extensions, collations, aggregates, operators, casts, statistics, rules, opclasses, publications, event triggers and foreign objects; order extension and collation steps; snapshot aggregates ([e550a8c](https://github.com/constructive-io/constructive/commit/e550a8ce278660abc26ccee60eb6fee9797d72de))
+- **diff:** park dependent columns in jsonb/text around type changes Postgres refuses in place ([a494196](https://github.com/constructive-io/constructive/commit/a494196b23d493a9143431e8efd633d9249794c4))
+- **diff:** rebuild composite[] columns through a statement-local helper (USING allows no subquery) keeping NULLs; drop typmods from overload signatures; identify operators and aggregates by operand types; cache function signatures ([16a0427](https://github.com/constructive-io/constructive/commit/16a0427c1237e31443c2603b4bcae4a0336a92dc))
+- **diff:** revert a dependent rebuilt around a renamed table in order and from its text as written; rewrite old.col only where old names the table, not an alias; a consumer of a new enum value depends on its ADD VALUE ([23da4cb](https://github.com/constructive-io/constructive/commit/23da4cbe930134420ee82b6e532b323af48a3913))
+- **diff:** treat each function overload as its own object, identified and pathed as name(argtypes) ([ee8cf6b](https://github.com/constructive-io/constructive/commit/ee8cf6bd5960e51c23ee51eaed49d5d39c056bf5))
+- **diff:** unfold serial columns into int + owned sequence + nextval default; order NOT NULL around identity ([f871405](https://github.com/constructive-io/constructive/commit/f8714059e7850865494e4ca72cf7297024dff6b3))
+
+# [0.32.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.31.0...@pgpmjs/transform@0.32.0) (2026-11-05)
+
+### Bug Fixes
+
+- **diff:** module vs live-database normalization — implicit ::text on string constants, restated sequence defaults, WITH NO DATA, FOR ROLE on default privileges, column attributes emitted as separate ALTERs by pg_dump ([81e6659](https://github.com/constructive-io/constructive/commit/81e6659ce0c39fd22f94c3efcf2090237ea58e70))
+- **diff:** name inline constraints of added tables so every inverse is derivable; e2e direct diffChangeSets calls accept data loss ([ebc0303](https://github.com/constructive-io/constructive/commit/ebc0303fb680d9d451351d4e69eee87826c8ddf8))
+- **diff:** report an object as modified only when a step is emitted (representation-only differences are identical) ([ecb129c](https://github.com/constructive-io/constructive/commit/ecb129c311e300853d2fbdfdba3d6809fc647634))
+
+### Features
+
+- **diff:** column attribute ALTERs, USING casts, declared renames, data-loss/incomplete policies, in-place enum/domain/sequence/composite ALTERs, comment/grant/owner diffs, type-alias normalization ([6d4bf03](https://github.com/constructive-io/constructive/commit/6d4bf03a2bd61a12e8c92d1aafcdf2e4b1548314))
+
+# [0.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.2...@pgpmjs/transform@0.31.0) (2026-11-05)
+
+### Bug Fixes
+
+- **pgpm:** drop a column's constraints before the column; --append-module rejects --emit-ledger ([204d7c1](https://github.com/constructive-io/constructive/commit/204d7c1849171d2abff94449e6c6fa3d8873739a))
+- **pgpm:** split a foreign key out of its table when folding it closes a cycle ([c0008ce](https://github.com/constructive-io/constructive/commit/c0008ce06c0fbf6089e9c7d524b7343907aff990))
+
+### Features
+
+- **pgpm:** order every undeployed diff change by one dependency graph ([fff381b](https://github.com/constructive-io/constructive/commit/fff381b6613b1b7a93c76d319878a669ecedd788))
+
+## [0.30.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.1...@pgpmjs/transform@0.30.2) (2026-11-05)
+
+**Note:** Version bump only for package @pgpmjs/transform
+
 ## [0.30.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.30.0...@pgpmjs/transform@0.30.1) (2026-11-01)
 
 **Note:** Version bump only for package @pgpmjs/transform
@@ -162,10 +247,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** change granularity dial — one change per alteration (planning [#1342](https://github.com/constructive-io/constructive/issues/1342)) ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
+- **pgpm:** change granularity dial — one change per alteration ([b671009](https://github.com/constructive-io/constructive/commit/b671009a7d58c6a8d76d847c5f9ce4facada5e07))
 - **pgpm:** change-granularity 'single' level + pgpm-projections skill ([f53f61a](https://github.com/constructive-io/constructive/commit/f53f61ab0a2d7316704c59b72fd9aeb777711ac9))
 - **pgpm:** pgpm diff --append-module — append the delta into an existing module ([4bfb5aa](https://github.com/constructive-io/constructive/commit/4bfb5aa1fbaaf1e9cf53f7f7d27584f503a0cd8a))
-- **transform:** constraint-placement-invariant semantic diff (planning [#1341](https://github.com/constructive-io/constructive/issues/1341)) ([73d4888](https://github.com/constructive-io/constructive/commit/73d48882122fc883f8676a441b5bcb964c426ae9))
+- **transform:** constraint-placement-invariant semantic diff ([73d4888](https://github.com/constructive-io/constructive/commit/73d48882122fc883f8676a441b5bcb964c426ae9))
 
 # [0.19.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.18.0...@pgpmjs/transform@0.19.0) (2026-08-01)
 
@@ -191,7 +276,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07)), closes [constructive-planning#1329](https://github.com/constructive-planning/issues/1329)
+- **pgpm:** generate revert/verify scripts for restructured exports ([a604bcf](https://github.com/constructive-io/constructive/commit/a604bcfbdcdda0ab5018b53c64b4e66bd9250c07))
 - **transform:** derive change names from the naming spec — identityOf + pathFor ([7d0c9c6](https://github.com/constructive-io/constructive/commit/7d0c9c62eeb45897a316158b331426f097d7d642))
 - **transform:** partition dial — project one deploy surface into pgpm packages ([4dda559](https://github.com/constructive-io/constructive/commit/4dda559b94e3ccd3809007c279d69833c841582e))
 

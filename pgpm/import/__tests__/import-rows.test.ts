@@ -42,6 +42,31 @@ describe('importDumpRows', () => {
     expect(result.rows.some(r => r.deploy === MISC_CHANGE_PATH)).toBe(false);
   });
 
+  it('places misc/statements after every schema change and requires them all', async () => {
+    // CREATE MATERIALIZED VIEW / ALTER DEFAULT PRIVILEGES have no identity of
+    // their own; they must deploy after the objects they reference.
+    const result = await importDumpRows(
+      sourceOf(
+        [
+          'CREATE SCHEMA app;',
+          'ALTER DEFAULT PRIVILEGES IN SCHEMA app GRANT SELECT ON TABLES TO PUBLIC;',
+          'CREATE TABLE app.t (id int PRIMARY KEY);',
+          'CREATE MATERIALIZED VIEW app.mv AS SELECT id FROM app.t;'
+        ].join('\n')
+      )
+    );
+    const paths = result.rows.map(r => r.deploy);
+    expect(paths[paths.length - 1]).toBe(MISC_CHANGE_PATH);
+    // The materialized view is identified (it creates app.mv), so it gets
+    // its own change that requires the table it selects from.
+    const mv = result.rows.find(r => r.deploy === 'schemas/app/views/mv/view')!;
+    expect(mv.content).toContain('CREATE MATERIALIZED VIEW app.mv');
+    expect(mv.deps).toContain('schemas/app/tables/t/table');
+    const misc = result.rows.find(r => r.deploy === MISC_CHANGE_PATH)!;
+    expect(misc.content).toContain('ALTER DEFAULT PRIVILEGES');
+    expect([...misc.deps].sort()).toEqual(paths.filter(p => p !== MISC_CHANGE_PATH).sort());
+  });
+
   it('folds pg_dump late-FK ALTER TABLE ONLY ... ADD CONSTRAINT at object granularity', async () => {
     const result = await importDumpRows(
       sourceOf(

@@ -9,21 +9,28 @@
  * - `hashContent` — SHA-256 hash for plain strings
  * - `putToPresignedUrl` — PUT bytes to a presigned S3 URL
  * - `fetchFromUrl` — GET from a presigned or CDN URL
- * - `uploadFile` — full upload orchestrator (hash → request → PUT)
+ *
+ * For upload orchestration, use `createStorageClient` from
+ * `@constructive-io/graphql-query` with this package's `storageTransport`.
+ * It discovers per-files-table upload mutations from the server's `_meta`.
  *
  * Framework-agnostic, works in any browser or Node.js 18+ environment.
  * Uses @constructive-io/fetch for isomorphic HTTP (handles *.localhost DNS in Node.js).
  *
  * @example
  * ```typescript
- * import { uploadFile, hashFile, hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
+ * import { createStorageClient } from '@constructive-io/graphql-query';
+ * import { storageTransport, hashFile, hashContent, putToPresignedUrl } from '@constructive-io/upload-client';
  *
  * // Full orchestrated upload
- * const result = await uploadFile({
- *   file: selectedFile,
- *   bucketKey: 'avatars',
+ * const storage = createStorageClient({
  *   execute: myGraphQLExecutor,
+ *   transport: storageTransport,
  * });
+ * const result = await storage.upload(
+ *   { filesType: 'AppFile' },
+ *   { file: selectedFile, bucketKey: 'avatars' },
+ * );
  *
  * // Atomic functions for custom flows
  * const hash = await hashFile(myFile);
@@ -37,26 +44,17 @@ export { hashFile, hashFileChunked } from './hash';
 export { hashContent } from './hash-content';
 
 // Presigned URL helpers
+export { CHECKSUM_SHA256_HEADER, presignedPutHeaders, sha256HexOfBody, sha256HexToBase64 } from './checksum';
+export type { PutToPresignedUrlOptions } from './put';
 export { fetchFromUrl,putToPresignedUrl } from './put';
-
-// Orchestrator
-export { uploadFile } from './upload';
 
 // Adapter for the dynamic storage client's StorageTransport port
 export type { StorageTransportPort } from './storage-transport';
 export { createStorageTransport, storageTransport } from './storage-transport';
 
-// GraphQL query builders (for custom integrations)
-export { buildRequestUploadUrlQuery, DEFAULT_BUCKET_QUERY_FIELD,REQUEST_UPLOAD_URL_MUTATION, REQUEST_UPLOAD_URL_QUERY } from './queries';
-
 // Types
 export type {
   FileInput,
-  GraphQLExecutor,
-  RequestUploadUrlInput,
-  RequestUploadUrlPayload,
   UploadErrorCode,
-  UploadFileOptions,
-  UploadResult,
 } from './types';
 export { UploadError } from './types';

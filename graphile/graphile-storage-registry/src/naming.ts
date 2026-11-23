@@ -64,3 +64,12 @@ export function uploadSurfaceNames(
     bulkUploadFilePayloadType: `Upload${filesTypeName}BulkFilePayload`,
   };
 }
+
+/**
+ * The Postgres domains whose value is a file document: a jsonb object that
+ * projects a files row (`id`, `key`, `bucket_id`, …) and may list the
+ * `versions` rendered beside it. A column of one of these domains, or an array
+ * of one, is a file-reference column. One list, so that a new file type is a
+ * name added here and nothing else.
+ */
+export const FILE_REF_DOMAINS: readonly string[] = ['image', 'upload'];

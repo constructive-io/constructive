@@ -11,11 +11,13 @@
  * constraint-by-constraint so an added column emits `ALTER TABLE ADD COLUMN`,
  * not a table rebuild.
  *
- * The emitted delta is a set of pgpm changes: DROPs for removed objects
- * (reverse topological order), then CREATE/ALTER changes for added and
- * modified objects routed through the granularity pipeline
- * (`restructureChanges`), so names come from the naming spec and `requires`
- * from the statement graph — the same derivation every other projection uses.
+ * The emitted delta is a set of pgpm changes ordered by one dependency graph
+ * over everything undeployed: DROPs of removed objects, ALTER TABLE steps of
+ * modified tables, replacements (and the drop/recreate of unchanged dependents
+ * a breaking step would invalidate) and CREATEs of added objects. Added
+ * objects are shaped and named by the granularity pipeline
+ * (`restructureChanges`); every other change gets its name from the naming
+ * spec and its `requires` from the graph — never a positional chain.
  * Every emitted change carries a full deploy/revert/verify triple: inverses
  * and existence checks are composed at the AST level via `@pgsql/scripts`'
  * node-level API (`invertStatement`/`existenceCheck`) — never hand-templated
@@ -26,22 +28,28 @@
  *
  * Requires `loadModule()` from `plpgsql-parser` before use.
  */
-import { pathFor, PathStyle } from '@pgpmjs/naming-spec';
+import { ObjectIdentity as NamingIdentity, pathFor, PathStyle } from '@pgpmjs/naming-spec';
 import { existenceCheck, invertStatement, revertFor, verifyFor } from '@pgsql/scripts';
 import type { StatementFacts } from '@pgsql/semantics';
-import { classifyStatements } from '@pgsql/semantics';
 import type { ObjectIdentity } from '@pgsql/transform';
 import {
   buildStatementGraph,
   cleanTree,
-  Granularity,
-  identityOf
+  Granularity
 } from '@pgsql/transform';
 import { Deparser, parseSync } from 'plpgsql-parser';
 
+import { absorbAnnotation, AnnotationState, diffAnnotations, emptyAnnotations, stablePrint } from './annotations';
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { ConstraintNode, defaultConstraintName } from './constraint-names';
-import { ChangeGranularity, GranularityChange, restructureChanges } from './granularity-driver';
+import { classifyStatements } from './facts';
+import { identityOf } from './facts';
+import { ChangeGranularity, defaultChangeName, GranularityChange, restructureChanges } from './granularity-driver';
+import { objectKeyOf, unitKeyOf } from './keys';
+import { alterInPlace } from './object-alters';
+import { topologicalOrder } from './order';
+import { nameUnnamedConstraints } from './sub-object';
+import { canonicalizeTypes, stripDefaultCasts, typeKey } from './type-canon';
 
 /** How one object differs between the two sides. */
 export type ObjectDelta = 'added' | 'removed' | 'modified';
@@ -57,6 +65,52 @@ export interface SemanticObjectDiff {
   columnsModified?: string[];
 }
 
+/**
+ * An explicit rename. Renames are never inferred from a drop/add pair: the
+ * caller declares them (`--rename app.t.old=app.t.new`, `--rename
+ * app.old=app.new`) and the diff emits `ALTER .. RENAME` with its inverse.
+ */
+export interface RenameDeclaration {
+  kind: 'column' | 'table';
+  schema: string | null;
+  /** The table, for column renames. */
+  table?: string;
+  /** For column renames declared with the table's new name (renamed in the same diff). */
+  toTable?: string;
+  from: string;
+  to: string;
+}
+
+/** Parse `schema.table.old=schema.table.new` (column) or `schema.old=schema.new` (table). */
+export function parseRenameDeclaration(spec: string): RenameDeclaration {
+  const [lhs, rhs, ...rest] = spec.split('=');
+  if (!lhs || !rhs || rest.length > 0) {
+    throw new DiffPolicyError('rename', `pgpm diff: --rename expects <from>=<to>, got "${spec}"`);
+  }
+  const a = lhs.split('.');
+  const b = rhs.split('.');
+  if (a.length !== b.length || a.length < 2 || a.length > 3 || a.some(x => !x) || b.some(x => !x)) {
+    throw new DiffPolicyError('rename', `pgpm diff: --rename expects schema.table=schema.table or schema.table.column=schema.table.column, got "${spec}"`);
+  }
+  if (a[0] !== b[0]) {
+    throw new DiffPolicyError('rename', `pgpm diff: --rename cannot move "${lhs}" to another schema ("${rhs}")`);
+  }
+  if (a.length === 3) {
+    const decl: RenameDeclaration = { kind: 'column', schema: a[0], table: a[1], from: a[2], to: b[2] };
+    if (a[1] !== b[1]) decl.toTable = b[1];
+    return decl;
+  }
+  return { kind: 'table', schema: a[0], from: a[1], to: b[1] };
+}
+
+/** A migration the policy refuses to emit as-is (data loss, incompleteness, bad rename). */
+export class DiffPolicyError extends Error {
+  constructor(readonly kind: 'data-loss' | 'incomplete' | 'rename', message: string) {
+    super(message);
+    this.name = 'DiffPolicyError';
+  }
+}
+
 export interface SemanticDiffOptions {
   /** Granularity for the emitted CREATE/ALTER changes (default `object`). */
   granularity?: Granularity;
@@ -64,6 +118,21 @@ export interface SemanticDiffOptions {
   changeGranularity?: ChangeGranularity;
   /** Naming-spec rendering style (default `directory`). */
   style?: PathStyle;
+  /** Declared table/column renames (never inferred). */
+  renames?: RenameDeclaration[];
+  /**
+   * Accept steps that can lose data (DROP TABLE/COLUMN/SCHEMA/SEQUENCE, type
+   * changes, replaced types). Without it such a delta throws `DiffPolicyError`.
+   */
+  allowDataLoss?: boolean;
+  /**
+   * Accept steps whose DROP or inverse cannot be derived; they are emitted
+   * with a `-- pgpm:` marker and reported as warnings. Without it such a
+   * delta throws `DiffPolicyError`.
+   */
+  allowIncomplete?: boolean;
+  /** `schema.table.column` → USING expression for that column's type change (default `column::newtype`). */
+  casts?: Record<string, string>;
 }
 
 /** One emitted delta change: a full deploy/revert/verify triple. */
@@ -78,16 +147,16 @@ export interface SemanticDiffResult {
   /** Per-object dispositions, in `to`-then-removed order. */
   objects: SemanticObjectDiff[];
   /**
-   * The migration delta: DROP changes for removed objects first (reverse
-   * topological order), then CREATE/ALTER changes named and ordered by the
-   * granularity pipeline.
+   * The migration delta: drops, table alterations, replacements and creates
+   * in one stable topological order over their real dependencies (phase and
+   * `to`-side source order break ties); each change's `dependencies` are its
+   * graph edges.
    */
   changes: SemanticDeltaChange[];
   warnings: string[];
 }
 
-const identityKey = (id: ObjectIdentity): string =>
-  `${id.kind}\u0000${id.schema ?? ''}\u0000${id.table ?? ''}\u0000${id.name}`;
+const identityKey = objectKeyOf;
 
 /** One side's statements for a single object. */
 interface ObjectUnit {
@@ -95,6 +164,8 @@ interface ObjectUnit {
   /** Statement indexes in source order. */
   statements: number[];
   texts: string[];
+  /** The texts as written on the from side, before a declared rename rewrote them (what a revert recreates). */
+  inverseTexts?: string[];
 }
 
 interface SideProgram {
@@ -106,12 +177,128 @@ interface SideProgram {
 }
 
 /**
+ * The `schema.name` object an annotation statement (COMMENT, GRANT, OWNER,
+ * ALTER DEFAULT PRIVILEGES) decorates, when it names it explicitly.
+ */
+function annotationHost(text: string): string | null {
+  const stmts = parseSync(text).sql.stmts;
+  if (stmts.length !== 1) return null;
+  const stmt = stmts[0].stmt as unknown as Record<string, Record<string, unknown>>;
+  const items = (list: unknown): string[] =>
+    (((list as { List?: { items?: { String?: { sval?: string } }[] } })?.List?.items) ?? [])
+      .map(x => x.String?.sval ?? '');
+  const relation = (rv: unknown): string | null => {
+    const r = rv as { schemaname?: string; relname?: string } | undefined;
+    return r?.relname ? `${r.schemaname ?? ''}.${r.relname}` : null;
+  };
+  if (stmt.CommentStmt) {
+    const objtype = stmt.CommentStmt.objtype as string;
+    const names = items(stmt.CommentStmt.object);
+    if (objtype === 'OBJECT_SCHEMA' && names.length === 1) return `.${names[0]}`;
+    if (objtype === 'OBJECT_COLUMN' && names.length >= 2) return `${names.length === 3 ? names[0] : ''}.${names[names.length - 2]}`;
+    if (names.length === 2) return `${names[0]}.${names[1]}`;
+    if (names.length === 1 && objtype !== 'OBJECT_COLUMN') return `.${names[0]}`;
+    return null;
+  }
+  if (stmt.GrantStmt) {
+    const objects = (stmt.GrantStmt.objects as unknown[]) ?? [];
+    if (objects.length !== 1) return null;
+    const first = objects[0] as Record<string, unknown>;
+    if (first.RangeVar) return relation(first.RangeVar);
+    if (stmt.GrantStmt.targtype === 'ACL_TARGET_ALL_IN_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
+    if (stmt.GrantStmt.objtype === 'OBJECT_SCHEMA' && first.String) return `.${(first.String as { sval: string }).sval}`;
+    const names = first.ObjectWithArgs
+      ? ((first.ObjectWithArgs as { objname?: { String?: { sval?: string } }[] }).objname ?? []).map(x => x.String?.sval ?? '')
+      : first.List ? items(first) : [];
+    if (names.length === 2) return `${names[0]}.${names[1]}`;
+    if (names.length === 1) return `.${names[0]}`;
+    return null;
+  }
+  if (stmt.AlterDefaultPrivilegesStmt) {
+    const options = (stmt.AlterDefaultPrivilegesStmt.options as { DefElem?: { defname?: string; arg?: unknown } }[]) ?? [];
+    const schemas = options.find(o => o.DefElem?.defname === 'schemas');
+    const names = schemas ? items(schemas.DefElem!.arg) : [];
+    return names.length === 1 ? `.${names[0]}` : null;
+  }
+  if (stmt.AlterOwnerStmt) {
+    const o = stmt.AlterOwnerStmt;
+    if (o.objectType === 'OBJECT_SCHEMA' && (o.object as { String?: { sval?: string } })?.String?.sval) {
+      return `.${(o.object as { String: { sval: string } }).String.sval}`;
+    }
+    if (o.relation) return relation(o.relation);
+    const names = items(o.object);
+    return names.length === 2 ? `${names[0]}.${names[1]}` : null;
+  }
+  if (stmt.AlterTableStmt) return relation(stmt.AlterTableStmt.relation);
+  return null;
+}
+
+/**
  * Group one side's script into identity-keyed object units. Statements with
  * no identity (grants, comments) attach to the unit of the first object they
  * reference, falling back to the preceding statement's unit; truly homeless
  * statements are reported via `warnings`.
  */
-function readSide(sql: string, warnings: string[], label: string): SideProgram {
+/**
+ * Argument-type signature of a `CREATE FUNCTION`/`PROCEDURE` text — the IN,
+ * INOUT and VARIADIC parameter types that make an overload distinct. Null for
+ * anything else.
+ */
+const signatureCache = new Map<string, string | null>();
+
+/**
+ * The input argument types of a `CREATE FUNCTION` statement as Postgres
+ * identifies the function: canonical type names, no typmods (`varchar(10)`
+ * and `varchar` are the same overload), OUT and TABLE parameters excluded.
+ */
+function functionArgSignature(text: string): string | null {
+  if (signatureCache.has(text)) return signatureCache.get(text)!;
+  let stmts;
+  try {
+    stmts = parseSync(text).sql.stmts;
+  } catch {
+    signatureCache.set(text, null);
+    return null;
+  }
+  const fn = stmts.length === 1 ? (stmts[0].stmt as unknown as { CreateFunctionStmt?: { parameters?: { FunctionParameter?: { mode?: string; argType?: unknown } }[] } }).CreateFunctionStmt : undefined;
+  const sig = !fn ? null : (fn.parameters ?? [])
+    .map(p => p.FunctionParameter)
+    .filter(p => p && p.mode !== 'FUNC_PARAM_OUT' && p.mode !== 'FUNC_PARAM_TABLE')
+    .map(p => Deparser.deparse({ TypeName: { ...canonicalizeTypes(cleanTree(p!.argType)), typmods: undefined } } as any, { pretty: false }))
+    .join(', ');
+  signatureCache.set(text, sig);
+  return sig;
+}
+
+/**
+ * Functions declared with more than one argument signature across both
+ * sides, keyed `schema.name`. Each overload of such a function is its own
+ * object: identified (and pathed) as `name(argtypes)`.
+ */
+function overloadedFunctions(sides: string[]): Set<string> {
+  const signatures = new Map<string, Set<string>>();
+  for (const sql of sides) {
+    const bytes = sqlSourceBytes(sql);
+    for (const f of classifyStatements(sql)) {
+      if (f.nodeTag !== 'CreateFunctionStmt' || !f.creates[0]) continue;
+      const sig = functionArgSignature(sliceStatementBytes(bytes, f.span.start, f.span.len));
+      if (sig === null) continue;
+      const name = `${f.creates[0].schema ?? ''}.${f.creates[0].name}`;
+      if (!signatures.has(name)) signatures.set(name, new Set());
+      signatures.get(name)!.add(sig);
+    }
+  }
+  return new Set([...signatures].filter(([, sigs]) => sigs.size > 1).map(([name]) => name));
+}
+
+/** The identity an overloaded function's statement groups under: `name(argtypes)`. */
+function overloadIdentity(identity: ObjectIdentity, text: string, overloaded: Set<string>): ObjectIdentity {
+  if (identity.kind !== 'function' || !overloaded.has(`${identity.schema ?? ''}.${identity.name}`)) return identity;
+  const sig = functionArgSignature(text);
+  return sig === null ? identity : { ...identity, name: `${identity.name}(${sig})` };
+}
+
+function readSide(sql: string, warnings: string[], label: string, overloaded: Set<string>): SideProgram {
   const facts = classifyStatements(sql);
   const graph = buildStatementGraph(facts);
   const units = new Map<string, ObjectUnit>();
@@ -126,6 +313,7 @@ function readSide(sql: string, warnings: string[], label: string): SideProgram {
     if (!text) return;
 
     let identity = groupingIdentity(f);
+    if (identity && f.nodeTag === 'CreateFunctionStmt') identity = overloadIdentity(identity, text, overloaded);
     if (identity && identity.kind === 'other') {
       const asTable = identityKey({ kind: 'table', schema: identity.schema, name: identity.name });
       if (units.has(asTable)) identity = units.get(asTable)!.identity;
@@ -141,9 +329,11 @@ function readSide(sql: string, warnings: string[], label: string): SideProgram {
         byObject.set(`${identity.schema ?? ''}.${identity.name}`, key);
       }
     } else {
-      for (const r of f.references) {
-        const host = byObject.get(`${r.schema ?? ''}.${r.name}`);
-        if (host) { key = host; break; }
+      const host = annotationHost(text);
+      if (host) key = byObject.get(host) ?? null;
+      for (const r of key ? [] : f.references) {
+        const candidate = byObject.get(`${r.schema ?? ''}.${r.name}`);
+        if (candidate) { key = candidate; break; }
       }
       if (!key && i > 0) key = unitOf[i - 1];
     }
@@ -180,10 +370,116 @@ function groupingIdentity(f: StatementFacts): ObjectIdentity | null {
   return identity;
 }
 
+/**
+ * Fold an `ALTER SEQUENCE` (OWNED BY, increment, ...) into the unit's
+ * `CREATE SEQUENCE` node so the sequence compares as one definition whether
+ * its options were authored inline or as a later ALTER. Later options win.
+ */
+function foldSequenceAlter(nodes: Record<string, unknown>[], definition: string[], stmt: Record<string, unknown>): boolean {
+  const alter = stmt.AlterSeqStmt as { options?: { DefElem?: { defname?: string } }[] } | undefined;
+  if (!alter) return false;
+  const at = nodes.findIndex(n => n.CreateSeqStmt);
+  if (at < 0) return false;
+  const create = nodes[at].CreateSeqStmt as { options?: { DefElem?: { defname?: string } }[] };
+  const overridden = new Set((alter.options ?? []).map(o => o.DefElem?.defname));
+  const merged = {
+    CreateSeqStmt: {
+      ...create,
+      options: [...(create.options ?? []).filter(o => !overridden.has(o.DefElem?.defname)), ...(alter.options ?? [])]
+    }
+  };
+  nodes[at] = merged;
+  definition[at] = deparseStmt(merged);
+  return true;
+}
+
+/** A table column whose type is (an array of) the given user type. */
+interface DependentColumn {
+  relation: unknown;
+  table: string;
+  schema: string | null;
+  name: string;
+  def: Record<string, unknown>;
+  toDef: Record<string, unknown> | undefined;
+  array: boolean;
+}
+
+/** Columns of the side's tables declared with the type (or arrays of it). */
+function typeDependentColumns(side: SideProgram, other: SideProgram, type: ObjectIdentity): DependentColumn[] {
+  const key = typeKey({ names: [type.schema, type.name].filter((x): x is string => x !== null).map(sval => ({ String: { sval } })) } as any);
+  const out: DependentColumn[] = [];
+  for (const unitKey of side.order) {
+    const unit = side.units.get(unitKey)!;
+    if (unit.identity.kind !== 'table') continue;
+    const shape = tableShape(unit);
+    const toShape = other.units.has(unitKey) ? tableShape(other.units.get(unitKey)!) : null;
+    for (const [name, col] of shape.columns) {
+      const colKey = typeKey((col.def as Record<string, unknown>).typeName as any);
+      if (colKey !== key && colKey !== `${key}[]`) continue;
+      out.push({
+        relation: shape.relation,
+        table: unit.identity.name,
+        schema: unit.identity.schema,
+        name,
+        def: col.def as Record<string, unknown>,
+        toDef: toShape?.columns.get(name)?.def as Record<string, unknown> | undefined,
+        array: colKey !== key
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Postgres refuses to alter or drop a type a table column uses, so the
+ * column is parked in a bridge type (jsonb for composites, text otherwise)
+ * around the type's change and cast back afterwards. Values the new type
+ * rejects are lost, which the caller reports as destructive.
+ */
+function columnRebridge(col: DependentColumn, composite: boolean): { pre: { sql: string; inverse: string }[]; post: { sql: string; inverse: string }[] } {
+  const ident = (name: string): string => /^[a-z_][a-z0-9_]*$/.test(name) ? name : `"${name.replace(/"/g, '""')}"`;
+  const c = ident(col.name);
+  const typeName = col.def.typeName as Record<string, unknown>;
+  const element: Record<string, unknown> = { ...typeName, arrayBounds: undefined };
+  const elementType = Deparser.deparse({ TypeName: element } as any, { pretty: false });
+  const bridge = { names: [{ String: { sval: composite ? 'jsonb' : 'text' } }] };
+  const out = composite ? `to_jsonb(${c})` : `${c}::text`;
+  // A USING expression may not contain a subquery, so an array of records
+  // is rebuilt by a session-local helper that lives only for the statement.
+  const helper = composite && col.array ? 'pg_temp.pgpm_jsonb_array' : null;
+  const back = !composite
+    ? `${c}::${Deparser.deparse({ TypeName: typeName } as any, { pretty: false })}`
+    : helper
+      ? `${helper}(NULL::${elementType}, ${c})`
+      : `jsonb_populate_record(NULL::${elementType}, ${c})`;
+  const alter = (cmd: Record<string, unknown>): string =>
+    deparseStmt({ AlterTableStmt: { relation: col.relation, objtype: 'OBJECT_TABLE', cmds: [{ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } }] } });
+  const retype = (target: unknown, using: string, collClause?: unknown): string => {
+    const stmt = alter({ subtype: 'AT_AlterColumnType', name: col.name, def: { ColumnDef: { typeName: target, collClause, raw_default: parseExpression(using) } } });
+    if (!helper || using !== back) return stmt;
+    return [
+      `CREATE FUNCTION ${helper}(base anyelement, j jsonb) RETURNS anyarray LANGUAGE sql IMMUTABLE AS $$ SELECT CASE WHEN j IS NULL THEN NULL ELSE ARRAY(SELECT jsonb_populate_record(base, e) FROM jsonb_array_elements(j) AS e) END $$;`,
+      stmt,
+      `DROP FUNCTION ${helper}(anyelement, jsonb);`
+    ].join('\n');
+  };
+  const setDefault = (expr: unknown): string => alter({ subtype: 'AT_ColumnDefault', name: col.name, def: expr });
+  const dropDefault = alter({ subtype: 'AT_ColumnDefault', name: col.name });
+  const fromDefault = columnAttributes(col.def).def;
+  const toDefault = columnAttributes(col.toDef ?? col.def).def;
+  const pre: { sql: string; inverse: string }[] = [];
+  const post: { sql: string; inverse: string }[] = [];
+  if (fromDefault) pre.push({ sql: dropDefault, inverse: setDefault(fromDefault) });
+  pre.push({ sql: retype(bridge, out), inverse: retype(typeName, back, col.def.collClause) });
+  post.push({ sql: retype(typeName, back, col.def.collClause), inverse: retype(bridge, out) });
+  if (toDefault) post.push({ sql: setDefault(toDefault), inverse: dropDefault });
+  return { pre, post };
+}
+
 /** Normalized-AST fingerprint of one statement (formatting/position-proof). */
 function fingerprint(text: string): string {
   const parsed = parseSync(text);
-  return JSON.stringify(cleanTree(parsed.sql.stmts.map(s => s.stmt)));
+  return stablePrint(canonicalizeTypes(cleanTree(parsed.sql.stmts.map(s => s.stmt))));
 }
 
 /** Multiset fingerprint of a whole unit. */
@@ -192,27 +488,72 @@ const unitFingerprint = (unit: ObjectUnit): string =>
 
 interface TableShape {
   relation: unknown;
-  /** column name → normalized ColumnDef. */
-  columns: Map<string, { def: unknown; print: string }>;
+  /** column name → ColumnDef as authored (emitted), its canonical form (compared) and print key. */
+  columns: Map<string, { def: unknown; canon: unknown; print: string }>;
+  /** serial columns → the implied owned sequence (pg_dump's int + nextval + sequence). */
+  serials: Map<string, { schema: string | null; name: string; as: string }>;
   /** normalized table-level constraints/extras, keyed by their print. */
   extras: Map<string, unknown>;
+  /** COMMENT / GRANT / OWNER state attached to the table. */
+  annotations: AnnotationState;
+  /** Constraints authored without a name; Postgres derives theirs from the table name. */
+  implicitConstraints: { node: ConstraintNode; column?: string }[];
+  /** Table-level settings folded from CREATE TABLE and the ALTER TABLE commands that change them. */
+  props: TableProps;
 }
 
-/** JSON with recursively sorted object keys — an insertion-order-proof fingerprint. */
-function stablePrint(node: unknown): string {
-  if (Array.isArray(node)) return `[${node.map(stablePrint).join(',')}]`;
-  if (node && typeof node === 'object') {
-    const entries = Object.entries(node as Record<string, unknown>)
-      .filter(([, v]) => v !== undefined)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${JSON.stringify(k)}:${stablePrint(v)}`);
-    return `{${entries.join(',')}}`;
-  }
-  return JSON.stringify(node);
+interface TableProps {
+  /** relpersistence: 'p' (logged) or 'u' (unlogged). */
+  persistence: string;
+  /** reloption name → DefElem. */
+  options: Map<string, unknown>;
+  /** INHERITS parents, keyed by print. */
+  inherits: Map<string, unknown>;
+  /** PARTITION OF parent and bound, when the table is a partition. */
+  partition: { parent: unknown; bound: unknown } | null;
+  /** PARTITION BY clause of a partitioned table. */
+  partspec: unknown;
 }
 
 /** Constraint kinds that can move between column, table-elt, and ALTER form. */
 const RELOCATABLE = new Set(['CONSTR_PRIMARY', 'CONSTR_UNIQUE', 'CONSTR_FOREIGN', 'CONSTR_CHECK']);
+
+/** Column constraint "attributes" the parser emits as siblings of the constraint they qualify. */
+const CONSTRAINT_ATTRS: Record<string, Record<string, boolean>> = {
+  CONSTR_ATTR_DEFERRABLE: { deferrable: true },
+  CONSTR_ATTR_NOT_DEFERRABLE: { deferrable: false },
+  CONSTR_ATTR_DEFERRED: { initdeferred: true },
+  CONSTR_ATTR_IMMEDIATE: { initdeferred: false }
+};
+
+/** Normalize one column constraint to its semantic core (parser-version extras dropped). */
+const IDENTITY_OPTION_DEFAULTS: Record<string, string> = {
+  start: '{"Integer":{"ival":1}}',
+  increment: '{"Integer":{"ival":1}}',
+  minvalue: 'undefined',
+  maxvalue: 'undefined',
+  cache: '{"Integer":{"ival":1}}',
+  cycle: '{"Boolean":{"boolval":false}}'
+};
+
+function normalizeColumnConstraint(c: ConstraintNode & Record<string, unknown>, columnType: unknown): Record<string, unknown> {
+  if (c.contype === 'CONSTR_NOTNULL') return { Constraint: { contype: 'CONSTR_NOTNULL' } };
+  if (c.contype === 'CONSTR_IDENTITY') {
+    // pg_dump spells out the backing sequence (SEQUENCE NAME, START 1, ...);
+    // only non-default options are semantic.
+    const options = ((c.options as { DefElem?: { defname?: string; arg?: unknown } }[] | undefined) ?? []).filter(o => {
+      const name = o.DefElem?.defname ?? '';
+      if (name === 'sequence_name') return false;
+      const value = o.DefElem?.arg === undefined ? 'undefined' : JSON.stringify(cleanTree(o.DefElem.arg));
+      return IDENTITY_OPTION_DEFAULTS[name] !== value;
+    });
+    return { Constraint: { contype: 'CONSTR_IDENTITY', generated_when: c.generated_when, options: options.length > 0 ? options : undefined } };
+  }
+  if (c.contype === 'CONSTR_DEFAULT') {
+    return { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: stripDefaultCasts(c.raw_expr, columnType as any) } };
+  }
+  return { Constraint: c };
+}
 
 /**
  * Fold a table unit's statements (CREATE TABLE plus any ALTER TABLE
@@ -225,34 +566,98 @@ const RELOCATABLE = new Set(['CONSTR_PRIMARY', 'CONSTR_UNIQUE', 'CONSTR_FOREIGN'
  * (PK/UNIQUE/FK/CHECK) are therefore lifted out of columns and ALTER
  * commands into one canonical table-level set — keyed with the Postgres
  * default name when unnamed, columns filled in from the owning column when
- * column-attached — and PK columns gain the NOT NULL the catalog implies.
+ * column-attached, DEFERRABLE/INITIALLY DEFERRED siblings folded in — and
+ * PK/identity columns gain the NOT NULL the catalog implies. Type names and
+ * default-expression casts are canonicalized so a module compares equal to
+ * the catalog rendering of the same table.
  */
+const SERIAL_TYPES: Record<string, string> = {
+  smallserial: 'int2', serial2: 'int2', serial: 'int4', serial4: 'int4', bigserial: 'int8', serial8: 'int8'
+};
+
+/** The serial pseudo-type a column is declared with, if any (`serial`, `bigserial`, ...). */
+function serialTypeName(typeName: unknown): string | null {
+  const names = ((typeName as { names?: { String?: { sval?: string } }[] } | undefined)?.names ?? []).map(n => n.String?.sval ?? '');
+  const bare = names.length === 1 ? names[0] : names.length === 2 && names[0] === 'pg_catalog' ? names[1] : null;
+  return bare !== null && bare in SERIAL_TYPES ? bare : null;
+}
+
 function tableShape(unit: ObjectUnit): TableShape {
-  const shape: TableShape = { relation: null, columns: new Map(), extras: new Map() };
+  const props: TableProps = { persistence: 'p', options: new Map(), inherits: new Map(), partition: null, partspec: null };
+  const shape: TableShape = { relation: null, columns: new Map(), serials: new Map(), extras: new Map(), annotations: emptyAnnotations(), implicitConstraints: [], props };
+  const setOptions = (items: unknown[] | undefined, keep: boolean): void => {
+    for (const o of items ?? []) {
+      const name = (o as { DefElem?: { defname?: string } }).DefElem?.defname;
+      if (!name) continue;
+      if (keep) props.options.set(name, cleanTree(o));
+      else props.options.delete(name);
+    }
+  };
   const table = unit.identity.name;
   const rawColumns: { colname: string; def: Record<string, unknown> }[] = [];
   const constraints: { node: ConstraintNode & Record<string, unknown>; column?: string }[] = [];
-  const pkColumns = new Set<string>();
+  const notNullImplied = new Set<string>();
 
   const addColumn = (node: Record<string, unknown>): void => {
     const colname = (node as { colname?: string }).colname ?? '';
     const attached = (node.constraints as { Constraint?: Record<string, unknown> }[] | undefined) ?? [];
     const residual: unknown[] = [];
+    let last: (ConstraintNode & Record<string, unknown>) | null = null;
     for (const item of attached) {
       const c = item.Constraint as (ConstraintNode & Record<string, unknown>) | undefined;
-      if (c && RELOCATABLE.has(c.contype ?? '')) {
-        constraints.push({ node: c, column: colname });
-      } else {
-        residual.push(item);
+      if (!c) continue;
+      if (c.contype && CONSTRAINT_ATTRS[c.contype]) {
+        if (last) Object.assign(last, CONSTRAINT_ATTRS[c.contype]);
+        continue;
       }
+      const copy = { ...c };
+      if (RELOCATABLE.has(c.contype ?? '')) {
+        constraints.push({ node: copy, column: colname });
+      } else {
+        residual.push({ Constraint: copy });
+        if (c.contype === 'CONSTR_IDENTITY') notNullImplied.add(colname);
+      }
+      last = copy;
     }
     rawColumns.push({ colname, def: { ...node, constraints: residual } });
   };
   const addConstraint = (node: Record<string, unknown>, column?: string): void => {
     constraints.push({ node: node as ConstraintNode & Record<string, unknown>, column });
   };
+  // pg_dump emits column attributes as separate ALTER TABLE commands
+  // (SET DEFAULT nextval(..), SET NOT NULL, ADD GENERATED .. AS IDENTITY);
+  // they fold into the column they qualify.
+  const foldColumnCommand = (at: Record<string, unknown>): boolean => {
+    const target = rawColumns.find(c => c.colname === at.name);
+    if (!target) return false;
+    const list = target.def.constraints as Record<string, unknown>[];
+    const without = (contype: string): Record<string, unknown>[] =>
+      list.filter(item => (item.Constraint as { contype?: string } | undefined)?.contype !== contype);
+    switch (at.subtype) {
+    case 'AT_ColumnDefault':
+      target.def.constraints = at.def === undefined
+        ? without('CONSTR_DEFAULT')
+        : [...without('CONSTR_DEFAULT'), { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: at.def } }];
+      return true;
+    case 'AT_SetNotNull':
+      target.def.constraints = [...without('CONSTR_NOTNULL'), { Constraint: { contype: 'CONSTR_NOTNULL' } }];
+      return true;
+    case 'AT_DropNotNull':
+      target.def.constraints = without('CONSTR_NOTNULL');
+      return true;
+    case 'AT_AddIdentity':
+      target.def.constraints = [...without('CONSTR_IDENTITY'), at.def as Record<string, unknown>];
+      notNullImplied.add(target.colname);
+      return true;
+    case 'AT_DropIdentity':
+      target.def.constraints = without('CONSTR_IDENTITY');
+      return true;
+    default:
+      return false;
+    }
+  };
   const addExtra = (node: unknown): void => {
-    const clean = cleanTree(node);
+    const clean = canonicalizeTypes(cleanTree(node));
     shape.extras.set(stablePrint(clean), clean);
   };
 
@@ -261,6 +666,18 @@ function tableShape(unit: ObjectUnit): TableShape {
       const stmt = raw.stmt as unknown as Record<string, Record<string, unknown>>;
       if (stmt.CreateStmt) {
         shape.relation = stmt.CreateStmt.relation;
+        props.persistence = (stmt.CreateStmt.relation as { relpersistence?: string }).relpersistence ?? 'p';
+        setOptions(stmt.CreateStmt.options as unknown[] | undefined, true);
+        const parents = (stmt.CreateStmt.inhRelations as unknown[] | undefined) ?? [];
+        if (stmt.CreateStmt.partbound) {
+          props.partition = { parent: cleanTree(parents[0]), bound: cleanTree(stmt.CreateStmt.partbound) };
+        } else {
+          for (const parent of parents) {
+            const clean = cleanTree(parent);
+            props.inherits.set(stablePrint(clean), clean);
+          }
+        }
+        if (stmt.CreateStmt.partspec) props.partspec = cleanTree(stmt.CreateStmt.partspec);
         const elts = (stmt.CreateStmt.tableElts as Record<string, unknown>[] | undefined) ?? [];
         for (const elt of elts) {
           if (elt.ColumnDef) addColumn(elt.ColumnDef as Record<string, unknown>);
@@ -283,17 +700,30 @@ function tableShape(unit: ObjectUnit): TableShape {
             RELOCATABLE.has((def.Constraint as ConstraintNode).contype ?? '')
           ) {
             addConstraint(def.Constraint as Record<string, unknown>);
-          } else {
+          } else if (at.subtype === 'AT_ChangeOwner') {
+            absorbAnnotation(shape.annotations, {
+              AlterTableStmt: { relation: stmt.AlterTableStmt.relation, objtype: stmt.AlterTableStmt.objtype, cmds: [cmd] }
+            });
+          } else if (at.subtype === 'AT_SetRelOptions' || at.subtype === 'AT_ResetRelOptions') {
+            setOptions((def as { List?: { items?: unknown[] } } | undefined)?.List?.items, at.subtype === 'AT_SetRelOptions');
+          } else if (at.subtype === 'AT_SetUnLogged' || at.subtype === 'AT_SetLogged') {
+            props.persistence = at.subtype === 'AT_SetUnLogged' ? 'u' : 'p';
+          } else if (at.subtype === 'AT_AddInherit' || at.subtype === 'AT_DropInherit') {
+            const clean = cleanTree(def);
+            if (at.subtype === 'AT_AddInherit') props.inherits.set(stablePrint(clean), clean);
+            else props.inherits.delete(stablePrint(clean));
+          } else if (!foldColumnCommand(at)) {
             addExtra({ AlterTableCmd: at });
           }
         }
-      } else {
+      } else if (!absorbAnnotation(shape.annotations, stmt)) {
         addExtra(stmt);
       }
     }
   }
 
   for (const { node, column } of constraints) {
+    if (!node.conname) shape.implicitConstraints.push({ node, column });
     const canonical: Record<string, unknown> = { ...node };
     canonical.conname = node.conname ?? defaultConstraintName(table, node, column) ?? undefined;
     if (column && (node.keys ?? []).length === 0 && node.contype !== 'CONSTR_FOREIGN' && node.contype !== 'CONSTR_CHECK') {
@@ -304,33 +734,45 @@ function tableShape(unit: ObjectUnit): TableShape {
     }
     if (node.contype === 'CONSTR_PRIMARY') {
       const keyed = (canonical.keys as { String?: { sval?: string } }[] | undefined) ?? [];
-      for (const k of keyed) if (k.String?.sval) pkColumns.add(k.String.sval);
+      for (const k of keyed) if (k.String?.sval) notNullImplied.add(k.String.sval);
     }
     addExtra({ Constraint: canonical });
   }
 
-  for (const { colname, def } of rawColumns) {
-    const residual = ((def.constraints as unknown[] | undefined) ?? []).map(c => {
-      const constraint = (c as { Constraint?: ConstraintNode & { conname?: string } }).Constraint;
-      // NOT NULL parses with parser-version-dependent extras (is_enforced,
-      // initially_valid); reduce to its semantic core so an authored NOT NULL
-      // equals the one a primary key implies.
-      if (constraint?.contype === 'CONSTR_NOTNULL') {
-        return { Constraint: { contype: 'CONSTR_NOTNULL', conname: constraint.conname } };
+  for (const { colname, def: declared } of rawColumns) {
+    // `serial` is shorthand for an int column with an owned sequence and a
+    // nextval default; it is unfolded so it compares with that spelling.
+    const serialAs = SERIAL_TYPES[serialTypeName(declared.typeName) ?? ''];
+    const sequence = serialAs
+      ? { schema: unit.identity.schema, name: `${unit.identity.name}_${colname}_seq`, as: serialAs }
+      : null;
+    const def = sequence
+      ? {
+        ...declared,
+        typeName: { names: [{ String: { sval: 'pg_catalog' } }, { String: { sval: sequence.as } }], typemod: -1 },
+        constraints: [
+          ...((declared.constraints as unknown[] | undefined) ?? []),
+          { Constraint: { contype: 'CONSTR_DEFAULT', raw_expr: parseExpression(`nextval('${[sequence.schema, sequence.name].filter(Boolean).join('.')}'::regclass)`) } }
+        ]
       }
-      return c;
-    });
+      : declared;
+    if (sequence) shape.serials.set(colname, sequence);
+    const typeName = canonicalizeTypes(cleanTree(def.typeName));
+    const residual = ((def.constraints as unknown[] | undefined) ?? []).map(c =>
+      normalizeColumnConstraint((c as { Constraint: ConstraintNode & Record<string, unknown> }).Constraint, typeName)
+    );
     const hasNotNull = residual.some(
       c => (c as { Constraint?: ConstraintNode }).Constraint?.contype === 'CONSTR_NOTNULL'
     );
-    if (pkColumns.has(colname) && !hasNotNull) {
+    if ((notNullImplied.has(colname) || sequence) && !hasNotNull) {
       residual.push({ Constraint: { contype: 'CONSTR_NOTNULL' } });
     }
     const sorted = residual
       .map(c => cleanTree(c))
-      .sort((x, y) => stablePrint(x).localeCompare(stablePrint(y)));
+      .sort((x, y) => stablePrint(canonicalizeTypes(x)).localeCompare(stablePrint(canonicalizeTypes(y))));
     const clean = cleanTree({ ...def, constraints: sorted });
-    shape.columns.set(colname, { def: clean, print: stablePrint(clean) });
+    const canon = canonicalizeTypes(clean);
+    shape.columns.set(colname, { def: clean, canon, print: stablePrint(canon) });
   }
   return shape;
 }
@@ -338,15 +780,140 @@ function tableShape(unit: ObjectUnit): TableShape {
 const deparseStmt = (node: Record<string, unknown>): string =>
   `${Deparser.deparse(node, { pretty: false })};`;
 
-/** Column-level ALTERs between two table shapes. */
+/** Postgres' NAMEDATALEN - 1: longer derived names are truncated by the server and cannot be predicted here. */
+const MAX_IDENTIFIER = 63;
+
+/**
+ * Renaming a table does not rename the constraints (and their indexes) whose
+ * names Postgres derived from the old table name; a fresh deploy of the target
+ * would derive them from the new one. Rename each to keep the catalogs equal.
+ */
+function implicitConstraintRenames(
+  shape: TableShape,
+  relation: Record<string, unknown>,
+  fromTable: string,
+  toTable: string,
+  incomplete: string[]
+): TableAlteration[] {
+  const steps: TableAlteration[] = [];
+  const seen = new Map<string, number>();
+  const pairs = shape.implicitConstraints.map(({ node, column }) => ({
+    from: defaultConstraintName(fromTable, node, column),
+    to: defaultConstraintName(toTable, node, column)
+  }));
+  for (const { from } of pairs) if (from) seen.set(from, (seen.get(from) ?? 0) + 1);
+  const label = relation.schemaname ? `${relation.schemaname}.${toTable}` : toTable;
+  for (const { from, to } of pairs) {
+    if (!from || !to || from === to) continue;
+    if (seen.get(from)! > 1 || from.length > MAX_IDENTIFIER || to.length > MAX_IDENTIFIER) {
+      incomplete.push(`${label}: constraint "${from}" was named by Postgres from the old table name and cannot be renamed predictably (duplicate or truncated derivation); name it explicitly`);
+      continue;
+    }
+    const renameConstraint = (subname: string, newname: string): string =>
+      deparseStmt({ RenameStmt: { renameType: 'OBJECT_TABCONSTRAINT', relationType: 'OBJECT_TABLE', relation: { ...relation, relname: toTable }, subname, newname, behavior: 'DROP_RESTRICT' } });
+    steps.push({
+      sql: renameConstraint(from, to),
+      inverse: renameConstraint(to, from),
+      phase: 'alter',
+      sub: { kind: 'constraint', schema: (relation.schemaname as string | undefined) ?? null, table: toTable, name: to },
+      keyColumns: [],
+      breaking: false,
+      rename: true
+    });
+  }
+  return steps;
+}
+
+/** Where in the migration an alteration belongs (tie-break only; edges rule). */
+type Phase = 'drop' | 'remove' | 'alter' | 'add' | 'create';
+const PHASE_RANK: Record<Phase, number> = { drop: 0, remove: 1, alter: 2, add: 3, create: 4 };
+
+/** One ALTER TABLE step of a modified table, with its mechanical inverse. */
+interface TableAlteration {
+  sql: string;
+  inverse: string;
+  phase: Phase;
+  /** Column/constraint identity the step targets (null for RLS toggles / annotations). */
+  sub: NamingIdentity | null;
+  /** Columns this step keys on (constraint keys / fk columns). */
+  keyColumns: string[];
+  /** Whether the step invalidates dependents of the column it targets (drop, retype). */
+  breaking: boolean;
+  /** The RENAME step every other step of the table must follow. */
+  rename?: boolean;
+  /** The column's name on the from side when it was renamed (dependents mention that name). */
+  fromName?: string;
+}
+
+/** Policy and declaration inputs threaded into the table diff. */
+interface TableDiffContext {
+  /** Declared column renames for this table (old → new). */
+  columnRenames: Map<string, string>;
+  /** `schema.table.column` → USING expression. */
+  casts: Record<string, string>;
+  destructive: string[];
+  incomplete: string[];
+}
+
+interface ColumnAttributes {
+  notNull: boolean;
+  def?: unknown;
+  identity?: Record<string, unknown>;
+  generated?: Record<string, unknown>;
+  other: unknown[];
+}
+
+/** Pull the diffable attributes out of a normalized ColumnDef's residual constraints. */
+function columnAttributes(def: Record<string, unknown>): ColumnAttributes {
+  const out: ColumnAttributes = { notNull: false, other: [] };
+  for (const item of (def.constraints as { Constraint?: Record<string, unknown> }[] | undefined) ?? []) {
+    const c = item.Constraint;
+    if (!c) continue;
+    if (c.contype === 'CONSTR_NOTNULL') out.notNull = true;
+    else if (c.contype === 'CONSTR_DEFAULT') out.def = c.raw_expr;
+    else if (c.contype === 'CONSTR_IDENTITY') out.identity = c;
+    else if (c.contype === 'CONSTR_GENERATED') out.generated = c;
+    else out.other.push(item);
+  }
+  return out;
+}
+
+/** The expression node of `SELECT <expr>`. */
+function parseExpression(expr: string): unknown {
+  let stmts: { stmt?: unknown }[];
+  try {
+    stmts = parseSync(`SELECT ${expr}`).sql.stmts;
+  } catch (e) {
+    throw new DiffPolicyError('incomplete', `pgpm diff: --using expression could not be parsed: ${expr} (${(e as Error).message})`);
+  }
+  const select = stmts[0]?.stmt as { SelectStmt?: { targetList?: { ResTarget?: { val?: unknown } }[] } } | undefined;
+  const targets = select?.SelectStmt?.targetList ?? [];
+  const val = targets[0]?.ResTarget?.val;
+  if (stmts.length !== 1 || targets.length !== 1 || !val) {
+    throw new DiffPolicyError('incomplete', `pgpm diff: --using expression is not a single expression (one value, no top-level comma): ${expr}`);
+  }
+  return cleanTree(val);
+}
+
+/** Column name a COMMENT ON COLUMN entry targets, if any. */
+const commentColumn = (entry: { objtype: string; object: unknown }): string | null => {
+  if (entry.objtype !== 'OBJECT_COLUMN') return null;
+  const items = ((entry.object as { List?: { items?: { String?: { sval?: string } }[] } }).List?.items) ?? [];
+  return items[items.length - 1]?.String?.sval ?? null;
+};
+
+/** Column-level ALTERs between two table shapes, each paired with its inverse. */
 function diffTable(
   from: TableShape,
   to: TableShape,
   diff: SemanticObjectDiff,
-  warnings: string[]
-): string[] {
-  const stmts: string[] = [];
+  ctx: TableDiffContext
+): TableAlteration[] {
+  const steps: TableAlteration[] = [];
   const relation = to.relation ?? from.relation;
+  const schema = (relation as { schemaname?: string } | null)?.schemaname ?? null;
+  const table = (relation as { relname?: string } | null)?.relname ?? diff.identity.name;
+  const qualified = `${schema ?? ''}${schema ? '.' : ''}${table}`;
   const alter = (cmd: Record<string, unknown>): string =>
     deparseStmt({
       AlterTableStmt: {
@@ -355,43 +922,254 @@ function diffTable(
         objtype: 'OBJECT_TABLE'
       }
     });
+  const column = (name: string): NamingIdentity => ({ kind: 'column', schema, name, table });
+  const constraintName = (extra: unknown): string | undefined =>
+    (extra as { Constraint?: { conname?: string } }).Constraint?.conname
+    ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
+      .AlterTableCmd?.def?.Constraint?.conname;
+  const constraintKeys = (extra: unknown): string[] => {
+    const c = (extra as { Constraint?: ConstraintNode }).Constraint
+      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: ConstraintNode } } }).AlterTableCmd?.def?.Constraint;
+    const keys = [...(c?.keys ?? []), ...(c?.fk_attrs ?? [])]
+      .map(k => (k as { String?: { sval?: string } }).String?.sval)
+      .filter((s): s is string => typeof s === 'string');
+    const expr: ColumnMentions = { names: new Set(), star: false };
+    collectColumnMentions((c as { raw_expr?: unknown } | undefined)?.raw_expr, expr);
+    return [...new Set([...keys, ...expr.names])];
+  };
+  const renamedFrom = new Map<string, string>();
+  const attr = (name: string, phase: Phase, sql: string, inverse: string, breaking = false): TableAlteration =>
+    ({ sql, inverse, phase, sub: column(name), keyColumns: [], breaking, fromName: renamedFrom.get(name) });
 
   diff.columnsAdded = [];
   diff.columnsRemoved = [];
   diff.columnsModified = [];
 
+  // ---- declared column renames: the from side is re-keyed, then compared.
+  const fromColumns = new Map(from.columns);
+  const fromAnnotations: AnnotationState = { ...from.annotations, comments: new Map(from.annotations.comments) };
+  for (const [oldName, newName] of ctx.columnRenames) {
+    const prior = fromColumns.get(oldName);
+    if (!prior || fromColumns.has(newName) || !to.columns.has(newName) || to.columns.has(oldName)) {
+      throw new DiffPolicyError(
+        'rename',
+        `pgpm diff: cannot apply rename ${qualified}.${oldName} -> ${newName}: ` +
+        `the source must have "${oldName}" (and not "${newName}") and the target "${newName}" (and not "${oldName}")`
+      );
+    }
+    fromColumns.delete(oldName);
+    renamedFrom.set(newName, oldName);
+    const def = { ...(prior.def as Record<string, unknown>), colname: newName };
+    const canon = { ...(prior.canon as Record<string, unknown>), colname: newName };
+    fromColumns.set(newName, { def, canon, print: stablePrint(canon) });
+    for (const [key, entry] of from.annotations.comments) {
+      if (commentColumn(entry) !== oldName) continue;
+      const items = ((entry.object as { List: { items: { String?: { sval?: string } }[] } }).List.items).slice();
+      items[items.length - 1] = { String: { sval: newName } };
+      const object = { List: { items } };
+      fromAnnotations.comments.delete(key);
+      fromAnnotations.comments.set(`${entry.objtype}:${stablePrint(object)}`, { ...entry, object });
+    }
+    steps.push({
+      sql: deparseStmt({ RenameStmt: { renameType: 'OBJECT_COLUMN', relationType: 'OBJECT_TABLE', relation, subname: oldName, newname: newName, behavior: 'DROP_RESTRICT' } }),
+      inverse: deparseStmt({ RenameStmt: { renameType: 'OBJECT_COLUMN', relationType: 'OBJECT_TABLE', relation, subname: newName, newname: oldName, behavior: 'DROP_RESTRICT' } }),
+      phase: 'alter',
+      sub: column(newName),
+      fromName: oldName,
+      keyColumns: [],
+      // Dependents that name the column must be rebuilt around the rename
+      // (their from-side text uses the old name, their to-side text the new).
+      breaking: true,
+      rename: true
+    });
+  }
+
   for (const [name, col] of to.columns) {
-    const prior = from.columns.get(name);
+    const prior = fromColumns.get(name);
     if (!prior) {
       diff.columnsAdded.push(name);
-      stmts.push(alter({ subtype: 'AT_AddColumn', def: { ColumnDef: col.def } }));
-    } else if (prior.print !== col.print) {
-      diff.columnsModified.push(name);
-      const fromDef = prior.def as { typeName?: unknown; constraints?: unknown };
-      const toDef = col.def as { typeName?: unknown; constraints?: unknown };
-      const typeChanged = JSON.stringify(fromDef.typeName) !== JSON.stringify(toDef.typeName);
-      const restChanged =
-        JSON.stringify({ ...(fromDef as object), typeName: null }) !==
-        JSON.stringify({ ...(toDef as object), typeName: null });
+      steps.push({
+        sql: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: col.def } }),
+        inverse: alter({ subtype: 'AT_DropColumn', name }),
+        phase: 'add',
+        sub: column(name),
+        keyColumns: [],
+        breaking: false
+      });
+      continue;
+    }
+    if (prior.print === col.print) continue;
+    diff.columnsModified.push(name);
+    const fromDef = prior.def as Record<string, unknown>;
+    const toDef = col.def as Record<string, unknown>;
+    // Compare canonical forms (type aliases, default casts); emit authored forms.
+    const a = columnAttributes(prior.canon as Record<string, unknown>);
+    const b = columnAttributes(col.canon as Record<string, unknown>);
+    const aRaw = columnAttributes(fromDef);
+    const bRaw = columnAttributes(toDef);
+    const rebuild = (): void => {
+      const drop = alter({ subtype: 'AT_DropColumn', name });
+      steps.push(attr(name, 'alter',
+        `${drop}\n${alter({ subtype: 'AT_AddColumn', def: { ColumnDef: toDef } })}`,
+        `${drop}\n${alter({ subtype: 'AT_AddColumn', def: { ColumnDef: fromDef } })}`,
+        true));
+    };
+
+    // Generated columns: the expression cannot be altered in place.
+    if (b.generated && (!a.generated || stablePrint(a.generated) !== stablePrint(b.generated))) {
+      if (!a.generated) ctx.destructive.push(`${qualified}: column "${name}" becomes GENERATED (rewritten: DROP COLUMN + ADD COLUMN)`);
+      rebuild();
+      continue;
+    }
+    if (a.generated && !b.generated) {
+      steps.push(attr(name, 'alter',
+        alter({ subtype: 'AT_DropExpression', name }),
+        `${alter({ subtype: 'AT_DropColumn', name })}\n${alter({ subtype: 'AT_AddColumn', def: { ColumnDef: fromDef } })}`));
+    }
+
+    const typeChanged = typeKey(fromDef.typeName as any) !== typeKey(toDef.typeName as any);
+    const collationChanged = stablePrint(fromDef.collClause) !== stablePrint(toDef.collClause);
+    if (typeChanged || collationChanged) {
+      const cast = ctx.casts[`${qualified}.${name}`];
+      const using = (typeName: unknown): unknown =>
+        cast !== undefined
+          ? parseExpression(cast)
+          : { TypeCast: { arg: { ColumnRef: { fields: [{ String: { sval: name } }] } }, typeName } };
+      const retype = (def: Record<string, unknown>, expr: unknown): string =>
+        alter({ subtype: 'AT_AlterColumnType', name, def: { ColumnDef: { typeName: def.typeName, collClause: def.collClause, raw_default: expr } } });
       if (typeChanged) {
-        stmts.push(alter({
-          subtype: 'AT_AlterColumnType',
-          name,
-          def: { ColumnDef: { typeName: toDef.typeName } }
-        }));
+        const targetType = Deparser.deparse({ TypeName: toDef.typeName } as any, { pretty: false });
+        ctx.destructive.push(`${qualified}: ALTER COLUMN ${name} TYPE ${targetType}${cast !== undefined ? ` USING ${cast}` : ''} (cast may lose data)`);
       }
-      if (restChanged) {
-        warnings.push(
-          `${diff.path}: column "${name}" changed beyond its type (constraints/defaults); emit a manual ALTER`
-        );
-      }
+      // The inverse always casts back with `col::oldtype`: a user USING
+      // expression is written for the old representation, not the new one.
+      const castBack = { TypeCast: { arg: { ColumnRef: { fields: [{ String: { sval: name } }] } }, typeName: fromDef.typeName } };
+      steps.push(attr(name, 'alter',
+        retype(toDef, typeChanged ? using(toDef.typeName) : undefined),
+        retype(fromDef, typeChanged ? castBack : undefined),
+        typeChanged));
+    }
+
+    const defaultSteps: TableAlteration[] = [];
+    if (stablePrint(a.def) !== stablePrint(b.def)) {
+      const setDefault = (expr: unknown): string => alter(expr === undefined ? { subtype: 'AT_ColumnDefault', name } : { subtype: 'AT_ColumnDefault', name, def: expr });
+      defaultSteps.push(attr(name, 'alter', setDefault(bRaw.def), setDefault(aRaw.def)));
+    }
+    const identitySteps: TableAlteration[] = [];
+    if (stablePrint(a.identity) !== stablePrint(b.identity)) {
+      const add = (c: Record<string, unknown>): string => alter({ subtype: 'AT_AddIdentity', name, def: { Constraint: c } });
+      const drop = alter({ subtype: 'AT_DropIdentity', name });
+      if (a.identity) identitySteps.push(attr(name, 'alter', drop, add(aRaw.identity!)));
+      if (b.identity) identitySteps.push(attr(name, 'alter', add(bRaw.identity!), drop));
+    }
+    // A serial's owned sequence comes and goes with the spelling: dropped
+    // after its default is gone (and before an identity claims its name), or
+    // created after an identity is dropped and before the default needs it.
+    const serialFrom = from.serials.get(renamedFrom.get(name) ?? name) ?? null;
+    const serialTo = to.serials.get(name) ?? null;
+    const sequenceSql = (seq: { schema: string | null; name: string; as: string }): { create: string; drop: string } => {
+      const items = (parts: (string | null)[]): unknown[] => parts.filter((x): x is string => x !== null).map(sval => ({ String: { sval } }));
+      return {
+        create: deparseStmt({ CreateSeqStmt: { sequence: { schemaname: seq.schema ?? undefined, relname: seq.name }, options: [
+          { DefElem: { defname: 'as', arg: { TypeName: { names: items(['pg_catalog', seq.as]) } }, defaction: 'DEFELEM_UNSPEC' } },
+          { DefElem: { defname: 'owned_by', arg: { List: { items: items([schema, table, name]) } }, defaction: 'DEFELEM_UNSPEC' } }
+        ] } }),
+        drop: deparseStmt({ DropStmt: { objects: [{ List: { items: items([seq.schema, seq.name]) } }], removeType: 'OBJECT_SEQUENCE', behavior: 'DROP_RESTRICT' } })
+      };
+    };
+    // NOT NULL is required before an identity is added and may only be
+    // dropped after one is gone.
+    const notNullStep = a.notNull !== b.notNull
+      ? attr(name, 'alter',
+        alter({ subtype: b.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }),
+        alter({ subtype: a.notNull ? 'AT_SetNotNull' : 'AT_DropNotNull', name }))
+      : null;
+    if (notNullStep && b.notNull) steps.push(notNullStep);
+    if (serialFrom && !serialTo) {
+      const seq = sequenceSql(serialFrom);
+      ctx.destructive.push(`${qualified}: DROP SEQUENCE ${[serialFrom.schema, serialFrom.name].filter(Boolean).join('.')} (the serial's sequence and its current value are lost)`);
+      steps.push(...defaultSteps, attr(name, 'alter', seq.drop, seq.create), ...identitySteps);
+    } else if (serialTo && !serialFrom) {
+      const seq = sequenceSql(serialTo);
+      steps.push(...identitySteps, attr(name, 'alter', seq.create, seq.drop), ...defaultSteps);
+    } else {
+      steps.push(...defaultSteps, ...identitySteps);
+    }
+    if (notNullStep && !b.notNull) steps.push(notNullStep);
+    if (stablePrint(a.other) !== stablePrint(b.other)) {
+      ctx.incomplete.push(`${diff.path}: column "${name}" changed in a way pgpm cannot express as ALTER COLUMN (${a.other.length + b.other.length} unsupported constraint(s)); alter it manually`);
+    }
+    // Storage and compression are plain per-column settings; "default" puts
+    // either back to what the column type implies.
+    const setting = (def: unknown, field: 'storage_name' | 'compression'): string =>
+      ((def as Record<string, string | undefined>)[field] ?? 'default').toLowerCase();
+    for (const [field, subtype] of [['storage_name', 'AT_SetStorage'], ['compression', 'AT_SetCompression']] as const) {
+      const was = setting(prior.canon, field);
+      const now = setting(col.canon, field);
+      if (was === now) continue;
+      const set = (value: string): string => alter({ subtype, name, def: { String: { sval: value } } });
+      steps.push(attr(name, 'alter', set(now), set(was)));
+    }
+    const rest = (def: unknown): string =>
+      stablePrint({
+        ...(def as Record<string, unknown>), colname: null, typeName: null, collClause: null, constraints: null,
+        is_local: null, location: null, storage_name: null, compression: null
+      });
+    if (rest(prior.canon) !== rest(col.canon)) {
+      ctx.incomplete.push(`${diff.path}: column "${name}" changed options pgpm cannot express as ALTER COLUMN; alter it manually`);
     }
   }
-  for (const name of from.columns.keys()) {
-    if (!to.columns.has(name)) {
-      diff.columnsRemoved.push(name);
-      stmts.push(alter({ subtype: 'AT_DropColumn', name }));
+  // ---- table-level properties: persistence, reloptions, inheritance and
+  // partition bound all change in place with exact inverses.
+  const alterCmds = (rel: unknown, cmds: Record<string, unknown>[]): string =>
+    deparseStmt({
+      AlterTableStmt: { relation: rel, cmds: cmds.map(cmd => ({ AlterTableCmd: { behavior: 'DROP_RESTRICT', ...cmd } })), objtype: 'OBJECT_TABLE' }
+    });
+  const prop = (sql: string, inverse: string): TableAlteration => ({ sql, inverse, phase: 'alter', sub: null, keyColumns: [], breaking: false });
+  if (from.props.persistence !== to.props.persistence) {
+    const persistence = (p: string): string => alter({ subtype: p === 'u' ? 'AT_SetUnLogged' : 'AT_SetLogged' });
+    steps.push(prop(persistence(to.props.persistence), persistence(from.props.persistence)));
+  }
+  {
+    const set = (items: unknown[]): Record<string, unknown> => ({ subtype: 'AT_SetRelOptions', def: { List: { items } } });
+    const reset = (names: string[]): Record<string, unknown> =>
+      ({ subtype: 'AT_ResetRelOptions', def: { List: { items: names.map(defname => ({ DefElem: { defname, defaction: 'DEFELEM_UNSPEC' } })) } } });
+    const changed = [...to.props.options].filter(([k, v]) => stablePrint(from.props.options.get(k)) !== stablePrint(v));
+    const removed = [...from.props.options].filter(([k]) => !to.props.options.has(k));
+    const forward: Record<string, unknown>[] = [];
+    const backward: Record<string, unknown>[] = [];
+    if (changed.length > 0) {
+      forward.push(set(changed.map(([, v]) => v)));
+      const restore = changed.filter(([k]) => from.props.options.has(k)).map(([k]) => from.props.options.get(k));
+      const undo = changed.filter(([k]) => !from.props.options.has(k)).map(([k]) => k);
+      if (restore.length > 0) backward.push(set(restore));
+      if (undo.length > 0) backward.push(reset(undo));
     }
+    if (removed.length > 0) {
+      forward.push(reset(removed.map(([k]) => k)));
+      backward.push(set(removed.map(([, v]) => v)));
+    }
+    if (forward.length > 0) steps.push(prop(alterCmds(relation, forward), alterCmds(relation, backward)));
+  }
+  for (const [print, parent] of from.props.inherits) {
+    if (to.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_DropInherit', def: parent }), alter({ subtype: 'AT_AddInherit', def: parent })));
+  }
+  for (const [print, parent] of to.props.inherits) {
+    if (from.props.inherits.has(print)) continue;
+    steps.push(prop(alter({ subtype: 'AT_AddInherit', def: parent }), alter({ subtype: 'AT_DropInherit', def: parent })));
+  }
+  if (stablePrint(from.props.partition) !== stablePrint(to.props.partition)) {
+    const parentOf = (p: { parent: unknown }): unknown => (p.parent as { RangeVar?: unknown }).RangeVar ?? p.parent;
+    const detach = (p: { parent: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_DetachPartition', def: { PartitionCmd: { name: relation } } }]);
+    const attach = (p: { parent: unknown; bound: unknown }): string =>
+      alterCmds(parentOf(p), [{ subtype: 'AT_AttachPartition', def: { PartitionCmd: { name: relation, bound: p.bound } } }]);
+    if (from.props.partition) steps.push(prop(detach(from.props.partition), attach(from.props.partition)));
+    if (to.props.partition) steps.push(prop(attach(to.props.partition), detach(to.props.partition)));
+  }
+  if (stablePrint(from.props.partspec) !== stablePrint(to.props.partspec)) {
+    ctx.incomplete.push(`${diff.path}: PARTITION BY changed; Postgres cannot re-partition a table in place, rebuild it manually`);
   }
 
   // Self-inverse ALTER TABLE subtypes: a removed extra with one of these
@@ -400,37 +1178,361 @@ function diffTable(
     AT_EnableRowSecurity: 'AT_DisableRowSecurity',
     AT_DisableRowSecurity: 'AT_EnableRowSecurity',
     AT_ForceRowSecurity: 'AT_NoForceRowSecurity',
-    AT_NoForceRowSecurity: 'AT_ForceRowSecurity'
+    AT_NoForceRowSecurity: 'AT_ForceRowSecurity',
+    AT_EnableTrig: 'AT_DisableTrig',
+    AT_DisableTrig: 'AT_EnableTrig',
+    AT_EnableAlwaysTrig: 'AT_EnableTrig',
+    AT_EnableReplicaTrig: 'AT_EnableTrig',
+    AT_EnableTrigAll: 'AT_DisableTrigAll',
+    AT_DisableTrigAll: 'AT_EnableTrigAll',
+    AT_EnableTrigUser: 'AT_DisableTrigUser',
+    AT_DisableTrigUser: 'AT_EnableTrigUser'
   };
+  /** The trigger an ENABLE/DISABLE TRIGGER command addresses (it must exist first). */
+  const triggerOf = (cmd: Record<string, unknown>): NamingIdentity | null =>
+    /Trig$/.test(cmd.subtype as string) && typeof cmd.name === 'string' ? { kind: 'trigger', schema, name: cmd.name, table } : null;
+  const invert = (cmd: Record<string, unknown>): Record<string, unknown> =>
+    cmd.name === undefined ? { subtype: INVERSE_SUBTYPE[cmd.subtype as string] } : { subtype: INVERSE_SUBTYPE[cmd.subtype as string], name: cmd.name };
 
   // Removed extras drop before added ones: a changed constraint that keeps
   // its name must DROP CONSTRAINT before the replacement ADD CONSTRAINT.
   for (const [print, extra] of from.extras) {
     if (to.extras.has(print)) continue;
-    const conname = (extra as { Constraint?: { conname?: string } }).Constraint?.conname
-      ?? (extra as { AlterTableCmd?: { def?: { Constraint?: { conname?: string } } } })
-        .AlterTableCmd?.def?.Constraint?.conname;
+    const conname = constraintName(extra);
     const subtype = (extra as { AlterTableCmd?: { subtype?: string } }).AlterTableCmd?.subtype;
     if (conname) {
-      stmts.push(alter({ subtype: 'AT_DropConstraint', name: conname }));
+      const def = (extra as { Constraint?: unknown }).Constraint ? extra : undefined;
+      steps.push({
+        sql: alter({ subtype: 'AT_DropConstraint', name: conname }),
+        inverse: def
+          ? alter({ subtype: 'AT_AddConstraint', def })
+          : alter((extra as { AlterTableCmd: Record<string, unknown> }).AlterTableCmd),
+        phase: 'remove',
+        sub: { kind: 'constraint', schema, name: conname, table },
+        keyColumns: constraintKeys(extra),
+        breaking: false
+      });
     } else if (subtype && INVERSE_SUBTYPE[subtype]) {
-      stmts.push(alter({ subtype: INVERSE_SUBTYPE[subtype] }));
+      const cmd = (extra as { AlterTableCmd: Record<string, unknown> }).AlterTableCmd;
+      steps.push({
+        sql: alter(invert(cmd)),
+        inverse: alter(cmd),
+        phase: 'remove',
+        sub: triggerOf(cmd),
+        keyColumns: [],
+        breaking: false
+      });
     } else {
-      warnings.push(`${diff.path}: removed table element has no name to drop; emit a manual ALTER`);
+      ctx.incomplete.push(`${diff.path}: removed table element has no name to drop (${describeExtra(extra)}); alter it manually`);
     }
   }
+  // A dropped column takes its constraints with it, so constraint drops come
+  // first (and, reverted, the column is re-added before its constraints).
+  const dropSteps = new Map<string, TableAlteration>();
+  for (const [name, prior] of fromColumns) {
+    if (!to.columns.has(name)) {
+      diff.columnsRemoved.push(name);
+      ctx.destructive.push(`${qualified}: DROP COLUMN ${name}`);
+      const step: TableAlteration = {
+        sql: alter({ subtype: 'AT_DropColumn', name }),
+        inverse: alter({ subtype: 'AT_AddColumn', def: { ColumnDef: prior.def } }),
+        phase: 'remove',
+        sub: column(name),
+        keyColumns: [],
+        breaking: true
+      };
+      dropSteps.set(name, step);
+      steps.push(step);
+    }
+  }
+
   for (const [print, extra] of to.extras) {
-    if (!from.extras.has(print)) {
-      const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
-      if (at) stmts.push(alter(at));
-      else if ((extra as Record<string, unknown>).Constraint) {
-        stmts.push(alter({ subtype: 'AT_AddConstraint', def: extra }));
-      } else {
-        warnings.push(`${diff.path}: unrecognized added table element; emit a manual ALTER`);
+    if (from.extras.has(print)) continue;
+    const at = (extra as Record<string, Record<string, unknown>>).AlterTableCmd;
+    const conname = constraintName(extra);
+    if (at) {
+      const subtype = at.subtype as string;
+      const inverse = INVERSE_SUBTYPE[subtype]
+        ? alter(invert(at))
+        : conname ? alter({ subtype: 'AT_DropConstraint', name: conname }) : '';
+      if (!inverse) ctx.incomplete.push(`${diff.path}: added table element has no derivable inverse (${describeExtra(extra)})`);
+      steps.push({
+        sql: alter(at),
+        inverse: inverse || `-- pgpm: no inverse for ${describeExtra(extra)}`,
+        phase: 'add',
+        sub: conname ? { kind: 'constraint', schema, name: conname, table } : triggerOf(at),
+        keyColumns: constraintKeys(extra),
+        breaking: false
+      });
+    } else if ((extra as Record<string, unknown>).Constraint && conname) {
+      steps.push({
+        sql: alter({ subtype: 'AT_AddConstraint', def: extra }),
+        inverse: alter({ subtype: 'AT_DropConstraint', name: conname }),
+        phase: 'add',
+        sub: { kind: 'constraint', schema, name: conname, table },
+        keyColumns: constraintKeys(extra),
+        breaking: false
+      });
+    } else {
+      ctx.incomplete.push(`${diff.path}: unrecognized added table element (${describeExtra(extra)}); alter it manually`);
+    }
+  }
+
+  // ---- comments, grants, owner: keyed state, diffed to exact statements.
+  for (const step of diffAnnotations(fromAnnotations, to.annotations, diff.path)) {
+    if (step.incomplete) ctx.incomplete.push(step.incomplete);
+    const comment = /^COMMENT ON COLUMN /i.exec(step.sql);
+    const dropped = comment ? [...dropSteps.keys()].find(c => step.inverse.includes(`.${c} IS`) || step.inverse.includes(`.${c}" IS`)) : undefined;
+    if (dropped && /IS NULL;$/i.test(step.sql.trim())) {
+      // The column drop takes the comment with it; re-adding the column restores it.
+      const drop = dropSteps.get(dropped)!;
+      drop.inverse = `${drop.inverse}\n${step.inverse}`;
+      continue;
+    }
+    steps.push({ sql: step.sql, inverse: step.inverse, phase: 'add', sub: null, keyColumns: [], breaking: false });
+  }
+  return steps;
+}
+
+/** Short human label for an unrecognized table element. */
+function describeExtra(extra: unknown): string {
+  const rec = extra as Record<string, Record<string, unknown>>;
+  if (rec.AlterTableCmd) return `ALTER TABLE ${String(rec.AlterTableCmd.subtype)}`;
+  const tag = Object.keys(rec)[0];
+  if (tag === 'Constraint') return `constraint ${String(rec.Constraint.contype)}`;
+  return tag ?? 'unknown element';
+}
+
+/** Column names a parse tree mentions (unqualified; `star` for `*`). */
+interface ColumnMentions {
+  names: Set<string>;
+  star: boolean;
+}
+
+function collectColumnMentions(node: unknown, out: ColumnMentions): void {
+  if (Array.isArray(node)) {
+    for (const item of node) collectColumnMentions(item, out);
+    return;
+  }
+  if (!node || typeof node !== 'object') return;
+  const rec = node as Record<string, unknown>;
+  if (rec.ColumnRef) {
+    const fields = ((rec.ColumnRef as { fields?: unknown[] }).fields ?? []);
+    const last = fields[fields.length - 1] as { String?: { sval?: string }; A_Star?: unknown } | undefined;
+    if (last?.A_Star) out.star = true;
+    else if (last?.String?.sval) out.names.add(last.String.sval);
+    return;
+  }
+  if (rec.IndexElem) {
+    const name = (rec.IndexElem as { name?: string }).name;
+    if (name) out.names.add(name);
+  }
+  if (rec.CreateTrigStmt) {
+    for (const c of ((rec.CreateTrigStmt as { columns?: { String?: { sval?: string } }[] }).columns ?? [])) {
+      if (c.String?.sval) out.names.add(c.String.sval);
+    }
+  }
+  if (rec.Constraint) {
+    const c = rec.Constraint as { keys?: unknown[]; fk_attrs?: unknown[]; pk_attrs?: unknown[] };
+    for (const k of [...(c.keys ?? []), ...(c.fk_attrs ?? []), ...(c.pk_attrs ?? [])]) {
+      const sval = (k as { String?: { sval?: string } }).String?.sval;
+      if (sval) out.names.add(sval);
+    }
+  }
+  if (rec.CreateFunctionStmt) {
+    // `LANGUAGE sql AS $$ ... $$` bodies are opaque strings: parse them too.
+    const options = ((rec.CreateFunctionStmt as { options?: { DefElem?: { defname?: string; arg?: unknown } }[] }).options ?? []);
+    const language = options.find(o => o.DefElem?.defname === 'language')?.DefElem?.arg as { String?: { sval?: string } } | undefined;
+    const as = options.find(o => o.DefElem?.defname === 'as')?.DefElem?.arg as { List?: { items?: { String?: { sval?: string } }[] } } | undefined;
+    const body = as?.List?.items?.[0]?.String?.sval;
+    if (language?.String?.sval?.toLowerCase() === 'sql' && body) {
+      try {
+        collectColumnMentions(parseSync(body).sql.stmts.map(s => s.stmt), out);
+      } catch {
+        out.star = true;
       }
     }
   }
-  return stmts;
+  for (const value of Object.values(rec)) collectColumnMentions(value, out);
+}
+
+/** Column names mentioned anywhere in `texts` (conservative: unqualified). */
+function columnMentions(texts: string[]): ColumnMentions {
+  const out: ColumnMentions = { names: new Set(), star: false };
+  for (const text of texts) collectColumnMentions(parseSync(text).sql.stmts.map(s => s.stmt), out);
+  return out;
+}
+
+const mentions = (m: ColumnMentions, column: string): boolean => m.star || m.names.has(column);
+
+/**
+ * The part of a `CREATE FUNCTION` that `CREATE OR REPLACE` cannot change:
+ * name, parameters (names, types, defaults) and return type. Null for
+ * anything that is not a single function/procedure definition.
+ */
+function functionSignature(texts: string[]): string | null {
+  if (texts.length === 0) return null;
+  const nodes = parseSync(texts[0]).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
+  const fn = nodes.length === 1 ? nodes[0].CreateFunctionStmt : undefined;
+  if (!fn) return null;
+  // Postgres discards typmods from parameter types (f(varchar(10)) is f(varchar)).
+  const parameters = ((fn.parameters ?? []) as { FunctionParameter?: { argType?: Record<string, unknown> } }[])
+    .map(p => p.FunctionParameter
+      ? { FunctionParameter: { ...p.FunctionParameter, argType: p.FunctionParameter.argType ? { ...p.FunctionParameter.argType, typmods: undefined } : undefined } }
+      : p);
+  return stablePrint(cleanTree({
+    funcname: fn.funcname,
+    parameters: canonicalizeTypes(parameters),
+    returnType: fn.returnType,
+    is_procedure: fn.is_procedure
+  }));
+}
+
+/** Rewrite the unit's `CREATE FUNCTION` as `CREATE OR REPLACE FUNCTION`. */
+function asReplace(texts: string[]): string {
+  return texts.map(text => {
+    const nodes = parseSync(text).sql.stmts.map(s => s.stmt as unknown as Record<string, Record<string, unknown>>);
+    if (nodes.length === 1 && nodes[0].CreateFunctionStmt) {
+      return deparseStmt({ CreateFunctionStmt: { ...nodes[0].CreateFunctionStmt, replace: true } });
+    }
+    return text;
+  }).join('\n');
+}
+
+/** Kinds whose catalog entries pin the columns/objects they reference. */
+const REBUILDABLE = new Set(['view', 'index', 'policy', 'trigger', 'function']);
+
+/** Kinds whose DROP loses data (tables, their columns' sequences, whole schemas, types with dependents). */
+const DATA_BEARING = new Set(['table', 'schema', 'sequence', 'type', 'domain']);
+
+/**
+ * One undeployed statement group of the delta: a DROP, an ALTER TABLE step,
+ * or a CREATE. Atoms are the nodes of the delta's dependency graph; changes
+ * are built from them afterwards.
+ */
+interface Atom {
+  id: number;
+  /** Grouping key: atoms of one unit become one change unless an outside atom must sit between them. */
+  unit: string;
+  /** Unit key of the object this atom belongs to (the table, for ALTER TABLE steps). */
+  owner: string;
+  /** Change name for this atom's segment (segments with a different mix get `/drop`). */
+  name: string;
+  phase: Phase;
+  sql: string;
+  inverse: string;
+  facts: StatementFacts[];
+  /** Column/constraint identity for table alterations. */
+  sub: NamingIdentity | null;
+  /** Columns a constraint alteration keys on. */
+  keyColumns: string[];
+  /** Whether the step invalidates dependents (drops, column drop/retype). */
+  breaking: boolean;
+  /** A RENAME step: everything addressing the object afterwards depends on it. */
+  rename?: boolean;
+  /** An added object's create, shaped by the granularity pipeline. */
+  added?: boolean;
+  /** From-side name of a renamed column (what from-side dependents mention). */
+  fromName?: string;
+  /** Tie-break within a phase (lower first). */
+  rank: number;
+  deps: Set<number>;
+}
+
+const objectKey = (ref: { schema: string | null; name: string }): string => `${ref.schema ?? ''}.${ref.name}`;
+
+/** Rewrite every reference to relation `schema.from` in `texts` to `schema.to` (AST-level). */
+/** COMMENT/SECURITY LABEL object kinds whose name list ends with one element below the relation. */
+const RELATION_SUBOBJECT_KINDS = new Set(['OBJECT_COLUMN', 'OBJECT_TABCONSTRAINT', 'OBJECT_TRIGGER', 'OBJECT_POLICY', 'OBJECT_RULE']);
+const RELATION_KINDS = new Set(['OBJECT_TABLE', 'OBJECT_VIEW', 'OBJECT_MATVIEW', 'OBJECT_SEQUENCE', 'OBJECT_INDEX', 'OBJECT_FOREIGN_TABLE']);
+
+/**
+ * Rewrite every reference to relation `schema.from` as `to`: RangeVars
+ * (tables, FK targets, policies, grants, composite typevars), qualified
+ * column references, COMMENT ON name lists and `::regclass` literals.
+ * Function bodies are strings and stay as written: Postgres does not rewrite
+ * them on rename either, so a body naming the old relation diffs as a
+ * replacement against the target.
+ */
+const objectLabelOf = (id: ObjectIdentity): string => `${id.schema ? `${id.schema}.` : ''}${id.table ? `${id.table}.` : ''}${id.name}`;
+
+function renameRelation(texts: string[], schema: string | null, from: string, to: string): string[] {
+  const svalOf = (x: unknown): string | undefined => (x as { String?: { sval?: string } })?.String?.sval;
+  const schemaMatches = (name: string | undefined | null): boolean => name === undefined || name === null || name === schema;
+  // `old.col` names the relation only where the statement reads `old` itself,
+  // not where `old` is another relation's alias (`FROM app.other AS old`).
+  let qualifiesRelation = false;
+  const scanRelations = (node: unknown, found: { named: boolean; aliased: boolean }): void => {
+    if (Array.isArray(node)) { node.forEach(x => scanRelations(x, found)); return; }
+    if (!node || typeof node !== 'object') return;
+    const rv = node as { relname?: unknown; schemaname?: string; alias?: { aliasname?: string } };
+    if (typeof rv.relname === 'string') {
+      if (rv.alias?.aliasname === from) found.aliased = true;
+      else if (rv.relname === from && schemaMatches(rv.schemaname)) found.named = true;
+    }
+    for (const value of Object.values(node)) scanRelations(value, found);
+  };
+  // `[schema?, relation, ...depth trailing names]`
+  const renameNames = (items: unknown[], depth: number): unknown[] => {
+    const at = items.length - 1 - depth;
+    if (at < 0 || svalOf(items[at]) !== from) return items;
+    if (at > 1 || (at === 1 && !schemaMatches(svalOf(items[0])))) return items;
+    return items.map((x, i) => (i === at ? { String: { sval: to } } : x));
+  };
+  const walk = (node: unknown): unknown => {
+    if (Array.isArray(node)) return node.map(walk);
+    if (!node || typeof node !== 'object') return node;
+    const rec = node as Record<string, unknown>;
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rec)) {
+      const rv = value as { relname?: string; schemaname?: string } | undefined;
+      if (rv && typeof rv === 'object' && typeof rv.relname === 'string' && rv.relname === from && schemaMatches(rv.schemaname)) {
+        out[key] = walk({ ...rv, relname: to });
+        continue;
+      }
+      if (key === 'ColumnRef' && qualifiesRelation) {
+        const cr = value as { fields?: unknown[] };
+        if (cr.fields && cr.fields.length >= 2) {
+          out[key] = { ...cr, fields: renameNames(cr.fields, 1) };
+          continue;
+        }
+      }
+      if (key === 'CommentStmt' || key === 'SecLabelStmt') {
+        const c = value as { objtype?: string; object?: { List?: { items?: unknown[] } } };
+        const items = c.object?.List?.items;
+        const depth = RELATION_SUBOBJECT_KINDS.has(c.objtype ?? '') ? 1 : RELATION_KINDS.has(c.objtype ?? '') ? 0 : -1;
+        if (items && depth >= 0) {
+          out[key] = { ...c, object: { List: { items: renameNames(items, depth) } } };
+          continue;
+        }
+      }
+      if (key === 'TypeCast') {
+        const tc = value as { arg?: { A_Const?: { sval?: { sval?: string } } }; typeName?: { names?: unknown[] } };
+        const names = tc.typeName?.names ?? [];
+        const literal = tc.arg?.A_Const?.sval?.sval;
+        if (svalOf(names[names.length - 1]) === 'regclass' && literal !== undefined) {
+          const parts = literal.split('.');
+          const renamed = renameNames(parts.map(x => ({ String: { sval: x } })), 0).map(svalOf).join('.');
+          if (renamed !== literal) {
+            out[key] = { ...tc, arg: { A_Const: { sval: { sval: renamed } } } };
+            continue;
+          }
+        }
+      }
+      out[key] = walk(value);
+    }
+    return out;
+  };
+  const mentions = new RegExp(`\\b${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+  return texts.map(text => {
+    if (!mentions.test(text)) return text;
+    return parseSync(text).sql.stmts.map(st => {
+      const found = { named: false, aliased: false };
+      scanRelations(st.stmt, found);
+      qualifiesRelation = found.named && !found.aliased;
+      return deparseStmt(walk(st.stmt) as Record<string, unknown>);
+    }).join('\n');
+  });
 }
 
 /**
@@ -438,8 +1540,9 @@ function diffTable(
  *
  * `from`/`to` are whole deploy scripts (flatten changes in plan order to
  * diff bundles/modules). The result's `changes` deploy `to`'s shape on top
- * of `from`: reverse-topological DROPs, then CREATE/ALTERs named and
- * ordered by `restructureChanges`.
+ * of `from`, ordered by one dependency graph over everything undeployed —
+ * drops, table alterations, replacements and creates alike — with phase and
+ * source order breaking ties only.
  */
 export function diffSchemas(
   from: string,
@@ -447,21 +1550,81 @@ export function diffSchemas(
   options: SemanticDiffOptions = {}
 ): SemanticDiffResult {
   const style = options.style ?? 'directory';
+  const alteration = options.changeGranularity === 'alteration';
   const warnings: string[] = [];
-  const a = readSide(from, warnings, 'from');
-  const b = readSide(to, warnings, 'to');
+  /** Steps that can lose data; refused unless `allowDataLoss`. */
+  const destructive: string[] = [];
+  /** Steps with no derivable DROP/inverse; refused unless `allowIncomplete`. */
+  const incomplete: string[] = [];
+  const overloaded = overloadedFunctions([from, to]);
+  const a = readSide(from, warnings, 'from', overloaded);
+  const b = readSide(to, warnings, 'to', overloaded);
+  const renames = options.renames ?? [];
+  const casts = options.casts ?? {};
+
+  // ---- declared table renames: re-key the from-side unit under its new name.
+  const renamedTables = new Map<string, { from: string; schema: string | null }>();
+  const renamedTo = new Map<string, { key: string; name: string }>();
+  for (const rename of renames.filter(r => r.kind === 'table')) {
+    const oldKey = identityKey({ kind: 'table', schema: rename.schema, name: rename.from });
+    const newKey = identityKey({ kind: 'table', schema: rename.schema, name: rename.to });
+    const unit = a.units.get(oldKey);
+    if (!unit || a.units.has(newKey) || !b.units.has(newKey) || b.units.has(oldKey)) {
+      throw new DiffPolicyError(
+        'rename',
+        `pgpm diff: cannot apply rename ${rename.schema ?? ''}.${rename.from} -> ${rename.to}: ` +
+        `the source must have table "${rename.from}" (and not "${rename.to}") and the target "${rename.to}" (and not "${rename.from}")`
+      );
+    }
+    a.units.delete(oldKey);
+    const renamed: ObjectUnit = {
+      identity: { ...unit.identity, name: rename.to },
+      statements: unit.statements,
+      texts: renameRelation(unit.texts, rename.schema, rename.from, rename.to),
+      inverseTexts: unit.inverseTexts ?? unit.texts
+    };
+    a.units.set(newKey, renamed);
+    a.order[a.order.indexOf(oldKey)] = newKey;
+    renamedTables.set(newKey, { from: rename.from, schema: rename.schema });
+    renamedTo.set(oldKey, { key: newKey, name: rename.to });
+    // Postgres follows the rename in views, policies, grants and comments; so does the from side.
+    for (const [key, other] of [...a.units]) {
+      if (key === newKey) continue;
+      const texts = renameRelation(other.texts, rename.schema, rename.from, rename.to);
+      const scoped = other.identity.table === rename.from && other.identity.schema === rename.schema;
+      if (!scoped && texts.every((t, i) => t === other.texts[i])) continue;
+      const identity = scoped ? { ...other.identity, table: rename.to } : other.identity;
+      const movedKey = identityKey(identity);
+      if (movedKey !== key) {
+        if (a.units.has(movedKey)) {
+          throw new DiffPolicyError('rename', `pgpm diff: cannot apply rename ${rename.schema ?? ''}.${rename.from} -> ${rename.to}: "${objectLabelOf(identity)}" already exists on the source`);
+        }
+        a.units.delete(key);
+        a.order[a.order.indexOf(key)] = movedKey;
+      }
+      a.units.set(movedKey, { ...other, identity, texts, inverseTexts: other.inverseTexts ?? other.texts });
+    }
+  }
+  const columnRenames = new Map<string, Map<string, string>>();
+  for (const rename of renames.filter(r => r.kind === 'column')) {
+    const declared = identityKey({ kind: 'table', schema: rename.schema, name: rename.table! });
+    const target = renamedTo.get(declared);
+    const key = target?.key ?? declared;
+    const tableName = target?.name ?? rename.table!;
+    if (rename.toTable !== undefined && rename.toTable !== tableName && rename.toTable !== rename.table) {
+      throw new DiffPolicyError(
+        'rename',
+        `pgpm diff: --rename cannot move "${rename.schema}.${rename.table}.${rename.from}" to another table ("${rename.schema}.${rename.toTable}.${rename.to}")`
+      );
+    }
+    if (!columnRenames.has(key)) columnRenames.set(key, new Map());
+    columnRenames.get(key)!.set(rename.from, rename.to);
+  }
 
   const objects: SemanticObjectDiff[] = [];
   const forwardSql: string[] = [];
-  const modifiedChanges: SemanticDeltaChange[] = [];
-  const dropUnits: ObjectUnit[] = [];
+  const atoms: Atom[] = [];
 
-  /**
-   * `@pgsql/scripts` inverse of a deploy script (drops in reverse topo
-   * order), composed at the AST level via `invertStatement` and deparsed
-   * once. Underivable statements fall back to `revertFor` on the single
-   * statement to surface its not-derivable comment and warning.
-   */
   const inverseOf = (deploy: string, context: string): string => {
     const facts = classifyStatements(deploy);
     const graph = buildStatementGraph(facts);
@@ -470,7 +1633,7 @@ export function diffSchemas(
       const nodes = invertStatement(facts[i]);
       if (nodes === null) {
         const { sql, warnings: w } = revertFor([facts[i]]);
-        warnings.push(...w.map(x => `${context}: ${x}`));
+        incomplete.push(...w.map(x => `${context}: ${x}`));
         if (sql.trim()) pieces.push(sql);
         continue;
       }
@@ -478,11 +1641,6 @@ export function diffSchemas(
     }
     return pieces.join('\n');
   };
-  /**
-   * `@pgsql/scripts` existence checks for a deploy script, composed from
-   * `existenceCheck`'s SelectStmt nodes and deparsed once. Underivable
-   * statements fall back to `verifyFor` to surface the warning.
-   */
   const verifyOf = (deploy: string, context: string): string => {
     const pieces: string[] = [];
     for (const fact of classifyStatements(deploy)) {
@@ -497,106 +1655,677 @@ export function diffSchemas(
     return pieces.join('\n\n');
   };
 
-  for (const key of b.order) {
+  const addAtom = (atom: Omit<Atom, 'id' | 'deps' | 'facts' | 'owner' | 'breaking'> & { owner?: string; breaking?: boolean }): Atom => {
+    const full: Atom = {
+      ...atom,
+      owner: atom.owner ?? atom.unit,
+      breaking: atom.breaking ?? (atom.phase === 'drop'),
+      id: atoms.length,
+      deps: new Set(),
+      facts: classifyStatements(atom.sql)
+    };
+    atoms.push(full);
+    return full;
+  };
+
+  /** Atoms per unit key, and the unit's object key for reference binding. */
+  const unitAtoms = new Map<string, Atom[]>();
+  const track = (unitKey: string, atom: Atom): void => {
+    if (!unitAtoms.has(unitKey)) unitAtoms.set(unitKey, []);
+    unitAtoms.get(unitKey)!.push(atom);
+  };
+  const unitPhase = (unitKey: string, ...phases: Phase[]): Atom[] =>
+    (unitAtoms.get(unitKey) ?? []).filter(x => phases.includes(x.phase));
+  /** Object key (`schema.name`) → unit key, for both sides. */
+  const unitByObject = new Map<string, string>();
+  for (const side of [a, b]) {
+    for (const [key, unit] of side.units) {
+      if (!unit.identity.table || unit.identity.kind === 'table') {
+        unitByObject.set(objectKey({ schema: unit.identity.schema, name: unit.identity.table ?? unit.identity.name }), key);
+      }
+    }
+  }
+  /** `from`-side column mentions per unit (lazy). */
+  const fromMentions = new Map<string, ColumnMentions>();
+  const mentionsOf = (unit: ObjectUnit): ColumnMentions => {
+    const key = identityKey(unit.identity);
+    if (!fromMentions.has(key)) fromMentions.set(key, columnMentions(unit.texts));
+    return fromMentions.get(key)!;
+  };
+  /** `from`-side unit dependencies (graph edges mapped onto units). */
+  const fromUnitOf = new Map<number, string>();
+  for (const [key, unit] of a.units) for (const st of unit.statements) fromUnitOf.set(st, key);
+  const fromDependencies = (unitKey: string): Set<string> => {
+    const out = new Set<string>();
+    for (const edge of a.graph.edges) {
+      const fromUnit = fromUnitOf.get(edge.from);
+      const toUnit = fromUnitOf.get(edge.to);
+      if (fromUnit !== unitKey || !toUnit || toUnit === unitKey) continue;
+      // Late (body-level) references bind at call time — except types, which
+      // a function signature or table column pins in the catalog.
+      if (edge.kind === 'late' && a.units.get(toUnit)?.identity.kind !== 'type') continue;
+      out.add(toUnit);
+    }
+    return out;
+  };
+  const objectLabel = (id: ObjectIdentity): string => `${id.schema ? `${id.schema}.` : ''}${id.name}`;
+
+  // Drop + create pair for a unit's statements (replacements, rebuilds, removals).
+  // A drop runs before the alter phase (so before a table rename) and its
+  // inverse after the rename is undone: both speak the from side as written.
+  const dropOf = (unit: ObjectUnit, path: string, rank: number): Atom | null => {
+    const recreate = (unit.inverseTexts ?? unit.texts).join('\n');
+    const drop = inverseOf(recreate, path);
+    if (!drop.trim() || drop.trim().startsWith('--')) {
+      incomplete.push(`${path}: no DROP derivable for kind "${unit.identity.kind}" (${objectLabel(unit.identity)}); drop it manually`);
+      return null;
+    }
+    return addAtom({ unit: identityKey(unit.identity), name: path, phase: 'drop', sql: drop, inverse: recreate, sub: null, keyColumns: [], rank });
+  };
+  const createOf = (unit: ObjectUnit, path: string, rank: number): Atom => {
+    const deploy = unit.texts.join('\n');
+    return addAtom({ unit: identityKey(unit.identity), name: path, phase: 'create', sql: deploy, inverse: inverseOf(deploy, path), sub: null, keyColumns: [], rank });
+  };
+
+  const fromRank = (unit: ObjectUnit): number =>
+    -Math.min(...unit.statements.map(st => a.graph.order.indexOf(st)));
+
+  /** A non-table unit's defining statements (texts) and its annotation state. */
+  const splitUnit = (unit: ObjectUnit): { definition: string[]; nodes: Record<string, unknown>[]; annotations: AnnotationState } => {
+    const annotations = emptyAnnotations();
+    const definition: string[] = [];
+    const nodes: Record<string, unknown>[] = [];
+    for (const text of unit.texts) {
+      for (const raw of parseSync(text).sql.stmts) {
+        const stmt = raw.stmt as unknown as Record<string, unknown>;
+        if (absorbAnnotation(annotations, stmt)) continue;
+        if (foldSequenceAlter(nodes, definition, stmt)) continue;
+        definition.push(deparseStmt(stmt));
+        nodes.push(stmt);
+      }
+    }
+    return { definition, nodes, annotations };
+  };
+  const definitionFingerprint = (texts: string[]): string => texts.map(fingerprint).sort().join('\n');
+
+  // ---- to-side pass 1: added objects and modified tables; other modified
+  // units are deferred until every drop is known (a function that keeps its
+  // signature can only be replaced in place if nothing it depends on is dropped).
+  const deferred: { key: string; unit: ObjectUnit; prior: ObjectUnit; toRank: number }[] = [];
+  b.order.forEach((key, toRank) => {
     const unit = b.units.get(key)!;
     const prior = a.units.get(key);
     const path = pathFor(unit.identity, { style });
     if (!prior) {
       objects.push({ identity: unit.identity, path, delta: 'added' });
       forwardSql.push(...unit.texts);
-      continue;
+      return;
     }
     if (unit.identity.kind === 'table') {
       const shapeFrom = tableShape(prior);
       const shapeTo = tableShape(unit);
       const diff: SemanticObjectDiff = { identity: unit.identity, path, delta: 'modified' };
-      const stmts = diffTable(shapeFrom, shapeTo, diff, warnings);
+      const steps = diffTable(shapeFrom, shapeTo, diff, {
+        columnRenames: columnRenames.get(key) ?? new Map(),
+        casts,
+        destructive,
+        incomplete
+      });
+      const renamed = renamedTables.get(key);
+      if (renamed) {
+        const relation = { schemaname: renamed.schema ?? undefined, relname: renamed.from, inh: true, relpersistence: 'p' };
+        const renameSql = (fromName: string, toName: string): string =>
+          deparseStmt({ RenameStmt: { renameType: 'OBJECT_TABLE', relationType: 'OBJECT_TABLE', relation: { ...relation, relname: fromName }, newname: toName, behavior: 'DROP_RESTRICT' } });
+        steps.unshift({
+          sql: renameSql(renamed.from, unit.identity.name),
+          inverse: renameSql(unit.identity.name, renamed.from),
+          phase: 'alter',
+          sub: { kind: 'table', schema: renamed.schema, name: unit.identity.name },
+          keyColumns: [],
+          breaking: false,
+          rename: true
+        }, ...implicitConstraintRenames(shapeFrom, relation, renamed.from, unit.identity.name, incomplete));
+      }
       const columnsTouched =
         diff.columnsAdded!.length + diff.columnsRemoved!.length + diff.columnsModified!.length > 0;
-      if (stmts.length > 0 || columnsTouched) {
-        objects.push(diff);
-        if (stmts.length > 0) {
-          // The inverse alteration is the same diff with the sides swapped.
-          const scratch: SemanticObjectDiff = { identity: unit.identity, path, delta: 'modified' };
-          const deploy = stmts.join('\n');
-          modifiedChanges.push({
-            name: `${path}/alter`,
-            dependencies: [],
-            deploy,
-            revert: diffTable(shapeTo, shapeFrom, scratch, []).join('\n'),
-            verify: verifyOf(deploy, path)
-          });
+      if (steps.length > 0 || columnsTouched) objects.push(diff);
+      const renameAtoms: Atom[] = [];
+      const stepAtoms: Atom[] = [];
+      steps.forEach((step, i) => {
+        let name = `${path}/alter`;
+        if (alteration && step.sub) {
+          const subPath = pathFor(step.sub, { style });
+          name = step.rename ? `${subPath}/rename` : step.phase === 'add' ? subPath : step.phase === 'remove' ? `${subPath}/drop` : `${subPath}/alter`;
         }
-      }
-      continue;
-    }
-    if (unitFingerprint(prior) !== unitFingerprint(unit)) {
-      objects.push({ identity: unit.identity, path, delta: 'modified' });
-      const priorDeploy = prior.texts.join('\n');
-      const newDeploy = unit.texts.join('\n');
-      modifiedChanges.push({
-        name: path,
-        dependencies: [],
-        deploy: [inverseOf(priorDeploy, path), newDeploy].filter(Boolean).join('\n'),
-        revert: [inverseOf(newDeploy, path), priorDeploy].filter(Boolean).join('\n'),
-        verify: verifyOf(newDeploy, path)
+        const atom = addAtom({
+          unit: alteration ? unitKeyOf({ kind: 'alteration', key, name }) : key,
+          owner: key,
+          name,
+          phase: step.phase,
+          sql: step.sql,
+          inverse: step.inverse,
+          sub: step.sub,
+          keyColumns: step.keyColumns,
+          breaking: step.breaking,
+          rename: step.rename,
+          fromName: step.fromName,
+          rank: toRank * 1000 + i - (step.rename ? 1000 : 0)
+        });
+        (step.rename ? renameAtoms : stepAtoms).push(atom);
+        track(key, atom);
       });
+      // Every other step of the table addresses it (or its columns) by the new name.
+      for (const r of renameAtoms) for (const x of stepAtoms) x.deps.add(r.id);
+      const tableRename = renameAtoms.find(r => r.sub?.kind === 'table');
+      if (tableRename) for (const r of renameAtoms) if (r !== tableRename) r.deps.add(tableRename.id);
+      return;
     }
-  }
+    if (unitFingerprint(prior) === unitFingerprint(unit)) return;
+    deferred.push({ key, unit, prior, toRank });
+  });
 
+  // ---- from-side: removed ------------------------------------------------
   for (const key of a.order) {
     if (b.units.has(key)) continue;
     const unit = a.units.get(key)!;
-    objects.push({ identity: unit.identity, path: pathFor(unit.identity, { style }), delta: 'removed' });
-    dropUnits.push(unit);
+    const path = pathFor(unit.identity, { style });
+    objects.push({ identity: unit.identity, path, delta: 'removed' });
+    if (DATA_BEARING.has(unit.identity.kind)) {
+      destructive.push(`${objectLabel(unit.identity)}: DROP ${unit.identity.kind.toUpperCase()}`);
+    }
+    const drop = dropOf(unit, path, fromRank(unit));
+    if (drop) track(key, drop);
   }
 
-  // Removed objects drop in reverse topological order of the `from` graph
-  // (dependents before dependencies), one change per object.
-  const position = new Map(dropUnits.map(u => [u, Math.min(...u.statements.map(s => a.graph.order.indexOf(s)))]));
-  dropUnits.sort((x, y) => position.get(y)! - position.get(x)!);
-  const dropChanges: SemanticDeltaChange[] = [];
-  for (const unit of dropUnits) {
+  // ---- to-side pass 2: modified non-table units, dependencies first.
+  deferred.sort((x, y) => fromRank(y.prior) - fromRank(x.prior));
+  for (const { key, unit, prior, toRank } of deferred) {
     const path = pathFor(unit.identity, { style });
-    const recreate = unit.texts.join('\n');
-    const drop = inverseOf(recreate, path);
-    if (!drop.trim() || drop.trim().startsWith('--')) {
-      warnings.push(`${path}: no DROP derivable for kind "${unit.identity.kind}"; drop manually`);
+    const modified = (): void => { objects.push({ identity: unit.identity, path, delta: 'modified' }); };
+    const pa = splitUnit(prior);
+    const pb = splitUnit(unit);
+    const annotationSteps = diffAnnotations(pa.annotations, pb.annotations, path);
+    const emitSteps = (list: { sql: string; inverse: string; incomplete?: string; destructive?: string }[], after?: Atom, breaking = false): Atom[] => {
+      return list.map((step, i) => {
+        if (step.incomplete) incomplete.push(`${path}: ${step.incomplete}`);
+        if (step.destructive) destructive.push(step.destructive);
+        const atom = addAtom({
+          unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse,
+          sub: null, keyColumns: [], breaking, rank: toRank * 1000 + i + (after ? 500 : 0)
+        });
+        if (after) atom.deps.add(after.id);
+        track(key, atom);
+        return atom;
+      });
+    };
+    // Columns typed with this type: parked in a bridge type around steps
+    // Postgres refuses while the type is in use (see `columnRebridge`).
+    const dependentColumns = unit.identity.kind === 'type' || unit.identity.kind === 'other'
+      ? typeDependentColumns(a, b, unit.identity)
+      : [];
+    const bridgeColumns = (middle: Atom[], composite: boolean): void => {
+      for (const col of dependentColumns) {
+        const { pre, post } = columnRebridge(col, composite);
+        const sub: NamingIdentity = { kind: 'column', schema: col.schema, table: col.table, name: col.name };
+        destructive.push(`${[col.schema, col.table, col.name].filter(Boolean).join('.')}: cast through ${composite ? 'jsonb' : 'text'} around ${objectLabel(unit.identity)} (values the new type rejects are lost)`);
+        let last: Atom | null = null;
+        pre.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: true, rank: toRank * 1000 - 100 + i });
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+        for (const m of middle) if (last) m.deps.add(last.id);
+        post.forEach((step, i) => {
+          const atom = addAtom({ unit: key, name: path, phase: 'alter', sql: step.sql, inverse: step.inverse, sub, keyColumns: [], breaking: false, rank: toRank * 1000 + 900 + i });
+          for (const m of middle) atom.deps.add(m.id);
+          if (last) atom.deps.add(last.id);
+          last = atom;
+          track(key, atom);
+        });
+      }
+    };
+    const definitionChanged = definitionFingerprint(pa.definition) !== definitionFingerprint(pb.definition);
+    if (!definitionChanged) {
+      // Representation-only differences (e.g. pg_dump's FOR ROLE) yield no steps.
+      if (annotationSteps.length > 0) modified();
+      emitSteps(annotationSteps);
       continue;
     }
-    dropChanges.push({
-      name: `${path}/drop`,
-      dependencies: dropChanges.length > 0 ? [dropChanges[dropChanges.length - 1].name] : [],
-      deploy: drop,
-      revert: recreate,
-      verify: ''
-    });
+    if (pa.nodes.length === 1 && pb.nodes.length === 1) {
+      const steps = alterInPlace(pa.nodes[0], pb.nodes[0], objectLabel(unit.identity));
+      if (steps) {
+        if (steps.length + annotationSteps.length > 0) modified();
+        // Shape changes (enum values, domain rules, attributes) invalidate
+        // dependents the way a drop does; annotations do not.
+        const atoms = emitSteps(steps, undefined, true);
+        // ADD/DROP ATTRIBUTE work with dependent columns; ALTER ATTRIBUTE ... TYPE does not.
+        const retypes = atoms.filter(a => /\bALTER ATTRIBUTE\b/.test(a.sql) || /\bALTER ATTRIBUTE\b/.test(a.inverse));
+        if (pa.nodes[0].CompositeTypeStmt && retypes.length > 0) bridgeColumns(retypes, true);
+        emitSteps(annotationSteps);
+        continue;
+      }
+    }
+    modified();
+    const signature = functionSignature(pb.definition);
+    // A function body is validated against the current shape of the types it
+    // uses, so around a dropped or altered dependency it must be dropped and
+    // recreated (in both directions) rather than replaced in place.
+    const dependencyChanged = [...fromDependencies(key)].some(dep => unitPhase(dep, 'drop', 'alter').some(x => x.breaking));
+    if (signature !== null && signature === functionSignature(pa.definition) && !dependencyChanged) {
+      // Same name, parameters and return type: replace in place. Dependents
+      // (views, triggers, defaults) keep pointing at the same function.
+      const inverseDefinition = prior.inverseTexts ? splitUnit({ ...prior, texts: prior.inverseTexts }).definition : pa.definition;
+      const atom = addAtom({
+        unit: key, name: path, phase: 'create', sql: asReplace(pb.definition), inverse: asReplace(inverseDefinition),
+        sub: null, keyColumns: [], breaking: false, rank: toRank * 1000
+      });
+      track(key, atom);
+      // Objects it stopped depending on may only be dropped once it is replaced.
+      for (const dep of fromDependencies(key)) for (const x of unitPhase(dep, 'drop')) x.deps.add(atom.id);
+      emitSteps(annotationSteps, atom);
+      continue;
+    }
+    if (DATA_BEARING.has(unit.identity.kind)) {
+      destructive.push(`${objectLabel(unit.identity)}: ${unit.identity.kind} is dropped and recreated (not alterable in place)`);
+    }
+    const drop = dropOf(prior, path, fromRank(prior));
+    const create = createOf(unit, path, toRank * 1000);
+    if (drop) {
+      create.deps.add(drop.id);
+      track(key, drop);
+    }
+    track(key, create);
+    bridgeColumns(drop ? [drop, create] : [create], Boolean(pa.nodes[0]?.CompositeTypeStmt));
   }
 
-  let forwardChanges: SemanticDeltaChange[] = [];
+  // ---- from-side: unchanged dependents that a breaking step would invalidate
+  // (view/policy/trigger on a dropped or retyped column, or on a replaced
+  // object; a function whose signature uses a replaced type): drop them
+  // before the breaking step and recreate them after. `from`'s topological
+  // order processes dependencies before dependents, so rebuilds cascade in
+  // one pass.
+  const fromUnitsTopo = [...a.units.keys()].sort((x, y) => fromRank(a.units.get(y)!) - fromRank(a.units.get(x)!));
+  for (const key of fromUnitsTopo) {
+    const unit = a.units.get(key)!;
+    const other = b.units.get(key);
+    if (!other || !REBUILDABLE.has(unit.identity.kind)) continue;
+    if (unitFingerprint(unit) !== unitFingerprint(other)) continue;
+    const used = mentionsOf(unit);
+    const breaking: Atom[] = [];
+    for (const dep of fromDependencies(key)) {
+      if (!b.units.has(dep)) continue;
+      breaking.push(...unitPhase(dep, 'drop'));
+      // Functions bind late to columns; only replaced objects invalidate them.
+      if (unit.identity.kind === 'function') continue;
+      breaking.push(...unitPhase(dep, 'remove', 'alter').filter(x => x.breaking && x.sub?.kind === 'column' && mentions(used, x.fromName ?? x.sub.name)));
+    }
+    if (breaking.length === 0) continue;
+    const path = pathFor(unit.identity, { style });
+    const drop = dropOf(unit, path, fromRank(unit));
+    if (!drop) continue;
+    const create = createOf(unit, path, b.order.indexOf(key) * 1000);
+    create.deps.add(drop.id);
+    for (const x of breaking) {
+      x.deps.add(drop.id);
+      create.deps.add(x.id);
+    }
+    track(key, drop);
+    track(key, create);
+  }
+
+  // ---- drops order by the `from` graph: a dependent's DROP precedes the DROP
+  // (or the dropped/retyped column) of what it referenced.
+  for (const [key, list] of unitAtoms) {
+    const drops = list.filter(x => x.phase === 'drop');
+    if (drops.length === 0) continue;
+    const unit = a.units.get(key);
+    if (!unit) continue;
+    const used = mentionsOf(unit);
+    for (const dep of fromDependencies(key)) {
+      for (const x of unitPhase(dep, 'drop')) for (const d of drops) x.deps.add(d.id);
+      for (const x of unitPhase(dep, 'remove', 'alter')) {
+        if (!x.breaking) continue;
+        if (x.sub?.kind === 'column' && !mentions(used, x.fromName ?? x.sub.name)) continue;
+        for (const d of drops) x.deps.add(d.id);
+      }
+    }
+  }
+
+  // ---- added objects: shaped and named by the granularity pipeline; each
+  // emitted change is one atom carrying the pipeline's requires.
+  const createAtomByName = new Map<string, Atom>();
   if (forwardSql.length > 0) {
+    // Unnamed constraints get their Postgres default names up front so every
+    // added object's DROP CONSTRAINT inverse is derivable.
     const { changes, warnings: w } = restructureChanges(
-      [{ name: 'delta', dependencies: [], deploy: forwardSql.join('\n\n') }],
+      [{ name: 'delta', dependencies: [], deploy: nameUnnamedConstraints(forwardSql.join('\n\n')) }],
       {
         granularity: options.granularity ?? 'object',
-        changeGranularity: options.changeGranularity,
+        changeGranularity: alteration ? 'alteration' : undefined,
+        changeName: (facts, text) => {
+          const identity = identityOf(facts);
+          if (!identity) return defaultChangeName(facts);
+          return pathFor(overloadIdentity(identity, text, overloaded), { style });
+        },
         subObjectName: identity => pathFor(identity, { style })
       }
     );
-    forwardChanges = changes.map(c => ({
-      ...c,
-      revert: inverseOf(c.deploy, c.name),
-      verify: verifyOf(c.deploy, c.name)
-    }));
     warnings.push(...w);
+    const pending: [Atom, string[]][] = [];
+    changes.forEach((c, i) => {
+      const atom = addAtom({
+        unit: unitKeyOf({ kind: 'added', name: c.name }), name: c.name, phase: 'create', sql: c.deploy,
+        inverse: inverseOf(c.deploy, c.name), sub: null, keyColumns: [], rank: 100000 + i, added: true
+      });
+      createAtomByName.set(c.name, atom);
+      track(atom.unit, atom);
+      pending.push([atom, c.dependencies]);
+    });
+    for (const [atom, deps] of pending) {
+      for (const d of deps) {
+        const target = createAtomByName.get(d);
+        if (target) atom.deps.add(target.id);
+      }
+    }
   }
+
+  // ---- forward edges: a create/add step depends on what it references —
+  // the create of a replaced/rebuilt/added object, and on a modified table
+  // the RENAME, ADD COLUMN / ADD CONSTRAINT / type-change steps of the columns it uses.
+  const createAtomsByObject = new Map<string, Atom[]>();
+  for (const atom of atoms) {
+    if (atom.phase !== 'create') continue;
+    for (const f of atom.facts) {
+      for (const c of f.creates) {
+        const k = objectKey(c);
+        if (!createAtomsByObject.has(k)) createAtomsByObject.set(k, []);
+        createAtomsByObject.get(k)!.push(atom);
+      }
+    }
+  }
+  for (const atom of atoms) {
+    if (atom.phase !== 'create' && atom.phase !== 'add') continue;
+    const used = columnMentions(atom.facts.map(f => sliceStatementBytes(sqlSourceBytes(atom.sql), f.span.start, f.span.len)));
+    const seen = new Set<string>();
+    for (const f of atom.facts) {
+      for (const ref of f.references) {
+        const k = objectKey(ref);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        for (const target of createAtomsByObject.get(k) ?? []) {
+          if (target.unit !== atom.unit && !(atom.added && target.added)) {
+            atom.deps.add(target.id);
+          }
+        }
+        const unitKey = unitByObject.get(k);
+        if (!unitKey || unitKey === atom.owner) continue;
+        for (const step of unitPhase(unitKey, 'add', 'alter')) {
+          if (step.sub?.kind === 'table' || step.rename) atom.deps.add(step.id);
+          if (step.sub === null && step.breaking && step.phase === 'alter') atom.deps.add(step.id);
+          if (step.sub?.kind === 'column' && mentions(used, step.sub.name)) atom.deps.add(step.id);
+          if (step.sub?.kind === 'constraint' && step.phase === 'add' && step.keyColumns.length > 0
+            && step.keyColumns.every(c => mentions(used, c))) {
+            atom.deps.add(step.id);
+          }
+        }
+      }
+    }
+    // Within a table: constraints follow the columns they key on (added or
+    // altered) and the same-name constraint they replace.
+    if (atom.sub) {
+      const tableKey = atom.owner;
+      for (const step of unitPhase(tableKey, 'add', 'alter')) {
+        if (step !== atom && step.sub?.kind === 'column' && atom.keyColumns.includes(step.sub.name)) atom.deps.add(step.id);
+      }
+      for (const step of unitPhase(tableKey, 'remove')) {
+        if (step.sub?.kind === atom.sub.kind && step.sub.name === atom.sub.name) atom.deps.add(step.id);
+      }
+    }
+  }
+
+  // Within a table: a column drop follows the drop of every constraint that
+  // keyed on or checked that column (the column drop would take them with it,
+  // and the revert must re-add the column before them); a column alteration
+  // (e.g. DROP NOT NULL) follows the drop of the primary key that implied it.
+  for (const atom of atoms) {
+    if ((atom.phase !== 'remove' && atom.phase !== 'alter') || atom.sub?.kind !== 'column') continue;
+    const tableKey = atom.owner;
+    for (const step of unitPhase(tableKey, 'remove')) {
+      if (step.sub?.kind === 'constraint' && step.keyColumns.includes(atom.sub.name)) atom.deps.add(step.id);
+    }
+  }
+
+  // ENABLE/DISABLE TRIGGER addresses a trigger by name: it follows the
+  // trigger's creation and precedes its drop.
+  for (const atom of atoms) {
+    if (atom.sub?.kind !== 'trigger') continue;
+    const triggerKey = identityKey(atom.sub as ObjectIdentity);
+    const created = createAtomByName.get(pathFor(atom.sub, { style }));
+    if (created) atom.deps.add(created.id);
+    for (const create of unitPhase(triggerKey, 'create')) if (create.unit !== atom.unit) atom.deps.add(create.id);
+    for (const drop of unitPhase(triggerKey, 'drop')) drop.deps.add(atom.id);
+  }
+
+  // Extensions are cluster-level providers of types, functions and operators
+  // that references do not resolve to (`uuid_generate_v4()` names no schema):
+  // creating one precedes every other step and dropping one follows them.
+  const isExtension = (atom: Atom): boolean => atom.name.startsWith('extensions/');
+  for (const ext of atoms) {
+    if (!isExtension(ext)) continue;
+    for (const other of atoms) {
+      if (other === ext || isExtension(other)) continue;
+      if (ext.phase === 'drop') ext.deps.add(other.id);
+      else other.deps.add(ext.id);
+    }
+  }
+
+  // Collations are referenced by `COLLATE` clauses that resolve to no tracked
+  // object: a column that starts using one follows its creation, and a
+  // collation is dropped only after every step whose inverse still uses it.
+  const collationRef = /^(CREATE|DROP) COLLATION (?:IF EXISTS )?(?:("?)([^".\s]+)\2\.)?("?)([^"\s(;]+)\4/;
+  for (const atom of atoms) {
+    const m = collationRef.exec(atom.sql);
+    if (!m) continue;
+    const bare = m[5].replace(/^"|"$/g, '');
+    const uses = new RegExp(`\\bCOLLATE\\s+(?:"?${m[3] ?? '[^".\\s]+'}"?\\.)?"?${bare.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"?(?![\\w"])`, 'i');
+    for (const other of atoms) {
+      if (other === atom) continue;
+      if (m[1] === 'CREATE' && uses.test(other.sql)) other.deps.add(atom.id);
+      if (m[1] === 'DROP' && uses.test(other.inverse)) atom.deps.add(other.id);
+    }
+  }
+
+  // `ALTER SEQUENCE .. OWNED BY table.column` names a column: it follows that
+  // column's addition and precedes its drop.
+  const ownedBy = /\bOWNED BY (?:"?([^".\s]+)"?\.)?"?([^".\s]+)"?\."?([^".\s;]+)"?/;
+  for (const atom of atoms) {
+    const m = /^ALTER SEQUENCE\b/.test(atom.sql) ? ownedBy.exec(atom.sql) : null;
+    if (!m) continue;
+    const owner = (x: Atom): boolean =>
+      x.sub?.kind === 'column' && x.sub.table === m[2] && x.sub.name === m[3] && (m[1] === undefined || (x.sub.schema ?? 'public') === m[1]);
+    for (const other of atoms) {
+      if (other === atom || !owner(other)) continue;
+      if (other.phase === 'add') atom.deps.add(other.id);
+      if (other.phase === 'remove' && other.breaking) other.deps.add(atom.id);
+    }
+  }
+
+  // ---- enum values added and used in the same migration: Postgres refuses to
+  // use a new value before the transaction that added it commits (55P04).
+  for (const atom of atoms) {
+    const added = /^ALTER TYPE (\S+) ADD VALUE ('(?:[^']|'')*')/.exec(atom.sql);
+    if (!added) continue;
+    const users = atoms.filter(x => x !== atom && x.phase !== 'drop' && !/^ALTER TYPE \S+ ADD VALUE /.test(x.sql) && x.sql.includes(added[2]));
+    if (users.length === 0) continue;
+    const note = `enum value ${added[2].replace(/\s+/g, ' ')} of ${added[1]} is added and used in the same migration; Postgres cannot use a new enum value before the transaction that added it commits (deploy with --no-tx, or split the migration)`;
+    incomplete.push(`${atom.name}: ${note}`);
+    for (const user of users) {
+      user.sql = `-- pgpm: ${note}\n${user.sql}`;
+      user.deps.add(atom.id);
+    }
+  }
+
+  // ---- policy: refuse data loss / incompleteness unless accepted explicitly.
+  if (destructive.length > 0 && !options.allowDataLoss) {
+    throw new DiffPolicyError(
+      'data-loss',
+      `pgpm diff: refusing to emit a migration with data loss; re-run with --allow-data-loss to accept it:\n${destructive.map(x => `  - ${x}`).join('\n')}`
+    );
+  }
+  if (incomplete.length > 0 && !options.allowIncomplete) {
+    throw new DiffPolicyError(
+      'incomplete',
+      `pgpm diff: migration is incomplete (steps pgpm cannot derive); re-run with --allow-incomplete to emit it with the gaps marked:\n${incomplete.map(x => `  - ${x}`).join('\n')}`
+    );
+  }
+  warnings.push(...destructive.map(x => `data loss accepted: ${x}`));
+  warnings.push(...incomplete.map(x => `incomplete: ${x}`));
+
+  // An object replaced in place whose new definition needs the table's new
+  // name (function bodies are text; Postgres does not rewrite them on RENAME)
+  // needs its old definition restored only once the table carries its old
+  // name again. The reverse order would recreate it first, so the rename's
+  // inverse restores it. A drop/create pair is already ordered: its create's
+  // inverse drops, and the drop's inverse recreates after the rename is undone.
+  for (const renameAtom of atoms) {
+    if (!renameAtom.rename || renameAtom.sub?.kind !== 'table') continue;
+    for (const atom of atoms) {
+      if (atom.phase !== 'create' || atom.added || !atom.inverse || !atom.deps.has(renameAtom.id)) continue;
+      if (unitPhase(atom.unit, 'drop').length > 0) continue;
+      renameAtom.inverse = `${renameAtom.inverse}\n${atom.inverse}`;
+      atom.inverse = '';
+    }
+  }
+
+  // ---- order: stable topological sort over atoms (phase, then rank, break ties).
+  const order = topoOrder(atoms, atom => `${atom.name} (${atom.phase})`);
+
+  // ---- segments: a unit's atoms form one change unless an outside atom
+  // depends on an earlier atom and a later atom depends on it.
+  const changes = buildChanges(atoms, order, options.changeGranularity === 'single', inverseOf, verifyOf);
 
   return {
     identical: objects.length === 0,
     objects,
-    changes: [...dropChanges, ...forwardChanges, ...modifiedChanges],
+    changes,
     warnings
   };
+}
+
+/** Topological order over atoms with a (phase, rank) priority; throws on a cycle. */
+function topoOrder(atoms: Atom[], label: (atom: Atom) => string): number[] {
+  return topologicalOrder(atoms.map(x => x.deps), {
+    priority: (x, y) =>
+      PHASE_RANK[atoms[x].phase] - PHASE_RANK[atoms[y].phase] || atoms[x].rank - atoms[y].rank || x - y,
+    onCycle: stuck =>
+      new Error(`pgpm diff: dependency cycle among undeployed changes; cannot order: ${stuck.map(id => label(atoms[id])).join(', ')}`)
+  });
+}
+
+function buildChanges(
+  atoms: Atom[],
+  order: number[],
+  single: boolean,
+  inverseOf: (deploy: string, context: string) => string,
+  verifyOf: (deploy: string, context: string) => string
+): SemanticDeltaChange[] {
+  const position = new Map(order.map((id, i) => [id, i]));
+  const ordered = order.map(id => atoms[id]);
+
+  if (single) {
+    if (ordered.length === 0) return [];
+    const deploy = ordered.map(x => x.sql).join('\n\n');
+    const forward = ordered.filter(x => x.phase === 'create' || x.phase === 'add').map(x => x.sql).join('\n\n');
+    return [{
+      name: 'module/init',
+      dependencies: [],
+      deploy,
+      revert: [...ordered].reverse().map(x => x.inverse).filter(Boolean).join('\n\n'),
+      verify: forward ? verifyOf(forward, 'module/init') : ''
+    }];
+  }
+
+  // Segment nodes: start one per atom, then merge same-unit atoms when no
+  // outside node lies on a dependency path between them.
+  const segmentOf = atoms.map(x => x.id);
+  const members: number[][] = atoms.map(x => [x.id]);
+  const segDeps = (s: number): Set<number> => {
+    const out = new Set<number>();
+    for (const m of members[s]) for (const d of atoms[m].deps) if (segmentOf[d] !== s) out.add(segmentOf[d]);
+    return out;
+  };
+  const reaches = (from: number, target: number, skip: number): boolean => {
+    const seen = new Set<number>([skip]);
+    const stack = [...segDeps(from)].filter(s => s !== skip);
+    while (stack.length > 0) {
+      const s = stack.pop()!;
+      if (s === target) return true;
+      if (seen.has(s)) continue;
+      seen.add(s);
+      for (const d of segDeps(s)) if (!seen.has(d)) stack.push(d);
+    }
+    return false;
+  };
+  const byUnit = new Map<string, Atom[]>();
+  for (const atom of ordered) {
+    if (!byUnit.has(atom.unit)) byUnit.set(atom.unit, []);
+    byUnit.get(atom.unit)!.push(atom);
+  }
+  for (const list of byUnit.values()) {
+    let current = segmentOf[list[0].id];
+    for (const atom of list.slice(1)) {
+      // Merging is safe iff no path from `atom` back to `current` passes
+      // through another segment.
+      const external = [...new Set([...atom.deps].map(d => segmentOf[d]))].filter(s => s !== current);
+      if (external.some(s => reaches(s, current, -1)) || reaches(current, segmentOf[atom.id], -1)) {
+        current = segmentOf[atom.id];
+        continue;
+      }
+      members[current].push(atom.id);
+      members[atom.id] = [];
+      segmentOf[atom.id] = current;
+    }
+  }
+
+  const segments = [...new Set(segmentOf)].sort((x, y) => position.get(x)! - position.get(y)!);
+
+  // Emit in topological order of segments (segment deps are acyclic by construction).
+  const segmentIndex = new Map(segments.map((s, i) => [s, i]));
+  const emitted = topologicalOrder(
+    segments.map(s => new Set([...segDeps(s)].map(d => segmentIndex.get(d)!))),
+    {
+      priority: (x, y) => position.get(segments[x])! - position.get(segments[y])!,
+      onCycle: () => new Error('pgpm diff: dependency cycle among emitted changes; cannot order')
+    }
+  ).map(i => segments[i]);
+
+  // Name segments in emitted order: a unit split in two gets `<name>` then `<name>-2`.
+  const nameOf = new Map<number, string>();
+  const used = new Map<string, number>();
+  for (const s of emitted) {
+    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
+    const first = atoms[list[0]];
+    const dropOnly = list.every(id => atoms[id].phase === 'drop');
+    let base = dropOnly ? `${first.name}/drop` : first.name;
+    if (!dropOnly && first.phase === 'drop') base = atoms[list.find(id => atoms[id].phase !== 'drop')!].name;
+    const n = (used.get(base) ?? 0) + 1;
+    used.set(base, n);
+    nameOf.set(s, n === 1 ? base : `${base}-${n}`);
+  }
+
+  return emitted.map(s => {
+    const list = members[s].sort((x, y) => position.get(x)! - position.get(y)!);
+    const name = nameOf.get(s)!;
+    const forward = list.map(id => atoms[id]).filter(x => x.phase === 'create' || x.phase === 'add');
+    return {
+      name,
+      dependencies: [...segDeps(s)].map(d => nameOf.get(d)!).sort(),
+      deploy: list.map(id => atoms[id].sql).join('\n'),
+      revert: [...list].reverse().map(id => atoms[id].inverse).filter(Boolean).join('\n'),
+      verify: forward.length > 0 ? verifyOf(forward.map(x => x.sql).join('\n'), name) : ''
+    };
+  });
 }
 
 /** A change's deploy surface (same seam as the other drivers). */
@@ -668,9 +2397,14 @@ export function coverChanges(
   for (const obj of diff.objects) {
     deltaByKey.set(identityKey(obj.identity), obj.delta);
   }
+  const overloaded = new Set(
+    diff.objects
+      .filter(obj => obj.identity.kind === 'function' && /\)$/.test(obj.identity.name))
+      .map(obj => `${obj.identity.schema ?? ''}.${obj.identity.name.replace(/\(.*\)$/, '')}`)
+  );
   return changes.map(change => {
     const sideWarnings: string[] = [];
-    const side = readSide(change.deploy, sideWarnings, change.name);
+    const side = readSide(change.deploy, sideWarnings, change.name, overloaded);
     const objects: ChangeObjectCoverage[] = side.order.map(key => {
       const unit = side.units.get(key)!;
       return {

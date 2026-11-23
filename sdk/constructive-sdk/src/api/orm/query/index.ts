@@ -6,11 +6,7 @@
 import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
-import type { ResolveRouteRecord, ResolveRouteRecordSelect } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface ApiSchemaNamesVariables {
-  targetApiId?: string;
-}
 export interface ApplyRegistryDefaultsVariables {
   data?: unknown;
   nodeType?: string;
@@ -50,18 +46,6 @@ export interface PlatformVerifySitePreviewTokenVariables {
   siteId?: string;
   token?: string;
 }
-export interface ResolveDeepLinkVariables {
-  linkSlug?: string;
-  targetSiteId?: string;
-}
-export interface ResolveRouteVariables {
-  requestHost?: string;
-  requestMethod?: string;
-  requestPath?: string;
-}
-export interface ResolveSiteAppLinksVariables {
-  targetSiteId?: string;
-}
 export interface SitesDeepLinkUrlVariables {
   linkSlug?: string;
   targetSiteId?: string;
@@ -75,35 +59,6 @@ export interface VerifySitePreviewTokenVariables {
 }
 export function createQueryOperations(client: OrmClient) {
   return {
-    apiSchemaNames: (
-      args: ApiSchemaNamesVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        apiSchemaNames: unknown | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ApiSchemaNames',
-        fieldName: 'apiSchemaNames',
-        ...buildCustomDocument(
-          'query',
-          'ApiSchemaNames',
-          'apiSchemaNames',
-          options?.select,
-          args,
-          [
-            {
-              name: 'targetApiId',
-              type: 'UUID',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     applyRegistryDefaults: (
       args: ApplyRegistryDefaultsVariables,
       options?: {
@@ -443,105 +398,6 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'token',
               type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    resolveDeepLink: (
-      args: ResolveDeepLinkVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        resolveDeepLink: unknown | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveDeepLink',
-        fieldName: 'resolveDeepLink',
-        ...buildCustomDocument(
-          'query',
-          'ResolveDeepLink',
-          'resolveDeepLink',
-          options?.select,
-          args,
-          [
-            {
-              name: 'linkSlug',
-              type: 'String',
-            },
-            {
-              name: 'targetSiteId',
-              type: 'UUID',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    resolveRoute: <S extends ResolveRouteRecordSelect>(
-      args: ResolveRouteVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ResolveRouteRecordSelect>
-    ) =>
-      new QueryBuilder<{
-        resolveRoute: InferSelectResult<ResolveRouteRecord, S> | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveRoute',
-        fieldName: 'resolveRoute',
-        ...buildCustomDocument(
-          'query',
-          'ResolveRoute',
-          'resolveRoute',
-          options.select,
-          args,
-          [
-            {
-              name: 'requestHost',
-              type: 'String',
-            },
-            {
-              name: 'requestMethod',
-              type: 'String',
-            },
-            {
-              name: 'requestPath',
-              type: 'String',
-            },
-          ],
-          connectionFieldsMap,
-          'ResolveRouteRecord'
-        ),
-      }),
-    resolveSiteAppLinks: (
-      args: ResolveSiteAppLinksVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        resolveSiteAppLinks: unknown | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'ResolveSiteAppLinks',
-        fieldName: 'resolveSiteAppLinks',
-        ...buildCustomDocument(
-          'query',
-          'ResolveSiteAppLinks',
-          'resolveSiteAppLinks',
-          options?.select,
-          args,
-          [
-            {
-              name: 'targetSiteId',
-              type: 'UUID',
             },
           ],
           connectionFieldsMap,

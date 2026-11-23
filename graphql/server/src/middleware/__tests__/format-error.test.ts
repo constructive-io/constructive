@@ -146,6 +146,56 @@ describe('formatError', () => {
     expect(result.extensions?.errorId).toBeUndefined();
   });
 
+  /** What node-postgres hands over for `errors.raise_error(code, context, class)`. */
+  const raisedByDatabase = (code: string, context: Record<string, unknown>, errorClass?: string) => {
+    const pgError = Object.assign(new Error(code), {
+      code: 'P0001',
+      detail: JSON.stringify({ code, context, ...(errorClass ? { class: errorClass } : {}) }),
+    });
+    return new GraphQLError(pgError.message, { path: ['confirmUpload'], originalError: pgError });
+  };
+
+  it('passes a public database code the registry does not know through unchanged', () => {
+    const result = formatError(raisedByDatabase('CODE_NO_REGISTRY_KNOWS', { id: 'abc' }, 'public')) as {
+      message: string;
+      extensions?: Record<string, unknown>;
+    };
+
+    expect(result.message).toBe('CODE_NO_REGISTRY_KNOWS');
+    expect(result.extensions).toEqual({
+      code: 'CODE_NO_REGISTRY_KNOWS',
+      class: 'public',
+      context: { id: 'abc' },
+    });
+  });
+
+  it('passes an internal database code the registry does not know through with an errorId', () => {
+    const result = formatError(raisedByDatabase('CODE_NO_REGISTRY_KNOWS', { id: 'abc' }, 'internal')) as {
+      message: string;
+      extensions?: Record<string, unknown>;
+    };
+
+    expect(result.message).toBe('CODE_NO_REGISTRY_KNOWS');
+    expect(result.extensions).toMatchObject({
+      code: 'CODE_NO_REGISTRY_KNOWS',
+      class: 'internal',
+      context: { id: 'abc' },
+    });
+    expect(result.extensions?.errorId).toMatch(/^[0-9a-f]{16}$/);
+  });
+
+  it('treats an unknown database code that names no class as internal', () => {
+    const result = formatError(raisedByDatabase('CODE_NO_REGISTRY_KNOWS', {})) as {
+      message: string;
+      extensions?: Record<string, unknown>;
+    };
+
+    expect(result.message).toBe('CODE_NO_REGISTRY_KNOWS');
+    expect(result.extensions?.code).toBe('CODE_NO_REGISTRY_KNOWS');
+    expect(result.extensions?.class).toBe('internal');
+    expect(result.extensions?.errorId).toMatch(/^[0-9a-f]{16}$/);
+  });
+
   it.each(['production', 'development', 'test', undefined])(
     'formats errors identically when NODE_ENV is %s',
     async (env) => {

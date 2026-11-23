@@ -161,6 +161,13 @@ enum ArticlesOrderBy {
 }
 ```
 
+Rules for search orderBy:
+
+- A search orderBy requires the filter that computes its score in `where` (`BODY_BM25_SCORE_ASC` needs `bm25Body` or `unifiedSearch`; `SEARCH_SCORE_*` needs any search filter). Without it the query errors and names the filter to add.
+- `SEARCH_SCORE_ASC/DESC` orders by the displayed composite `searchScore` and pages with `first`/`after` and `last`/`before` like any other order (the primary key breaks ties, so cursors are total).
+- A column scored by its own filter and by `unifiedSearch` in the same query uses the explicit filter's score for display and ordering.
+- Mixed column and search terms follow the order of the list, whether `orderBy` is a literal or a variable.
+
 ### StringTrgmFilter Type
 
 For tables that qualify for trgm (see "Trgm Scoping" below), string columns get a `StringTrgmFilter` type instead of the regular `StringFilter`. This adds two operators:
@@ -238,7 +245,7 @@ Each adapter declares how its scores behave:
 | trgm | `similarity` | No (higher = better) | [0, 1] |
 | pgvector | `distance` | Yes (closer = better) | Unbounded |
 
-**Composite `searchScore` uses Reciprocal Rank Fusion (RRF)** — not score normalization. Each adapter's results are ranked by `ROW_NUMBER()` window functions in SQL, and the composite score is:
+**Composite `searchScore` uses Reciprocal Rank Fusion (RRF)** — not score normalization. Each adapter's matching rows are ranked by `RANK()` window functions in a subquery LEFT JOINed to the query on the primary key (tied scores share a rank), and the composite score is:
 
 ```
 searchScore = Σ(weight_i / (rrfK + rank_i)) / Σ(weight_i / (rrfK + 1))
@@ -260,6 +267,7 @@ This avoids the problem of BM25/pgvector producing unbounded scores that can't b
 | `includeChunks` field missing | No `@hasChunks` tables in schema | Add `@hasChunks` smart tag to parent table codec |
 | `Unknown type "FullText"` | TsvectorCodecPlugin not loaded | Use `UnifiedSearchPreset()` which includes all codecs |
 | `Unknown type "Vector"` | VectorCodecPlugin not loaded | Use `UnifiedSearchPreset()` which includes all codecs |
+| Vector search returns nothing after changing the embedding model | Rows are stamped with the old model in the `@embeddingModelOf` column | Re-embed the rows; see `references/pgvector-adapter.md` |
 | Duplicate type errors | Multiple search presets | Use only `UnifiedSearchPreset()`, not individual presets |
 
 ## Related Skills

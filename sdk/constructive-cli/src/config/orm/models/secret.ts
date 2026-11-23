@@ -29,7 +29,6 @@ import type {
   SecretSelect,
   SecretFilter,
   SecretOrderBy,
-  CreateSecretInput,
   UpdateSecretInput,
   SecretPatch,
 } from '../input-types';
@@ -142,33 +141,6 @@ export class SecretModel {
       }) => ({
         secret: data.secrets?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends SecretSelect>(
-    args: CreateArgs<S, CreateSecretInput['secret']> & {
-      select: S;
-    } & StrictSelect<S, SecretSelect>
-  ): QueryBuilder<{
-    createSecret: {
-      secret: InferSelectResult<SecretWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'Secret',
-      'createSecret',
-      'secret',
-      args.select,
-      args.data,
-      'CreateSecretInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'Secret',
-      fieldName: 'createSecret',
-      document,
-      variables,
     });
   }
 }

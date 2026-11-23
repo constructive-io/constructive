@@ -30,5 +30,5 @@ const { data, isLoading } = usePlatformProposalsChunksQuery({
 const { mutate } = useCreatePlatformProposalsChunkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', platformProposalsId: '<UUID>', searchScore: '<Float>' });
+mutate({ actorId: '<UUID>', body: '<String>', chunkIndex: '<Int>', embedding: '<Vector>', metadata: '<JSON>', platformProposalsId: '<UUID>' });
 ```

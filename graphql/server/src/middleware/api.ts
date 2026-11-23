@@ -15,6 +15,7 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
+import { generationOf } from './cache-generation';
 import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool } from './routing';
 
 const log = new Logger('api');
@@ -24,6 +25,17 @@ const log = new Logger('api');
 // =============================================================================
 
 const defaultRegistry: LoaderRegistry = createDefaultRegistry();
+
+/**
+ * Drop the settings a host is built from (CORS origins, auth, RLS, database,
+ * pubkey and WebAuthn settings) for one database, or for all. Each loader
+ * keeps its own short-lived cache, so a host evicted by a flush and rebuilt
+ * within that time would otherwise take the old settings again, and keep them
+ * for as long as the host stays cached.
+ */
+export const invalidateApiSettings = (databaseId?: string): void => {
+  defaultRegistry.invalidate(databaseId);
+};
 
 // =============================================================================
 // SQL Queries (API resolution only — module queries now live in loaders)
@@ -86,6 +98,7 @@ interface RoutingHeaders {
 
 interface ResolvedModuleSettings {
   rlsModule?: RlsModule;
+  realtimeModule?: { schemaName: string };
   authSettings?: AuthSettings;
   corsOrigins?: string[];
   databaseSettings?: DatabaseSettings;
@@ -134,6 +147,9 @@ const resolveModuleSettings = async (
 
   return {
     rlsModule,
+    realtimeModule: databaseSettings?.enableRealtime
+      ? await registry.resolve<{ schemaName: string }>('realtimeModule', ctx)
+      : undefined,
     authSettings,
     corsOrigins,
     databaseSettings,
@@ -146,7 +162,7 @@ const resolveModuleSettings = async (
 // Helpers
 // =============================================================================
 
-const isApiError = (result: ApiConfigResult): result is ApiError =>
+export const isApiError = (result: ApiConfigResult): result is ApiError =>
   !!result && typeof (result as ApiError).errorHtml === 'string';
 
 /**
@@ -222,6 +238,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, settings: ResolvedModuleS
   roleName: requireApiRole('role_name', row.role_name, row.api_id),
   schema: row.schemas || [],
   rlsModule: settings.rlsModule,
+  realtimeModule: settings.realtimeModule,
   domains: [],
   databaseId: row.database_id,
   isPublic: row.is_public,
@@ -361,6 +378,7 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
   return {
     ...structure,
     rlsModule: settings.rlsModule,
+    realtimeModule: settings.realtimeModule,
     authSettings: settings.authSettings,
     corsOrigins: settings.corsOrigins,
     databaseSettings: settings.databaseSettings,
@@ -373,9 +391,10 @@ const resolveScopedRoute = async (ctx: ResolveContext): Promise<ApiStructure | n
 // Main Resolution Function
 // =============================================================================
 
-export const getApiConfig = async (
+const resolveApiConfig = async (
   opts: ApiOptions,
-  req: Request
+  req: Request,
+  retries: number
 ): Promise<ApiConfigResult> => {
   const pool = getPgPool(opts.pg);
   const { domain, subdomains } = getUrlDomains(req);
@@ -383,6 +402,8 @@ export const getApiConfig = async (
   const cacheKey = getSvcKey(opts, req);
 
   req.svc_key = cacheKey;
+  const startedUnder = generationOf(cacheKey);
+  req.apiGeneration = startedUnder;
 
   // Check cache first
   if (svcCache.has(cacheKey)) {
@@ -442,6 +463,13 @@ export const getApiConfig = async (
     break;
   }
 
+  // A lookup can straddle a flush too. Do not repopulate the routing cache
+  // (or hand a request a route) read before that invalidation.
+  if (generationOf(cacheKey) !== startedUnder) {
+    if (retries === 0) throw new Error('API configuration kept changing during resolution');
+    return resolveApiConfig(opts, req, retries - 1);
+  }
+
   // Cache successful results
   if (result && !isApiError(result)) {
     assertDatabaseId(result);
@@ -450,6 +478,9 @@ export const getApiConfig = async (
 
   return result;
 };
+
+export const getApiConfig = (opts: ApiOptions, req: Request): Promise<ApiConfigResult> =>
+  resolveApiConfig(opts, req, 2);
 
 // =============================================================================
 // Express Middleware

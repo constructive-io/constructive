@@ -23,6 +23,8 @@ export interface BuildContext {
   emittedJunctions?: Set<PgCodec>;
   /** Memo for `exposedColumns`, per table codec. */
   exposedColumns?: Map<PgCodec, Map<string, string | null>>;
+  /** The API's only storage files type, or null (see `soleFilesTypeName`). */
+  filesType?: string | null;
 }
 
 export type TableResourceWithCodec = PgTableResource & {

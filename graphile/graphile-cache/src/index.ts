@@ -27,7 +27,8 @@ export {
   // Time constants
   ONE_HOUR_MS,
   waitForActiveDisposals,
-  waitForEntryDisposal} from './graphile-cache';
+  waitForEntryDisposal
+} from './graphile-cache';
 
 // Factory for creating PostGraphile v5 instances
 export { createGraphileInstance } from './create-instance';

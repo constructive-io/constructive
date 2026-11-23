@@ -59,6 +59,10 @@ describe('the realtime wakeup', () => {
     expect(changedSubscriptionDocument(names)).not.toMatch(/entry|seq/);
   });
 
+  it('only selects fields supplied by the realtime payload', () => {
+    expect(changedSubscriptionDocument(names)).not.toContain('timestamp');
+  });
+
   it('resolves the next wait when a change arrives', async () => {
     const ws = fakeWs();
     const wakeup = createRealtimeWakeup({ client: ws, names });

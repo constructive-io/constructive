@@ -110,7 +110,6 @@ export interface GraphileCacheEntry {
 }
 
 const disposalPromises = new WeakMap<GraphileCacheEntry, Promise<void>>();
-const activeDisposals = new Set<Promise<void>>();
 // Retain failed generations until a bulk drain observes them. Successful work
 // is removed immediately; exact-entry outcomes remain in the WeakMap above.
 const disposalRecords = new Map<number, Promise<void>>();
@@ -176,15 +175,13 @@ const scheduleDisposal = (
   const pending = releaseEntry(entry, key);
 
   disposalPromises.set(entry, pending);
-  activeDisposals.add(pending);
   const sequence = ++disposalSequence;
   disposalRecords.set(sequence, pending);
   void pending
     .then(() => { disposalRecords.delete(sequence); }, () => {
       // The original rejection remains observable through the owner APIs.
       log.error('Graphile resource cleanup failed', { generation: sequence });
-    })
-    .finally(() => activeDisposals.delete(pending));
+    });
   return pending;
 };
 

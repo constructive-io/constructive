@@ -3,6 +3,158 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.21.47](https://github.com/constructive-io/constructive/compare/introspectron@5.21.46...introspectron@5.21.47) (2026-11-23)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.46](https://github.com/constructive-io/constructive/compare/introspectron@5.21.45...introspectron@5.21.46) (2026-11-23)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.45](https://github.com/constructive-io/constructive/compare/introspectron@5.21.44...introspectron@5.21.45) (2026-11-22)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.44](https://github.com/constructive-io/constructive/compare/introspectron@5.21.43...introspectron@5.21.44) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.43](https://github.com/constructive-io/constructive/compare/introspectron@5.21.42...introspectron@5.21.43) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.42](https://github.com/constructive-io/constructive/compare/introspectron@5.21.41...introspectron@5.21.42) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.41](https://github.com/constructive-io/constructive/compare/introspectron@5.21.40...introspectron@5.21.41) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.40](https://github.com/constructive-io/constructive/compare/introspectron@5.21.39...introspectron@5.21.40) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.39](https://github.com/constructive-io/constructive/compare/introspectron@5.21.38...introspectron@5.21.39) (2026-11-21)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.38](https://github.com/constructive-io/constructive/compare/introspectron@5.21.37...introspectron@5.21.38) (2026-11-19)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.37](https://github.com/constructive-io/constructive/compare/introspectron@5.21.36...introspectron@5.21.37) (2026-11-19)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.36](https://github.com/constructive-io/constructive/compare/introspectron@5.21.35...introspectron@5.21.36) (2026-11-18)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.35](https://github.com/constructive-io/constructive/compare/introspectron@5.21.34...introspectron@5.21.35) (2026-11-17)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.34](https://github.com/constructive-io/constructive/compare/introspectron@5.21.33...introspectron@5.21.34) (2026-11-17)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.33](https://github.com/constructive-io/constructive/compare/introspectron@5.21.32...introspectron@5.21.33) (2026-11-17)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.32](https://github.com/constructive-io/constructive/compare/introspectron@5.21.31...introspectron@5.21.32) (2026-11-17)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.31](https://github.com/constructive-io/constructive/compare/introspectron@5.21.30...introspectron@5.21.31) (2026-11-16)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.30](https://github.com/constructive-io/constructive/compare/introspectron@5.21.29...introspectron@5.21.30) (2026-11-16)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.29](https://github.com/constructive-io/constructive/compare/introspectron@5.21.28...introspectron@5.21.29) (2026-11-16)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.28](https://github.com/constructive-io/constructive/compare/introspectron@5.21.27...introspectron@5.21.28) (2026-11-14)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.27](https://github.com/constructive-io/constructive/compare/introspectron@5.21.26...introspectron@5.21.27) (2026-11-12)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.26](https://github.com/constructive-io/constructive/compare/introspectron@5.21.25...introspectron@5.21.26) (2026-11-11)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.25](https://github.com/constructive-io/constructive/compare/introspectron@5.21.24...introspectron@5.21.25) (2026-11-11)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.24](https://github.com/constructive-io/constructive/compare/introspectron@5.21.23...introspectron@5.21.24) (2026-11-11)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.23](https://github.com/constructive-io/constructive/compare/introspectron@5.21.22...introspectron@5.21.23) (2026-11-10)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.22](https://github.com/constructive-io/constructive/compare/introspectron@5.21.21...introspectron@5.21.22) (2026-11-09)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.21](https://github.com/constructive-io/constructive/compare/introspectron@5.21.20...introspectron@5.21.21) (2026-11-09)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.20](https://github.com/constructive-io/constructive/compare/introspectron@5.21.19...introspectron@5.21.20) (2026-11-08)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.19](https://github.com/constructive-io/constructive/compare/introspectron@5.21.18...introspectron@5.21.19) (2026-11-06)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.18](https://github.com/constructive-io/constructive/compare/introspectron@5.21.17...introspectron@5.21.18) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.17](https://github.com/constructive-io/constructive/compare/introspectron@5.21.16...introspectron@5.21.17) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.16](https://github.com/constructive-io/constructive/compare/introspectron@5.21.15...introspectron@5.21.16) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.15](https://github.com/constructive-io/constructive/compare/introspectron@5.21.14...introspectron@5.21.15) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.14](https://github.com/constructive-io/constructive/compare/introspectron@5.21.13...introspectron@5.21.14) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.13](https://github.com/constructive-io/constructive/compare/introspectron@5.21.12...introspectron@5.21.13) (2026-11-05)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.12](https://github.com/constructive-io/constructive/compare/introspectron@5.21.11...introspectron@5.21.12) (2026-11-04)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.11](https://github.com/constructive-io/constructive/compare/introspectron@5.21.10...introspectron@5.21.11) (2026-11-04)
+
+**Note:** Version bump only for package introspectron
+
+## [5.21.10](https://github.com/constructive-io/constructive/compare/introspectron@5.21.9...introspectron@5.21.10) (2026-11-04)
+
+**Note:** Version bump only for package introspectron
+
 ## [5.21.9](https://github.com/constructive-io/constructive/compare/introspectron@5.21.8...introspectron@5.21.9) (2026-11-04)
 
 **Note:** Version bump only for package introspectron
