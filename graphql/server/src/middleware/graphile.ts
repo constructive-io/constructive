@@ -10,6 +10,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
   cacheGraphileInstance,
   createGraphileInstance,
+  disposeUncachedEntry,
   graphileCache,
   type GraphileCacheEntry
 } from 'graphile-cache';
@@ -511,15 +512,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // handler describes a service that may no longer exist, so it is
       // released rather than admitted, and the requests resolve it again.
       if (generationOf(key) !== startedUnder) {
-        // Release even when the realtime teardown fails, and keep the
-        // invalidation signal either way: the waiters resolve again on it.
         try {
-          await instance.realtimeManager?.stop();
-        } catch (error) {
-          log.warn(`Stopping realtime for the discarded PostGraphile[${key}] failed`, error);
-        }
-        try {
-          await instance.pgl.release();
+          await disposeUncachedEntry(instance);
         } catch (error) {
           log.warn(`Releasing the discarded PostGraphile[${key}] failed`, error);
         }
