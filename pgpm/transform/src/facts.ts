@@ -24,7 +24,7 @@ import type { StatementFacts } from '@pgsql/semantics';
 import { classifyStatements as upstreamClassify } from '@pgsql/semantics';
 import type { ObjectIdentity } from '@pgsql/transform';
 import { identityOf as upstreamIdentityOf } from '@pgsql/transform';
-import { parseSync } from 'plpgsql-parser';
+import { parseSql, parseSync } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from './byte-slice';
 import { canonicalTypeNames } from './type-canon';
@@ -172,6 +172,15 @@ function completedIdentityKind(f: StatementFacts): ObjectIdentityKind | null {
 /** `classifyStatements` with pgpm's completions applied. */
 export function classifyStatements(sql: string): StatementFacts[] {
   const facts = upstreamClassify(sql);
+  const last = facts.at(-1);
+  if (last && last.span.len === Math.max(0, sql.length - last.span.start)) {
+    const byteLength = Buffer.byteLength(sql);
+    // Upstream uses UTF-16 length when the parser omits the final stmt_len.
+    if (byteLength > sql.length && parseSql(sql).stmts?.at(-1)?.stmt_len === undefined) {
+      last.span.len = byteLength - last.span.start;
+    }
+  }
+
   let bytes: Buffer | null = null;
   return facts.map(f => {
     if (!COMPLETED_TAGS.has(f.nodeTag) || f.creates.length > 0) return f;

@@ -203,6 +203,26 @@ describe('importDumpRows', () => {
     expect(table.content).toContain("COMMENT ON TABLE app.users IS 'users — all of them'");
   });
 
+  it('preserves a final UTF-8 statement without a semicolon', async () => {
+    const schemaComment = 'cafe\u0301';
+    const tableComment = 'users 🎉';
+    const result = await importDumpRows(
+      sourceOf(
+        [
+          'CREATE SCHEMA app;',
+          `COMMENT ON SCHEMA app IS '${schemaComment}';`,
+          'CREATE TABLE app.users (id int PRIMARY KEY);',
+          `COMMENT ON TABLE app.users IS '${tableComment}'`
+        ].join('\n')
+      )
+    );
+    const schema = result.rows.find(r => r.deploy === 'schemas/app/schema')!;
+    const table = result.rows.find(r => r.deploy === 'schemas/app/tables/users/table')!;
+    expect(schema.content).toContain(`COMMENT ON SCHEMA app IS '${schemaComment}';`);
+    expect(table.content).toContain('CREATE TABLE app.users');
+    expect(table.content).toContain(`COMMENT ON TABLE app.users IS '${tableComment}';`);
+  });
+
   it('imports a script whose statements all land in misc/', async () => {
     const result = await importDumpRows(sourceOf('REVOKE CREATE ON SCHEMA public FROM PUBLIC;'));
     expect(result.rows.map(r => r.deploy)).toEqual([MISC_CHANGE_PATH]);
