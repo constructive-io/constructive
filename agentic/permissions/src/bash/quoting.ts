@@ -31,6 +31,56 @@ export function matchParen(s: string, open: number): number {
   throw new LexError('unterminated substitution');
 }
 
+/**
+ * Where `((` at `open` ends when bash reads it as arithmetic (the index of its
+ * last `)`), or `null` when bash reads the parens as a command substitution of a
+ * subshell (after `$`) or as nested subshells (as a command).
+ *
+ * After `$`, bash decides as it expands the word (`chk_arithsub` in subst.c): the
+ * text up to the `)` that closes `$(` must end in `)`, and the parens between must
+ * balance, skipping backslashes and quotes but not backticks. As a command, bash
+ * decides as it parses (`parse_arith_cmd` in parse.y): the paren the second `(`
+ * opens, skipping quotes and backticks, must close right before a `)`.
+ */
+export function arithmeticEnd(s: string, open: number, context: 'dollar' | 'command'): number | null {
+  if (context === 'command') {
+    const close = matchParen(s, open + 1);
+    return s[close + 1] === ')' ? close + 1 : null;
+  }
+  const end = matchParen(s, open);
+  return s[end - 1] === ')' && parensBalance(s.slice(open + 2, end - 1)) ? end : null;
+}
+
+/** The parens in `text` balance and never close more than they opened. A quote left open runs to the end. */
+function parensBalance(text: string): boolean {
+  let depth = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '\\') {
+      i++;
+    } else if (ch === "'") {
+      i = text.indexOf("'", i + 1);
+      if (i < 0) break;
+    } else if (ch === '"') {
+      i = doubleQuoteEnd(text, i);
+    } else if (ch === '(') {
+      depth++;
+    } else if (ch === ')' && --depth < 0) {
+      return false;
+    }
+  }
+  return depth === 0;
+}
+
+function doubleQuoteEnd(s: string, open: number): number {
+  try {
+    return skipDouble(s, open);
+  } catch (error) {
+    if (error instanceof LexError) return s.length;
+    throw error;
+  }
+}
+
 function skipDouble(s: string, open: number): number {
   for (let i = open + 1; i < s.length; i++) {
     const ch = s[i];

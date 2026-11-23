@@ -13,6 +13,7 @@
  */
 
 import {
+  arithmeticEnd,
   decodeAnsiC,
   findAnsiClose,
   heredocDelimiter,
@@ -182,7 +183,12 @@ class Lexer {
       this.endCommand(true);
     } else {
       // `;`, `&`, `(`, `)`
-      if (ch === '(' && s[this.i + 1] === '(' && !this.plainArithmeticCommand()) this.dynamic.push('an arithmetic command ((…))');
+      const arithmetic = ch === '(' && s[this.i + 1] === '(' ? arithmeticEnd(s, this.i, 'command') : null;
+      if (arithmetic !== null) {
+        this.arithmetic(s.slice(this.i + 2, arithmetic - 1), 'an arithmetic command ((…))');
+        this.i = arithmetic + 1;
+        return;
+      }
       if (ch === '(' && s[this.i + 1] === ')') {
         // `name()`: a function definition hides a body that runs later.
         this.dynamic.push('defines a shell function');
@@ -191,25 +197,6 @@ class Lexer {
       }
       this.i++;
       this.endCommand(false);
-    }
-  }
-
-  /**
-   * `$((` at `this.i` is arithmetic only when the paren its second `(` opens
-   * closes right before the final `)`. Otherwise bash reads it as a command
-   * substitution of a subshell (`$((1) | cmd )`) and runs it.
-   */
-  private isArithmetic(): boolean {
-    return matchParen(this.s, this.i + 2) === matchParen(this.s, this.i + 1) - 1;
-  }
-
-  /** `((…))` at `this.i` holds only numbers and operators. */
-  private plainArithmeticCommand(): boolean {
-    try {
-      return PLAIN_ARITHMETIC.test(this.s.slice(this.i + 1, matchParen(this.s, this.i)));
-    } catch (error) {
-      if (error instanceof LexError) return false;
-      throw error;
     }
   }
 
@@ -283,27 +270,48 @@ class Lexer {
         body += `${line}\n`;
       }
       if (!found) throw new LexError('unterminated heredoc');
-      if (!doc.quoted) this.scanExpansions(body);
+      if (!doc.quoted) this.scanExpansions(body, 'in a heredoc');
       doc.body = body;
     }
     this.pending = [];
   }
 
-  /** An unquoted heredoc body expands `$(…)` and backticks: lex them. */
-  private scanExpansions(body: string): void {
-    for (let i = 0; i < body.length; i++) {
-      const ch = body[i];
-      if (ch === '\\') i++;
-      else if (ch === '$' && body[i + 1] === '(') {
-        const end = matchParen(body, i + 1);
-        this.substitute(body.slice(i + 2, end), 'command substitution in a heredoc');
+  /** Text bash expands as in double quotes (an unquoted heredoc body, a `${…}` word, arithmetic): lex its substitutions. */
+  private scanExpansions(text: string, where: string): void {
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '\\') {
+        i++;
+      } else if (ch === '$' && text[i + 1] === '(') {
+        const arithmetic = text[i + 2] === '(' ? arithmeticEnd(text, i + 1, 'dollar') : null;
+        if (arithmetic !== null) {
+          this.arithmetic(text.slice(i + 3, arithmetic - 1), 'arithmetic expansion $((…))');
+          i = arithmetic;
+        } else {
+          const end = matchParen(text, i + 1);
+          this.substitute(text.slice(i + 2, end), `command substitution ${where}`);
+          i = end;
+        }
+      } else if (ch === '$' && text[i + 1] === '[') {
+        const end = matchBracket(text, i + 1);
+        this.arithmetic(text.slice(i + 2, end), 'arithmetic expansion $[…]');
         i = end;
       } else if (ch === '`') {
-        const end = matchBacktick(body, i);
-        this.substitute(unescapeBackticks(body.slice(i + 1, end)), 'backtick substitution in a heredoc');
+        const end = matchBacktick(text, i);
+        this.substitute(unescapeBackticks(text.slice(i + 1, end)), `backtick substitution ${where}`);
         i = end;
       }
     }
+  }
+
+  /**
+   * The text of `$((…))`, `$[…]` or `((…))`. Bash expands it as in double quotes
+   * and then evaluates it, and a name in it reads a variable's value as an
+   * expression, where a subscript runs code.
+   */
+  private arithmetic(text: string, note: string): void {
+    if (!PLAIN_ARITHMETIC.test(text)) this.dynamic.push(note);
+    this.scanExpansions(text, 'in arithmetic');
   }
 
   private substitute(inner: string, note: string): void {
@@ -461,12 +469,16 @@ class Lexer {
   private readDollar(parts: Part[], lit: (text: string, quoted: boolean) => void, quoted: boolean): void {
     const { s } = this;
     const next = s[this.i + 1];
-    if (next === '[' || (next === '(' && s[this.i + 2] === '(' && this.isArithmetic())) {
-      // Arithmetic reads a variable's value as an expression, and a subscript in it runs code.
-      const end = next === '[' ? matchBracket(s, this.i + 1) : matchParen(s, this.i + 1);
-      const inner = s.slice(this.i + 2, end);
-      if (!PLAIN_ARITHMETIC.test(inner)) this.dynamic.push(next === '[' ? 'arithmetic expansion $[…]' : 'arithmetic expansion $((…))');
-      if (/\$\(|`/.test(inner)) this.substitute(inner.replace(/^[^$`]*/, ''), 'command substitution in arithmetic');
+    const arithmetic = next === '(' && s[this.i + 2] === '(' ? arithmeticEnd(s, this.i + 1, 'dollar') : null;
+    if (arithmetic !== null) {
+      this.arithmetic(s.slice(this.i + 3, arithmetic - 1), 'arithmetic expansion $((…))');
+      parts.push({ kind: 'unknown' });
+      this.i = arithmetic + 1;
+      return;
+    }
+    if (next === '[') {
+      const end = matchBracket(s, this.i + 1);
+      this.arithmetic(s.slice(this.i + 2, end), 'arithmetic expansion $[…]');
       parts.push({ kind: 'unknown' });
       this.i = end + 1;
       return;
@@ -493,7 +505,7 @@ class Lexer {
       const ref = /^[#!]?([A-Za-z_][A-Za-z0-9_]*)/.exec(inner)?.[1];
       const withDefault = /^([A-Za-z_][A-Za-z0-9_]*):?[-=](.*)$/s.exec(inner);
       this.dynamic.push(`parameter expansion \${${inner}}`);
-      if (/\$\(|`/.test(inner)) this.scanExpansions(inner);
+      this.scanExpansions(inner, 'in a parameter expansion');
       if (withDefault) {
         parts.push({ kind: 'var', name: withDefault[1], quoted, fallback: stripQuotes(withDefault[2]) });
         return;

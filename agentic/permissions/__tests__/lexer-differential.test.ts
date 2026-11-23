@@ -64,6 +64,10 @@ const rows: Row[] = [
   // `$((` whose second paren closes early is a command substitution of a subshell, and it runs
   ['echo $((1) | /???/?? ~/*/*/* 1 )', 'deny', 'deny', 'deny', ['hard-deny']],
   ['echo $((1) >2 )', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ['echo $(( cat ~/.ssh/id_rsa `;)`))', 'deny', 'deny', 'deny', ['hard-deny']],
+  // `((` whose parens close as `))` is arithmetic, where `<<` is a shift and not a heredoc
+  ['(( 1 << 2 )); cat ~/.ssh/id_rsa', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['(( x = 1 << 2 ))\ncat ~/.ssh/id_rsa\n2', 'deny', 'deny', 'deny', ['hard-deny']],
   // a substitution body that does not parse fails only that substitution, and the command around it runs
   ["cat ~/.ssh/id_rsa `'`", 'deny', 'deny', 'deny', ['hard-deny']],
   ['echo $((`$(` cat ~/.ssh/id_rsa  ))', 'deny', 'deny', 'deny', ['hard-deny']],
