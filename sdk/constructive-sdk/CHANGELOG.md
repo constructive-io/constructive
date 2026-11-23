@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.47](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.46...@constructive-io/sdk@1.21.47) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.46](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.45...@constructive-io/sdk@1.21.46) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.45](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.44...@constructive-io/sdk@1.21.45) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.44](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.43...@constructive-io/sdk@1.21.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.43](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.42...@constructive-io/sdk@1.21.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.42](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.41...@constructive-io/sdk@1.21.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [1.21.41](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.40...@constructive-io/sdk@1.21.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
 ## [1.21.40](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@1.21.39...@constructive-io/sdk@1.21.40) (2026-11-21)
 
 **Note:** Version bump only for package @constructive-io/sdk

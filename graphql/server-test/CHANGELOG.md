@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.1...graphql-server-test@3.43.2) (2026-11-23)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.43.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.0...graphql-server-test@3.43.1) (2026-11-23)
+
+### Features
+
+- **presigned-url:** download a stored image version by name ([#2053](https://github.com/constructive-io/constructive/issues/2053)) ([696dfd0](https://github.com/constructive-io/constructive/commit/696dfd002d59d7f600746a4ce788849c25c9176f))
+
+# [3.43.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.13...graphql-server-test@3.43.0) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
+### Features
+
+- **graphile-meta:** expose a file column's bucket binding on MetaFileField ([#2050](https://github.com/constructive-io/constructive/issues/2050)) ([334996e](https://github.com/constructive-io/constructive/commit/334996e5e1badbb156c926de24d81e5bc1015c40)), closes [constructive-io/constructive-planning#2565](https://github.com/constructive-io/constructive-planning/issues/2565)
+
+## [3.42.13](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.12...graphql-server-test@3.42.13) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
+## [3.42.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.11...graphql-server-test@3.42.12) (2026-11-21)
+
+### Bug Fixes
+
+- **i18n:** localized reads on tenant APIs (physical table names + request languages) ([#2045](https://github.com/constructive-io/constructive/issues/2045)) ([836796e](https://github.com/constructive-io/constructive/commit/836796ef9ca06aaf91bbaf3e88f3110a1cd4dd20))
+
+## [3.42.11](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.10...graphql-server-test@3.42.11) (2026-11-21)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [3.42.10](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.9...graphql-server-test@3.42.10) (2026-11-21)
+
+**Note:** Version bump only for package graphql-server-test
+
 ## [3.42.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.8...graphql-server-test@3.42.9) (2026-11-21)
 
 **Note:** Version bump only for package graphql-server-test

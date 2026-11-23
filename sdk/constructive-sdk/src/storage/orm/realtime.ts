@@ -64,8 +64,6 @@ export interface SubscriptionEvent<T> {
   data: T | null;
   /** Previous field values (populated on UPDATE when available) */
   previousValues?: Partial<T>;
-  /** Server-side timestamp of when the change occurred */
-  timestamp: string;
 }
 
 /**
@@ -185,7 +183,6 @@ export class RealtimeManager {
             operation: (payload.event as SubscriptionOperation) ?? 'UPDATE',
             data: (payload[meta.dataFieldName] as T) ?? null,
             previousValues: payload.previousValues as Partial<T> | undefined,
-            timestamp: (payload.timestamp as string) ?? new Date().toISOString(),
           };
           options.onEvent(event);
         },

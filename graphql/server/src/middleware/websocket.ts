@@ -58,6 +58,13 @@ export async function authenticatedWebSocketRequest(
     }
     req.headers.authorization = authorizations[0][1];
   }
+  const languages = Object.entries(params ?? {}).filter(([key]) => key.toLowerCase() === 'accept-language');
+  if (languages.length) {
+    if (languages.length !== 1 || typeof languages[0][1] !== 'string') {
+      throw new SafeError('Invalid Accept-Language', { code: 'BAD_USER_INPUT' });
+    }
+    req.headers['accept-language'] = languages[0][1];
+  }
   if (!getBearerToken(req) && requiresAuth) {
     throw new SafeError('Authentication required', { code: 'UNAUTHENTICATED' });
   }

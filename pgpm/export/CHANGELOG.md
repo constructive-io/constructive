@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.45](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.44...@pgpmjs/export@1.25.45) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.44](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.43...@pgpmjs/export@1.25.44) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.43](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.42...@pgpmjs/export@1.25.43) (2026-11-22)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.42](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.41...@pgpmjs/export@1.25.42) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.41](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.40...@pgpmjs/export@1.25.41) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.40](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.39...@pgpmjs/export@1.25.40) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/export
+
+## [1.25.39](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.38...@pgpmjs/export@1.25.39) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/export
+
 ## [1.25.38](https://github.com/constructive-io/constructive/compare/@pgpmjs/export@1.25.37...@pgpmjs/export@1.25.38) (2026-11-21)
 
 **Note:** Version bump only for package @pgpmjs/export

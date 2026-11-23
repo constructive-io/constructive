@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.22.9](https://github.com/constructive-io/constructive/compare/node-type-registry@1.22.8...node-type-registry@1.22.9) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [1.22.8](https://github.com/constructive-io/constructive/compare/node-type-registry@1.22.7...node-type-registry@1.22.8) (2026-11-23)
+
+**Note:** Version bump only for package node-type-registry
+
+## [1.22.7](https://github.com/constructive-io/constructive/compare/node-type-registry@1.22.6...node-type-registry@1.22.7) (2026-11-21)
+
+**Note:** Version bump only for package node-type-registry
+
+## [1.22.6](https://github.com/constructive-io/constructive/compare/node-type-registry@1.22.5...node-type-registry@1.22.6) (2026-11-21)
+
+**Note:** Version bump only for package node-type-registry
+
 ## [1.22.5](https://github.com/constructive-io/constructive/compare/node-type-registry@1.22.4...node-type-registry@1.22.5) (2026-11-14)
 
 ### Bug Fixes

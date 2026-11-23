@@ -1,6 +1,6 @@
 {
   "name": "graphile-realtime-subscriptions",
-  "version": "1.13.1",
+  "version": "1.13.3",
   "description": "Realtime subscription plugin for PostGraphile v5 — per-table GraphQL subscriptions via LISTEN/NOTIFY",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/quotes": "^18.2.4"
+    "@pgsql/quotes": "^18.2.5"
   },
   "peerDependencies": {
     "grafast": "^1.1.2",

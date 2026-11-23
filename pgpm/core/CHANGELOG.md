@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.35.15](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.14...@pgpmjs/core@7.35.15) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+- **pgpm:** accept pre-upgrade AST hashes in diff ledger classification ([3832a54](https://github.com/constructive-io/constructive/commit/3832a546dd69cb6e4bcbe7f6ca4d1351ca201e50))
+- **pgpm:** ignore new parser offsets in package round-trip diffs ([df1a5b5](https://github.com/constructive-io/constructive/commit/df1a5b5609fbf1144efb5fefc965c200d3a1988b))
+- **pgpm:** ignore parser version in migration AST hashes ([d1d948f](https://github.com/constructive-io/constructive/commit/d1d948f3cb2b586c4398ff123f12fb46184db4b2))
+- **pgpm:** preserve migration AST hashes after parser upgrade ([46cd8e0](https://github.com/constructive-io/constructive/commit/46cd8e0321a954874ab9fc989735c980d1bfebc6))
+
+## [7.35.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.13...@pgpmjs/core@7.35.14) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.12...@pgpmjs/core@7.35.13) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [7.35.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.11...@pgpmjs/core@7.35.12) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
 ## [7.35.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.10...@pgpmjs/core@7.35.11) (2026-11-19)
 
 **Note:** Version bump only for package @pgpmjs/core

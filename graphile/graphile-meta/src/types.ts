@@ -197,6 +197,13 @@ export interface FileFieldMeta {
    * one; null when it has none or several.
    */
   filesType: string | null;
+  /**
+   * Bucket key the column's file reference is bound to (`DataFileRef`'s
+   * `bucket`); uploads for it must land there. Null when it is not bound to one.
+   */
+  bucketKey: string | null;
+  /** Public/private intent the binding declares; null when it declares none. */
+  isPublic: boolean | null;
 }
 
 export interface TypeMeta {

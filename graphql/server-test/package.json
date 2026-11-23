@@ -1,6 +1,6 @@
 {
   "name": "graphql-server-test",
-  "version": "3.42.9",
+  "version": "3.43.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server Testing with SuperTest HTTP requests",
   "main": "index.js",
@@ -51,6 +51,7 @@
     "inquirerer": "^4.9.4",
     "makage": "^0.8.0",
     "nested-obj": "^0.2.3",
+    "postgraphile": "5.1.4",
     "ws": "^8.21.3"
   },
   "dependencies": {

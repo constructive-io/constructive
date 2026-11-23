@@ -25,6 +25,8 @@ function fileKindOf(codec: PgCodec | null | undefined): FileKind | null {
 /**
  * File details for a column whose type is a file domain, or a list of one.
  * `filesType` is the API's only storage files table (see `soleFilesTypeName`).
+ * The bucket binding comes from the `@fileBucketKey` / `@fileIsPublic` tags
+ * constructive-db's DataFileRef generator writes on the column.
  */
 export function buildFileFieldMeta(
   attr: PgAttribute | null | undefined,
@@ -33,5 +35,23 @@ export function buildFileFieldMeta(
   const codec = attr?.codec;
   if (!codec) return null;
   const kind = fileKindOf(codec.arrayOfCodec ?? codec);
-  return kind ? { kind, isMultiple: !!codec.arrayOfCodec, filesType } : null;
+  if (!kind) return null;
+  const tags = (attr.extensions?.tags ?? {}) as Record<string, unknown>;
+  return {
+    kind,
+    isMultiple: !!codec.arrayOfCodec,
+    filesType,
+    bucketKey: tagString(tags.fileBucketKey),
+    isPublic: tagBoolean(tags.fileIsPublic)
+  };
+}
+
+function tagString(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function tagBoolean(value: unknown): boolean | null {
+  if (value === true || value === 'true') return true;
+  if (value === false || value === 'false') return false;
+  return null;
 }

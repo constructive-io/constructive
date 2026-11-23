@@ -60,7 +60,7 @@ describe('graphile-i18n plugin', () => {
 
     const connections = await (getConnections as any)(
       {
-        schemas: ['i18n_test'],
+        schemas: ['i18n_test', 'i18n-quoted"schema'],
         preset: testPreset,
         useRoot: true,
         authRole: 'postgres',
@@ -75,6 +75,43 @@ describe('graphile-i18n plugin', () => {
 
   afterAll(async () => {
     await teardown();
+  });
+
+  beforeEach(async () => {
+    await db.beforeEach();
+  });
+
+  afterEach(async () => {
+    await db.afterEach();
+  });
+
+  it('reads snake_case base and companion tables in a quoted schema', async () => {
+    const result = await query<{ allI18NQuotedSchemaSnakePosts: { nodes: PostNode[] } }>(`
+      { allI18NQuotedSchemaSnakePosts(orderBy: ROW_ID_ASC) {
+        nodes { rowId title body localeStrings { langCode title body } }
+      } }
+    `, {}, false, { langCodes: ['fr'] });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.allI18NQuotedSchemaSnakePosts.nodes).toEqual([
+      {
+        rowId: 1, title: 'Source title', body: 'Source body',
+        localeStrings: { langCode: 'fr', title: 'Titre traduit', body: 'Corps traduit' },
+      },
+      {
+        rowId: 2, title: 'Untranslated title', body: null,
+        localeStrings: { langCode: null, title: 'Untranslated title', body: null },
+      },
+    ]);
+  });
+
+  it('returns null for a missing row in a quoted schema', async () => {
+    const result = await query<{ i18NQuotedSchemaSnakePostByRowId: PostNode | null }>(`
+      { i18NQuotedSchemaSnakePostByRowId(rowId: 999) { localeStrings { langCode title body } } }
+    `);
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.i18NQuotedSchemaSnakePostByRowId).toBeNull();
   });
 
   it('should add localeStrings field to posts with @i18n tag', async () => {

@@ -22,6 +22,7 @@
     "lint": "pnpm -r run lint",
     "internal:deps": "makage update-workspace",
     "deps": "pnpm up -r -i -L",
+    "deps:pgsql-parser": "makage deps pgsql-parser",
     "fixtures:install": "node pgpm/cli/dist/index.js install -W",
     "fixtures:install:force": "node pgpm/cli/dist/index.js install -W --force",
     "policy": "pnpm-policy generate",

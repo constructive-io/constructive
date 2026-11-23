@@ -19,7 +19,7 @@ const envVars = getEnvVars(process.env);
 // Merged: defaults → env → overrides
 const opts = getEnvOptions();
 // opts.embedding.provider  → EMBEDDER_PROVIDER  || 'ollama'
-// opts.embedding.model     → EMBEDDER_MODEL     || 'nomic-embed-text'
+// opts.embedding.model     → EMBEDDER_MODEL     || 'embeddinggemma-2:440m'
 // opts.embedding.baseUrl   → EMBEDDER_BASE_URL  || 'http://localhost:11434'
 // opts.chat.provider       → CHAT_PROVIDER      || 'ollama'
 // opts.chat.model          → CHAT_MODEL         || 'llama3'
@@ -34,7 +34,7 @@ const custom = getEnvOptions({ embedding: { model: 'mxbai-embed-large' } });
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `EMBEDDER_PROVIDER` | `ollama` | Embedding provider name |
-| `EMBEDDER_MODEL` | `nomic-embed-text` | Embedding model identifier |
+| `EMBEDDER_MODEL` | `embeddinggemma-2:440m` | Embedding model identifier |
 | `EMBEDDER_BASE_URL` | `http://localhost:11434` | Embedding provider URL |
 | `CHAT_PROVIDER` | `ollama` | Chat provider name |
 | `CHAT_MODEL` | `llama3` | Chat model identifier |

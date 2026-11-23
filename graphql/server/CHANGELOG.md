@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.9...@constructive-io/graphql-server@5.36.10) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [5.36.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.8...@constructive-io/graphql-server@5.36.9) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.7...@constructive-io/graphql-server@5.36.8) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
+## [5.36.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.6...@constructive-io/graphql-server@5.36.7) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.5...@constructive-io/graphql-server@5.36.6) (2026-11-21)
+
+### Bug Fixes
+
+- **i18n:** localized reads on tenant APIs (physical table names + request languages) ([#2045](https://github.com/constructive-io/constructive/issues/2045)) ([836796e](https://github.com/constructive-io/constructive/commit/836796ef9ca06aaf91bbaf3e88f3110a1cd4dd20))
+
+## [5.36.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.4...@constructive-io/graphql-server@5.36.5) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.3...@constructive-io/graphql-server@5.36.4) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [5.36.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.2...@constructive-io/graphql-server@5.36.3) (2026-11-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

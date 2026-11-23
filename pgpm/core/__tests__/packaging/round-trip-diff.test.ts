@@ -25,4 +25,14 @@ describe('AST round-trip diff detection', () => {
     );
     expect(diff).toBeUndefined();
   });
+
+  it.each([
+    ['CREATE FUNCTION', 'CREATE FUNCTION f() RETURNS integer AS $$SELECT 1$$ LANGUAGE sql;'],
+    ['NOTIFY', "NOTIFY c,    'x';"],
+    ['CREATE SUBSCRIPTION', "CREATE SUBSCRIPTION sub CONNECTION    'dbname=postgres' PUBLICATION pub;"],
+    ['ALTER SUBSCRIPTION', "ALTER SUBSCRIPTION sub CONNECTION    'dbname=postgres';"]
+  ])('ignores parser offsets when deparsing %s', async (_statement, sql) => {
+    const { diff } = await mergeSqlStatements(sql);
+    expect(diff).toBeUndefined();
+  });
 });
