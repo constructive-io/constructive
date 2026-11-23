@@ -66,6 +66,7 @@ import { PagesModuleModel } from './models/pagesModule';
 import { PhoneNumbersModuleModel } from './models/phoneNumbersModule';
 import { PlansModuleModel } from './models/plansModule';
 import { PrincipalAuthModuleModel } from './models/principalAuthModule';
+import { PrincipalsModuleModel } from './models/principalsModule';
 import { ProfilesModuleModel } from './models/profilesModule';
 import { RateLimitMetersModuleModel } from './models/rateLimitMetersModule';
 import { RateLimitsModuleModel } from './models/rateLimitsModule';
@@ -187,6 +188,7 @@ export function createClient(config: OrmClientConfig) {
     phoneNumbersModule: new PhoneNumbersModuleModel(client),
     plansModule: new PlansModuleModel(client),
     principalAuthModule: new PrincipalAuthModuleModel(client),
+    principalsModule: new PrincipalsModuleModel(client),
     profilesModule: new ProfilesModuleModel(client),
     rateLimitMetersModule: new RateLimitMetersModuleModel(client),
     rateLimitsModule: new RateLimitsModuleModel(client),
