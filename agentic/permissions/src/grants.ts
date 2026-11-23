@@ -12,7 +12,8 @@
 import * as path from 'node:path';
 
 import { commandPattern, isExactKey, isStoredPrefix } from './command-pattern';
-import { MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
+import { grantCaveat, MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
+import { grantOptionLabel } from './grant-copy';
 import { commonParent, contains, displayDir } from './paths';
 import { byRequest } from './requests';
 import { SIGNAL_RULES } from './signals';
@@ -28,6 +29,7 @@ import type {
   GrantOption,
   GrantScope,
   ListedPrefix,
+  PathPattern,
   PermissionRequest,
   Signal,
   Target
@@ -110,19 +112,6 @@ export function findGrants(grants: readonly Grant[], request: PermissionRequest)
   return [...used];
 }
 
-export const ACCESS_VERB: Readonly<Record<Access, string>> = { read: 'reads', write: 'writes', exec: 'runs' };
-
-/** What a grant covers, in words: "reads in ~/work/lib/", "bash: pnpm dlx shadcn add button", "bash: git status *". */
-export function describeGrant(match: GrantMatch, homeDir: string): string {
-  switch (match.type) {
-  case 'command':
-  case 'command-prefix':
-    return `bash: ${commandPattern(match)}`;
-  case 'path':
-    return `${ACCESS_VERB[match.access]} in ${displayDir(match.pathPrefix, homeDir)}`;
-  }
-}
-
 /**
  * One prefix for each part that `held` does not cover yet, or `null` when the
  * grant must be the exact command: the call raises a signal or is not a plain
@@ -146,14 +135,20 @@ function newPrefixes(request: BashRequest, held: readonly Grant[]): ListedPrefix
  * already covers, the project option only those a project grant covers, so
  * the project grant still holds in the next chat.
  */
-function commandOption(scope: GrantScope, request: BashRequest, grants: readonly Grant[]): GrantOption {
+function commandOption(scope: GrantScope, request: BashRequest, grants: readonly Grant[], homeDir: string): GrantOption {
   const held = scope === 'chat' ? grants : grants.filter((g) => g.scope === 'project');
   const prefixes = newPrefixes(request, held);
   const match: CommandMatch | CommandPrefixMatch = prefixes
     ? { type: 'command-prefix', prefixes }
     : { type: 'command', command: request.command };
-  const pattern = commandPattern(match);
-  return { scope, label: scope === 'chat' ? 'Allow in this chat' : `Always allow ${pattern}`, pattern, match };
+  const caveat = grantCaveat(match);
+  return {
+    scope,
+    label: grantOptionLabel(scope, match, homeDir),
+    pattern: commandPattern(match),
+    ...(caveat === undefined ? {} : { caveat }),
+    match
+  };
 }
 
 function pathOptions(request: FileRequest, homeDir: string): GrantOption[] {
@@ -162,18 +157,15 @@ function pathOptions(request: FileRequest, homeDir: string): GrantOption[] {
   if (request.targets.some((t) => t.access !== access)) return [];
   const prefix = commonParent(request.targets.map((t) => t.path));
   const match: GrantMatch = { type: 'path', access, pathPrefix: prefix };
-  const pattern = displayDir(prefix, homeDir);
-  return [
-    { scope: 'chat', label: 'Allow in this chat', pattern, match },
-    { scope: 'project', label: `Always allow ${describeGrant(match, homeDir)}`, pattern, match }
-  ];
+  const pattern: PathPattern = { kind: 'path', text: displayDir(prefix, homeDir) };
+  return (['chat', 'project'] as const).map((scope) => ({ scope, label: grantOptionLabel(scope, match, homeDir), pattern, match }));
 }
 
 /** The scopes the user may pick on an ASK: this chat, or always for this project. `grants` are the ones already held. */
 export function grantOptionsFor(request: PermissionRequest, homeDir: string, grants: readonly Grant[] = []): GrantOption[] {
   if (!isGrantable(request)) return [];
   return byRequest(request, {
-    bash: (r) => (r.command === '' ? [] : [commandOption('chat', r, grants), commandOption('project', r, grants)]),
+    bash: (r) => (r.command === '' ? [] : [commandOption('chat', r, grants, homeDir), commandOption('project', r, grants, homeDir)]),
     file: (r) => pathOptions(r, homeDir)
   });
 }

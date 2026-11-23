@@ -70,7 +70,7 @@ describe('a prefix never covers a part that writes a file or runs another progra
   it('still covers the plain runs of the same commands', async () => {
     expect((await sb.bash('git fetch origin', 'ask', [prefix('git fetch')])).decision).toBe('allow');
     expect((await sb.bash('git log -1 --format=%H', 'ask', [prefix('git log')])).decision).toBe('allow');
-    expect((await sb.bash('git switch -c feature', 'ask', [prefix('git switch')])).decision).toBe('allow');
+    expect((await sb.bash('git grep -c foo', 'ask', [prefix('git grep')])).decision).toBe('allow');
     expect((await sb.bash('npm run build -- --watch', 'ask', [prefix('npm run build')])).decision).toBe('allow');
   });
 
@@ -143,5 +143,34 @@ describe('the arity table offers a prefix only for an action that runs no code f
     expect((await sb.bash(mutation, 'ask', [prefix('gh api graphql')])).decision).toBe('ask');
     expect((await sb.bash('git bisect run rm -rf src', 'ask', [prefix('git')])).decision).toBe('ask');
     expect((await sb.bash('npm test', 'ask', [prefix('npm')])).decision).toBe('ask');
+  });
+});
+
+// Each one can discard uncommitted work, or rewrite or publish history.
+// prettier-ignore
+const exactOnlyGit: string[] = [
+  'git reset HEAD~1',
+  'git rm src/a.ts',
+  'git mv a.ts b.ts',
+  'git checkout -- src',
+  'git restore src/a.ts',
+  'git switch main',
+  'git stash drop',
+  'git push origin main',
+  'git pull origin main',
+  'git merge feature',
+  'git rebase main',
+  'git cherry-pick abc123',
+  'git revert HEAD'
+];
+
+describe('a git command that can lose work or change history gets only an exact rule', () => {
+  it.each(exactOnlyGit)('%j gets the exact command', async (command) => {
+    expect(await projectMatch(command)).toEqual({ type: 'command', command });
+  });
+
+  it('ignores a held prefix for one', async () => {
+    expect((await sb.bash('git switch -c feature', 'ask', [prefix('git switch')])).decision).toBe('ask');
+    expect((await sb.bash('git push origin main', 'ask', [prefix('git push')])).decision).toBe('ask');
   });
 });

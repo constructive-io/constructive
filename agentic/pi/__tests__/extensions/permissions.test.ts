@@ -58,7 +58,7 @@ const fakePi = (entries: unknown[] = []) => {
 const chatOption: GrantOption = {
   scope: 'chat',
   label: 'Allow in this chat',
-  pattern: '~/work/lib/',
+  pattern: { kind: 'path', text: '~/work/lib/' },
   match: { type: 'path', access: 'read', pathPrefix: '/home/u/work/lib' }
 };
 const projectOption: GrantOption = { ...chatOption, scope: 'project', label: 'Always: reads in ~/work/lib/' };

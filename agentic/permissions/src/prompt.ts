@@ -73,6 +73,6 @@ export function buildPrompt(
     targets: request.targets.map((t, i) => ({ path: shown[i], access: t.access, zone: t.zone })),
     signals: request.signals,
     reasons: cardReasons,
-    grantOptions: grantOptions.map(({ scope, label, pattern }) => ({ scope, label, pattern }))
+    grantOptions: grantOptions.map(({ match: _match, ...shown }) => shown)
   };
 }

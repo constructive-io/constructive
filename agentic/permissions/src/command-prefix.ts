@@ -9,85 +9,116 @@ import { normalizeCommand } from './bash/analyze';
 import { type Effect, operandEffects, optionsIn } from './bash/options';
 import { wordTexts } from './bash/parts';
 import { gitSubcommand, PROGRAMS } from './bash/programs';
-import type { CommandPart, ListedPrefix } from './types';
+import type { CommandPart, GrantCaveat, GrantMatch, ListedPrefix } from './types';
+
+/**
+ * What a listed prefix's program does: reads or filters (`cat`), reads or adds
+ * to a git repo (`git status`), runs the project's tests (`npm test`), reads
+ * package data (`npm ls`), runs a package script by its name (`npm run
+ * build`), or runs a script by its path (`node scripts/build.js`).
+ */
+type PrefixClass = 'reader' | 'vcs' | 'test' | 'package-query' | 'package-script' | 'script-runner';
+
+interface PrefixEntry {
+  /** How many leading words a prefix keeps. */
+  arity: number;
+  class: PrefixClass;
+}
+
+const entries = (keys: readonly string[], arity: number, cls: PrefixClass) => keys.map((key) => [key, { arity, class: cls }] as const);
 
 /**
  * The prefixes "always" may offer and a grant may hold: by the words that name
- * the program, how many leading words a prefix keeps. The longest key wins
- * (`npm run` before `npm test`).
+ * the program, how many leading words a prefix keeps and its class. The
+ * longest key wins (`npm run` before `npm test`).
  *
  * A prefix is offered only when its words name an action that runs no code
- * taken from its arguments: a reader or filter by its name, a git or package
- * manager subcommand that acts on this repo, a package script by its name, or
- * an interpreter's script by its path (after `tsx watch` or `node inspect`, too). Anything else keeps the exact command:
- * a program that runs or fetches code named by an argument (`npx`, `npm
- * init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`, `make`, `gh
- * api`, `git bisect run`), one that writes files (`touch`, `mkdir`, `sort -o`,
- * `tree -o`), one whose options run a program (`rg --pre`, `printf -v`), and
- * any program the table does not list.
+ * taken from its arguments: a reader or filter by its name, a git subcommand
+ * that only reads or adds to the repo, a package manager subcommand that acts
+ * on this repo, a package script by its name, or an interpreter's script by its
+ * path (after `tsx watch` or `node inspect`, too). Anything else keeps the
+ * exact command: a program that runs or fetches code named by an argument
+ * (`npx`, `npm init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`,
+ * `make`, `gh api`, `git bisect run`), one that writes files (`touch`,
+ * `mkdir`, `sort -o`, `tree -o`), one whose options run a program (`rg --pre`,
+ * `printf -v`), a git subcommand that can discard uncommitted work or rewrite
+ * or publish history (`reset`, `rm`, `mv`, `checkout`, `restore`, `switch`,
+ * `stash`, `push`, `pull`, `merge`, `rebase`, `cherry-pick`, `revert`), and any
+ * program the table does not list.
  */
-const ARITY: ReadonlyMap<string, number> = new Map<string, number>([
-  ...[
-    'cat',
-    'head',
-    'tail',
-    'wc',
-    'ls',
-    'pwd',
-    'echo',
-    'grep',
-    'cut',
-    'diff',
-    'jq',
-    'which',
-    'stat',
-    'du',
-    'df',
-    'date',
-    'sleep',
-    'basename',
-    'dirname',
-    'realpath'
-  ].map((name) => [name, 1] as const),
-  ...[
-    'status',
-    'diff',
-    'log',
-    'show',
-    'add',
-    'commit',
-    'restore',
-    'switch',
-    'checkout',
-    'branch',
-    'tag',
-    'stash',
-    'fetch',
-    'pull',
-    'push',
-    'merge',
-    'rebase',
-    'cherry-pick',
-    'revert',
-    'reset',
-    'rm',
-    'mv',
-    'blame',
-    'grep',
-    'ls-files',
-    'rev-parse',
-    'describe',
-    'shortlog',
-    'reflog'
-  ].map((sub) => [`git ${sub}`, 2] as const),
-  ...['test', 't', 'ls', 'outdated', 'view', 'why', 'explain'].map((sub) => [`npm ${sub}`, 2] as const),
-  ...['test', 't', 'ls', 'list', 'outdated', 'why'].map((sub) => [`pnpm ${sub}`, 2] as const),
-  ...['test', 'why', 'info'].map((sub) => [`yarn ${sub}`, 2] as const),
-  ['bun test', 2],
-  ...['node', 'python', 'python3', 'ruby', 'bash', 'sh', 'zsh', 'tsx', 'ts-node'].map((name) => [name, 2] as const),
-  ...['npm run', 'pnpm run', 'yarn run', 'bun run'].map((name) => [name, 3] as const),
-  ...['tsx watch', 'node inspect'].map((name) => [name, 3] as const)
+const ARITY: ReadonlyMap<string, PrefixEntry> = new Map<string, PrefixEntry>([
+  ...entries(
+    [
+      'cat',
+      'head',
+      'tail',
+      'wc',
+      'ls',
+      'pwd',
+      'echo',
+      'grep',
+      'cut',
+      'diff',
+      'jq',
+      'which',
+      'stat',
+      'du',
+      'df',
+      'date',
+      'sleep',
+      'basename',
+      'dirname',
+      'realpath'
+    ],
+    1,
+    'reader'
+  ),
+  ...entries(
+    [
+      'status',
+      'diff',
+      'log',
+      'show',
+      'add',
+      'commit',
+      'branch',
+      'tag',
+      'fetch',
+      'blame',
+      'grep',
+      'ls-files',
+      'rev-parse',
+      'describe',
+      'shortlog',
+      'reflog'
+    ].map((sub) => `git ${sub}`),
+    2,
+    'vcs'
+  ),
+  ...entries(['npm test', 'npm t', 'pnpm test', 'pnpm t', 'yarn test', 'bun test'], 2, 'test'),
+  ...entries(
+    [
+      ...['ls', 'outdated', 'view', 'why', 'explain'].map((sub) => `npm ${sub}`),
+      ...['ls', 'list', 'outdated', 'why'].map((sub) => `pnpm ${sub}`),
+      ...['why', 'info'].map((sub) => `yarn ${sub}`)
+    ],
+    2,
+    'package-query'
+  ),
+  ...entries(['npm run', 'pnpm run', 'yarn run', 'bun run'], 3, 'package-script'),
+  ...entries(['node', 'python', 'python3', 'ruby', 'bash', 'sh', 'zsh', 'tsx', 'ts-node'], 2, 'script-runner'),
+  ...entries(['tsx watch', 'node inspect'], 3, 'script-runner')
 ]);
+
+/** The caveat a host shows beside a prefix of each class. */
+const CLASS_CAVEAT: Readonly<Record<PrefixClass, GrantCaveat | undefined>> = {
+  reader: undefined,
+  vcs: undefined,
+  test: undefined,
+  'package-query': undefined,
+  'package-script': undefined,
+  'script-runner': 'script-unchecked'
+};
 
 const LONGEST_KEY = Math.max(...[...ARITY.keys()].map((key) => key.split(' ').length));
 
@@ -100,13 +131,34 @@ export const MAX_PREFIXES = 5;
  */
 const PREFIX_WORD = /^[\w@%=:./][\w@%+=:./-]*$/;
 
-/** The table entry the leading words name, longest key first. */
-function arityKey(words: readonly string[]): { length: number; arity: number } | null {
+/** The table entry the leading words name, longest key first, with the number of words its key has. */
+function arityKey(words: readonly string[]): (PrefixEntry & { length: number }) | null {
   for (let k = Math.min(words.length, LONGEST_KEY); k > 0; k--) {
-    const arity = ARITY.get(words.slice(0, k).join(' '));
-    if (arity !== undefined) return { length: k, arity };
+    const entry = ARITY.get(words.slice(0, k).join(' '));
+    if (entry !== undefined) return { ...entry, length: k };
   }
   return null;
+}
+
+/**
+ * The caveat a host shows beside a stored or offered grant, from the class of
+ * each prefix the table lists: `script-unchecked` when one runs a script by
+ * its path. An exact command, a path grant and an unlisted prefix get none.
+ */
+export function grantCaveat(match: GrantMatch): GrantCaveat | undefined {
+  if (match.type !== 'command-prefix') return undefined;
+  for (const prefix of match.prefixes) {
+    const cls = listedClass(prefix);
+    if (cls !== undefined && CLASS_CAVEAT[cls] !== undefined) return CLASS_CAVEAT[cls];
+  }
+  return undefined;
+}
+
+/** The class of a prefix the table lists, at least as long as its entry, or `undefined`. */
+function listedClass(prefix: string): PrefixClass | undefined {
+  const words = prefix.split(' ');
+  const key = arityKey(words);
+  return key && words.length >= key.arity ? key.class : undefined;
 }
 
 /** The first word a prefix may not hold, or `undefined`. */

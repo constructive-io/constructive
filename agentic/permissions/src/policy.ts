@@ -8,7 +8,8 @@
  * 5. the mode default (see `modeDefault`)
  */
 
-import { ACCESS_VERB, findGrants, grantOptionsFor, matchCovers } from './grants';
+import { ACCESS_VERB } from './grant-copy';
+import { findGrants, grantOptionsFor, matchCovers } from './grants';
 import { NEXT_STEP } from './guidance';
 import { showPath } from './paths';
 import { buildPrompt, type PromptDisplay } from './prompt';

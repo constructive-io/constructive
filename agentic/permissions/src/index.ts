@@ -10,6 +10,7 @@
  */
 
 export { commandPattern, type CommandPatternResult, parseCommandPattern } from './command-pattern';
+export { grantCaveat } from './command-prefix';
 export {
   createPermissionEngine,
   type EvaluateContext,
@@ -22,7 +23,8 @@ export {
   type ToolResultInput
 } from './engine';
 export { scrubEnv } from './env';
-export { describeGrant, grantFrom, type GrantStore, memoryGrantStore, NEVER_GRANTED, parseGrantMatch, sameMatch } from './grants';
+export { describeGrant } from './grant-copy';
+export { grantFrom, type GrantStore, memoryGrantStore, NEVER_GRANTED, parseGrantMatch, sameMatch } from './grants';
 export { nodeFsProbe } from './node-fs';
 export type { PolicyRules, RuleMatch } from './policy';
 export {
