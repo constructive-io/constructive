@@ -47,6 +47,110 @@ interface IntrospectionQueryScope {
   authMemberPredicate?: string;
 }
 
+/**
+ * SQL for a smart-tag identifier, mirroring graphile-build-pg@5.1.3
+ * PgFakeConstraintsPlugin `removeQuotes`: quoted names are taken verbatim and
+ * unquoted names are lower-cased. The input is already trimmed.
+ */
+const smartTagIdentifier = (expression: string): string => `case
+          when pg_catalog.left(${expression}, 1) = '"' then
+            case
+              when pg_catalog.length(${expression}) >= 2
+                and pg_catalog.right(${expression}, 1) = '"'
+              then pg_catalog.substr(${expression}, 2, pg_catalog.length(${expression}) - 2)
+            end
+          else pg_catalog.lower(${expression})
+        end`;
+
+/**
+ * Closure step for `@foreignKey` smart tags. The target of such a tag has no
+ * catalog dependency on the tagged class, but graphile-build-pg@5.1.3
+ * PgFakeConstraintsPlugin resolves the tags of every introspected class by
+ * name and fails the whole build when a target is missing. Comments are read
+ * as pg-introspection reads them (the class comment, else the row type
+ * comment; tags only in the leading `@` lines) and specs are parsed with the
+ * plugin's own pattern, where an unqualified table is in the tagged class's
+ * schema. Targets join the closure, so their own tags are followed as well.
+ */
+const SMART_TAG_FOREIGN_KEY_TARGETS = `
+      select 'pg_catalog.pg_class'::regclass::oid, foreign_key_target.oid
+      from pg_catalog.pg_class as tagged_class
+      cross join lateral (
+        select coalesce(
+          (
+            select pg_description.description
+            from pg_catalog.pg_description
+            where pg_description.classoid = 'pg_catalog.pg_class'::regclass
+              and pg_description.objoid = tagged_class.oid
+              and pg_description.objsubid = 0
+          ),
+          (
+            select pg_description.description
+            from pg_catalog.pg_description
+            where pg_description.classoid = 'pg_catalog.pg_type'::regclass
+              and pg_description.objoid = tagged_class.reltype
+              and pg_description.objsubid = 0
+          )
+        ) as description
+      ) as class_comment
+      cross join lateral pg_catalog.regexp_split_to_table(
+        case
+          when pg_catalog.strpos(class_comment.description, '@foreignKey') > 0
+          then class_comment.description
+        end,
+        '\\r?\\n'
+      ) with ordinality as comment_line(line, line_number)
+      cross join lateral (
+        select pg_catalog.regexp_match(
+          pg_catalog.split_part(
+            pg_catalog.substring(
+              comment_line.line,
+              '^[ \\t]*@foreignKey\\s(.*)$'
+            ),
+            '|',
+            1
+          ),
+          '^\\(([^()]+)\\) references ([^().]+)(?:\\.([^().]+))?(?:\\s*\\(([^()]+)\\))?$',
+          'i'
+        ) as parts
+      ) as foreign_key_spec
+      cross join lateral (
+        select
+          pg_catalog.regexp_replace(foreign_key_spec.parts[2], '^\\s+|\\s+$', '', 'g') as first_name,
+          pg_catalog.regexp_replace(foreign_key_spec.parts[3], '^\\s+|\\s+$', '', 'g') as second_name
+      ) as foreign_key_names
+      cross join lateral (
+        select
+          case
+            when foreign_key_names.second_name is null then tagged_class.relnamespace
+            else (
+              select pg_namespace.oid
+              from pg_catalog.pg_namespace
+              where pg_namespace.nspname = ${smartTagIdentifier('foreign_key_names.first_name')}
+            )
+          end as namespace_id,
+          ${smartTagIdentifier('coalesce(foreign_key_names.second_name, foreign_key_names.first_name)')} as relname
+      ) as foreign_key_reference
+      inner join pg_catalog.pg_class as foreign_key_target
+        on foreign_key_target.relnamespace = foreign_key_reference.namespace_id
+        and foreign_key_target.relname = foreign_key_reference.relname
+      where object_closure.object_class = 'pg_catalog.pg_class'::regclass
+        and tagged_class.oid = object_closure.object_id
+        and not exists (
+          select 1
+          from pg_catalog.regexp_split_to_table(
+            class_comment.description,
+            '\\r?\\n'
+          ) with ordinality as earlier_line(line, line_number)
+          where earlier_line.line_number < comment_line.line_number
+            and not (earlier_line.line_number = 1 and earlier_line.line = '')
+            and pg_catalog.regexp_match(
+              earlier_line.line,
+              '^[ \\t]*@[a-zA-Z][a-zA-Z0-9_]*(\\s|$)'
+            ) is null
+        )
+`;
+
 const SCOPED_CTES = `recursive
   requested_schema_names(schema_name) as (
     select distinct requested.schema_name
@@ -141,6 +245,8 @@ const SCOPED_CTES = `recursive
       where object_closure.object_class = 'pg_catalog.pg_class'::regclass
         and pg_inherits.inhrelid = object_closure.object_id
 
+      union all
+${SMART_TAG_FOREIGN_KEY_TARGETS}
       union all
 
       select 'pg_catalog.pg_class'::regclass::oid, constraint_class.oid

@@ -44,7 +44,14 @@ gather: {
 ```
 
 The query follows real PostgreSQL dependencies across schemas automatically;
-there is no dependency-schema allowlist. `capabilityExtensions` records the
+there is no dependency-schema allowlist. It also follows `@foreignKey` smart
+tags in table, view and composite type comments, because graphile-build-pg
+resolves those targets by name and fails the whole build when one is missing.
+Tags are read the way graphile-build-pg reads them, targets in other schemas
+are retained, and their own tags are followed in turn. Smart tags supplied by
+plugins (for example JSON smart tags) and `@interface` polymorphism tags are
+not visible to the query, so their targets must be reachable some other way.
+`capabilityExtensions` records the
 requested extension capability metadata and does not add user schemas to the
 scope. Unknown service names fail validation even when mapped to `false`.
 
