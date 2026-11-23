@@ -2,6 +2,7 @@ import { classifyStatements } from '@pgsql/semantics';
 import { loadModule } from 'plpgsql-parser';
 
 import { sliceStatementBytes, sqlSourceBytes } from '../src/byte-slice';
+import { classifyStatements as classifyPgpmStatements } from '../src/facts';
 import { diffSchemas } from '../src/semantic-diff-driver';
 
 beforeAll(async () => {
@@ -39,6 +40,20 @@ describe('sliceStatementBytes', () => {
     // The em dash (3 bytes / 1 JS char) shifts the byte-offset span two code
     // units past the real start, so the naive slice loses the leading "CO".
     expect(naive.startsWith('COMMENT')).toBe(false);
+  });
+
+  it('slices to the end of the source when the byte length is omitted', () => {
+    const prefix = '-- prefix — 🎉\n';
+    const bytes = sqlSourceBytes(`${prefix}SELECT 1;`);
+    expect(sliceStatementBytes(bytes, Buffer.byteLength(prefix), undefined)).toBe('SELECT 1;');
+  });
+});
+
+describe('classifyStatements byte spans', () => {
+  it.each(['', ';  '])('slices the final statement with suffix %j', suffix => {
+    const sql = `SELECT '🎉'; SELECT 'cafe\u0301'${suffix}`;
+    const { start, len } = classifyPgpmStatements(sql).at(-1)!.span;
+    expect(sliceStatementBytes(sqlSourceBytes(sql), start, len)).toBe("SELECT 'cafe\u0301'");
   });
 });
 

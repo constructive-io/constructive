@@ -191,6 +191,7 @@ export function restructureChanges(
     .map(c => c.deploy.trim())
     .filter(Boolean)
     .join('\n\n');
+  if (!flattened) return { changes: [], warnings: [] };
 
   // `ADD CONSTRAINT .. NOT VALID` cannot be folded into CREATE TABLE (the
   // catalog would validate it), so those statements are held out of the
