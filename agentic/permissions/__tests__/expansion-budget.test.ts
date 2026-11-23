@@ -49,6 +49,13 @@ describe('expansions stay within one budget per command', () => {
     expect(ms).toBeLessThan(1000);
   });
 
+  it('charges the text that xargs -I builds when it puts each line in place of its string', async () => {
+    const { d, ms, heapMb } = await bounded(`printf '%s\\n' ${'a'.repeat(30_000)} | xargs -I@ echo ${'@'.repeat(15_000)}`);
+    expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
+    expect(ms).toBeLessThan(1000);
+    expect(heapMb).toBeLessThan(256);
+  });
+
   it('stops a variable that doubles itself before it builds the value', async () => {
     let command = 'v0=x';
     for (let k = 1; k <= 24; k++) command += `; v${k}=$v${k - 1}$v${k - 1}`;

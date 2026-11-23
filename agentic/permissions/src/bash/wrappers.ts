@@ -7,8 +7,9 @@
 import * as path from 'node:path';
 
 import { type Analyzer, type Arg, type Cwd, literalStart } from './analyze';
-import { generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
+import { builtArg, generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
+import type { ExpansionBudget } from './expand';
 import { hasOption, isOption, readArgs, valuesOf } from './options';
 import { ENV, XARGS } from './programs';
 import { applyEffects, dirSpecOf, movedBy } from './scripts';
@@ -100,19 +101,36 @@ export function xargsItems(text: string, lines: boolean): string[] | null {
   return items;
 }
 
-/** `a` with every `replace` in it put back by the item `w`. */
-function replaced(a: Arg, replace: string, w: Arg): Arg {
+/** `a` with every `replace` in it put back by the item `w`, charged to the budget before it is built. */
+function replaced(a: Arg, replace: string, w: Arg, budget: ExpansionBudget): Arg {
   if (a.kind !== 'known' || !a.text.includes(replace)) return a;
-  if (w.kind === 'known') return { ...a, text: a.text.split(replace).join(w.text) };
-  return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw, splits: false };
+  if (w.kind !== 'known') return { kind: 'unknown', knownPrefix: a.text.slice(0, a.text.indexOf(replace)) + w.knownPrefix, raw: a.raw, splits: false };
+  const parts = a.text.split(replace);
+  return builtArg(budget, a.text.length + (parts.length - 1) * (w.text.length - replace.length), () => parts.join(w.text), a);
 }
 
-/** The runs one list of items makes: one per item with `-I`, else one with the items at the `-J` word or after the other words. */
-function runsOf(rest: readonly Arg[], items: readonly Arg[], input: XargsInput): Arg[][] {
-  const { replace, insert } = input;
-  if (replace !== undefined) return items.map((item) => rest.map((a) => replaced(a, replace, item)));
+/** Without -I: one run with the items at the `-J` word, or after the other words. */
+function placedRun(rest: readonly Arg[], items: readonly Arg[], insert: string | undefined): Arg[] {
   const at = insert === undefined ? -1 : rest.findIndex((a) => a.kind === 'known' && a.text === insert);
-  return [at < 0 ? [...rest, ...items] : [...rest.slice(0, at), ...items, ...rest.slice(at + 1)]];
+  return at < 0 ? [...rest, ...items] : [...rest.slice(0, at), ...items, ...rest.slice(at + 1)];
+}
+
+/**
+ * With -I: one run per distinct item, each word with the item in place of the
+ * string. Each run's words, and the text it builds, are charged; past the
+ * budget no more runs are made, and the analysis is incomplete.
+ */
+function replacedRuns(rest: readonly Arg[], items: readonly Arg[], replace: string, budget: ExpansionBudget): Arg[][] {
+  const seen = new Set<string>();
+  const runs: Arg[][] = [];
+  for (const item of items) {
+    const key = `${item.kind}\u0000${literalStart(item)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (runs.length > 0 && !budget.takeWords(rest.length)) break;
+    runs.push(rest.map((a) => replaced(a, replace, item, budget)));
+  }
+  return runs;
 }
 
 /**
@@ -129,10 +147,15 @@ export function xargsRuns(analyzer: Analyzer, name: string, rest: Arg[], input: 
     if (!NO_OPERANDS.has(name)) analyzer.flag('stdin-operands', `xargs gives ${name} file names from its input, which cannot be checked before it runs`);
     return [rest];
   }
-  if (!analyzer.textBudget.takeWords(lists.reduce((n, list) => n + list.length, 0))) return [rest];
+  const budget = analyzer.textBudget;
+  if (!budget.takeWords(lists.reduce((n, list) => n + list.length, 0))) return [rest];
+  if (input.replace !== undefined) {
+    const runs = replacedRuns(rest, lists.flat(), input.replace, budget);
+    return runs.length > 0 ? runs : [rest];
+  }
   const runs = new Map<string, Arg[]>();
-  for (const list of lists) for (const run of runsOf(rest, list, input)) runs.set(JSON.stringify(run.map(literalStart)), run);
-  return runs.size > 0 ? [...runs.values()] : [rest];
+  for (const list of lists) runs.set(list.map(literalStart).join('\u0000'), placedRun(rest, list, input.insert));
+  return [...runs.values()];
 }
 
 /** The items of each text, or `null` when one has an unmatched quote. */

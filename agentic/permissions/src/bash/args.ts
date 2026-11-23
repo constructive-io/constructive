@@ -2,6 +2,7 @@
 
 import type { Access } from '../types';
 import { type Analyzer, type Arg, type KnownArg, literalStart } from './analyze';
+import type { ExpansionBudget } from './expand';
 import { mayBeOption } from './options';
 import { isPathLike, isUrl } from './words';
 
@@ -16,6 +17,17 @@ export interface CommandContext {
 /** An argument the analyzer made up itself (`.` for a default root): fully known, no glob. */
 export function literalArg(text: string, raw: string = text): KnownArg {
   return { kind: 'known', text, raw, glob: false };
+}
+
+/**
+ * An argument the analysis builds from other text, whose size can grow past
+ * the command's own (`xargs -I` puts each line in each word): `length` is
+ * charged to the budget before `build` runs, and past the budget the
+ * argument is one the analysis cannot see.
+ */
+export function builtArg(budget: ExpansionBudget, length: number, build: () => string, like: Arg): Arg {
+  if (!budget.takeChars(length)) return { kind: 'unknown', knownPrefix: '', raw: like.raw, splits: false };
+  return { kind: 'known', text: build(), raw: like.raw, glob: like.kind === 'known' && like.glob };
 }
 
 /** The argument may name a path: its literal start, or for an unknown one its spelling, looks like one. */
