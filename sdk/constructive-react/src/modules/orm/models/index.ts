@@ -64,6 +64,7 @@ export { PagesModuleModel } from './pagesModule';
 export { PhoneNumbersModuleModel } from './phoneNumbersModule';
 export { PlansModuleModel } from './plansModule';
 export { PrincipalAuthModuleModel } from './principalAuthModule';
+export { PrincipalsModuleModel } from './principalsModule';
 export { ProfilesModuleModel } from './profilesModule';
 export { RateLimitMetersModuleModel } from './rateLimitMetersModule';
 export { RateLimitsModuleModel } from './rateLimitsModule';

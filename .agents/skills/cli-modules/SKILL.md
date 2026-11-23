@@ -1,13 +1,13 @@
 ---
 name: cli-modules
-description: CLI tool (csdk) for the modules API — provides CRUD commands for 88 tables and 3 custom operations
+description: CLI tool (csdk) for the modules API — provides CRUD commands for 89 tables and 3 custom operations
 ---
 
 # cli-modules
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the modules API — provides CRUD commands for 88 tables and 3 custom operations
+CLI tool (csdk) for the modules API — provides CRUD commands for 89 tables and 3 custom operations
 
 ## Usage
 
@@ -117,6 +117,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [phone-numbers-module](references/phone-numbers-module.md)
 - [plans-module](references/plans-module.md)
 - [principal-auth-module](references/principal-auth-module.md)
+- [principals-module](references/principals-module.md)
 - [profiles-module](references/profiles-module.md)
 - [rate-limit-meters-module](references/rate-limit-meters-module.md)
 - [rate-limits-module](references/rate-limits-module.md)

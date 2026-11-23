@@ -605,6 +605,15 @@ export const principalAuthModuleMutationKeys = {
   /** Delete principalAuthModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'principalauthmodule', 'delete', id] as const,
 } as const;
+export const principalsModuleMutationKeys = {
+  /** All principalsModule mutation keys */ all: ['mutation', 'principalsmodule'] as const,
+  /** Create principalsModule mutation key */ create: () =>
+    ['mutation', 'principalsmodule', 'create'] as const,
+  /** Update principalsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'principalsmodule', 'update', id] as const,
+  /** Delete principalsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'principalsmodule', 'delete', id] as const,
+} as const;
 export const profilesModuleMutationKeys = {
   /** All profilesModule mutation keys */ all: ['mutation', 'profilesmodule'] as const,
   /** Create profilesModule mutation key */ create: () =>
@@ -962,6 +971,7 @@ export const mutationKeys = {
   phoneNumbersModule: phoneNumbersModuleMutationKeys,
   plansModule: plansModuleMutationKeys,
   principalAuthModule: principalAuthModuleMutationKeys,
+  principalsModule: principalsModuleMutationKeys,
   profilesModule: profilesModuleMutationKeys,
   rateLimitMetersModule: rateLimitMetersModuleMutationKeys,
   rateLimitsModule: rateLimitsModuleMutationKeys,

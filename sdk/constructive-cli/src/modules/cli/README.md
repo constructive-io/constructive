@@ -87,6 +87,7 @@ csdk auth set-token <your-token>
 | `phone-numbers-module` | phoneNumbersModule CRUD operations |
 | `plans-module` | plansModule CRUD operations |
 | `principal-auth-module` | principalAuthModule CRUD operations |
+| `principals-module` | principalsModule CRUD operations |
 | `profiles-module` | profilesModule CRUD operations |
 | `rate-limit-meters-module` | rateLimitMetersModule CRUD operations |
 | `rate-limits-module` | rateLimitsModule CRUD operations |
@@ -2706,6 +2707,41 @@ CRUD operations for PrincipalAuthModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `apiName`, `auditsTableId`, `createOrgApiKeyFunction`, `createOrgPrincipalFunction`, `createPrincipalFunction`, `deleteOrgPrincipalFunction`, `deletePrincipalFunction`, `principalEntitiesTableId`, `principalScopeOverridesTableId`, `principalsTableId`, `principalsTableName`, `privateSchemaId`, `revokeOrgApiKeyFunction`, `schemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `sweepExpiredPrincipalsFunction`, `usersTableId`
+
+### `principals-module`
+
+CRUD operations for PrincipalsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all principalsModule records |
+| `find-first` | Find first matching principalsModule record |
+| `get` | Get a principalsModule by id |
+| `create` | Create a new principalsModule |
+| `update` | Update an existing principalsModule |
+| `delete` | Delete a principalsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `createOrgPrincipalFunction` | String |
+| `createPrincipalFunction` | String |
+| `databaseId` | UUID |
+| `deleteOrgPrincipalFunction` | String |
+| `deletePrincipalFunction` | String |
+| `id` | UUID |
+| `principalEntitiesTableId` | UUID |
+| `principalScopeOverridesTableId` | UUID |
+| `principalsTableId` | UUID |
+| `principalsTableName` | String |
+| `privateSchemaId` | UUID |
+| `schemaId` | UUID |
+| `sweepExpiredPrincipalsFunction` | String |
+| `usersTableId` | UUID |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `createOrgPrincipalFunction`, `createPrincipalFunction`, `deleteOrgPrincipalFunction`, `deletePrincipalFunction`, `principalEntitiesTableId`, `principalScopeOverridesTableId`, `principalsTableId`, `principalsTableName`, `privateSchemaId`, `schemaId`, `sweepExpiredPrincipalsFunction`, `usersTableId`
 
 ### `profiles-module`
 

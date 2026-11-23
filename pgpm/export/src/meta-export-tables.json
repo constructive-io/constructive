@@ -322,6 +322,11 @@
       "table": "principal_auth_module"
     },
     {
+      "key": "principals_module",
+      "schema": "metaschema_modules_public",
+      "table": "principals_module"
+    },
+    {
       "key": "profiles_module",
       "schema": "metaschema_modules_public",
       "table": "profiles_module"
