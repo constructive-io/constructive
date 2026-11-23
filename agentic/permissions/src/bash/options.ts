@@ -251,7 +251,7 @@ export function operandEffects(spec: ProgramSpec, words: readonly string[]): Eff
 }
 
 /** The option has the effect for its value: always, or for a value that matches `when`, or one the analysis cannot know. */
-function hasEffect(s: OptionSpec, effect: Effect, value: Arg | undefined): boolean {
+export function hasEffect(s: OptionSpec, effect: Effect, value: Arg | undefined): boolean {
   if (s.effect !== effect) return false;
   return !s.when || value === undefined || value.kind === 'unknown' || s.when.test(value.text);
 }

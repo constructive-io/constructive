@@ -138,8 +138,9 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   for (const option of global.options) {
     const v = option.value;
     if (isOption(option, '-C')) {
+      // Each -C is read from the dir the one before it names.
+      if (v) analyzer.within(cwd ?? analyzer.cwdNow, () => analyzer.addPath(v, 'read', true));
       cwd = v?.kind === 'known' ? analyzer.dirAt(v.text, cwd ?? undefined) : { kind: 'unknown' };
-      if (v) analyzer.addPath(v, 'read', true);
     } else if (isOption(option, '-c')) {
       configKey(ctx, 'git -c', v);
       const repointed = v?.kind === 'known' ? GIT_REMOTE_URL_CONFIG.exec(v.text) : null;
@@ -148,7 +149,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
       if (v?.kind === 'unknown') analyzer.dynamic(`git --config-env ${v.raw} takes a config key from a variable`);
       else if (v && GIT_EXEC_CONFIG.test(v.text)) analyzer.dynamic(`git --config-env ${v.text} makes git run a program from the environment`);
     } else if (isOption(option, '--git-dir', '--work-tree')) {
-      if (v) analyzer.addPath(v, 'read', true);
+      if (v) analyzer.within(cwd ?? analyzer.cwdNow, () => analyzer.addPath(v, 'read', true));
     } else if (isOption(option, '--exec-path')) {
       analyzer.dynamic('git --exec-path changes which programs git runs');
     }

@@ -330,6 +330,7 @@ export const TAR: ProgramSpec = sub(
   { names: ['--checkpoint-action'], value: 'required', effect: 'runs-program', when: /^exec=/, shell: /^exec=([\s\S]*)$/ },
   does('reads-file', 'required', '-T', '--files-from', '-X', '--exclude-from'),
   does('changes-dir', 'required', '-C', '--directory'),
+  flag('-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete', '-x', '--extract', '--get', '-t', '--list', '-d', '--diff', '--compare'),
   value('-f', '--file', '-b', '--blocking-factor', '-H', '--format', '-K', '-N', '-L', '-V', '--exclude', '--transform', '--owner', '--group', '--mode', '--mtime')
 );
 

@@ -370,6 +370,11 @@ class Analyzer implements ExpansionScope {
     this.moveTo(next);
   }
 
+  /** The shell's working dir at this point of the command. */
+  get cwdNow(): Cwd {
+    return this.cwd;
+  }
+
   /** `git -C dir`: run `fn` with the shell in `dir`, then move back. */
   within<T>(dir: Cwd, fn: () => T): T {
     const outer = this.cwd;

@@ -7,32 +7,75 @@
  * denied like any other; code it cannot read raises `shell-dynamic`.
  */
 
-import type { Arg } from './analyze';
-import { type CommandContext, generic, literalArg, restOf } from './args';
-import { effectsOf, hasOption, isOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf, withEffect } from './options';
+import { unreachable } from '../unreachable';
+import type { Arg, Cwd } from './analyze';
+import { type CommandContext, generic, literalArg, operands, restOf, textOf } from './args';
+import { effectsOf, hasEffect, hasOption, isOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf } from './options';
 import { MAN, SORT, TAR, type TextProgram, ZIP } from './programs';
 
+/** A dir the program moves to: the option that moves it, and the dir it is in from there on. */
+export interface DirChange {
+  readonly at: Arg;
+  readonly dir: Cwd;
+}
+
 /**
- * What the read options do: a program they run (its shell command read as
- * bash where the spec captures one), files they read or write, and an argument
- * from a variable, which may be any option the program takes.
+ * What the read options do, in order: a program they run (its shell command
+ * read as bash where the spec captures one), files they read or write, and
+ * the dir they move the program to, each resolved from the one before. An
+ * argument from a variable may be any option the program takes. Returns the
+ * dir changes, for the operands after them.
  */
-export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpec, read: ReadArgs): void {
+export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpec, read: ReadArgs): DirChange[] {
   const { analyzer } = ctx;
-  for (const option of withEffect(read, 'runs-program')) {
-    const commands = shellCommands(option);
-    if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program or code the analysis does not read`);
-    for (const command of commands) analyzer.nested(command, `it runs ${name} ${option.name}, which runs a shell command`);
+  const changes: DirChange[] = [];
+  const dir = (): Cwd | undefined => changes[changes.length - 1]?.dir;
+  for (const option of read.options) {
+    const { value } = option;
+    for (const s of option.specs) {
+      if (!s.effect || !hasEffect(s, s.effect, value)) continue;
+      switch (s.effect) {
+      case 'runs-program': {
+        const commands = shellCommands(option);
+        if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program or code the analysis does not read`);
+        for (const command of commands) analyzer.nested(command, `it runs ${name} ${option.name}, which runs a shell command`);
+        break;
+      }
+      case 'reads-file':
+        if (value) analyzer.addPath(value, 'read', true);
+        break;
+      case 'writes-file':
+        if (value) analyzer.addPath(value, 'write', true);
+        break;
+      case 'changes-dir':
+        if (!value) break;
+        analyzer.within(dir() ?? analyzer.cwdNow, () => analyzer.addPath(value, 'read', true));
+        changes.push({ at: option.arg, dir: value.kind === 'known' ? analyzer.dirAt(value.text, dir()) : { kind: 'unknown' } });
+        break;
+      // git, ssh and the prefix guard read these themselves.
+      case 'sets-config':
+      case 'sends-to':
+      case 'rewrites-history':
+        break;
+      default:
+        return unreachable(s.effect);
+      }
+    }
   }
-  for (const option of withEffect(read, 'reads-file')) if (option.value) analyzer.addPath(option.value, 'read', true);
-  for (const option of withEffect(read, 'writes-file')) if (option.value) analyzer.addPath(option.value, 'write', true);
   const hidden = read.unknown[0];
-  if (!hidden) return;
+  if (!hidden) return changes;
   const could = effectsOf(spec, { ...read, options: [] });
   if (could.has('runs-program')) analyzer.dynamic(`it passes ${name} ${hidden.raw}, a value from a variable that may be an option that runs a program`);
   if (could.has('reads-file') || could.has('writes-file')) {
     analyzer.unresolvable(`it passes ${name} ${hidden.raw}, a value from a variable that may be an option naming a file the analysis cannot place`);
   }
+  if (could.has('changes-dir')) changes.push({ at: hidden, dir: { kind: 'unknown' } });
+  return changes;
+}
+
+/** The dir the program is in after all its dir changes, or `null` when it does not move. */
+export function finalDir(changes: readonly DirChange[]): Cwd | null {
+  return changes[changes.length - 1]?.dir ?? null;
 }
 
 /** The text a program runs in its command language: a shell command it shows is read as bash, other code asks. */
@@ -57,7 +100,7 @@ function runsInstead(read: ReadArgs, unless: readonly string[], operandText: boo
 export function textProgram(name: string, program: TextProgram, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   const read = readArgs(program.spec, rest);
-  applyEffects(ctx, name, program.spec, read);
+  const dir = finalDir(applyEffects(ctx, name, program.spec, read));
   const texts: { arg: Arg; where: string }[] = valuesOf(read, ...program.textOptions).map((arg) => ({ arg, where: 'in an option' }));
   const plus = (a: Arg) => program.plusText === true && (a.kind === 'known' ? a.text : a.knownPrefix).startsWith('+');
   for (const op of read.operands) if (plus(op)) texts.push({ arg: restOf(op, 1), where: 'in an argument' });
@@ -70,7 +113,7 @@ export function textProgram(name: string, program: TextProgram, ctx: CommandCont
     if (input !== null) for (const text of new Set(input)) runText(ctx, name, program, literalArg(text), 'on its input');
     else if (!file) analyzer.dynamic(`it feeds ${name} commands from input the analysis cannot see`);
   }
-  generic(ctx, operands.slice(0, textFrom));
+  analyzer.within(dir ?? analyzer.cwdNow, () => generic(ctx, operands.slice(0, textFrom)));
 }
 
 /**
@@ -90,16 +133,35 @@ function tarWords(rest: readonly Arg[]): Arg[] {
   return [...words, ...values];
 }
 
+/**
+ * tar: the mode sets the archive's access (create, append and update write
+ * it), a member it adds is read from the dir the `-C` before it names, and an
+ * extraction writes into the dir the last `-C` names.
+ */
 export function tar(ctx: CommandContext, rest: readonly Arg[]): void {
-  const read = readArgs(TAR, tarWords(rest));
-  applyEffects(ctx, 'tar', TAR, read);
-  generic(ctx, [...valuesOf(read, '-f', '--file'), ...read.operands]);
+  const { analyzer } = ctx;
+  const words = tarWords(rest);
+  const read = readArgs(TAR, words);
+  const changes = applyEffects(ctx, 'tar', TAR, read);
+  const writes = hasOption(read, '-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete');
+  for (const archive of valuesOf(read, '-f', '--file')) if (textOf(archive) !== '-') analyzer.addPath(archive, writes ? 'write' : 'read', true);
+  const at = (arg: Arg) => words.indexOf(arg);
+  const dirBefore = (arg: Arg): Cwd => changes.filter((c) => at(c.at) < at(arg)).pop()?.dir ?? analyzer.cwdNow;
+  if (hasOption(read, '-x', '--extract', '--get')) {
+    analyzer.within(finalDir(changes) ?? analyzer.cwdNow, () => analyzer.addPath(literalArg('.'), 'write', true));
+    return;
+  }
+  if (!writes) return;
+  for (const member of read.positionals) analyzer.within(dirBefore(member), () => operands(ctx, [member], 'read'));
 }
 
+/** zip: its first operand is the archive it writes, the rest are files it reads. */
 export function zip(ctx: CommandContext, rest: readonly Arg[]): void {
   const read = readArgs(ZIP, rest);
   applyEffects(ctx, 'zip', ZIP, read);
-  generic(ctx, read.operands);
+  const [archive, ...members] = read.positionals;
+  if (archive) ctx.analyzer.addPath(archive, 'write', true);
+  operands(ctx, members, 'read');
 }
 
 /** sort reads its operands; one from a variable is a path, as for any reader. */

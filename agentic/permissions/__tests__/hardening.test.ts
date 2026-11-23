@@ -121,7 +121,17 @@ const rows: Row[] = [
   ['defaults -container com.x write com.x k v', 'ask', 'allow', 'persistence'],
   ['echo ~/.ssh >/dev/null; env --chdir=$_ cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
   ['git config --file ~/.aws/credentials --list', 'deny', 'deny', 'hard-deny'],
-  ['git config --file ~/.aws/credentials --get x.y', 'deny', 'deny', 'hard-deny']
+  ['git config --file ~/.aws/credentials --get x.y', 'deny', 'deny', 'hard-deny'],
+  // 14. option effects in one switch: a dir change moves the paths after it, and the archive mode sets the archive's access
+  ['tar -xf p.tar -C .pi', 'deny', 'deny'],
+  ['tar -x -f p.tar --directory=.pi', 'deny', 'deny'],
+  ['tar -xf p.tar -C .git/hooks', 'ask', 'allow', 'ask-write'],
+  ['tar cf .pi/ext.js src', 'deny', 'deny'],
+  ['zip -r .pi/x.zip src', 'deny', 'deny'],
+  ['tar -C ~/.ssh -cf out.tar id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['tar -C ~ -C .ssh -cf out.tar id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['git -C ~ -C .ssh status', 'deny', 'deny', 'hard-deny'],
+  ['git -C ~ --git-dir=.ssh status', 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {
