@@ -42,10 +42,10 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
         break;
       }
       case 'reads-file':
-        if (value) analyzer.addPath(value, 'read', true);
+        if (value && !(s.stdio && textOf(value) === '-')) analyzer.addPath(value, 'read', true);
         break;
       case 'writes-file':
-        if (value) analyzer.addPath(value, 'write', true);
+        if (value && !(s.stdio && textOf(value) === '-')) analyzer.addPath(value, 'write', true);
         break;
       case 'changes-dir':
         if (!value) break;

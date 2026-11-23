@@ -38,6 +38,8 @@ export interface OptionSpec {
   readonly when?: RegExp;
   /** Captures, in group 1, the shell command the value runs, which the analysis reads as bash. */
   readonly shell?: RegExp;
+  /** The value `-` is stdin or stdout, not a file of that name (`curl -o -`, `psql -f -`). */
+  readonly stdio?: true;
 }
 
 /** An operand with an effect: an action word in first place (`reflog expire`), or a prefix any operand starts with (`+main`). */
@@ -83,11 +85,12 @@ export interface ReadArgs {
 }
 
 /**
- * An argument from a variable that may be an option: its text does not start
- * with a literal, or an unquoted value in it may split off a word of its own.
+ * An argument from a variable that may be an option: what it certainly starts
+ * with, after quote removal, is not plain text (`"$X"`, `--$X`), or an
+ * unquoted value in it may split off a word of its own.
  */
 export function mayBeOption(arg: Arg): boolean {
-  return arg.kind === 'unknown' && (arg.splits || !/^[\w./]/.test(arg.raw));
+  return arg.kind === 'unknown' && (arg.splits || !/^[\w./]/.test(arg.knownPrefix));
 }
 
 /** The options a written name can be: their full spellings, and the specs that describe them. */

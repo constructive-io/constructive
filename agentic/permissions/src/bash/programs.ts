@@ -316,22 +316,40 @@ export const ENV: ProgramSpec = {
   stopAtOperand: true
 };
 
-/** curl's options that take a value. curl reads options by their exact name. */
+/** A file option whose value `-` is stdin or stdout. */
+const stdio = (spec: OptionSpec): OptionSpec => ({ ...spec, stdio: true });
+
+/**
+ * curl's options that take a value, and the files they read and write. curl
+ * reads options by their exact name. The data forms (`-d @file`, `-F
+ * name=@file`, `-H @file`) and `-T` are uploads, which `curl` reads itself.
+ */
 export const CURL: ProgramSpec = {
   abbreviations: false,
   stopAtOperand: false,
   options: [
-    value('-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--data-urlencode', '--json', '-F', '--form', '--form-string', '-T', '--upload-file', '-H', '--header', '-K', '--config'),
-    value('-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header', '--output-dir', '-E', '--cert', '--key', '--cacert', '--capath', '-b', '--cookie', '--url'),
-    value('--trace', '--trace-ascii', '--stderr', '--libcurl', '--etag-save', '--etag-compare', '--hsts', '--alt-svc', '--netrc-file', '-Q', '--quote', '-t', '--telnet-option', '-P', '--ftp-port', '--unix-socket', '--noproxy', '--mail-from', '--mail-rcpt', '--cert-type', '--key-type', '--ciphers', '--pass', '--aws-sigv4', '--variable'),
+    value('-d', '--data', '--data-binary', '--data-raw', '--data-ascii', '--data-urlencode', '--json', '-F', '--form', '--form-string', '-H', '--header', '--url'),
+    // `-T -` and `-T .` upload stdin.
+    { names: ['-T', '--upload-file'], value: 'required', effect: 'reads-file', when: /^(?!-$|\.$)/ },
+    stdio(does('reads-file', 'required', '-K', '--config')),
+    stdio(does('writes-file', 'required', '-o', '--output', '-c', '--cookie-jar', '-D', '--dump-header', '--trace', '--trace-ascii', '--stderr', '--libcurl', '--etag-save', '--hsts', '--alt-svc')),
+    does('writes-file', 'required', '--output-dir'),
+    does('reads-file', 'required', '--netrc-file', '--etag-compare', '-E', '--cert', '--key', '--cacert', '--capath'),
+    // A `-b` value with no `=` names a cookie file.
+    { names: ['-b', '--cookie'], value: 'required', effect: 'reads-file', when: /^[^=]*$/ },
+    value('-Q', '--quote', '-t', '--telnet-option', '-P', '--ftp-port', '--unix-socket', '--noproxy', '--mail-from', '--mail-rcpt', '--cert-type', '--key-type', '--ciphers', '--pass', '--aws-sigv4', '--variable'),
     value('-X', '--request', '-u', '--user', '-A', '--user-agent', '-e', '--referer', '-r', '--range', '-m', '--max-time', '--connect-timeout', '--retry', '--resolve', '-w', '--write-out', '-x', '--proxy', '-U', '--proxy-user', '-z', '--time-cond', '-Y', '--speed-limit', '-y', '--speed-time', '-C', '--continue-at', '--limit-rate', '--max-filesize', '--interface', '--dns-servers', '--connect-to', '--oauth2-bearer')
   ]
 };
 
-/** wget's options that take a value. */
+/** wget's options that take a value, and the files they read and write. `--post-file` and `--body-file` are uploads, which `wget` reads itself. */
 export const WGET = tool(
-  value('-O', '--output-document', '-o', '--output-file', '-a', '--append-output', '-P', '--directory-prefix', '-i', '--input-file', '--post-file', '--body-file', '--post-data', '--body-data'),
-  value('-U', '--user-agent', '--header', '-t', '--tries', '-T', '--timeout', '-w', '--wait', '-Q', '--quota', '-l', '--level', '-A', '--accept', '-R', '--reject', '-D', '--domains', '-e', '--execute', '--user', '--password', '--method', '--referer', '--limit-rate', '--load-cookies', '--save-cookies')
+  stdio(does('writes-file', 'required', '-O', '--output-document')),
+  does('writes-file', 'required', '-o', '--output-file', '-a', '--append-output', '-P', '--directory-prefix', '--save-cookies'),
+  stdio(does('reads-file', 'required', '-i', '--input-file')),
+  does('reads-file', 'required', '--post-file', '--body-file', '--load-cookies'),
+  value('--post-data', '--body-data', '-U', '--user-agent', '--header', '-t', '--tries', '-T', '--timeout', '-w', '--wait', '-Q', '--quota', '-l', '--level', '-A', '--accept', '-R', '--reject', '-D', '--domains', '-e', '--execute'),
+  value('--user', '--password', '--method', '--referer', '--limit-rate')
 );
 
 /** tar: the options that run a program or a shell command, and the ones that take a value. */
@@ -437,7 +455,7 @@ const PSQL: TextProgram = {
     { names: ['-o', '--output'], value: 'required', effect: 'runs-program', when: /^\|/, shell: /^\|([\s\S]*)$/ },
     { names: ['-o', '--output'], value: 'required', effect: 'writes-file', when: /^(?!\|)/ },
     does('writes-file', 'required', '-L', '--log-file'),
-    does('reads-file', 'required', '-f', '--file'),
+    stdio(does('reads-file', 'required', '-f', '--file')),
     value('-c', '--command', '-d', '--dbname', '-h', '--host', '-p', '--port', '-U', '--username', '-v', '--set', '--variable'),
     value('-P', '--pset', '-F', '--field-separator', '-R', '--record-separator', '-T', '--table-attr')
   ),
