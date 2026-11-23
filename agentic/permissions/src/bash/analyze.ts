@@ -146,12 +146,44 @@ interface Trap {
   vars: Variables;
 }
 
-/** A subshell open where the analysis is: the variables and dir it started with, and the traps set in it, which run when it ends. */
+/**
+ * One shell as the command runs in it: its variables and dir, its traps by
+ * condition, the names a trap that may run before any later command assigns
+ * (unknown wherever they are read after it is set), and whether such a trap
+ * moves the shell, so no later relative path is known. A subshell and a child
+ * shell start from a copy; `eval` and a trap's action run in the state itself.
+ */
+class ShellState {
+  constructor(
+    public vars: Variables,
+    public cwd: Cwd,
+    readonly traps: Map<string, Trap> = new Map(),
+    readonly trapAssigns: Set<string> = new Set(),
+    public trapMovesDir = false
+  ) {}
+
+  /** What a subshell or a child shell starts with. bash resets the traps it caught there; a name a trap may assign stays unknown. */
+  copy(): ShellState {
+    return new ShellState(this.vars.copy(), this.cwd, new Map(), new Set(this.trapAssigns), this.trapMovesDir);
+  }
+
+  /** The same shell with its variables and dir copied, to read an action in and throw away. */
+  scratch(): ShellState {
+    return new ShellState(this.vars.copy(), this.cwd, this.traps, this.trapAssigns, this.trapMovesDir);
+  }
+}
+
+/** A subshell open where the analysis is, and the state of the shell around it, which is the state again when it ends. */
 interface Frame {
   subshell: Subshell;
-  vars: Variables;
-  cwd: Cwd;
-  traps: Trap[];
+  outer: ShellState;
+}
+
+/** The key bash keeps a trap's condition under: it reads `EXIT`, `exit`, `SIGEXIT` and `0` as one; `null` for one from a variable. */
+function trapKey(condition: Arg): string | null {
+  if (condition.kind === 'unknown') return null;
+  const name = condition.text.toUpperCase().replace(/^SIG/, '');
+  return name === '0' ? 'EXIT' : name;
 }
 
 /** How a shell string runs: `inherits` the stdin of the command that runs it, and `shared`, in the current shell (`eval`, a trap). */
@@ -300,10 +332,8 @@ class Analyzer implements ExpansionScope {
   stdin: Stdin = NO_INPUT;
   /** What a command reads when no pipe or redirection sets its stdin: nothing at the top, and in a shell string what its runner gave it. */
   inheritedStdin: Stdin = NO_INPUT;
-  /** Shell variables as the command has set them so far. */
-  vars = new Variables((name) => this.outsideValue(name));
-  /** The shell's working dir at this point of the command. */
-  private cwd: Cwd = { kind: 'start' };
+  /** The shell the analysis is in at this point of the command. */
+  private state = new ShellState(new Variables((name) => this.outsideValue(name)), { kind: 'start' });
   /** Some command ran, or the shell moved, outside the start dir. */
   private leftStart = false;
   /** What the expansions of this command may still build. */
@@ -312,14 +342,10 @@ class Analyzer implements ExpansionScope {
   private scope: CommandScope | null = null;
   /** The subshells open in the shell string being analyzed, outermost first. */
   private frames: Frame[] = [];
-  /** The traps set in the shell the analysis is in, outside any subshell. */
-  private traps: Trap[] = [];
-  /** Names a trap that may run before any later command assigns: unknown wherever they are read after it is set. */
-  private readonly trapAssigns = new Set<string>();
-  /** A trap that may run before any later command moves the shell, so no later relative path is known. */
-  private trapMovesDir = false;
   /** Names unknown to the trap action being read at the end: the command assigned them after the trap was set. */
   private trapUnknown: ReadonlySet<string> | null = null;
+  /** How many traps on a condition from a variable were set, which no later trap command replaces. */
+  private unknownConditions = 0;
   /** The command mentions `lastpipe`, which runs a pipeline's last element in the shell itself. */
   lastpipe = false;
 
@@ -362,15 +388,11 @@ class Analyzer implements ExpansionScope {
 
   /** `cd dir` looks `dir` up in `CDPATH` when the command set it and `dir` is not `/…`, `./…` or `../…`. */
   searchesCdPath(dir: string): boolean {
-    return this.vars.touched('CDPATH') && this.vars.get('CDPATH') !== undefined && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
+    return this.state.vars.touched('CDPATH') && this.state.vars.get('CDPATH') !== undefined && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
   }
 
-  /**
-   * Analyze one shell string. Returns what it lexed to, or `null` when it was
-   * not lexed. A `shared` string runs in the current shell (`eval`), so the
-   * traps it sets are the shell's.
-   */
-  analyzeString(command: string, shared = false): Lexed | null {
+  /** Analyze one shell string in the shell the analysis is in. Returns what it lexed to, or `null` when it was not lexed. */
+  analyzeString(command: string): Lexed | null {
     if (this.depth > MAX_SHELL_STRING_DEPTH) {
       this.incomplete('shell-string-depth');
       return null;
@@ -385,19 +407,27 @@ class Analyzer implements ExpansionScope {
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const limit of lexed.limits) this.incomplete(limit);
     const outerFrames = this.frames;
-    const outerTraps = this.traps;
-    if (shared) this.traps = this.trapList();
-    else this.traps = [];
     this.frames = [];
     for (const cmd of lexed.commands) {
       this.enterSubshells(cmd.subshells);
       this.analyzeCommand(cmd);
     }
     this.enterSubshells([]);
-    if (!shared) this.endTraps(this.traps);
     this.frames = outerFrames;
-    this.traps = outerTraps;
     return lexed;
+  }
+
+  /** The shell the analysis is in exits, so the traps set in it run. */
+  exitShell(): void {
+    for (const trap of [...this.state.traps.values()]) {
+      const outer = this.state;
+      this.state = outer.scratch();
+      // A trap that may have run earlier does not know a name assigned after it was set.
+      this.trapUnknown = trap.anytime ? new Set(outer.vars.changedFrom(trap.vars)) : null;
+      this.nested(trap.text, null, { shared: true });
+      this.trapUnknown = null;
+      this.state = outer;
+    }
   }
 
   /** Leave the open subshells `chain` does not hold, innermost first, and open the ones it adds, outermost first. */
@@ -405,68 +435,63 @@ class Analyzer implements ExpansionScope {
     let keep = 0;
     while (keep < this.frames.length && this.frames[keep].subshell === chain[keep]) keep++;
     while (this.frames.length > keep) this.leaveSubshell(this.frames.pop());
-    for (const subshell of chain.slice(keep)) this.frames.push({ subshell, vars: this.vars.copy(), cwd: this.cwd, traps: [] });
+    for (const subshell of chain.slice(keep)) {
+      this.frames.push({ subshell, outer: this.state });
+      this.state = this.state.copy();
+    }
   }
 
   /**
-   * A subshell ends: its traps run, then the shell's variables and dir are
-   * what they were when it started. Under `lastpipe` the last element of a
-   * pipeline ran in the shell itself, so a name it changed holds either value
-   * and a dir it moved to is unknown.
+   * A subshell ends: its traps run, and the shell around it is as it was.
+   * Under `lastpipe` the last element of a pipeline ran in the shell itself,
+   * so a name it changed holds either value, a dir it moved to is unknown,
+   * and the traps it set and their effects are the shell's.
    */
   private leaveSubshell(frame: Frame): void {
-    this.endTraps(frame.traps);
-    if (frame.subshell.lastElement && this.lastpipe) {
-      for (const name of this.vars.changedFrom(frame.vars)) frame.vars.either(name, frame.vars.record(name));
-      if (!sameCwd(this.cwd, frame.cwd)) this.cwd = { kind: 'unknown' };
-    } else {
-      this.cwd = frame.cwd;
-    }
-    this.vars = frame.vars;
-  }
-
-  /** The traps of the shell or subshell the analysis is in. */
-  private trapList(): Trap[] {
-    return this.frames[this.frames.length - 1]?.traps ?? this.traps;
+    this.exitShell();
+    const inner = this.state;
+    const { outer } = frame;
+    this.state = outer;
+    if (!frame.subshell.lastElement || !this.lastpipe) return;
+    for (const name of inner.vars.changedFrom(outer.vars)) outer.vars.either(name, outer.vars.record(name));
+    if (!sameCwd(inner.cwd, outer.cwd)) outer.cwd = { kind: 'unknown' };
+    for (const [key, trap] of inner.traps) outer.traps.set(key, trap);
+    for (const name of inner.trapAssigns) outer.trapAssigns.add(name);
+    outer.trapMovesDir ||= inner.trapMovesDir;
   }
 
   /**
-   * `trap ACTION CONDITION…`: the shell runs the action later, in itself. It
-   * is read here, in the shell as it is now, and again when its shell ends.
-   * One that may run before any later command (`anytime`) leaves each name it
-   * assigns unknown for the rest of the command, and the dir unknown when it
-   * moves it.
+   * `trap ACTION CONDITION…`: the shell keeps the action for each condition,
+   * in place of the one it had, and runs it later, in itself. It is read
+   * here, in the shell as it is now, and again when the shell exits. One that
+   * may run before any later command (any condition but `EXIT`) leaves each
+   * name it assigns unknown for the rest of the command, and the dir unknown
+   * when it moves it.
    */
-  trapAction(text: string, anytime: boolean): void {
-    const trap: Trap = { text, anytime, vars: this.vars.copy() };
-    this.trapList().push(trap);
-    const vars = this.vars.copy();
-    const cwd = this.cwd;
+  setTrap(text: string, conditions: readonly Arg[]): void {
+    const keys = conditions.map(trapKey);
+    const vars = this.state.vars.copy();
+    for (const key of keys) this.state.traps.set(key ?? `\u0000${this.unknownConditions++}`, { text, anytime: key !== 'EXIT', vars });
+    const outer = this.state;
+    const read = outer.scratch();
+    this.state = read;
     this.nested(text, null, { shared: true });
-    if (anytime) {
-      for (const name of this.vars.changedFrom(vars)) this.trapAssigns.add(name);
-      if (!sameCwd(this.cwd, cwd)) this.trapMovesDir = true;
-    }
-    this.vars = vars;
-    this.cwd = cwd;
+    this.state = outer;
+    if (keys.every((k) => k === 'EXIT')) return;
+    for (const name of read.vars.changedFrom(outer.vars)) outer.trapAssigns.add(name);
+    outer.trapMovesDir ||= read.trapMovesDir || !sameCwd(read.cwd, outer.cwd);
   }
 
-  /** The traps of a shell or subshell that ends, read in its state there; one that may have run earlier does not know a name assigned after it was set. */
-  private endTraps(traps: readonly Trap[]): void {
-    for (const trap of [...traps]) {
-      const vars = this.vars.copy();
-      const cwd = this.cwd;
-      this.trapUnknown = trap.anytime ? new Set(this.vars.changedFrom(trap.vars)) : null;
-      this.nested(trap.text, null, { shared: true });
-      this.trapUnknown = null;
-      this.vars = vars;
-      this.cwd = cwd;
-    }
+  /** A trap reset (`trap - INT`) or ignore (`trap '' INT`): no action runs on those conditions. One from a variable may be any, so it removes none. */
+  resetTraps(conditions: readonly Arg[]): void {
+    const keys = conditions.map(trapKey);
+    if (keys.includes(null)) return;
+    for (const key of keys) this.state.traps.delete(key);
   }
 
   /** The working dir as an absolute path, or `null` when it cannot be known. */
   get base(): string | null {
-    return this.trapMovesDir ? null : this.dirOf(this.cwd);
+    return this.state.trapMovesDir ? null : this.dirOf(this.state.cwd);
   }
 
   /** Every command so far ran in the start dir, so relative paths in its parts mean what they say. */
@@ -488,36 +513,36 @@ class Analyzer implements ExpansionScope {
   }
 
   /** The dir `text` names from `from` (the working dir by default). */
-  dirAt(text: string, from: Cwd = this.cwd): Cwd {
+  dirAt(text: string, from: Cwd = this.state.cwd): Cwd {
     const abs = this.toAbs(text, this.dirOf(from));
     return abs === null ? { kind: 'unknown' } : { kind: 'moved', dir: path.resolve(abs) };
   }
 
   /** `cd`, `pushd`, `popd`: the shell moves for the rest of the command. */
   moveTo(next: Cwd): void {
-    this.cwd = next;
+    this.state.cwd = next;
     if (next.kind !== 'start') this.leftStart = true;
   }
 
   /** `env -C dir`: the shell moves for this one command, and `runArgs` moves it back. */
   moveForOneCommand(scope: WrapperScope, next: Cwd): void {
-    scope.outerCwd ??= this.cwd;
+    scope.outerCwd ??= this.state.cwd;
     this.moveTo(next);
   }
 
   /** The shell's working dir at this point of the command. */
   get cwdNow(): Cwd {
-    return this.cwd;
+    return this.state.cwd;
   }
 
   /** `git -C dir`: run `fn` with the shell in `dir`, then move back. */
   within<T>(dir: Cwd, fn: () => T): T {
-    const outer = this.cwd;
+    const outer = this.state.cwd;
     this.moveTo(dir);
     try {
       return fn();
     } finally {
-      this.cwd = outer;
+      this.state.cwd = outer;
     }
   }
 
@@ -526,23 +551,22 @@ class Analyzer implements ExpansionScope {
    * when it is code the command hides. `inherits`: it reads the stdin of the
    * command that runs it (`sh -c`, `eval`, `sudo -s`); otherwise its stdin is
    * one the analysis cannot see (a pager, tar's `--to-command`). `shared`: it
-   * runs in the current shell (`eval`), so what it assigns and the dir it
-   * moves to hold after it; otherwise it runs in a shell of its own.
+   * runs in the current shell (`eval`, a trap's action), so what it assigns,
+   * the dir it moves to and the traps it sets hold after it; otherwise it runs
+   * in a shell of its own, which exits at its end.
    */
   nested(text: string, why: string | null, how: Nesting = {}): void {
     if (why !== null) this.dynamic(why);
-    const savedCwd = this.cwd;
-    const savedVars = this.vars.copy();
+    const outer = this.state;
     const savedStdin = this.stdin;
     const savedInherited = this.inheritedStdin;
     this.inheritedStdin = how.inherits ? this.stdin : unseenInput();
+    if (!how.shared) this.state = outer.copy();
     this.depth++;
-    this.analyzeString(text, how.shared === true);
+    this.analyzeString(text);
+    if (!how.shared) this.exitShell();
     this.depth--;
-    if (!how.shared) {
-      this.cwd = savedCwd;
-      this.vars = savedVars;
-    }
+    this.state = outer;
     this.stdin = savedStdin;
     this.inheritedStdin = savedInherited;
   }
@@ -573,14 +597,14 @@ class Analyzer implements ExpansionScope {
   assign(name: string, op: AssignOp, value: string | null): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     if (DANGEROUS_VARS.test(name)) this.dynamic(`it sets ${name}, which changes what runs`);
-    this.vars.assign(name, op, value);
+    this.state.vars.assign(name, op, value);
   }
 
   /** An assignment before a command, or after a wrapper (`env A=1 cmd`): it holds for this command only. */
   private assignForCommand(scope: CommandScope, name: string, op: AssignOp, value: string | null): void {
-    if (!scope.has(name)) scope.set(name, { before: this.vars.record(name), set: undefined });
+    if (!scope.has(name)) scope.set(name, { before: this.state.vars.record(name), set: undefined });
     this.assign(name, op, value);
-    scope.get(name).set = this.vars.record(name);
+    scope.get(name).set = this.state.vars.record(name);
   }
 
   /**
@@ -590,9 +614,9 @@ class Analyzer implements ExpansionScope {
    */
   private endCommandScope(scope: CommandScope, special: boolean): void {
     for (const [name, { before, set }] of scope) {
-      if (this.vars.record(name) !== set) this.vars.assign(name, '=', null);
-      else if (special) this.vars.either(name, before);
-      else this.vars.restore(name, before);
+      if (this.state.vars.record(name) !== set) this.state.vars.assign(name, '=', null);
+      else if (special) this.state.vars.either(name, before);
+      else this.state.vars.restore(name, before);
     }
   }
 
@@ -617,12 +641,12 @@ class Analyzer implements ExpansionScope {
 
   unset(name: string): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
-    this.vars.unset(name);
+    this.state.vars.unset(name);
   }
 
   /** A variable the command expands: an env ref unless the command set it. */
   noteRef(name: string): void {
-    if (!this.vars.touched(name)) this.envRefs.add(name);
+    if (!this.state.vars.touched(name)) this.envRefs.add(name);
   }
 
   /** A variable the command did not set: only HOME, IFS and PWD are known. */
@@ -658,8 +682,8 @@ class Analyzer implements ExpansionScope {
 
   /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
   lookup(name: string): string | null | undefined {
-    if (this.trapUnknown !== null ? this.trapUnknown.has(name) : this.trapAssigns.has(name)) return null;
-    return this.vars.get(name);
+    if (this.trapUnknown !== null ? this.trapUnknown.has(name) : this.state.trapAssigns.has(name)) return null;
+    return this.state.vars.get(name);
   }
 
   /**
@@ -822,7 +846,7 @@ class Analyzer implements ExpansionScope {
     try {
       return this.run(args, stdinFed, scope);
     } finally {
-      if (scope.outerCwd) this.cwd = scope.outerCwd;
+      if (scope.outerCwd) this.state.cwd = scope.outerCwd;
     }
   }
 
@@ -903,6 +927,7 @@ export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Find
   const analyzer = new Analyzer(ctx, findings);
   analyzer.lastpipe = /lastpipe/.test(command);
   const lexed = analyzer.analyzeString(command);
+  analyzer.exitShell();
   for (const pattern of CRITICAL_PATTERNS) {
     if (pattern.test(command)) {
       analyzer.flag('destructive', 'it matches a known destructive pattern');

@@ -133,20 +133,27 @@ function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void 
 }
 
 /**
- * `trap ACTION CONDITION…`: the shell runs the action later, in itself. There
- * is none to read for a listing (`-l`, `-p`, no condition), a reset (`-`,
- * one operand, or a number first, which POSIX reads as a condition), or an
- * ignore (`''`). An action from a variable is code the analysis cannot see.
+ * `trap ACTION CONDITION…`: the shell runs the action later, in itself, in
+ * place of the one each condition had. There is none to keep for a listing
+ * (`-l`, `-p`, no operand), and a reset (`-`, one operand, or a number first,
+ * which POSIX reads as a condition) or an ignore (`''`) removes the one there
+ * was. An action from a variable is code the analysis cannot see.
  */
 function trap(ctx: CommandContext, rest: readonly Arg[]): void {
+  const { analyzer } = ctx;
   const read = readArgs(TRAP, rest);
   if (hasOption(read, '-l', '-p', '-P')) return;
-  const [action, ...conditions] = operandWords(read, rest);
-  if (!action || conditions.length === 0) return;
-  if (action.kind === 'unknown') return ctx.analyzer.dynamic(`it sets a trap whose action comes from ${action.raw}, a value from a variable`);
-  if (action.text === '-' || action.text === '' || /^\d+$/.test(action.text)) return;
-  const exitOnly = conditions.every((c) => c.kind === 'known' && /^(EXIT|SIGEXIT|0)$/i.test(c.text));
-  ctx.analyzer.trapAction(action.text, !exitOnly);
+  const operands = operandWords(read, rest);
+  if (operands.length === 0) return;
+  if (operands.length === 1) return analyzer.resetTraps(operands);
+  const [action, ...conditions] = operands;
+  if (action.kind === 'unknown') {
+    analyzer.dynamic(`it sets a trap whose action comes from ${action.raw}, a value from a variable`);
+    return analyzer.resetTraps(conditions);
+  }
+  if (/^\d+$/.test(action.text)) return analyzer.resetTraps(operands);
+  if (action.text === '-' || action.text === '') return analyzer.resetTraps(conditions);
+  analyzer.setTrap(action.text, conditions);
 }
 
 /** Shell options that take a value; the `*file` ones name a script the shell loads. */

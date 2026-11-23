@@ -262,7 +262,15 @@ const rows: Row[] = [
   ["echo 'cat ~/.ssh/id_ed25519' | bash", 'deny', 'deny', 'hard-deny'],
   ["bash -s <<'EOF'\ncat ~/.ssh/id_ed25519\nEOF", 'deny', 'deny', 'hard-deny'],
   // 29. an argument from a variable may be an option, so every operand from a reader's output slot on may be the file it writes
-  ['read -r F <<< x; uniq "$F" src/config.ts .pi/ext.js', 'deny', 'deny']
+  ['read -r F <<< x; uniq "$F" src/config.ts .pi/ext.js', 'deny', 'deny'],
+  // 30. one shell state: a subshell and a child shell keep their own variables, dir and traps, and a reset, an ignore or a new action replaces a trap
+  ["(trap 'F=x' DEBUG; true); F=src/config.ts; cat \"$F\"", 'allow', 'allow'],
+  ["(trap 'cd /' DEBUG; true); cat src/config.ts", 'ask', 'allow', 'outside-workspace'],
+  ["bash -c \"trap 'F=x' DEBUG; true\"; F=src/config.ts; cat \"$F\"", 'ask', 'allow', 'shell-dynamic'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap - EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap '' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'true' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
