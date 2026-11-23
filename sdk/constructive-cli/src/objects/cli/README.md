@@ -124,7 +124,6 @@ CRUD operations for GetAllTreeNodesRecord records.
 | `list` | List all getAllTreeNodesRecord records |
 | `find-first` | Find first matching getAllTreeNodesRecord record |
 | `get` | Get a getAllTreeNodesRecord by id |
-| `create` | Create a new getAllTreeNodesRecord |
 | `update` | Update an existing getAllTreeNodesRecord |
 | `delete` | Delete a getAllTreeNodesRecord |
 

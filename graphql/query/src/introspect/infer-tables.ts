@@ -142,6 +142,9 @@ export function inferTablesFromIntrospection(
   const mutationFields = mutationType
     ? getTypeFields(typeMap.get(mutationType.name))
     : [];
+  const subscriptionFields = schema.subscriptionType
+    ? getTypeFields(typeMap.get(schema.subscriptionType.name))
+    : [];
 
   // Step 1: Build Table for each inferred entity
   const tables: Table[] = [];
@@ -161,6 +164,24 @@ export function inferTablesFromIntrospection(
       connectionToEntity,
       commentsEnabled,
     );
+
+    const subscription = subscriptionFields.find(
+      (field) => field.name === `on${entityName}Changed`,
+    );
+    if (subscription && !isList(subscription.type) && !subscription.args.some(
+      argument => isNonNull(argument.type) && argument.defaultValue == null,
+    )) {
+      const payload = getTypeFields(typeMap.get(getBaseTypeName(subscription.type)));
+      const hasEvent = payload.some(
+        (field) => field.name === 'event' && !isList(field.type) && getBaseTypeName(field.type) === 'String',
+      );
+      const hasRow = payload.some(
+        (field) => field.name === lcFirst(entityName) && !isList(field.type) && getBaseTypeName(field.type) === entityName,
+      );
+      if (hasEvent && hasRow) {
+        table.smartTags = { '@realtime': true, ...table.smartTags };
+      }
+    }
 
     // Only include tables that have at least one real operation
     if (hasRealOperation) {

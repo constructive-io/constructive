@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.14](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.13...@pgpmjs/slice@0.21.14) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [0.21.13](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.12...@pgpmjs/slice@0.21.13) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
+## [0.21.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.11...@pgpmjs/slice@0.21.12) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
+## [0.21.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.10...@pgpmjs/slice@0.21.11) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
+## [0.21.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.9...@pgpmjs/slice@0.21.10) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
+## [0.21.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.8...@pgpmjs/slice@0.21.9) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/slice
+
 ## [0.21.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.7...@pgpmjs/slice@0.21.8) (2026-11-14)
 
 ### Bug Fixes

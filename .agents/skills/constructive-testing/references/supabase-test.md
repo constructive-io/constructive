@@ -50,7 +50,7 @@ If using pgpm for schema management:
 pgpm init workspace
 cd packages/myapp
 pgpm init
-pgpm install @pgpm/supabase
+pgpm install @pgpm/supabase-schema
 ```
 
 ## Core Concepts

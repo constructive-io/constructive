@@ -17,6 +17,7 @@ import type {
 import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   createdAt: 'string',
+  data: 'json',
   databaseId: 'uuid',
   id: 'uuid',
   includeGrants: 'boolean',
@@ -79,6 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
   try {
     const defaultSelect = {
       createdAt: true,
+      data: true,
       databaseId: true,
       id: true,
       includeGrants: true,
@@ -109,6 +111,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
   try {
     const defaultSelect = {
       createdAt: true,
+      data: true,
       databaseId: true,
       id: true,
       includeGrants: true,
@@ -151,6 +154,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         id: answers.id as string,
         select: {
           createdAt: true,
+          data: true,
           databaseId: true,
           id: true,
           includeGrants: true,
@@ -175,6 +179,13 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
 async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: Inquirerer) {
   try {
     const rawAnswers = await prompter.prompt(argv, [
+      {
+        type: 'json',
+        name: 'data',
+        message: 'data',
+        required: false,
+        skipPrompt: true,
+      },
       {
         type: 'text',
         name: 'databaseId',
@@ -228,6 +239,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
     const result = await client.derive
       .create({
         data: {
+          data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           includeGrants: cleanedData.includeGrants,
           includeMutations: cleanedData.includeMutations,
@@ -238,6 +250,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           createdAt: true,
+          data: true,
           databaseId: true,
           id: true,
           includeGrants: true,
@@ -267,6 +280,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'id',
         message: 'id',
         required: true,
+      },
+      {
+        type: 'json',
+        name: 'data',
+        message: 'data',
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'text',
@@ -324,6 +344,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           id: answers.id as string,
         },
         data: {
+          data: cleanedData.data,
           databaseId: cleanedData.databaseId,
           includeGrants: cleanedData.includeGrants,
           includeMutations: cleanedData.includeMutations,
@@ -334,6 +355,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         select: {
           createdAt: true,
+          data: true,
           databaseId: true,
           id: true,
           includeGrants: true,

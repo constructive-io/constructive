@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.6](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.5...graphile-presigned-url-plugin@1.28.6) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [1.28.5](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.4...graphile-presigned-url-plugin@1.28.5) (2026-11-23)
+
+### Features
+
+- **presigned-url:** download a stored image version by name ([#2053](https://github.com/constructive-io/constructive/issues/2053)) ([696dfd0](https://github.com/constructive-io/constructive/commit/696dfd002d59d7f600746a4ce788849c25c9176f))
+
+## [1.28.4](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.3...graphile-presigned-url-plugin@1.28.4) (2026-11-21)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.2...graphile-presigned-url-plugin@1.28.3) (2026-11-19)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.1...graphile-presigned-url-plugin@1.28.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-presigned-url-plugin
+
+## [1.28.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.0...graphile-presigned-url-plugin@1.28.1) (2026-11-17)
+
+### Bug Fixes
+
+- **presigned-url:** a bucket cache hit re-reads the bucket id under the caller's RLS ([#2007](https://github.com/constructive-io/constructive/issues/2007)) ([af63b90](https://github.com/constructive-io/constructive/commit/af63b90ea9946f62891901b417a5f238cb0fc8c5))
+
 # [1.28.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.27.2...graphile-presigned-url-plugin@1.28.0) (2026-11-16)
 
 ### Bug Fixes

@@ -31,19 +31,37 @@ const moduleQueries = ({ file, src }: { file: string; src: string }) => {
   return matches.map(m => ({ file, module: m[1], body: m[2] }));
 };
 
+/**
+ * Every `FROM function_resolution.<reader>(<args>)` in the source: the
+ * login-only readers a loader reaches rows through that row-level security
+ * hides from the server's own connection.
+ */
+const readerCalls = ({ file, src }: { file: string; src: string }) => {
+  const matches = [...src.matchAll(/FROM\s+function_resolution\.(\w+)\(([^)]*)\)/g)];
+  return matches.map(m => ({ file, reader: m[1], args: m[2] }));
+};
+
 describe('tenant-DB discovery is keyed by database_id', () => {
   it('finds the module discovery queries it is meant to be checking', () => {
     // A regex that silently matches nothing would make every assertion below
     // vacuously true — including for a loader added later.
-    const all = loaderSources.flatMap(moduleQueries);
-    expect(all.length).toBeGreaterThanOrEqual(6);
-    expect(new Set(all.map(q => q.module))).toContain('sessions_module');
+    const tables = loaderSources.flatMap(moduleQueries);
+    const readers = loaderSources.flatMap(readerCalls);
+    expect(tables.length + readers.length).toBeGreaterThanOrEqual(6);
+    expect(new Set(readers.map(q => q.reader))).toContain('sessions_module_registrations');
   });
 
   it.each(loaderSources.flatMap(moduleQueries))(
     '$file: $module is filtered by database_id',
     ({ body }) => {
       expect(body).toMatch(/WHERE[\s\S]*\bdatabase_id\s*=\s*\$1/);
+    }
+  );
+
+  it.each(loaderSources.flatMap(readerCalls))(
+    '$file: $reader is called for the context database',
+    ({ args }) => {
+      expect(args).toMatch(/^\s*\$1\b/);
     }
   );
 

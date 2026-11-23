@@ -7,7 +7,7 @@ CRUD operations for PlatformAgentResource records via csdk CLI
 **pgvector embedding fields:** `embedding`
 High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance. Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.
 
-**Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `titleTrgmSimilarity`
+**Unified Search API fields:** `bodyTrgmSimilarity`, `descriptionTrgmSimilarity`, `embeddingModelTrgmSimilarity`, `kindTrgmSimilarity`, `search`, `searchScore`, `searchTsvRank`, `titleTrgmSimilarity`
 Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ## Usage
@@ -97,6 +97,12 @@ csdk platform-agent-resource list --where.trgmBody.value "approximate query" --w
 csdk platform-agent-resource list --where.trgmDescription.value "approximate query" --where.trgmDescription.threshold 0.3 --select title,descriptionTrgmSimilarity
 ```
 
+### Fuzzy search via trigram similarity (`trgmEmbeddingModel`)
+
+```bash
+csdk platform-agent-resource list --where.trgmEmbeddingModel.value "approximate query" --where.trgmEmbeddingModel.threshold 0.3 --select title,embeddingModelTrgmSimilarity
+```
+
 ### Fuzzy search via trigram similarity (`trgmKind`)
 
 ```bash
@@ -106,7 +112,7 @@ csdk platform-agent-resource list --where.trgmKind.value "approximate query" --w
 ### Full-text search via tsvector (`search`)
 
 ```bash
-csdk platform-agent-resource list --where.search "search query" --select title,tsvRank
+csdk platform-agent-resource list --where.search "search query" --select title,searchTsvRank
 ```
 
 ### Fuzzy search via trigram similarity (`trgmTitle`)
@@ -118,7 +124,7 @@ csdk platform-agent-resource list --where.trgmTitle.value "approximate query" --
 ### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk platform-agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,kindTrgmSimilarity,tsvRank,searchScore,titleTrgmSimilarity
+csdk platform-agent-resource list --where.unifiedSearch "search query" --select title,bodyTrgmSimilarity,descriptionTrgmSimilarity,embeddingModelTrgmSimilarity,kindTrgmSimilarity,searchTsvRank,searchScore,titleTrgmSimilarity
 ```
 
 ### Search with pagination and field projection

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.3](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log-client@0.4.2...@agentic-kit/run-log-client@0.4.3) (2026-11-23)
+
+**Note:** Version bump only for package @agentic-kit/run-log-client
+
+## [0.4.2](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log-client@0.4.1...@agentic-kit/run-log-client@0.4.2) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
 ## [0.4.1](https://github.com/constructive-io/constructive/compare/@agentic-kit/run-log-client@0.4.0...@agentic-kit/run-log-client@0.4.1) (2026-11-03)
 
 **Note:** Version bump only for package @agentic-kit/run-log-client

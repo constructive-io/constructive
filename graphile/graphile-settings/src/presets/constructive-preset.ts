@@ -170,7 +170,7 @@ export function createConstructivePreset(
 
   if (opts.enableSearch) {
     presets.push(
-      UnifiedSearchPreset({ fullTextScalarName: 'FullText', tsConfig: 'english' })
+      UnifiedSearchPreset({ fullTextScalarName: 'FullText' })
     );
   }
 
@@ -223,7 +223,7 @@ export function createConstructivePreset(
   if (opts.enableConnectionFilter) {
     if (opts.enableSearch) {
       operatorFactories.push(
-        createMatchesOperatorFactory('FullText', 'english'),
+        createMatchesOperatorFactory('FullText'),
         createTrgmOperatorFactories()
       );
     }

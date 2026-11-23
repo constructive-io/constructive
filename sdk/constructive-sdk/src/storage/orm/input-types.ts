@@ -232,7 +232,7 @@ export interface UUIDListFilter {
 }
 // ============ Enum Types ============
 export type BucketType = 'PRIVATE' | 'PUBLIC' | 'TEMP';
-export type FileStatus = 'EXPIRED' | 'PROCESSED' | 'REJECTED' | 'REQUESTED' | 'UPLOADED';
+export type FileStatus = 'PROCESSED' | 'REJECTED' | 'REQUESTED' | 'UPLOADED';
 // ============ Custom Scalar Types ============
 export type ConstructiveInternalTypeUpload = unknown;
 /** Logical storage containers that group files with shared access policies and CDN behavior */
@@ -287,7 +287,7 @@ export interface File {
   databaseId?: string | null;
   /** Human-readable description or alt text for the file (mutable) */
   description?: string | null;
-  /** URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL. */
+  /** URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL. Null until the upload is confirmed (status uploaded or processed), and for a rejected file. */
   downloadUrl?: string | null;
   /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
   expiryEnqueuedAt?: string | null;
@@ -303,15 +303,21 @@ export interface File {
   mimeType?: string | null;
   /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
   promotedAt?: string | null;
+  /** Why the upload was rejected (declared MIME, extension and magic bytes disagreed, size mismatch, ...). NULL unless status is rejected. */
+  rejectionReason?: string | null;
   /** File size in bytes. Immutable after INSERT. */
   size?: string | null;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
+  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes). A requested row whose bytes never arrive within upload_url_expiry_seconds is deleted by the confirm loop. */
   status?: FileStatus | null;
   /** User-defined tags for categorization and search (mutable) */
   tags?: string[] | null;
   updatedAt?: string | null;
   /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
   upload?: ConstructiveInternalTypeUpload | null;
+  /** URL to fetch `upload`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  uploadUrl?: string | null;
+  /** The versions rendered beside `upload`, narrowest first, each with a URL. Empty when there are none. */
+  uploadVersions?: FileVersion[] | null;
 }
 /** Logical storage containers that group files with shared access policies and CDN behavior */
 export interface PlatformBucket {
@@ -360,7 +366,7 @@ export interface PlatformFile {
   createdAt?: string | null;
   /** Human-readable description or alt text for the file (mutable) */
   description?: string | null;
-  /** URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL. */
+  /** URL to download this file. For public files, returns the public URL. For private files, returns a time-limited presigned URL. Null until the upload is confirmed (status uploaded or processed), and for a rejected file. */
   downloadUrl?: string | null;
   /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
   expiryEnqueuedAt?: string | null;
@@ -376,15 +382,21 @@ export interface PlatformFile {
   mimeType?: string | null;
   /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
   promotedAt?: string | null;
+  /** Why the upload was rejected (declared MIME, extension and magic bytes disagreed, size mismatch, ...). NULL unless status is rejected. */
+  rejectionReason?: string | null;
   /** File size in bytes. Immutable after INSERT. */
   size?: string | null;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
+  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes). A requested row whose bytes never arrive within upload_url_expiry_seconds is deleted by the confirm loop. */
   status?: FileStatus | null;
   /** User-defined tags for categorization and search (mutable) */
   tags?: string[] | null;
   updatedAt?: string | null;
   /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
   upload?: ConstructiveInternalTypeUpload | null;
+  /** URL to fetch `upload`: the narrowest rendered version at least `width` pixels wide, else the source file. Null when the column names no file the reader can fetch. */
+  uploadUrl?: string | null;
+  /** The versions rendered beside `upload`, narrowest first, each with a URL. Empty when there are none. */
+  uploadVersions?: FileVersion[] | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -473,11 +485,21 @@ export type FileSelect = {
   key?: boolean;
   mimeType?: boolean;
   promotedAt?: boolean;
+  rejectionReason?: boolean;
   size?: boolean;
   status?: boolean;
   tags?: boolean;
   updatedAt?: boolean;
   upload?: boolean;
+  uploadUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  uploadVersions?: {
+    select: FileVersionSelect;
+  };
   bucket?: {
     select: BucketSelect;
   };
@@ -532,11 +554,21 @@ export type PlatformFileSelect = {
   key?: boolean;
   mimeType?: boolean;
   promotedAt?: boolean;
+  rejectionReason?: boolean;
   size?: boolean;
   status?: boolean;
   tags?: boolean;
   updatedAt?: boolean;
   upload?: boolean;
+  uploadUrl?: {
+    args: {
+      width?: number;
+    };
+    select?: Record<string, boolean>;
+  };
+  uploadVersions?: {
+    select: FileVersionSelect;
+  };
   bucket?: {
     select: PlatformBucketSelect;
   };
@@ -633,6 +665,8 @@ export interface FileFilter {
   or?: FileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -731,6 +765,8 @@ export interface PlatformFileFilter {
   or?: PlatformFileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -813,6 +849,8 @@ export type FileOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROMOTED_AT_ASC'
   | 'PROMOTED_AT_DESC'
+  | 'REJECTION_REASON_ASC'
+  | 'REJECTION_REASON_DESC'
   | 'SIZE_ASC'
   | 'SIZE_DESC'
   | 'STATUS_ASC'
@@ -889,6 +927,8 @@ export type PlatformFileOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'PROMOTED_AT_ASC'
   | 'PROMOTED_AT_DESC'
+  | 'REJECTION_REASON_ASC'
+  | 'REJECTION_REASON_DESC'
   | 'SIZE_ASC'
   | 'SIZE_DESC'
   | 'STATUS_ASC'
@@ -946,24 +986,6 @@ export interface DeleteBucketInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateFileInput {
-  clientMutationId?: string;
-  file: {
-    actorId: string;
-    bucketId: string;
-    contentHash?: string;
-    description?: string;
-    expiryEnqueuedAt?: string;
-    filename?: string;
-    key: string;
-    mimeType: string;
-    promotedAt?: string;
-    size: string;
-    status?: FileStatus;
-    tags?: string[];
-    upload?: ConstructiveInternalTypeUpload;
-  };
-}
 export interface FilePatch {
   actorId?: string | null;
   bucketId?: string | null;
@@ -976,11 +998,11 @@ export interface FilePatch {
   key?: string | null;
   mimeType?: string | null;
   promotedAt?: string | null;
+  rejectionReason?: string | null;
   size?: string | null;
   status?: FileStatus | null;
   tags?: string[] | null;
   upload?: ConstructiveInternalTypeUpload | null;
-  uploadUpload?: File | null;
 }
 export interface UpdateFileInput {
   clientMutationId?: string;
@@ -1035,24 +1057,6 @@ export interface DeletePlatformBucketInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreatePlatformFileInput {
-  clientMutationId?: string;
-  platformFile: {
-    actorId: string;
-    bucketId: string;
-    contentHash?: string;
-    description?: string;
-    expiryEnqueuedAt?: string;
-    filename?: string;
-    key: string;
-    mimeType: string;
-    promotedAt?: string;
-    size: string;
-    status?: FileStatus;
-    tags?: string[];
-    upload?: ConstructiveInternalTypeUpload;
-  };
-}
 export interface PlatformFilePatch {
   actorId?: string | null;
   bucketId?: string | null;
@@ -1064,11 +1068,11 @@ export interface PlatformFilePatch {
   key?: string | null;
   mimeType?: string | null;
   promotedAt?: string | null;
+  rejectionReason?: string | null;
   size?: string | null;
   status?: FileStatus | null;
   tags?: string[] | null;
   upload?: ConstructiveInternalTypeUpload | null;
-  uploadUpload?: File | null;
 }
 export interface UpdatePlatformFileInput {
   clientMutationId?: string;
@@ -1117,6 +1121,8 @@ export interface UploadFileInput {
   contentHash: string;
   /** MIME type of the file */
   contentType: string;
+  /** Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused. */
+  databaseId?: string;
   /** Original filename (optional) */
   filename?: string;
   /** Which default bucket to resolve when bucketKey is omitted: the public one (true) or the private one (default false). Ignored when bucketKey is given. */
@@ -1129,6 +1135,8 @@ export interface UploadFileInput {
 export interface UploadFileBulkInput {
   /** Bucket key (e.g., "public", "private"). Omit to use the database's default bucket for the requested access. */
   bucketKey?: string;
+  /** Database the file belongs to. Omit for the database of the current session; a caller who is not a member of the named database is refused. */
+  databaseId?: string;
   /** Array of files to upload */
   files: UploadFileBulkFileInput[];
   /** Which default bucket to resolve when bucketKey is omitted. Ignored when bucketKey is given. */
@@ -1359,38 +1367,6 @@ export interface IntervalInput {
   /** A quantity of years. */
   years?: number;
 }
-/** An input for mutations affecting `File` */
-export interface FileInput {
-  /** User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization. */
-  actorId: string;
-  /** Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger. */
-  bucketId: string;
-  /** SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately. */
-  contentHash?: string;
-  createdAt?: string;
-  /** Human-readable description or alt text for the file (mutable) */
-  description?: string;
-  /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
-  expiryEnqueuedAt?: string;
-  /** Original filename provided by the uploader. Used for display and Content-Disposition header on download. */
-  filename?: string;
-  id?: string;
-  /** S3 object key for this file, unique within its bucket */
-  key: string;
-  /** MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT. */
-  mimeType: string;
-  /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
-  promotedAt?: string;
-  /** File size in bytes. Immutable after INSERT. */
-  size: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
-  status?: FileStatus;
-  /** User-defined tags for categorization and search (mutable) */
-  tags?: string[];
-  updatedAt?: string;
-  /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  upload?: ConstructiveInternalTypeUpload;
-}
 /** An input for mutations affecting `PlatformBucket` */
 export interface PlatformBucketInput {
   /** User who created this bucket. Forced to current_user_id() on INSERT. */
@@ -1424,38 +1400,6 @@ export interface PlatformBucketInput {
   /** Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads) */
   type?: BucketType;
   updatedAt?: string;
-}
-/** An input for mutations affecting `PlatformFile` */
-export interface PlatformFileInput {
-  /** User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization. */
-  actorId: string;
-  /** Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger. */
-  bucketId: string;
-  /** SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately. */
-  contentHash?: string;
-  createdAt?: string;
-  /** Human-readable description or alt text for the file (mutable) */
-  description?: string;
-  /** When the staged-expiry sweep enqueued deletion of this file's object. NULL until it expires; set once so expiry is enqueued exactly once. */
-  expiryEnqueuedAt?: string;
-  /** Original filename provided by the uploader. Used for display and Content-Disposition header on download. */
-  filename?: string;
-  id?: string;
-  /** S3 object key for this file, unique within its bucket */
-  key: string;
-  /** MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT. */
-  mimeType: string;
-  /** When this file was promoted out of its staging bucket into its destination bucket. NULL for a file that was never staged, or is still staged. */
-  promotedAt?: string;
-  /** File size in bytes. Immutable after INSERT. */
-  size: string;
-  /** File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3 and content validated, ready for use), processed (image resized, text extracted, embedding computed), rejected (declared type disagreed with the bytes), expired (bytes never arrived before the confirm window closed). */
-  status?: FileStatus;
-  /** User-defined tags for categorization and search (mutable) */
-  tags?: string[];
-  updatedAt?: string;
-  /** Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file. */
-  upload?: ConstructiveInternalTypeUpload;
 }
 export interface UploadFileBulkFileInput {
   /** SHA-256 content hash (hex-encoded, 64 chars) */
@@ -1574,6 +1518,8 @@ export interface FileFilter {
   or?: FileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -1674,6 +1620,8 @@ export interface PlatformFileFilter {
   or?: PlatformFileFilter[];
   /** Filter by the object’s `promotedAt` field. */
   promotedAt?: DatetimeFilter;
+  /** Filter by the object’s `rejectionReason` field. */
+  rejectionReason?: StringFilter;
   /** Filter by the object’s `size` field. */
   size?: BigIntFilter;
   /** Filter by the object’s `status` field. */
@@ -1950,12 +1898,14 @@ export interface UploadFilePayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. */
+  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. After the upload is confirmed, use `file.id` to query the file row's `downloadUrl`. */
   file?: Record<string, unknown> | null;
   /** The file ID (UUID) */
   fileId: string;
   /** The S3 object key */
   key: string;
+  /** The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. Null if deduplicated. */
+  uploadHeaders?: Record<string, unknown> | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1965,6 +1915,7 @@ export type UploadFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
+  uploadHeaders?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadFileBulkPayload {
@@ -1980,12 +1931,14 @@ export interface UploadPlatformFilePayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
-  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename, url?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. */
+  /** The projection document for the created file: {id, key, bucket_id, mime, size, filename?}. Store this verbatim in an image/upload column — its `id` is what keeps the object from being garbage collected while the column still references it. After the upload is confirmed, use `file.id` to query the file row's `downloadUrl`. */
   file?: Record<string, unknown> | null;
   /** The file ID (UUID) */
   fileId: string;
   /** The S3 object key */
   key: string;
+  /** The exact headers the PUT to uploadUrl must send (Content-Type and every header the URL is signed over, e.g. x-amz-checksum-sha256 and x-amz-meta-upload-id). Forward them as-is. Null if deduplicated. */
+  uploadHeaders?: Record<string, unknown> | null;
   /** Presigned PUT URL (null if deduplicated) */
   uploadUrl?: string | null;
 }
@@ -1995,6 +1948,7 @@ export type UploadPlatformFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
+  uploadHeaders?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadPlatformFileBulkPayload {
@@ -2049,21 +2003,6 @@ export type DeleteBucketPayloadSelect = {
     select: BucketEdgeSelect;
   };
   clientMutationId?: boolean;
-};
-export interface CreateFilePayload {
-  clientMutationId?: string | null;
-  /** The `File` that was created by this mutation. */
-  file?: File | null;
-  fileEdge?: FileEdge | null;
-}
-export type CreateFilePayloadSelect = {
-  clientMutationId?: boolean;
-  file?: {
-    select: FileSelect;
-  };
-  fileEdge?: {
-    select: FileEdgeSelect;
-  };
 };
 export interface UpdateFilePayload {
   clientMutationId?: string | null;
@@ -2140,21 +2079,6 @@ export type DeletePlatformBucketPayloadSelect = {
     select: PlatformBucketEdgeSelect;
   };
 };
-export interface CreatePlatformFilePayload {
-  clientMutationId?: string | null;
-  /** The `PlatformFile` that was created by this mutation. */
-  platformFile?: PlatformFile | null;
-  platformFileEdge?: PlatformFileEdge | null;
-}
-export type CreatePlatformFilePayloadSelect = {
-  clientMutationId?: boolean;
-  platformFile?: {
-    select: PlatformFileSelect;
-  };
-  platformFileEdge?: {
-    select: PlatformFileEdgeSelect;
-  };
-};
 export interface UpdatePlatformFilePayload {
   clientMutationId?: string | null;
   /** The `PlatformFile` that was updated by this mutation. */
@@ -2184,6 +2108,25 @@ export type DeletePlatformFilePayloadSelect = {
   platformFileEdge?: {
     select: PlatformFileEdgeSelect;
   };
+};
+/** One version rendered beside a file, with a URL to fetch it. */
+export interface FileVersion {
+  format?: string | null;
+  height?: number | null;
+  key: string;
+  name?: string | null;
+  size?: number | null;
+  url: string;
+  width?: number | null;
+}
+export type FileVersionSelect = {
+  format?: boolean;
+  height?: boolean;
+  key?: boolean;
+  name?: boolean;
+  size?: boolean;
+  url?: boolean;
+  width?: boolean;
 };
 /** A `File` edge in the connection. */
 export interface FileEdge {
@@ -2216,6 +2159,8 @@ export interface UploadFileBulkFilePayload {
   file?: Record<string, unknown> | null;
   fileId: string;
   key: string;
+  /** The exact headers the PUT to uploadUrl must send. */
+  uploadHeaders?: Record<string, unknown> | null;
   uploadUrl?: string | null;
 }
 export type UploadFileBulkFilePayloadSelect = {
@@ -2224,6 +2169,7 @@ export type UploadFileBulkFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
+  uploadHeaders?: boolean;
   uploadUrl?: boolean;
 };
 export interface UploadPlatformFileBulkFilePayload {
@@ -2233,6 +2179,8 @@ export interface UploadPlatformFileBulkFilePayload {
   file?: Record<string, unknown> | null;
   fileId: string;
   key: string;
+  /** The exact headers the PUT to uploadUrl must send. */
+  uploadHeaders?: Record<string, unknown> | null;
   uploadUrl?: string | null;
 }
 export type UploadPlatformFileBulkFilePayloadSelect = {
@@ -2241,6 +2189,7 @@ export type UploadPlatformFileBulkFilePayloadSelect = {
   file?: boolean;
   fileId?: boolean;
   key?: boolean;
+  uploadHeaders?: boolean;
   uploadUrl?: boolean;
 };
 /** A `Bucket` edge in the connection. */

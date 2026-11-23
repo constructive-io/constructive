@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.19.3...@pgpmjs/bundle@0.19.4) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/bundle
+
+## [0.19.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.19.2...@pgpmjs/bundle@0.19.3) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/bundle
+
+## [0.19.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.19.1...@pgpmjs/bundle@0.19.2) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/bundle
+
 ## [0.19.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/bundle@0.19.0...@pgpmjs/bundle@0.19.1) (2026-11-09)
 
 **Note:** Version bump only for package @pgpmjs/bundle

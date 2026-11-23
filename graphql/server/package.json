@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-server",
-  "version": "5.35.18",
+  "version": "5.36.10",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive GraphQL Server",
   "main": "index.js",
@@ -55,8 +55,9 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/quotes": "^18.2.4",
+    "@pgsql/quotes": "^18.2.5",
     "@simplewebauthn/server": "13.3.2",
+    "accept-language-parser": "^1.5.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
@@ -86,6 +87,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1052.0",
+    "@types/accept-language-parser": "^1.5.4",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",

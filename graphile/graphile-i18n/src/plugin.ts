@@ -25,6 +25,7 @@ import { TYPES } from '@dataplan/pg';
 import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
+import { sql } from 'pg-sql2';
 
 import type { I18nPluginOptions, I18nTableInfo, TranslatableField } from './types';
 
@@ -95,16 +96,15 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
               const translationTableName = hasI18nTag(c);
               if (!translationTableName) continue;
 
-              // Get schema name from the codec's pg extensions
-              let schemaName = (c.extensions as any)?.pg?.schemaName ?? 'public';
+              const pg = (c.extensions as any)?.pg;
+              if (!pg?.schemaName || !pg?.name) continue;
+              const schemaName = pg.schemaName;
+              const baseTable = pg.name;
               let pkColumn: string | null = null;
               let pkType = 'text';
               for (const [, resource] of Object.entries(build.input.pgRegistry.pgResources)) {
                 const r = resource as any;
                 if (r.codec === c) {
-                  // Try multiple sources for schema name
-                  const rSchema = r.extensions?.pg?.schemaName ?? r.schemaName;
-                  if (rSchema) schemaName = rSchema;
                   // Extract PK from the resource's uniques array
                   const uniques = r.uniques as Array<{ attributes: string[]; isPrimary?: boolean }> | undefined;
                   if (uniques) {
@@ -122,38 +122,21 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
               }
               if (!pkColumn) continue;
 
-              // Find the translation codec. The @i18n tag value is the SQL table name
-              // (e.g. 'posts_translations'), but PostGraphile inflects codec names
-              // to camelCase (e.g. 'postsTranslations'). Match via resource name.
               let translationCodec: PgCodecWithAttributes | null = null;
               for (const [, resource] of Object.entries(build.input.pgRegistry.pgResources)) {
                 const r = resource as any;
                 if (!r.codec?.attributes) continue;
-                // Match by the resource's SQL name (which preserves snake_case)
-                const sqlName = r.codec?.extensions?.pg?.name ?? r.name;
-                if (sqlName === translationTableName) {
+                const translationPg = r.codec.extensions?.pg;
+                if (translationPg?.schemaName === schemaName && translationPg?.name === translationTableName) {
                   translationCodec = r.codec as PgCodecWithAttributes;
                   break;
                 }
               }
-              // Fallback: try matching the inflected codec name directly
-              if (!translationCodec) {
-                const inflectedName = build.inflection.camelCase(translationTableName);
-                for (const [, tCodec] of Object.entries(build.input.pgRegistry.pgCodecs)) {
-                  const tc = tCodec as any;
-                  if (!tc.attributes) continue;
-                  if (tc.name === translationTableName || tc.name === inflectedName) {
-                    translationCodec = tc;
-                    break;
-                  }
-                }
-              }
-
               if (!translationCodec) continue;
 
               // Find FK column on translation table — convention first, then type match
               let fkColumn: string | null = null;
-              const conventionalFk = `${c.name}_id`;
+              const conventionalFk = `${baseTable}_id`;
               if (translationCodec.attributes[conventionalFk]) {
                 fkColumn = conventionalFk;
               }
@@ -191,8 +174,8 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
               if (Object.keys(fields).length === 0) continue;
 
               i18nRegistry[c.name] = {
-                baseTable: c.name,
-                translationTable: translationTableName,
+                baseTable,
+                translationTable: (translationCodec.extensions as any).pg.name,
                 schemaName,
                 fkColumn,
                 pkColumn,
@@ -235,6 +218,8 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
           const localeType = localeTypeCache[localeTypeName];
 
           const { schemaName, baseTable, translationTable, fkColumn, pkColumn, pkType, fields: i18nFields } = info;
+          const baseTableSql = sql.compile(sql.identifier(schemaName, baseTable)).text;
+          const translationTableSql = sql.compile(sql.identifier(schemaName, translationTable)).text;
 
           const coalescedCols = Object.values(i18nFields)
             .map(f => `coalesce(v."${f.column}", b."${f.column}") as "${f.column}"`)
@@ -242,8 +227,8 @@ export function createI18nPlugin(options: I18nPluginOptions = {}): GraphileConfi
 
           // Build the SQL query template
           const sqlQuery = `SELECT v."${langCodeColumn}" AS "lang_code", ${coalescedCols}
-             FROM "${schemaName}"."${baseTable}" b
-             LEFT JOIN "${schemaName}"."${translationTable}" v
+             FROM ${baseTableSql} b
+             LEFT JOIN ${translationTableSql} v
                ON v."${fkColumn}" = b."${pkColumn}"
                AND array_position($2::text[], v."${langCodeColumn}") IS NOT NULL
              WHERE b."${pkColumn}" = $1::${pkType}

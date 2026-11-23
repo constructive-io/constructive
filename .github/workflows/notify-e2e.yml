@@ -12,7 +12,7 @@ on:
 jobs:
   trigger-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 50
     steps:
       - name: Checkout release metadata
         if: "${{ startsWith(github.event.head_commit.message, 'chore(release): publish') }}"

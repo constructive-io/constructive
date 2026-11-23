@@ -30,5 +30,5 @@ const { data, isLoading } = useAgentResourceChunksQuery({
 const { mutate } = useCreateAgentResourceChunkMutation({
   selection: { fields: { id: true } },
 });
-mutate({ agentResourceId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', embeddingVectorDistance: '<Float>', metadata: '<JSON>', searchScore: '<Float>' });
+mutate({ agentResourceId: '<UUID>', body: '<String>', chunkIndex: '<Int>', databaseId: '<UUID>', embedding: '<Vector>', metadata: '<JSON>' });
 ```

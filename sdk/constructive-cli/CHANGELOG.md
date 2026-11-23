@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.22.47](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.46...@constructive-sdk/cli@1.22.47) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.46](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.45...@constructive-sdk/cli@1.22.46) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.45](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.44...@constructive-sdk/cli@1.22.45) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.44](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.43...@constructive-sdk/cli@1.22.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.43](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.42...@constructive-sdk/cli@1.22.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.42](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.41...@constructive-sdk/cli@1.22.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.41](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.40...@constructive-sdk/cli@1.22.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.40](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.39...@constructive-sdk/cli@1.22.40) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.39](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.38...@constructive-sdk/cli@1.22.39) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.38](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.37...@constructive-sdk/cli@1.22.38) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.37](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.36...@constructive-sdk/cli@1.22.37) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.36](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.35...@constructive-sdk/cli@1.22.36) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.35](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.34...@constructive-sdk/cli@1.22.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.34](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.33...@constructive-sdk/cli@1.22.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.33](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.32...@constructive-sdk/cli@1.22.33) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [1.22.32](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.31...@constructive-sdk/cli@1.22.32) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
 ## [1.22.31](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@1.22.30...@constructive-sdk/cli@1.22.31) (2026-11-16)
 
 **Note:** Version bump only for package @constructive-sdk/cli

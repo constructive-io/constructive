@@ -29,7 +29,6 @@ import type {
   DatabaseFunctionGraphSelect,
   DatabaseFunctionGraphFilter,
   DatabaseFunctionGraphOrderBy,
-  CreateDatabaseFunctionGraphInput,
   UpdateDatabaseFunctionGraphInput,
   DatabaseFunctionGraphPatch,
 } from '../input-types';
@@ -144,33 +143,6 @@ export class DatabaseFunctionGraphModel {
       }) => ({
         databaseFunctionGraph: data.databaseFunctionGraphs?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends DatabaseFunctionGraphSelect>(
-    args: CreateArgs<S, CreateDatabaseFunctionGraphInput['databaseFunctionGraph']> & {
-      select: S;
-    } & StrictSelect<S, DatabaseFunctionGraphSelect>
-  ): QueryBuilder<{
-    createDatabaseFunctionGraph: {
-      databaseFunctionGraph: InferSelectResult<DatabaseFunctionGraphWithRelations, S>;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'DatabaseFunctionGraph',
-      'createDatabaseFunctionGraph',
-      'databaseFunctionGraph',
-      args.select,
-      args.data,
-      'CreateDatabaseFunctionGraphInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'DatabaseFunctionGraph',
-      fieldName: 'createDatabaseFunctionGraph',
-      document,
-      variables,
     });
   }
   update<S extends DatabaseFunctionGraphSelect>(

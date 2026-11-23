@@ -85,6 +85,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       agentId: true,
       authorRole: true,
       createdAt: true,
+      databaseId: true,
       deliveredRunId: true,
       id: true,
       kind: true,
@@ -92,6 +93,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       parts: true,
       threadId: true,
       updatedAt: true,
+      visibility: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<AgentMessageSelect, AgentMessageFilter, AgentMessageOrderBy> & {
@@ -116,6 +118,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       agentId: true,
       authorRole: true,
       createdAt: true,
+      databaseId: true,
       deliveredRunId: true,
       id: true,
       kind: true,
@@ -123,6 +126,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       parts: true,
       threadId: true,
       updatedAt: true,
+      visibility: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<AgentMessageSelect, AgentMessageFilter, AgentMessageOrderBy> & {
@@ -159,6 +163,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           agentId: true,
           authorRole: true,
           createdAt: true,
+          databaseId: true,
           deliveredRunId: true,
           id: true,
           kind: true,
@@ -166,6 +171,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           parts: true,
           threadId: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -259,6 +265,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           agentId: true,
           authorRole: true,
           createdAt: true,
+          databaseId: true,
           deliveredRunId: true,
           id: true,
           kind: true,
@@ -266,6 +273,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           parts: true,
           threadId: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();
@@ -309,6 +317,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'databaseId',
+        message: 'databaseId',
+        required: false,
+      },
+      {
+        type: 'text',
         name: 'deliveredRunId',
         message: 'deliveredRunId',
         required: false,
@@ -341,6 +355,12 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'threadId',
         required: false,
       },
+      {
+        type: 'text',
+        name: 'visibility',
+        message: 'visibility',
+        required: false,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as AgentMessagePatch;
@@ -354,17 +374,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           actorId: cleanedData.actorId,
           agentId: cleanedData.agentId,
           authorRole: cleanedData.authorRole,
+          databaseId: cleanedData.databaseId,
           deliveredRunId: cleanedData.deliveredRunId,
           kind: cleanedData.kind,
           model: cleanedData.model,
           parts: cleanedData.parts,
           threadId: cleanedData.threadId,
+          visibility: cleanedData.visibility,
         },
         select: {
           actorId: true,
           agentId: true,
           authorRole: true,
           createdAt: true,
+          databaseId: true,
           deliveredRunId: true,
           id: true,
           kind: true,
@@ -372,6 +395,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           parts: true,
           threadId: true,
           updatedAt: true,
+          visibility: true,
         },
       })
       .execute();

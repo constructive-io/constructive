@@ -63,6 +63,7 @@ const bucket = {
 
 function fakeS3(): S3Config {
   return {
+    publicUrlPrefix: 'https://cdn.example.com',
     client: { send: jest.fn(async () => ({})) },
     bucket: 'site-bucket',
     region: 'us-east-1',
@@ -123,6 +124,7 @@ describe.each([
         deduplicated: false,
         uploadUrl: 'https://s3.example.com/put',
       });
+      expect(result.file).not.toHaveProperty('url');
       expect(heads(s3)).toEqual([]);
       const del = queries.find((q) => /^DELETE/.test(q.text));
       expect(del).toBeUndefined();
@@ -137,6 +139,7 @@ describe.each([
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
     expect(heads(s3)).toEqual([]);
+    expect(result.file).not.toHaveProperty('url');
     expect(queries).toHaveLength(1);
     expect(queries[0].text).toContain('status');
   });

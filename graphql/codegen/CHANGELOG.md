@@ -3,6 +3,74 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.47](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.46...@constructive-io/graphql-codegen@5.25.47) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.46](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.45...@constructive-io/graphql-codegen@5.25.46) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.45](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.44...@constructive-io/graphql-codegen@5.25.45) (2026-11-22)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.44](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.43...@constructive-io/graphql-codegen@5.25.44) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.43](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.42...@constructive-io/graphql-codegen@5.25.43) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.42](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.41...@constructive-io/graphql-codegen@5.25.42) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.41](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.40...@constructive-io/graphql-codegen@5.25.41) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.40](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.39...@constructive-io/graphql-codegen@5.25.40) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.39](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.38...@constructive-io/graphql-codegen@5.25.39) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
+## [5.25.38](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.37...@constructive-io/graphql-codegen@5.25.38) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.37](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.36...@constructive-io/graphql-codegen@5.25.37) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.36](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.35...@constructive-io/graphql-codegen@5.25.36) (2026-11-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.35](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.34...@constructive-io/graphql-codegen@5.25.35) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.34](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.33...@constructive-io/graphql-codegen@5.25.34) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.33](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.32...@constructive-io/graphql-codegen@5.25.33) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [5.25.32](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.31...@constructive-io/graphql-codegen@5.25.32) (2026-11-17)
+
+### Bug Fixes
+
+- **codegen:** computed fields in CLI/ORM/docs, prune stale generated skills ([#2012](https://github.com/constructive-io/constructive/issues/2012)) ([0326ce9](https://github.com/constructive-io/constructive/commit/0326ce95e6e00ab1190138e09c1f90c0e0f79096))
+
 ## [5.25.31](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.30...@constructive-io/graphql-codegen@5.25.31) (2026-11-16)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

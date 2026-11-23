@@ -10,6 +10,7 @@ import type { SQL } from 'pg-sql2';
 
 import type { FilterApplyResult,SearchableColumn, SearchAdapter } from '../types';
 import { type ChunksInfo,getChunksInfo } from './chunks';
+import { getI18nVectorInfo, type I18nVectorInfo } from './i18n';
 
 /**
  * Build a distance expression for the given metric.
@@ -101,12 +102,14 @@ export function createPgvectorAdapter(
           const modelColumn = Object.entries(codec.attributes as Record<string, any>).find(
             ([, other]) => other.extensions?.tags?.embeddingModelOf === attributeName
           )?.[0];
+          const i18nInfo = getI18nVectorInfo(codec, attributeName, dimensions, _build);
           columns.push({
             attributeName,
             adapterData:
-              chunksInfo || dimensions || model || modelColumn
+              chunksInfo || dimensions || model || modelColumn || i18nInfo
                 ? {
                   ...(chunksInfo && { chunksInfo }),
+                  ...(i18nInfo && { i18nInfo }),
                   ...(dimensions && { dimensions }),
                   ...(model && { model }),
                   ...(modelColumn && { modelColumn }),
@@ -224,7 +227,12 @@ export function createPgvectorAdapter(
       const vectorExpr = sql`${sql.value(vectorString)}::vector`;
 
       // Check if this column has chunks info and chunk querying is requested
-      const adapterData = column.adapterData as { chunksInfo?: ChunksInfo; modelColumn?: string } | undefined;
+      const adapterData = column.adapterData as {
+        chunksInfo?: ChunksInfo;
+        modelColumn?: string;
+        i18nInfo?: I18nVectorInfo;
+        langCodes?: string[];
+      } | undefined;
       const chunksInfo = adapterData?.chunksInfo;
 
       // A row whose vector another model produced is not a worse match, it is
@@ -239,6 +247,50 @@ export function createPgvectorAdapter(
       const both = (a: SQL | null, b: SQL | null): SQL | null => (a && b ? sql`(${a}) AND (${b})` : b);
       const scored = (distance: SQL): SQL =>
         sameModel ? sql`CASE WHEN ${sameModel} THEN ${distance} END` : distance;
+
+      // A table with translations (@i18n) is searched in the request's
+      // language: a row is compared through its translation in the first
+      // requested language it has one embedded for, and through its own
+      // vector otherwise. A default-language request finds no translation and
+      // compares the base rows only, so another language's text never matches.
+      const i18nInfo = adapterData?.i18nInfo;
+      const langCodes = adapterData?.langCodes;
+      let translationDistance: SQL | null = null;
+      if (i18nInfo && langCodes && langCodes.length > 0) {
+        const t = sql.identifier('__translation');
+        const langs = sql`${sql.value(langCodes)}::text[]`;
+        const position = sql`array_position(${langs}, ${t}.${sql.identifier(i18nInfo.langField)}::text)`;
+        const translationVector = sql`${t}.${sql.identifier(i18nInfo.embeddingField)}`;
+        const translationModel =
+          i18nInfo.modelColumn && typeof model === 'string' && model
+            ? sql` AND ${t}.${sql.identifier(i18nInfo.modelColumn)} = ${sql.value(model)}`
+            : sql``;
+        translationDistance = sql`(
+          SELECT ${buildDistanceExpr(sql, translationVector, vectorExpr, resolvedMetric)}
+          FROM ${sql.identifier(i18nInfo.schema, i18nInfo.tableName)} AS ${t}
+          WHERE ${t}.${sql.identifier(i18nInfo.parentFkField)} = ${alias}.${sql.identifier(i18nInfo.parentPkField)}
+            AND ${position} IS NOT NULL
+            AND ${translationVector} IS NOT NULL${translationModel}
+          ORDER BY ${position}
+          LIMIT 1
+        )`;
+      }
+      const inRequestLanguage = (baseDistance: SQL, baseScorable: SQL | null): FilterApplyResult => {
+        const scoreExpression = translationDistance
+          ? sql`COALESCE(${translationDistance}, ${baseDistance})`
+          : baseDistance;
+        const scorableClause = translationDistance
+          ? sql`(${translationDistance} IS NOT NULL OR ${baseScorable ?? sql`true`})`
+          : baseScorable;
+        return {
+          whereClause:
+            distance !== undefined && distance !== null
+              ? sql`${scoreExpression} <= ${sql.value(distance)}`
+              : null,
+          scoreExpression,
+          scorableClause,
+        };
+      };
 
       if (chunksInfo && (includeChunks !== false)) {
         // Chunk-aware query: find the closest chunk for each parent row
@@ -277,21 +329,19 @@ export function createPgvectorAdapter(
         // MIN(distance) is NULL exactly when no chunk has an embedding.
         const scorableClause = sql`(${parentScorable} OR ${chunkDistanceSubquery} IS NOT NULL)`;
 
-        let whereClause: SQL | null = null;
-        if (distance !== undefined && distance !== null) {
-          whereClause = sql`${combinedDistanceExpr} <= ${sql.value(distance)}`;
-        }
-
-        return {
-          whereClause,
-          scoreExpression: combinedDistanceExpr,
-          scorableClause,
-        };
+        return inRequestLanguage(combinedDistanceExpr, scorableClause);
       }
 
       // Standard (non-chunk) query
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
       const distanceExpr = buildDistanceExpr(sql, columnExpr, vectorExpr, resolvedMetric);
+
+      if (translationDistance) {
+        return inRequestLanguage(
+          scored(distanceExpr),
+          both(sameModel, sql`${columnExpr} IS NOT NULL`)
+        );
+      }
 
       let whereClause: SQL | null = null;
       if (distance !== undefined && distance !== null) {

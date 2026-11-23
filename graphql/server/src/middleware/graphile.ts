@@ -5,6 +5,7 @@ import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
+import { parse as parseAcceptLanguage } from 'accept-language-parser';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import {
   cacheGraphileInstance,
@@ -19,21 +20,27 @@ import {
   createConstructivePreset,
   createGrafastCacheLimitsPreset
 } from 'graphile-settings';
+import { getOperationAST, GraphQLError, parse } from 'graphql';
+import type { IncomingMessage } from 'http';
 
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import errorPage404Message from '../errors/404-message';
 import { HandlerCreationError } from '../errors/api-errors';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
+import { CaptchaPlugin } from '../plugins/captcha-plugin';
 import { createErrorEventsPlugin } from '../plugins/error-events-plugin';
+import { OwnerHandoffPlugin } from '../plugins/owner-handoff-plugin';
 import { RequestProtectionPlugin } from '../plugins/request-protection-plugin';
 import { WebauthnPlugin } from '../plugins/webauthn-plugin';
+import { recordRefusal } from '../refusals/recorder';
 import type { ApiOptions, DatabaseSettings } from '../types';
 import { getApiConfig, isApiError } from './api';
 import { generationOf } from './cache-generation';
 import { formatError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import { authenticatedWebSocketRequest, forwardWebSocketUpgrade } from './websocket';
 
 // =============================================================================
 // Single-Flight Pattern: In-Flight Tracking
@@ -72,6 +79,24 @@ export function clearInFlightMap(): void {
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
+const requestLanguages = (header: string | string[] | undefined): string[] | undefined => {
+  const value = (Array.isArray(header) ? header.join(',') : header ?? '')
+    .replace(/\s*;\s*/g, ';').replace(/\s*=\s*/g, '=');
+  const preferences = parseAcceptLanguage(value);
+  const languages = preferences
+    .filter(({ code, quality }) => code !== '*' && quality > 0 && quality <= 1)
+    .map(({ code, script, region }) => [code, script, region].filter(Boolean)
+      .map((subtag, index) => {
+        if (index === 0) return subtag.toLowerCase();
+        if (/^[a-z]{4}$/i.test(subtag)) return subtag[0].toUpperCase() + subtag.slice(1).toLowerCase();
+        if (/^(?:[a-z]{2}|[0-9]{3})$/i.test(subtag)) return subtag.toUpperCase();
+        return subtag.toLowerCase();
+      }).join('-'));
+  if (languages.length) return [...new Set(languages)];
+  return preferences.length && !preferences.some(({ code, quality }) => code === '*' && quality > 0)
+    ? [] : undefined;
+};
+
 /**
  * Build a PostGraphile v5 preset for a tenant.
  *
@@ -91,7 +116,8 @@ const buildPreset = (
   apiId?: string,
   compute?: ComputeConfig,
   webauthn?: boolean,
-  platform?: boolean
+  platform?: boolean,
+  serverOptions: ConstructiveOptions = {}
 ): GraphileConfig.Preset => {
   const introspection = makeIntrospectionWiring(pool, schemas, graphileOptions, introspectionRole);
   const configuredPreset = graphileOptions?.preset ?? {};
@@ -114,10 +140,54 @@ const buildPreset = (
       ...(configuredPreset.plugins ?? []),
       AuthCookiePlugin,
       RequestProtectionPlugin,
+      CaptchaPlugin,
       createErrorEventsPlugin(pool),
+      {
+        name: 'WebSocketSubscriptionOnlyPlugin',
+        version: '0.0.0',
+        grafserv: {
+          middleware: {
+            async onSubscribe(next, event) {
+              const req = (event.ctx.extra as { request: Request }).request;
+              const limit = (req.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+              const bytes = Buffer.byteLength(JSON.stringify(event.message.payload), 'utf8');
+              if (bytes > limit) {
+                recordRefusal(req, 'request_too_large');
+                const error = errors.REQUEST_TOO_LARGE({ bytes, limit });
+                return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+              }
+              let operation;
+              try {
+                operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+              } catch (error) {
+                if (error instanceof GraphQLError) return [error];
+                throw error;
+              }
+              if (operation?.operation !== 'subscription') {
+                return [new GraphQLError('WebSocket transport only accepts subscriptions')];
+              }
+              const result = await next();
+              if (result && !Array.isArray(result)) {
+                const refreshed = (result as { requestContext?: { ws?: { request?: Request } } }).requestContext?.ws?.request;
+                const refreshedLimit = (refreshed?.requestProtection ?? DEFAULT_REQUEST_PROTECTION).maxRequestBytes;
+                if (refreshed && bytes > refreshedLimit) {
+                  recordRefusal(refreshed, 'request_too_large');
+                  const error = errors.REQUEST_TOO_LARGE({ bytes, limit: refreshedLimit });
+                  return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
+                }
+              }
+              return result;
+            }
+          }
+        }
+      },
       // Only when the tenant provisioned the WebAuthn module; the policy
       // itself is read per request from `req.api.webauthnSettings`.
       ...(webauthn ? [WebauthnPlugin] : []),
+      // planning#2511: the platform's passwordless owner hand-off. Registered
+      // only on the platform database's own APIs — a tenant must never mint a
+      // session into another tenant.
+      ...(platform ? [OwnerHandoffPlugin] : []),
       // Only registered when the compute module is provisioned for this
       // database — all schema/table names come from the constructive
       // metaschema (express-context compute module loader); the plugin has
@@ -144,6 +214,7 @@ const buildPreset = (
       pgScopedIntrospection: introspection.pgScopedIntrospection
     },
     grafserv: {
+      websockets: databaseSettings?.enableRealtime === true,
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
       graphiql: true,
@@ -152,9 +223,14 @@ const buildPreset = (
     },
     grafast: {
       explain: graphileOptions?.explain === true,
-      context: (requestContext: Partial<Grafast.RequestContext>) => {
+      context: async (requestContext: Partial<Grafast.RequestContext>) => {
       // In grafserv/express/v4, the request is available at requestContext.expressv4.req
-        const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        const ws = (requestContext as { ws?: { request: IncomingMessage; normalizedConnectionParams?: Record<string, unknown> } }).ws;
+        const req = ws
+          ? await authenticatedWebSocketRequest(ws.request, ws.normalizedConnectionParams, serverOptions)
+          : (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
+        if (ws && req) ws.request = req;
+        const langCodes = requestLanguages(req?.headers?.['accept-language']);
         const context: Record<string, string> = {};
 
         // Timeouts travel with the transaction as GUCs, so they bound the work
@@ -230,7 +306,7 @@ const buildPreset = (
               pgSettings['request.id'] = req.requestId;
             }
 
-            return { pgSettings };
+            return { pgSettings, langCodes };
           }
 
           // Private (in-cluster) surface: there is no token — identity
@@ -266,7 +342,7 @@ const buildPreset = (
             if (req.requestId) {
               pgSettings['request.id'] = req.requestId;
             }
-            return { pgSettings };
+            return { pgSettings, langCodes };
           }
         }
 
@@ -289,7 +365,8 @@ const buildPreset = (
         }
 
         return {
-          pgSettings: anonSettings
+          pgSettings: anonSettings,
+          langCodes
         };
       }
     }
@@ -413,7 +490,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         api.apiId,
         compute,
         Boolean(api.webauthnSettings),
-        platform?.platform
+        platform?.platform,
+        opts
       );
       const instance = await observeGraphileBuild(
         {
@@ -424,6 +502,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         () => createGraphileInstance({
           preset,
           cacheKey: key,
+          realtimeSchema: api.realtimeModule?.schemaName,
           enableRealtime: api.databaseSettings?.enableRealtime
         }),
         { enabled: observabilityEnabled }
@@ -518,6 +597,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
           api = resolved;
           continue;
         }
+        if (forwardWebSocketUpgrade(req, res, instance)) return;
         return instance.handler(req, res, next);
       }
     } catch (e: any) {

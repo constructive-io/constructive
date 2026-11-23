@@ -8,7 +8,6 @@ React Query hooks for GetSitePreviewsRecord data operations
 
 ```typescript
 useGetSitePreviewsQuery({ selection: { fields: { commitId: true, name: true } } })
-useCreateGetSitePreviewsRecordMutation({ selection: { fields: { id: true } } })
 ```
 
 ## Examples
@@ -19,13 +18,4 @@ useCreateGetSitePreviewsRecordMutation({ selection: { fields: { id: true } } })
 const { data, isLoading } = useGetSitePreviewsQuery({
   selection: { fields: { commitId: true, name: true } },
 });
-```
-
-### Create a getSitePreviewsRecord
-
-```typescript
-const { mutate } = useCreateGetSitePreviewsRecordMutation({
-  selection: { fields: { id: true } },
-});
-mutate({ commitId: '<UUID>', name: '<String>' });
 ```

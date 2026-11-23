@@ -22,12 +22,14 @@
 import 'graphile-build';
 
 import { Logger } from '@pgpmjs/logger';
-import { context as grafastContext, lambda, object } from 'grafast';
+import { constant, ConstantStep, context as grafastContext, lambda, object } from 'grafast';
+import type {} from 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
 import { isLiveFileRow } from './file-lifecycle';
+import { isVersionKeyOf } from './file-ref-urls';
 import { resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, readBucketPhysicalName, resolveStorageConfigFromCodec } from './storage-module-cache';
@@ -78,6 +80,8 @@ export function createDownloadUrlPlugin(
           } = build;
 
           const capturedCodec = pgCodec;
+          const canReadVersions = pgCodec.attributes.image_versions &&
+            build.behavior.pgCodecAttributeMatches([pgCodec, 'image_versions'], 'attribute:select');
 
           return build.extend(
             fields,
@@ -90,7 +94,16 @@ export function createDownloadUrlPlugin(
                     'For private files, returns a time-limited presigned URL. ' +
                     'Null until the upload is confirmed (status uploaded or processed), and for a rejected file.',
                   type: GraphQLString,
-                  plan($parent: any) {
+                  args: {
+                    version: {
+                      type: GraphQLString,
+                      description: 'Exact name of a generated image version. Omit or pass null for the original file. ' +
+                        'Returns null when the named version is unavailable or ambiguous.',
+                    },
+                  },
+                  plan($parent: any, fieldArgs) {
+                    const $version = fieldArgs.getRaw('version');
+                    const sourceOnly = $version instanceof ConstantStep && $version.data == null;
                     const $key = $parent.get('key');
                     const $isPublic = $parent.get('is_public');
                     const $filename = $parent.get('filename');
@@ -106,15 +119,28 @@ export function createDownloadUrlPlugin(
                       filename: $filename,
                       bucketId: $bucketId,
                       status: $status,
+                      version: $version,
+                      imageVersions: canReadVersions && !sourceOnly ? $parent.get('image_versions') : constant(null),
                       withPgClient: $withPgClient,
                       pgSettings: $pgSettings,
                     });
 
-                    return lambda($combined, async ({ key, isPublic, filename, bucketId, status, withPgClient, pgSettings }: any) => {
+                    return lambda($combined, async ({ key, isPublic, filename, bucketId, status, version, imageVersions, withPgClient, pgSettings }: any) => {
                       if (!key) return null;
                       if (!isLiveFileRow({ status })) return null;
 
                       if (!withPgClient || !pgSettings) return null;
+
+                      let downloadKey = key;
+                      let downloadFilename = filename || undefined;
+                      if (version != null) {
+                        const versions = imageVersions?.versions;
+                        if (!Array.isArray(versions)) return null;
+                        const matches = versions.filter((entry) => entry?.name === version);
+                        if (matches.length !== 1 || !isVersionKeyOf(key, matches[0].key)) return null;
+                        downloadKey = matches[0].key;
+                        downloadFilename = downloadKey.slice(downloadKey.lastIndexOf('/') + 1);
+                      }
 
                       const databaseId = await withRequestPgClient(withPgClient, pgSettings, async (pgClient) => {
                         const dbResult = await pgClient.query({
@@ -149,14 +175,15 @@ export function createDownloadUrlPlugin(
 
                       const s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.physicalName);
                       if (isPublic && s3ForDb.publicUrlPrefix) {
-                        return `${s3ForDb.publicUrlPrefix}/${s3ForDb.bucket}/${key}`;
+                        const path = version == null ? key : downloadKey.split('/').map(encodeURIComponent).join('/');
+                        return `${s3ForDb.publicUrlPrefix}/${s3ForDb.bucket}/${path}`;
                       }
 
                       return generatePresignedGetUrl(
                         s3ForDb,
-                        key,
+                        downloadKey,
                         resolved.config.downloadUrlExpirySeconds,
-                        filename || undefined,
+                        downloadFilename,
                       );
                     });
                   },

@@ -13,6 +13,7 @@ import { closeAllCaches,graphileCache } from 'graphile-cache';
 import type { Server as HttpServer } from 'http';
 import { Notification, Pool, PoolClient } from 'pg';
 import { getPgPool } from 'pg-cache';
+import type { Duplex } from 'stream';
 
 import { createAgenticRouter } from './agentic';
 import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
@@ -28,7 +29,6 @@ import { createAdmissionControlMiddleware } from './middleware/admission-control
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware, getBearerToken } from './middleware/auth';
 // Auth cookie handling is done via AuthCookiePlugin in grafserv
-import { createCaptchaMiddleware } from './middleware/captcha';
 import { clientIpMiddleware } from './middleware/client-ip';
 import { parseCookieValue, rejectInvalidSessionCookieHeader, SESSION_COOKIE_NAME } from './middleware/cookie';
 import { cors } from './middleware/cors';
@@ -43,6 +43,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { createStandingMiddleware } from './middleware/standing';
+import { isWebSocketUpgrade, routeWebSocketUpgrade } from './middleware/websocket';
 import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
 const log = new Logger('server');
@@ -90,6 +91,7 @@ class Server {
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
+  private webSockets = new Set<Duplex>();
   private debugSampler: DebugSamplerHandle | null = null;
   private refusalRecorder: RefusalRecorder | null = null;
 
@@ -169,7 +171,7 @@ class Server {
     app.use(corsForRoutedApi);
     app.use(api);
     app.use(corsForRoutedApi);
-    app.use(authenticate);
+    app.use((req, res, next) => isWebSocketUpgrade(req) ? next() : authenticate(req, res, next));
     app.use(createContextMiddleware({
       pg: effectiveOpts.pg,
       loaders: createDefaultRegistry()
@@ -187,7 +189,10 @@ class Server {
     // sit in the budget for the life of the stream. The other lanes need
     // their own bound sized for streaming, not this one.
     app.use('/graphql', createAdmissionControlMiddleware());
-    app.use(createCaptchaMiddleware());
+    const graphileMiddleware = graphile(effectiveOpts);
+    app.use((req, res, next) => isWebSocketUpgrade(req)
+      ? graphileMiddleware(req, res, next)
+      : next());
 
     // CSRF protection for cookie-authenticated requests
     // Skip CSRF for Bearer token auth (not vulnerable to CSRF) and anonymous requests
@@ -229,7 +234,7 @@ class Server {
     // REST function invocation routes (POST /fn/:alias, GET /fn/invocations/:id)
     app.use(createFnRouter());
 
-    app.use(graphile(effectiveOpts));
+    app.use(graphileMiddleware);
     app.use(createFlushMiddleware(effectiveOpts));
 
     // Error handling - MUST be LAST
@@ -251,6 +256,12 @@ class Server {
     const httpServer = this.app.listen(server?.port, server?.host, () =>
       log.info(`listening at http://${server?.host}:${server?.port}`)
     );
+
+    httpServer.on('upgrade', (req, socket, head) => {
+      this.webSockets.add(socket);
+      socket.once('close', () => this.webSockets.delete(socket));
+      routeWebSocketUpgrade(this.app, req, socket, head);
+    });
 
     httpServer.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
@@ -411,6 +422,7 @@ class Server {
       this.debugSampler = null;
     }
     if (this.httpServer?.listening) {
+      for (const socket of this.webSockets) socket.destroy();
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
     await closeDebugDatabasePools();

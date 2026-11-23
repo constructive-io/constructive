@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
-const DEFAULT_ATTEMPTS = 30;
-const DEFAULT_DELAY_MS = 20_000;
+const DEFAULT_ATTEMPTS = 80;
+const DEFAULT_DELAY_MS = 30_000;
 const DEFAULT_REGISTRY = 'https://registry.npmjs.org';
 
 const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));

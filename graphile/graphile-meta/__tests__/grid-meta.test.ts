@@ -342,8 +342,8 @@ describe('file columns', () => {
     const documents = resource(
       codec('documents', {
         id: attr(scalar('uuid')),
-        avatar: attr(image),
-        scan: attr(upload),
+        avatar: attr(image, { extensions: { tags: { fileBucketKey: 'avatars' } } }),
+        scan: attr(upload, { extensions: { tags: { fileIsPublic: 'false' } } }),
         gallery: attr(arrayOf(upload)),
         link: attr(attachment),
         contact: attr(domain('email', 'citext')),
@@ -357,13 +357,14 @@ describe('file columns', () => {
     return Object.fromEntries(fields.map((f) => [f.name, f.file]));
   }
 
-  it('reports the file domains, a list of uploads, and the only files table', () => {
+  it('reports the file domains, a list of uploads, the only files table and the bucket a field is bound to', () => {
+    const files = { filesType: 'AppFiles' };
     expect(documentFields(storagePlane('app'))).toEqual({
       id: null,
-      avatar: { kind: 'image', isMultiple: false, filesType: 'AppFiles' },
-      scan: { kind: 'upload', isMultiple: false, filesType: 'AppFiles' },
-      gallery: { kind: 'upload', isMultiple: true, filesType: 'AppFiles' },
-      link: { kind: 'attachment', isMultiple: false, filesType: 'AppFiles' },
+      avatar: { kind: 'image', isMultiple: false, ...files, bucketKey: 'avatars', isPublic: null },
+      scan: { kind: 'upload', isMultiple: false, ...files, bucketKey: null, isPublic: false },
+      gallery: { kind: 'upload', isMultiple: true, ...files, bucketKey: null, isPublic: null },
+      link: { kind: 'attachment', isMultiple: false, ...files, bucketKey: null, isPublic: null },
       contact: null,
       notAFile: null,
       raw: null
@@ -371,7 +372,13 @@ describe('file columns', () => {
   });
 
   it('names no files table when the API has none or several', () => {
-    expect(documentFields({}).avatar).toEqual({ kind: 'image', isMultiple: false, filesType: null });
+    expect(documentFields({}).avatar).toEqual({
+      kind: 'image',
+      isMultiple: false,
+      filesType: null,
+      bucketKey: 'avatars',
+      isPublic: null
+    });
     expect(documentFields({ ...storagePlane('app'), ...storagePlane('org') }).avatar).toMatchObject({
       filesType: null
     });
@@ -385,7 +392,7 @@ describe('the new fields through the _meta query', () => {
       codec('documents', {
         id: attr(scalar('uuid')),
         title: attr(scalar('varchar'), { extensions: { maxLength: 80 } }),
-        avatar: attr(domain('image', 'jsonb')),
+        avatar: attr(domain('image', 'jsonb'), { extensions: { tags: { fileBucketKey: 'avatars', fileIsPublic: 'true' } } }),
         owner_id: attr(scalar('uuid'))
       }),
       [pk('id')],
@@ -435,7 +442,7 @@ describe('the new fields through the _meta query', () => {
       source: `{
         _meta { tables {
           tableName kind description
-          fields { name isComputed type { maxLength precision scale } file { kind isMultiple filesType } }
+          fields { name isComputed type { maxLength precision scale } file { kind isMultiple filesType bucketKey isPublic } }
           relations {
             belongsTo { fieldName keys { name } refKeys { name } }
             hasMany { fieldName keys { name } remoteKeys { name } }
@@ -454,7 +461,9 @@ describe('the new fields through the _meta query', () => {
     expect(doc.fields.find((f: any) => f.name === 'avatar').file).toEqual({
       kind: 'image',
       isMultiple: false,
-      filesType: null
+      filesType: null,
+      bucketKey: 'avatars',
+      isPublic: true
     });
     expect(doc.relations.belongsTo).toEqual([
       { fieldName: 'owner', keys: [{ name: 'ownerId' }], refKeys: [{ name: 'id' }] }

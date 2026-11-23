@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.1...graphile-llm@1.25.2) (2026-11-23)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.25.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.0...graphile-llm@1.25.1) (2026-11-23)
+
+**Note:** Version bump only for package graphile-llm
+
+# [1.25.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.9...graphile-llm@1.25.0) (2026-11-22)
+
+### Features
+
+- **graphile-search:** vector search in the request language on tables with translations ([#2048](https://github.com/constructive-io/constructive/issues/2048)) ([ebf6839](https://github.com/constructive-io/constructive/commit/ebf68391bcc0f54d8e36cf8da37b05a5c304e04b))
+
+## [1.24.9](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.8...graphile-llm@1.24.9) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.8](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.7...graphile-llm@1.24.8) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.7](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.6...graphile-llm@1.24.7) (2026-11-21)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.6](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.5...graphile-llm@1.24.6) (2026-11-19)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.5](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.4...graphile-llm@1.24.5) (2026-11-19)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.3...graphile-llm@1.24.4) (2026-11-18)
+
+### Bug Fixes
+
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+
+## [1.24.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.2...graphile-llm@1.24.3) (2026-11-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.2](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.1...graphile-llm@1.24.2) (2026-11-17)
+
+**Note:** Version bump only for package graphile-llm
+
+## [1.24.1](https://github.com/constructive-io/constructive/compare/graphile-llm@1.24.0...graphile-llm@1.24.1) (2026-11-17)
+
+### Bug Fixes
+
+- **graphile-llm:** add `{col}Text` only to inputs that carry `{col}` ([#2006](https://github.com/constructive-io/constructive/issues/2006)) ([14d3e8d](https://github.com/constructive-io/constructive/commit/14d3e8d8c680d7c28dce748ddf49114a2fb2d95b))
+
 # [1.24.0](https://github.com/constructive-io/constructive/compare/graphile-llm@1.23.10...graphile-llm@1.24.0) (2026-11-16)
 
 ### Bug Fixes

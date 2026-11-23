@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.10](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.9...@pgpmjs/import@0.11.10) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.9](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.8...@pgpmjs/import@0.11.9) (2026-11-23)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.8](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.7...@pgpmjs/import@0.11.8) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.6...@pgpmjs/import@0.11.7) (2026-11-21)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.5...@pgpmjs/import@0.11.6) (2026-11-19)
+
+**Note:** Version bump only for package @pgpmjs/import
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.4...@pgpmjs/import@0.11.5) (2026-11-17)
+
+**Note:** Version bump only for package @pgpmjs/import
+
 ## [0.11.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/import@0.11.3...@pgpmjs/import@0.11.4) (2026-11-14)
 
 **Note:** Version bump only for package @pgpmjs/import

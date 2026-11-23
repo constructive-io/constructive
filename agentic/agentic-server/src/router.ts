@@ -14,6 +14,7 @@ import { Logger } from '@pgpmjs/logger';
 import { Router } from 'express';
 
 import { BadRequestError } from './errors';
+import { listServedModels, MODEL_LIST_HINT } from './models';
 import { buildProviderHeaders, resolveProvider, resolveUpstreamUrl } from './providers';
 import { relayEventStream, withUsageStreamOptions } from './streaming';
 import {
@@ -79,9 +80,13 @@ function upstreamErrorMessage(
     ? `${parsed.slice(0, UPSTREAM_REASON_LIMIT)}…`
     : parsed;
 
-  return reason
+  const message = reason
     ? `${provider.type} provider error ${status}: ${reason}`
     : `${provider.type} provider error ${status}`;
+
+  // 404 is how every dialect answers a model it does not serve, and a run
+  // configured with one fails on its first call: say where the served ones are.
+  return status === 404 ? `${message} — ${MODEL_LIST_HINT}` : message;
 }
 
 /**
@@ -433,6 +438,22 @@ export const createRouter = (options: AgenticServerOptions): Router => {
     res.status(202).json({ accepted: true });
   });
 
+  // GET /v1/models — the models a caller can run: id and display name, nothing
+  // of the providers behind them. Asked for with the identity a run carries.
+  router.get('/v1/models', async (req: any, res: any) => {
+    if (!req.get('X-Database-Id')) {
+      res.status(400).json({ error: { message: 'X-Database-Id is required' } });
+      return;
+    }
+    try {
+      res.json({ object: 'list', data: await listServedModels(options) });
+    } catch (err: any) {
+      // The reason names a provider; it is the operator's to read, in the log.
+      log.error('models error', err);
+      res.status(502).json({ error: { message: 'the model list is unavailable' } });
+    }
+  });
+
   // GET /v1/providers — list configured providers
   router.get('/v1/providers', (_req: any, res: any) => {
     const providers = options.providers || [{
@@ -448,18 +469,10 @@ export const createRouter = (options: AgenticServerOptions): Router => {
     });
   });
 
-  // GET /healthz — health check
+  // GET /healthz — liveness only. It is unauthenticated, and whatever forwards
+  // to this gateway forwards here too, so it describes no provider.
   router.get('/healthz', (_req: any, res: any) => {
-    const providers = options.providers || [{
-      type: options.providerType || 'ollama',
-      baseUrl: options.providerBaseUrl || 'http://localhost:11434'
-    }];
-    res.json({
-      status: 'ok',
-      provider: providers[0]?.type || 'ollama',
-      providerUrl: providers[0]?.baseUrl || options.providerBaseUrl,
-      providers: providers.map((p) => p.type)
-    });
+    res.json({ status: 'ok' });
   });
 
   return router;

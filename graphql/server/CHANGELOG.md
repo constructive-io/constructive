@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.10](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.9...@constructive-io/graphql-server@5.36.10) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [5.36.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.8...@constructive-io/graphql-server@5.36.9) (2026-11-23)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.7...@constructive-io/graphql-server@5.36.8) (2026-11-22)
+
+### Bug Fixes
+
+- **server:** release a cached API's LISTEN client when its last subscription ends ([#2049](https://github.com/constructive-io/constructive/issues/2049)) ([3b80491](https://github.com/constructive-io/constructive/commit/3b804911e10c12d9dcf87bd3f0b21df6e19b5a22))
+
+## [5.36.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.6...@constructive-io/graphql-server@5.36.7) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.5...@constructive-io/graphql-server@5.36.6) (2026-11-21)
+
+### Bug Fixes
+
+- **i18n:** localized reads on tenant APIs (physical table names + request languages) ([#2045](https://github.com/constructive-io/constructive/issues/2045)) ([836796e](https://github.com/constructive-io/constructive/commit/836796ef9ca06aaf91bbaf3e88f3110a1cd4dd20))
+
+## [5.36.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.4...@constructive-io/graphql-server@5.36.5) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.3...@constructive-io/graphql-server@5.36.4) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.2...@constructive-io/graphql-server@5.36.3) (2026-11-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.36.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.1...@constructive-io/graphql-server@5.36.2) (2026-11-21)
+
+### Bug Fixes
+
+- **realtime:** serve tenant GraphQL subscriptions over WS and generate them from endpoint schemas ([#2037](https://github.com/constructive-io/constructive/issues/2037)) ([56476d5](https://github.com/constructive-io/constructive/commit/56476d5843466571544392f710c476dfcbb2a01d))
+
+## [5.36.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.0...@constructive-io/graphql-server@5.36.1) (2026-11-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [5.36.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.22...@constructive-io/graphql-server@5.36.0) (2026-11-19)
+
+### Features
+
+- **server:** mintTenantOwnerHandoff for passwordless owner builds (planning[#2511](https://github.com/constructive-io/constructive/issues/2511)) ([#1997](https://github.com/constructive-io/constructive/issues/1997)) ([784f1aa](https://github.com/constructive-io/constructive/commit/784f1aacf5bfc8106cb65604dd043598ae66e380)), closes [constructive-db#4356](https://github.com/constructive-db/issues/4356)
+
+## [5.35.22](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.21...@constructive-io/graphql-server@5.35.22) (2026-11-18)
+
+### Bug Fixes
+
+- **graphql-server:** a flush makes rebuilt hosts read their settings again ([#2018](https://github.com/constructive-io/constructive/issues/2018)) ([278e12c](https://github.com/constructive-io/constructive/commit/278e12c2c32180583cd46cf8bb94c00ff7d3822c)), closes [constructive-planning#2539](https://github.com/constructive-planning/issues/2539)
+- **server:** a refused credential on a REST route answers its HTTP status with a JSON error ([#2028](https://github.com/constructive-io/constructive/issues/2028)) ([29b71f0](https://github.com/constructive-io/constructive/commit/29b71f0a25bf160da98c056ca712ed49f8d2fcbb))
+- **server:** chat routes carry the acting principal, write actor_id, survive a second turn, and report RLS and provider failures ([#2026](https://github.com/constructive-io/constructive/issues/2026)) ([0559e25](https://github.com/constructive-io/constructive/commit/0559e25277db0dc2fbd7fb89d88b84047ad37c5e))
+- **server:** chat routes resolve an entity to the agent module of its own scope ([#2027](https://github.com/constructive-io/constructive/issues/2027)) ([eae302c](https://github.com/constructive-io/constructive/commit/eae302cb7aec48c74a387c470ae7c67d79d40f03))
+- **server:** gate captcha on the mutation fields that execute ([#2022](https://github.com/constructive-io/constructive/issues/2022)) ([d32d3ab](https://github.com/constructive-io/constructive/commit/d32d3ab97c95162764d3e83a7e2aef9c2bfed0b1))
+- **server:** return document-gate refusals with their registered error code ([#2025](https://github.com/constructive-io/constructive/issues/2025)) ([bbe2567](https://github.com/constructive-io/constructive/commit/bbe2567e0f249b03a2bb671563def01278e7c2e9))
+
+## [5.35.21](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.20...@constructive-io/graphql-server@5.35.21) (2026-11-17)
+
+### Bug Fixes
+
+- **errors:** register the codes constructive-db main raises, including ones handed to raise helpers ([#2017](https://github.com/constructive-io/constructive/issues/2017)) ([d92dd40](https://github.com/constructive-io/constructive/commit/d92dd40765cbedf00ba8e031ffca926cccf78020))
+
+## [5.35.20](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.19...@constructive-io/graphql-server@5.35.20) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [5.35.19](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.18...@constructive-io/graphql-server@5.35.19) (2026-11-17)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [5.35.18](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.35.17...@constructive-io/graphql-server@5.35.18) (2026-11-16)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

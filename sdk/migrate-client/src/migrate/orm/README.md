@@ -21,8 +21,8 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `astMigration` | findMany, findOne, create, update, delete |
-| `sqlAction` | findMany, findOne, create, update, delete |
+| `astMigration` | findMany, findOne, update, delete |
+| `sqlAction` | findMany, findOne, update, delete |
 
 ## Table Operations
 
@@ -56,9 +56,6 @@ const items = await db.astMigration.findMany({ select: { actionId: true, actionN
 
 // Get one by id
 const item = await db.astMigration.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, createdAt: true, databaseId: true, deploy: true, deploys: true, id: true, name: true, payload: true, requires: true, revert: true, verify: true } }).execute();
-
-// Create
-const created = await db.astMigration.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', databaseId: '<UUID>', deploy: '<JSON>', deploys: '<String>', name: '<String>', payload: '<JSON>', requires: '<String>', revert: '<JSON>', verify: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.astMigration.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();
@@ -97,9 +94,6 @@ const items = await db.sqlAction.findMany({ select: { actionId: true, actionName
 
 // Get one by id
 const item = await db.sqlAction.findOne({ id: '<Int>', select: { actionId: true, actionName: true, actorId: true, content: true, createdAt: true, databaseId: true, deploy: true, deps: true, id: true, name: true, payload: true, revert: true, verify: true } }).execute();
-
-// Create
-const created = await db.sqlAction.create({ data: { actionId: '<UUID>', actionName: '<String>', actorId: '<UUID>', content: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', name: '<String>', payload: '<JSON>', revert: '<String>', verify: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { actionId: '<UUID>' }, select: { id: true } }).execute();

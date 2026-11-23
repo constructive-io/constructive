@@ -47,15 +47,18 @@ csdk auth set-token <your-token>
 | `current-user-id` | currentUserId |
 | `get-mfa-status` | getMfaStatus |
 | `require-step-up` | requireStepUp |
+| `sign-in-options` | signInOptions |
 | `approve-device` | approveDevice |
+| `cancel-sign-up-handoff` | cancelSignUpHandoff |
 | `check-password` | checkPassword |
 | `complete-mfa-challenge` | completeMfaChallenge |
 | `confirm-delete-account` | confirmDeleteAccount |
 | `confirm-totp-setup` | confirmTotpSetup |
-| `create-api-key` | createApiKey |
+| `create-api-key` | Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key. |
 | `create-child-principal` | createChildPrincipal |
 | `create-org-api-key` | createOrgApiKey |
 | `create-org-principal` | createOrgPrincipal |
+| `create-principal` | createPrincipal |
 | `create-principal-from-preset` | createPrincipalFromPreset |
 | `delete-org-principal` | deleteOrgPrincipal |
 | `delete-principal` | deletePrincipal |
@@ -66,6 +69,8 @@ csdk auth set-token <your-token>
 | `enable-email-mfa` | enableEmailMfa |
 | `enable-sms-mfa` | enableSmsMfa |
 | `enable-totp` | enableTotp |
+| `ensure-auth-csrf` | ensureAuthCsrf |
+| `exchange-native-handoff` | exchangeNativeHandoff |
 | `extend-token-expires` | extendTokenExpires |
 | `forgot-password` | forgotPassword |
 | `generate-backup-codes` | generateBackupCodes |
@@ -79,6 +84,7 @@ idempotent for an already-reconciled bucket; failures become GraphQL
 errors. |
 | `refresh-access-token` | refreshAccessToken |
 | `request-cross-origin-token` | requestCrossOriginToken |
+| `request-device-approval` | requestDeviceApproval |
 | `request-magic-link` | requestMagicLink |
 | `reset-password` | resetPassword |
 | `revoke-api-key` | revokeApiKey |
@@ -103,6 +109,7 @@ errors. |
 | `sign-up-sms` | signUpSms |
 | `update-principal` | updatePrincipal |
 | `verify-email` | verifyEmail |
+| `verify-email-handoff` | verifyEmailHandoff |
 | `verify-password` | verifyPassword |
 | `verify-phone` | verifyPhone |
 | `verify-step-up-code` | verifyStepUpCode |
@@ -246,7 +253,6 @@ CRUD operations for IdentityProvider records.
 | `list` | List all identityProvider records |
 | `find-first` | Find first matching identityProvider record |
 | `get` | Get a identityProvider by id |
-| `create` | Create a new identityProvider |
 | `update` | Update an existing identityProvider |
 | `delete` | Delete a identityProvider |
 
@@ -270,7 +276,6 @@ CRUD operations for OrgApiKeyList records.
 | `list` | List all orgApiKeyList records |
 | `find-first` | Find first matching orgApiKeyList record |
 | `get` | Get a orgApiKeyList by id |
-| `create` | Create a new orgApiKeyList |
 | `update` | Update an existing orgApiKeyList |
 | `delete` | Delete a orgApiKeyList |
 
@@ -332,7 +337,6 @@ CRUD operations for Principal records.
 | `list` | List all principal records |
 | `find-first` | Find first matching principal record |
 | `get` | Get a principal by principalId |
-| `create` | Create a new principal |
 | `update` | Update an existing principal |
 | `delete` | Delete a principal |
 
@@ -366,7 +370,6 @@ CRUD operations for PrincipalEntity records.
 | `list` | List all principalEntity records |
 | `find-first` | Find first matching principalEntity record |
 | `get` | Get a principalEntity by id |
-| `create` | Create a new principalEntity |
 | `update` | Update an existing principalEntity |
 | `delete` | Delete a principalEntity |
 
@@ -392,7 +395,6 @@ CRUD operations for PrincipalScopeOverride records.
 | `list` | List all principalScopeOverride records |
 | `find-first` | Find first matching principalScopeOverride record |
 | `get` | Get a principalScopeOverride by id |
-| `create` | Create a new principalScopeOverride |
 | `update` | Update an existing principalScopeOverride |
 | `delete` | Delete a principalScopeOverride |
 
@@ -443,7 +445,6 @@ CRUD operations for UserConnectedAccount records.
 | `list` | List all userConnectedAccount records |
 | `find-first` | Find first matching userConnectedAccount record |
 | `get` | Get a userConnectedAccount by id |
-| `create` | Create a new userConnectedAccount |
 | `update` | Update an existing userConnectedAccount |
 | `delete` | Delete a userConnectedAccount |
 
@@ -485,6 +486,8 @@ CRUD operations for User records.
 | `displayNameTrgmSimilarity` | Float |
 | `id` | UUID |
 | `profilePicture` | Image |
+| `profilePictureUrl` | String |
+| `profilePictureVersions` | FileVersion |
 | `searchScore` | Float |
 | `searchTsv` | FullText |
 | `searchTsvRank` | Float |
@@ -493,30 +496,30 @@ CRUD operations for User records.
 | `username` | String |
 
 **Optional create fields (backend defaults):** `displayName`, `profilePicture`, `type`, `username`
-> **Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`, `searchTsv`
+> **Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`, `searchTsv`, `searchTsvRank`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 **Search Examples:**
 
 *Fuzzy search via trigram similarity (`trgmDisplayName`):*
 ```bash
-csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
+csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select displayName,displayNameTrgmSimilarity
 ```
 
 *Full-text search via tsvector (`searchTsv`):*
 ```bash
-csdk user list --where.searchTsv "search query" --select title,tsvRank
+csdk user list --where.searchTsv "search query" --select displayName,searchTsvRank
 ```
 
 *Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk user list --where.unifiedSearch "search query" --select title,displayNameTrgmSimilarity,searchScore,tsvRank
+csdk user list --where.unifiedSearch "search query" --select displayName,displayNameTrgmSimilarity,searchScore,searchTsvRank
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk user list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
-csdk user search "query" --limit 10 --select id,title,searchScore
+csdk user list --where.unifiedSearch "query" --limit 10 --select id,displayName,searchScore
+csdk user search "query" --limit 10 --select id,displayName,searchScore
 ```
 
 
@@ -657,6 +660,13 @@ requireStepUp
   |----------|------|
   | `--stepUpType` | String |
 
+### `sign-in-options`
+
+signInOptions
+
+- **Type:** query
+- **Arguments:** none
+
 ### `approve-device`
 
 approveDevice
@@ -668,6 +678,19 @@ approveDevice
   |----------|------|
   | `--input.approvalToken` | String (required) |
   | `--input.clientMutationId` | String |
+
+### `cancel-sign-up-handoff`
+
+cancelSignUpHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.codeChallenge` | String |
+  | `--input.email` | String |
 
 ### `check-password`
 
@@ -727,7 +750,7 @@ confirmTotpSetup
 
 ### `create-api-key`
 
-createApiKey
+Mint an API key for the current user; the plaintext key is returned once. access_level: full_access (default) or read_only. mfa_level: none (default) or verified; verified needs a fresh MFA proof on the calling session. A key minted while authenticated by another API key never outlives that key.
 
 - **Type:** mutation
 - **Arguments:**
@@ -790,6 +813,22 @@ createOrgPrincipal
   | `--input.isReadOnly` | Boolean |
   | `--input.name` | String |
   | `--input.orgId` | UUID |
+  | `--input.useAdminOwner` | Boolean |
+
+### `create-principal`
+
+createPrincipal
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.bypassStepUp` | Boolean |
+  | `--input.clientMutationId` | String |
+  | `--input.entityIds` | UUID |
+  | `--input.isReadOnly` | Boolean |
+  | `--input.name` | String |
   | `--input.useAdminOwner` | Boolean |
 
 ### `create-principal-from-preset`
@@ -910,6 +949,32 @@ enableTotp
   |----------|------|
   | `--input.clientMutationId` | String |
 
+### `ensure-auth-csrf`
+
+ensureAuthCsrf
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.existingToken` | String |
+
+### `exchange-native-handoff`
+
+exchangeNativeHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.code` | String |
+  | `--input.codeVerifier` | String |
+  | `--input.credentialKind` | String |
+
 ### `extend-token-expires`
 
 extendTokenExpires
@@ -955,7 +1020,7 @@ linkIdentity
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.ticket` | String (required) |
+  | `--input.ticket` | String |
 
 ### `mint-access-token`
 
@@ -1015,6 +1080,20 @@ requestCrossOriginToken
   | `--input.password` | String |
   | `--input.rememberMe` | Boolean |
 
+### `request-device-approval`
+
+requestDeviceApproval
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.deviceToken` | String |
+  | `--input.next` | String |
+  | `--input.userId` | UUID |
+
 ### `request-magic-link`
 
 requestMagicLink
@@ -1025,7 +1104,9 @@ requestMagicLink
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
+  | `--input.codeChallenge` | String |
   | `--input.email` | String |
+  | `--input.nativeRedirectUri` | String |
   | `--input.next` | String |
 
 ### `reset-password`
@@ -1164,6 +1245,7 @@ setPassword
   | `--input.clientMutationId` | String |
   | `--input.currentPassword` | String |
   | `--input.newPassword` | String |
+  | `--input.signOutOtherSessions` | Boolean |
 
 ### `set-principal-entities`
 
@@ -1277,9 +1359,11 @@ signUp
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
+  | `--input.codeChallenge` | String |
   | `--input.csrfToken` | String |
   | `--input.email` | String |
   | `--input.inviteToken` | String |
+  | `--input.nativeRedirectUri` | String |
   | `--input.password` | String |
 
 ### `sign-up-magic-link`
@@ -1343,6 +1427,21 @@ verifyEmail
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.emailId` | UUID |
+  | `--input.password` | String |
+  | `--input.token` | String |
+
+### `verify-email-handoff`
+
+verifyEmailHandoff
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.password` | String |
   | `--input.token` | String |
 
 ### `verify-password`

@@ -7,6 +7,8 @@ import { ScopedIntrospectionPreset } from 'graphile-scoped-introspection';
 import { makePgService } from 'graphile-settings';
 import type { Pool } from 'pg';
 
+import { IdleReleasingPgSubscriber } from './pg-subscriber';
+
 export interface IntrospectionWiring {
   presets: GraphileConfig.Preset[];
   pgService: GraphileConfig.PgServiceConfiguration;
@@ -48,7 +50,13 @@ export const makeIntrospectionWiring = (
   introspectionRole?: string
 ): IntrospectionWiring => {
   const pgSettingsForIntrospection = introspectionRole ? { role: introspectionRole } : undefined;
-  const pgService = makePgService({ pool, schemas, pgSettingsForIntrospection });
+  const pgSubscriber = new IdleReleasingPgSubscriber(pool);
+  const pgService = makePgService({ pool, schemas, pgSettingsForIntrospection, pgSubscriber });
+  const release = pgService.release;
+  pgService.release = async () => {
+    pgSubscriber.release();
+    await release?.();
+  };
   const configured = resolveCallerPreset(graphileOptions)?.gather?.pgScopedIntrospection;
 
   if (configured !== undefined && !isPlainObject(configured)) {

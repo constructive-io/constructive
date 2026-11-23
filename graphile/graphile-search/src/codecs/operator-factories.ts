@@ -11,6 +11,8 @@
 import type { ConnectionFilterOperatorFactory } from 'graphile-connection-filter';
 import type { SQL } from 'pg-sql2';
 
+import { conditionTsConfig } from '../ts-config';
+
 /**
  * Creates the `matches` filter operator factory for full-text search.
  * Declared here so it's registered via the declarative
@@ -18,7 +20,7 @@ import type { SQL } from 'pg-sql2';
  */
 export function createMatchesOperatorFactory(
   fullTextScalarName: string,
-  tsConfig: string
+  tsConfig?: string
 ): ConnectionFilterOperatorFactory {
   return (build) => {
     const { sql, graphql: { GraphQLString } } = build;
@@ -35,10 +37,12 @@ export function createMatchesOperatorFactory(
           sqlIdentifier: SQL,
           sqlValue: SQL,
           _input: unknown,
-          _$where: any,
+          $where: any,
           _details: { fieldName: string | null; operatorName: string }
         ) {
-          return sql`${sqlIdentifier} @@ websearch_to_tsquery(${sql.literal(tsConfig)}, ${sqlValue})`;
+          const columnConfig = $where.extensions?.pgFilterAttribute?.attribute?.extensions?.tags?.tsConfig;
+          const config = (typeof columnConfig === 'string' ? columnConfig : undefined) ?? tsConfig ?? conditionTsConfig($where) ?? 'english';
+          return sql`${sqlIdentifier} @@ websearch_to_tsquery(${sql.value(config)}::regconfig, ${sqlValue})`;
         },
       },
     }];

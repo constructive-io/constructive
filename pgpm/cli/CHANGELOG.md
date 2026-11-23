@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.41.28](https://github.com/constructive-io/constructive/compare/pgpm@5.41.27...pgpm@5.41.28) (2026-11-23)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser to 18.4.4 ([36242d3](https://github.com/constructive-io/constructive/commit/36242d32e0cee4c367906a40bd546205db4b6e98))
+
+## [5.41.27](https://github.com/constructive-io/constructive/compare/pgpm@5.41.26...pgpm@5.41.27) (2026-11-23)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.26](https://github.com/constructive-io/constructive/compare/pgpm@5.41.25...pgpm@5.41.26) (2026-11-22)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.25](https://github.com/constructive-io/constructive/compare/pgpm@5.41.24...pgpm@5.41.25) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.24](https://github.com/constructive-io/constructive/compare/pgpm@5.41.23...pgpm@5.41.24) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.23](https://github.com/constructive-io/constructive/compare/pgpm@5.41.22...pgpm@5.41.23) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.22](https://github.com/constructive-io/constructive/compare/pgpm@5.41.21...pgpm@5.41.22) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.21](https://github.com/constructive-io/constructive/compare/pgpm@5.41.20...pgpm@5.41.21) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.20](https://github.com/constructive-io/constructive/compare/pgpm@5.41.19...pgpm@5.41.20) (2026-11-21)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.19](https://github.com/constructive-io/constructive/compare/pgpm@5.41.18...pgpm@5.41.19) (2026-11-19)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.18](https://github.com/constructive-io/constructive/compare/pgpm@5.41.17...pgpm@5.41.18) (2026-11-19)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.17](https://github.com/constructive-io/constructive/compare/pgpm@5.41.16...pgpm@5.41.17) (2026-11-18)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.16](https://github.com/constructive-io/constructive/compare/pgpm@5.41.15...pgpm@5.41.16) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.15](https://github.com/constructive-io/constructive/compare/pgpm@5.41.14...pgpm@5.41.15) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
+## [5.41.14](https://github.com/constructive-io/constructive/compare/pgpm@5.41.13...pgpm@5.41.14) (2026-11-17)
+
+**Note:** Version bump only for package pgpm
+
 ## [5.41.13](https://github.com/constructive-io/constructive/compare/pgpm@5.41.12...pgpm@5.41.13) (2026-11-16)
 
 **Note:** Version bump only for package pgpm

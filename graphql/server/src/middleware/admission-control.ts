@@ -14,6 +14,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { recordRefusal } from '../refusals/recorder';
 import { resolveProxyHops } from './client-ip';
+import { isWebSocketUpgrade } from './websocket';
 
 const log = new Logger('admission');
 
@@ -112,7 +113,9 @@ export const createAdmissionControlMiddleware = (
     // attached only after `acquire` resolves misses a hang-up during it.
     const gone = new AbortController();
     const onClose = () => gone.abort();
-    res.once('close', onClose);
+    // An upgraded socket holds one slot for its entire lifetime.
+    const lifetime = isWebSocketUpgrade(req) ? req.socket : res;
+    lifetime.once('close', onClose);
 
     let lease: AdmissionLease;
     try {
@@ -122,11 +125,11 @@ export const createAdmissionControlMiddleware = (
         signal: gone.signal
       });
     } catch (e) {
-      res.off('close', onClose);
+      lifetime.off('close', onClose);
       next(e);
       return;
     }
-    res.off('close', onClose);
+    lifetime.off('close', onClose);
 
     if (gone.signal.aborted) {
       lease.release();
@@ -162,7 +165,7 @@ export const createAdmissionControlMiddleware = (
     // until the process restarts, and a client that retries on abort would
     // drain the tenant's budget one leaked slot at a time. `release` is
     // idempotent, so both listeners can fire.
-    res.on('close', () => lease.release());
+    lifetime.on('close', () => lease.release());
     res.on('finish', () => lease.release());
     next();
   };

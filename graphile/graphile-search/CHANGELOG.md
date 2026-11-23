@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.2](https://github.com/constructive-io/constructive/compare/graphile-search@2.21.1...graphile-search@2.21.2) (2026-11-23)
+
+**Note:** Version bump only for package graphile-search
+
+## [2.21.1](https://github.com/constructive-io/constructive/compare/graphile-search@2.21.0...graphile-search@2.21.1) (2026-11-23)
+
+**Note:** Version bump only for package graphile-search
+
+# [2.21.0](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.6...graphile-search@2.21.0) (2026-11-22)
+
+### Features
+
+- **graphile-search:** vector search in the request language on tables with translations ([#2048](https://github.com/constructive-io/constructive/issues/2048)) ([ebf6839](https://github.com/constructive-io/constructive/commit/ebf68391bcc0f54d8e36cf8da37b05a5c304e04b))
+
+## [2.20.6](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.5...graphile-search@2.20.6) (2026-11-21)
+
+### Bug Fixes
+
+- **search:** pick the tsvector query config from the request language ([#2047](https://github.com/constructive-io/constructive/issues/2047)) ([5a13201](https://github.com/constructive-io/constructive/commit/5a1320140fcfb01c58912ff7c131cd3f60c9dfed))
+
+## [2.20.5](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.4...graphile-search@2.20.5) (2026-11-21)
+
+**Note:** Version bump only for package graphile-search
+
+## [2.20.4](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.3...graphile-search@2.20.4) (2026-11-21)
+
+**Note:** Version bump only for package graphile-search
+
+## [2.20.3](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.2...graphile-search@2.20.3) (2026-11-19)
+
+### Bug Fixes
+
+- **graphile-search:** preserve mixed literal orderBy ordering ([#2034](https://github.com/constructive-io/constructive/issues/2034)) ([b749333](https://github.com/constructive-io/constructive/commit/b74933377334027c40370e38bb2ff4e2d2f0479d))
+
+## [2.20.2](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.1...graphile-search@2.20.2) (2026-11-19)
+
+**Note:** Version bump only for package graphile-search
+
+## [2.20.1](https://github.com/constructive-io/constructive/compare/graphile-search@2.20.0...graphile-search@2.20.1) (2026-11-17)
+
+**Note:** Version bump only for package graphile-search
+
 # [2.20.0](https://github.com/constructive-io/constructive/compare/graphile-search@2.19.12...graphile-search@2.20.0) (2026-11-16)
 
 ### Bug Fixes

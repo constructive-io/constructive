@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.15](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.14...insforge-test@1.19.15) (2026-11-23)
+
+**Note:** Version bump only for package insforge-test
+
+## [1.19.14](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.13...insforge-test@1.19.14) (2026-11-23)
+
+**Note:** Version bump only for package insforge-test
+
+## [1.19.13](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.12...insforge-test@1.19.13) (2026-11-21)
+
+**Note:** Version bump only for package insforge-test
+
+## [1.19.12](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.11...insforge-test@1.19.12) (2026-11-21)
+
+**Note:** Version bump only for package insforge-test
+
+## [1.19.11](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.10...insforge-test@1.19.11) (2026-11-19)
+
+**Note:** Version bump only for package insforge-test
+
+## [1.19.10](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.9...insforge-test@1.19.10) (2026-11-17)
+
+**Note:** Version bump only for package insforge-test
+
 ## [1.19.9](https://github.com/constructive-io/constructive/compare/insforge-test@1.19.8...insforge-test@1.19.9) (2026-11-14)
 
 **Note:** Version bump only for package insforge-test

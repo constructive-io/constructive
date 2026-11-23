@@ -5,16 +5,17 @@
  */
 import type { ApiExposureLevel, ObjectCategory } from './schema-types';
 export type ConstructiveInternalTypeImage = unknown;
+export type FileVersion = unknown;
 export interface Api {
   anonRole: string | null;
   config: unknown | null;
   createdAt: string | null;
   databaseId: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
   roleName: string | null;
+  serviceHostname: string | null;
   updatedAt: string | null;
 }
 export interface ApiSchema {
@@ -32,7 +33,6 @@ export interface ApiSetting {
   enableAggregates: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -129,7 +129,6 @@ export interface DatabaseSetting {
   enableBilling: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -182,6 +181,7 @@ export interface DefaultPrivilege {
 }
 export interface Derive {
   createdAt: string | null;
+  data: unknown | null;
   databaseId: string | null;
   id: string | null;
   includeGrants: boolean | null;
@@ -549,11 +549,11 @@ export interface PlatformApi {
   anonRole: string | null;
   config: unknown | null;
   createdAt: string | null;
-  dbname: string | null;
   id: string | null;
   isPublished: boolean | null;
   name: string | null;
   roleName: string | null;
+  serviceHostname: string | null;
   updatedAt: string | null;
 }
 export interface PlatformApiSchema {
@@ -569,7 +569,6 @@ export interface PlatformApiSetting {
   enableAggregates: boolean | null;
   enableBulk: boolean | null;
   enableConnectionFilter: boolean | null;
-  enableDirectUploads: boolean | null;
   enableI18N: boolean | null;
   enableIntrospection: boolean | null;
   enableLlm: boolean | null;
@@ -717,6 +716,16 @@ export interface PlatformPage {
   storeId: string | null;
   updatedAt: string | null;
 }
+export interface PlatformReservedSubdomain {
+  createdAt: string | null;
+  createdByPrincipal: string | null;
+  id: string | null;
+  label: string | null;
+  match: string | null;
+  reason: string | null;
+  updatedAt: string | null;
+  updatedByPrincipal: string | null;
+}
 export interface PlatformSiteAppLink {
   appStoreIdentityId: string | null;
   createdAt: string | null;
@@ -764,14 +773,22 @@ export interface PlatformSiteErrorPage {
 }
 export interface PlatformSiteMetadatum {
   appleTouchIcon: ConstructiveInternalTypeImage | null;
+  appleTouchIconUrl: string | null;
+  appleTouchIconVersions: FileVersion[] | null;
   canonicalUrl: string | null;
   commitId: string | null;
   createdAt: string | null;
   description: string | null;
   favicon: ConstructiveInternalTypeImage | null;
+  faviconUrl: string | null;
+  faviconVersions: FileVersion[] | null;
   id: string | null;
   logo: ConstructiveInternalTypeImage | null;
+  logoUrl: string | null;
+  logoVersions: FileVersion[] | null;
   ogImage: ConstructiveInternalTypeImage | null;
+  ogImageUrl: string | null;
+  ogImageVersions: FileVersion[] | null;
   robots: string | null;
   robotsSeededFrom: unknown | null;
   siteId: string | null;
@@ -990,15 +1007,23 @@ export interface SiteErrorPage {
 }
 export interface SiteMetadatum {
   appleTouchIcon: ConstructiveInternalTypeImage | null;
+  appleTouchIconUrl: string | null;
+  appleTouchIconVersions: FileVersion[] | null;
   canonicalUrl: string | null;
   commitId: string | null;
   createdAt: string | null;
   databaseId: string | null;
   description: string | null;
   favicon: ConstructiveInternalTypeImage | null;
+  faviconUrl: string | null;
+  faviconVersions: FileVersion[] | null;
   id: string | null;
   logo: ConstructiveInternalTypeImage | null;
+  logoUrl: string | null;
+  logoVersions: FileVersion[] | null;
   ogImage: ConstructiveInternalTypeImage | null;
+  ogImageUrl: string | null;
+  ogImageVersions: FileVersion[] | null;
   robots: string | null;
   robotsSeededFrom: unknown | null;
   siteId: string | null;

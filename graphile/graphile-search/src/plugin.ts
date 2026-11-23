@@ -27,6 +27,14 @@ import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
 import type { SQL } from 'pg-sql2';
 
+import {
+  columnWithRequestContext,
+  columnWithRequestLangCodes,
+  REQUEST_LANG_CODES,
+  REQUEST_TS_CONFIG,
+  requestLangCodes,
+  requestTsConfig
+} from './ts-config';
 import type { SearchableColumn, SearchAdapter, UnifiedSearchOptions } from './types';
 
 /**
@@ -261,10 +269,9 @@ export function createUnifiedSearchPlugin(
 
   // A search orderBy needs the direction (from the orderBy enum) and the
   // score expression (from the filter). The filter always applies at
-  // runtime; a literal orderBy applies at plan time, before it, and a
-  // variable orderBy applies at runtime, after it. Each side stores its
-  // half in the query builder's meta, which is copied per execution, and
-  // whichever side runs second adds the ORDER BY.
+  // runtime; orderBy applies at plan time for most literals and at runtime
+  // for variables and mixed literals. Each side stores its half in the
+  // query builder's meta, and whichever side runs second adds the ORDER BY.
   //
   // The ORDER BY spec object is kept in meta so a later filter can swap
   // the expression in place (pgSelect renders `orders` after every apply
@@ -467,6 +474,30 @@ export function createUnifiedSearchPlugin(
     return names;
   }
 
+  function getSearchOrderByRequirements(codec: PgCodecWithAttributes, build: GraphileBuild.Build) {
+    const { inflection } = build;
+    const requiredFilters = new Map<string, string[]>();
+    const anySearchFilter = new Set<string>();
+    for (const { adapter, columns } of getAdapterColumns(codec, build)) {
+      for (const column of columns) {
+        const filters = filtersScoring(adapter, column, inflection);
+        filters.forEach((f) => anySearchFilter.add(f));
+        for (const ascending of [true, false]) {
+          const name = inflection.pgSearchOrderByEnum(
+            codec, column.attributeName, adapter.name, adapter.scoreSemantics.metric, ascending,
+          );
+          requiredFilters.set(name, filters);
+        }
+      }
+    }
+    if (enableSearchScore && requiredFilters.size > 0) {
+      const all = [...anySearchFilter];
+      requiredFilters.set(inflection.constantCase('search_score_asc'), all);
+      requiredFilters.set(inflection.constantCase('search_score_desc'), all);
+    }
+    return requiredFilters;
+  }
+
   /** Filter field names present (non-null) anywhere in a `where` value. */
   function collectFilterFields(where: unknown, into: Set<string>): Set<string> {
     if (Array.isArray(where)) {
@@ -626,30 +657,10 @@ export function createUnifiedSearchPlugin(
           if (!isPgFieldConnection && !isPgFieldSimpleCollection) return field;
           const codec = pgFieldResource?.codec as PgCodecWithAttributes | undefined;
           if (!codec?.attributes || (codec as any).isAnonymous) return field;
-          const adapterColumns = getAdapterColumns(codec, build);
-          if (adapterColumns.length === 0) return field;
+          const requiredFilters = getSearchOrderByRequirements(codec, build);
+          if (requiredFilters.size === 0) return field;
           const plan = (field as any).plan;
           if (typeof plan !== 'function') return field;
-
-          const requiredFilters = new Map<string, string[]>();
-          const anySearchFilter = new Set<string>();
-          for (const { adapter, columns } of adapterColumns) {
-            for (const column of columns) {
-              const filters = filtersScoring(adapter, column, inflection);
-              filters.forEach((f) => anySearchFilter.add(f));
-              for (const ascending of [true, false]) {
-                const name = inflection.pgSearchOrderByEnum(
-                  codec, column.attributeName, adapter.name, adapter.scoreSemantics.metric, ascending,
-                );
-                requiredFilters.set(name, filters);
-              }
-            }
-          }
-          if (enableSearchScore) {
-            const all = [...anySearchFilter];
-            requiredFilters.set(inflection.constantCase('search_score_asc'), all);
-            requiredFilters.set(inflection.constantCase('search_score_desc'), all);
-          }
 
           const compositeOrders = enableSearchScore
             ? [inflection.constantCase('search_score_asc'), inflection.constantCase('search_score_desc')]
@@ -700,6 +711,51 @@ export function createUnifiedSearchPlugin(
               return $result;
             },
           } as typeof field;
+        },
+
+        GraphQLObjectType_fields_field_args_arg(arg, build, context) {
+          const { argName, isPgFieldConnection, isPgFieldSimpleCollection, pgFieldResource } = context.scope;
+          const { applyPlan } = arg;
+          if (argName === (build.options.connectionFilterArgumentName ?? 'where') && applyPlan &&
+              (isPgFieldConnection || isPgFieldSimpleCollection)) {
+            return {
+              ...arg,
+              applyPlan($parent, $result, input, info) {
+                const $select = isPgFieldConnection ? $result.getSubplan() : $result;
+                const { context, lambda } = build.grafast;
+                $select.apply(lambda(context(), (ctx: any) => (qb: any) => {
+                  qb.setMeta(REQUEST_TS_CONFIG, requestTsConfig(ctx.langCodes));
+                  qb.setMeta(REQUEST_LANG_CODES, requestLangCodes(ctx.langCodes));
+                }, true));
+                return applyPlan($parent, $result, input, info);
+              },
+            };
+          }
+          if (argName !== 'orderBy' || !applyPlan || (!isPgFieldConnection && !isPgFieldSimpleCollection)) return arg;
+          const codec = pgFieldResource?.codec;
+          if (!codec?.attributes || codec.isAnonymous) return arg;
+          const requiredFilters = getSearchOrderByRequirements(codec, build);
+          if (requiredFilters.size === 0) return arg;
+
+          const { applyInput, ConstantStep, lambda } = build.grafast;
+          return {
+            ...arg,
+            applyPlan($parent, $result, input, info) {
+              const $orderBy = input.getRaw();
+              const values = $orderBy instanceof ConstantStep ? $orderBy.data : null;
+              if (!Array.isArray(values) ||
+                  !values.some((value) => requiredFilters.has(value)) ||
+                  !values.some((value) => !requiredFilters.has(value))) {
+                return applyPlan($parent, $result, input, info);
+              }
+
+              // Defer the whole list until the filters have supplied scores,
+              // so all enum applies add their order terms in list order.
+              const $select = isPgFieldConnection ? $result.getSubplan() : $result;
+              const $apply = applyInput(info.arg.type, $orderBy);
+              $select.apply(lambda($apply, (apply) => apply, true));
+            },
+          };
         },
 
         /**
@@ -1257,7 +1313,7 @@ export function createUnifiedSearchPlugin(
                         if (val == null) return;
 
                         const applyFor = (alias: SQL) =>
-                          adapter.buildFilterApply(sql, alias, column, val, build);
+                          adapter.buildFilterApply(sql, alias, columnWithRequestContext(adapter.name, column, $condition), val, build);
                         const result = applyFor($condition.alias);
                         if (!result) return;
 
@@ -1353,7 +1409,7 @@ export function createUnifiedSearchPlugin(
                             const filterInput = adapter.buildTextSearchInput!(text);
 
                             const applyFor = (alias: SQL) =>
-                              adapter.buildFilterApply(sql, alias, column, filterInput, build);
+                              adapter.buildFilterApply(sql, alias, columnWithRequestContext(adapter.name, column, $condition), filterInput, build);
                             const result = applyFor($condition.alias);
                             if (!result) continue;
 
@@ -1379,7 +1435,7 @@ export function createUnifiedSearchPlugin(
                               if (declared && declared !== query.vector.length) continue;
                               const applyFor = (alias: SQL) =>
                                 adapter.buildFilterApply(
-                                  sql, alias, column,
+                                  sql, alias, columnWithRequestLangCodes(column, $condition),
                                   { vector: query.vector, model: query.model, metric: 'COSINE' },
                                   build
                                 );

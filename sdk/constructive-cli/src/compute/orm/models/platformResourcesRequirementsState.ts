@@ -29,7 +29,6 @@ import type {
   PlatformResourcesRequirementsStateSelect,
   PlatformResourcesRequirementsStateFilter,
   PlatformResourcesRequirementsStateOrderBy,
-  CreatePlatformResourcesRequirementsStateInput,
   UpdatePlatformResourcesRequirementsStateInput,
   PlatformResourcesRequirementsStatePatch,
 } from '../input-types';
@@ -116,39 +115,6 @@ export class PlatformResourcesRequirementsStateModel {
         platformResourcesRequirementsState:
           data.platformResourcesRequirementsStates?.nodes?.[0] ?? null,
       }),
-    });
-  }
-  create<S extends PlatformResourcesRequirementsStateSelect>(
-    args: CreateArgs<
-      S,
-      CreatePlatformResourcesRequirementsStateInput['platformResourcesRequirementsState']
-    > & {
-      select: S;
-    } & StrictSelect<S, PlatformResourcesRequirementsStateSelect>
-  ): QueryBuilder<{
-    createPlatformResourcesRequirementsState: {
-      platformResourcesRequirementsState: InferSelectResult<
-        PlatformResourcesRequirementsStateWithRelations,
-        S
-      >;
-    };
-  }> {
-    const { document, variables } = buildCreateDocument(
-      'PlatformResourcesRequirementsState',
-      'createPlatformResourcesRequirementsState',
-      'platformResourcesRequirementsState',
-      args.select,
-      args.data,
-      'CreatePlatformResourcesRequirementsStateInput',
-      connectionFieldsMap
-    );
-    return new QueryBuilder({
-      client: this.client,
-      operation: 'mutation',
-      operationName: 'PlatformResourcesRequirementsState',
-      fieldName: 'createPlatformResourcesRequirementsState',
-      document,
-      variables,
     });
   }
 }

@@ -12,8 +12,8 @@ csdk proposal-reaction list --where.<field>.<op> <value> --orderBy <values>
 csdk proposal-reaction list --limit 10 --after <cursor>
 csdk proposal-reaction find-first --where.<field>.<op> <value>
 csdk proposal-reaction get --id <UUID>
-csdk proposal-reaction create --actorId <UUID> --emoji <String> --proposalId <UUID> [--commentId <UUID>] [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>]
-csdk proposal-reaction update --id <UUID> [--actorId <UUID>] [--commentId <UUID>] [--createdByPrincipal <UUID>] [--emoji <String>] [--proposalId <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal-reaction create --actorId <UUID> --databaseId <UUID> --emoji <String> --proposalId <UUID> [--commentId <UUID>] [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal-reaction update --id <UUID> [--actorId <UUID>] [--commentId <UUID>] [--createdByPrincipal <UUID>] [--databaseId <UUID>] [--emoji <String>] [--proposalId <UUID>] [--updatedByPrincipal <UUID>]
 csdk proposal-reaction delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk proposal-reaction list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a proposalReaction
 
 ```bash
-csdk proposal-reaction create --actorId <UUID> --emoji <String> --proposalId <UUID> [--commentId <UUID>] [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>]
+csdk proposal-reaction create --actorId <UUID> --databaseId <UUID> --emoji <String> --proposalId <UUID> [--commentId <UUID>] [--createdByPrincipal <UUID>] [--updatedByPrincipal <UUID>]
 ```
 
 ### Get a proposalReaction by id
