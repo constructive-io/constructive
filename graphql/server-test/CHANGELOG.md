@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.0...graphql-server-test@3.43.1) (2026-11-23)
+
+### Features
+
+- **presigned-url:** download a stored image version by name ([#2053](https://github.com/constructive-io/constructive/issues/2053)) ([696dfd0](https://github.com/constructive-io/constructive/commit/696dfd002d59d7f600746a4ce788849c25c9176f))
+
 # [3.43.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.42.13...graphql-server-test@3.43.0) (2026-11-22)
 
 ### Bug Fixes

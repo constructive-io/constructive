@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.15](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.14...graphile-function-source@0.3.15) (2026-11-23)
+
+**Note:** Version bump only for package graphile-function-source
+
 ## [0.3.14](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.13...graphile-function-source@0.3.14) (2026-11-21)
 
 **Note:** Version bump only for package graphile-function-source

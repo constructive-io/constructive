@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.7](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.6...pg-ast@3.15.7) (2026-11-23)
+
+**Note:** Version bump only for package pg-ast
+
 ## [3.15.6](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.5...pg-ast@3.15.6) (2026-11-21)
 
 **Note:** Version bump only for package pg-ast
