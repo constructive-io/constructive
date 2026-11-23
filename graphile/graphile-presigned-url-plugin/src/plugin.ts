@@ -707,6 +707,7 @@ export async function processSingleFile(
   });
   if (existingResult.rows.length > 0) {
     const existing = existingResult.rows[0];
+    log.info(`Dedup hit: file ${existing.id} for hash ${contentHash}`);
     return {
       uploadUrl: null as string | null,
       uploadHeaders: null as Record<string, string> | null,
