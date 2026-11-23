@@ -92,6 +92,8 @@ export interface Lexed {
   dynamic: string[];
   /** The limits of the analysis the lexer stopped at, leaving text unread. */
   limits: Limit[];
+  /** The runs of unquoted spaces and tabs that separate tokens, as `[start, end)` in the command. */
+  blanks: [number, number][];
   error?: string;
 }
 
@@ -117,6 +119,7 @@ class Lexer {
   readonly commands: SimpleCommand[] = [];
   readonly dynamic: string[] = [];
   readonly limits: Limit[] = [];
+  readonly blanks: [number, number][] = [];
   private current = newCommand();
   private pending: PendingHeredoc[] = [];
   /** The stdin the next command gets: after `|` the stdout of what came before. */
@@ -133,7 +136,7 @@ class Lexer {
     while (this.i < s.length) {
       const ch = s[this.i];
       if (ch === ' ' || ch === '\t') {
-        this.i++;
+        this.skipBlanks();
       } else if (ch === '\\' && s[this.i + 1] === '\n') {
         this.i += 2;
       } else if (ch === '\n') {
@@ -154,6 +157,13 @@ class Lexer {
     }
     if (this.pending.length > 0) throw new LexError('unterminated heredoc');
     this.endCommand(false);
+  }
+
+  /** Skip a run of spaces and tabs between tokens, and note where it was. */
+  private skipBlanks(): void {
+    const start = this.i;
+    while (this.s[this.i] === ' ' || this.s[this.i] === '\t') this.i++;
+    if (this.i > start) this.blanks.push([start, this.i]);
   }
 
   private endCommand(pipe: boolean): void {
@@ -217,7 +227,7 @@ class Lexer {
       return;
     }
     this.i += op.length;
-    while (s[this.i] === ' ' || s[this.i] === '\t') this.i++;
+    this.skipBlanks();
     if (this.i >= s.length || s[this.i] === '\n' || OPERATOR_CHARS.has(s[this.i])) {
       throw new LexError(`redirection ${op} has no target`);
     }
@@ -529,9 +539,9 @@ export function tokenize(command: string): Lexed {
   const lexer = new Lexer(command, 0);
   try {
     lexer.run();
-    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits };
+    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits, blanks: lexer.blanks };
   } catch (error) {
     if (!(error instanceof LexError)) throw error;
-    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits, error: error.message };
+    return { commands: lexer.commands, dynamic: lexer.dynamic, limits: lexer.limits, blanks: lexer.blanks, error: error.message };
   }
 }

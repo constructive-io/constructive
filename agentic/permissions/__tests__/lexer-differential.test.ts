@@ -230,4 +230,11 @@ describe('an exact grant key keeps what bash reads differently', () => {
     const grant = exact('curl -d @data.json https://api.example.com');
     expect((await sb.bash('  curl  -d @data.json\thttps://api.example.com ', 'workspace', [grant])).decision).toBe('allow');
   });
+
+  it('treats the blanks between words as one also in a command with quotes and a `$`', async () => {
+    const grant = grantFrom(asAsk(await sb.bash('for f in a b; do echo "$f  x"; done', 'ask')).grantOptions[1]);
+    expect(grant.match.type).toBe('command');
+    expect((await sb.bash('for  f in a\tb;  do echo "$f  x"; done', 'ask', [grant])).decision).toBe('allow');
+    expect((await sb.bash('for f in a b; do echo "$f x"; done', 'ask', [grant])).decision).toBe('ask');
+  });
 });

@@ -116,16 +116,26 @@ export function trimBlanks(text: string): string {
 }
 
 /**
- * The exact-grant key: the ends trimmed of spaces and tabs, and every run of
- * them made one space. Any other character stays, newline, `\r` and NBSP
- * included, because bash reads each of them differently from a space. A
- * command with a quote, a backslash, a `$` or a heredoc keeps its spacing as
- * written: there a space or tab can be text (inside `${x/ /-}`, or split by
- * an IFS the command sets), and changing it can move where a heredoc ends.
+ * The exact-grant key, built from the lexer's tokens: the ends trimmed of
+ * spaces and tabs, and each run of them between two tokens made one space,
+ * since bash reads any such run the same. The text inside a token (quotes,
+ * `${…}`, a substitution) and a heredoc body stay as written, and so does every
+ * other character (newline, `\r`, NBSP), because bash reads each of them
+ * differently from a space. A command the lexer cannot read, or one longer than
+ * the analysis reads, keeps its spacing as written.
  */
 export function normalizeCommand(command: string): CommandKey {
   const trimmed = trimBlanks(command);
-  return (/['"\\$]|<</.test(trimmed) ? trimmed : trimmed.replace(/[ \t]+/g, ' ')) as CommandKey;
+  if (trimmed.length > MAX_COMMAND_LENGTH) return trimmed as CommandKey;
+  const lexed = tokenize(trimmed);
+  if (lexed.error) return trimmed as CommandKey;
+  let key = '';
+  let from = 0;
+  for (const [start, end] of lexed.blanks) {
+    key += `${trimmed.slice(from, start)} `;
+    from = end;
+  }
+  return (key + trimmed.slice(from)) as CommandKey;
 }
 
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
