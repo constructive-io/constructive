@@ -1,6 +1,7 @@
 import * as path from 'node:path';
 
 import {
+  type CommandPattern,
   describeGrant,
   type Grant,
   grantFrom,
@@ -31,6 +32,10 @@ describe('grants', () => {
       ['chat', 'Allow in this chat'],
       ['project', 'Always allow reads in ~/work/lib/']
     ]);
+    expect(asAsk(first).grantOptions.map((o) => o.pattern)).toEqual([
+      { kind: 'path', text: '~/work/lib/' },
+      { kind: 'path', text: '~/work/lib/' }
+    ]);
     const grant = projectGrant(first);
     expect(grant.match).toEqual({ type: 'path', access: 'read', pathPrefix: path.join(sb.home, 'work', 'lib') });
 
@@ -47,7 +52,7 @@ describe('grants', () => {
     expect(first.decision).toBe('ask');
     const grant = projectGrant(first);
     expect(grant.match).toEqual({ type: 'command', command: 'curl -d @data.json https://api.example.com' });
-    expect(asAsk(first).grantOptions[1].label).toBe('Always allow curl -d @data.json https://api.example.com');
+    expect(asAsk(first).grantOptions[1].label).toBe('Always allow exactly: curl -d @data.json https://api.example.com');
 
     expect((await sb.bash('curl  -d @data.json\thttps://api.example.com', 'workspace', [grant])).decision).toBe('allow');
     expect((await sb.bash('curl -d @data.json\nhttps://api.example.com', 'workspace', [grant])).decision).toBe('ask');
@@ -84,11 +89,14 @@ describe('grants', () => {
 
 
 describe('command prefix grants', () => {
+  const prefix = (text: string): CommandPattern => ({ kind: 'prefix', text });
+  const exact = (text: string): CommandPattern => ({ kind: 'exact', text });
+
   it('saves a prefix for a plain command, and the prefix covers a later variant', async () => {
     const first = await sb.bash('git status', 'ask');
     expect(asAsk(first).grantOptions.map((o) => [o.scope, o.label, o.pattern])).toEqual([
-      ['chat', 'Allow in this chat', 'git status *'],
-      ['project', 'Always allow git status *', 'git status *']
+      ['chat', 'Allow in this chat', { kind: 'prefix', text: 'git status' }],
+      ['project', 'Always allow commands that start with git status', { kind: 'prefix', text: 'git status' }]
     ]);
     const grant = projectGrant(first);
     expect(grant.match).toEqual({ type: 'command-prefix', prefixes: ['git status'] });
@@ -101,26 +109,35 @@ describe('command prefix grants', () => {
   });
 
   // prettier-ignore
-  const patterns: [command: string, pattern: string][] = [
-    ['npm run test -- --watch', 'npm run test *'],
-    ['pnpm test --watch', 'pnpm test *'],
-    ['pnpm run build', 'pnpm run build *'],
-    ['ls -la src', 'ls *'],
-    ['node scripts/build.js --watch', 'node scripts/build.js *'],
-    ['tsx watch src/index.ts', 'tsx watch src/index.ts *'],
-    ['node inspect src/index.js', 'node inspect src/index.js *'],
-    ['grep -rn foo src | head -5', 'grep *, head *'],
+  const patterns: [command: string, pattern: CommandPattern, label: string][] = [
+    ['npm run test -- --watch', prefix('npm run test'), 'Always allow commands that start with npm run test'],
+    ['pnpm test --watch', prefix('pnpm test'), 'Always allow commands that start with pnpm test'],
+    ['pnpm run build', prefix('pnpm run build'), 'Always allow commands that start with pnpm run build'],
+    ['ls -la src', prefix('ls'), 'Always allow commands that start with ls'],
+    ['node scripts/build.js --watch', prefix('node scripts/build.js'), 'Always allow commands that start with node scripts/build.js'],
+    ['tsx watch src/index.ts', prefix('tsx watch src/index.ts'), 'Always allow commands that start with tsx watch src/index.ts'],
+    ['node inspect src/index.js', prefix('node inspect src/index.js'), 'Always allow commands that start with node inspect src/index.js'],
+    ['grep -rn foo src | head -5', prefix('grep, head'), 'Always allow commands that start with grep or head'],
+    ['git status && git log && npm test', prefix('git status, git log, npm test'), 'Always allow commands that start with git status, git log or npm test'],
     // An unknown program, a flag before the subcommand, or too few words: the exact command.
-    ['./scripts/deploy.sh staging', './scripts/deploy.sh staging'],
-    ['git -C src status', 'git -C src status'],
-    ['npm run a,b', 'npm run a,b'],
-    ['git', 'git'],
-    ['if true; then npm test; fi', 'if true; then npm test; fi']
+    ['./scripts/deploy.sh staging', exact('./scripts/deploy.sh staging'), 'Always allow exactly: ./scripts/deploy.sh staging'],
+    ['git -C src status', exact('git -C src status'), 'Always allow exactly: git -C src status'],
+    ['npm run a,b', exact('npm run a,b'), 'Always allow exactly: npm run a,b'],
+    ['git', exact('git'), 'Always allow exactly: git'],
+    ['if true; then npm test; fi', exact('if true; then npm test; fi'), 'Always allow exactly: if true; then npm test; fi']
   ];
-  it.each(patterns)('offers the pattern for %s', async (command, pattern) => {
+  it.each(patterns)('offers the pattern for %s', async (command, pattern, label) => {
     const options = asAsk(await sb.bash(command, 'ask')).grantOptions;
     expect(options.map((o) => o.pattern)).toEqual([pattern, pattern]);
-    expect(options[1].label).toBe(`Always allow ${pattern}`);
+    expect(options[1].label).toBe(label);
+  });
+
+  it('labels an exact grant for a command with a `*` as exact', async () => {
+    const options = asAsk(await sb.bash('rm *', 'ask')).grantOptions;
+    expect(options.map((o) => [o.label, o.pattern, o.match])).toEqual([
+      ['Allow in this chat', exact('rm *'), { type: 'command', command: 'rm *' }],
+      ['Always allow exactly: rm *', exact('rm *'), { type: 'command', command: 'rm *' }]
+    ]);
   });
 
   it('covers a compound command only when every part is covered', async () => {
@@ -158,7 +175,7 @@ describe('command prefix grants', () => {
 
   it('covers a part whose redirections cannot change a file', async () => {
     const first = asAsk(await sb.bash('npm test 2>&1 | tail -20', 'ask'));
-    expect(first.grantOptions.map((o) => o.pattern)).toEqual(['npm test *, tail *', 'npm test *, tail *']);
+    expect(first.grantOptions.map((o) => o.pattern)).toEqual([prefix('npm test, tail'), prefix('npm test, tail')]);
     const grant = projectGrant(first);
     expect((await sb.bash('npm test -- --watch 2>&1 | tail -50', 'ask', [grant])).decision).toBe('allow');
 
@@ -215,7 +232,8 @@ describe('command prefix grants', () => {
 
   it('describes and de-duplicates a prefix grant', () => {
     const match: GrantMatch = storedPrefixes('git status', 'npm run test');
-    expect(describeGrant(match, sb.home)).toBe('bash: git status *, npm run test *');
+    expect(describeGrant(match, sb.home)).toBe('commands that start with git status or npm run test');
+    expect(describeGrant(storedCommand('rm *'), sb.home)).toBe('exactly: rm *');
     expect(sameMatch(match, storedPrefixes('npm run test', 'git status'))).toBe(true);
     expect(sameMatch(match, storedPrefixes('git status'))).toBe(false);
     expect(sameMatch(match, storedCommand('git status'))).toBe(false);
