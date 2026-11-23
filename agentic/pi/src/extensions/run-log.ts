@@ -1,7 +1,7 @@
 /**
  * The pi side of the run log: drain the neutral session mirror after anything
- * that can append an entry. Every listed event is a point where pi has just
- * written to the session, so the run log trails the session by at most one event.
+ * that can append an entry. Every listed event can follow a write to the
+ * session, so the run log trails the session by at most one event.
  */
 
 import {
@@ -17,6 +17,10 @@ import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-a
  * Events after which the session may have grown. `session_start` also covers
  * resume (pi replays the file before the first event), so a resumed run
  * re-appends its history and the store's idempotency discards the duplicates.
+ * pi appends a message only after extensions see its `message_end`, so each
+ * message is first readable at the next event: the user prompt at the
+ * assistant's `message_start`, before the answer streams, and the assistant
+ * entry that calls a tool at `tool_execution_start`, before the tool runs.
  */
 export const MIRROR_EVENTS = [
   'session_start',
@@ -25,7 +29,9 @@ export const MIRROR_EVENTS = [
   'session_shutdown',
   'input',
   'before_agent_start',
+  'message_start',
   'message_end',
+  'tool_execution_start',
   'tool_execution_end',
   'turn_end',
   'agent_end',

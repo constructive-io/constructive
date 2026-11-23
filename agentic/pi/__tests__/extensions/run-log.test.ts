@@ -58,6 +58,63 @@ describe('createRunLogExtension', () => {
     expect(page.records.map((r) => r.seq)).toEqual([1, 2, 3]);
   });
 
+  it('records the tool call before the tool runs, though pi appends it after message_end', async () => {
+    const store = new MemoryRunLogStore();
+    const handlers = new Map<string, (event: unknown, ctx: unknown) => Promise<void> | void>();
+    const entries: unknown[] = [];
+    const sessionManager = { getHeader: () => header, getEntries: () => entries };
+    const api = { on: (event: string, handler: any) => handlers.set(event, handler) } as unknown as ExtensionAPI;
+    createRunLogExtension({ runId: 'run-1', store }).extension(api);
+    const emit = async (event: string) => {
+      await handlers.get(event)?.({ type: event }, { sessionManager });
+    };
+    const logged = async () => (await store.read('run-1', START)).records.map((r) => (r.entry as unknown as { id: string }).id);
+
+    // pi's order for one tool call: extensions see message_end, then pi
+    // appends the message, then the tool starts, runs, and ends.
+    await emit('session_start');
+    await emit('message_end');
+    entries.push(entry('call', null));
+    await emit('tool_execution_start');
+
+    expect(await logged()).toEqual(['sess-1', 'call']);
+
+    await emit('tool_execution_end');
+    await emit('message_end');
+    entries.push(entry('result', 'call'));
+    await emit('turn_end');
+
+    expect(await logged()).toEqual(['sess-1', 'call', 'result']);
+  });
+
+  it('records the user prompt when the answer starts, though pi appends it after message_end', async () => {
+    const store = new MemoryRunLogStore();
+    const handlers = new Map<string, (event: unknown, ctx: unknown) => Promise<void> | void>();
+    const entries: unknown[] = [];
+    const sessionManager = { getHeader: () => header, getEntries: () => entries };
+    const api = { on: (event: string, handler: any) => handlers.set(event, handler) } as unknown as ExtensionAPI;
+    createRunLogExtension({ runId: 'run-1', store }).extension(api);
+    const emit = async (event: string) => {
+      await handlers.get(event)?.({ type: event }, { sessionManager });
+    };
+    const logged = async () => (await store.read('run-1', START)).records.map((r) => (r.entry as unknown as { id: string }).id);
+
+    // pi's order for one prompt: extensions see the user message_end, then pi
+    // appends the message, then the assistant answer starts streaming.
+    await emit('session_start');
+    await emit('message_end');
+    entries.push(entry('prompt', null));
+    await emit('message_start');
+
+    expect(await logged()).toEqual(['sess-1', 'prompt']);
+
+    await emit('message_end');
+    entries.push(entry('answer', 'prompt'));
+    await emit('turn_end');
+
+    expect(await logged()).toEqual(['sess-1', 'prompt', 'answer']);
+  });
+
   it('registers every mirrored event, and only those', async () => {
     const seen: string[] = [];
     const api = { on: (event: string) => seen.push(event) } as unknown as ExtensionAPI;
