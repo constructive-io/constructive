@@ -138,7 +138,8 @@ describe('deploySite', () => {
       batchSize: 10,
     });
 
-    expect(server.countOf('uploadSiteFiles')).toBe(3);
+    expect(server.calls.filter((call) => call.operation === 'uploadSiteFiles' &&
+      !(call.variables.input as { checkOnly?: boolean }).checkOnly)).toHaveLength(3);
     expect(server.puts).toHaveLength(25);
   });
 
@@ -156,6 +157,7 @@ describe('deploySite', () => {
     expect(server.activeCommitId).toBe(result.commitId);
     expect(server.calls.map((c) => c.operation)).toEqual([
       'siteReleases',
+      'uploadSiteFiles',
       'uploadSiteFiles',
       'createSiteRelease',
       'updateSite',
@@ -253,7 +255,7 @@ describe('deploySite', () => {
     expect(result.uploaded).toBe(1);
   });
 
-  it('fails before uploading when the server returns a non-CAS key', async () => {
+  it('fails before uploading when the server returns a fixed CAS object key', async () => {
     const server = createMockServer({ corruptKeyFor: 'index.html' });
     await expect(
       deploySite({ ...base, api: server.api, putObject: server.putObject, source: build }),
@@ -319,7 +321,7 @@ describe('deploySite', () => {
       skipped: 2,
     });
     expect(server.countOf('updateSiteRelease')).toBe(0);
-    expect(server.countOf('uploadSiteFiles')).toBe(1);
+    expect(server.countOf('uploadSiteFiles')).toBe(2);
   });
 
   it('commits again when the tree changed even with skipIfUnchanged', async () => {
@@ -350,6 +352,7 @@ describe('deploySite', () => {
     expect(result.files).toBe(2);
     expect(server.puts).toHaveLength(0);
     expect(server.release).toBeNull();
+    expect(server.firstCall('uploadSiteFiles')).toMatchObject({ input: { checkOnly: true } });
   });
 
   it('skips ignored paths', async () => {

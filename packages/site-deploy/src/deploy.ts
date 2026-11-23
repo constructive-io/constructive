@@ -11,7 +11,7 @@
  * live site exactly as it was.
  */
 
-import { diffCas, errorMessage, throwIfAborted, uploadMissing } from './cas-upload';
+import { diffCas, errorMessage, throwIfAborted, uploadMissing, waitForConfirmation } from './cas-upload';
 import {
   buildCreateReleaseMutation,
   buildProvisionPreviewMutation,
@@ -136,13 +136,14 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
     putObject: options.putObject,
     signal,
   };
-  const diff = await diffCas(files, uploadOptions);
+  const diff = await diffCas(files, uploadOptions, dryRun);
+  const toUpload = dryRun ? diff.absent : diff.missing.map(({ file }) => file);
   onProgress?.({
     type: 'diffed',
     files: manifest.file_count,
-    toUpload: diff.missing.length,
+    toUpload: toUpload.length,
     skipped: diff.deduplicated.length,
-    bytesToUpload: diff.missing.reduce((sum, entry) => sum + entry.file.size, 0),
+    bytesToUpload: toUpload.reduce((sum, file) => sum + file.size, 0),
   });
 
   if (dryRun) {
@@ -166,18 +167,19 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
   let done = 0;
   const uploadResult = await uploadMissing(diff, {
     ...uploadOptions,
-    onUploaded: (file) => {
+    onUploaded: (file, physicalKey) => {
       done += 1;
       onProgress?.({
         type: 'uploaded',
         path: file.path,
-        key: file.key,
+        key: physicalKey,
         size: file.size,
         done,
         total: diff.missing.length,
       });
     },
   });
+  await waitForConfirmation([...diff.missing.map(({ file }) => file), ...diff.pending], uploadOptions);
 
   // 5. Write the manifest — this is the commit.
   const release = existing

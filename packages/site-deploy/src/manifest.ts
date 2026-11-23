@@ -14,13 +14,13 @@ import { contentTypeFor } from './content-type';
 import type { DeployFile, ManifestEntry, ReleaseManifest } from './types';
 import { DeployError } from './types';
 
-/** Prefix every file's bytes are stored under, in the site's own bucket. */
+/** Namespace reserved for release logical slots in the site's bucket. */
 export const CAS_PREFIX = 'cas/sha256/';
 
 /** The one legal shape of a CAS key. */
 export const CAS_KEY_PATTERN = /^cas\/sha256\/[0-9a-f]{64}$/;
 
-/** The content-addressed bucket key holding the bytes with this hash. */
+/** The logical release slot for this hash, not an object-store key. */
 export function casKey(hash: string): string {
   return `${CAS_PREFIX}${hash}`;
 }
@@ -52,7 +52,7 @@ export function normalizePath(path: string): string {
   if (normalized.startsWith(CAS_PREFIX)) {
     throw new DeployError(
       'INVALID_PATH',
-      `Logical path must not start with "${CAS_PREFIX}" (that is the byte namespace): "${path}"`,
+      `Logical path must not start with "${CAS_PREFIX}" (reserved for release slots): "${path}"`,
     );
   }
   return normalized;
@@ -62,7 +62,7 @@ export function normalizePath(path: string): string {
 export interface HashedFile {
   /** Normalized logical path. */
   path: string;
-  /** Content-addressed bucket key for these bytes. */
+  /** Logical release slot for these bytes. */
   key: string;
   hash: string;
   contentType: string;

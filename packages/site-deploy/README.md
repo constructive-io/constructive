@@ -14,9 +14,9 @@
 
 Deploy a static build as an immutable Constructive release.
 
-A deploy is **bytes plus one manifest**: every file's bytes go to the site's
-bucket at `cas/sha256/<hash>`, and one `siteRelease` row maps logical paths to
-those hashes. Writing that row commits the manifest into the site's own merkle
+A deploy is **bytes plus one manifest**: the site-scoped upload mutation
+registers each hash in the site's bucket and allocates a managed object key.
+One `siteRelease` row maps logical paths to those hashes. Writing that row commits the manifest into the site's own merkle
 store, so the returned commit id *is* the release — publishing, rolling back and
 previewing are pointer moves the server owns.
 
@@ -68,7 +68,8 @@ await publishCommit(api, deployNames(), siteId, previousCommitId);
 3. **Registers the bytes** in batches (`batchSize`, default 100) and PUTs only
    the files the server reports as *not* deduplicated, with bounded concurrency
    and retries — so a one-file change re-uploads one file.
-4. **Verifies** every returned key is the `cas/sha256/<hash>` it asked for.
+4. **Checks** that each returned logical slot matches the declared hash and
+   waits for new or in-flight uploads to be confirmed before writing the manifest.
 5. **Writes the manifest**: creates the site's release row on the first deploy,
    patches it after, and asserts the trigger stamped a `commitId`/`storeId`.
 6. **Optionally publishes** and/or points `preview/<name>` at the new commit, as

@@ -2,7 +2,7 @@
  * Types for the site deploy pipeline.
  *
  * A deploy is bytes plus one manifest: every file's bytes live in the site's
- * bucket at `cas/sha256/<hash>`, and one `siteRelease` row maps logical paths
+ * bucket under an independently allocated key, and one `siteRelease` row maps logical paths
  * to those hashes. Writing that row commits it into the site's own merkle
  * store, so the returned commit id *is* the release id.
  */

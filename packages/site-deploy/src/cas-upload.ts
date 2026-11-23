@@ -12,7 +12,7 @@ import { putToPresignedUrl } from '@constructive-io/upload-client';
 
 import { buildBulkUploadMutation } from './documents';
 import type { HashedFile } from './manifest';
-import { CAS_KEY_PATTERN } from './manifest';
+import { CAS_PREFIX } from './manifest';
 import type { GraphQLExecutor, PutObject } from './types';
 import { DeployError } from './types';
 
@@ -21,8 +21,10 @@ interface BulkFilePayload {
   uploadUrl: string | null;
   uploadHeaders: Record<string, string> | null;
   fileId: string;
-  key: string;
+  key: string | null;
+  logicalKey: string;
   deduplicated: boolean;
+  pending?: boolean | null;
 }
 
 export interface UploadCasOptions {
@@ -40,7 +42,7 @@ export interface UploadCasOptions {
   retries: number;
   putObject?: PutObject;
   signal?: AbortSignal;
-  onUploaded?: (file: HashedFile) => void;
+  onUploaded?: (file: HashedFile, physicalKey: string) => void;
 }
 
 export interface UploadCasResult {
@@ -52,9 +54,11 @@ export interface UploadCasResult {
 /** The bytes the server does not have yet, as told by the bulk mutation. */
 export interface CasDiff {
   /** Files whose bytes must be PUT, paired with their presigned URL and the headers it is signed over. */
-  missing: { file: HashedFile; uploadUrl: string; uploadHeaders: Record<string, string> }[];
+  missing: { file: HashedFile; physicalKey: string; uploadUrl: string; uploadHeaders: Record<string, string> }[];
   /** Files the server already had. */
   deduplicated: HashedFile[];
+  pending: HashedFile[];
+  absent: HashedFile[];
 }
 
 /**
@@ -66,10 +70,13 @@ export interface CasDiff {
 export async function diffCas(
   files: HashedFile[],
   options: UploadCasOptions,
+  checkOnly = false,
 ): Promise<CasDiff> {
   const mutation = buildBulkUploadMutation(options.mutation);
   const missing: CasDiff['missing'] = [];
   const deduplicated: HashedFile[] = [];
+  const pending: HashedFile[] = [];
+  const absent: HashedFile[] = [];
 
   for (let offset = 0; offset < files.length; offset += options.batchSize) {
     throwIfAborted(options.signal);
@@ -77,6 +84,7 @@ export async function diffCas(
     const data = await options.storage(mutation, {
       input: {
         siteId: options.siteId,
+        ...(checkOnly ? { checkOnly } : {}),
         files: batch.map((file) => ({
           contentHash: file.hash,
           contentType: file.contentType,
@@ -97,12 +105,20 @@ export async function diffCas(
 
     results.forEach((result, index) => {
       const file = batch[index];
-      // A mismatch would publish a manifest pointing at bytes nobody can serve.
-      if (result.key !== file.key || !CAS_KEY_PATTERN.test(result.key)) {
+      if (result.logicalKey !== file.key || result.key?.startsWith(CAS_PREFIX)) {
         throw new DeployError(
           'KEY_MISMATCH',
-          `Expected key "${file.key}" for "${file.path}", server returned "${result.key}"`,
+          `Unexpected logical or object key for "${file.path}"`,
         );
+      }
+      if (checkOnly && !result.key && !result.deduplicated && !result.pending) {
+        absent.push(file);
+        return;
+      }
+      if (!result.key) throw new DeployError('KEY_MISMATCH', `Missing object key for "${file.path}"`);
+      if (result.pending) {
+        pending.push(file);
+        return;
       }
       if (result.deduplicated) {
         deduplicated.push(file);
@@ -114,11 +130,30 @@ export async function diffCas(
           `No upload URL or upload headers for "${file.path}" and deduplicated=false`,
         );
       }
-      missing.push({ file, uploadUrl: result.uploadUrl, uploadHeaders: result.uploadHeaders });
+      missing.push({ file, physicalKey: result.key, uploadUrl: result.uploadUrl, uploadHeaders: result.uploadHeaders });
     });
   }
 
-  return { missing, deduplicated };
+  return { missing, deduplicated, pending, absent };
+}
+
+/** Wait for the worker to verify each new or already-in-flight upload before publishing. */
+export async function waitForConfirmation(files: HashedFile[], options: UploadCasOptions): Promise<void> {
+  const deadline = Date.now() + 120_000;
+  let pending = files;
+  while (pending.length) {
+    const result = await diffCas(pending, options, true);
+    if (result.missing.length) throw new DeployError('UPLOAD_FAILED', 'Status check returned a PUT URL');
+    if (result.absent.length) {
+      throw new DeployError('UPLOAD_FAILED', `No active upload for "${result.absent[0].path}"`);
+    }
+    pending = result.pending;
+    if (!pending.length) return;
+    if (Date.now() >= deadline) {
+      throw new DeployError('UPLOAD_FAILED', `Confirmation timed out for "${pending[0].path}"`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 }
 
 /**
@@ -140,7 +175,7 @@ export async function uploadMissing(
       throwIfAborted(options.signal);
       const index = next++;
       if (index >= diff.missing.length) return;
-      const { file, uploadUrl, uploadHeaders } = diff.missing[index];
+      const { file, physicalKey, uploadUrl, uploadHeaders } = diff.missing[index];
       await withRetries(
         () => put(uploadUrl, file.bytes, file.contentType, options.signal, file.hash, uploadHeaders),
         options.retries,
@@ -148,7 +183,7 @@ export async function uploadMissing(
         options.signal,
       );
       bytesUploaded += file.size;
-      options.onUploaded?.(file);
+      options.onUploaded?.(file, physicalKey);
     }
   };
 
@@ -157,7 +192,7 @@ export async function uploadMissing(
 
   return {
     uploaded: diff.missing.length,
-    skipped: diff.deduplicated.length,
+    skipped: diff.deduplicated.length + diff.pending.length,
     bytesUploaded,
   };
 }

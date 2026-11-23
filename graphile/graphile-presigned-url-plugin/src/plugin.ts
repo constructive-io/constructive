@@ -19,6 +19,7 @@
 import 'graphile-build';
 
 import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
@@ -41,6 +42,7 @@ const log = new Logger('graphile-presigned-url:plugin');
 const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
+const RELEASE_SLOT_PREFIX = 'cas/sha256/';
 
 // --- Helpers ---
 
@@ -159,7 +161,8 @@ export function createPresignedUrlPlugin(
           // Each @storageFiles table is paired with its @storageBuckets table
           // through the registry's actual FK relation; a tagged table that cannot
           // be paired is a provisioning bug and throws at schema build.
-          const planes = discoverStoragePlanes((build.input as any).pgRegistry as any);
+          const registry = (build.input as any).pgRegistry;
+          const planes = discoverStoragePlanes(registry);
 
           if (planes.length === 0) return fields;
 
@@ -472,6 +475,104 @@ export function createPresignedUrlPlugin(
                   },
                 },
             );
+
+            for (const siteCodec of Object.values(registry.pgCodecs) as any[]) {
+              const scope = siteCodec.extensions?.tags?.siteUploads;
+              if (scope !== 'platform' && scope !== 'database') continue;
+              const refs = Object.values(registry.pgRelations[siteCodec.name] ?? {}) as any[];
+              if (!refs.some((ref) =>
+                !ref.isReferencee && ref.localAttributes.length === 1 &&
+                ref.localAttributes[0] === 'bucket_id' && ref.remoteResource?.codec === matchingBucketCodec,
+              )) continue;
+              const site = siteCodec.extensions.pg;
+              const sites = QuoteUtils.quoteQualifiedIdentifier(site.schemaName, site.name);
+              const stem = scope === 'platform' ? 'PlatformSiteFile' : 'SiteFile';
+              const name = `upload${stem}s`;
+              const SiteFilePayload = new GraphQLObjectType({
+                name: `${stem}UploadResult`,
+                fields: {
+                  ...BulkFilePayloadType.toConfig().fields,
+                  key: { type: GraphQLString },
+                  fileId: { type: GraphQLString },
+                  logicalKey: { type: new GraphQLNonNull(GraphQLString) },
+                  pending: { type: GraphQLBoolean },
+                },
+              });
+              const SitePayload = new GraphQLObjectType({
+                name: `${stem}UploadPayload`,
+                fields: { files: { type: new GraphQLList(new GraphQLNonNull(SiteFilePayload)) } },
+              });
+              const FileInput = new GraphQLInputObjectType({
+                name: `Upload${stem}Input`,
+                fields: {
+                  contentHash: { type: new GraphQLNonNull(GraphQLString) },
+                  contentType: { type: new GraphQLNonNull(GraphQLString) },
+                  size: { type: new GraphQLNonNull(GraphQLInt) },
+                  filename: { type: GraphQLString },
+                  route: { type: GraphQLString, description: 'Mutable route. Omit for release content.' },
+                },
+              });
+              const Input = new GraphQLInputObjectType({
+                name: `Upload${stem}BulkInput`,
+                fields: {
+                  siteId: { type: new GraphQLNonNull(uuidGqlType) },
+                  files: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(FileInput))) },
+                  checkOnly: { type: GraphQLBoolean, description: 'Read upload status without issuing PUT URLs.' },
+                },
+              });
+              newFields[name] = context.fieldWithHooks({ fieldName: name } as any, {
+                type: SitePayload,
+                args: { input: { type: new GraphQLNonNull(Input) } },
+                plan(_$mutation: any, fieldArgs: any) {
+                  const $input = fieldArgs.getRaw('input');
+                  return lambda(object({
+                    siteId: access($input, 'siteId'),
+                    files: access($input, 'files'),
+                    checkOnly: access($input, 'checkOnly'),
+                    withPgClient: (grafastContext() as any).get('withPgClient'),
+                    pgSettings: (grafastContext() as any).get('pgSettings'),
+                  }), (vals: any) => withRequestPgClient(vals.withPgClient, vals.pgSettings, async (txClient) => {
+                    const databaseId = await resolveDatabaseId(txClient);
+                    if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                    const configs = await loadAllStorageModules(txClient, databaseId);
+                    const config = resolveStorageConfigFromCodec(capturedFilesCodec, configs);
+                    if (!config) throw new Error('STORAGE_MODULE_NOT_FOUND');
+                    const { rows } = await txClient.query({
+                      text: `SELECT b.id, b.key, b.type, b.is_public, b.allowed_mime_types,
+                                    b.max_file_size, b.allow_custom_keys, b.physical_name
+                               FROM ${sites} AS s
+                               JOIN ${config.bucketsQualifiedName} AS b ON b.id = s.bucket_id
+                              WHERE s.id = $1::uuid AND b.is_public
+                              ${vals.checkOnly ? 'FOR SHARE OF s' : 'FOR UPDATE OF s'}`,
+                      values: [vals.siteId],
+                    });
+                    const bucket = rows[0] as unknown as BucketConfig | undefined;
+                    if (!bucket) throw new Error('SITE_UPLOAD_NOT_AUTHORIZED');
+                    const files = vals.files as any[];
+                    if (files.length > config.maxBulkFiles) throw new Error('BULK_UPLOAD_FILES_EXCEEDED');
+                    if (files.reduce((sum, file) => sum + file.size, 0) > config.maxBulkTotalSize) {
+                      throw new Error('BULK_UPLOAD_SIZE_EXCEEDED');
+                    }
+                    if (!vals.checkOnly && files.some((file) => file.route == null)) {
+                      await txClient.query({
+                        text: "SELECT pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('site-release:' || $1::text, 0))",
+                        values: [bucket.id],
+                      });
+                    }
+                    const s3 = resolveS3ForDatabase(options, config, assertBucketReconciled(bucket, databaseId));
+                    const results = [];
+                    for (const file of files) {
+                      results.push(await processSingleFile(
+                        options, txClient, config, databaseId, bucket, s3,
+                        { ...file, key: file.route },
+                        { release: file.route == null, checkOnly: vals.checkOnly === true },
+                      ));
+                    }
+                    return { files: results };
+                  }));
+                },
+              });
+            }
           }
 
           return build.extend(
@@ -495,6 +596,7 @@ export async function processSingleFile(
   bucket: BucketConfig,
   s3ForDb: S3Config,
   input: any,
+  siteUpload?: { release: boolean; checkOnly: boolean },
 ) {
   const { contentHash, contentType, size, filename, key: customKey } = input;
 
@@ -557,13 +659,38 @@ export async function processSingleFile(
 
   // The user names a logical slot, never an object-store location. Only the
   // recorder allocates the physical key, independently for every new request.
-  const logicalKey = customKey || contentHash;
-  if (customKey) {
-    if (!bucket.allow_custom_keys) {
+  const logicalKey = siteUpload?.release ? RELEASE_SLOT_PREFIX + contentHash : customKey || contentHash;
+  if (customKey || (siteUpload && !siteUpload.release)) {
+    if (!customKey) throw new Error('INVALID_ROUTE');
+    if (customKey.startsWith(RELEASE_SLOT_PREFIX)) {
+      throw new Error('RESERVED_RELEASE_SLOT');
+    }
+    if (!siteUpload && !bucket.allow_custom_keys) {
       throw new Error('CUSTOM_KEY_NOT_ALLOWED: bucket does not allow custom keys');
     }
     const keyError = validateCustomKey(customKey);
     if (keyError) throw new Error(keyError);
+  }
+
+  if (siteUpload?.release || siteUpload?.checkOnly) {
+    const { rows } = await txClient.query({
+      text: `SELECT id, key, status::text AS status
+               FROM ${storageConfig.filesQualifiedName}
+              WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
+                AND NOT logical_key_retired AND status IN ('requested', 'uploaded', 'processed')
+              ORDER BY CASE WHEN status = 'requested' THEN 1 ELSE 0 END LIMIT 1`,
+      values: [logicalKey, bucket.id, contentHash],
+    });
+    const row = rows[0];
+    if (row) {
+      return {
+        uploadUrl: null as string | null, uploadHeaders: null as Record<string, string> | null,
+        fileId: row.id, key: row.key, logicalKey,
+        deduplicated: row.status !== 'requested', pending: row.status === 'requested',
+        expiresAt: null as string | null, file: projectFile(row.id, row.key),
+      };
+    }
+    if (siteUpload.checkOnly) return { logicalKey, deduplicated: false, pending: false };
   }
 
   // Dedup is a read of confirmed identical content in the same logical slot.
@@ -585,6 +712,7 @@ export async function processSingleFile(
       uploadHeaders: null as Record<string, string> | null,
       fileId: existing.id as string,
       key: existing.key as string,
+      logicalKey,
       deduplicated: true,
       expiresAt: null as string | null,
       file: projectFile(existing.id as string, existing.key as string),
@@ -625,6 +753,7 @@ export async function processSingleFile(
     uploadHeaders,
     fileId,
     key: s3Key,
+    logicalKey,
     deduplicated: false,
     expiresAt,
     file: projectFile(fileId, s3Key),

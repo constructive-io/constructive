@@ -47,7 +47,9 @@ export function buildBulkUploadMutation(mutation: string): string {
         uploadHeaders
         fileId
         key
+        logicalKey
         deduplicated
+        pending
       }
     }
   }

@@ -86,13 +86,18 @@ export function createMockServer(options: MockServerOptions = {}): MockServer {
         uploadSiteFiles: {
           files: (input.files as any[]).map((file) => {
             const deduplicated = stored.has(file.contentHash);
+            const logicalKey = casKey(file.contentHash);
+            if (input.checkOnly && !deduplicated) {
+              return { logicalKey, key: null as string | null, deduplicated: false, pending: false };
+            }
             const key =
                 file.filename === options.corruptKeyFor
-                  ? 'uploads/wrong-key'
-                  : casKey(file.contentHash);
+                  ? casKey(file.contentHash)
+                  : `originals/${file.contentHash}`;
             return {
               fileId: `file-${file.contentHash.slice(0, 8)}`,
               key,
+              logicalKey,
               deduplicated,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
               uploadHeaders: deduplicated ? null : signedHeaders(file),
