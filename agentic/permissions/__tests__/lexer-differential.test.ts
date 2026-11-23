@@ -64,6 +64,10 @@ const rows: Row[] = [
   // `$((` whose second paren closes early is a command substitution of a subshell, and it runs
   ['echo $((1) | /???/?? ~/*/*/* 1 )', 'deny', 'deny', 'deny', ['hard-deny']],
   ['echo $((1) >2 )', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // a substitution body that does not parse fails only that substitution, and the command around it runs
+  ["cat ~/.ssh/id_rsa `'`", 'deny', 'deny', 'deny', ['hard-deny']],
+  ['echo $((`$(` cat ~/.ssh/id_rsa  ))', 'deny', 'deny', 'deny', ['hard-deny']],
+  ['cat ~/.ssh/id_rsa $(cat <<EOF)', 'deny', 'deny', 'deny', ['hard-deny']],
   // a program named by a glob or a variable still touches the files it is given
   ['/???/cat ~/.ssh/id_rsa', 'deny', 'deny', 'deny', ['hard-deny']],
   ['$CAT ~/.ssh/id_rsa', 'deny', 'deny', 'deny', ['hard-deny']],

@@ -310,7 +310,14 @@ class Lexer {
     this.dynamic.push(note);
     if (this.depth >= MAX_DEPTH) throw new LexError('substitutions nested too deep');
     const sub = new Lexer(inner, this.depth + 1);
-    sub.run();
+    try {
+      sub.run();
+    } catch (error) {
+      if (!(error instanceof LexError)) throw error;
+      // Bash parses a backtick body (and in 3.2 a `$(…)` body) only when it expands it,
+      // so a body it cannot parse fails that substitution and the command around it still runs.
+      this.dynamic.push(`a substitution it could not read (${error.message})`);
+    }
     this.commands.push(...sub.commands);
     this.dynamic.push(...sub.dynamic);
   }
