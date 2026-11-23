@@ -20,7 +20,7 @@ interface ReleaseRow {
 export interface MockServer {
   api: GraphQLExecutor;
   putObject: PutObject;
-  /** CAS keys whose bytes the bucket holds. */
+  /** Managed object keys whose bytes the bucket holds. */
   storedKeys: string[];
   /** Hashes the bucket holds, as dedupe sees them. */
   storedHashes: Set<string>;
@@ -47,7 +47,7 @@ export function createMockServer(): MockServer {
       assertSignedHeaders(url, headers);
       const hash = url.slice(url.lastIndexOf('/') + 1);
       hashes.add(hash);
-      server.storedKeys.push(`cas/sha256/${hash}`);
+      server.storedKeys.push(`originals/${hash}`);
       void body;
       void contentType;
     },
@@ -63,7 +63,8 @@ export function createMockServer(): MockServer {
             const deduplicated = hashes.has(file.contentHash);
             return {
               fileId: `file-${file.contentHash.slice(0, 8)}`,
-              key: `cas/sha256/${file.contentHash}`,
+              key: `originals/${file.contentHash}`,
+              logicalKey: `cas/sha256/${file.contentHash}`,
               deduplicated,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
               uploadHeaders: deduplicated ? null : signedHeaders(file),

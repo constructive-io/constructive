@@ -25,6 +25,9 @@ write itself: walk, hash, upload only what is missing, and commit one manifest.
 
 ## Usage
 
+Use the site API endpoint that exposes both the site upload and release
+mutations. A storage-only GraphQL endpoint does not expose those site mutations.
+
 ```typescript
 import { deploySite } from '@constructive-io/site-deploy';
 

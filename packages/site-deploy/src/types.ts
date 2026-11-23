@@ -114,10 +114,8 @@ export type PutObject = (
 ) => Promise<void>;
 
 export interface DeploySiteOptions {
-  /** Executor for the tenant API target (releases, sites, previews). */
+  /** Executor for the site API target (site uploads, releases, and previews). */
   api: GraphQLExecutor;
-  /** Executor for the storage target. Defaults to `api`. */
-  storage?: GraphQLExecutor;
   /** The site to deploy to. */
   siteId: string;
   /**

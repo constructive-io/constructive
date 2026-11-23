@@ -81,7 +81,7 @@ test('deploys the build to a play preview without touching production', async ()
 
   // Bytes are addressed by content, and the manifest carries served types.
   expect(server.storedKeys).toHaveLength(5);
-  for (const key of server.storedKeys) expect(key).toMatch(/^cas\/sha256\/[0-9a-f]{64}$/);
+  for (const key of server.storedKeys) expect(key).toMatch(/^originals\/[0-9a-f]{64}$/);
   expect(result.manifest.files['assets/site.css'].content_type).toBe('text/css; charset=utf-8');
   expect(result.manifest.files['index.html'].content_type).toBe('text/html; charset=utf-8');
 });

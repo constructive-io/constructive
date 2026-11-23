@@ -58,6 +58,20 @@ describe('deploySite', () => {
     });
   });
 
+  it('sends site uploads to the same endpoint as release mutations', async () => {
+    const server = createMockServer();
+    const storageOnly = jest.fn(async () => {
+      throw new Error('Cannot query field "uploadSiteFiles" on type "Mutation".');
+    });
+    const options = { ...base, api: server.api, storage: storageOnly, putObject: server.putObject, source: build };
+
+    await deploySite(options);
+
+    expect(storageOnly).not.toHaveBeenCalled();
+    expect(server.countOf('uploadSiteFiles')).toBeGreaterThan(0);
+    expect(server.countOf('createSiteRelease')).toBe(1);
+  });
+
   it('patches the existing row on later deploys instead of creating a second one', async () => {
     const server = createMockServer({
       release: {

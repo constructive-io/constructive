@@ -56,7 +56,6 @@ interface ExistingRelease {
 export async function deploySite(options: DeploySiteOptions): Promise<DeploySiteResult> {
   const {
     api,
-    storage = options.api,
     siteId,
     databaseId,
     scope = 'database',
@@ -127,7 +126,7 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
 
   // 3. Register the bytes and learn which ones are missing.
   const uploadOptions = {
-    storage,
+    storage: api,
     mutation: names.bulkUploadMutation,
     siteId,
     batchSize,

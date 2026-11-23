@@ -81,9 +81,6 @@ async function main(): Promise<void> {
   const api = fetchExecutor(required('CONSTRUCTIVE_API_URL'), process.env.CONSTRUCTIVE_TOKEN);
   const result = await deploySite({
     api,
-    storage: process.env.CONSTRUCTIVE_STORAGE_URL
-      ? fetchExecutor(process.env.CONSTRUCTIVE_STORAGE_URL, process.env.CONSTRUCTIVE_TOKEN)
-      : undefined,
     siteId: required('SITE_ID'),
     databaseId: process.env.DATABASE_ID,
     source: dist,
