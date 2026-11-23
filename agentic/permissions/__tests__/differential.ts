@@ -66,7 +66,8 @@ export function runBash(bash: string, script: string, options: { cwd: string; en
 
 /**
  * Run one command in bash in its own process group, and wait until every job
- * it left in the background has exited too, or the timeout kills the group.
+ * it left in the background has exited too. It must finish: a group the
+ * timeout kills is an error, not a finished run, since its record is partial.
  */
 export function runInGroup(bash: string, command: string, options: { cwd: string; env: Record<string, string>; timeout?: number }): Promise<void> {
   const timeout = options.timeout ?? 3000;
@@ -77,6 +78,7 @@ export function runInGroup(bash: string, command: string, options: { cwd: string
       child.on('error', (error) => fail(new Error(`bash did not start: ${error.message}. Check that ${bash} exists.`)));
       return;
     }
+    let timedOut = false;
     const kill = () => {
       try {
         process.kill(-pid, 'SIGKILL');
@@ -85,7 +87,10 @@ export function runInGroup(bash: string, command: string, options: { cwd: string
       }
     };
     const deadline = Date.now() + timeout;
-    const timer = setTimeout(kill, timeout);
+    const timer = setTimeout(() => {
+      timedOut = true;
+      kill();
+    }, timeout);
     child.on('exit', async () => {
       for (;;) {
         try {
@@ -93,12 +98,16 @@ export function runInGroup(bash: string, command: string, options: { cwd: string
         } catch {
           break;
         }
-        if (Date.now() > deadline) break;
+        if (Date.now() > deadline) {
+          timedOut = true;
+          break;
+        }
         await new Promise((r) => setTimeout(r, 5));
       }
       kill();
       clearTimeout(timer);
-      done();
+      if (timedOut) fail(new Error(`bash did not finish ${JSON.stringify(command)} within ${timeout} ms, so its record is partial. Check the command for a job that waits, or raise the timeout.`));
+      else done();
     });
   });
 }

@@ -69,6 +69,12 @@ let counter = 0;
  */
 export async function makeSandbox(): Promise<Sandbox> {
   const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'agentic-perm-')));
+  if (/\s/.test(root)) {
+    await fs.rm(root, { recursive: true, force: true });
+    throw new Error(
+      `The test sandbox ${JSON.stringify(root)} has a blank in its path, so an unquoted path in a test row splits into two words and the row checks another command. Set TMPDIR to a dir whose path has no blanks, then run the tests again.`
+    );
+  }
   const home = path.join(root, 'home');
   const ws = path.join(home, 'work', 'app');
   const scratch = path.join(root, 'scratch');

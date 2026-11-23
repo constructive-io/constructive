@@ -55,7 +55,7 @@ const cases: string[][] = [
 (available ? describe : describe.skip)('ssh options, against ssh -G', () => {
   it.each(cases.map((c) => [JSON.stringify(c), c] as const))('%s', async (_, args) => {
     const mark = path.join(sb.ws, 'MARK');
-    const words = args.map((a) => a.split('MARK').join(mark));
+    const words = args.map((a) => a.split('MARK').join(quote(mark)));
     const config = sshG(words).stdout;
     const runs = /^(proxycommand|localcommand|knownhostscommand) /m.test(config);
     const d = await sb.bash(`ssh ${words.map(quote).join(' ')}`, 'workspace');
