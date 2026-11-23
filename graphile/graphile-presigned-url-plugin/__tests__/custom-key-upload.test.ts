@@ -10,7 +10,6 @@
  */
 
 import { processSingleFile } from '../src/plugin';
-import { generatePresignedPutUrl } from '../src/s3-signer';
 import type { BucketConfig, PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from '../src/types';
 
 jest.mock('../src/s3-signer', () => ({
@@ -22,8 +21,6 @@ const BUCKET_ID = '33333333-3333-3333-3333-333333333333';
 const OLD_FILE_ID = '44444444-4444-4444-4444-444444444444';
 const NEW_FILE_ID = '55555555-5555-5555-5555-555555555555';
 const KEY = 'index.html';
-const OLD_KEY = `originals/${OLD_FILE_ID}`;
-const NEW_KEY = `originals/${NEW_FILE_ID}`;
 
 function storageConfig(overrides: Partial<StorageModuleConfig> = {}): StorageModuleConfig {
   return {
@@ -63,15 +60,15 @@ function fakeTx(existingHash: string, deletable = true, existingStatus = 'upload
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
-      if (/^SELECT id, (?:key|status)/.test(opts.text) && !/record_file\(/.test(opts.text)) {
+      if (/^SELECT id, status/.test(opts.text)) {
         // The probe is by (key, bucket, hash): a row carrying other bytes is not seen.
         const probedHash = opts.values[2];
-        return { rows: probedHash === existingHash && ['uploaded', 'processed'].includes(existingStatus) ? [{ id: OLD_FILE_ID, key: OLD_KEY, status: existingStatus }] : [] };
+        return { rows: probedHash === existingHash ? [{ id: OLD_FILE_ID, status: existingStatus }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
         return { rows: deletable ? [{ id: OLD_FILE_ID }] : [] };
       }
-      if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID, key: NEW_KEY }] };
+      if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
     },
   };
@@ -99,7 +96,7 @@ describe('custom-key upload of changed bytes', () => {
 
     expect(result).toMatchObject({
       fileId: NEW_FILE_ID,
-      key: NEW_KEY,
+      key: KEY,
       deduplicated: false,
       uploadUrl: 'https://s3.example.com/put',
     });
@@ -119,28 +116,22 @@ describe('custom-key upload of changed bytes', () => {
     const result = await upload(storageConfig(), txClient);
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false });
-    expect(queries.map((q) => q.text.trim().split(/\s+/)[0])).toEqual(['SELECT', 'SELECT']);
-    expect(result.key).toBe(NEW_KEY);
-    expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
+    expect(queries.map((q) => q.text.trim().split(/\s+/)[0])).toEqual(['SELECT', 'DELETE', 'SELECT']);
+    expect(queries[1].values).toEqual([OLD_FILE_ID]);
   });
 
-  it('retries independently even when the caller cannot delete an earlier attempt', async () => {
+  it('refuses to restart a row the caller cannot delete', async () => {
     const { txClient, queries } = fakeTx('b'.repeat(64), false, 'requested');
-    await expect(upload(storageConfig(), txClient)).resolves.toMatchObject({ key: NEW_KEY, deduplicated: false });
-    expect(queries.some((q) => /^DELETE/.test(q.text))).toBe(false);
-  });
 
-  it.each(['a'.repeat(64), OLD_KEY, `derived/${OLD_KEY}/thumb.webp`])(
-    'never signs the attacker-selected logical key %s', async (logicalKey) => {
-      const { txClient } = fakeTx('a'.repeat(64));
-      const result = await processSingleFile(options, txClient, storageConfig(), 'db', bucket, s3, {
-        contentHash: 'b'.repeat(64), contentType: 'text/html', size: 16, key: logicalKey,
-      });
-      expect(result.key).toBe(NEW_KEY);
-      expect(result.file.key).toBe(NEW_KEY);
-      expect(generatePresignedPutUrl).toHaveBeenLastCalledWith(s3, NEW_KEY, 'text/html', 16, 900, 'b'.repeat(64), NEW_FILE_ID);
-    },
-  );
+    const refused = upload(storageConfig(), txClient);
+    await expect(refused).rejects.toThrow(
+      `FILE_NOT_REPLACEABLE: file ${OLD_FILE_ID} at key ${KEY}`,
+    );
+    // A named error carries its code, so the server passes it through
+    // instead of masking it as INTERNAL_SERVER_ERROR.
+    await expect(refused).rejects.toMatchObject({ code: 'FILE_NOT_REPLACEABLE', errorClass: 'public' });
+    expect(queries.some((q) => /record_file\(/.test(q.text))).toBe(false);
+  });
 
   it('deduplicates identical bytes at the key without touching the row', async () => {
     const { txClient, queries } = fakeTx('b'.repeat(64));

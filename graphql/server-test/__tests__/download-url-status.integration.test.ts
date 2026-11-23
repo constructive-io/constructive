@@ -56,7 +56,7 @@ const APP_FILES = `
 
 const manifest = (key: string) => {
   const version = (name: string, leaf: string, width: number) => ({
-    name, key: `derived/${key}/${leaf}`, width, height: width, format: 'webp', size: 100
+    name, key: `${key}.versions/${leaf}`, width, height: width, format: 'webp', size: 100
   });
   return {
     source: { width: 1024, height: 1024, format: 'png' },
@@ -66,7 +66,7 @@ const manifest = (key: string) => {
       version('small', 'small-0123abcd.webp', 160),
       version('duplicate', 'first.webp', 320),
       version('duplicate', 'second.webp', 400),
-      { name: 'foreign', key: 'derived/another-file/small.webp' }
+      { name: 'foreign', key: 'another-file.versions/small.webp' }
     ]
   };
 };
@@ -186,7 +186,7 @@ describe('storage file downloadUrl', () => {
     const rows = await files(bobDatabaseId, bobSchema, 'small');
     for (const status of ['uploaded', 'processed']) {
       const url = new URL(rows.get(`status-${status}`).selected);
-      expect(url.pathname).toBe(`/app-a1a1a1a1-public-4db6afbff1a2/derived/status-${status}/small-0123abcd.webp`);
+      expect(url.pathname).toBe(`/app-a1a1a1a1-public-4db6afbff1a2/status-${status}.versions/small-0123abcd.webp`);
       expect(url.searchParams.get('X-Amz-Signature')).toEqual(expect.any(String));
       expect(url.searchParams.get('response-content-disposition')).toBe('attachment; filename="small-0123abcd.webp"');
     }
@@ -198,7 +198,7 @@ describe('storage file downloadUrl', () => {
   it('returns the public artifact URL and respects the reader’s file visibility', async () => {
     const rows = await files(bobDatabaseId, bobSchema, 'large');
     expect(rows.get('seeded-public-hash').selected).toBe(
-      `${cdn}/app-a1a1a1a1-public-4db6afbff1a2/derived/seeded-public-hash/large-abcd1234.webp`
+      `${cdn}/app-a1a1a1a1-public-4db6afbff1a2/seeded-public-hash.versions/large-abcd1234.webp`
     );
     expect(rows.has('seeded-private-hash')).toBe(false);
   });

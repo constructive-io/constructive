@@ -47,9 +47,7 @@ BEGIN
     'CREATE TABLE IF NOT EXISTS %I.app_files (
        id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
        bucket_id uuid NOT NULL REFERENCES %I.app_buckets(id),
-       key text NOT NULL DEFAULT ''originals/'' || gen_random_uuid()::text,
-       logical_key text,
-       logical_key_retired boolean NOT NULL DEFAULT false,
+       key text NOT NULL,
        content_hash text NOT NULL,
        mime_type text NOT NULL,
        size bigint,
@@ -65,10 +63,6 @@ BEGIN
 
   EXECUTE format(
     'COMMENT ON TABLE %I.app_files IS E''@storageFiles\nStorage files table''',
-    schema_name);
-
-  EXECUTE format(
-    'CREATE INDEX ON %I.app_files (bucket_id, logical_key, content_hash) WHERE status IN (''uploaded'', ''processed'')',
     schema_name);
 
   -- Grant CRUD to all roles
@@ -96,7 +90,7 @@ BEGIN
     BEGIN
       INSERT INTO %I.app_files (
         bucket_id,
-        logical_key,
+        key,
         content_hash,
         mime_type,
         size,

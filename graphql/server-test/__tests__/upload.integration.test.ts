@@ -287,10 +287,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
    * run: a row is written as `requested` and only becomes a dedup hit once the
    * confirm job has inspected the object and moved it to `uploaded`.
    */
-  const confirmUploaded = async (fileId: string): Promise<void> => {
+  const confirmUploaded = async (contentHash: string): Promise<void> => {
     await pg.query(
-      `UPDATE "${aliceSchemas[0]}".app_files SET status = 'uploaded' WHERE id = $1`,
-      [fileId]
+      `UPDATE "${aliceSchemas[0]}".app_files SET status = 'uploaded' WHERE content_hash = $1`,
+      [contentHash]
     );
   };
   let teardown: () => Promise<void>;
@@ -419,7 +419,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(payload.uploadUrl).toBeTruthy();
         expect(new URL(payload.uploadUrl).host).toBe('127.0.0.1:9000');
         expect(payload.fileId).toBeTruthy();
-        expect(payload.key).toMatch(/^originals\/[0-9a-f-]{36}$/);
+        expect(payload.key).toBe(contentHash);
         expect(payload.deduplicated).toBe(false);
         expect(payload.expiresAt).toBeTruthy();
 
@@ -435,7 +435,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       it('should accept a PUT to the presigned URL', async () => {
         const putRes = await putToPresignedUrl(uploadUrl, fileContent, contentType, { headers: uploadHeaders });
         expect(putRes.ok).toBe(true);
-        await confirmUploaded(uploadHeaders['x-amz-meta-upload-id']);
+        await confirmUploaded(contentHash);
       });
     });
 
@@ -469,7 +469,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         const payload = data.uploadAppFile;
         expect(payload.uploadUrl).toBeTruthy();
         expect(payload.fileId).toBeTruthy();
-        expect(payload.key).toMatch(/^originals\/[0-9a-f-]{36}$/);
+        expect(payload.key).toBe(contentHash);
         expect(payload.deduplicated).toBe(false);
         expect(payload.expiresAt).toBeTruthy();
 
@@ -519,34 +519,6 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
       // (stood in for here by confirmUploaded) moves it to `uploaded`, and only
       // an uploaded row is a dedup hit. A retry after a PUT that never ran must
       // get a URL again.
-      it('allocates separate objects for repeated caller-selected logical keys', async () => {
-        await pg.query(`INSERT INTO "${aliceSchemas[0]}".app_buckets
-          (key, type, is_public, allow_custom_keys, physical_name)
-          VALUES ('logical-slot', 'public', true, true, 'logical-slot-fixture')`);
-        try {
-          const key = 'derived/originals/known-object/thumb.webp';
-          const request = async (text: string) => expectSuccess(await postGraphQL({
-            query: UPLOAD_APP_FILE,
-            variables: { input: {
-              bucketKey: 'logical-slot', key, contentHash: await hashContent(text),
-              contentType: 'text/plain', size: Buffer.byteLength(text), filename: 'logical.txt'
-            } }
-          })).uploadAppFile;
-          const first = await request('first');
-          const second = await request('second');
-          expect(first.key).toMatch(/^originals\/[0-9a-f-]{36}$/);
-          expect(second.key).toMatch(/^originals\/[0-9a-f-]{36}$/);
-          expect(first.key).not.toBe(second.key);
-          expect(first.fileId).not.toBe(second.fileId);
-          expect(first.deduplicated).toBe(false);
-          expect(second.deduplicated).toBe(false);
-        } finally {
-          await pg.query(`DELETE FROM "${aliceSchemas[0]}".app_files WHERE bucket_id IN
-            (SELECT id FROM "${aliceSchemas[0]}".app_buckets WHERE key = 'logical-slot')`);
-          await pg.query(`DELETE FROM "${aliceSchemas[0]}".app_buckets WHERE key = 'logical-slot'`);
-        }
-      });
-
       it('issues a fresh upload URL when the earlier PUT never ran', async () => {
         const fileContent = `Never PUT: the client walked away (${crypto.randomUUID()}).`;
         const contentHash = await hashContent(fileContent);
@@ -566,11 +538,10 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
         expect(retry.deduplicated).toBe(false);
         expect(retry.uploadUrl).toBeTruthy();
         expect(retry.fileId).not.toBe(first.fileId);
-        expect(retry.key).not.toBe(first.key);
 
         const putRes = await putToPresignedUrl(retry.uploadUrl, fileContent, 'text/plain', { headers: retry.uploadHeaders });
         expect(putRes.ok).toBe(true);
-        await confirmUploaded(retry.fileId);
+        await confirmUploaded(contentHash);
 
         const afterPut = expectSuccess(await postGraphQL({ query: UPLOAD_APP_FILE, variables: { input } })).uploadAppFile;
         expect(afterPut.deduplicated).toBe(true);
