@@ -539,6 +539,8 @@ function makeTestSmartTagsPlugin(
 }
 
 describe('RAG plugin schema enrichment', () => {
+  const CHUNKS_MODEL = 'chunks-model';
+  const embedCalls: Array<{ text: string; model: string | undefined }> = [];
   let db: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;
@@ -561,10 +563,35 @@ describe('RAG plugin schema enrichment', () => {
     });
 
     // Mock embedder that returns a fixed 3-dim vector with token count
-    const mockEmbedder = async (_text: string) => ({
-      embedding: [1, 0, 0],
-      promptTokens: 5
-    });
+    const mockEmbedder = async (text: string, model?: string) => {
+      embedCalls.push({ text, model });
+      return { embedding: [1, 0, 0], promptTokens: 5 };
+    };
+
+    // The chunks vector column records the model its vectors came from
+    const chunksModelPlugin: GraphileConfig.Plugin = {
+      name: 'TestChunksModelPlugin',
+      version: '1.0.0',
+      before: ['LlmRagPlugin'],
+      schema: {
+        hooks: {
+          build: {
+            before: ['LlmRagPlugin'],
+            callback(build) {
+              const pgRegistry = build.input?.pgRegistry ?? (build as any).pgRegistry;
+              const chunks = Object.values(pgRegistry?.pgCodecs || {})
+                .find((c: any) => c?.extensions?.pg?.name === 'articles_chunks') as any;
+              const embedding = chunks?.attributes?.embedding;
+              if (embedding) {
+                embedding.extensions = embedding.extensions || {};
+                embedding.extensions.tags = { ...embedding.extensions.tags, embeddingModel: CHUNKS_MODEL };
+              }
+              return build;
+            }
+          }
+        }
+      }
+    };
 
     // Mock chat completer that returns a canned response with usage
     const mockChatCompleter = async (
@@ -606,6 +633,7 @@ describe('RAG plugin schema enrichment', () => {
         VectorCodecPlugin,
         unifiedPlugin,
         smartTagsPlugin,
+        chunksModelPlugin,
         mockLlmPlugin,
         createLlmTextSearchPlugin(),
         createLlmTextMutationPlugin(),
@@ -753,6 +781,20 @@ describe('RAG plugin schema enrichment', () => {
       expect(source.tableName).toBe('articles');
       expect(source.parentId).toBeTruthy();
     }
+  });
+
+  it('ragQuery embeds the prompt with the model the chunks vector column records', async () => {
+    embedCalls.length = 0;
+    const result = await query<{ ragQuery: { sources: Array<{ content: string }> } }>(`
+      query {
+        ragQuery(prompt: "Which model embeds me?", contextLimit: 1) {
+          sources { content }
+        }
+      }
+    `);
+
+    expect(result.errors).toBeUndefined();
+    expect(embedCalls).toEqual([{ text: 'Which model embeds me?', model: CHUNKS_MODEL }]);
   });
 
   it('embedText executes and returns vector with dimensions', async () => {

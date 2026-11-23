@@ -181,6 +181,8 @@ export interface ChunkTableInfo {
   embeddingField: string;
   /** Text content column on chunks table (the actual chunk text) */
   contentField: string;
+  /** Model the chunks embedding column records (`@embeddingModel`); unset, the request's model */
+  embeddingModel?: string;
 }
 
 // ─── Plugin Options ─────────────────────────────────────────────────────────
