@@ -25,14 +25,15 @@ import * as path from 'path';
 import type { PgConfig } from 'pg-env';
 
 import { PgpmMigrate } from '../migrate/client';
-import { hashSqlFile, hashString } from '../migrate/utils/hash';
+import { hashSqlFileCandidates, hashString } from '../migrate/utils/hash';
 import { loadPlanSideModules } from './sides';
 
 /**
  * Candidate hashes for every plan entry of a set of modules: the raw content
  * hash (what `pgpm deploy` records by default) and the AST hash (what
- * `DEPLOYMENT_HASH_METHOD=ast` records — formatting- and comment-proof). A
- * ledger row matches the plan entry when it recorded either.
+ * `DEPLOYMENT_HASH_METHOD=ast` records — formatting- and comment-proof),
+ * including the AST hashes older releases recorded with the parser version
+ * in them. A ledger row matches the plan entry when it recorded any of them.
  */
 export const planChangeRefs = async (modules: ModuleSource[]): Promise<PlanChangeRef[]> => {
   const refs: PlanChangeRef[] = [];
@@ -42,7 +43,7 @@ export const planChangeRefs = async (modules: ModuleSource[]): Promise<PlanChang
       const hashes: string[] = [];
       if (fs.existsSync(deployPath)) {
         hashes.push(hashString(fs.readFileSync(deployPath, 'utf-8')));
-        hashes.push(await hashSqlFile(deployPath));
+        hashes.push(...(await hashSqlFileCandidates(deployPath)));
       }
       refs.push({
         package: mod.name,
