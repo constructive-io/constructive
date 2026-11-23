@@ -49,6 +49,10 @@ const rows: Row[] = [
   // an option that shares a spec with -c (-v) is not -c, so psql still reads its input
   ["echo '\\! cat ~/.ssh/id_rsa' | psql -v x=1", 'deny', 'deny', 'deny', ['hard-deny']],
   ['vim -i ~/.ssh/viminfo notes.txt', 'deny', 'deny', 'deny', ['hard-deny']],
+  // after -e or -E, vim's -s is the silent flag, so the -c after it is still a command
+  ["vim -es -c '!cat ~/.ssh/id_rsa' -c q", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["vim -e -s -c '!cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["vim $X -s -c '!cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
   // text is plain only when it uses none of the language's escapes; an abbreviation is an escape too
   ["sqlite3 :memory: '.sys touch m40'", 'ask', 'ask', 'allow', ['shell-dynamic']],
   ["sqlite3 :memory: '.shel touch m41'", 'ask', 'ask', 'allow', ['shell-dynamic']],

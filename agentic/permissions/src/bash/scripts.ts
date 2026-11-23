@@ -98,9 +98,14 @@ function runsInstead(read: ReadArgs, unless: readonly string[], operandText: boo
 
 /** A program with a command language of its own: its text from options, operands and stdin. */
 export function textProgram(name: string, program: TextProgram, ctx: CommandContext, rest: readonly Arg[]): void {
+  for (const spec of program.readings?.(rest) ?? [program.spec]) readText(name, program, spec, ctx, rest);
+}
+
+/** One reading of a text program's arguments: its option effects, its texts, its stdin and its operands. */
+function readText(name: string, program: TextProgram, spec: ProgramSpec, ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const read = readArgs(program.spec, rest);
-  const dir = finalDir(applyEffects(ctx, name, program.spec, read));
+  const read = readArgs(spec, rest);
+  const dir = finalDir(applyEffects(ctx, name, spec, read));
   const texts: { arg: Arg; where: string }[] = valuesOf(read, ...program.textOptions).map((arg) => ({ arg, where: 'in an option' }));
   const plus = (a: Arg) => program.plusText === true && (a.kind === 'known' ? a.text : a.knownPrefix).startsWith('+');
   for (const op of read.operands) if (plus(op)) texts.push({ arg: restOf(op, 1), where: 'in an argument' });

@@ -7,9 +7,10 @@
  * operand.
  */
 
+import type { Arg } from './analyze';
 import type { CommandLanguage } from './languages';
 import * as languages from './languages';
-import type { Effect, OptionSpec, ProgramSpec } from './options';
+import { type Effect, mayBeOption, type OptionSpec, type ProgramSpec } from './options';
 
 const flag = (...names: string[]): OptionSpec => ({ names, value: 'none' });
 const value = (...names: string[]): OptionSpec => ({ names, value: 'required' });
@@ -412,6 +413,11 @@ export interface TextProgram {
    * `-f`, gdb's `-batch`). An option whose value is `-` still reads stdin.
    */
   readonly stdin: false | { readonly unless: readonly string[] };
+  /**
+   * The specs the program may read its arguments with, when an option's
+   * arity depends on the ones before it; each reading is analyzed.
+   */
+  readonly readings?: (args: readonly Arg[]) => readonly ProgramSpec[];
 }
 
 const PSQL: TextProgram = {
@@ -511,16 +517,46 @@ const GDB: TextProgram = {
   stdin: { unless: ['-batch', '--batch'] }
 };
 
+const VIM_OPTIONS = [
+  value('-c', '--cmd', '-T'),
+  flag('-r', '-e', '-E'),
+  does('reads-file', 'required', '-i'),
+  does('writes-file', 'required', '-i'),
+  does('reads-file', 'optional', '-S'),
+  does('reads-file', 'required', '-u', '-U'),
+  does('writes-file', 'required', '-w', '-W')
+];
+/** vim reads `-s file` as a script of keystrokes, but after `-e` or `-E` `-s` is the silent flag. */
+const VIM_SPEC = sub(...VIM_OPTIONS, does('reads-file', 'required', '-s'));
+const VIM_EX_SPEC = sub(...VIM_OPTIONS, flag('-s'));
+
+/**
+ * vim's readings: decided by the first `-s` and whether an `-e` or `-E` came
+ * before it; both when a word from a variable before it may be one.
+ */
+function vimReadings(args: readonly Arg[]): readonly ProgramSpec[] {
+  let ex = false;
+  let unsure = false;
+  for (const arg of args) {
+    if (arg.kind === 'unknown') {
+      unsure ||= mayBeOption(arg);
+      continue;
+    }
+    if (arg.text === '--') break;
+    if (!/^-[A-Za-z]/.test(arg.text)) continue;
+    for (const c of arg.text.slice(1)) {
+      if (c === 'e' || c === 'E') ex = true;
+      else if (c === 's') return ex ? [VIM_EX_SPEC] : unsure ? [VIM_SPEC, VIM_EX_SPEC] : [VIM_SPEC];
+      // The rest of the word is this option's value.
+      else if ('cTiuUwWS'.includes(c)) break;
+    }
+  }
+  return [VIM_SPEC];
+}
+
 const VIM: TextProgram = {
-  spec: sub(
-    value('-c', '--cmd', '-T'),
-    flag('-r'),
-    does('reads-file', 'required', '-i'),
-    does('writes-file', 'required', '-i'),
-    does('reads-file', 'optional', '-S'),
-    does('reads-file', 'required', '-u', '-U', '-s'),
-    does('writes-file', 'required', '-w', '-W')
-  ),
+  spec: VIM_SPEC,
+  readings: vimReadings,
   language: languages.VIM,
   textOptions: ['-c', '--cmd'],
   plusText: true,
