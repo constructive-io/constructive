@@ -26,7 +26,10 @@ export type Effect =
   | 'rewrites-history';
 
 export interface OptionSpec {
-  /** Its spellings: `-c`, `--config`. */
+  /**
+   * The spellings of the options it describes (`-c`, `--command`). Options
+   * that share a spec share its value and effect, and stay separate options.
+   */
   readonly names: readonly string[];
   /** `none`: a flag. `required`: glued (`-cX`, `--opt=X`) or the next word. `optional`: glued only. */
   readonly value: 'none' | 'required' | 'optional';
@@ -58,6 +61,8 @@ export interface ReadOption {
   readonly arg: Arg;
   /** The spelling as written, without a glued value: `--conf`, `-c`. */
   readonly name: string;
+  /** The full spellings it can be: `--config` for `--conf`; the written spelling for an option no spec lists. */
+  readonly spellings: readonly string[];
   readonly specs: readonly OptionSpec[];
   readonly value?: Arg;
 }
@@ -81,19 +86,34 @@ export function mayBeOption(arg: Arg): boolean {
   return arg.kind === 'unknown' && (arg.splits || !/^[\w./]/.test(arg.raw));
 }
 
+/** The options a written name can be: their full spellings, and the specs that describe them. */
+interface Resolved {
+  readonly spellings: readonly string[];
+  readonly specs: readonly OptionSpec[];
+}
+
 /**
  * The options a spelling can be. An exact name wins; otherwise, where the
  * program takes abbreviations, every long option the spelling starts, since
  * the analysis does not know every option that could make it ambiguous.
  */
-export function optionSpecs(spec: ProgramSpec, name: string): readonly OptionSpec[] {
+function resolveOption(spec: ProgramSpec, name: string): Resolved {
   const fold = (n: string) => (spec.anyCase ? n.toLowerCase() : n);
   const wanted = fold(name);
-  const exact = spec.options.filter((o) => o.names.some((n) => fold(n) === wanted));
+  const matching = (is: (n: string) => boolean): Resolved => {
+    const specs = spec.options.filter((o) => o.names.some(is));
+    const spellings = [...new Set(specs.flatMap((o) => o.names.filter(is)))];
+    return { spellings: spellings.length > 0 ? spellings : [name], specs };
+  };
+  const exact = matching((n) => fold(n) === wanted);
   const long = name.startsWith('--') || (spec.singleDash === true && name.startsWith('-'));
-  if (exact.length > 0 || !spec.abbreviations || !long || name.length < 3) return exact;
+  if (exact.specs.length > 0 || !spec.abbreviations || !long || name.length < 3) return exact;
   const dashes = name.startsWith('--') ? '--' : '-';
-  return spec.options.filter((o) => o.names.some((n) => n.startsWith(dashes) && !n.startsWith(`${dashes}-`) && fold(n).startsWith(wanted)));
+  return matching((n) => n.startsWith(dashes) && !n.startsWith(`${dashes}-`) && fold(n).startsWith(wanted));
+}
+
+export function optionSpecs(spec: ProgramSpec, name: string): readonly OptionSpec[] {
+  return resolveOption(spec, name).specs;
 }
 
 /** The value an option takes: `required` when any option its spelling can be takes one. */
@@ -110,6 +130,7 @@ function restOf(arg: Arg, from: number): Arg {
 /** One option an argument spells, and where its value is: glued from `glued` on, or the next word. */
 export interface SpelledOption {
   readonly name: string;
+  readonly spellings: readonly string[];
   readonly specs: readonly OptionSpec[];
   /** The index in the argument's text where a glued value starts. */
   readonly glued?: number;
@@ -125,29 +146,29 @@ export interface SpelledOption {
 export function optionsIn(spec: ProgramSpec, text: string): SpelledOption[] | null {
   const whole = text.startsWith('-') && !text.startsWith('--') && text.length > 2 ? text.split('=')[0] : null;
   if (whole !== null && (spec.singleDash || optionSpecs({ ...spec, abbreviations: false }, whole).length > 0)) {
-    const specs = optionSpecs(spec, whole);
-    if (whole.length < text.length) return [{ name: whole, specs, glued: whole.length + 1, takesNext: false }];
-    return [{ name: whole, specs, takesNext: valueOf(specs) === 'required' }];
+    const { spellings, specs } = resolveOption(spec, whole);
+    if (whole.length < text.length) return [{ name: whole, spellings, specs, glued: whole.length + 1, takesNext: false }];
+    return [{ name: whole, spellings, specs, takesNext: valueOf(specs) === 'required' }];
   }
   if (text.startsWith('--') && text.length > 2) {
     const eq = text.indexOf('=');
     const name = eq < 0 ? text : text.slice(0, eq);
-    const specs = optionSpecs(spec, name);
-    if (eq >= 0) return [{ name, specs, glued: eq + 1, takesNext: false }];
-    return [{ name, specs, takesNext: valueOf(specs) === 'required' }];
+    const { spellings, specs } = resolveOption(spec, name);
+    if (eq >= 0) return [{ name, spellings, specs, glued: eq + 1, takesNext: false }];
+    return [{ name, spellings, specs, takesNext: valueOf(specs) === 'required' }];
   }
   if (!text.startsWith('-') || text.length < 2 || text === '--') return null;
   const spelled: SpelledOption[] = [];
   for (let c = 1; c < text.length; c++) {
     const name = `-${text[c]}`;
-    const specs = optionSpecs(spec, name);
+    const { spellings, specs } = resolveOption(spec, name);
     const value = valueOf(specs);
     if (value === 'none') {
-      spelled.push({ name, specs, takesNext: false });
+      spelled.push({ name, spellings, specs, takesNext: false });
       continue;
     }
-    if (c + 1 < text.length) spelled.push({ name, specs, glued: c + 1, takesNext: false });
-    else spelled.push({ name, specs, takesNext: value === 'required' });
+    if (c + 1 < text.length) spelled.push({ name, spellings, specs, glued: c + 1, takesNext: false });
+    else spelled.push({ name, spellings, specs, takesNext: value === 'required' });
     break;
   }
   return spelled;
@@ -188,10 +209,10 @@ export function readArgs(spec: ProgramSpec, args: readonly Arg[]): ReadArgs {
     }
     const spelled = optionsIn(spec, t);
     if (spelled) {
-      for (const { name, specs, glued, takesNext } of spelled) {
-        if (glued !== undefined) options.push({ arg, name, specs, value: restOf(arg, glued) });
-        else if (takesNext) options.push({ arg, name, specs, value: args[++k] });
-        else options.push({ arg, name, specs });
+      for (const { name, spellings, specs, glued, takesNext } of spelled) {
+        if (glued !== undefined) options.push({ arg, name, spellings, specs, value: restOf(arg, glued) });
+        else if (takesNext) options.push({ arg, name, spellings, specs, value: args[++k] });
+        else options.push({ arg, name, spellings, specs });
       }
       continue;
     }
@@ -240,9 +261,9 @@ export function shellCommands(option: ReadOption): string[] {
   });
 }
 
-/** The read option can be one spelled `name` (any spelling of the same option counts). */
+/** The read option can be one of `names`, which list every spelling of an option (`-f`, `--file`). */
 export function isOption(option: ReadOption, ...names: string[]): boolean {
-  return option.specs.some((s) => names.some((n) => s.names.includes(n))) || names.includes(option.name);
+  return option.spellings.some((s) => names.includes(s));
 }
 
 /** Any read option can be one spelled `name`. */

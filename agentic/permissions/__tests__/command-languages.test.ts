@@ -45,7 +45,10 @@ const rows: Row[] = [
   ["gdb -batch -ex 'shell cd ~/.ssh; cat id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
   ["vim -c '!cd ~/.ssh; cat id_rsa' -c q", 'deny', 'deny', 'deny', ['hard-deny']],
   ["ssh -o ProxyCommand='sh -c x' host", 'ask', 'ask', 'allow', ['shell-dynamic']],
-  ["man -P 'sh -c x' ls", 'ask', 'ask', 'allow', ['shell-dynamic']]
+  ["man -P 'sh -c x' ls", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // an option that shares a spec with -c (-v) is not -c, so psql still reads its input
+  ["echo '\\! cat ~/.ssh/id_rsa' | psql -v x=1", 'deny', 'deny', 'deny', ['hard-deny']],
+  ['vim -i ~/.ssh/viminfo notes.txt', 'deny', 'deny', 'deny', ['hard-deny']]
 ];
 
 const modes: PermissionMode[] = ['ask', 'workspace', 'full'];

@@ -418,7 +418,10 @@ const GDB: TextProgram = {
 
 const VIM: TextProgram = {
   spec: sub(
-    value('-c', '--cmd', '-i', '-T', '-r'),
+    value('-c', '--cmd', '-T'),
+    flag('-r'),
+    does('reads-file', 'required', '-i'),
+    does('writes-file', 'required', '-i'),
     does('reads-file', 'optional', '-S'),
     does('reads-file', 'required', '-u', '-U', '-s'),
     does('writes-file', 'required', '-w', '-W')

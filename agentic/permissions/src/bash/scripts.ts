@@ -9,7 +9,7 @@
 
 import type { Arg } from './analyze';
 import { type CommandContext, generic, literalArg, restOf } from './args';
-import { effectsOf, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf, withEffect } from './options';
+import { effectsOf, hasOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf, withEffect } from './options';
 import { MAN, SORT, TAR, type TextProgram, ZIP } from './programs';
 
 /**
@@ -116,6 +116,6 @@ export function man(ctx: CommandContext, rest: readonly Arg[]): void {
 
 /** tar and zip take file names from stdin: `tar -T -`, `zip -@`. */
 export function namesFromStdinIn(name: 'tar' | 'zip', rest: readonly Arg[]): boolean {
-  if (name === 'zip') return readArgs(ZIP, rest).options.some((o) => o.name === '-@' || o.specs.some((s) => s.names.includes('-@')));
+  if (name === 'zip') return hasOption(readArgs(ZIP, rest), '-@', '--names-stdin');
   return valuesOf(readArgs(TAR, tarWords(rest)), '-T', '--files-from').some((v) => v.kind === 'known' && v.text === '-');
 }
