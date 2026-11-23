@@ -15,14 +15,18 @@ import type { CommandPart, ListedPrefix } from './types';
  * (`npm run` before `npm test`).
  *
  * A prefix is offered only when its words name an action that runs no code
- * taken from its arguments: a reader or filter by its name, a git or package
- * manager subcommand that acts on this repo, a package script by its name, or
- * an interpreter's script by its path (after `tsx watch` or `node inspect`, too). Anything else keeps the exact command:
- * a program that runs or fetches code named by an argument (`npx`, `npm
- * init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`, `make`, `gh
- * api`, `git bisect run`), one that writes files (`touch`, `mkdir`, `sort -o`,
- * `tree -o`), one whose options run a program (`rg --pre`, `printf -v`), and
- * any program the table does not list.
+ * taken from its arguments: a reader or filter by its name, a git subcommand
+ * that only reads or adds to the repo, a package manager subcommand that acts
+ * on this repo, a package script by its name, or an interpreter's script by its
+ * path (after `tsx watch` or `node inspect`, too). Anything else keeps the
+ * exact command: a program that runs or fetches code named by an argument
+ * (`npx`, `npm init`, `pnpm dlx`, `npm install <pkg>`, `go run`, `docker run`,
+ * `make`, `gh api`, `git bisect run`), one that writes files (`touch`,
+ * `mkdir`, `sort -o`, `tree -o`), one whose options run a program (`rg --pre`,
+ * `printf -v`), a git subcommand that can discard uncommitted work or rewrite
+ * or publish history (`reset`, `rm`, `mv`, `checkout`, `restore`, `switch`,
+ * `stash`, `push`, `pull`, `merge`, `rebase`, `cherry-pick`, `revert`), and any
+ * program the table does not list.
  */
 const ARITY: ReadonlyMap<string, number> = new Map<string, number>([
   ...[
@@ -54,22 +58,9 @@ const ARITY: ReadonlyMap<string, number> = new Map<string, number>([
     'show',
     'add',
     'commit',
-    'restore',
-    'switch',
-    'checkout',
     'branch',
     'tag',
-    'stash',
     'fetch',
-    'pull',
-    'push',
-    'merge',
-    'rebase',
-    'cherry-pick',
-    'revert',
-    'reset',
-    'rm',
-    'mv',
     'blame',
     'grep',
     'ls-files',

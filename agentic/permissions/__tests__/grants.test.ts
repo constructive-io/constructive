@@ -244,6 +244,7 @@ describe('parseGrantMatch', () => {
     ['not an object', 'git status'],
     ['an unknown type', { type: 'tool', name: 'bash' }],
     ['a prefix the table does not list', { type: 'command-prefix', prefixes: ['git'] }],
+    ['a git prefix that can lose work', { type: 'command-prefix', prefixes: ['git reset'] }],
     ['a prefix with extra spacing', { type: 'command-prefix', prefixes: ['git  status'] }],
     ['a prefix with an option', { type: 'command-prefix', prefixes: ['git -C src status'] }],
     ['no prefixes', { type: 'command-prefix', prefixes: [] }],
