@@ -150,11 +150,16 @@ function dotCommands(loadsCode: RegExp): CommandLanguage {
 }
 
 /**
- * sqlite3's CLI adds functions that load code, run an editor, or read and
- * write any file. A function name may be quoted or followed by a comment, so
- * the bare word counts.
+ * sqlite3 SQL with string literals is plain, since sqlite reads no string as
+ * a file by itself. These words are not: the functions and modules that the
+ * 3.54 CLI adds to the library (`pragma function_list`, `pragma
+ * module_list`) and that read or write a file, run an editor, or run SQL from
+ * a string, which `char()` can build; `load_extension`, which the CLI
+ * enables; `ATTACH`; and `VACUUM`, since a comment can sit between it and
+ * `INTO`. A name may be quoted or followed by a comment, so the bare word
+ * counts.
  */
-export const SQLITE = dotCommands(/\b(?:load_extension|edit|readfile|writefile|lsdir)\b/i);
+export const SQLITE = dotCommands(/\b(?:readfile|writefile|edit|fsdir|zipfile|sha1_query|sha3_query|load_extension|attach|vacuum)\b/i);
 
 /** duckdb loads native code with `INSTALL` and `LOAD`. */
 export const DUCKDB = dotCommands(/\b(?:install|load)\b/i);

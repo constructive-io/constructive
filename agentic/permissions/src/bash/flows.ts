@@ -43,6 +43,8 @@ export interface Stdin {
    * when it cannot be seen.
    */
   texts: readonly string[] | null;
+  /** stdin is a file a `<` redirect names, which a program reads like a script it runs by name (`psql -f`). */
+  file: boolean;
   /**
    * When stdin is a file listing (`find src |`, `git ls-files |`): the roots
    * every listed name lies under. `null` when it is anything else.
@@ -151,6 +153,12 @@ function printedWords(name: string, rest: readonly Arg[]): Arg[] | null {
   return splitWords(rest.slice(k));
 }
 
+/** The last redirection of fd 0 is `< file`, which wins over a pipe. */
+function stdinIsFile(cmd: SimpleCommand): boolean {
+  const last = cmd.redirects.filter((r) => (r.fd ?? 0) === 0 && (r.kind === 'heredoc' || r.kind === 'here-string' || r.op === '<' || r.op === '<&' || r.op === '<>')).pop();
+  return last?.kind === 'file' && last.op === '<';
+}
+
 /**
  * The roots a file-listing command prints names under: `find`, `ls`, and
  * `git ls-files`. `null` for any other command, an unknown root, or a `find`
@@ -247,7 +255,7 @@ export class FlowTracker {
     default:
       return unreachable(input);
     }
-    return { sources, words, texts, listedUnder };
+    return { sources, words, texts, file: stdinIsFile(cmd), listedUnder };
   }
 
   /**

@@ -94,7 +94,16 @@ const rows: Row[] = [
   ["gdb -batch -ex 'she cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
   ["gdb -batch -ex 'pipe info frame | cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
   ["gdb -batch -ex 'print 1' ./a.out", 'ask', 'ask', 'allow', ['shell-dynamic']],
-  ['gdb -batch -x cmds.gdb ./a.out', 'ask', 'ask', 'allow', ['shell-dynamic']]
+  ['gdb -batch -x cmds.gdb ./a.out', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // sqlite3: ATTACH, VACUUM INTO, and the CLI's functions that touch files or run SQL from a string
+  ["sqlite3 app.db \"ATTACH '/tmp/x.db' AS x\"", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 app.db \"VACUUM INTO 'backup.db'\"", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: \"select name from fsdir('.')\"", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: 'select sha3_query(char(65,84))'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // stdin from a file a redirect names is read like a script the program runs by name (`psql -f`)
+  ['mysql < dump.sql', 'ask', 'allow', 'allow', []],
+  ['psql -U app < schema.sql', 'ask', 'allow', 'allow', []],
+  ['sqlite3 app.db < seed.sql', 'ask', 'allow', 'allow', []]
 ];
 
 const modes: PermissionMode[] = ['ask', 'workspace', 'full'];
