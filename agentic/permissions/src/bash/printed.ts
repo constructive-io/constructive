@@ -6,6 +6,11 @@
  * the C library (`\u`, a byte above 0x7f or NUL, a number format) is `null`.
  */
 
+/** The per-command text budget (`ExpansionBudget`): a charge that does not fit takes nothing. */
+export interface TextBudget {
+  takeChars(n: number): boolean;
+}
+
 interface Escape {
   /** The text the escape prints. */
   readonly text: string;
@@ -117,17 +122,18 @@ function echoBody(body: string, escapes: boolean, newline: boolean): string | nu
  * xpg_echo option (and in zsh) it reads them by default; and bash as POSIX
  * sh with xpg_echo (macOS /bin/sh) reads no options and every escape.
  */
-function echoTexts(words: readonly string[]): string[] | null {
+function echoTexts(words: readonly string[], budget: TextBudget): string[] | null {
   if (!words.every(ascii)) return null;
   const texts = [echoText(words, false), echoText(words, true), echoBody(words.join(' '), true, true)];
-  const known = texts.filter((text): text is string => text !== null);
-  return known.length < texts.length ? null : [...new Set(known)];
+  if (texts.includes(null)) return null;
+  const known = [...new Set(texts as string[])];
+  return budget.takeChars(known.reduce((n, text) => n + text.length, 0)) ? known : null;
 }
 
 const INTEGER = /^-?(?:0|[1-9]\d{0,14})$/;
 
-/** One printf conversion, filled from its argument; `null` for a form the analysis does not model. */
-function convert(spec: RegExpExecArray, arg: string | undefined): Expanded | null {
+/** One printf conversion, filled from its argument; `null` for a form the analysis does not model or a pad over the budget. */
+function convert(spec: RegExpExecArray, arg: string | undefined, budget: TextBudget): Expanded | null {
   const [, flags, width, precision, conversion] = spec;
   if (flags !== '' && flags !== '-') return null;
   let read: Expanded | null;
@@ -145,13 +151,15 @@ function convert(spec: RegExpExecArray, arg: string | undefined): Expanded | nul
   }
   if (!ascii(read.text)) return null;
   let text = precision === undefined ? read.text : read.text.slice(0, Number(precision));
-  const pad = ' '.repeat(Math.max(0, Number(width ?? 0) - text.length));
+  const padding = Math.max(0, Number(width ?? 0) - text.length);
+  if (!budget.takeChars(padding)) return null;
+  const pad = ' '.repeat(padding);
   text = flags === '-' ? text + pad : pad + text;
   return { text, stop: read.stop };
 }
 
 /** What `printf` prints: its format, used again while arguments are left, with `%s`, `%b`, `%d` and `%i` filled in. */
-function printfText(words: readonly string[]): string | null {
+function printfText(words: readonly string[], budget: TextBudget): string | null {
   if (words[0] === '-v') return '';
   const [format, ...args] = words[0] === '--' ? words.slice(1) : words;
   if (format === undefined || /^-./.test(format) || !ascii(format)) return null;
@@ -159,6 +167,7 @@ function printfText(words: readonly string[]): string | null {
   let used = 0;
   for (;;) {
     const before = used;
+    const built = out.length;
     for (let i = 0; i < format.length; i++) {
       if (format[i] === '\\') {
         const escape = printfEscape(format, i, false);
@@ -173,7 +182,7 @@ function printfText(words: readonly string[]): string | null {
       } else {
         const spec = /^%([-+ #0']*)(\d+)?(?:\.(\d*))?([A-Za-z])/.exec(format.slice(i));
         if (!spec) return null;
-        const filled = convert(spec, args[used]);
+        const filled = convert(spec, args[used], budget);
         if (filled === null) return null;
         if (used < args.length) used++;
         out += filled.text;
@@ -181,14 +190,16 @@ function printfText(words: readonly string[]): string | null {
         i += spec[0].length - 1;
       }
     }
+    // Each pass over the format is charged, so a long format used again for many arguments stays in budget.
+    if (!budget.takeChars(out.length - built)) return null;
     if (used === before || used >= args.length) return out;
   }
 }
 
 /** The texts `echo` or `printf` may print from these words, or `null` when the analysis cannot be sure of them. */
-export function printedText(name: 'echo' | 'printf', words: readonly string[]): readonly string[] | null {
-  if (name === 'echo') return echoTexts(words);
-  const text = printfText(words);
+export function printedText(name: 'echo' | 'printf', words: readonly string[], budget: TextBudget): readonly string[] | null {
+  if (name === 'echo') return echoTexts(words, budget);
+  const text = printfText(words, budget);
   return text === null ? null : [text];
 }
 
@@ -198,7 +209,8 @@ export function printedText(name: 'echo' | 'printf', words: readonly string[]): 
  * `\`, `$` and `` ` `` (bash's manual, "Here Documents"), so any other `$`
  * or `` ` `` is an expansion the analysis does not run.
  */
-export function heredocText(body: string, quoted: boolean): string | null {
+export function heredocText(body: string, quoted: boolean, budget: TextBudget): string | null {
+  if (!budget.takeChars(body.length)) return null;
   if (quoted) return body;
   let out = '';
   for (let i = 0; i < body.length; i++) {

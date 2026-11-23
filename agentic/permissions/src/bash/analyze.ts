@@ -263,7 +263,7 @@ class Analyzer implements ExpansionScope {
   /** git remotes the command adds or points elsewhere (`git remote add`, `set-url`, `-c remote.x.url=`). */
   readonly gitRemotes = new Set<string>();
   /** What the command being analyzed reads on stdin. */
-  stdin: Stdin = { sources: [], words: [], texts: [''], file: false, listedUnder: null };
+  stdin: Stdin = { sources: [], words: [], texts: () => [''], file: false, listedUnder: null };
   /** Shell variables as the command has set them so far. */
   vars = new Variables((name) => this.outsideValue(name));
   /** The shell's working dir at this point of the command. */
@@ -272,6 +272,11 @@ class Analyzer implements ExpansionScope {
   private leftStart = false;
   /** What the expansions of this command may still build. */
   private readonly budget = new ExpansionBudget((limit) => this.incomplete(limit));
+
+  /** The command's one text budget, for the texts the analysis builds beyond its words (printed output, heredocs). */
+  get textBudget(): ExpansionBudget {
+    return this.budget;
+  }
   /**
    * Whether IFS may differ from bash's default: a word names it (`IFS=:`,
    * `read IFS`, `mapfile -t IFS`, `for IFS in …`) or the command assigns it

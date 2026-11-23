@@ -109,7 +109,8 @@ export function textProgram(name: string, program: TextProgram, ctx: CommandCont
   for (const arg of operands.slice(textFrom)) texts.push({ arg, where: 'in an argument' });
   for (const { arg, where } of texts) runText(ctx, name, program, arg, where);
   if (program.stdin && ctx.stdinFed && !runsInstead(read, program.stdin.unless, operands.length > textFrom)) {
-    const { texts: input, file } = analyzer.stdin;
+    const input = analyzer.stdin.texts();
+    const { file } = analyzer.stdin;
     if (input !== null) for (const text of new Set(input)) runText(ctx, name, program, literalArg(text), 'on its input');
     else if (!file) analyzer.dynamic(`it feeds ${name} commands from input the analysis cannot see`);
   }

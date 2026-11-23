@@ -16,6 +16,20 @@ async function bounded(command: string) {
 }
 
 describe('expansions stay within one budget per command', () => {
+  it('charges the text printf prints to a program that reads it, before it builds the text', async () => {
+    const { d, ms, heapMb } = await bounded('printf %500000000s x | psql');
+    expect(d.decision).toBe('ask');
+    expect(d.request.signals).toContain('unresolvable-path');
+    expect(ms).toBeLessThan(1000);
+    expect(heapMb).toBeLessThan(64);
+  });
+
+  it('builds no printed text that nothing reads', async () => {
+    const { d, heapMb } = await bounded('printf %999999999s x | cat');
+    expect(d.decision).toBe('allow');
+    expect(heapMb).toBeLessThan(64);
+  });
+
   it('stops a brace expansion of a long word before it builds the results', async () => {
     const { d, ms, heapMb } = await bounded(`echo ${'a'.repeat(60_000)}{1..4096}`);
     expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
