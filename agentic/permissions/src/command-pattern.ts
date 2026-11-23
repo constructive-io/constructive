@@ -7,7 +7,7 @@
  * to the grant it came from.
  */
 
-import { hasPlaceholder, MAX_COMMAND_LENGTH, normalizeCommand, trimBlanks } from './bash/analyze';
+import { hasPlaceholder, MAX_COMMAND_LENGTH, normalizeCommand } from './bash/analyze';
 import { isShellSyntax } from './bash/parts';
 import { tokenize } from './bash/tokenize';
 import { firstNonPrefixWord, grantCaveat, MAX_PREFIXES, prefixShortfall } from './command-prefix';
@@ -64,8 +64,8 @@ function listed(piece: string, words: readonly string[]): PrefixResult | null {
 }
 
 function readPrefixes(text: string): CommandPatternResult {
-  const pieces = text.split(',').map(trimBlanks);
-  if (pieces.includes('')) return refused(RULE_REFUSAL.extraComma);
+  const pieces = text.split(',').map((piece) => normalizeCommand(piece));
+  if (pieces.includes('' as CommandKey)) return refused(RULE_REFUSAL.extraComma);
   const prefixes = new Set<ListedPrefix>();
   for (const piece of pieces) {
     const read = readPrefix(piece);
@@ -105,9 +105,9 @@ export function parseCommandPattern(pattern: CommandPattern): CommandPatternResu
   if (text.length > MAX_COMMAND_LENGTH) return refused(RULE_REFUSAL.tooLong);
   switch (kind) {
   case 'prefix':
-    return readPrefixes(trimBlanks(text));
+    return readPrefixes(text);
   case 'exact':
-    return readExact(trimBlanks(text));
+    return readExact(text);
   default:
     throw new Error(
       `permissions: parseCommandPattern could not read a rule of kind ${JSON.stringify(kind satisfies never)}. Pass 'prefix' or 'exact', and check the kind where the host reads it from a file or a message.`

@@ -163,6 +163,14 @@ describe('command prefix grants', () => {
     expect((await sb.bash('git status --short', 'ask', [exactGrant('git status')])).decision).toBe('ask');
   });
 
+  it("keeps a part's input redirections in its exact identity, and builds the key from the tokens alone", async () => {
+    expect((await sb.bash('cat < src/config.ts', 'ask', [exactGrant('cat')])).decision).toBe('ask');
+    expect((await sb.bash('cat < src/config.ts', 'ask', [exactGrant('cat < src/config.ts')])).decision).toBe('allow');
+    expect((await sb.bash('git status && cat < src/config.ts', 'ask', [exactGrant('git status'), exactGrant('cat')])).decision).toBe('ask');
+    expect((await sb.bash('echo a\\ ', 'ask', [exactGrant('echo a\\')])).decision).toBe('ask');
+    expect((await sb.bash('echo a\\ ', 'ask', [exactGrant('echo a\\ ')])).decision).toBe('allow');
+  });
+
   it('never covers a part that raises a signal, so only an exact grant of the whole command does', async () => {
     const broad = [prefixGrant('node'), prefixGrant('bash'), prefixGrant('git status'), prefixGrant('curl'), prefixGrant('cat')];
     expect((await sb.bash('node -e "process.exit(0)"', 'workspace', broad)).decision).toBe('ask');
@@ -220,10 +228,11 @@ describe('command prefix grants', () => {
 
   it('splits only a plain list or pipeline into parts', async () => {
     expect(bashRequestOf(await sb.bash("git status 2>&1 | head -5 > out.txt; git log '--format=%H' -- -x", 'ask')).parts).toEqual([
-      { words: ['git', 'status'], writesFile: false, options: [] },
-      { words: ['head', '-5'], writesFile: true, options: ['-5'] },
-      { words: ['git', 'log', "'--format=%H'", '--', '-x'], writesFile: false, options: ['--format=%H', '--', '-x'] }
+      { words: ['git', 'status'], writesFile: false, inputs: [], options: [] },
+      { words: ['head', '-5'], writesFile: true, inputs: [], options: ['-5'] },
+      { words: ['git', 'log', "'--format=%H'", '--', '-x'], writesFile: false, inputs: [], options: ['--format=%H', '--', '-x'] }
     ]);
+    expect(bashRequestOf(await sb.bash('cat < src/a.ts', 'ask')).parts).toEqual([{ words: ['cat'], writesFile: false, inputs: ['< src/a.ts'], options: [] }]);
     expect(bashRequestOf(await sb.bash('git fetch $OPT', 'ask')).parts?.[0].options).toBeNull();
     expect(bashRequestOf(await sb.bash('git fetch . HEAD$IFS', 'ask')).parts?.[0].options).toBeNull();
     for (const command of ['if true; then npm test; fi', 'for f in a b; do echo $f; done', '{ npm test; }', 'cat <<EOF\nhi\nEOF', 'echo a\rb']) {

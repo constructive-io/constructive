@@ -21,6 +21,13 @@ const COMPOUND_OPENERS: ReadonlySet<string> = new Set(['for', 'select', 'case', 
  * `/dev/null` is exempt: another device or a word with quotes or a variable
  * is not proven harmless.
  */
+/** An input redirection as written; output ones are in `writesFile`, and a heredoc or here-string makes no parts. */
+function inputOf(r: Redirect): string[] {
+  if (r.kind === 'file' && (r.op === '<' || r.op === '<>')) return [`${r.fd ?? ''}${r.op} ${r.target.raw}`];
+  if (r.kind === 'dup' && r.op === '<&') return [`${r.fd ?? ''}<&`];
+  return [];
+}
+
 function writesFile(r: Redirect): boolean {
   switch (r.kind) {
   case 'file':
@@ -106,6 +113,7 @@ export function commandParts(command: string, lexed: Lexed): CommandPart[] | nul
   return lexed.commands.map((cmd) => ({
     words: cmd.words.map((w) => w.raw),
     writesFile: cmd.redirects.some(writesFile),
+    inputs: cmd.redirects.flatMap((r) => inputOf(r)),
     options: optionsOf(cmd.words, budget, () => spent)
   }));
 }

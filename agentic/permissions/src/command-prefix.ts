@@ -227,7 +227,7 @@ export function prefixCovers(prefix: string, part: CommandPart): boolean {
   return words.length <= part.words.length && words.every((w, i) => part.words[i] === w);
 }
 
-/** The part is exactly `command` and writes no file: an exact grant's share of a longer command. */
+/** The part, its input redirections included, is exactly `command`, and it writes no file: an exact grant's share of a longer command. */
 export function partIs(command: string, part: CommandPart): boolean {
-  return !part.writesFile && normalizeCommand(part.words.join(' ')) === command;
+  return !part.writesFile && normalizeCommand([...part.words, ...part.inputs].join(' ')) === command;
 }

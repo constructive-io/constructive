@@ -101,6 +101,8 @@ export interface CommandPart {
    * (`2>&1`), input (`<`, a heredoc, a here-string) or the exact path `/dev/null`.
    */
   writesFile: boolean;
+  /** Its input redirections as written (`< src/a.ts`), which are part of its exact identity. */
+  inputs: string[];
   /**
    * The options it passes, after quote removal and brace expansion, `--` and
    * the words after it included; `null` when a word may hold an option the

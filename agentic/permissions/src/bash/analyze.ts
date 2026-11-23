@@ -113,32 +113,27 @@ export interface Run {
   rest: Arg[];
 }
 
-/** The text without the spaces and tabs at its ends; any other character there stays. */
-export function trimBlanks(text: string): string {
-  return text.replace(/^[ \t]+|[ \t]+$/g, '');
-}
-
 /**
- * The exact-grant key, built from the lexer's tokens: the ends trimmed of
- * spaces and tabs, and each run of them between two tokens made one space,
- * since bash reads any such run the same. The text inside a token (quotes,
- * `${…}`, a substitution) and a heredoc body stay as written, and so does every
+ * The exact-grant key, built from the lexer's tokens alone: the unquoted runs
+ * of spaces and tabs before the first token and after the last one dropped,
+ * and each run between two tokens made one space, since bash reads any such
+ * run the same. Everything inside a token stays as written: quotes, `${…}`, a
+ * substitution, an escaped space (`a\ `), and so do a heredoc body and every
  * other character (newline, `\r`, NBSP), because bash reads each of them
- * differently from a space. A command the lexer cannot read, or one longer than
- * the analysis reads, keeps its spacing as written.
+ * differently from a space. A command the lexer cannot read, or one longer
+ * than the analysis reads, is its own key as written.
  */
 export function normalizeCommand(command: string): CommandKey {
-  const trimmed = trimBlanks(command);
-  if (trimmed.length > MAX_COMMAND_LENGTH) return trimmed as CommandKey;
-  const lexed = tokenize(trimmed);
-  if (lexed.error) return trimmed as CommandKey;
+  if (command.length > MAX_COMMAND_LENGTH) return command as CommandKey;
+  const lexed = tokenize(command);
+  if (lexed.error) return command as CommandKey;
   let key = '';
   let from = 0;
   for (const [start, end] of lexed.blanks) {
-    key += `${trimmed.slice(from, start)} `;
+    key += command.slice(from, start) + (start === 0 || end === command.length ? '' : ' ');
     from = end;
   }
-  return (key + trimmed.slice(from)) as CommandKey;
+  return (key + command.slice(from)) as CommandKey;
 }
 
 /** Where the shell is at a point of the command: where it started, a dir it moved to, or one the analysis cannot know. */
