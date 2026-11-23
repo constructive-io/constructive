@@ -37,7 +37,7 @@ export {
   StatusResult,
   VerifyOptions, 
   VerifyResult} from './migrate/types';
-export { hashFile, hashSqlFile, hashSqlFileCandidates, hashString } from './migrate/utils/hash';
+export { hashFile, hashSqlFile, hashString } from './migrate/utils/hash';
 export { executeQuery,TransactionContext, TransactionOptions, withTransaction } from './migrate/utils/transaction';
 export * from './refactor';
 export * from './roles';
