@@ -141,7 +141,15 @@ const rows: Row[] = [
   ['ssh h -R 8080:localhost:80', 'ask', 'allow', 'network-exposure'],
   // 16. brace sequences as bash expands them: a zero-padded or stepped one differs between bash 3.2 and 5, so it is unknown
   ['cat img-{01..03}.png', 'ask', 'ask', 'unresolvable-path'],
-  ['cat {a..e..2}', 'ask', 'ask', 'unresolvable-path']
+  ['cat {a..e..2}', 'ask', 'ask', 'unresolvable-path'],
+  // 17. bash 3.2 (macOS's /bin/bash) drops a group with `..` before a nested list, which bash 4+ keeps: both readings count
+  ['cat {~/work/../.ssh/id_ed2551{9,x}}', 'deny', 'deny', 'hard-deny'],
+  ['cat {../../.ssh/id_ed2551{9,x}}', 'deny', 'deny', 'hard-deny'],
+  ['cat {../../.aws/credential{s,x}}', 'deny', 'deny', 'hard-deny'],
+  ['cat {..{/../.ssh/id_ed25519,x}}', 'deny', 'deny', 'hard-deny'],
+  ['cat {..x}{a,b}', 'ask', 'ask', 'unresolvable-path'],
+  // a bash 4+ parameter transform, which bash 3.2 refuses, is still read as bash 4+ runs it
+  ['x=~/.ssh/id_ed25519; eval cat ${x@Q}', 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {

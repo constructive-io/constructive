@@ -32,7 +32,7 @@ import {
 /** One piece of a word. `quoted` pieces take no globbing, brace or tilde expansion. */
 export type Part =
   | { kind: 'lit'; text: string; quoted: boolean }
-  | { kind: 'var'; name: string; quoted: boolean; fallback?: string; colon?: boolean }
+  | { kind: 'var'; name: string; quoted: boolean; fallback?: string; colon?: boolean; transform?: string }
   /**
    * `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). `splits`: bash may split its
    * value into more words (it is unquoted, or `$@`), which may be options.
@@ -501,6 +501,12 @@ class Lexer {
       }
       if (SPECIAL_PARAMS.has(inner)) {
         parts.push({ kind: 'unknown', splits: inner === '@' || !quoted });
+        return;
+      }
+      // bash 4+'s `${x@Q}` and case changes run no code, so the value is read through them.
+      const transform = /^([A-Za-z_][A-Za-z0-9_]*)(@[QULu]|\^\^|,,|\^|,)$/.exec(inner);
+      if (transform) {
+        parts.push({ kind: 'var', name: transform[1], quoted, transform: transform[2] });
         return;
       }
       const ref = /^[#!]?([A-Za-z_][A-Za-z0-9_]*)/.exec(inner)?.[1];

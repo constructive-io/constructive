@@ -448,6 +448,11 @@ class Analyzer implements ExpansionScope {
     return null;
   }
 
+  /** bash 3.2 (macOS's /bin/bash) and bash 4+ expand a word's braces differently: the command may make either word list. */
+  bashesDiffer(word: string): void {
+    this.unresolvable(`bash 3.2 and bash 4 or later expand the braces in ${word} to different words, and the analysis cannot know which bash runs it`);
+  }
+
   /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
   lookup(name: string): string | null | undefined {
     return this.vars.get(name);

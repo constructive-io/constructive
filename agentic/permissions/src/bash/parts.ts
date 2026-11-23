@@ -52,7 +52,9 @@ const LITERAL_SCOPE: ExpansionScope = {
   value: () => null,
   ifsMayDiffer: () => false,
   noteRef: () => undefined,
-  dynamic: () => undefined
+  dynamic: () => undefined,
+  // The words of both bashes count, so an option either one makes is seen.
+  bashesDiffer: () => undefined
 };
 
 /** The texts a word of literals expands to: after braces, tilde and quote removal. */
