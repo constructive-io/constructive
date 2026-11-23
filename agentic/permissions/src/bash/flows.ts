@@ -36,6 +36,8 @@ export interface Stdin {
   sources: Source[];
   /** The words on stdin when they are known (`echo a b |`, `<<< a`); `null` when they are not. */
   words: Arg[] | null;
+  /** The text on stdin when it is known (a heredoc body too); `''` for none; `null` when it cannot be seen. */
+  text: string | null;
   /**
    * When stdin is a file listing (`find src |`, `git ls-files |`): the roots
    * every listed name lies under. `null` when it is anything else.
@@ -184,19 +186,28 @@ export class FlowTracker {
     const { analyzer } = this;
     const sources: Source[] = [];
     let words: Arg[] | null = [];
+    let text: string | null = '';
+    const add = (said: Arg[] | null) => {
+      text = text !== null && said?.every(isKnown) ? `${text}${said.map((a) => (a.kind === 'known' ? a.text : '')).join(' ')}\n` : null;
+    };
     let listedUnder: Arg[] | null = null;
     for (const r of cmd.redirects) {
       if (r.kind !== 'file' || r.op !== '<') continue;
       words = null;
+      text = null;
       for (const t of analyzer.resolveWord(r.target)) {
         const abs = t.kind === 'unknown' ? null : analyzer.toAbs(t.text);
         if (abs) sources.push({ raw: t.raw, abs });
       }
     }
-    if (heredocsOf(cmd).length > 0) words = null;
+    for (const doc of heredocsOf(cmd)) {
+      words = null;
+      if (text !== null) text += doc.body;
+    }
     for (const w of hereStringsOf(cmd)) {
       const said = splitWords(analyzer.resolveWord(w));
       words = words && said ? [...words, ...said] : null;
+      add(said);
     }
     const input = cmd.input;
     switch (input.kind) {
@@ -205,17 +216,20 @@ export class FlowTracker {
     case 'group-pipe':
       for (const source of this.all) sources.push(source);
       words = null;
+      text = null;
       break;
     case 'pipe': {
       const up = input.from;
       if (up.words.every((w) => GROUP_END.has(w.raw))) {
         for (const source of this.all) sources.push(source);
         words = null;
+        text = null;
         break;
       }
       for (const source of this.outputs.get(up) ?? []) sources.push(source);
-      const said = this.printed.get(up);
+      const said = this.printed.get(up) ?? null;
       words = words && said ? [...words, ...said] : null;
+      add(said);
       const onlyPipe = cmd.redirects.every((r) => r.kind === 'dup' || (r.kind === 'file' && r.op !== '<'));
       listedUnder = onlyPipe ? (this.listed.get(up) ?? null) : null;
       break;
@@ -223,7 +237,7 @@ export class FlowTracker {
     default:
       return unreachable(input);
     }
-    return { sources, words, listedUnder };
+    return { sources, words, text, listedUnder };
   }
 
   /**

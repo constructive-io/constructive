@@ -5,7 +5,10 @@
  */
 
 import { type Arg, literalStart } from './analyze';
-import { type CommandContext, firstOperand, generic, has, looksLikePath, parse, pathLikeArgs, restOf, textOf, valuesOf } from './args';
+import { type CommandContext, firstOperand, generic, looksLikePath, parse, pathLikeArgs, restOf, textOf, valuesOf } from './args';
+import { hasOption, readArgs, valuesOf as valuesRead } from './options';
+import { RSYNC, SCP, SSH } from './programs';
+import { applyEffects } from './scripts';
 import { isLoopbackHost, isRemoteSpec, isUrl } from './words';
 
 const CURL_WITH_VALUE = new Set([
@@ -167,18 +170,14 @@ export function wget(ctx: CommandContext, rest: readonly Arg[]): void {
   if (ctx.stdinFed && remote) analyzer.flag('upload', 'it uploads data: wget gets piped input and talks to a remote host');
 }
 
-export function remoteCopy(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
+export function remoteCopy(name: 'scp' | 'rsync', ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const withValue =
-    name === 'scp'
-      ? new Set(['-i', '-F', '-P', '-o', '-c', '-l', '-S', '-J'])
-      : new Set(['-e', '--rsh', '--exclude', '--include', '--exclude-from', '--include-from', '--files-from', '-f', '--filter']);
-  const p = parse(rest, withValue);
-  for (const v of valuesOf(p, '-i', '-F', '--exclude-from', '--include-from', '--files-from')) {
-    if (textOf(v) === '-') analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
-    else analyzer.addPath(v, 'read', true);
-  }
-  const ops = p.positionals;
+  const spec = name === 'scp' ? SCP : RSYNC;
+  const read = readArgs(spec, rest);
+  const fromStdin = valuesRead(read, '--exclude-from', '--include-from', '--files-from').some((v) => textOf(v) === '-');
+  if (fromStdin) analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
+  applyEffects(ctx, name, spec, { ...read, options: read.options.filter((o) => textOf(o.value) !== '-') });
+  const ops = read.operands;
   if (ops.length === 0) return;
   const dest = ops[ops.length - 1];
   const sources = ops.slice(0, -1);
@@ -192,9 +191,9 @@ export function remoteCopy(name: string, ctx: CommandContext, rest: readonly Arg
 
 export function ssh(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
-  const p = parse(rest, new Set(['-i', '-F', '-o', '-p', '-l', '-J', '-L', '-R', '-D', '-E', '-S', '-W', '-b', '-c', '-e', '-m', '-O', '-Q', '-w']));
-  for (const v of valuesOf(p, '-i', '-F')) analyzer.addPath(v, 'read', true);
-  if (has(p, '-R')) expose(ctx, 'ssh -R forwards a port from a remote host to this machine');
+  const read = readArgs(SSH, rest);
+  applyEffects(ctx, 'ssh', SSH, read);
+  if (hasOption(read, '-R')) expose(ctx, 'ssh -R forwards a port from a remote host to this machine');
   if (ctx.stdinFed) analyzer.flag('upload', 'it uploads data: ssh gets piped input');
 }
 

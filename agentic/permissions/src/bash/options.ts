@@ -31,6 +31,10 @@ export interface OptionSpec {
   /** `none`: a flag. `required`: glued (`-cX`, `--opt=X`) or the next word. `optional`: glued only. */
   readonly value: 'none' | 'required' | 'optional';
   readonly effect?: Effect;
+  /** The effect holds only for a value that matches (`ProxyCommand=…` among ssh's `-o` values); a value from a variable may. */
+  readonly when?: RegExp;
+  /** Captures, in group 1, the shell command the value runs, which the analysis reads as bash. */
+  readonly shell?: RegExp;
 }
 
 /** An operand with an effect: an action word in first place (`reflog expire`), or a prefix any operand starts with (`+main`). */
@@ -43,6 +47,10 @@ export interface ProgramSpec {
   readonly stopAtOperand: boolean;
   readonly options: readonly OptionSpec[];
   readonly operandEffects?: readonly OperandEffect[];
+  /** A word with one dash is a whole option name, never a cluster (`-cmd`, `-ex`, PowerShell's `-Command`). */
+  readonly singleDash?: boolean;
+  /** Option names match in any case (PowerShell). */
+  readonly anyCase?: boolean;
 }
 
 /** One option as the program reads it, with every option its spelling can be. */
@@ -79,9 +87,13 @@ export function mayBeOption(arg: Arg): boolean {
  * the analysis does not know every option that could make it ambiguous.
  */
 export function optionSpecs(spec: ProgramSpec, name: string): readonly OptionSpec[] {
-  const exact = spec.options.filter((o) => o.names.includes(name));
-  if (exact.length > 0 || !spec.abbreviations || !name.startsWith('--') || name.length < 3) return exact;
-  return spec.options.filter((o) => o.names.some((n) => n.startsWith('--') && n.startsWith(name)));
+  const fold = (n: string) => (spec.anyCase ? n.toLowerCase() : n);
+  const wanted = fold(name);
+  const exact = spec.options.filter((o) => o.names.some((n) => fold(n) === wanted));
+  const long = name.startsWith('--') || (spec.singleDash === true && name.startsWith('-'));
+  if (exact.length > 0 || !spec.abbreviations || !long || name.length < 3) return exact;
+  const dashes = name.startsWith('--') ? '--' : '-';
+  return spec.options.filter((o) => o.names.some((n) => n.startsWith(dashes) && !n.startsWith(`${dashes}-`) && fold(n).startsWith(wanted)));
 }
 
 /** The value an option takes: `required` when any option its spelling can be takes one. */
@@ -111,6 +123,12 @@ export interface SpelledOption {
  * the rest of the cluster or the next word. `null` when it is not an option.
  */
 export function optionsIn(spec: ProgramSpec, text: string): SpelledOption[] | null {
+  const whole = text.startsWith('-') && !text.startsWith('--') && text.length > 2 ? text.split('=')[0] : null;
+  if (whole !== null && (spec.singleDash || optionSpecs({ ...spec, abbreviations: false }, whole).length > 0)) {
+    const specs = optionSpecs(spec, whole);
+    if (whole.length < text.length) return [{ name: whole, specs, glued: whole.length + 1, takesNext: false }];
+    return [{ name: whole, specs, takesNext: valueOf(specs) === 'required' }];
+  }
   if (text.startsWith('--') && text.length > 2) {
     const eq = text.indexOf('=');
     const name = eq < 0 ? text : text.slice(0, eq);
@@ -200,9 +218,26 @@ export function operandEffects(spec: ProgramSpec, words: readonly string[]): Eff
   });
 }
 
-/** The read options whose spelling can be an option with `effect`. */
+/** The option has the effect for its value: always, or for a value that matches `when`, or one the analysis cannot know. */
+function hasEffect(s: OptionSpec, effect: Effect, value: Arg | undefined): boolean {
+  if (s.effect !== effect) return false;
+  return !s.when || value === undefined || value.kind === 'unknown' || s.when.test(value.text);
+}
+
+/** The read options whose spelling can be an option with `effect` for its value. */
 export function withEffect(read: ReadArgs, effect: Effect): ReadOption[] {
-  return read.options.filter((o) => o.specs.some((s) => s.effect === effect));
+  return read.options.filter((o) => o.specs.some((s) => hasEffect(s, effect, o.value)));
+}
+
+/** The shell commands the read option's value runs, as the spec's `shell` captures them; empty when it names none. */
+export function shellCommands(option: ReadOption): string[] {
+  const value = option.value;
+  if (value?.kind !== 'known') return [];
+  return option.specs.flatMap((s) => {
+    if (!s.shell) return [];
+    const m = s.shell.exec(value.text);
+    return m ? [m[1]] : [];
+  });
 }
 
 /** The read option can be one spelled `name` (any spelling of the same option counts). */

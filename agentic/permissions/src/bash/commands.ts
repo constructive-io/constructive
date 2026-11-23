@@ -16,7 +16,6 @@ import {
   hiddenLeadingOption,
   knownTexts,
   leadingOptions,
-  longSpellings,
   parse,
   type Parsed,
   pathLikeArgs,
@@ -26,6 +25,8 @@ import {
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
+import { TEXT_PROGRAMS } from './programs';
+import { man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh', 'mksh', 'fish', 'ash']);
@@ -74,7 +75,6 @@ const READERS = new Map<string, ReadonlySet<string>>([
   ...['cat', 'less', 'more', 'bat', 'wc', 'nl', 'strings', 'file', 'stat', 'cmp', 'diff'].map((n) => [n, new Set<string>()] as const),
   ['head', new Set(['-n', '-c'])],
   ['tail', new Set(['-n', '-c', '-b'])],
-  ['sort', new Set(['-k', '-t', '-o', '-S', '-T', ...longSpellings('--output')])],
   ['uniq', new Set(['-f', '-s'])],
   ['base64', new Set(['-b', '-i', '-o', '-w'])],
   ['xxd', new Set(['-c', '-g', '-l', '-s', '-o'])],
@@ -82,11 +82,9 @@ const READERS = new Map<string, ReadonlySet<string>>([
   ['hexdump', new Set(['-e', '-f', '-n', '-s'])]
 ]);
 
-/** Where a reader writes instead of stdout: `sort -o FILE`, `uniq IN OUT`. */
+/** Where a reader writes instead of stdout: `uniq IN OUT`. */
 function readerOutputs(name: string, p: Parsed): Arg[] {
-  if (name === 'sort') return valuesOf(p, '-o', ...longSpellings('--output'));
-  if (name === 'uniq') return p.positionals.slice(1, 2);
-  return [];
+  return name === 'uniq' ? p.positionals.slice(1, 2) : [];
 }
 
 /** The test commands: `[` and `[[` are names here, not globs. */
@@ -247,6 +245,8 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     else for (const w of words) analyzer.addPath(w, 'read', true);
   }
   if (SHELLS.has(name)) return shell(name, ctx, rest);
+  const language = TEXT_PROGRAMS.get(name);
+  if (language) return textProgram(name, language, ctx, rest);
   const spec = interpreterOf(name);
   if (spec) return interpret(name, spec, ctx, rest);
   if (AWKS.has(name)) return awk(name, ctx, rest);
@@ -340,6 +340,16 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return remoteCopy(name, ctx, rest);
   case 'ssh':
     return ssh(ctx, rest);
+  case 'tar':
+  case 'gtar':
+    return tar(ctx, rest);
+  case 'zip':
+    return zip(ctx, rest);
+  case 'sort':
+  case 'gsort':
+    return sort(ctx, rest);
+  case 'man':
+    return man(ctx, rest);
   case 'security':
     return security(ctx, rest);
   case 'busybox':

@@ -10,6 +10,7 @@ import { KEYCHAIN_DIR } from '../roots';
 import { type Arg, literalStart } from './analyze';
 import { type CommandContext, firstOperand, generic, literalArg, pathLikeArgs, textOf } from './args';
 import type { Source } from './flows';
+import { namesFromStdinIn } from './scripts';
 
 const LAUNCHCTL_LOADS = new Set(['load', 'bootstrap', 'submit', 'enable']);
 
@@ -83,9 +84,6 @@ export function clipboard(name: string, ctx: CommandContext, rest: readonly Arg[
 export function namesFromStdin(name: string, rest: readonly Arg[]): boolean {
   const words = rest.map(literalStart);
   if (name === 'cpio') return words.some((w) => /^-[a-zA-Z]*[op]/.test(w) || w === '--create' || w === '--pass-through');
-  if (name === 'zip') return words.includes('-@');
-  if (name === 'tar') {
-    return words.some((w, k) => w === '-T-' || w === '--files-from=-' || ((w === '-T' || w === '--files-from') && words[k + 1] === '-'));
-  }
+  if (name === 'zip' || name === 'tar') return namesFromStdinIn(name, rest);
   return false;
 }
