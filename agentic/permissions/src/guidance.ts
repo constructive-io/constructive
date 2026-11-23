@@ -4,7 +4,7 @@
  */
 export const NEXT_STEP = {
   /** A credential store or a protected path: no spelling of the call is allowed. */
-  blocked: "Don't reach it another way: not by splitting the command, and not with a script. If the task needs it, ask the user to do it.",
+  blocked: "Don't reach it another way. Don't split the command, and don't put it in a script. If the task needs it, ask the user to do it.",
   /** The analysis could not read the whole command. */
-  unread: "Don't split it or put it in a script; rewrite it as simpler commands, or use the read tool to read a file."
+  unread: "Don't put it in a script. Rewrite it as simpler commands, or use the read tool to read a file."
 } as const;
