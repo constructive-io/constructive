@@ -14,15 +14,17 @@ const log = new Logger('package');
 
 const noop = (): any => undefined;
 
+const astOffsetTransforms = {
+  stmt_len: noop,
+  stmt_location: noop,
+  location: noop,
+  arg_location: noop,
+  payload_location: noop,
+  conninfo_location: noop,
+};
+
 export const cleanTree = (tree: any): any => {
-  return transformProps(tree, {
-    stmt_len: noop,
-    stmt_location: noop,
-    location: noop,
-    arg_location: noop,
-    payload_location: noop,
-    conninfo_location: noop,
-  });
+  return transformProps(tree, astOffsetTransforms);
 };
 
 /**
@@ -33,9 +35,7 @@ export const cleanTree = (tree: any): any => {
  */
 export const cleanTreeForDiff = (tree: any): any => {
   return transformProps(tree, {
-    stmt_len: noop,
-    stmt_location: noop,
-    location: noop,
+    ...astOffsetTransforms,
     list_start: noop,
     list_end: noop,
     rexpr_list_start: noop,
