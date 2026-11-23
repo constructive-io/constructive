@@ -210,6 +210,24 @@ describe('createPermissionsExtension', () => {
     expect(seenGrants[0]).toEqual([grant]);
   });
 
+  it('drops a restored chat grant that the kit would not have saved', async () => {
+    const { engine } = fakeEngine({ read: 'ask' });
+    const grant: Grant = { scope: 'chat', match: chatOption.match, createdAt: 'earlier' };
+    const entry = (data: unknown) => ({ type: 'custom', customType: PERMISSION_GRANT_ENTRY, data });
+    const host = fakePi([
+      entry({ scope: 'chat', match: { type: 'command-prefix', prefixes: new Array(1) }, createdAt: 'x' }),
+      entry({ scope: 'chat', match: { type: 'path', access: 'read', pathPrefix: 'relative' }, createdAt: 'x' }),
+      entry({ scope: 'project', match: chatOption.match, createdAt: 'x' }),
+      entry('not a grant'),
+      entry({ ...grant, match: { ...grant.match, extra: 1 } })
+    ]);
+    const lane = createPermissionsExtension({ runId: 'r', engine, getMode: () => 'workspace' });
+    lane.extension(host.pi);
+
+    await host.start();
+    expect(lane.chatGrants).toEqual([grant]);
+  });
+
   it('hands a project grant to the host store, not to the session', async () => {
     const { engine } = fakeEngine({ read: 'ask' });
     const { approvals } = channel({ decision: 'allow', grant: { scope: 'project' } });
