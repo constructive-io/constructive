@@ -68,10 +68,26 @@ function literalTexts(word: Word, budget: ExpansionBudget): string[] {
  * (word splitting can turn `HEAD$IFS--upload-pack=x` into two words), or a
  * quoted variable at a start that may be an option.
  */
+/**
+ * The word has an unquoted glob character with nothing or a dash before it,
+ * so it may expand to a file named like an option (`*` to `--output=o.txt`).
+ */
+function mayGlobToOption(word: Word): boolean {
+  let lead = '';
+  for (const part of word.parts) {
+    if (part.kind !== 'lit') return false;
+    const glob = part.quoted ? -1 : part.text.search(/[*?[]/);
+    if (glob >= 0) return !/^[^-]/.test(lead + part.text.slice(0, glob));
+    lead += part.text;
+  }
+  return false;
+}
+
 function optionsOf(words: readonly Word[], budget: ExpansionBudget, spent: () => boolean): string[] | null {
   const options: string[] = [];
   for (const word of words) {
     if (word.parts.some((p) => p.kind === 'unknown' || (p.kind === 'var' && !p.quoted))) return null;
+    if (mayGlobToOption(word)) return null;
     const open = word.parts.findIndex((p) => p.kind === 'var');
     if (open >= 0) {
       const lead = word.parts

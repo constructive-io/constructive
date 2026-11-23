@@ -51,6 +51,10 @@ const bypasses: [command: string, prefixes: string[]][] = [
   ["echo '/.. --upload-pack=touch${IFS}x;#'; git fetch src$_", ['echo', 'git fetch']],
   [`git fetch {.,${'x,'.repeat(300)}--upload-pack='touch x;'}`, ['git fetch']],
   ['cat id_{a..z}{a..z}{a..z}', ['cat']],
+  // an unquoted glob may expand to a file named like an option (`--output=o.txt`)
+  ['git diff *', ['git diff']],
+  ['git log -*', ['git log']],
+  ['git diff [-]*', ['git diff']],
   // a `+x` is an option, and a `cd` points every later relative path somewhere else
   ['bash +x other.sh', ['bash +x']],
   // a runner's subcommand comes before the script, so the script must still be in the prefix
