@@ -168,7 +168,22 @@ const rows: Row[] = [
   ['read -r O <<< -o; curl "$O" .pi/ext.js https://example.invalid', 'ask', 'ask', 'unresolvable-path'],
   ['read -r O <<< -O; wget "$O" .pi/ext.js https://example.invalid', 'ask', 'ask', 'unresolvable-path'],
   ['curl --capath ~/.ssh https://example.invalid', 'deny', 'deny', 'hard-deny'],
-  ['printf "Hello $NAME\\n"', 'allow', 'allow']
+  ['printf "Hello $NAME\\n"', 'allow', 'allow'],
+  // 20. the variable model: an assignment before a command holds for that command only (and before a special builtin it may persist), bare
+  // assignments take effect in order and before their redirections, `read` with no name sets REPLY, `${X:=…}` assigns, and `for` sets its name
+  ['F=~/.ssh/id_ed25519; F=src/config.ts true; cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; env F=src/config.ts true; cat $F', 'deny', 'deny', 'hard-deny'],
+  ['F=~/.ssh/id_ed25519; F=src/config.ts :; cat $F', 'ask', 'ask', 'unresolvable-path'],
+  ['D=.pi/ext.js; D=out.txt true; echo x > $D', 'deny', 'deny'],
+  ['OPENAI_API_KEY=x true; echo $OPENAI_API_KEY', 'ask', 'allow', 'secret-env-expansion'],
+  ['OPENAI_API_KEY=x :; echo $OPENAI_API_KEY', 'ask', 'allow', 'secret-env-expansion'],
+  ['A=src/config.ts; A=~/.ssh/id_ed25519 B=$A; cat $B', 'deny', 'deny', 'hard-deny'],
+  ["A=src/config.ts; A=~/.ssh/id_ed25519 B=$A eval 'cat $B'", 'ask', 'ask', 'unresolvable-path'],
+  ['F=src/config.ts; F=.pi/ext.js >$F', 'deny', 'deny'],
+  ['REPLY=src/config.ts; read -r <<< ~/.ssh/id_ed25519; cat "$REPLY"', 'ask', 'ask', 'unresolvable-path'],
+  ['X=; Y=${X:=~/.ssh/id_ed25519}; cat $X', 'deny', 'deny', 'hard-deny'],
+  ['unset X; : ${X=~/.ssh/id_ed25519}; cat $X', 'deny', 'deny', 'hard-deny'],
+  ['D=src; for D in .ssh; do cat ~/$D/id_ed25519; done', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {

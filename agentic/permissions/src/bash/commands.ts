@@ -96,7 +96,7 @@ function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
 /** Builtins whose options (`-i`, `-n`, `-v`) make them read a value as a subscript or arithmetic. */
 const EVALUATING_BUILTINS: ReadonlySet<string> = new Set(['declare', 'local', 'typeset', 'printf', 'read']);
 
-/** The variables a builtin assigns or unsets by name: `printf -v NAME`, `read NAME…`, `mapfile NAME`, `unset NAME…`. */
+/** The variables a builtin assigns or unsets by name: `printf -v NAME`, `read NAME…` (`REPLY` with no name), `mapfile NAME`, `unset NAME…`. */
 function namedVariables(ctx: CommandContext, name: string, rest: readonly Arg[]): Arg[] {
   const operands = (spec: ProgramSpec) => {
     const read = readArgs(spec, rest);
@@ -105,7 +105,8 @@ function namedVariables(ctx: CommandContext, name: string, rest: readonly Arg[])
   if (name === 'printf') return valuesRead(readArgs(PRINTF, rest), '-v');
   if (name === 'read') {
     const { read, names } = operands(READ);
-    return [...valuesRead(read, '-a'), ...names];
+    const assigned = [...valuesRead(read, '-a'), ...names];
+    return assigned.length > 0 ? assigned : [literalArg('REPLY')];
   }
   if (name === 'mapfile' || name === 'readarray') {
     const { read, names } = operands(MAPFILE);

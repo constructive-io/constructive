@@ -83,8 +83,16 @@ export class ExpansionBudget {
 /** How an assignment sets a variable: `=` replaces it, `+=` appends to it. */
 export type AssignOp = '=' | '+=';
 
-/** A variable the command itself set or unset. */
-type Variable = { kind: 'set'; value: string } | { kind: 'unknown' } | { kind: 'unset' };
+/**
+ * A variable the command itself set or unset, or one that holds either the
+ * environment's value or one the command gave it (`X=1 :`, where POSIX sh
+ * keeps the assignment and bash does not), so it is unknown and its
+ * references still count as the environment's.
+ */
+type Variable = { kind: 'set'; value: string } | { kind: 'unknown' } | { kind: 'unset' } | { kind: 'maybe-outside' };
+
+/** The command's record of one name, to put back later; `undefined` when it never touched the name. */
+export type VariableRecord = Variable | undefined;
 
 /**
  * The shell variables as the command leaves them, at every assignment site:
@@ -113,17 +121,42 @@ export class Variables {
     this.vars.set(name, { kind: 'unset' });
   }
 
+  /** It holds the value it had before the command set it, or the one the command set: unknown, and still the environment's when it was untouched. */
+  either(name: string, before: VariableRecord): void {
+    this.vars.set(name, before === undefined || before.kind === 'maybe-outside' ? { kind: 'maybe-outside' } : { kind: 'unknown' });
+  }
+
+  record(name: string): VariableRecord {
+    return this.vars.get(name);
+  }
+
+  /** Put back a record `record` gave. */
+  restore(name: string, record: VariableRecord): void {
+    if (record === undefined) this.vars.delete(name);
+    else this.vars.set(name, record);
+  }
+
   /** The command set or unset it, so the environment does not decide it. */
   touched(name: string): boolean {
-    return this.vars.has(name);
+    const v = this.vars.get(name);
+    return v !== undefined && v.kind !== 'maybe-outside';
   }
 
   /** Its value; `null` when it cannot be known, `undefined` when it is unset. */
   get(name: string): string | null | undefined {
     const v = this.vars.get(name);
     if (v === undefined) return this.outside(name);
-    if (v.kind === 'set') return v.value;
-    return v.kind === 'unknown' ? null : undefined;
+    switch (v.kind) {
+    case 'set':
+      return v.value;
+    case 'unknown':
+    case 'maybe-outside':
+      return null;
+    case 'unset':
+      return undefined;
+    default:
+      return unreachable(v);
+    }
   }
 
   copy(): Variables {
@@ -137,9 +170,11 @@ export interface ExpansionScope {
   readonly home: string;
   /**
    * `$name`, or `${name-fallback}` (`colon` for `${name:-fallback}`, which
-   * also takes the fallback for an empty value); `null` when it cannot be known.
+   * also takes the fallback for an empty value); `null` when it cannot be
+   * known. `assigns`: the `=` forms, which also set the variable to the
+   * fallback when they take it.
    */
-  value(name: string, fallback: string | undefined, colon: boolean): string | null;
+  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean): string | null;
   /** IFS may differ from bash's default, so an unquoted expansion splits where the analysis cannot follow. */
   ifsMayDiffer(): boolean;
   noteRef(name: string): void;
@@ -204,7 +239,9 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
       break;
     case 'var': {
       scope.noteRef(part.name);
-      const raw = !part.quoted && scope.ifsMayDiffer() ? null : scope.value(part.name, part.fallback, part.colon === true);
+      // Looked up even when IFS may differ, since an `=` form assigns.
+      const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true);
+      const raw = !part.quoted && scope.ifsMayDiffer() ? null : looked;
       const value = raw === null || part.transform === undefined ? raw : transformed(raw, part.transform);
       if (value === null) markUnknown(!part.quoted);
       else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'e');

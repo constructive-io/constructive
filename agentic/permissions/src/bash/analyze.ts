@@ -19,7 +19,7 @@ import type { Access, CommandKey, CommandPart, Signal } from '../types';
 import { unreachable } from '../unreachable';
 import { generic } from './args';
 import { runCommand, TESTS } from './commands';
-import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, Variables, type WordUse } from './expand';
+import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, type VariableRecord, Variables, type WordUse } from './expand';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
@@ -168,6 +168,24 @@ const DECLARATION_BUILTINS: ReadonlySet<string> = new Set(['export', 'declare', 
 
 const ASSIGNMENT_WORD = /^[A-Za-z_][A-Za-z0-9_]*\+?=/;
 
+/** POSIX special builtins: an assignment before one persists in POSIX sh (macOS /bin/sh, `set -o posix`), and not in bash. */
+const SPECIAL_BUILTINS: ReadonlySet<string> = new Set(['break', ':', 'continue', '.', 'source', 'eval', 'exec', 'exit', 'export', 'readonly', 'return', 'set', 'shift', 'times', 'trap', 'unset']);
+
+/** Assignments that hold for one command only, by name: the record before the first one, and the one the last one left. */
+type CommandScope = Map<string, { before: VariableRecord; set: VariableRecord }>;
+
+/** How many leading words are assignments or keywords, before the command word. */
+function assignmentLead(words: readonly Word[]): number {
+  let k = 0;
+  while (k < words.length && (ASSIGNMENT_WORD.test(words[k].raw) || SHELL_KEYWORDS.has(words[k].raw))) k++;
+  return k;
+}
+
+/** The word expands a variable one of `names` (an assignment before it in the same prefix). */
+function refersTo(word: Word, names: ReadonlySet<string>): boolean {
+  return word.parts.some((p) => (p.kind === 'var' && names.has(p.name)) || (p.kind === 'unknown' && p.ref !== undefined && names.has(p.ref)));
+}
+
 /** Device paths that are not files. */
 const HARMLESS_DEVICES = new Set([
   '/dev/null',
@@ -267,6 +285,8 @@ class Analyzer implements ExpansionScope {
   private leftStart = false;
   /** What the expansions of this command may still build. */
   private readonly budget = new ExpansionBudget((limit) => this.incomplete(limit));
+  /** The assignments that hold for the command being analyzed only. */
+  private scope: CommandScope | null = null;
 
   /** The command's one text budget, for the texts the analysis builds beyond its words (printed output, heredocs). */
   get textBudget(): ExpansionBudget {
@@ -429,6 +449,45 @@ class Analyzer implements ExpansionScope {
     this.vars.assign(name, op, value);
   }
 
+  /** An assignment before a command, or after a wrapper (`env A=1 cmd`): it holds for this command only. */
+  private assignForCommand(scope: CommandScope, name: string, op: AssignOp, value: string | null): void {
+    if (!scope.has(name)) scope.set(name, { before: this.vars.record(name), set: undefined });
+    this.assign(name, op, value);
+    scope.get(name).set = this.vars.record(name);
+  }
+
+  /**
+   * After the command: each name its assignments set is put back. Before a
+   * special builtin it holds either value; one the command changed itself
+   * (`X=1 read X`) is unknown.
+   */
+  private endCommandScope(scope: CommandScope, special: boolean): void {
+    for (const [name, { before, set }] of scope) {
+      if (this.vars.record(name) !== set) this.vars.assign(name, '=', null);
+      else if (special) this.vars.either(name, before);
+      else this.vars.restore(name, before);
+    }
+  }
+
+  /**
+   * The assignments before the command word, in order, each expanded after
+   * the ones before it. Before a command (`scope`), bash 3.2 expands them
+   * all first and bash 4+ one at a time, so one that refers to an earlier
+   * one is unknown.
+   */
+  private assignPrefix(words: readonly Word[], scope: CommandScope | null): void {
+    for (const word of words) {
+      if (SHELL_KEYWORDS.has(word.raw)) continue;
+      const arg = this.resolveWord(word, 'assignment')[0];
+      const m = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(literalStart(arg));
+      if (!m) continue;
+      const op: AssignOp = m[2] ? '+=' : '=';
+      const value = arg.kind === 'known' && !(scope && refersTo(word, new Set(scope.keys()))) ? m[3] : null;
+      if (scope) this.assignForCommand(scope, m[1], op, value);
+      else this.assign(m[1], op, value);
+    }
+  }
+
   unset(name: string): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     this.vars.unset(name);
@@ -461,13 +520,20 @@ class Analyzer implements ExpansionScope {
   /**
    * `$NAME`, or `${NAME-fallback}` and `${NAME:-fallback}`. The fallback
    * counts only when the variable is unset, or with the colon empty; one from
-   * outside may hold anything. A fallback with its own expansion is not known,
-   * and a leading `~` in it is the home dir as in bash (`~user` is not known).
+   * outside may hold anything. The `=` forms (`assigns`) also set the variable
+   * to the fallback they take.
    */
-  value(name: string, fallback: string | undefined, colon: boolean): string | null {
+  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean): string | null {
     const value = this.lookup(name);
     if (fallback === undefined) return value === undefined ? '' : value;
     if (value === null || (value !== undefined && !(colon && value === ''))) return value;
+    const taken = this.fallbackValue(fallback);
+    if (assigns) this.assign(name, '=', taken);
+    return taken;
+  }
+
+  /** A fallback's value: unknown with its own expansion, and a leading `~` is the home dir as in bash (`~user` is not known). */
+  private fallbackValue(fallback: string): string | null {
     if (/[$`]/.test(fallback)) return null;
     if (!fallback.startsWith('~')) return fallback;
     return /^~(\/|$)/.test(fallback) ? this.home + fallback.slice(1) : null;
@@ -550,8 +616,17 @@ class Analyzer implements ExpansionScope {
     else this.checks.push({ raw: arg.raw, abs, what, rootCounts });
   }
 
+  /**
+   * One simple command, in POSIX's order ("Simple Commands"): a command of
+   * assignments alone makes them before its redirections. Otherwise its words
+   * and redirections expand first, and its assignments hold for it only.
+   */
   analyzeCommand(cmd: SimpleCommand): void {
-    const args = this.expandWords(cmd.words);
+    const lead = assignmentLead(cmd.words);
+    const prefix = cmd.words.slice(0, lead);
+    const bare = lead === cmd.words.length;
+    if (bare) this.assignPrefix(prefix, null);
+    const args = this.expandWords(cmd.words.slice(lead));
     const stdinFed = isPipedIn(cmd) || readsStdinDoc(cmd) || cmd.redirects.some((r) => r.kind === 'file' && r.op === '<');
     const stdin = this.tracker.stdinOf(cmd);
     this.stdin = stdin;
@@ -574,7 +649,17 @@ class Analyzer implements ExpansionScope {
         if (access === 'write' && r.fd !== 2 && abs !== null && !isHarmlessDevice(abs)) stdout.push({ raw: target.raw, abs });
       }
     }
-    const run = this.runArgs(args, stdinFed);
+    const outer = this.scope;
+    const scope: CommandScope | null = bare ? null : new Map();
+    this.scope = scope;
+    let run: Run | null;
+    try {
+      if (scope) this.assignPrefix(prefix, scope);
+      run = this.runArgs(args, stdinFed);
+    } finally {
+      this.scope = outer;
+    }
+    if (scope) this.endCommandScope(scope, args[0]?.kind === 'known' && SPECIAL_BUILTINS.has(args[0].text));
     const reads = this.paths.slice(from).filter((p) => p.access === 'read' && !p.quiet);
     const sources = [...reads.map(({ raw, abs }) => ({ raw, abs })), ...stdin.sources];
     this.tracker.record(cmd, run, sources, stdout);
@@ -599,8 +684,10 @@ class Analyzer implements ExpansionScope {
     while (i < args.length) {
       const arg = args[i];
       const assignment = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(literalStart(arg));
-      if (assignment && /^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(arg.raw)) {
-        this.assign(assignment[1], assignment[2] ? '+=' : '=', arg.kind === 'known' ? assignment[3] : null);
+      if (assignment && ASSIGNMENT_WORD.test(arg.raw)) {
+        const value = arg.kind === 'known' ? assignment[3] : null;
+        if (this.scope) this.assignForCommand(this.scope, assignment[1], assignment[2] ? '+=' : '=', value);
+        else this.assign(assignment[1], assignment[2] ? '+=' : '=', value);
         i++;
         continue;
       }
@@ -613,6 +700,8 @@ class Analyzer implements ExpansionScope {
         return null;
       }
       if (arg.raw === 'for' || arg.raw === 'select') {
+        const name = args[i + 1];
+        if (name?.kind === 'known' && /^[A-Za-z_][A-Za-z0-9_]*$/.test(name.text)) this.assign(name.text, '=', null);
         const inAt = args.findIndex((a, k) => k > i && a.raw === 'in');
         if (inAt > 0) for (const item of args.slice(inAt + 1)) this.operand(item);
         return null;
