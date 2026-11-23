@@ -4,8 +4,9 @@
  * quote removal and says which parts were quoted. Each step acts only on the
  * characters bash lets it act on, so every character keeps a kind: `l` for an
  * unquoted literal (braces, tildes and globs act on it), `v` for the result of
- * an unquoted expansion (splitting and globs act on it), and `q` for settled
- * text (quoted text, a tilde's home dir, and the marks below).
+ * an unquoted expansion (splitting and globs act on it), `q` for settled text
+ * (quoted text, a tilde's home dir, the unknown mark), and `e` for the mark an
+ * empty quoted part leaves, which no character of the word can be taken for.
  *
  * One `ExpansionBudget` per command bounds the text and the words that the
  * expansions build. It is charged before anything is built, and past it the
@@ -26,14 +27,15 @@ export const MAX_EXPANSION_WORDS = 8192;
 /** Stands for an unknown part: the word is known only up to it. */
 const UNKNOWN = '\u0000';
 
-/** Stands for an empty quoted part (`""`): it keeps a word that is otherwise empty, and it stops a tilde. */
+/** Stands, with kind `e`, for an empty quoted part (`""`): it keeps a word that is otherwise empty, and it stops a tilde. */
 const EMPTY_QUOTE = '\u0001';
 
 /** The characters bash's default IFS splits on. */
 const IFS_WHITESPACE = new Set([' ', '\t', '\n']);
 
 const NAME_EQUALS = /^[A-Za-z_][A-Za-z0-9_]*\+?=/;
-const SEQUENCE = /^(-?\d+|[A-Za-z])\.\.(-?\d+|[A-Za-z])(?:\.\.(-?\d+))?$/;
+/** `{1..9}` or `{a..z}`, with bash 4's optional step; both ends the same kind. */
+const SEQUENCE = /^(?:([-+]?\d+)\.\.([-+]?\d+)|([A-Za-z])\.\.([A-Za-z]))(?:\.\.([-+]?\d+))?$/;
 
 type ExpansionLimit = Extract<Limit, 'expansion-chars' | 'expansion-words'>;
 
@@ -180,7 +182,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
     text += UNKNOWN;
     kinds += 'q';
   };
-  const add = (piece: string, kind: 'l' | 'v' | 'q') => {
+  const add = (piece: string, kind: 'l' | 'v' | 'q' | 'e') => {
     if (!budget.takeChars(piece.length)) return markUnknown(kind === 'v');
     text += piece;
     kinds += kind.repeat(piece.length);
@@ -188,7 +190,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
   for (const part of word.parts) {
     switch (part.kind) {
     case 'lit':
-      if (part.text === '' && part.quoted) add(EMPTY_QUOTE, 'q');
+      if (part.text === '' && part.quoted) add(EMPTY_QUOTE, 'e');
       else add(part.text, part.quoted ? 'q' : 'l');
       break;
     case 'unknown':
@@ -199,7 +201,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
       scope.noteRef(part.name);
       const value = !part.quoted && scope.ifsMayDiffer() ? null : scope.value(part.name, part.fallback, part.colon === true);
       if (value === null) markUnknown(!part.quoted);
-      else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'q');
+      else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'e');
       else add(value, part.quoted ? 'q' : 'v');
       break;
     }
@@ -251,9 +253,16 @@ function expandBraces(text: string, kinds: string, out: Piece[], budget: Expansi
       const bounds = [open, ...commas, close];
       alternatives = bounds.slice(1).map((end, k) => ({ text: text.slice(bounds[k] + 1, end), kinds: kinds.slice(bounds[k] + 1, end) }));
     } else {
-      const seq = SEQUENCE.exec(text.slice(open + 1, close));
+      // A sequence needs every character between the braces unquoted.
+      const seq = allLiteral(kinds, open + 1, close) ? SEQUENCE.exec(text.slice(open + 1, close)) : null;
       if (!seq) continue;
-      alternatives = sequence(seq[1], seq[2], seq[3], budget.wordRoom + 1).map((t) => ({ text: t, kinds: 'l'.repeat(t.length) }));
+      const [, fromNumber, toNumber, fromLetter, toLetter, step] = seq;
+      // bash 3.2 leaves a stepped sequence as it is and pads no number; bash 4 and later do both.
+      if (step !== undefined || [fromNumber, toNumber].some((n) => n !== undefined && /^[-+]?0\d/.test(n))) {
+        alternatives = [{ text: UNKNOWN, kinds: 'q' }];
+      } else {
+        alternatives = sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, fromNumber !== undefined, budget.wordRoom + 1).map((t) => ({ text: t, kinds: 'l'.repeat(t.length) }));
+      }
     }
     const around = open + text.length - close - 1;
     for (const alt of alternatives) {
@@ -268,14 +277,12 @@ function expandBraces(text: string, kinds: string, out: Piece[], budget: Expansi
   return true;
 }
 
-/** The first `limit` values of `{from..to..step}`. */
-function sequence(from: string, to: string, step: string | undefined, limit: number): string[] {
-  const numeric = /^-?\d+$/.test(from) && /^-?\d+$/.test(to);
+/** The first `limit` values of `{from..to}`: numbers, or the characters between two letters. */
+function sequence(from: string, to: string, numeric: boolean, limit: number): string[] {
   const a = numeric ? Number(from) : from.charCodeAt(0);
   const b = numeric ? Number(to) : to.charCodeAt(0);
-  const inc = Math.max(1, Math.abs(Number(step ?? 1)));
   const texts: string[] = [];
-  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit; v += a <= b ? inc : -inc) {
+  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit; v += a <= b ? 1 : -1) {
     texts.push(numeric ? String(v) : String.fromCharCode(v));
   }
   return texts;
@@ -346,7 +353,8 @@ function toArg(piece: Piece, raw: string, globs: boolean, splits: boolean): Arg 
   for (let k = 0; globs && !glob && k < piece.text.length; k++) {
     glob = piece.kinds[k] !== 'q' && (piece.text[k] === '*' || piece.text[k] === '?' || piece.text[k] === '[');
   }
-  const settled = piece.text.split(EMPTY_QUOTE).join('');
+  let settled = '';
+  for (let k = 0; k < piece.text.length; k++) if (piece.kinds[k] !== 'e') settled += piece.text[k];
   const cut = settled.indexOf(UNKNOWN);
   if (cut >= 0) return { kind: 'unknown', knownPrefix: settled.slice(0, cut), raw, splits };
   return { kind: 'known', text: settled, raw, glob };

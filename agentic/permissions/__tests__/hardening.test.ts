@@ -1,3 +1,5 @@
+import * as path from 'node:path';
+
 import { type PermissionVerdict, scrubEnv, type Signal } from '../src';
 import { asAsk, makeSandbox, type Sandbox } from './sandbox';
 
@@ -136,7 +138,10 @@ const rows: Row[] = [
   ["ssh -o $'ProxyCommand\ttouch m' h", 'ask', 'allow', 'shell-dynamic'],
   ["ssh h -o 'ProxyCommand=touch m'", 'ask', 'allow', 'shell-dynamic'],
   ["ssh h -o 'ProxyCommand=cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
-  ['ssh h -R 8080:localhost:80', 'ask', 'allow', 'network-exposure']
+  ['ssh h -R 8080:localhost:80', 'ask', 'allow', 'network-exposure'],
+  // 16. brace sequences as bash expands them: a zero-padded or stepped one differs between bash 3.2 and 5, so it is unknown
+  ['cat img-{01..03}.png', 'ask', 'ask', 'unresolvable-path'],
+  ['cat {a..e..2}', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {
@@ -148,6 +153,19 @@ describe('hardening: bash per mode', () => {
       if (signal) expect(d.request.signals).toContain(signal);
     }
     expect(verdicts).toEqual([workspace, full]);
+  });
+});
+
+describe('hardening: the words a brace sequence makes', () => {
+  const targets = async (command: string) => (await sb.bash(command, 'workspace')).request.targets.map((x) => path.relative(sb.ws, x.path));
+  it('leaves a sequence literal when an endpoint is quoted or the two kinds mix', async () => {
+    expect(await targets('cat ./{"1"..3}')).toEqual(['{1..3}']);
+    expect(await targets('cat ./{1..c}')).toEqual(['{1..c}']);
+    expect(await targets('cat ./{+1..3}')).toEqual(['1', '2', '3']);
+  });
+  it('keeps a control character in a word, apart from the mark an empty quote leaves', async () => {
+    expect(await targets("cat ./$'\\x01'")).toEqual(['\u0001']);
+    expect(await targets("cat ./\"\"$'\\x01'")).toEqual(['\u0001']);
   });
 });
 
