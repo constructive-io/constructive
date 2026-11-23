@@ -9,7 +9,7 @@
 
 import type { Arg } from './analyze';
 import { type CommandContext, generic, literalArg, restOf } from './args';
-import { effectsOf, hasOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf, withEffect } from './options';
+import { effectsOf, hasOption, isOption, type ProgramSpec, type ReadArgs, readArgs, shellCommands, valuesOf, withEffect } from './options';
 import { MAN, SORT, TAR, type TextProgram, ZIP } from './programs';
 
 /**
@@ -21,7 +21,7 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
   const { analyzer } = ctx;
   for (const option of withEffect(read, 'runs-program')) {
     const commands = shellCommands(option);
-    if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program the command names`);
+    if (commands.length === 0) analyzer.dynamic(`it runs ${name} ${option.arg.raw}, which runs a program or code the analysis does not read`);
     for (const command of commands) analyzer.nested(command, `it runs ${name} ${option.name}, which runs a shell command`);
   }
   for (const option of withEffect(read, 'reads-file')) if (option.value) analyzer.addPath(option.value, 'read', true);
@@ -42,12 +42,15 @@ function runText(ctx: CommandContext, name: string, program: TextProgram, text: 
     analyzer.dynamic(`it runs ${name} commands from ${text.raw}, a value from a variable that may run a program`);
     return;
   }
-  if (!program.language.runs.test(text.text)) return;
-  const commands = program.language.shells.flatMap(({ pattern, sqlQuoted }) =>
-    [...text.text.matchAll(pattern)].map((m) => (sqlQuoted ? m[1].replace(/''/g, "'") : m[1]))
-  );
-  if (commands.length === 0) analyzer.dynamic(`it runs ${name} commands ${where}, which can run a program`);
-  for (const command of commands) analyzer.nested(command, `it runs a shell command from ${name} ${where}`);
+  const { escapes, shells } = program.language(text.text);
+  if (!escapes) return;
+  if (shells.length === 0) analyzer.dynamic(`it runs ${name} commands ${where} that can run a program or touch files`);
+  for (const command of shells) analyzer.nested(command, `it runs a shell command from ${name} ${where}`);
+}
+
+/** The program runs text from an operand or an option, and exits instead of reading stdin; `-` as the value still names stdin. */
+function runsInstead(read: ReadArgs, unless: readonly string[], operandText: boolean): boolean {
+  return operandText || read.options.some((o) => isOption(o, ...unless) && !(o.value?.kind === 'known' && o.value.text === '-'));
 }
 
 /** A program with a command language of its own: its text from options, operands and stdin. */
@@ -62,11 +65,10 @@ export function textProgram(name: string, program: TextProgram, ctx: CommandCont
   const textFrom = program.textFrom ?? operands.length;
   for (const arg of operands.slice(textFrom)) texts.push({ arg, where: 'in an argument' });
   for (const { arg, where } of texts) runText(ctx, name, program, arg, where);
-  const given = texts.length > 0 || valuesOf(read, ...program.fileOptions).length > 0;
-  if (program.readsStdin && !given && ctx.stdinFed) {
-    const input = analyzer.stdin.text;
+  if (program.stdin && ctx.stdinFed && !runsInstead(read, program.stdin.unless, operands.length > textFrom)) {
+    const input = analyzer.stdin.texts;
     if (input === null) analyzer.dynamic(`it feeds ${name} commands from input the analysis cannot see`);
-    else runText(ctx, name, program, literalArg(input), 'on its input');
+    else for (const text of new Set(input)) runText(ctx, name, program, literalArg(text), 'on its input');
   }
   generic(ctx, operands.slice(0, textFrom));
 }

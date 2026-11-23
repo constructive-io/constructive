@@ -263,7 +263,7 @@ class Analyzer implements ExpansionScope {
   /** git remotes the command adds or points elsewhere (`git remote add`, `set-url`, `-c remote.x.url=`). */
   readonly gitRemotes = new Set<string>();
   /** What the command being analyzed reads on stdin. */
-  stdin: Stdin = { sources: [], words: [], text: '', listedUnder: null };
+  stdin: Stdin = { sources: [], words: [], texts: [''], listedUnder: null };
   /** Shell variables set earlier in the command. `null` = set to something unknown. */
   vars = new Map<string, string | null>();
   /** The shell's working dir at this point of the command. */

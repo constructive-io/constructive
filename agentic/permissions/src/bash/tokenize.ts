@@ -50,7 +50,11 @@ export type FileOp = '<' | '>' | '>>' | '>|' | '&>' | '&>>' | '<>' | '>&' | '<&'
 
 export interface Heredoc {
   quoted: boolean;
-  /** Filled in when the lexer reaches the lines after the command. */
+  /**
+   * The lines as bash reads them, before any expansion: an unquoted body's
+   * `\` newline joins two lines, and `<<-` strips each line's leading tabs.
+   * Filled in when the lexer reaches the lines after the command.
+   */
   body: string;
 }
 
@@ -285,7 +289,7 @@ class Lexer {
           found = true;
           break;
         }
-        body += `${line}\n`;
+        body += `${check}\n`;
       }
       if (!found) throw new LexError('unterminated heredoc');
       if (!doc.quoted) this.scanExpansions(body, 'in a heredoc');

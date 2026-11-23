@@ -48,7 +48,53 @@ const rows: Row[] = [
   ["man -P 'sh -c x' ls", 'ask', 'ask', 'allow', ['shell-dynamic']],
   // an option that shares a spec with -c (-v) is not -c, so psql still reads its input
   ["echo '\\! cat ~/.ssh/id_rsa' | psql -v x=1", 'deny', 'deny', 'deny', ['hard-deny']],
-  ['vim -i ~/.ssh/viminfo notes.txt', 'deny', 'deny', 'deny', ['hard-deny']]
+  ['vim -i ~/.ssh/viminfo notes.txt', 'deny', 'deny', 'deny', ['hard-deny']],
+  // text is plain only when it uses none of the language's escapes; an abbreviation is an escape too
+  ["sqlite3 :memory: '.sys touch m40'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: '.shel touch m41'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 db '.sy touch m44'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["duckdb -c '.sys touch m45'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["printf '.sys touch m47\\n' | sqlite3 :memory:", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: <<'EOF'\n.sys touch m48\nEOF", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // stdin is read as the text echo, printf and a here-string print, line by line
+  ["printf '%s\\n' 'select 1;' '.sys touch m' | sqlite3 :memory:", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo -e 'select 1;\\n.sys touch m' | sqlite3 :memory:", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["echo 'select 1;\\n.sys touch m' | sqlite3 :memory:", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: <<< $'select 1;\\n.sys touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // an unquoted heredoc reaches the program as bash expands it: `\\` is `\`, and `<<-` strips tabs
+  ['psql <<E\n\\\\! touch m\nE', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ['psql <<-E\n\t\\\\! touch m\n\tE', 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["printf '%s\\n' 'select 1;' '.sys cat ~/.ssh/id_rsa' | sqlite3 :memory:", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["sqlite3 :memory: '.sys cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["sqlite3 :memory: '.o |cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["sqlite3 db '.output out.txt'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["sqlite3 :memory: \"select readfile('notes.txt')\"", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["duckdb -c 'INSTALL httpfs; LOAD httpfs'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\gx |touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\out |touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\write |touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c 'select 1 \\g (format=csv) |touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\echo `touch m`'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\set x `touch m`'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c \"\\set p '|touch m'\" -c '\\o :p'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\i evil.sql'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\o out.txt' -c 'select 1'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql <<'EOF'\n\\echo `touch m`\nEOF", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  // text that runs before stdin (-cmd, -ex without -batch, -f -) still leaves stdin read
+  ["printf '.sys touch m\\n' | sqlite3 -cmd .tables :memory:", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -f - <<'EOF'\n\\! cat ~/.ssh/id_rsa\nEOF", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["echo 'shell cat ~/.ssh/id_rsa' | gdb -ex 'print 1' ./a.out", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["psql -U app <<'EOF'\n\\echo `touch m`\nEOF", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["psql -c '\\gx |cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["psql -c '\\echo `cat ~/.ssh/id_rsa`'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["mysql -e 'source dump.sql'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["mysql -e 'tee out.txt'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["mysql -e '\\. dump.sql'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["gdb -batch -ex 'she touch m'", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ["gdb -batch -ex 'she cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["gdb -batch -ex 'pipe info frame | cat ~/.ssh/id_rsa'", 'deny', 'deny', 'deny', ['hard-deny']],
+  ["gdb -batch -ex 'print 1' ./a.out", 'ask', 'ask', 'allow', ['shell-dynamic']],
+  ['gdb -batch -x cmds.gdb ./a.out', 'ask', 'ask', 'allow', ['shell-dynamic']]
 ];
 
 const modes: PermissionMode[] = ['ask', 'workspace', 'full'];

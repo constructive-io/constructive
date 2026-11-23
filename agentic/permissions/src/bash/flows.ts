@@ -9,6 +9,7 @@ import { unreachable } from '../unreachable';
 import { type Analyzer, type Arg, literalStart, type Run } from './analyze';
 import { isKnown, knownTexts, literalArg, textOf } from './args';
 import { findRoots } from './file-commands';
+import { heredocText, printedText } from './printed';
 import { heredocsOf, hereStringsOf, type SimpleCommand } from './tokenize';
 
 export interface Source {
@@ -36,8 +37,12 @@ export interface Stdin {
   sources: Source[];
   /** The words on stdin when they are known (`echo a b |`, `<<< a`); `null` when they are not. */
   words: Arg[] | null;
-  /** The text on stdin when it is known (a heredoc body too); `''` for none; `null` when it cannot be seen. */
-  text: string | null;
+  /**
+   * The texts stdin may carry (a heredoc body too): one when it is sure, more
+   * when it depends on the shell (`echo`'s escapes); `['']` for none; `null`
+   * when it cannot be seen.
+   */
+  texts: readonly string[] | null;
   /**
    * When stdin is a file listing (`find src |`, `git ls-files |`): the roots
    * every listed name lies under. `null` when it is anything else.
@@ -174,6 +179,8 @@ export class FlowTracker {
   private readonly outputs = new Map<SimpleCommand, Source[]>();
   /** The words each `echo` or `printf` printed. */
   private readonly printed = new Map<SimpleCommand, Arg[] | null>();
+  /** The texts each `echo` or `printf` may have printed. */
+  private readonly printedTexts = new Map<SimpleCommand, readonly string[] | null>();
   /** The roots each file-listing command printed names under. */
   private readonly listed = new Map<SimpleCommand, Arg[]>();
   /** Every source seen so far: what a `( … ) |` group may print. */
@@ -186,15 +193,15 @@ export class FlowTracker {
     const { analyzer } = this;
     const sources: Source[] = [];
     let words: Arg[] | null = [];
-    let text: string | null = '';
-    const add = (said: Arg[] | null) => {
-      text = text !== null && said?.every(isKnown) ? `${text}${said.map((a) => (a.kind === 'known' ? a.text : '')).join(' ')}\n` : null;
+    let texts: readonly string[] | null = [''];
+    const add = (said: readonly string[] | null) => {
+      texts = texts !== null && said !== null ? texts.flatMap((text) => said.map((s) => text + s)) : null;
     };
     let listedUnder: Arg[] | null = null;
     for (const r of cmd.redirects) {
       if (r.kind !== 'file' || r.op !== '<') continue;
       words = null;
-      text = null;
+      texts = null;
       for (const t of analyzer.resolveWord(r.target)) {
         const abs = t.kind === 'unknown' ? null : analyzer.toAbs(t.text);
         if (abs) sources.push({ raw: t.raw, abs });
@@ -202,12 +209,15 @@ export class FlowTracker {
     }
     for (const doc of heredocsOf(cmd)) {
       words = null;
-      if (text !== null) text += doc.body;
+      const text = heredocText(doc.body, doc.quoted);
+      add(text === null ? null : [text]);
     }
     for (const w of hereStringsOf(cmd)) {
-      const said = splitWords(analyzer.resolveWord(w));
+      const resolved = analyzer.resolveWord(w);
+      const said = splitWords(resolved);
       words = words && said ? [...words, ...said] : null;
-      add(said);
+      const known = knownTexts(resolved);
+      add(known?.length === 1 ? [`${known[0]}\n`] : null);
     }
     const input = cmd.input;
     switch (input.kind) {
@@ -216,20 +226,20 @@ export class FlowTracker {
     case 'group-pipe':
       for (const source of this.all) sources.push(source);
       words = null;
-      text = null;
+      texts = null;
       break;
     case 'pipe': {
       const up = input.from;
       if (up.words.every((w) => GROUP_END.has(w.raw))) {
         for (const source of this.all) sources.push(source);
         words = null;
-        text = null;
+        texts = null;
         break;
       }
       for (const source of this.outputs.get(up) ?? []) sources.push(source);
       const said = this.printed.get(up) ?? null;
       words = words && said ? [...words, ...said] : null;
-      add(said);
+      add(this.printedTexts.get(up) ?? null);
       const onlyPipe = cmd.redirects.every((r) => r.kind === 'dup' || (r.kind === 'file' && r.op !== '<'));
       listedUnder = onlyPipe ? (this.listed.get(up) ?? null) : null;
       break;
@@ -237,7 +247,7 @@ export class FlowTracker {
     default:
       return unreachable(input);
     }
-    return { sources, words, text, listedUnder };
+    return { sources, words, texts, listedUnder };
   }
 
   /**
@@ -248,7 +258,11 @@ export class FlowTracker {
     this.outputs.set(cmd, sources);
     for (const source of sources) this.all.push(source);
     if (!run) return;
-    if (run.name === 'echo' || run.name === 'printf') this.printed.set(cmd, printedWords(run.name, run.rest));
+    if (run.name === 'echo' || run.name === 'printf') {
+      this.printed.set(cmd, printedWords(run.name, run.rest));
+      const texts = knownTexts(run.rest);
+      this.printedTexts.set(cmd, texts === null ? null : printedText(run.name, texts));
+    }
     const roots = listedRoots(run.name, run.rest);
     if (roots) this.listed.set(cmd, roots);
     if (sources.length === 0) return;

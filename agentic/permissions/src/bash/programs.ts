@@ -7,6 +7,8 @@
  * operand.
  */
 
+import type { CommandLanguage } from './languages';
+import * as languages from './languages';
 import type { Effect, OptionSpec, ProgramSpec } from './options';
 
 const flag = (...names: string[]): OptionSpec => ({ names, value: 'none' });
@@ -250,70 +252,23 @@ export const MAN: ProgramSpec = sub(
   value('-M', '--manpath', '-S', '-s', '--sections', '-L', '--locale', '-m', '--systems', '-e', '--extension', '-p', '--preprocessor', '-R', '--recode')
 );
 
-/** A shell command a program's own text runs, captured in group 1 of a global pattern. */
-export interface ShellCapture {
-  readonly pattern: RegExp;
-  /** The capture is an SQL string literal, where `''` stands for `'`. */
-  readonly sqlQuoted?: boolean;
-}
-
-/** A program's own command language, and its commands that run a program. */
-export interface CommandLanguage {
-  /** A command that runs a shell or a program, or loads native code. */
-  readonly runs: RegExp;
-  /** The shell commands it runs, which the analysis reads as bash. */
-  readonly shells: readonly ShellCapture[];
-}
-
 /** A program that runs text in its own command language, from options, operands and stdin. */
 export interface TextProgram {
   readonly spec: ProgramSpec;
   readonly language: CommandLanguage;
   /** Options whose value is text in the language (`psql -c`, `mysql -e`, `sqlite3 -cmd`). */
   readonly textOptions: readonly string[];
-  /** Options that give it a script file, so it reads none from stdin (`psql -f`). */
-  readonly fileOptions: readonly string[];
   /** Operands from this index on are text in the language (sqlite3's after the database). */
   readonly textFrom?: number;
   /** An operand that starts with `+` is text in the language (vim's `+cmd`). */
   readonly plusText?: boolean;
-  /** It reads text from stdin when no option or operand gives it. */
-  readonly readsStdin: boolean;
+  /**
+   * Whether it reads text from stdin: never (`false`), or unless text in an
+   * operand or one of these options makes it run that and exit (`psql -c`,
+   * `-f`, gdb's `-batch`). An option whose value is `-` still reads stdin.
+   */
+  readonly stdin: false | { readonly unless: readonly string[] };
 }
-
-/** Any text is code the analysis cannot read (PowerShell, Tcl, vim commands). */
-const OPAQUE: CommandLanguage = { runs: /\S/, shells: [] };
-
-/** psql's meta-commands: `\!` runs a shell, `\o |`/`\g |`/`\w |` pipe to one, and `COPY … PROGRAM` runs a program. */
-const PSQL_LANGUAGE: CommandLanguage = {
-  runs: /\\!|\\[ogw]\s*\||\bcopy\b[^;]*\bprogram\b/i,
-  shells: [
-    { pattern: /\\!\s*([^\n]*)/g },
-    { pattern: /\\[ogw]\s*\|\s*([^\n]*)/g },
-    { pattern: /\bprogram\s+'((?:[^']|'')*)'/gi, sqlQuoted: true }
-  ]
-};
-
-/** sqlite3's and duckdb's dot-commands: `.shell`/`.system` run one, `.output|`/`.once|`/`.import|`/`.read|` pipe, `.load` loads native code. */
-const SQLITE_LANGUAGE: CommandLanguage = {
-  runs: /\.(shell|system|load|excel)\b|\.(output|once|import|read)\s+['"]?\||\bedit\s*\(/i,
-  shells: [{ pattern: /\.(?:shell|system)\s+([^\n]*)/gi }, { pattern: /\.(?:output|once|import|read)\s+['"]?\|\s*([^\n'"]*)/gi }]
-};
-
-/** mysql's client commands: `system`/`\!` run a shell command, `pager`/`\P` pipe output to one. */
-const MYSQL_LANGUAGE: CommandLanguage = {
-  runs: /(?:^|[\n;])\s*(?:system|pager)\s|\\[!P]/i,
-  shells: [{ pattern: /(?:^|[\n;])\s*(?:system|pager)\s+([^\n]*)/gi }, { pattern: /\\[!P]\s*([^\n]*)/g }]
-};
-
-/** gdb commands that run a shell or a program: `shell`/`!`, `pipe`/`|`, `python`, `guile`, `make`. */
-const GDB_LANGUAGE: CommandLanguage = {
-  runs: /^\s*(?:!|\||(?:shell|pipe|python|py|pi|python-interactive|guile|gu|make)\b)/m,
-  shells: [{ pattern: /^\s*(?:shell\s+|!)([^\n]*)/gm }]
-};
-
-/** Any vim command can run code; `!` hands the rest to a shell. */
-const VIM_LANGUAGE: CommandLanguage = { runs: /\S/, shells: [{ pattern: /!([^\n]*)/g }] };
 
 const PSQL: TextProgram = {
   spec: sub(
@@ -323,10 +278,9 @@ const PSQL: TextProgram = {
     value('-c', '--command', '-d', '--dbname', '-h', '--host', '-p', '--port', '-U', '--username', '-v', '--set', '--variable'),
     value('-P', '--pset', '-F', '--field-separator', '-R', '--record-separator', '-T', '--table-attr')
   ),
-  language: PSQL_LANGUAGE,
+  language: languages.PSQL,
   textOptions: ['-c', '--command'],
-  fileOptions: ['-f', '--file'],
-  readsStdin: true
+  stdin: { unless: ['-c', '--command', '-f', '--file'] }
 };
 
 const SQLITE_FLAGS = ['-bail', '-batch', '-csv', '-json', '-line', '-list', '-html', '-box', '-column', '-markdown', '-table', '-header'];
@@ -342,11 +296,10 @@ const SQLITE3: TextProgram = {
       flag(...SQLITE_FLAGS, '-noheader', '-echo', '-interactive', '-readonly', '-safe', '-version', '-help')
     ]
   },
-  language: SQLITE_LANGUAGE,
+  language: languages.SQLITE,
   textOptions: ['-cmd', '--cmd'],
-  fileOptions: [],
   textFrom: 1,
-  readsStdin: true
+  stdin: { unless: [] }
 };
 
 const DUCKDB: TextProgram = {
@@ -356,11 +309,10 @@ const DUCKDB: TextProgram = {
     singleDash: true,
     options: [value('-c', '-cmd', '-s', '-separator', '-newline', '-nullvalue'), does('reads-file', 'required', '-f', '-init'), flag(...SQLITE_FLAGS, '-readonly', '-unsigned')]
   },
-  language: SQLITE_LANGUAGE,
+  language: languages.DUCKDB,
   textOptions: ['-c', '-cmd', '-s'],
-  fileOptions: ['-f'],
   textFrom: 1,
-  readsStdin: true
+  stdin: { unless: ['-c', '-s', '-f'] }
 };
 
 const MYSQL: TextProgram = {
@@ -372,10 +324,9 @@ const MYSQL: TextProgram = {
     value('-e', '--execute', '-D', '--database', '-h', '--host', '-u', '--user', '-P', '--port', '-S', '--socket', '--init-command'),
     { names: ['-p', '--password'], value: 'optional' }
   ),
-  language: MYSQL_LANGUAGE,
+  language: languages.MYSQL,
   textOptions: ['-e', '--execute'],
-  fileOptions: [],
-  readsStdin: true
+  stdin: { unless: ['-e', '--execute'] }
 };
 
 const PWSH: TextProgram = {
@@ -391,10 +342,9 @@ const PWSH: TextProgram = {
       flag('-NoProfile', '-nop', '-NonInteractive', '-NoLogo', '-Version', '-Help', '-Login', '-l')
     ]
   },
-  language: OPAQUE,
+  language: languages.OPAQUE,
   textOptions: ['-Command', '-c', '-EncodedCommand', '-e', '-ec', '-CommandWithArgs', '-cwa'],
-  fileOptions: ['-File', '-f'],
-  readsStdin: true
+  stdin: { unless: ['-Command', '-c', '-EncodedCommand', '-e', '-ec', '-CommandWithArgs', '-cwa', '-File', '-f'] }
 };
 
 const GDB: TextProgram = {
@@ -404,16 +354,17 @@ const GDB: TextProgram = {
     singleDash: true,
     options: [
       value('-ex', '--ex', '-eval-command', '--eval-command', '-iex', '--iex', '-init-eval-command', '--init-eval-command'),
+      // A script file holds gdb commands the analysis does not read.
+      does('runs-program', 'required', '-x', '--command', '-command', '-ix', '--init-command', '-init-command'),
       does('reads-file', 'required', '-x', '--command', '-command', '-ix', '--init-command', '-init-command'),
       does('changes-dir', 'required', '-cd', '--cd'),
       value('-p', '--pid', '-d', '--directory', '-s', '--symbols', '-c', '--core', '-se', '-e', '--exec'),
       flag('-batch', '--batch', '-nx', '--nx', '-n', '-q', '--quiet', '-silent', '--args')
     ]
   },
-  language: GDB_LANGUAGE,
+  language: languages.GDB,
   textOptions: ['-ex', '--ex', '-eval-command', '--eval-command', '-iex', '--iex', '-init-eval-command', '--init-eval-command'],
-  fileOptions: ['-x', '--command', '-command'],
-  readsStdin: true
+  stdin: { unless: ['-batch', '--batch'] }
 };
 
 const VIM: TextProgram = {
@@ -426,19 +377,17 @@ const VIM: TextProgram = {
     does('reads-file', 'required', '-u', '-U', '-s'),
     does('writes-file', 'required', '-w', '-W')
   ),
-  language: VIM_LANGUAGE,
+  language: languages.VIM,
   textOptions: ['-c', '--cmd'],
-  fileOptions: [],
   plusText: true,
-  readsStdin: false
+  stdin: false
 };
 
 const EXPECT: TextProgram = {
   spec: sub(value('-c', '-D'), does('reads-file', 'required', '-f', '-b'), flag('-d', '-i', '-n', '-N', '-v')),
-  language: OPAQUE,
+  language: languages.OPAQUE,
   textOptions: ['-c'],
-  fileOptions: ['-f'],
-  readsStdin: true
+  stdin: { unless: ['-c', '-f'] }
 };
 
 /** Programs that run text in their own command language, by program name. */
