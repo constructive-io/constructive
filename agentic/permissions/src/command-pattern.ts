@@ -10,12 +10,18 @@
 import { hasPlaceholder, MAX_COMMAND_LENGTH, normalizeCommand, trimBlanks } from './bash/analyze';
 import { isShellSyntax } from './bash/parts';
 import { tokenize } from './bash/tokenize';
-import { firstNonPrefixWord, MAX_PREFIXES, prefixShortfall } from './command-prefix';
+import { firstNonPrefixWord, grantCaveat, MAX_PREFIXES, prefixShortfall } from './command-prefix';
 import { RULE_REFUSAL } from './grant-copy';
-import type { CommandKey, CommandMatch, CommandPattern, CommandPrefixMatch, ListedPrefix } from './types';
+import type { CommandKey, CommandMatch, CommandPattern, CommandPrefixMatch, GrantCaveat, ListedPrefix } from './types';
 
-/** A typed pattern read back: the match, or a short plain reason that says what is wrong and how to fix it. */
-export type CommandPatternResult = { ok: true; match: CommandMatch | CommandPrefixMatch } | { ok: false; reason: string };
+/**
+ * A typed pattern read back: the match, with the caveat a host shows beside it
+ * when it needs one, or a short plain reason that says what is wrong and how
+ * to fix it.
+ */
+export type CommandPatternResult =
+  | { ok: true; match: CommandMatch | CommandPrefixMatch; caveat?: GrantCaveat }
+  | { ok: false; reason: string };
 
 type PrefixResult = { ok: true; prefix: ListedPrefix } | { ok: false; reason: string };
 
@@ -67,7 +73,9 @@ function readPrefixes(text: string): CommandPatternResult {
     prefixes.add(read.prefix);
   }
   if (prefixes.size > MAX_PREFIXES) return refused(RULE_REFUSAL.tooManyPrefixes(MAX_PREFIXES, prefixes.size));
-  return { ok: true, match: { type: 'command-prefix', prefixes: [...prefixes] } };
+  const match: CommandPrefixMatch = { type: 'command-prefix', prefixes: [...prefixes] };
+  const caveat = grantCaveat(match);
+  return caveat === undefined ? { ok: true, match } : { ok: true, match, caveat };
 }
 
 function readExact(text: string): CommandPatternResult {

@@ -201,6 +201,14 @@ export interface PathPattern {
 /** What a grant option shows of the rule it saves, told apart by `kind`. */
 export type GrantPattern = CommandPattern | PathPattern;
 
+/**
+ * Something a host should say beside a rule, because the rule lets a call run
+ * that the kit does not fully check. `script-unchecked`: the prefix runs a
+ * script by its path (`node scripts/build.js`), and the kit never reads the
+ * script, which the agent may have changed.
+ */
+export type GrantCaveat = 'script-unchecked';
+
 export type GrantScope = 'chat' | 'project';
 
 export interface Grant {
@@ -216,6 +224,8 @@ export interface GrantOption {
   label: string;
   /** The rule as text, with its kind: `{ kind: 'prefix', text: 'git status' }`, `{ kind: 'path', text: '~/work/lib/' }`. */
   pattern: GrantPattern;
+  /** Set when the saved rule needs a caveat beside it; absent otherwise. */
+  caveat?: GrantCaveat;
   match: GrantMatch;
 }
 
@@ -247,7 +257,7 @@ export interface PermissionPrompt {
   signals: Signal[];
   /** One plain sentence per signal, in order. */
   reasons: string[];
-  grantOptions: { scope: GrantScope; label: string; pattern: GrantPattern }[];
+  grantOptions: Omit<GrantOption, 'match'>[];
 }
 
 /** The filesystem the engine needs. Injected so the pure modules stay testable. */

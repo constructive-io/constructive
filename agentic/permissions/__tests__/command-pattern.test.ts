@@ -27,7 +27,6 @@ describe('parseCommandPattern', () => {
     [prefixText('git status, npm run test'), prefixes('git status', 'npm run test')],
     [prefixText('  git   status ,npm run test  '), prefixes('git status', 'npm run test')],
     [prefixText('git status, git status'), prefixes('git status')],
-    [prefixText('node scripts/build.js'), prefixes('node scripts/build.js')],
     [exactText('pnpm   test'), exact('pnpm test')],
     [exactText('pnpm\ttest '), exact('pnpm test')],
     [exactText('echo "a  b"'), exact('echo "a  b"')],
@@ -40,6 +39,20 @@ describe('parseCommandPattern', () => {
   ];
   it.each(valid)('reads %j', (pattern, match) => {
     expect(parseCommandPattern(pattern)).toEqual({ ok: true, match });
+  });
+
+  // The kit does not check the script itself, which the agent may have edited.
+  // prettier-ignore
+  const scripts: [pattern: CommandPattern, match: GrantMatch][] = [
+    [prefixText('node scripts/build.js'), prefixes('node scripts/build.js')],
+    [prefixText('python3 manage.py'), prefixes('python3 manage.py')],
+    [prefixText('bash deploy.sh'), prefixes('bash deploy.sh')],
+    [prefixText('tsx watch src/x.ts'), prefixes('tsx watch src/x.ts')],
+    [prefixText('git status, node scripts/build.js'), prefixes('git status', 'node scripts/build.js')]
+  ];
+  it.each(scripts)('reads %j with the script caveat, which the exact command does not get', (pattern, match) => {
+    expect(parseCommandPattern(pattern)).toEqual({ ok: true, match, caveat: 'script-unchecked' });
+    expect(parseCommandPattern(exactText(pattern.text))).toEqual({ ok: true, match: exact(pattern.text) });
   });
 
   // prettier-ignore

@@ -12,7 +12,7 @@
 import * as path from 'node:path';
 
 import { commandPattern, isExactKey, isStoredPrefix } from './command-pattern';
-import { MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
+import { grantCaveat, MAX_PREFIXES, partIs, prefixCovers, prefixFor } from './command-prefix';
 import { grantOptionLabel } from './grant-copy';
 import { commonParent, contains, displayDir } from './paths';
 import { byRequest } from './requests';
@@ -141,7 +141,14 @@ function commandOption(scope: GrantScope, request: BashRequest, grants: readonly
   const match: CommandMatch | CommandPrefixMatch = prefixes
     ? { type: 'command-prefix', prefixes }
     : { type: 'command', command: request.command };
-  return { scope, label: grantOptionLabel(scope, match, homeDir), pattern: commandPattern(match), match };
+  const caveat = grantCaveat(match);
+  return {
+    scope,
+    label: grantOptionLabel(scope, match, homeDir),
+    pattern: commandPattern(match),
+    ...(caveat === undefined ? {} : { caveat }),
+    match
+  };
 }
 
 function pathOptions(request: FileRequest, homeDir: string): GrantOption[] {

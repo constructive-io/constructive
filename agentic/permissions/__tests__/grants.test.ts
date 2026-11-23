@@ -4,6 +4,7 @@ import {
   type CommandPattern,
   describeGrant,
   type Grant,
+  grantCaveat,
   grantFrom,
   type GrantMatch,
   memoryGrantStore,
@@ -240,6 +241,30 @@ describe('command prefix grants', () => {
     const store = memoryGrantStore([prefixGrant('git status', 'npm run test')]);
     store.add(prefixGrant('npm run test', 'git status'));
     expect(store.grants).toHaveLength(1);
+  });
+});
+
+describe('the script caveat', () => {
+  it('marks each option that saves an interpreter and its script, and the card the host receives, and no other', async () => {
+    const scripts = ['node scripts/build.js --watch', 'python3 manage.py migrate', 'bash deploy.sh staging', 'tsx watch src/x.ts', 'git status && node scripts/build.js'];
+    const others = ['git status', 'npm test', 'npm ls', 'npm run build', 'cat README.md', 'node -e "process.exit(0)"', './scripts/deploy.sh'];
+    const caveats = async (command: string) => {
+      const ask = asAsk(await sb.bash(command, 'ask'));
+      return [command, ask.grantOptions.map((o) => o.caveat ?? null), ask.prompt.grantOptions.map((o) => o.caveat ?? null)];
+    };
+    for (const command of scripts) {
+      expect(await caveats(command)).toEqual([command, ['script-unchecked', 'script-unchecked'], ['script-unchecked', 'script-unchecked']]);
+    }
+    for (const command of others) expect(await caveats(command)).toEqual([command, [null, null], [null, null]]);
+    expect(asAsk(await sb.run('read', { path: '../lib/util.ts' })).grantOptions.some((o) => 'caveat' in o)).toBe(false);
+  });
+
+  it('reads it from the table for a stored grant', () => {
+    expect(grantCaveat(storedPrefixes('git status', 'node scripts/build.js'))).toBe('script-unchecked');
+    expect(grantCaveat(storedPrefixes('node inspect src/index.js'))).toBe('script-unchecked');
+    expect(grantCaveat(storedPrefixes('git status', 'npm run build'))).toBeUndefined();
+    expect(grantCaveat(storedCommand('node scripts/build.js'))).toBeUndefined();
+    expect(grantCaveat({ type: 'path', access: 'read', pathPrefix: '/a' })).toBeUndefined();
   });
 });
 

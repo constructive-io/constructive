@@ -10,6 +10,7 @@
  */
 
 export { commandPattern, type CommandPatternResult, parseCommandPattern } from './command-pattern';
+export { grantCaveat } from './command-prefix';
 export {
   createPermissionEngine,
   type EvaluateContext,
