@@ -75,12 +75,66 @@ export class ExpansionBudget {
   }
 }
 
+/** How an assignment sets a variable: `=` replaces it, `+=` appends to it. */
+export type AssignOp = '=' | '+=';
+
+/** A variable the command itself set or unset. */
+type Variable = { kind: 'set'; value: string } | { kind: 'unknown' } | { kind: 'unset' };
+
+/**
+ * The shell variables as the command leaves them, at every assignment site:
+ * a `NAME=value` word, `export`, `declare` and the like, `read`, `printf -v`,
+ * `mapfile` and `unset`. A variable the command never touched comes from the
+ * environment, which `outside` reads.
+ */
+export class Variables {
+  private readonly vars: Map<string, Variable>;
+
+  constructor(
+    private readonly outside: (name: string) => string | null,
+    vars: ReadonlyMap<string, Variable> = new Map()
+  ) {
+    this.vars = new Map(vars);
+  }
+
+  /** `name=value` or `name+=value`; a `null` value is unknown. `+=` on an unset variable is `=`, as in bash. */
+  assign(name: string, op: AssignOp, value: string | null): void {
+    const before = op === '+=' ? this.get(name) : undefined;
+    if (value === null || before === null) this.vars.set(name, { kind: 'unknown' });
+    else this.vars.set(name, { kind: 'set', value: (before ?? '') + value });
+  }
+
+  unset(name: string): void {
+    this.vars.set(name, { kind: 'unset' });
+  }
+
+  /** The command set or unset it, so the environment does not decide it. */
+  touched(name: string): boolean {
+    return this.vars.has(name);
+  }
+
+  /** Its value; `null` when it cannot be known, `undefined` when it is unset. */
+  get(name: string): string | null | undefined {
+    const v = this.vars.get(name);
+    if (v === undefined) return this.outside(name);
+    if (v.kind === 'set') return v.value;
+    return v.kind === 'unknown' ? null : undefined;
+  }
+
+  copy(): Variables {
+    return new Variables(this.outside, this.vars);
+  }
+}
+
 /** What the expansions need from the analysis. */
 export interface ExpansionScope {
   /** The dir `~` expands to. */
   readonly home: string;
-  /** `$name`, or `${name:-fallback}`; `null` when it cannot be known. */
-  value(name: string, fallback: string | undefined): string | null;
+  /**
+   * `$name`, or `${name-fallback}` (`colon` for `${name:-fallback}`, which
+   * also takes the fallback for an empty value); `null` when it cannot be known.
+   */
+  value(name: string, fallback: string | undefined, colon: boolean): string | null;
   /** IFS may differ from bash's default, so an unquoted expansion splits where the analysis cannot follow. */
   ifsMayDiffer(): boolean;
   noteRef(name: string): void;
@@ -143,7 +197,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
       break;
     case 'var': {
       scope.noteRef(part.name);
-      const value = !part.quoted && scope.ifsMayDiffer() ? null : scope.value(part.name, part.fallback);
+      const value = !part.quoted && scope.ifsMayDiffer() ? null : scope.value(part.name, part.fallback, part.colon === true);
       if (value === null) markUnknown(!part.quoted);
       else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'q');
       else add(value, part.quoted ? 'q' : 'v');
@@ -231,7 +285,6 @@ function sequence(from: string, to: string, step: string | undefined, limit: num
  * Tilde expansion at the start of a word, and in an assignment after its `=`
  * and each unquoted `:`. The prefix runs to the first unquoted `/` (or `:` in
  * an assignment); any quoted or expanded character in it stops the expansion.
- * `~user` cannot be known.
  */
 function tildes(piece: Piece, assignment: boolean, scope: ExpansionScope, budget: ExpansionBudget): Piece {
   const { text, kinds } = piece;
@@ -249,9 +302,11 @@ function tildes(piece: Piece, assignment: boolean, scope: ExpansionScope, budget
     let end = start + 1;
     while (end < text.length && !(kinds[end] === 'l' && (text[end] === '/' || (assignment && text[end] === ':')))) end++;
     if (!allLiteral(kinds, start + 1, end)) continue;
-    const login = text.slice(start + 1, end);
-    if (login !== '') {
-      scope.dynamic(`it uses ~${login} expansion`);
+    if (end > start + 1) {
+      // `~user`, `~+` and `~-` name a dir the analysis cannot know, so the word is unknown from here.
+      outText += text.slice(from, start) + UNKNOWN;
+      outKinds += kinds.slice(from, start) + 'q';
+      from = end;
       continue;
     }
     if (!budget.takeChars(scope.home.length)) continue;

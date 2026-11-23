@@ -16,6 +16,7 @@ import {
   hiddenLeadingOption,
   knownTexts,
   leadingOptions,
+  literalArg,
   parse,
   type Parsed,
   pathLikeArgs,
@@ -25,8 +26,9 @@ import {
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
-import { TEXT_PROGRAMS } from './programs';
-import { man, sort, tar, textProgram, zip } from './scripts';
+import { hasOption, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
+import { MAPFILE, PRINTF, READ, TEXT_PROGRAMS, UNSET } from './programs';
+import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh', 'mksh', 'fish', 'ash']);
@@ -63,6 +65,8 @@ export const NO_OPERANDS = new Set([
   'kill',
   'trap',
   'read',
+  'mapfile',
+  'readarray',
   'let'
 ]);
 
@@ -109,14 +113,26 @@ function test(name: string, ctx: CommandContext, rest: readonly Arg[]): void {
 /** Builtins whose options (`-i`, `-n`, `-v`) make them read a value as a subscript or arithmetic. */
 const EVALUATING_BUILTINS: ReadonlySet<string> = new Set(['declare', 'local', 'typeset', 'printf', 'read']);
 
-/** The variables a builtin assigns by name: `printf -v NAME`, `read NAME…`, `unset NAME…`. */
-function namedVariables(name: string, rest: readonly Arg[]): Arg[] {
-  if (name === 'printf') return valuesOf(parse(rest, new Set(['-v'])), '-v');
+/** The variables a builtin assigns or unsets by name: `printf -v NAME`, `read NAME…`, `mapfile NAME`, `unset NAME…`. */
+function namedVariables(ctx: CommandContext, name: string, rest: readonly Arg[]): Arg[] {
+  const operands = (spec: ProgramSpec) => {
+    const read = readArgs(spec, rest);
+    return { read, names: rest.slice(read.next) };
+  };
+  if (name === 'printf') return valuesRead(readArgs(PRINTF, rest), '-v');
   if (name === 'read') {
-    const p = parse(rest, new Set(['-a', '-d', '-i', '-n', '-N', '-p', '-t', '-u']));
-    return [...valuesOf(p, '-a'), ...p.positionals];
+    const { read, names } = operands(READ);
+    return [...valuesRead(read, '-a'), ...names];
   }
-  if (name === 'unset') return parse(rest).positionals;
+  if (name === 'mapfile' || name === 'readarray') {
+    const { read, names } = operands(MAPFILE);
+    applyEffects(ctx, name, MAPFILE, read);
+    return names.length > 0 ? names.slice(0, 1) : [literalArg('MAPFILE')];
+  }
+  if (name === 'unset') {
+    const { read, names } = operands(UNSET);
+    return hasOption(read, '-f') ? [] : names;
+  }
   return [];
 }
 
@@ -129,7 +145,8 @@ function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void 
   const { analyzer } = ctx;
   if (variable.kind === 'unknown') return analyzer.dynamic(`it runs ${builtin} on a variable name from a variable or substitution`);
   if (variable.text.includes('[')) return analyzer.dynamic(`it runs ${builtin} on an array element, whose subscript runs as code`);
-  if (builtin !== 'unset') analyzer.assign(variable.text, null);
+  if (builtin === 'unset') analyzer.unset(variable.text);
+  else analyzer.assign(variable.text, '=', null);
 }
 
 /** Shell options that take a value; the `*file` ones name a script the shell loads. */
@@ -273,7 +290,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   if (name === 'let') return analyzer.dynamic('it runs let, which reads its words as arithmetic');
   const hidden = EVALUATING_BUILTINS.has(name) ? hiddenLeadingOption(rest) : undefined;
   if (hidden) analyzer.dynamic(`it runs ${name} with ${hidden.raw}, which may be an option such as -i, -n or -v`);
-  for (const variable of namedVariables(name, rest)) assignNamed(ctx, name, variable);
+  for (const variable of namedVariables(ctx, name, rest)) assignNamed(ctx, name, variable);
   if (NO_OPERANDS.has(name)) return;
   switch (name) {
   case 'cd':
@@ -307,8 +324,8 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
       const start = literalStart(arg);
       if (/^[^=-][^=]*\[/.test(start)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
       if (arg.kind === 'unknown' && !/^[A-Za-z_]/.test(start) && arg.raw.includes('=')) analyzer.assignUnknownName(arg.raw);
-      const m = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(start);
-      if (m) analyzer.assign(m[1], arg.kind === 'known' ? m[2] : null);
+      const m = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(start);
+      if (m) analyzer.assign(m[1], m[2] ? '+=' : '=', arg.kind === 'known' ? m[3] : null);
     }
     return;
   case 'eval':

@@ -99,7 +99,16 @@ const rows: Row[] = [
   ['echo $GH_HELPER', 'ask', 'allow', 'secret-env-expansion'],
   ['cat <<EOF\n$NPM_TOKEN\nEOF', 'ask', 'allow', 'secret-env-expansion'],
   ['ACCESS_TOKEN=x; echo $ACCESS_TOKEN', 'allow', 'allow'],
-  ['echo $HOME', 'allow', 'allow']
+  ['echo $HOME', 'allow', 'allow'],
+  // 12. one variable model: `=`, `+=` and unset at every assignment site, and `~login` is unknown
+  ['p=~/.ss; p+=h/id_ed25519; cat $p', 'deny', 'deny', 'hard-deny'],
+  ['export p=~/.ss; export p+=h/id_ed25519; cat $p', 'deny', 'deny', 'hard-deny'],
+  ['declare p=~/.a; declare p+=ws/credentials; cat $p', 'deny', 'deny', 'hard-deny'],
+  ['F=README.md; unset F; cat ${F:-~/.ssh/id_ed25519}', 'deny', 'deny', 'hard-deny'],
+  ['F=README.md; unset -v F; cat ${F-~/.ssh/id_ed25519}', 'deny', 'deny', 'hard-deny'],
+  ['p=README.md; mapfile -t p <<< ~/.ssh/id_ed25519; cat $p', 'ask', 'ask', 'unresolvable-path'],
+  ['p=README.md; readarray p < list.txt; cat $p', 'ask', 'ask', 'unresolvable-path'],
+  ['cat ~nobody/.ssh/id_ed25519', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {

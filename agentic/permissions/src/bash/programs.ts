@@ -15,6 +15,21 @@ const flag = (...names: string[]): OptionSpec => ({ names, value: 'none' });
 const value = (...names: string[]): OptionSpec => ({ names, value: 'required' });
 const does = (effect: Effect, value: OptionSpec['value'], ...names: string[]): OptionSpec => ({ names, value, effect });
 
+/** bash's builtins read their options with getopt, up to the first operand. */
+const builtin = (...options: OptionSpec[]): ProgramSpec => ({ abbreviations: false, stopAtOperand: true, options });
+
+/** `read [-ers] [-a array] [-d delim] [-i text] [-n|-N n] [-p prompt] [-t timeout] [-u fd] [name …]`. */
+export const READ = builtin(value('-a', '-d', '-i', '-n', '-N', '-p', '-t', '-u'), flag('-e', '-r', '-s'));
+
+/** `printf -v name format …`: the builtin's only option. */
+export const PRINTF = builtin(value('-v'));
+
+/** `mapfile`/`readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]`; the callback runs as code. */
+export const MAPFILE = builtin(value('-d', '-n', '-O', '-s', '-u', '-c'), does('runs-program', 'required', '-C'), flag('-t'));
+
+/** `unset [-f|-v|-n] name …`: `-f` unsets functions, the others variables. */
+export const UNSET = builtin(flag('-f', '-v', '-n'));
+
 /** git's own options, before the subcommand. git reads them by exact name only. */
 export const GIT: ProgramSpec = {
   abbreviations: false,

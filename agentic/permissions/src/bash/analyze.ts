@@ -19,7 +19,7 @@ import type { Access, CommandKey, CommandPart, Signal } from '../types';
 import { unreachable } from '../unreachable';
 import { generic } from './args';
 import { runCommand, TESTS } from './commands';
-import { expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, type WordUse } from './expand';
+import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EXPANSION_CHARS, MAX_EXPANSION_WORDS, Variables, type WordUse } from './expand';
 import { type ContentFlow, FlowTracker, type Source, type Stdin } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
@@ -264,8 +264,8 @@ class Analyzer implements ExpansionScope {
   readonly gitRemotes = new Set<string>();
   /** What the command being analyzed reads on stdin. */
   stdin: Stdin = { sources: [], words: [], texts: [''], file: false, listedUnder: null };
-  /** Shell variables set earlier in the command. `null` = set to something unknown. */
-  vars = new Map<string, string | null>();
+  /** Shell variables as the command has set them so far. */
+  vars = new Variables((name) => this.outsideValue(name));
   /** The shell's working dir at this point of the command. */
   private cwd: Cwd = { kind: 'start' };
   /** Some command ran, or the shell moved, outside the start dir. */
@@ -307,7 +307,7 @@ class Analyzer implements ExpansionScope {
 
   /** `cd dir` looks `dir` up in `CDPATH` when the command set it and `dir` is not `/…`, `./…` or `../…`. */
   searchesCdPath(dir: string): boolean {
-    return this.vars.has('CDPATH') && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
+    return this.vars.touched('CDPATH') && this.vars.get('CDPATH') !== undefined && !dir.startsWith('/') && !/^\.\.?(\/|$)/.test(dir);
   }
 
   /** Analyze one shell string. Returns what it lexed to, or `null` when it was not lexed. */
@@ -385,7 +385,7 @@ class Analyzer implements ExpansionScope {
   nested(text: string, why: string): void {
     this.dynamic(why);
     const savedCwd = this.cwd;
-    const savedVars = new Map(this.vars);
+    const savedVars = this.vars.copy();
     const savedStdin = this.stdin;
     this.depth++;
     this.analyzeString(text);
@@ -417,19 +417,25 @@ class Analyzer implements ExpansionScope {
     this.dynamic(`it sets a variable whose name comes from ${raw}, which may change what runs`);
   }
 
-  assign(name: string, value: string | null): void {
+  /** Every assignment goes through here: `NAME=value`, `NAME+=value`, and the builtins that set a name. */
+  assign(name: string, op: AssignOp, value: string | null): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     if (DANGEROUS_VARS.test(name)) this.dynamic(`it sets ${name}, which changes what runs`);
-    this.vars.set(name, value);
+    this.vars.assign(name, op, value);
+  }
+
+  unset(name: string): void {
+    if (name === 'IFS') this.ifs = 'maybe-changed';
+    this.vars.unset(name);
   }
 
   /** A variable the command expands: an env ref unless the command set it. */
   noteRef(name: string): void {
-    if (!this.vars.has(name)) this.envRefs.add(name);
+    if (!this.vars.touched(name)) this.envRefs.add(name);
   }
 
-  lookup(name: string): string | null {
-    if (this.vars.has(name)) return this.vars.get(name);
+  /** A variable the command did not set: only HOME, IFS and PWD are known. */
+  private outsideValue(name: string): string | null {
     if (name === 'HOME') return this.home;
     // Bash sets IFS to its default at startup and does not take it from the environment.
     if (name === 'IFS') return ' \t\n';
@@ -437,15 +443,24 @@ class Analyzer implements ExpansionScope {
     return null;
   }
 
+  /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
+  lookup(name: string): string | null | undefined {
+    return this.vars.get(name);
+  }
+
   /**
-   * `$NAME`, or `${NAME:-fallback}`. The fallback counts only when this
-   * command set the variable to empty: one from outside may hold anything, and
-   * a fallback with its own expansion or a `~` is not known either.
+   * `$NAME`, or `${NAME-fallback}` and `${NAME:-fallback}`. The fallback
+   * counts only when the variable is unset, or with the colon empty; one from
+   * outside may hold anything. A fallback with its own expansion is not known,
+   * and a leading `~` in it is the home dir as in bash (`~user` is not known).
    */
-  value(name: string, fallback: string | undefined): string | null {
+  value(name: string, fallback: string | undefined, colon: boolean): string | null {
     const value = this.lookup(name);
-    if (fallback === undefined || value !== '') return value;
-    return /[$`~]/.test(fallback) ? null : fallback;
+    if (fallback === undefined) return value === undefined ? '' : value;
+    if (value === null || (value !== undefined && !(colon && value === ''))) return value;
+    if (/[$`]/.test(fallback)) return null;
+    if (!fallback.startsWith('~')) return fallback;
+    return /^~(\/|$)/.test(fallback) ? this.home + fallback.slice(1) : null;
   }
 
   get home(): string {
@@ -573,9 +588,9 @@ class Analyzer implements ExpansionScope {
     let i = 0;
     while (i < args.length) {
       const arg = args[i];
-      const assignment = /^([A-Za-z_][A-Za-z0-9_]*)\+?=(.*)$/s.exec(literalStart(arg));
+      const assignment = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(literalStart(arg));
       if (assignment && /^[A-Za-z_][A-Za-z0-9_]*\+?=/.test(arg.raw)) {
-        this.assign(assignment[1], arg.kind === 'known' ? assignment[2] : null);
+        this.assign(assignment[1], assignment[2] ? '+=' : '=', arg.kind === 'known' ? assignment[3] : null);
         i++;
         continue;
       }
