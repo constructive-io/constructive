@@ -58,6 +58,12 @@ export interface Heredoc {
    * Filled in when the lexer reaches the lines after the command.
    */
   body: string;
+  /**
+   * The substitutions in an unquoted body. Bash runs them when the command
+   * that owns the heredoc applies its redirections, each in a subshell, so
+   * their subshell chains start there and not where the body was read.
+   */
+  commands: SimpleCommand[];
 }
 
 /** A redirection: to or from a file, a copied descriptor (`2>&1`), a heredoc or a here-string. */
@@ -100,6 +106,10 @@ export interface SimpleCommand {
   input: Input;
   /** The subshells it runs in, outermost first. */
   subshells: Subshell[];
+  /** The compound commands that open right before it, outermost first: they apply their redirections before it runs. */
+  opens: Compound[];
+  /** The compound command it closes (`}`, `done`, the redirections after `)`), whose redirections its own are. */
+  closes?: Compound;
 }
 
 export function heredocsOf(cmd: SimpleCommand): Heredoc[] {
@@ -149,7 +159,7 @@ interface PendingHeredoc {
 }
 
 function newCommand(): SimpleCommand {
-  return { words: [], redirects: [], input: { kind: 'inherited' }, subshells: [] };
+  return { words: [], redirects: [], input: { kind: 'inherited' }, subshells: [], opens: [] };
 }
 
 /**
@@ -181,6 +191,8 @@ class Lexer {
   private functionHeader = false;
   /** The `( … )` subshells open here, outermost first. */
   private readonly subshells: Subshell[] = [];
+  /** Compound commands opened since the last command was pushed, which the next one opens. */
+  private pendingOpens: Compound[] = [];
   /** The pipeline bookkeeping of each nesting level, innermost last: the top, and each open compound command. */
   private readonly levels: Level[] = [{ element: 0, list: 0, piped: false, depth: 0 }];
   private i = 0;
@@ -278,7 +290,9 @@ class Lexer {
 
   /** A compound command opens: what would feed the next command feeds every command in it, and `(` opens a subshell. */
   private open(closer: string): void {
-    this.compounds.push({ closer, compound: { input: this.inputNow(), redirects: [] } });
+    const compound: Compound = { input: this.inputNow(), redirects: [] };
+    this.compounds.push({ closer, compound });
+    this.pendingOpens.push(compound);
     this.nextInput = { kind: 'inherited' };
     if (closer === ')') this.subshells.push({ lastElement: false });
     const at = this.commands.length;
@@ -290,6 +304,8 @@ class Lexer {
     const open = this.compounds[this.compounds.length - 1];
     if (open?.closer !== closer) return null;
     this.endPipeline(false, true);
+    // One that held no command applies its redirections where it closes.
+    this.pendingOpens = this.pendingOpens.filter((c) => c !== open.compound);
     this.compounds.pop();
     this.levels.pop();
     if (closer === ')') this.subshells.pop();
@@ -308,9 +324,12 @@ class Lexer {
     if (cmd.words.length > 0 || cmd.redirects.length > 0) {
       cmd.input = this.inputNow();
       cmd.subshells = [...this.subshells];
-      this.commands.push(cmd);
       // `( … ) < f`, `{ …; } <<< w`, `done < f`: the redirections belong to the compound command that just closed.
-      if (this.closed) this.closed.redirects.push(...cmd.redirects);
+      if (this.closed) {
+        this.closed.redirects.push(...cmd.redirects);
+        cmd.closes = this.closed;
+      }
+      this.push([cmd]);
       this.nextInput = pipe ? { kind: 'pipe', from: cmd } : { kind: 'inherited' };
     } else {
       // `( … ) | x`: the group's output is piped on.
@@ -394,7 +413,7 @@ class Lexer {
     const cmd = this.current;
     if (op === '<<' || op === '<<-') {
       const { delim, quoted } = heredocDelimiter(target.raw);
-      const doc: Heredoc = { quoted, body: '' };
+      const doc: Heredoc = { quoted, body: '', commands: [] };
       this.pending.push({ delim, stripTabs: op === '<<-', doc });
       cmd.redirects.push({ kind: 'heredoc', fd, doc });
       return;
@@ -408,6 +427,14 @@ class Lexer {
       return;
     }
     cmd.redirects.push({ kind: 'file', op: op as FileOp, fd, target });
+  }
+
+  /** Commands bash runs here, in order; the first opens the compound commands opened since the last one. */
+  private push(commands: SimpleCommand[]): void {
+    if (commands.length === 0) return;
+    commands[0].opens = [...this.pendingOpens, ...commands[0].opens];
+    this.pendingOpens = [];
+    this.commands.push(...commands);
   }
 
   /** The next line of input, without its newline. */
@@ -441,14 +468,18 @@ class Lexer {
         body += `${check}\n`;
       }
       if (!found) throw new LexError('unterminated heredoc');
-      if (!doc.quoted) this.scanExpansions(body, 'in a heredoc');
+      if (!doc.quoted) this.scanExpansions(body, 'in a heredoc', doc.commands);
       doc.body = body;
     }
     this.pending = [];
   }
 
-  /** Text bash expands as in double quotes (an unquoted heredoc body, a `${…}` word, arithmetic): lex its substitutions. */
-  private scanExpansions(text: string, where: string): void {
+  /**
+   * Text bash expands as in double quotes (an unquoted heredoc body, a `${…}`
+   * word, arithmetic): lex its substitutions, into `into` when they run
+   * somewhere else than where the text is read (a heredoc's).
+   */
+  private scanExpansions(text: string, where: string, into: SimpleCommand[] | null = null): void {
     for (let i = 0; i < text.length; i++) {
       const ch = text[i];
       if (ch === '\\') {
@@ -456,20 +487,20 @@ class Lexer {
       } else if (ch === '$' && text[i + 1] === '(') {
         const arithmetic = text[i + 2] === '(' ? arithmeticEnd(text, i + 1, 'dollar') : null;
         if (arithmetic !== null) {
-          this.arithmetic(text.slice(i + 3, arithmetic - 1), 'arithmetic expansion $((…))');
+          this.arithmetic(text.slice(i + 3, arithmetic - 1), 'arithmetic expansion $((…))', into);
           i = arithmetic;
         } else {
           const end = matchParen(text, i + 1);
-          this.substitute(text.slice(i + 2, end), `command substitution ${where}`);
+          this.substitute(text.slice(i + 2, end), `command substitution ${where}`, into);
           i = end;
         }
       } else if (ch === '$' && text[i + 1] === '[') {
         const end = matchBracket(text, i + 1);
-        this.arithmetic(text.slice(i + 2, end), 'arithmetic expansion $[…]');
+        this.arithmetic(text.slice(i + 2, end), 'arithmetic expansion $[…]', into);
         i = end;
       } else if (ch === '`') {
         const end = matchBacktick(text, i);
-        this.substitute(unescapeBackticks(text.slice(i + 1, end)), `backtick substitution ${where}`);
+        this.substitute(unescapeBackticks(text.slice(i + 1, end)), `backtick substitution ${where}`, into);
         i = end;
       }
     }
@@ -480,12 +511,13 @@ class Lexer {
    * and then evaluates it, and a name in it reads a variable's value as an
    * expression, where a subscript runs code.
    */
-  private arithmetic(text: string, note: string): void {
+  private arithmetic(text: string, note: string, into: SimpleCommand[] | null = null): void {
     if (!PLAIN_ARITHMETIC.test(text)) this.dynamic.push(note);
-    this.scanExpansions(text, 'in arithmetic');
+    this.scanExpansions(text, 'in arithmetic', into);
   }
 
-  private substitute(inner: string, note: string): void {
+  /** A substitution's commands, which run in a subshell of their own: here, or into `into` with a chain that starts at that subshell. */
+  private substitute(inner: string, note: string, into: SimpleCommand[] | null = null): void {
     this.dynamic.push(note);
     if (this.depth >= MAX_SUBSTITUTION_DEPTH) {
       this.limits.push('substitution-depth');
@@ -501,10 +533,10 @@ class Lexer {
       this.dynamic.push(`a substitution it could not read (${error.message})`);
       this.limits.push('unparsed');
     }
-    // A substitution runs in a subshell, inside the ones open here.
     const subshell: Subshell = { lastElement: false };
-    for (const cmd of sub.commands) cmd.subshells = [...this.subshells, subshell, ...cmd.subshells];
-    this.commands.push(...sub.commands);
+    for (const cmd of sub.commands) cmd.subshells = [...(into ? [] : this.subshells), subshell, ...cmd.subshells];
+    if (into) into.push(...sub.commands);
+    else this.push(sub.commands);
     this.dynamic.push(...sub.dynamic);
     this.limits.push(...sub.limits);
   }

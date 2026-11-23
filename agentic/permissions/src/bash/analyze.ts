@@ -23,7 +23,7 @@ import { type AssignOp, expandWord, ExpansionBudget, type ExpansionScope, MAX_EX
 import { type ContentFlow, FlowTracker, NO_INPUT, type Source, type Stdin, unseenInput } from './flows';
 import type { Limit } from './limits';
 import { commandParts } from './parts';
-import { heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type SimpleCommand, type Subshell, tokenize, type Word } from './tokenize';
+import { type Compound, type Heredoc, heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type Redirect, type SimpleCommand, type Subshell, tokenize, type Word } from './tokenize';
 import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsRuns } from './wrappers';
 
@@ -316,6 +316,11 @@ function namesIfs(word: Word): boolean {
   return /^IFS(\+?=|$)/.test(lead);
 }
 
+/** The commands, with the substitutions of their heredocs, at every depth. */
+function withHeredocCommands(commands: readonly SimpleCommand[]): SimpleCommand[] {
+  return commands.flatMap((cmd) => [cmd, ...withHeredocCommands(heredocsOf(cmd).flatMap((doc) => doc.commands))]);
+}
+
 function isHarmlessDevice(abs: string): boolean {
   return HARMLESS_DEVICES.has(abs) || abs.startsWith('/dev/fd/');
 }
@@ -342,6 +347,8 @@ class Analyzer implements ExpansionScope {
   private scope: CommandScope | null = null;
   /** The subshells open in the shell string being analyzed, outermost first. */
   private frames: Frame[] = [];
+  /** The compound commands whose redirections were applied where they start. */
+  private readonly applied = new Set<Compound>();
   /** Names unknown to the trap action being read at the end: the command assigned them after the trap was set. */
   private trapUnknown: ReadonlySet<string> | null = null;
   /** How many traps on a condition from a variable were set, which no later trap command replaces. */
@@ -402,7 +409,7 @@ class Analyzer implements ExpansionScope {
       return null;
     }
     const lexed = tokenize(command);
-    if (lexed.commands.some((cmd) => cmd.words.some(namesIfs))) this.ifs = 'maybe-changed';
+    if (withHeredocCommands(lexed.commands).some((cmd) => cmd.words.some(namesIfs))) this.ifs = 'maybe-changed';
     if (lexed.error) this.incomplete('unparsed', lexed.error);
     for (const note of lexed.dynamic) this.dynamic(`it uses ${note}`);
     for (const limit of lexed.limits) this.incomplete(limit);
@@ -791,7 +798,11 @@ class Analyzer implements ExpansionScope {
    * assignments alone makes them before its redirections. Otherwise its words
    * and redirections expand first, and its assignments hold for it only.
    */
-  analyzeCommand(cmd: SimpleCommand): void {
+  analyzeCommand(cmd: SimpleCommand, chain: readonly Subshell[] = cmd.subshells): void {
+    for (const compound of cmd.opens) {
+      this.applied.add(compound);
+      this.redirect(compound.redirects, chain);
+    }
     // What feeds it, a compound command's redirections included, is expanded before anything in it runs.
     const stdin = this.tracker.stdinOf(cmd);
     const stdinFed = stdin.fed;
@@ -806,20 +817,7 @@ class Analyzer implements ExpansionScope {
     }
 
     const from = this.paths.length;
-    const stdout: Source[] = [];
-    for (const r of cmd.redirects) {
-      if (r.kind !== 'file') continue;
-      const access: Access = r.op === '<' ? 'read' : 'write';
-      for (const target of this.resolveWord(r.target)) {
-        if (target.kind === 'unknown') {
-          this.unresolvable(`it redirects to ${target.raw}, a path from a variable or substitution`);
-          continue;
-        }
-        this.addPath(target, access, true);
-        const abs = this.toAbs(target.text);
-        if (access === 'write' && r.fd !== 2 && abs !== null && !isHarmlessDevice(abs)) stdout.push({ raw: target.raw, abs });
-      }
-    }
+    const stdout = cmd.closes && this.applied.has(cmd.closes) ? [] : this.redirect(cmd.redirects, chain);
     const outer = this.scope;
     const scope: CommandScope | null = bare ? null : new Map();
     this.scope = scope;
@@ -834,6 +832,43 @@ class Analyzer implements ExpansionScope {
     const reads = this.paths.slice(from).filter((p) => p.access === 'read' && !p.quiet);
     const sources = [...reads.map(({ raw, abs }) => ({ raw, abs })), ...stdin.sources];
     this.tracker.record(cmd, run, sources, stdout);
+  }
+
+  /**
+   * Redirections, in order, in the shell `chain` is in: a file one is a path,
+   * and a heredoc's substitutions run where bash expands its body. Returns the
+   * files the command's stdout goes to.
+   */
+  private redirect(redirects: readonly Redirect[], chain: readonly Subshell[]): Source[] {
+    const stdout: Source[] = [];
+    for (const r of redirects) {
+      if (r.kind === 'heredoc') this.heredocCommands(r.doc, chain);
+      if (r.kind !== 'file') continue;
+      const access: Access = r.op === '<' ? 'read' : 'write';
+      for (const target of this.resolveWord(r.target)) {
+        if (target.kind === 'unknown') {
+          this.unresolvable(`it redirects to ${target.raw}, a path from a variable or substitution`);
+          continue;
+        }
+        this.addPath(target, access, true);
+        const abs = this.toAbs(target.text);
+        if (access === 'write' && r.fd !== 2 && abs !== null && !isHarmlessDevice(abs)) stdout.push({ raw: target.raw, abs });
+      }
+    }
+    return stdout;
+  }
+
+  /** The substitutions of a heredoc's body, each in its subshell inside the shell of the command that owns the heredoc. */
+  private heredocCommands(doc: Heredoc, chain: readonly Subshell[]): void {
+    if (doc.commands.length === 0) return;
+    const { stdin } = this;
+    for (const cmd of doc.commands) {
+      const inner = [...chain, ...cmd.subshells];
+      this.enterSubshells(inner);
+      this.analyzeCommand(cmd, inner);
+    }
+    this.enterSubshells(chain);
+    this.stdin = stdin;
   }
 
   /**
