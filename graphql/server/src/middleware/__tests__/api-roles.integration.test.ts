@@ -101,6 +101,22 @@ describe('API role validation SQL', () => {
     expect(await validate()).toEqual([]);
   });
 
+  it.each([true, false])('checks inherited ownership after SET ROLE (bridge inherits owner: %s)', async (inherits) => {
+    const bridge = `${role}_bridge`;
+    await createOwnedTable(schema, false, parent);
+    await pg.query(`CREATE ROLE ${quote(bridge)} NOLOGIN NOSUPERUSER NOBYPASSRLS;
+      GRANT ${quote(bridge)} TO ${quote(role)} WITH INHERIT FALSE, SET TRUE;
+      GRANT ${quote(parent)} TO ${quote(bridge)} WITH INHERIT ${inherits ? 'TRUE' : 'FALSE'}, SET FALSE`);
+    const { rows } = await pg.query(
+      `SELECT pg_has_role($1::name, $2::name, 'USAGE') AS inherited, pg_has_role($1::name, $2::name, 'SET') AS settable`,
+      [role, parent]
+    );
+    expect(rows).toEqual([{ inherited: false, settable: false }]);
+    expect(await validate()).toEqual(inherits
+      ? [{ rolname: role, reason: 'owner of served RLS table' }]
+      : []);
+  });
+
   it('accepts the owner when FORCE RLS is enabled', async () => {
     await createOwnedTable(schema, true);
     expect(await validate()).toEqual([]);
