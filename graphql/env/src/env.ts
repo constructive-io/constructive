@@ -15,6 +15,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   const {
     GRAPHILE_SCHEMA,
     GRAPHILE_EXPLAIN,
+    GRAPHILE_GRAPHIQL,
     GRAPHILE_QUERY_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATIONS_CACHE_MAX_LENGTH,
     GRAPHILE_OPERATION_PLANS_CACHE_MAX_LENGTH,
@@ -48,6 +49,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
   // Keep this function as a partial env-override parser. SMS runtime defaults
   // belong to the consuming application; injecting them here would incorrectly
   // let an absent env var overwrite pgpm.json or consumer-specific values.
+  const graphiql = parseEnvBoolean(GRAPHILE_GRAPHIQL);
   const smsRequestTimeoutMs = parseEnvNumber(SMS_REQUEST_TIMEOUT_MS);
   const smsDryRun = parseEnvBoolean(SEND_SMS_DRY_RUN);
   const hasGrafastCacheLimits = [
@@ -89,6 +91,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
         })
       }),
       ...(GRAPHILE_EXPLAIN && { explain: parseEnvBoolean(GRAPHILE_EXPLAIN) }),
+      ...(graphiql !== undefined && { graphiql }),
       ...(GRAPHILE_SCHEMA && {
         schema: GRAPHILE_SCHEMA.includes(',')
           ? GRAPHILE_SCHEMA.split(',').map(s => s.trim())

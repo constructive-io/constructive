@@ -121,7 +121,7 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 ## Routes
 
 - `GET /healthz` -> health check
-- `GET /graphiql` -> GraphiQL UI
+- `GET /graphiql` -> GraphiQL UI (disabled by default when `NODE_ENV=production`; override with `GRAPHILE_GRAPHIQL`)
 - `GET /graphql` / `POST /graphql` -> GraphQL endpoint
 - `POST /flush` -> clears cached Graphile schema for the current API; mounted only when `API_FLUSH_TOKEN` is set, and requires `Authorization: Bearer $API_FLUSH_TOKEN`. Without the variable the route is not served (404) — operators deploying a schema-cache flush must set it on the server and on every caller. The `LISTEN/NOTIFY` invalidation path is unaffected.
 - `GET /debug/memory` -> memory/process/Graphile debug snapshot when observability is enabled
@@ -163,6 +163,7 @@ Configuration is merged from defaults, config files, and env vars via `@construc
 | `PGPASSWORD`                   | Postgres password                     | `password`                                                    |
 | `PGDATABASE`                   | Postgres database                     | `postgres`                                                    |
 | `GRAPHILE_SCHEMA`              | Comma-separated schemas to expose     | empty                                                         |
+| `GRAPHILE_GRAPHIQL`            | Serve `/graphiql` UI and static assets | `false` when `NODE_ENV=production`, `true` otherwise         |
 | `FEATURES_SIMPLE_INFLECTION`   | Enable simple inflection              | `true`                                                        |
 | `FEATURES_OPPOSITE_BASE_NAMES` | Enable opposite base names            | `true`                                                        |
 | `FEATURES_POSTGIS`             | Enable PostGIS support                | `true`                                                        |

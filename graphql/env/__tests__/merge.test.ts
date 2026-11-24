@@ -305,4 +305,30 @@ describe('getEnvOptions', () => {
       dryRun: true
     });
   });
+
+  it('parses GRAPHILE_GRAPHIQL boolean overrides and leaves unset values undefined', () => {
+    expect(getGraphQLEnvVars({}).graphile?.graphiql).toBeUndefined();
+    expect(getGraphQLEnvVars({ GRAPHILE_GRAPHIQL: '' }).graphile?.graphiql).toBeUndefined();
+    expect(getGraphQLEnvVars({ GRAPHILE_GRAPHIQL: 'false' }).graphile?.graphiql).toBe(false);
+    expect(getGraphQLEnvVars({ GRAPHILE_GRAPHIQL: '0' }).graphile?.graphiql).toBe(false);
+    expect(getGraphQLEnvVars({ GRAPHILE_GRAPHIQL: 'true' }).graphile?.graphiql).toBe(true);
+    expect(getGraphQLEnvVars({ GRAPHILE_GRAPHIQL: '1' }).graphile?.graphiql).toBe(true);
+  });
+
+  it('honors config, env, and runtime override priority for graphile.graphiql', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'graphql-env-graphiql-'));
+    writeConfig(tempDir, {
+      graphile: {
+        graphiql: false
+      }
+    });
+
+    expect(getEnvOptions({}, tempDir, {}).graphile?.graphiql).toBe(false);
+    expect(
+      getEnvOptions({}, tempDir, { GRAPHILE_GRAPHIQL: 'true' }).graphile?.graphiql
+    ).toBe(true);
+    expect(
+      getEnvOptions({ graphile: { graphiql: false } }, tempDir, { GRAPHILE_GRAPHIQL: 'true' }).graphile?.graphiql
+    ).toBe(false);
+  });
 });
