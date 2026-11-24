@@ -24,6 +24,7 @@ import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
 import { discoverStoragePlanes, uploadSurfaceNames } from 'graphile-storage-registry';
+import { GraphQLError } from 'graphql';
 import { checkTypeAgreement } from 'mime-bytes';
 
 import { validateCustomKey } from './custom-key';
@@ -36,6 +37,10 @@ import { getBucketConfig, loadAllStorageModules, resolveStorageConfigFromCodec }
 import type { BucketConfig,PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:plugin');
+
+const databaseAccessDenied = () => new GraphQLError('DATABASE_ACCESS_DENIED', {
+  extensions: { code: 'DATABASE_ACCESS_DENIED' }
+});
 
 // --- Protocol-level constants (not configurable) ---
 
@@ -304,7 +309,7 @@ export function createPresignedUrlPlugin(
                           hasDatabaseId, vals.databaseId != null,
                         ),
                       );
-                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
+                      if (!bucket && vals.databaseId != null) throw databaseAccessDenied();
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // The reconciler records the coordinate; consumers never
@@ -433,7 +438,7 @@ export function createPresignedUrlPlugin(
                           hasDatabaseId, vals.databaseId != null,
                         ),
                       );
-                      if (!bucket && vals.databaseId != null) throw new Error('DATABASE_ACCESS_DENIED');
+                      if (!bucket && vals.databaseId != null) throw databaseAccessDenied();
                       if (!bucket) throw new Error('BUCKET_NOT_FOUND');
 
                       // Enforce bulk upload limits

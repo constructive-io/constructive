@@ -102,6 +102,7 @@ describe('uploadFile databaseId selector', () => {
     const res = await upload('alice-token', databaseB, 'foreign.png');
     expect(res.body.data?.uploadFile ?? null).toBeNull();
     expect(res.body.errors?.[0]?.message).toBe('DATABASE_ACCESS_DENIED');
+    expect(res.body.errors?.[0]?.extensions?.code).toBe('DATABASE_ACCESS_DENIED');
     const rows = await pg.any(`SELECT id FROM "${schema}".files WHERE database_id = $1`, [databaseB]);
     expect(rows).toEqual([]);
   });

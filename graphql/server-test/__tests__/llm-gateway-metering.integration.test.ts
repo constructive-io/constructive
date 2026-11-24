@@ -327,7 +327,14 @@ describe('server-side embeddings are recorded by the gateway', () => {
     });
 
     expect(res.body.errors).toHaveLength(1);
-    expect(res.body.errors[0].message).toMatch(/gateway embeddings failed: 503/);
+    expect(res.body.errors[0]).toMatchObject({
+      message: 'An unexpected error occurred.',
+      extensions: {
+        code: 'INTERNAL_SERVER_ERROR',
+        class: 'internal',
+        errorId: expect.stringMatching(/^[0-9a-f]{16}$/)
+      }
+    });
     expect(modelCalls.map((c) => c.path)).toEqual(['/api/embed']);
     expect(recorded).toHaveLength(1);
     expect(recorded[0]).toMatchObject({

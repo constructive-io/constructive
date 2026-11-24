@@ -13,7 +13,7 @@
 
 import type { ExecutableStep, FieldArgs } from 'grafast';
 import { access, ConstantStep, context, lambda, object } from 'grafast';
-import type { GraphQLInputType, GraphQLSchema } from 'graphql';
+import { GraphQLError, type GraphQLInputType, type GraphQLSchema } from 'graphql';
 
 import type { LlmRequestScope } from './embedder';
 import { llmConfigStore, resolveRequestScope } from './embedder';
@@ -194,13 +194,15 @@ export function createEmbedIndex(graphql: any) {
       const sentText = typeof text === 'string';
       const hasText = sentText && text.trim().length > 0;
       if (hasVector && sentText) {
-        throw new Error(
-          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`
+        throw new GraphQLError(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
         );
       }
       if (!hasVector && !hasText) {
-        throw new Error(
-          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`
+        throw new GraphQLError(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
         );
       }
       if (hasVector) return;
@@ -267,15 +269,17 @@ export function createEmbedIndex(graphql: any) {
       const hasVector = isNonEmptyVector(value[rule.into]);
       const hasText = typeof text === 'string';
       if (hasVector && hasText) {
-        throw new Error(
-          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`
+        throw new GraphQLError(
+          `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`, not both.`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
         );
       }
       if (hasVector) return;
       if (!hasText) {
         if (rule.required) {
-          throw new Error(
-            `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`
+          throw new GraphQLError(
+            `${typeName}: provide exactly one of \`${rule.into}\` or \`${fieldName}\`; neither was given.`,
+            { extensions: { code: 'BAD_USER_INPUT' } }
           );
         }
         return;

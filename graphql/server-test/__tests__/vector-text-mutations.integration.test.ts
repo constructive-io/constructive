@@ -183,6 +183,7 @@ describe('{column}Text companions over HTTP: vector or text', () => {
 
     expect(res.body.errors).toHaveLength(1);
     expect(res.body.errors[0].message).toMatch(EXACTLY_ONE);
+    expect(res.body.errors[0].extensions.code).toBe('BAD_USER_INPUT');
     expect(res.body.errors[0].message).toMatch(/not both/);
     expect(await storedVector('articles', 'both')).toBeNull();
     expect(embedCalls).toEqual([]);

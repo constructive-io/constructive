@@ -14,6 +14,12 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  DATABASE_ACCESS_DENIED: defineError({
+    code: 'DATABASE_ACCESS_DENIED',
+    class: 'public',
+    http: 403,
+    message: 'You do not have access to that database.'
+  }),
   STORAGE_BUCKET_NOT_RECONCILED: defineError({
     code: 'STORAGE_BUCKET_NOT_RECONCILED',
     class: 'public',
