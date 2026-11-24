@@ -308,7 +308,9 @@ const rows: Row[] = [
   ["unset HOME; bash -c 'cd; touch .pi/ext.js'", 'deny', 'deny'],
   // 36. a tilde the two bashes read differently makes a variable unknown, which asks where it is used, not where it is set
   ['HOME=/tmp; F=~/x; cat src/config.ts', 'allow', 'allow'],
-  ['HOME=/tmp; F=~/x; cat "$F"', 'ask', 'ask', 'unresolvable-path']
+  ['HOME=/tmp; F=~/x; cat "$F"', 'ask', 'ask', 'unresolvable-path'],
+  // 37. an env argument from a variable may be -C before an -S string too
+  ["env \"$X\" -S 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {

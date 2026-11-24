@@ -268,7 +268,9 @@ function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
  * env's arguments, read as env reads them: `-S` splits its string into words
  * that env reads as arguments again, before the ones after it, and each `-C`
  * moves by its repeat rule (the last one counts, from the dir env started in).
- * Returns the words from its command on.
+ * An argument from a variable before an `-S` may be `-C dir` or `-S string`
+ * too. Each pass after a split reads its words again, so they are charged to
+ * the budget. Returns the words from its command on.
  */
 function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: Arg[] } {
   const start = analyzer.cwdNow;
@@ -276,20 +278,18 @@ function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: 
   for (;;) {
     const read = readArgs(ENV, words);
     const split = read.options.find((o) => isOption(o, '-S', '--split-string'));
+    const at = split ? words.indexOf(split.arg) : words.length;
     for (const option of read.options) {
       if (option === split) break;
       const moves = dirSpecOf(option);
       if (moves && option.value) analyzer.moveForOneCommand(scope, movedBy(analyzer, moves, option.value, analyzer.cwdNow, start));
     }
-    if (!split) {
-      if (read.unknown.length > 0) {
-        // It may be `-C dir` or `-S string`.
-        analyzer.moveForOneCommand(scope, { kind: 'unknown' });
-        analyzer.dynamic(`it passes env ${read.unknown[0].raw}, a value from a variable that may be an option that runs a string`);
-      }
-      return { argv: words.slice(read.next) };
+    const hidden = read.unknown.find((u) => words.indexOf(u) < at);
+    if (hidden) {
+      analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+      analyzer.dynamic(`it passes env ${hidden.raw}, a value from a variable that may be an option that runs a string`);
     }
-    const at = words.indexOf(split.arg);
+    if (!split) return { argv: words.slice(read.next) };
     const after = words.slice(split.value !== undefined && split.value === words[at + 1] ? at + 2 : at + 1);
     const text = textOf(split.value);
     const parts = text === undefined ? null : envSplit(text);
@@ -299,6 +299,7 @@ function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: 
       return { argv: [] };
     }
     words = [...parts.map((w) => literalArg(w, split.arg.raw)), ...after];
+    if (!analyzer.textBudget.takeWords(words.length)) return { argv: [] };
   }
 }
 

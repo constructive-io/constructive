@@ -56,6 +56,12 @@ describe('expansions stay within one budget per command', () => {
     expect(heapMb).toBeLessThan(256);
   });
 
+  it('charges the words each env -S pass reads again, so a chain of -S stops at the budget', async () => {
+    const { d, ms } = await bounded(`env ${'-S '.repeat(8000)}true`);
+    expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
+    expect(ms).toBeLessThan(1000);
+  });
+
   it('charges a trap action each time a subshell that keeps it reads it again', async () => {
     const { d, ms } = await bounded(`trap '${'true;'.repeat(4000)}' DEBUG; ${'(:);'.repeat(4000)}`);
     expect(d.decision).toBe('ask');
