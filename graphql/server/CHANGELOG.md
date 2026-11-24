@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.13](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.12...@constructive-io/graphql-server@5.36.13) (2026-11-24)
+
+### Bug Fixes
+
+- harden and modularize API role validation ([b8e65d4](https://github.com/constructive-io/constructive/commit/b8e65d48e36bbf1f581da47c3fb02e3db6720e08))
+- reject SET-accessible served RLS table ownership ([50a8fce](https://github.com/constructive-io/constructive/commit/50a8fce85744e4cf105b7965805372af1e864e86))
+- validate inherited ownership after role switching ([5bfbb13](https://github.com/constructive-io/constructive/commit/5bfbb13e87c281cb6b98e558e62ba7e9b3870d40))
+
 ## [5.36.12](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.11...@constructive-io/graphql-server@5.36.12) (2026-11-24)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
