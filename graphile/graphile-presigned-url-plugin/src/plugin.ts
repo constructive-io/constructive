@@ -656,6 +656,11 @@ export async function processSingleFile(
   // collecting an object a document still points at.
   const projectFile = (fileId: string, key: string): FileProjection =>
     buildFileProjection({ id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename });
+  const projectStoredFile = (row: { id: string; key: string; mime_type: string; size: string | number; filename: string | null }): FileProjection =>
+    buildFileProjection({
+      id: row.id, key: row.key, bucketId: bucket.id,
+      mime: row.mime_type, size: Number(row.size), filename: row.filename,
+    });
 
   const signUpload = async (fileId: string, key: string, mime: string, bytes: number, ttl: number) => ({
     uploadUrl: await generatePresignedPutUrl(s3ForDb, key, mime, bytes, ttl, contentHash, fileId),
@@ -698,17 +703,14 @@ export async function processSingleFile(
           expiresAt: new Date(deadline).toISOString(),
           fileId: row.id, key: row.key, logicalKey,
           deduplicated: false, pending: false,
-          file: buildFileProjection({
-            id: row.id, key: row.key, bucketId: bucket.id,
-            mime: row.mime_type, size: Number(row.size), filename: row.filename,
-          }),
+          file: projectStoredFile(row),
         };
       }
       return {
         uploadUrl: null as string | null, uploadHeaders: null as Record<string, string> | null,
         fileId: row.id, key: row.key, logicalKey,
         deduplicated: row.status !== 'requested', pending: row.status === 'requested',
-        expiresAt: null as string | null, file: projectFile(row.id, row.key),
+        expiresAt: null as string | null, file: projectStoredFile(row),
       };
     }
     if (siteUpload.checkOnly) return { logicalKey, deduplicated: false, pending: false };
@@ -718,7 +720,7 @@ export async function processSingleFile(
   // It issues no PUT URL. Pending/rejected attempts are not reused or deleted:
   // each retry gets its own object and lifecycle, including its expiry/GC.
   const existingResult = await txClient.query({
-    text: `SELECT id, key
+    text: `SELECT id, key, mime_type, size, filename
        FROM ${storageConfig.filesQualifiedName}
        WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
          AND NOT logical_key_retired
@@ -737,7 +739,7 @@ export async function processSingleFile(
       logicalKey,
       deduplicated: true,
       expiresAt: null as string | null,
-      file: projectFile(existing.id as string, existing.key as string),
+      file: projectStoredFile(existing),
     };
   }
 

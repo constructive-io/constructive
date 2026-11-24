@@ -91,7 +91,9 @@ function fakeTx(rowKey: string, status: string, retired = false) {
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID, key: `originals/${NEW_FILE_ID}` }] };
       if (/^SELECT id/.test(opts.text)) {
         if (retired && /AND NOT logical_key_retired/.test(opts.text)) return { rows: [] };
-        return { rows: opts.values[0] === rowKey && ['uploaded', 'processed'].includes(status) ? [{ id: OLD_FILE_ID, key: `originals/${OLD_FILE_ID}` }] : [] };
+        const confirmedOnly = opts.text.includes("status IN ('uploaded', 'processed')");
+        return { rows: opts.values[0] === rowKey && (!confirmedOnly || ['uploaded', 'processed'].includes(status))
+          ? [{ id: OLD_FILE_ID, key: `originals/${OLD_FILE_ID}`, mime_type: 'text/plain', size: '32', filename: 'original.txt' }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
       throw new Error(`unexpected query: ${opts.text}`);
@@ -140,6 +142,7 @@ describe.each([
     const result = await upload(txClient, s3, customKey);
 
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, deduplicated: true, uploadUrl: null });
+    expect(result.file).toMatchObject({ mime: 'text/plain', size: 32, filename: 'original.txt' });
     expect(heads(s3)).toEqual([]);
     expect(result.file).not.toHaveProperty('url');
     expect(queries).toHaveLength(1);
@@ -204,6 +207,24 @@ describe('site release requested before the deploy was canceled', () => {
   it('does not sign during a confirmation-only poll', async () => {
     const { result } = await retry(true);
     expect(result).toMatchObject({ fileId: OLD_FILE_ID, pending: true, uploadUrl: null });
+    expect(generatePresignedPutUrl).not.toHaveBeenCalled();
+  });
+
+  it('uses the confirmed release row metadata when reusing a slot', async () => {
+    const key = `originals/${OLD_FILE_ID}`;
+    const txClient = {
+      query: jest.fn().mockResolvedValueOnce({
+        rows: [{ id: OLD_FILE_ID, key, status: 'uploaded', mime_type: 'text/plain',
+          size: '32', filename: 'original.txt' }],
+      }),
+    };
+
+    const result = await processSingleFile(options, txClient, storageConfig(), 'db', bucket, fakeS3(),
+      { contentHash: HASH, contentType: 'text/html', size: 16, filename: SITE_KEY },
+      { release: true, checkOnly: false });
+
+    expect(result).toMatchObject({ deduplicated: true, uploadUrl: null,
+      file: { id: OLD_FILE_ID, key, mime: 'text/plain', size: 32, filename: 'original.txt' } });
     expect(generatePresignedPutUrl).not.toHaveBeenCalled();
   });
 

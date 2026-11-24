@@ -43,6 +43,18 @@ const deployOptions = (server: ReturnType<typeof createMockServer>) => ({
   source: dist,
 });
 
+test('the mock reports an absent release asset without issuing a PUT URL', async () => {
+  const server = createMockServer();
+  const contentHash = 'a'.repeat(64);
+  const result = await server.api('mutation { uploadSiteFiles(input: $input) { files { key } } }', {
+    input: { checkOnly: true, files: [{ contentHash }] },
+  });
+
+  expect(result.uploadSiteFiles).toEqual({
+    files: [{ logicalKey: `cas/sha256/${contentHash}`, key: null, deduplicated: false, pending: false }],
+  });
+});
+
 test('builds every page, the stylesheet and a 404', async () => {
   const files = await buildSite(content, dist);
   expect(files).toEqual([

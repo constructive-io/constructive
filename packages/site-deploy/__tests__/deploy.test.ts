@@ -425,6 +425,25 @@ describe('deploySite', () => {
     expect(server.calls).toHaveLength(0);
   });
 
+  it('does not write the manifest when aborted during the final status request', async () => {
+    const server = createMockServer();
+    const controller = new AbortController();
+    const api: GraphQLExecutor = async (query, variables) => {
+      const response = await server.api(query, variables);
+      if ((variables.input as { checkOnly?: boolean } | undefined)?.checkOnly) {
+        controller.abort();
+      }
+      return response;
+    };
+
+    await expect(deploySite({
+      ...base, api, putObject: server.putObject, source: build, signal: controller.signal, publish: true,
+    })).rejects.toMatchObject({ code: 'ABORTED' });
+    expect(server.puts).toHaveLength(build.length);
+    expect(server.release).toBeNull();
+    expect(server.activeCommitId).toBeNull();
+  });
+
   it('talks to the platform surface when asked', async () => {
     const server = createMockServer();
     const seen: string[] = [];

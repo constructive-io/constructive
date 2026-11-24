@@ -66,7 +66,9 @@ function fakeTx(existingHash: string, deletable = true, existingStatus = 'upload
       if (/^SELECT id, (?:key|status)/.test(opts.text) && !/record_file\(/.test(opts.text)) {
         // The probe is by (key, bucket, hash): a row carrying other bytes is not seen.
         const probedHash = opts.values[2];
-        return { rows: probedHash === existingHash && ['uploaded', 'processed'].includes(existingStatus) ? [{ id: OLD_FILE_ID, key: OLD_KEY, status: existingStatus }] : [] };
+        const confirmedOnly = opts.text.includes("status IN ('uploaded', 'processed')");
+        return { rows: probedHash === existingHash && (!confirmedOnly || ['uploaded', 'processed'].includes(existingStatus))
+          ? [{ id: OLD_FILE_ID, key: OLD_KEY, status: existingStatus, mime_type: 'text/html', size: '16', filename: KEY }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) {
         return { rows: deletable ? [{ id: OLD_FILE_ID }] : [] };

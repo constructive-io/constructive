@@ -179,6 +179,7 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
     },
   });
   await waitForConfirmation([...diff.missing.map(({ file }) => file), ...diff.pending], uploadOptions);
+  throwIfAborted(signal);
 
   // 5. Write the manifest — this is the commit.
   const release = existing
