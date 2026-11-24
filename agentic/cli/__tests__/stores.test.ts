@@ -4,8 +4,11 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { AccountSession, clearSession, loadSession, saveSession } from '../src/account-store';
-import { BACKEND_PRESETS, loadBackendConfig, saveBackendConfig } from '../src/backend-store';
+import { backendFromApiEndpoint, loadBackendConfig, saveBackendConfig } from '../src/backend-store';
 import { loadConfig } from '../src/config';
+
+const LOCAL = backendFromApiEndpoint('http://api.localhost:3000/graphql');
+const REMOTE = backendFromApiEndpoint('https://api.example.com/graphql');
 
 let home: string;
 
@@ -28,11 +31,17 @@ const session: AccountSession = {
   signedInAt: 1754000000000
 };
 
-const store = (): ConfigStore => loadConfig(home).store;
+const store = (): ConfigStore => {
+  const s = loadConfig(home).store;
+  if (!s.getCurrentContext()) saveBackendConfig(s, LOCAL);
+  return s;
+};
+const bareStore = (): ConfigStore => loadConfig(home).store;
 
 describe('config', () => {
   it('shares the constructive stash rather than an agent-specific directory', () => {
     const config = loadConfig(home);
+    saveBackendConfig(config.store, LOCAL);
     expect(fs.existsSync(path.join(config.dirs.stash.config, 'agent', 'account.json'))).toBe(false);
     saveSession(config.store, session);
     // credentials land in the shared stash root, not an agent-only subdirectory
@@ -49,18 +58,18 @@ describe('account-store', () => {
 
   it('files the session under the active backend context, keeping backends independent', () => {
     const s = store();
-    saveBackendConfig(s, BACKEND_PRESETS.devnet);
+    saveBackendConfig(s, REMOTE);
     saveSession(s, session);
-    saveBackendConfig(s, BACKEND_PRESETS.localnet);
+    saveBackendConfig(s, LOCAL);
     expect(loadSession(s)).toBeNull();
-    saveBackendConfig(s, BACKEND_PRESETS.devnet);
+    saveBackendConfig(s, REMOTE);
     expect(loadSession(s)).toEqual(session);
   });
 
-  it('defaults to the localnet context when no backend was chosen yet', () => {
-    const s = store();
-    saveSession(s, session);
-    expect(s.getCurrentContext()?.name).toBe('localnet');
+  it('refuses to file a session before a backend is chosen', () => {
+    const s = bareStore();
+    expect(() => saveSession(s, session)).toThrow('No backend chosen');
+    expect(s.getCurrentContext()).toBeNull();
   });
 
   it('writes credentials with mode 0600', () => {
@@ -84,31 +93,33 @@ describe('account-store', () => {
 });
 
 describe('backend-store', () => {
-  it('ships localnet and devnet presets with all three endpoints', () => {
-    for (const preset of Object.values(BACKEND_PRESETS)) {
-      expect(preset.apiEndpoint).toMatch(/\/graphql$/);
-      expect(preset.authEndpoint).toMatch(/\/graphql$/);
-      expect(preset.modulesEndpoint).toMatch(/\/graphql$/);
-    }
-    expect(BACKEND_PRESETS.localnet.authEndpoint).toBe('http://auth.localhost:3000/graphql');
-    expect(BACKEND_PRESETS.devnet.authEndpoint).toBe('https://auth.launchql.dev/graphql');
-  });
-
-  it('round-trips a backend config and returns null before one is chosen', () => {
-    const s = store();
-    expect(loadBackendConfig(s)).toBeNull();
-    expect(saveBackendConfig(s, BACKEND_PRESETS.devnet)).toBe('devnet');
-    expect(loadBackendConfig(s)).toEqual(BACKEND_PRESETS.devnet);
-  });
-
-  it('files endpoints matching no preset under the custom context', () => {
-    const s = store();
-    const custom = {
+  it('derives all five planes from the api endpoint the user names', () => {
+    expect(REMOTE).toEqual({
       apiEndpoint: 'https://api.example.com/graphql',
       authEndpoint: 'https://auth.example.com/graphql',
-      modulesEndpoint: 'https://modules.example.com/graphql'
-    };
-    expect(saveBackendConfig(s, custom)).toBe('custom');
-    expect(loadBackendConfig(s)).toEqual(custom);
+      modulesEndpoint: 'https://modules.example.com/graphql',
+      agentEndpoint: 'https://agent.example.com/graphql',
+      computeEndpoint: 'https://compute.example.com/graphql'
+    });
+    expect(() => backendFromApiEndpoint('not a url')).toThrow('Invalid API endpoint URL');
+  });
+
+  it('round-trips all five planes and returns null before one is chosen', () => {
+    const s = bareStore();
+    expect(loadBackendConfig(s)).toBeNull();
+    expect(saveBackendConfig(s, REMOTE)).toBe('example.com');
+    expect(loadBackendConfig(s)).toEqual(REMOTE);
+    expect(saveBackendConfig(s, LOCAL)).toBe('localhost-3000');
+    expect(loadBackendConfig(s)).toEqual(LOCAL);
+  });
+
+  it('treats a context missing a plane as no backend rather than guessing one', () => {
+    const s = store();
+    s.createContext('partial', {
+      endpoint: REMOTE.apiEndpoint,
+      targets: { api: { endpoint: REMOTE.apiEndpoint }, auth: { endpoint: REMOTE.authEndpoint } }
+    });
+    s.setCurrentContext('partial');
+    expect(loadBackendConfig(s)).toBeNull();
   });
 });

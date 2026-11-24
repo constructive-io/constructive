@@ -20,7 +20,17 @@ export type HostAccount = {
 export type HostBackendConfig = {
   apiEndpoint?: string;
   modulesEndpoint?: string;
+  agentEndpoint?: string;
+  computeEndpoint?: string;
 };
+
+/**
+ * The tools never default to a backend: with no configured endpoint they fail
+ * and say so, rather than sending the account credential to a guessed host.
+ */
+export function noBackendReason(hint?: string): string {
+  return `No Constructive backend is configured. ${hint ?? 'Choose a backend in the app, then retry.'}`;
+}
 
 export type ActiveDataToken = {
   token: string;

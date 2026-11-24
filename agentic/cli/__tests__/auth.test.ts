@@ -11,6 +11,7 @@ jest.mock('@constructive-io/sdk', () => ({
 
 import { loadSession, saveSession } from '../src/account-store';
 import { refreshApiKeyIfNeeded, signIn, signOut } from '../src/auth';
+import { backendFromApiEndpoint, saveBackendConfig } from '../src/backend-store';
 import { loadConfig } from '../src/config';
 
 const AUTH_ENDPOINT = 'http://auth.localhost:3000/graphql';
@@ -24,6 +25,7 @@ let store: ConfigStore;
 beforeEach(() => {
   home = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-cli-auth-'));
   store = loadConfig(home).store;
+  saveBackendConfig(store, backendFromApiEndpoint('http://api.localhost:3000/graphql'));
   createClient.mockReset();
 });
 

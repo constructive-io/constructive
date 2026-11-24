@@ -5,10 +5,7 @@ import { api, auth, modules } from '@constructive-io/sdk';
 import { parseDotenv } from '12factor-env/dotenv';
 
 import { probeDatabase, type UnreachableCause } from './db-probe';
-import { DEFAULT_DATA_TOKEN_SKEW_MS, getHost, reprovisionAdvice } from './host';
-
-const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
-const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
+import { DEFAULT_DATA_TOKEN_SKEW_MS, getHost, noBackendReason, reprovisionAdvice } from './host';
 
 export type ApiClient = ReturnType<typeof api.createClient>;
 export type ModulesClient = ReturnType<typeof modules.createClient>;
@@ -33,6 +30,7 @@ export type ProjectContext = {
 
 export type ProjectContextFailureCode =
   | 'no-env'
+  | 'no-backend'
   | 'missing-credentials'
   | 'db-missing'
   | 'db-suspended'
@@ -153,8 +151,8 @@ export async function resolveProjectContext(
   // store (environment-aware) so app + harness share one endpoint source.
   const host = getHost();
   const backend = host.backendConfig();
-  const apiEndpoint = env.API_ENDPOINT || backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
-  const modulesEndpoint = env.MODULES_ENDPOINT || backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
+  const controlApiEndpoint = backend?.apiEndpoint;
+  const controlModulesEndpoint = backend?.modulesEndpoint;
 
   // The whole control plane (binding probe, schema resolution, blueprint/schema
   // tools) authenticates with the ACCOUNT bearer: the platform api rejects
@@ -162,8 +160,6 @@ export async function resolveProjectContext(
   // surfaces. The source's key stays in the context for the data plane only.
   // The bearer is only ever sent to the app-configured backend — never a
   // source-pinned endpoint, which an untrusted cloned project controls.
-  const controlApiEndpoint = backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
-  const controlModulesEndpoint = backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
   const account = host.account();
   const accountBearer = account?.apiKey ?? account?.accessToken;
   if (!accountBearer) {
@@ -175,6 +171,11 @@ export async function resolveProjectContext(
       code: 'missing-credentials',
     };
   }
+  if (!controlApiEndpoint || !controlModulesEndpoint) {
+    return { context: null, reason: noBackendReason(host.signInHint), code: 'no-backend' };
+  }
+  const apiEndpoint = env.API_ENDPOINT || controlApiEndpoint;
+  const modulesEndpoint = env.MODULES_ENDPOINT || controlModulesEndpoint;
   const controlHeaders = { Authorization: `Bearer ${accountBearer}` };
 
   const apiClient = api.createClient({ endpoint: controlApiEndpoint, headers: controlHeaders });
@@ -345,11 +346,9 @@ export async function resolveOrgName(ownerId: string): Promise<string | undefine
     const account = host.account();
     const bearer = account?.apiKey ?? account?.accessToken;
     if (!bearer) return undefined;
-    const backend = host.backendConfig();
-    const authEndpoint = deriveSubdomainEndpoint(
-      backend?.apiEndpoint || DEFAULT_API_ENDPOINT,
-      'auth',
-    );
+    const apiEndpoint = host.backendConfig()?.apiEndpoint;
+    if (!apiEndpoint) return undefined;
+    const authEndpoint = deriveSubdomainEndpoint(apiEndpoint, 'auth');
     if (!authEndpoint) return undefined;
     const client = auth.createClient({
       endpoint: authEndpoint,

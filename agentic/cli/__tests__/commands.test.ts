@@ -10,9 +10,12 @@ jest.mock('../src/auth', () => ({
 
 import { AccountSession, saveSession } from '../src/account-store';
 import { signIn, signOut } from '../src/auth';
-import { BACKEND_PRESETS, loadBackendConfig, saveBackendConfig } from '../src/backend-store';
+import { backendFromApiEndpoint, loadBackendConfig, saveBackendConfig } from '../src/backend-store';
 import { login, logout, whoami } from '../src/commands';
 import { AgentCliConfig, loadConfig } from '../src/config';
+
+const LOCAL = backendFromApiEndpoint('http://api.localhost:3000/graphql');
+const REMOTE = backendFromApiEndpoint('https://api.example.com/graphql');
 
 const signInMock = signIn as jest.Mock;
 const signOutMock = signOut as jest.Mock;
@@ -53,19 +56,19 @@ afterEach(() => {
 const output = () => logs.join('\n');
 
 describe('login', () => {
-  it('signs in against a preset backend and persists the backend config', async () => {
+  it('signs in against the named API endpoint and persists all five planes', async () => {
     signInMock.mockResolvedValue(session);
 
-    await login(config, { backend: 'localnet', email: 'dev@example.com', password: 'pw' });
+    await login(config, { apiUrl: LOCAL.apiEndpoint, email: 'dev@example.com', password: 'pw' });
 
     expect(signInMock).toHaveBeenCalledWith({
       store: config.store,
-      context: 'localnet',
-      authEndpoint: BACKEND_PRESETS.localnet.authEndpoint,
+      context: 'localhost-3000',
+      authEndpoint: LOCAL.authEndpoint,
       email: 'dev@example.com',
       password: 'pw'
     });
-    expect(loadBackendConfig(config.store)).toEqual(BACKEND_PRESETS.localnet);
+    expect(loadBackendConfig(config.store)).toEqual(LOCAL);
     expect(output()).toContain('signed in as dev@example.com');
     expect(output()).toContain('cnc_li...abcd');
   });
@@ -74,7 +77,6 @@ describe('login', () => {
     signInMock.mockResolvedValue(session);
 
     await login(config, {
-      backend: 'custom',
       apiUrl: 'https://api.example.com/graphql',
       email: 'dev@example.com',
       password: 'pw'
@@ -86,13 +88,22 @@ describe('login', () => {
     expect(loadBackendConfig(config.store)).toEqual({
       apiEndpoint: 'https://api.example.com/graphql',
       authEndpoint: 'https://auth.example.com/graphql',
-      modulesEndpoint: 'https://modules.example.com/graphql'
+      modulesEndpoint: 'https://modules.example.com/graphql',
+      agentEndpoint: 'https://agent.example.com/graphql',
+      computeEndpoint: 'https://compute.example.com/graphql'
     });
+  });
+
+  it('ships no backend: with no API endpoint named it refuses before any network call', async () => {
+    await expect(login(config, { email: 'dev@example.com', password: 'pw' })).rejects.toThrow(
+      'Invalid API endpoint URL: (empty)'
+    );
+    expect(signInMock).not.toHaveBeenCalled();
   });
 
   it('rejects an invalid custom URL before any network call', async () => {
     await expect(
-      login(config, { backend: 'custom', apiUrl: 'not a url', email: 'dev@example.com', password: 'pw' })
+      login(config, { apiUrl: 'not a url', email: 'dev@example.com', password: 'pw' })
     ).rejects.toThrow('Invalid API endpoint URL');
     expect(signInMock).not.toHaveBeenCalled();
   });
@@ -100,7 +111,7 @@ describe('login', () => {
   it('warns when the session lacks an API key after sign-in', async () => {
     signInMock.mockResolvedValue({ ...session, apiKey: undefined, keyId: undefined });
 
-    await login(config, { backend: 'localnet', email: 'dev@example.com', password: 'pw' });
+    await login(config, { apiUrl: LOCAL.apiEndpoint, email: 'dev@example.com', password: 'pw' });
 
     expect(output()).toContain('API key mint failed');
   });
@@ -109,7 +120,7 @@ describe('login', () => {
     signInMock.mockRejectedValue(new Error('Invalid credentials'));
 
     await expect(
-      login(config, { backend: 'devnet', email: 'dev@example.com', password: 'bad' })
+      login(config, { apiUrl: REMOTE.apiEndpoint, email: 'dev@example.com', password: 'bad' })
     ).rejects.toThrow('Invalid credentials');
     expect(loadBackendConfig(config.store)).toBeNull();
   });
@@ -117,36 +128,43 @@ describe('login', () => {
 
 describe('logout', () => {
   it('signs out against the stored backend', async () => {
-    saveBackendConfig(config.store, BACKEND_PRESETS.devnet);
+    saveBackendConfig(config.store, REMOTE);
     signOutMock.mockResolvedValue(true);
 
     await logout(config);
 
     expect(signOutMock).toHaveBeenCalledWith({
       store: config.store,
-      authEndpoint: BACKEND_PRESETS.devnet.authEndpoint
+      authEndpoint: REMOTE.authEndpoint
     });
     expect(output()).toContain('signed out');
   });
 
   it('reports when there is no session', async () => {
+    saveBackendConfig(config.store, LOCAL);
     signOutMock.mockResolvedValue(false);
     await logout(config);
+    expect(output()).toContain('not signed in');
+  });
+
+  it('never signs out against a guessed backend when none was chosen', async () => {
+    await logout(config);
+    expect(signOutMock).not.toHaveBeenCalled();
     expect(output()).toContain('not signed in');
   });
 });
 
 describe('whoami', () => {
   it('prints the session details with a masked API key', () => {
+    saveBackendConfig(config.store, LOCAL);
     saveSession(config.store, session);
-    saveBackendConfig(config.store, BACKEND_PRESETS.localnet);
 
     whoami(config);
 
     expect(process.exitCode).toBeUndefined();
     expect(output()).toContain('signed in as dev@example.com');
     expect(output()).toContain('user id: user-1');
-    expect(output()).toContain(BACKEND_PRESETS.localnet.apiEndpoint);
+    expect(output()).toContain(LOCAL.apiEndpoint);
     expect(output()).toContain('cnc_li...abcd');
     expect(output()).not.toContain(session.apiKey);
     expect(output()).not.toContain('access-token');

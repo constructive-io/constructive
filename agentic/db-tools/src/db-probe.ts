@@ -1,7 +1,6 @@
 import { classifyBackendErrors, errorsText, type GraphQLError, postGraphQL } from './graphql-http';
-import { getHost } from './host';
+import { getHost, noBackendReason } from './host';
 
-const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 
 export type UnreachableCause = 'network' | 'server' | 'auth' | 'error';
 
@@ -137,8 +136,12 @@ export async function probeBoundDatabase(databaseId: string): Promise<DatabasePr
       detail: `No usable account credential. ${host.signInHint ?? 'Sign in to the app, then retry.'}`,
     };
   }
+  const endpoint = host.backendConfig()?.apiEndpoint;
+  if (!endpoint) {
+    return { status: 'unreachable', databaseId, cause: 'error', detail: noBackendReason(host.signInHint) };
+  }
   return probeDatabase({
-    endpoint: host.backendConfig()?.apiEndpoint || DEFAULT_API_ENDPOINT,
+    endpoint,
     bearer,
     databaseId,
     signInHint: host.signInHint,

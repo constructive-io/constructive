@@ -1,54 +1,67 @@
+import { deriveSubdomainEndpoint } from '@agentic-kit/pi';
 import { ConfigStore } from 'appstash';
 
+/** Every Constructive plane the agent talks to, one GraphQL endpoint each. */
 export interface BackendConfig {
   apiEndpoint: string;
   authEndpoint: string;
   modulesEndpoint: string;
+  agentEndpoint: string;
+  computeEndpoint: string;
 }
 
-export const BACKEND_PRESETS: Record<string, BackendConfig> = {
-  localnet: {
-    apiEndpoint: 'http://api.localhost:3000/graphql',
-    authEndpoint: 'http://auth.localhost:3000/graphql',
-    modulesEndpoint: 'http://modules.localhost:3000/graphql'
-  },
-  devnet: {
-    apiEndpoint: 'https://api.launchql.dev/graphql',
-    authEndpoint: 'https://auth.launchql.dev/graphql',
-    modulesEndpoint: 'https://modules.launchql.dev/graphql'
-  }
+const PLANES = ['api', 'auth', 'modules', 'agent', 'compute'] as const;
+type Plane = (typeof PLANES)[number];
+const KEY: Record<Plane, keyof BackendConfig> = {
+  api: 'apiEndpoint',
+  auth: 'authEndpoint',
+  modules: 'modulesEndpoint',
+  agent: 'agentEndpoint',
+  compute: 'computeEndpoint'
 };
 
-/** Context name used for endpoints that match no preset. */
-export const CUSTOM_CONTEXT = 'custom';
+/**
+ * The CLI ships no backend URLs: the user names the api endpoint, and the other
+ * planes share its host scheme (api.<apex> -> auth.<apex>, modules.<apex>, ...).
+ * Throws on anything that is not an absolute URL.
+ */
+export function backendFromApiEndpoint(apiEndpoint: string): BackendConfig {
+  const api = apiEndpoint.trim();
+  const config = { apiEndpoint: api } as BackendConfig;
+  for (const plane of PLANES) {
+    if (plane === 'api') continue;
+    const endpoint = api ? deriveSubdomainEndpoint(api, plane) : '';
+    if (!endpoint) throw new Error(`Invalid API endpoint URL: ${api || '(empty)'}`);
+    config[KEY[plane]] = endpoint;
+  }
+  return config;
+}
 
 /**
- * A chosen backend is a named context in the shared store: the preset name when
- * the endpoints match one, `custom` otherwise. Credentials hang off the context,
- * so signing in against localnet and devnet keeps two independent sessions.
+ * A chosen backend is a named context in the shared store, named after the api
+ * endpoint's apex (https://api.example.com/graphql -> example.com). Credentials
+ * hang off the context, so each backend keeps an independent session.
  */
 export function contextNameFor(config: BackendConfig): string {
-  for (const [name, preset] of Object.entries(BACKEND_PRESETS)) {
-    if (
-      preset.apiEndpoint === config.apiEndpoint &&
-      preset.authEndpoint === config.authEndpoint &&
-      preset.modulesEndpoint === config.modulesEndpoint
-    ) {
-      return name;
-    }
-  }
-  return CUSTOM_CONTEXT;
+  const { host } = new URL(config.apiEndpoint);
+  const apex = host.includes('.') ? host.slice(host.indexOf('.') + 1) : host;
+  return apex.toLowerCase().replace(/[^a-z0-9.-]+/g, '-');
 }
 
 function toBackendConfig(targets: Record<string, { endpoint: string }> | undefined): BackendConfig | null {
-  const apiEndpoint = targets?.api?.endpoint;
-  const authEndpoint = targets?.auth?.endpoint;
-  const modulesEndpoint = targets?.modules?.endpoint;
-  if (!apiEndpoint || !authEndpoint || !modulesEndpoint) return null;
-  return { apiEndpoint, authEndpoint, modulesEndpoint };
+  const config = {} as BackendConfig;
+  for (const plane of PLANES) {
+    const endpoint = targets?.[plane]?.endpoint;
+    if (!endpoint) return null;
+    config[KEY[plane]] = endpoint;
+  }
+  return config;
 }
 
-/** Endpoints of the active context, or null when no backend has been chosen. */
+/**
+ * Endpoints of the active context, or null when no backend has been chosen or
+ * the context lacks a plane: callers must fail then, never pick a default.
+ */
 export function loadBackendConfig(store: ConfigStore): BackendConfig | null {
   const ctx = store.getCurrentContext();
   if (!ctx) return null;
@@ -58,14 +71,8 @@ export function loadBackendConfig(store: ConfigStore): BackendConfig | null {
 /** Persist the endpoints as a context and make it active. */
 export function saveBackendConfig(store: ConfigStore, config: BackendConfig): string {
   const name = contextNameFor(config);
-  store.createContext(name, {
-    endpoint: config.apiEndpoint,
-    targets: {
-      api: { endpoint: config.apiEndpoint },
-      auth: { endpoint: config.authEndpoint },
-      modules: { endpoint: config.modulesEndpoint }
-    }
-  });
+  const targets = Object.fromEntries(PLANES.map((plane) => [plane, { endpoint: config[KEY[plane]] }]));
+  store.createContext(name, { endpoint: config.apiEndpoint, targets });
   store.setCurrentContext(name);
   return name;
 }
