@@ -57,13 +57,13 @@ const OBJECT_STORE_PROFILE: ObjectStoreConfig = {
   secretAccessKey: 'constructive-dev-secret',
 };
 
-function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Record<string, string> {
+function configToEnvVars(config: PgConfig, inherited: NodeJS.ProcessEnv, objectStore?: ObjectStoreConfig): Record<string, string> {
   const vars: Record<string, string> = {
-    PGHOST: config.host,
-    PGPORT: String(config.port),
-    PGUSER: config.user,
-    PGPASSWORD: config.password,
-    PGDATABASE: config.database
+    PGHOST: inherited.PGHOST ?? config.host,
+    PGPORT: inherited.PGPORT ?? String(config.port),
+    PGUSER: inherited.PGUSER ?? config.user,
+    PGPASSWORD: inherited.PGPASSWORD ?? config.password,
+    PGDATABASE: inherited.PGDATABASE ?? config.database
   };
 
   if (objectStore) {
@@ -74,16 +74,15 @@ function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Rec
   return vars;
 }
 
-function printExports(config: PgConfig, objectStore?: ObjectStoreConfig): void {
-  const envVars = configToEnvVars(config, objectStore);
+function printExports(envVars: Record<string, string>): void {
   for (const [key, value] of Object.entries(envVars)) {
-    console.log(`export ${key}=${value}`);
+    const quoted = /^[\w./:@%+,=-]*$/.test(value) ? value : "'" + value.replace(/'/g, "'\"'\"'") + "'";
+    console.log(`export ${key}=${quoted}`);
   }
 }
 
-function executeCommand(config: PgConfig, command: string, args: string[], objectStore?: ObjectStoreConfig): Promise<number> {
+function executeCommand(envVars: Record<string, string>, command: string, args: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
-    const envVars = configToEnvVars(config, objectStore);
     const env = {
       ...process.env,
       ...envVars
@@ -120,6 +119,7 @@ export default async (
     argv.rustfs === true || typeof argv.rustfs === 'string';
   const profile = useSupabase ? SUPABASE_PROFILE : DEFAULT_PROFILE;
   const objectStoreProfile = useObjectStore ? OBJECT_STORE_PROFILE : undefined;
+  const envVars = configToEnvVars(profile, useSupabase ? {} : process.env, objectStoreProfile);
 
   const knownFlags = ['--supabase', '--minio', '--rustfs'];
 
@@ -142,14 +142,14 @@ export default async (
   }
 
   if (commandArgs.length === 0) {
-    printExports(profile, objectStoreProfile);
+    printExports(envVars);
     return;
   }
 
   const [command, ...args] = commandArgs;
   
   try {
-    const exitCode = await executeCommand(profile, command, args, objectStoreProfile);
+    const exitCode = await executeCommand(envVars, command, args);
     process.exit(exitCode);
   } catch (error) {
     if (error instanceof Error) {
