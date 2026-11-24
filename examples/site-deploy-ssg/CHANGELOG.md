@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-site-deploy-ssg@0.4.6...@constructive-io/examples-site-deploy-ssg@0.5.0) (2026-11-24)
+
+### Bug Fixes
+
+- **site-deploy:** send site uploads to the site API ([737a58d](https://github.com/constructive-io/constructive/commit/737a58d059f44b31f123ff4b462faa1db762d23c))
+
+### Features
+
+- **site-deploy:** request uploads by site instead of bucket ([8acc0a4](https://github.com/constructive-io/constructive/commit/8acc0a45ee9f8d8d68bb98eb3c27500ccb936971))
+
 ## [0.4.6](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-site-deploy-ssg@0.4.5...@constructive-io/examples-site-deploy-ssg@0.4.6) (2026-11-23)
 
 **Note:** Version bump only for package @constructive-io/examples-site-deploy-ssg

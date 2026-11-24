@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.29.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.6...graphile-presigned-url-plugin@1.29.0) (2026-11-24)
+
+### Bug Fixes
+
+- reissue PUTs for releases with subsecond lifetime ([d48929e](https://github.com/constructive-io/constructive/commit/d48929eb3d87d129e11456659ddc15febfc5c699))
+- **storage:** reissue pending site release uploads ([c925675](https://github.com/constructive-io/constructive/commit/c92567562583937b0d6df04632fab35d59ebd332))
+- **storage:** retain confirmed dedup diagnostics ([cc23cda](https://github.com/constructive-io/constructive/commit/cc23cda10982d781505ad62082f816dded97cad0))
+- **storage:** sign uploads for server-allocated object keys ([#2014](https://github.com/constructive-io/constructive/issues/2014)) ([bf443e9](https://github.com/constructive-io/constructive/commit/bf443e955a92c46ded652f36162162a81767bfe5))
+
+### Features
+
+- sign and confirm managed site uploads ([01f79dc](https://github.com/constructive-io/constructive/commit/01f79dc4008afcfa2b3371f19a141141f0c514a3))
+
+### Reverts
+
+- Revert "fix(storage): sign uploads for server-allocated object keys (#2014)" (#2064) ([f2e1ca9](https://github.com/constructive-io/constructive/commit/f2e1ca9b1eea00678242974d2a9e991ce6ec1f64)), closes [#2014](https://github.com/constructive-io/constructive/issues/2014) [#2064](https://github.com/constructive-io/constructive/issues/2064)
+
 ## [1.28.6](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.5...graphile-presigned-url-plugin@1.28.6) (2026-11-23)
 
 ### Bug Fixes

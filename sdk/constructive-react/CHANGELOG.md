@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.21.49](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.48...@constructive-io/react@1.21.49) (2026-11-24)
+
+**Note:** Version bump only for package @constructive-io/react
+
 ## [1.21.48](https://github.com/constructive-io/constructive/compare/@constructive-io/react@1.21.47...@constructive-io/react@1.21.48) (2026-11-23)
 
 **Note:** Version bump only for package @constructive-io/react
