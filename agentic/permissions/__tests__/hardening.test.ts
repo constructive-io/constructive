@@ -262,6 +262,10 @@ const rows: Row[] = [
   ['read -r HOME <<< x; cd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
   ['HOME=~/.ssh; pushd; cat id_ed25519', 'ask', 'ask', 'unresolvable-path'],
   ['unset HOME; cd; cat src/config.ts', 'allow', 'allow'],
+  // a fallback's tilde expands only when neither it nor the expansion is quoted; otherwise it is a dir named ~
+  ['cd .pi; unset F; mkdir -p "${F:-~/x}"', 'deny', 'deny'],
+  ['cd .pi; unset F; mkdir -p ${F:-"~/x"}', 'deny', 'deny'],
+  ['cd .pi; unset F; mkdir -p ${F:-~/x}', 'ask', 'allow', 'outside-workspace'],
   // 28. a shell that reads its script from stdin runs the text the analysis can see there as a script of its own
   ["sh <<< 'cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
   ["echo 'cat ~/.ssh/id_ed25519' | bash", 'deny', 'deny', 'hard-deny'],
@@ -301,7 +305,10 @@ const rows: Row[] = [
   ["export F=src/config.ts; unset F; F=src/config.ts; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
   ["read -r O <<< x; export F=src/config.ts; export $O F; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
   ["HOME=~/.ssh; bash -c 'cat ~/id_ed25519'", 'deny', 'deny', 'hard-deny'],
-  ["unset HOME; bash -c 'cd; touch .pi/ext.js'", 'deny', 'deny']
+  ["unset HOME; bash -c 'cd; touch .pi/ext.js'", 'deny', 'deny'],
+  // 36. a tilde the two bashes read differently makes a variable unknown, which asks where it is used, not where it is set
+  ['HOME=/tmp; F=~/x; cat src/config.ts', 'allow', 'allow'],
+  ['HOME=/tmp; F=~/x; cat "$F"', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {
@@ -313,6 +320,13 @@ describe('hardening: bash per mode', () => {
       if (signal) expect(d.request.signals).toContain(signal);
     }
     expect(verdicts).toEqual([workspace, full]);
+  });
+});
+
+describe('hardening: HOME', () => {
+  it('reads a tilde from every HOME the shell held, since bash 5.3 reads the one it last exported to a program', async () => {
+    const command = `HOME=~/.ssh; ls; HOME=${sb.home}; cat ~/id_ed25519`;
+    for (const mode of ['workspace', 'full'] as const) expect((await sb.bash(command, mode)).decision).toBe('deny');
   });
 });
 

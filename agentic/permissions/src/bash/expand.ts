@@ -216,18 +216,20 @@ export class Variables {
 /** What the expansions need from the analysis. */
 export interface ExpansionScope {
   /**
-   * The dirs `~` may expand to: one where every bash agrees, two where the
+   * The dirs `~` may expand to: one where every bash agrees, more where the
    * command changed HOME (bash 3.2 follows the shell's HOME, and bash 5.3
-   * keeps the HOME the shell started with), `null` when HOME is unknown.
+   * reads the HOME the shell last exported, which may be any one HOME held),
+   * `null` when HOME is unknown.
    */
   tildeHomes(): readonly string[] | null;
   /**
    * `$name`, or `${name-fallback}` (`colon` for `${name:-fallback}`, which
    * also takes the fallback for an empty value); `null` when it cannot be
    * known. `assigns`: the `=` forms, which also set the variable to the
-   * fallback when they take it.
+   * fallback when they take it. `tilde`: a `~` that starts the fallback
+   * expands; otherwise it is text.
    */
-  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean): string | null;
+  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null;
   /** IFS may differ from bash's default, so an unquoted expansion splits where the analysis cannot follow. */
   ifsMayDiffer(): boolean;
   noteRef(name: string): void;
@@ -253,8 +255,7 @@ export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budg
   if (use === 'assignment') {
     const readings = tildes(built, true, scope, budget);
     if (readings.length === 1) return [arg(readings[0], false)];
-    // A variable holds one value, so where the bashes differ it is unknown.
-    scope.tildesDiffer(word.raw);
+    // A variable holds one value, so where the bashes differ it is unknown, which asks where the command uses it.
     return [arg(withHome(built, tildeSpans(built, true), null, budget), false)];
   }
   const args: Arg[] = [];
@@ -307,7 +308,7 @@ function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piec
     case 'var': {
       scope.noteRef(part.name);
       // Looked up even when IFS may differ, since an `=` form assigns.
-      const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true);
+      const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true, part.tilde === true);
       const raw = !part.quoted && scope.ifsMayDiffer() ? null : looked;
       const value = raw === null || part.transform === undefined ? raw : transformed(raw, part.transform);
       if (value === null) markUnknown(!part.quoted);

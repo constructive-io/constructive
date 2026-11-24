@@ -1,5 +1,5 @@
 {
-  "note": "Recorded with printf from /bin/bash on macOS and a Homebrew bash, HOME=/h. Rerecord with RECORD_BASH_WORDS=1 on a machine with both.",
+  "note": "Recorded with printf from /bin/bash on macOS and a Homebrew bash, HOME=/h. `forms` are words, and `homes` are scripts that change HOME, each run in a bash of its own. Rerecord with RECORD_BASH_WORDS=1 on a machine with both.",
   "bash3": "3.2.57(1)-release",
   "bash5": "5.3.20(1)-release",
   "forms": {
@@ -766,6 +766,56 @@
         "x3",
         "y1",
         "y3"
+      ]
+    }
+  },
+  "homes": {
+    "HOME=/x; w ~/a": {
+      "bash3": [
+        "/x/a"
+      ],
+      "bash5": [
+        "/h/a"
+      ]
+    },
+    "export HOME=/x; w ~/a": {
+      "bash3": [
+        "/x/a"
+      ],
+      "bash5": [
+        "/h/a"
+      ]
+    },
+    "HOME=/x; /usr/bin/true; w ~/a": {
+      "bash3": [
+        "/x/a"
+      ],
+      "bash5": [
+        "/x/a"
+      ]
+    },
+    "HOME=/x; /usr/bin/true; HOME=/y; w ~/a": {
+      "bash3": [
+        "/y/a"
+      ],
+      "bash5": [
+        "/x/a"
+      ]
+    },
+    "HOME=/x; v=$(true); HOME=/y; w ~/a": {
+      "bash3": [
+        "/y/a"
+      ],
+      "bash5": [
+        "/x/a"
+      ]
+    },
+    "(HOME=/x; /usr/bin/true); w ~/a": {
+      "bash3": [
+        "/h/a"
+      ],
+      "bash5": [
+        "/h/a"
       ]
     }
   }

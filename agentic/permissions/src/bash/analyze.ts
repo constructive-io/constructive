@@ -160,8 +160,9 @@ function copyTraps(traps: ReadonlyMap<string, readonly Trap[]>, keep: (key: stri
 }
 
 /**
- * One shell as the command runs in it: its variables and dir; its traps by
- * condition, more than one where an action that may run anytime set
+ * One shell as the command runs in it: its variables and dir; every value of
+ * HOME bash 5.3's tilde may read there (`null` once one is unknown); its
+ * traps by condition, more than one where an action that may run anytime set
  * one in place of another; the names a trap that may run before any later
  * command assigns (unknown wherever they are read after it is set); and
  * whether such a trap moves the shell, so no later relative path is known.
@@ -172,6 +173,7 @@ class ShellState {
   constructor(
     public vars: Variables,
     public cwd: Cwd,
+    public homes: ReadonlySet<string | undefined> | null,
     readonly traps: Map<string, Trap[]> = new Map(),
     readonly trapAssigns: Set<string> = new Set(),
     public trapMovesDir = false
@@ -179,17 +181,19 @@ class ShellState {
 
   /** What a subshell starts with: a fork of this shell, with the traps bash resets there gone. A name a trap may assign stays unknown. */
   subshell(): ShellState {
-    return new ShellState(this.vars.copy(), this.cwd, copyTraps(this.traps, (key) => SUBSHELL_TRAPS.has(key)), new Set(this.trapAssigns), this.trapMovesDir);
+    return new ShellState(this.vars.copy(), this.cwd, this.homes, copyTraps(this.traps, (key) => SUBSHELL_TRAPS.has(key)), new Set(this.trapAssigns), this.trapMovesDir);
   }
 
-  /** What a child shell (`sh -c`, a script on stdin) starts with: the exported environment, and no traps. */
+  /** What a child shell (`sh -c`, a script on stdin) starts with: the exported environment, the HOME in it, and no traps. */
   child(): ShellState {
-    return new ShellState(this.vars.forChild(), this.cwd, new Map(), new Set(this.trapAssigns), this.trapMovesDir);
+    const vars = this.vars.forChild();
+    const home = vars.get('HOME');
+    return new ShellState(vars, this.cwd, home === null ? null : new Set([home]), new Map(), new Set(this.trapAssigns), this.trapMovesDir);
   }
 
   /** The same shell copied whole, to read an action in and throw away. */
   scratch(): ShellState {
-    return new ShellState(this.vars.copy(), this.cwd, copyTraps(this.traps), new Set(this.trapAssigns), this.trapMovesDir);
+    return new ShellState(this.vars.copy(), this.cwd, this.homes, copyTraps(this.traps), new Set(this.trapAssigns), this.trapMovesDir);
   }
 
   /** What `other`, a copy of this shell, may have added to it: the traps it set, beside the ones they may replace, the names its traps assign, and whether they move the dir. */
@@ -201,6 +205,13 @@ class ShellState {
     }
     for (const name of other.trapAssigns) this.trapAssigns.add(name);
     this.trapMovesDir ||= other.trapMovesDir;
+  }
+
+  /** HOME may have changed: keep the value it holds now. */
+  noteHome(): void {
+    if (this.homes === null) return;
+    const home = this.vars.get('HOME');
+    this.homes = home === null ? null : new Set([...this.homes, home]);
   }
 }
 
@@ -369,7 +380,7 @@ class Analyzer implements ExpansionScope {
   /** What a command reads when no pipe or redirection sets its stdin: nothing at the top, and in a shell string what its runner gave it. */
   inheritedStdin: Stdin = NO_INPUT;
   /** The shell the analysis is in at this point of the command. */
-  private state = new ShellState(new Variables((name) => this.outsideValue(name)), { kind: 'start' });
+  private state: ShellState;
   /** Some command ran, or the shell moved, outside the start dir. */
   private leftStart = false;
   /** What the expansions of this command may still build. */
@@ -404,6 +415,7 @@ class Analyzer implements ExpansionScope {
     readonly ctx: AnalyzeContext,
     private readonly findings: Findings
   ) {
+    this.state = new ShellState(new Variables((name) => this.outsideValue(name)), { kind: 'start' }, new Set([this.home]));
   }
 
   flag(signal: Signal, reason: string): void {
@@ -499,6 +511,7 @@ class Analyzer implements ExpansionScope {
     this.state = outer;
     if (!frame.subshell.lastElement || !this.lastpipe) return;
     for (const name of inner.vars.changedFrom(outer.vars)) outer.vars.either(name, outer.vars.record(name));
+    outer.noteHome();
     if (!sameCwd(inner.cwd, outer.cwd)) outer.cwd = { kind: 'unknown' };
     outer.addTrapsOf(inner);
   }
@@ -645,6 +658,7 @@ class Analyzer implements ExpansionScope {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     if (DANGEROUS_VARS.test(name)) this.dynamic(`it sets ${name}, which changes what runs`);
     this.state.vars.assign(name, op, value);
+    if (name === 'HOME') this.state.noteHome();
   }
 
   /** `export NAME`, `declare -x NAME` (`on`), or `export -n NAME`, `declare +x NAME`: whether a child shell sees the value. */
@@ -677,6 +691,7 @@ class Analyzer implements ExpansionScope {
       else if (special) vars.either(name, before);
       else vars.restore(name, before);
       vars.setExported(name, exported);
+      if (name === 'HOME') this.state.noteHome();
     }
   }
 
@@ -702,6 +717,7 @@ class Analyzer implements ExpansionScope {
   unset(name: string): void {
     if (name === 'IFS') this.ifs = 'maybe-changed';
     this.state.vars.unset(name);
+    if (name === 'HOME') this.state.noteHome();
   }
 
   /** A variable the command expands: an env ref unless the command set it. */
@@ -725,19 +741,22 @@ class Analyzer implements ExpansionScope {
 
   /** After the command changed HOME, bash 3.2 and bash 5.3 expand a tilde to different dirs. */
   tildesDiffer(word: string): void {
-    this.unresolvable(`bash 3.2 expands the ~ in ${word} from the HOME the command set, and bash 5.3 from the HOME it started with, and the analysis cannot know which bash runs it`);
+    this.unresolvable(
+      `bash 3.2 expands the ~ in ${word} from the HOME the command set, and bash 5.3 from the HOME the shell last passed to a program, which may be an earlier one, and the analysis cannot know which bash runs it`
+    );
   }
 
   /**
-   * The dirs `~` may expand to. bash 3.2 reads the shell's HOME (the user's
-   * home when it is unset), and bash 5.3 keeps the HOME the shell started
-   * with, so the two differ once the command sets HOME.
+   * The dirs `~` may expand to: the user's home for an unset HOME. bash 3.2
+   * reads the shell's HOME, and bash 5.3 the HOME of the environment the shell
+   * last built for a program it ran, which may be any value HOME held since
+   * the shell started, so they differ once the command sets HOME.
    */
   tildeHomes(): readonly string[] | null {
     const now = this.lookup('HOME');
-    if (now === null) return null;
-    const old = now === undefined ? this.home : now;
-    return old === this.home ? [old] : [old, this.home];
+    const { homes } = this.state;
+    if (now === null || homes === null) return null;
+    return [...new Set([now, ...homes].map((home) => home ?? this.home))];
   }
 
   /** Its value; `null` when it cannot be known, `undefined` when the command unset it. */
@@ -752,19 +771,23 @@ class Analyzer implements ExpansionScope {
    * outside may hold anything. The `=` forms (`assigns`) also set the variable
    * to the fallback they take.
    */
-  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean): string | null {
+  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null {
     const value = this.lookup(name);
     if (fallback === undefined) return value === undefined ? '' : value;
     if (value === null || (value !== undefined && !(colon && value === ''))) return value;
-    const taken = this.fallbackValue(fallback);
+    const taken = this.fallbackValue(fallback, tilde);
     if (assigns) this.assign(name, '=', taken);
     return taken;
   }
 
-  /** A fallback's value: unknown with its own expansion, and a leading `~` is the home dir as in bash (`~user`, and a `~` the bashes read differently, is not known). */
-  private fallbackValue(fallback: string): string | null {
+  /**
+   * A fallback's value: unknown with its own expansion, and a leading `~`
+   * that expands (`tilde`) is the home dir as in bash (`~user`, and a `~` the
+   * bashes read differently, is not known).
+   */
+  private fallbackValue(fallback: string, tilde: boolean): string | null {
     if (/[$`]/.test(fallback)) return null;
-    if (!fallback.startsWith('~')) return fallback;
+    if (!tilde || !fallback.startsWith('~')) return fallback;
     const homes = this.tildeHomes();
     return /^~(\/|$)/.test(fallback) && homes?.length === 1 ? homes[0] + fallback.slice(1) : null;
   }

@@ -33,8 +33,11 @@ import { SHELL_KEYWORDS } from './words';
 /** One piece of a word. `quoted` pieces take no globbing, brace or tilde expansion. */
 export type Part =
   | { kind: 'lit'; text: string; quoted: boolean }
-  /** `fallback` from `${name-…}` or `${name:-…}`; `assigns` for `${name=…}` and `${name:=…}`, which also set the variable to it. */
-  | { kind: 'var'; name: string; quoted: boolean; fallback?: string; colon?: boolean; assigns?: boolean; transform?: string }
+  /**
+   * `fallback` from `${name-…}` or `${name:-…}`; `assigns` for `${name=…}` and `${name:=…}`, which also set the variable to it;
+   * `tilde` when a `~` that starts the fallback expands, which needs it and the whole expansion unquoted.
+   */
+  | { kind: 'var'; name: string; quoted: boolean; fallback?: string; colon?: boolean; assigns?: boolean; tilde?: boolean; transform?: string }
   /**
    * `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). `splits`: bash may split its
    * value into more words (it is unquoted, or `$@`), which may be options.
@@ -698,7 +701,15 @@ class Lexer {
       this.dynamic.push(`parameter expansion \${${inner}}`);
       this.scanExpansions(inner, 'in a parameter expansion');
       if (withDefault) {
-        parts.push({ kind: 'var', name: withDefault[1], quoted, fallback: stripQuotes(withDefault[4]), colon: withDefault[2] === ':', assigns: withDefault[3] === '=' });
+        parts.push({
+          kind: 'var',
+          name: withDefault[1],
+          quoted,
+          fallback: stripQuotes(withDefault[4]),
+          colon: withDefault[2] === ':',
+          assigns: withDefault[3] === '=',
+          tilde: !quoted && withDefault[4].startsWith('~')
+        });
         return;
       }
       const splits = inner.includes('@') || !quoted;
