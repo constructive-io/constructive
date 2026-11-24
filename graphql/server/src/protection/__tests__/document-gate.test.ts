@@ -35,11 +35,21 @@ const schema = buildSchema(/* GraphQL */ `
     node: Post
   }
 
+  type PostAggregates {
+    distinctCount: Int
+  }
+
+  enum PostGroupBy {
+    TITLE
+  }
+
   type PostsConnection {
     nodes: [Post]
     edges: [PostEdge]
     pageInfo: PageInfo!
     totalCount: Int
+    aggregates: PostAggregates
+    groupedAggregates(groupBy: [PostGroupBy!]!): [PostAggregates!]
   }
 
   type User {
@@ -206,6 +216,14 @@ describe('cost', () => {
         ... on PostsConnection { items: edges { node { id } } }
       }
     `).cost).toBe(5_100);
+  });
+
+  it('charges grouped aggregates as unpaged rows without charging plain aggregates as rows', () => {
+    expect(enforce('{ users { nodes { posts { aggregates { distinctCount } } } } }').cost)
+      .toBe(200);
+    expect(enforce(`{
+      users { nodes { posts(first: 1) { groups: groupedAggregates(groupBy: [TITLE]) { distinctCount } } } }
+    }`).cost).toBe(10_100);
   });
 });
 

@@ -9,9 +9,10 @@
  *
  * A connection selecting rows contributes its page size per parent row, and
  * multiplies the cost of nested connections. Without `first`/`last` it is
- * charged `ASSUMED_PAGE_SIZE`, since it is unbounded in principle. A connection
- * selecting only metadata contributes one per parent row and does not multiply
- * nested costs.
+ * charged `ASSUMED_PAGE_SIZE`, since it is unbounded in principle. Grouped
+ * aggregates ignore pagination and always incur at least that estimate.
+ * A connection selecting only metadata contributes one per parent row and
+ * does not multiply nested costs.
  *
  * The walk is manual rather than `visitWithTypeInfo` because fragment spreads
  * have to be followed (a document can hide its depth entirely inside
@@ -72,17 +73,23 @@ const PAGE_SIZE_ARGS = ['first', 'last'] as const;
 const isConnectionType = (type: GraphQLNamedType | null | undefined): boolean =>
   Boolean(type && isObjectType(type) && 'pageInfo' in type.getFields());
 
-function selectsConnectionRows(
+function connectionMultiplier(
   selectionSet: SelectionSetNode | undefined,
-  fragments: Record<string, FragmentDefinitionNode>
-): boolean {
-  if (!selectionSet) return false;
+  fragments: Record<string, FragmentDefinitionNode>,
+  rowPageSize: number
+): number {
+  if (!selectionSet) return 1;
   const pending = [selectionSet];
   const seenFragments = new Set<string>();
+  let selectsRows = false;
+  let selectsGroups = false;
   for (let current = pending.pop(); current; current = pending.pop()) {
     for (const selection of current.selections) {
       if (selection.kind === Kind.FIELD) {
-        if (selection.name.value === 'nodes' || selection.name.value === 'edges') return true;
+        const fieldName = selection.name.value;
+        if (fieldName === 'nodes' || fieldName === 'edges') selectsRows = true;
+        if (fieldName === 'groupedAggregates') selectsGroups = true;
+        if (selectsRows && selectsGroups) return Math.max(rowPageSize, ASSUMED_PAGE_SIZE);
       } else if (selection.kind === Kind.INLINE_FRAGMENT) {
         pending.push(selection.selectionSet);
       } else {
@@ -95,7 +102,8 @@ function selectsConnectionRows(
       }
     }
   }
-  return false;
+  if (selectsGroups) return ASSUMED_PAGE_SIZE;
+  return selectsRows ? rowPageSize : 1;
 }
 
 interface Walk {
@@ -201,9 +209,11 @@ function walkSelectionSet(
       // flat selection is not penalized for being wide.
       let childMultiplier = multiplier;
       if (isConnectionType(fieldType)) {
-        if (selectsConnectionRows(selection.selectionSet, walk.fragments)) {
-          childMultiplier *= pageSize ?? ASSUMED_PAGE_SIZE;
-        }
+        childMultiplier *= connectionMultiplier(
+          selection.selectionSet,
+          walk.fragments,
+          pageSize ?? ASSUMED_PAGE_SIZE
+        );
         walk.cost += childMultiplier;
         if (walk.cost > walk.protection.maxQueryCost) {
           reject(
