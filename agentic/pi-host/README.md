@@ -30,11 +30,9 @@ the whole point of the coding lane is that editing the clone is free.
 ## Credentials do not go in the clone
 
 `@agentic-kit/pi` resolves tenant context with `resolveProjectContext(cwd)`,
-which reads `<cwd>/.env` for `ACCESS_TOKEN` and `DATABASE_ID`. In this lane `cwd`
-is a cloned git repository that the agent is about to `git add -A` and push, so
-writing platform credentials there is a credential-exfiltration bug waiting for
-a careless commit. The coding lane therefore runs with the coding tool set and no
-project context in the work tree. A lane that genuinely needs control-plane tools
+which reads database binding metadata from `<cwd>/.env` and authenticates
+through the host. The coding lane runs with the coding tool set and no project
+context in the work tree. A lane that genuinely needs control-plane tools
 calls `materializeProjectContext({ dir, workTree, ... })`, which writes a `0600`
 `.env` **outside** the work tree and throws
 `ProjectContextInsideWorkTreeError` if asked to do otherwise.

@@ -151,7 +151,7 @@ describe('materializeDbTools', () => {
 
     const project = path.join(home, 'project');
     fs.mkdirSync(project);
-    fs.writeFileSync(path.join(project, '.env'), 'ACCESS_TOKEN=x\nDATABASE_ID=db1\n');
+    fs.writeFileSync(path.join(project, '.env'), 'DATABASE_ID=db1\n');
 
     const result = await resolveProjectContext(project);
     expect(result.context).toBeNull();

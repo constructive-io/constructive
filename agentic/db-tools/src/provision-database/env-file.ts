@@ -96,12 +96,11 @@ export const PENDING_PROVISION_KEYS = {
   attempts: 'PROVISION_TICKET_ATTEMPTS',
 } as const;
 
-/** The credential keys provision_database owns in a project's .env. */
+/** The binding keys provision_database owns in a project's .env. */
 export const PROVISION_ENV_KEYS = [
   'DATABASE_ID',
   'DATABASE_NAME',
   'OWNER_ID',
-  'ACCESS_TOKEN',
   'PGDATABASE',
   'API_ENDPOINT',
   'MODULES_ENDPOINT',
@@ -109,9 +108,7 @@ export const PROVISION_ENV_KEYS = [
 
 /**
  * Keys archived as comments on reprovision — the binding identity: which
- * database, under whom, on which backend. ACCESS_TOKEN is the account login
- * token, identical across bindings, so it is overwritten in place rather than
- * archived.
+ * database, under whom, on which backend.
  */
 export const ARCHIVED_BINDING_KEYS = [
   'DATABASE_ID',
@@ -123,7 +120,7 @@ export const ARCHIVED_BINDING_KEYS = [
 ] as const;
 
 /**
- * Build the provisioning credential block written to a project's .env. The
+ * Build the database binding written to a project's .env. The
  * endpoint pins record which backend owns this binding — outside-app consumers
  * (verify-feature.sh, skill scripts, dev-server shells) resolve them instead of
  * falling back to localhost defaults when the app targets a hosted backend.
@@ -132,7 +129,6 @@ export function provisionEnvVars(args: {
   databaseId: string;
   databaseName: string;
   ownerId: string;
-  accessToken: string;
   apiEndpoint: string;
   modulesEndpoint: string;
 }): EnvVars {
@@ -140,7 +136,6 @@ export function provisionEnvVars(args: {
     DATABASE_ID: args.databaseId,
     DATABASE_NAME: args.databaseName,
     OWNER_ID: args.ownerId,
-    ACCESS_TOKEN: args.accessToken,
     PGDATABASE: args.databaseName,
     API_ENDPOINT: args.apiEndpoint,
     MODULES_ENDPOINT: args.modulesEndpoint,

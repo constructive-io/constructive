@@ -55,7 +55,7 @@ pi.use(dbTools);
 
 ## Project context
 
-The tools need a bound database: an access key, a database id, and optionally endpoint/name pins. Where those values come from is the host's choice — `resolveProjectContext` takes values, not a directory:
+The tools need a database binding and host authentication. `resolveProjectContext` accepts a project directory or values injected by the host:
 
 ```ts
 import { fromEnvironment, resolveProjectContext } from '@agentic-kit/pi';
@@ -70,11 +70,11 @@ await resolveProjectContext(cwd);
 await resolveProjectContext((name) => vault.get(name));
 ```
 
-Injected variables carry a `CONSTRUCTIVE_` prefix; the bare names are also accepted (that is what the scaffolder writes into a project `.env`), with the prefixed spelling winning:
+Injected variables carry a `CONSTRUCTIVE_` prefix; the bare names are also accepted, with the prefixed spelling winning. A project `.env` holds only binding metadata; the file-backed resolver does not read an access token from it:
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `CONSTRUCTIVE_ACCESS_TOKEN` | yes | project data-plane key |
+| `CONSTRUCTIVE_ACCESS_TOKEN` | injected contexts only | project data-plane key |
 | `CONSTRUCTIVE_DATABASE_ID` | yes | bound database |
 | `CONSTRUCTIVE_DATABASE_NAME` | no | derives the per-db data endpoint |
 | `CONSTRUCTIVE_API_ENDPOINT` | no | data-plane api pin |
@@ -85,7 +85,7 @@ Endpoint pins from the source apply to the **data plane only**. The control plan
 
 ## Provisioning
 
-`provision_database` requests a database through the `requestDatabase` mutation on the api endpoint. When the requested module set matches a cataloged preset, the backend claims a warm pre-baked database in seconds. Otherwise a background job provisions the database cold. The tool polls the provision ticket on the modules endpoint until the database and its owner bootstrap are complete. Then it writes the credentials to the project `.env` and returns.
+`provision_database` requests a database through the `requestDatabase` mutation on the api endpoint. When the requested module set matches a cataloged preset, the backend claims a warm pre-baked database in seconds. Otherwise a background job provisions the database cold. The tool polls the provision ticket on the modules endpoint until the database and its owner bootstrap are complete. Then it writes the binding metadata to the project `.env` and returns.
 
 For local development, the cold path and the warm pool depend on the backend's jobs worker. Start the worker in `constructive-db` with `pnpm dev:fn`. If the worker is not running, cold tickets stay `pending` and the tool times out after 240 seconds.
 

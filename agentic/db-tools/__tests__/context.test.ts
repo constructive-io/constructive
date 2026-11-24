@@ -73,12 +73,16 @@ describe('resolveProjectContext sources', () => {
     });
   });
 
-  it('resolves from a project .env when given a cwd (unchanged host behavior)', async () => {
-    writeFileSync(path.join(dir, '.env'), 'ACCESS_TOKEN=file-key\nDATABASE_ID=db-file\n');
+  it.each(['', 'ACCESS_TOKEN=file-key\n'])('resolves a file-backed binding with host auth (%j)', async (extra) => {
+    writeFileSync(path.join(dir, '.env'), `DATABASE_ID=db-file\n${extra}`);
 
     const resolved = await resolveProjectContext(dir);
 
-    expect(resolved.context).toMatchObject({ accessToken: 'file-key', databaseId: 'db-file' });
+    expect(resolved.context).toMatchObject({ databaseId: 'db-file' });
+    expect(resolved.context).not.toHaveProperty('accessToken');
+    expect(mockProbe).toHaveBeenCalledWith(
+      expect.objectContaining({ databaseId: 'db-file', bearer: 'account-bearer' }),
+    );
   });
 
   it('prefers the prefixed name over the bare one', async () => {

@@ -19,7 +19,7 @@ export type ProjectContext = {
   apiEndpoint: string;
   modulesEndpoint: string;
   databaseName: string;
-  accessToken: string;
+  accessToken?: string;
   // Per-DB data/CRUD endpoint (api-<db>.localhost). Empty when DATABASE_NAME is
   // absent — record tools need it; schema tools use `api` and ignore it.
   dataEndpoint: string;
@@ -47,10 +47,8 @@ export type ResolveResult = {
 };
 
 // The project values pi needs, and where they come from. A scaffolded project
-// folder carries them in `.env` (desktop); a headless host — a container, a
-// Job, CI — injects them as real environment variables, so no credential is
-// ever written into a git clone the agent could commit. Both lanes produce the
-// same record, which is why the resolver takes VALUES, not a directory.
+// folder carries binding metadata in `.env`; a headless host — a container,
+// a Job, CI — injects values without writing credentials into a git clone.
 export const CONTEXT_ENV_KEYS = [
   'ACCESS_TOKEN',
   'DATABASE_ID',
@@ -89,9 +87,8 @@ export function fromEnvironment(
   return environment;
 }
 
-/** Read a project `.env` as the source. The file is authoritative here — the
- *  key in it belongs to whatever backend wrote it, so it is not merged under
- *  the ambient environment. Returns null when the file is absent. */
+/** Read a project `.env` without merging ambient environment variables.
+ *  Returns null when the file is absent. */
 export async function fromEnvFile(cwd: string): Promise<ContextSource | null> {
   try {
     return parseDotenv(await readFile(path.join(cwd, '.env'), 'utf8'));
@@ -113,8 +110,8 @@ export type ResolveOptions = {
 /**
  * Resolve the project context from injected values, or from a project folder.
  *
- * Passing a `cwd` string keeps the original behavior (read `<cwd>/.env`) so
- * existing hosts — Constructive Desktop, the confirm gate — are unchanged.
+ * Passing a `cwd` string reads the binding in `<cwd>/.env` and authenticates
+ * through the host.
  * Headless hosts pass values instead: `fromEnvironment()` for a container or
  * Job, an explicit record for anything else.
  */
@@ -122,7 +119,8 @@ export async function resolveProjectContext(
   input: string | ContextSource,
   options: ResolveOptions = {},
 ): Promise<ResolveResult> {
-  const source = typeof input === 'string' ? await fromEnvFile(input) : input;
+  const fileBacked = typeof input === 'string';
+  const source = fileBacked ? await fromEnvFile(input) : input;
   if (!source) {
     return {
       context: null,
@@ -133,15 +131,17 @@ export async function resolveProjectContext(
   }
 
   const env = Object.fromEntries(
-    CONTEXT_ENV_KEYS.map((key) => [key, readContextValue(source, key)]),
+    CONTEXT_ENV_KEYS.map((key) => [key, fileBacked && key === 'ACCESS_TOKEN' ? undefined : readContextValue(source, key)]),
   ) as Record<ContextEnvKey, string | undefined>;
   const accessToken = env.ACCESS_TOKEN;
   const databaseId = env.DATABASE_ID;
 
-  if (!accessToken || !databaseId) {
+  if (!databaseId || (!fileBacked && !accessToken)) {
     return {
       context: null,
-      reason: `Project is not connected to a Constructive database yet (missing ${CONTEXT_ENV_PREFIX}ACCESS_TOKEN/${CONTEXT_ENV_PREFIX}DATABASE_ID in the environment, or ACCESS_TOKEN/DATABASE_ID in .env). Provision the database first, then retry.`,
+      reason: fileBacked
+        ? 'Project is not connected to a Constructive database yet (missing DATABASE_ID in .env). Provision the database first, then retry.'
+        : `Missing ${CONTEXT_ENV_PREFIX}ACCESS_TOKEN or ${CONTEXT_ENV_PREFIX}DATABASE_ID from the injected project context.`,
       code: 'missing-credentials',
     };
   }
@@ -157,7 +157,7 @@ export async function resolveProjectContext(
   // The whole control plane (binding probe, schema resolution, blueprint/schema
   // tools) authenticates with the ACCOUNT bearer: the platform api rejects
   // per-database keys, so the project ACCESS_TOKEN can never act on metaschema
-  // surfaces. The source's key stays in the context for the data plane only.
+  // surfaces. An explicitly injected key stays in the context for the data plane only.
   // The bearer is only ever sent to the app-configured backend — never a
   // source-pinned endpoint, which an untrusted cloned project controls.
   const account = host.account();
@@ -258,7 +258,7 @@ export async function resolveProjectContext(
       apiEndpoint,
       modulesEndpoint,
       databaseName,
-      accessToken,
+      ...(accessToken ? { accessToken } : {}),
       dataEndpoint,
       hash: probe.hash,
     },

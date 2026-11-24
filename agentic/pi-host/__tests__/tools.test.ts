@@ -98,41 +98,38 @@ describe('project context', () => {
     expect(isInside('/work/repo', '/work/context')).toBe(false);
   });
 
-  it('refuses to write credentials anywhere a commit could publish them', async () => {
+  it('refuses to write a project binding inside the work tree', async () => {
     await expect(
       materializeProjectContext({
         dir: '/work/repo/.constructive',
         workTree: '/work/repo',
-        databaseId: 'db',
-        accessToken: 'token'
+        databaseId: 'db'
       })
     ).rejects.toThrow(ProjectContextInsideWorkTreeError);
   });
 
-  it('writes a private .env beside the clone', async () => {
+  it('writes only the binding to a private .env beside the clone', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'pi-host-'));
     const dir = await materializeProjectContext({
       dir: path.join(root, 'context'),
       workTree: path.join(root, 'repo'),
       databaseId: 'db-1',
-      accessToken: 'token-1',
       databaseName: 'app'
     });
 
     const env = await readFile(path.join(dir, '.env'), 'utf8');
-    expect(env).toBe('DATABASE_ID=db-1\nACCESS_TOKEN=token-1\nDATABASE_NAME=app\n');
+    expect(env).toBe('DATABASE_ID=db-1\nDATABASE_NAME=app\n');
     expect((await stat(path.join(dir, '.env'))).mode & 0o777).toBe(0o600);
   });
 
-  it('will not pretend to have a context without credentials', async () => {
+  it('requires a database ID to write a project binding', async () => {
     await expect(
       materializeProjectContext({
         dir: '/tmp/ctx',
         workTree: '/tmp/repo',
-        databaseId: '',
-        accessToken: 'token'
+        databaseId: ''
       })
-    ).rejects.toThrow(/DATABASE_ID and ACCESS_TOKEN/);
+    ).rejects.toThrow(/DATABASE_ID/);
   });
 });
 
