@@ -36,7 +36,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
 import { createFlushMiddleware, flushAllServices, flushService } from './middleware/flush';
 import { createFnRouter } from './middleware/fn';
-import { graphile } from './middleware/graphile';
+import { graphile, isGraphiqlEnabled } from './middleware/graphile';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
@@ -116,6 +116,7 @@ class Server {
       serverPort: effectiveOpts.server?.port,
       apiIsPublic: apiOpts.isPublic,
       metaSchemas: apiOpts.metaSchemas?.join(',') || 'default',
+      graphiqlEnabled: isGraphiqlEnabled(effectiveOpts.graphile),
       observabilityEnabled
     });
 

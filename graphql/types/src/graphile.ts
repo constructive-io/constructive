@@ -70,6 +70,11 @@ export interface GraphileOptions {
    * `x-graphql-explain` header. Off unless set.
    */
   explain?: boolean;
+  /**
+   * Serve the GraphiQL UI at `/graphiql` and its static assets at `/ruru-static/`.
+   * Defaults to `false` when `NODE_ENV=production` and `true` otherwise.
+   */
+  graphiql?: boolean;
 }
 
 /**

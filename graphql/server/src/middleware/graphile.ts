@@ -98,6 +98,11 @@ const requestLanguages = (header: string | string[] | undefined): string[] | und
     ? [] : undefined;
 };
 
+export const isGraphiqlEnabled = (
+  graphileOptions?: ConstructiveOptions['graphile'],
+  nodeEnv: string | undefined = process.env.NODE_ENV
+): boolean => graphileOptions?.graphiql ?? nodeEnv !== 'production';
+
 /**
  * Build a PostGraphile v5 preset for a tenant.
  *
@@ -218,7 +223,7 @@ const buildPreset = (
       websockets: databaseSettings?.enableRealtime === true,
       graphqlPath: '/graphql',
       graphiqlPath: '/graphiql',
-      graphiql: true,
+      graphiql: isGraphiqlEnabled(graphileOptions),
       graphiqlOnGraphQLGET: false,
       maskError: formatError
     },
