@@ -187,6 +187,7 @@ describe('SEARCH_SCORE ordering, scored-once columns and orderBy validation', ()
     async function errorFor(q: string, variables: Record<string, unknown> = {}) {
       const result = await query<Result>(q, variables);
       expect(result.errors).toBeDefined();
+      expect(result.errors![0].extensions?.code).toBe('BAD_USER_INPUT');
       return result.errors!.map((e: any) => e.message).join('\n');
     }
 

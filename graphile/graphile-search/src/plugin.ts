@@ -25,6 +25,7 @@ import type { PgCodecWithAttributes } from '@dataplan/pg';
 import { TYPES } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import { getQueryBuilder } from 'graphile-plugin-utils';
+import { GraphQLError } from 'graphql';
 import type { SQL } from 'pg-sql2';
 
 import {
@@ -677,9 +678,10 @@ export function createUnifiedSearchPlugin(
               if (!filters) continue;
               present ??= collectFilterFields(where, new Set());
               if (!filters.some((f) => present!.has(f))) {
-                throw new Error(
+                throw new GraphQLError(
                   `Cannot order by ${name} without a search filter that scores it: ` +
                   `add ${filters.map((f) => `where.${f}`).join(' or ')}.`,
+                  { extensions: { code: 'BAD_USER_INPUT' } },
                 );
               }
               if (!hasScoringSource && compositeOrders.includes(name)) {

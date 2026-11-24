@@ -26,6 +26,30 @@ export const registry = {
     http: 409,
     message: 'The storage bucket has not yet been reconciled.'
   }),
+  INVALID_FILE_SIZE: defineError({
+    code: 'INVALID_FILE_SIZE',
+    class: 'public',
+    http: 400,
+    message: 'The file size is outside the allowed range.'
+  }),
+  FILE_TOO_LARGE: defineError({
+    code: 'FILE_TOO_LARGE',
+    class: 'public',
+    http: 413,
+    message: 'The file exceeds the bucket size limit.'
+  }),
+  BULK_UPLOAD_FILES_EXCEEDED: defineError({
+    code: 'BULK_UPLOAD_FILES_EXCEEDED',
+    class: 'public',
+    http: 400,
+    message: 'The upload exceeds the allowed file count.'
+  }),
+  BULK_UPLOAD_SIZE_EXCEEDED: defineError({
+    code: 'BULK_UPLOAD_SIZE_EXCEEDED',
+    class: 'public',
+    http: 413,
+    message: 'The upload exceeds the allowed total size.'
+  }),
 
   // ===========================================================================
   // Auth / account (public) — copy sourced from dashboard auth-errors.ts

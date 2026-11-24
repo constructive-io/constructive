@@ -42,6 +42,9 @@ const databaseAccessDenied = () => new GraphQLError('DATABASE_ACCESS_DENIED', {
   extensions: { code: 'DATABASE_ACCESS_DENIED' }
 });
 
+const uploadLimitError = (code: string, message?: string) =>
+  new GraphQLError(message ? `${code}: ${message}` : code, { extensions: { code } });
+
 // --- Protocol-level constants (not configurable) ---
 
 const MAX_CONTENT_HASH_LENGTH = 128;
@@ -444,14 +447,16 @@ export function createPresignedUrlPlugin(
                       // Enforce bulk upload limits
                       const filesArray = vals.files as any[];
                       if (filesArray.length > storageConfig.maxBulkFiles) {
-                        throw new Error(
-                          `BULK_UPLOAD_FILES_EXCEEDED: ${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
+                        throw uploadLimitError(
+                          'BULK_UPLOAD_FILES_EXCEEDED',
+                          `${filesArray.length} files exceeds maximum of ${storageConfig.maxBulkFiles} per batch`,
                         );
                       }
                       const totalSize = filesArray.reduce((sum: number, f: any) => sum + (f.size || 0), 0);
                       if (totalSize > storageConfig.maxBulkTotalSize) {
-                        throw new Error(
-                          `BULK_UPLOAD_SIZE_EXCEEDED: ${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
+                        throw uploadLimitError(
+                          'BULK_UPLOAD_SIZE_EXCEEDED',
+                          `${totalSize} bytes exceeds maximum of ${storageConfig.maxBulkTotalSize} bytes per batch`,
                         );
                       }
 
@@ -554,9 +559,9 @@ export function createPresignedUrlPlugin(
                     const bucket = rows[0] as unknown as BucketConfig | undefined;
                     if (!bucket) throw new Error('SITE_UPLOAD_NOT_AUTHORIZED');
                     const files = vals.files as any[];
-                    if (files.length > config.maxBulkFiles) throw new Error('BULK_UPLOAD_FILES_EXCEEDED');
+                    if (files.length > config.maxBulkFiles) throw uploadLimitError('BULK_UPLOAD_FILES_EXCEEDED');
                     if (files.reduce((sum, file) => sum + file.size, 0) > config.maxBulkTotalSize) {
-                      throw new Error('BULK_UPLOAD_SIZE_EXCEEDED');
+                      throw uploadLimitError('BULK_UPLOAD_SIZE_EXCEEDED');
                     }
                     if (!vals.checkOnly && files.some((file) => file.route == null)) {
                       await txClient.query({
@@ -615,7 +620,7 @@ export async function processSingleFile(
     throw new Error('INVALID_CONTENT_TYPE');
   }
   if (typeof size !== 'number' || size <= 0 || size > storageConfig.defaultMaxFileSize) {
-    throw new Error(`INVALID_FILE_SIZE: must be between 1 and ${storageConfig.defaultMaxFileSize} bytes`);
+    throw uploadLimitError('INVALID_FILE_SIZE', `must be between 1 and ${storageConfig.defaultMaxFileSize} bytes`);
   }
   if (filename !== undefined && filename !== null) {
     if (typeof filename !== 'string' || filename.length > storageConfig.maxFilenameLength) {
@@ -652,7 +657,7 @@ export async function processSingleFile(
 
   // Validate size against bucket's max_file_size
   if (bucket.max_file_size && size > bucket.max_file_size) {
-    throw new Error(`FILE_TOO_LARGE: exceeds bucket max of ${bucket.max_file_size} bytes`);
+    throw uploadLimitError('FILE_TOO_LARGE', `exceeds bucket max of ${bucket.max_file_size} bytes`);
   }
 
   // The projection document the caller stores in an image/upload column. Built

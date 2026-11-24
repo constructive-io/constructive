@@ -111,6 +111,22 @@ const upload = (txClient: unknown, s3: S3Config, key?: string) =>
     key,
   });
 
+it.each([
+  [1001, null, 'INVALID_FILE_SIZE', 'must be between 1 and 1000 bytes'],
+  [17, 16, 'FILE_TOO_LARGE', 'exceeds bucket max of 16 bytes'],
+])('rejects a file of size %s before querying with a public %s limit', async (size, limit, code, reason) => {
+  const { txClient, queries } = fakeTx(HASH, 'uploaded');
+  await expect(processSingleFile(options, txClient, storageConfig(), 'db', {
+    ...bucket, max_file_size: limit,
+  }, fakeS3(), {
+    contentHash: HASH, contentType: 'text/html', size, filename: SITE_KEY,
+  })).rejects.toMatchObject({
+    message: `${code}: ${reason}`,
+    extensions: { code },
+  });
+  expect(queries).toEqual([]);
+});
+
 describe.each([
   ['content-addressed key', undefined, HASH],
   ['custom key', SITE_KEY, SITE_KEY],

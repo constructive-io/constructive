@@ -102,17 +102,35 @@ export const normalizeError = (
   return { code: parsed.code, context: parsed.context, class: parsed.class };
 };
 
-export const formatError = (error: GraphQLError): GraphQLFormattedError => {
-  const { code, context, class: errorClass } = normalizeError(error);
-  const sqlState = extractPgErrorFields(error.originalError)?.code;
-  const declaredDbError = sqlState === RAISE_EXCEPTION_SQLSTATE && code != null && code === error.originalError?.message;
-  const nativePg = sqlState && !declaredDbError && /^[A-Z0-9]{5}$/.test(sqlState);
-  const nativeCode = nativePg ? SQLSTATE_TO_CODE[sqlState] : undefined;
-  const requestError = !nativePg && isRequestError(error) &&
-    (code ? GRAPHQL_REQUEST_CODES.has(code) : Boolean(error.locations?.length) || isOperationSelectionError(error));
-  const internal = !nativeCode && !requestError && (nativePg || !code || errorClass === 'internal');
+const findPostgresError = (error: GraphQLError) => {
+  const pending: unknown[] = [error];
+  const seen = new Set<object>();
+  let raised: object | undefined;
+  for (const candidate of pending) {
+    if (!candidate || typeof candidate !== 'object' || seen.has(candidate)) continue;
+    seen.add(candidate);
+    const sqlState = extractPgErrorFields(candidate)?.code;
+    if (sqlState === RAISE_EXCEPTION_SQLSTATE) {
+      raised ??= candidate;
+    } else if (sqlState && /^[A-Z0-9]{5}$/.test(sqlState)) {
+      return { sqlState };
+    }
+    const { originalError, cause } = candidate as { originalError?: unknown; cause?: unknown };
+    pending.push(originalError, cause);
+  }
+  return raised ? { raised } : {};
+};
 
-  const extensions: Record<string, unknown> = nativePg || (internal && !declaredDbError)
+export const formatError = (error: GraphQLError): GraphQLFormattedError => {
+  const { sqlState, raised } = findPostgresError(error);
+  const applicationError = raised ? parse(raised) : undefined;
+  const { code, context, class: errorClass } = applicationError ?? normalizeError(error);
+  const nativeCode = sqlState ? SQLSTATE_TO_CODE[sqlState] : undefined;
+  const requestError = !sqlState && !applicationError && isRequestError(error) &&
+    (code ? GRAPHQL_REQUEST_CODES.has(code) : Boolean(error.locations?.length) || isOperationSelectionError(error));
+  const internal = !nativeCode && !requestError && (Boolean(sqlState) || !code || errorClass === 'internal');
+
+  const extensions: Record<string, unknown> = sqlState || applicationError || internal
     ? {}
     : { ...error.extensions };
   let message = error.message;
@@ -121,11 +139,15 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
     message = format(nativeCode);
     extensions.code = nativeCode;
     extensions.class = 'public';
+  } else if (applicationError) {
+    message = applicationError.rawMessage;
+    if (code) extensions.code = code;
+    extensions.class = errorClass;
+    if (Object.keys(context).length > 0) extensions.context = context;
   } else if (requestError) {
     message = withoutInputValues(error);
     extensions.code = code ?? BAD_USER_INPUT;
-  } else if (code && (!internal || declaredDbError)) {
-    if (declaredDbError) message = code;
+  } else if (code && !internal) {
     extensions.code = code;
     extensions.class = errorClass;
     if (Object.keys(context).length > 0) {
@@ -134,9 +156,9 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
   }
 
   if (internal) {
-    if (!declaredDbError) {
+    if (!applicationError) {
       message = format('UNKNOWN_ERROR');
-      extensions.code = (nativePg ? error.extensions?.code : code) ?? INTERNAL_SERVER_ERROR;
+      extensions.code = (sqlState ? error.extensions?.code : code) ?? INTERNAL_SERVER_ERROR;
       extensions.class = 'internal';
     }
     extensions.errorId = logInternalError(error);

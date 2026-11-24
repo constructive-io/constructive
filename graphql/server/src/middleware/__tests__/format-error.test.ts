@@ -242,6 +242,55 @@ describe('formatError', () => {
     return new GraphQLError(pgError.message, { path: ['confirmUpload'], originalError: pgError });
   };
 
+  it('preserves a plain PostgreSQL RAISE EXCEPTION with positional context', () => {
+    const originalError = Object.assign(new Error('FEATURE_DISABLED (cloud_agents)'), {
+      code: 'P0001',
+      where: 'PL/pgSQL function private_feature_trigger()',
+    });
+    const error = new GraphQLError(originalError.message, {
+      originalError,
+      path: ['databaseStartExecution'],
+    });
+
+    expect(formatError(error)).toEqual({
+      message: 'FEATURE_DISABLED (cloud_agents)',
+      path: ['databaseStartExecution'],
+      extensions: { code: 'FEATURE_DISABLED', class: 'public', context: { arg0: 'cloud_agents' } },
+    });
+  });
+
+  it('preserves an author-written P0001 message without a machine code', () => {
+    const originalError = Object.assign(new Error('This action requires a paid plan.'), { code: 'P0001' });
+    const error = new GraphQLError(originalError.message, { originalError, path: ['start'] });
+
+    expect(formatError(error)).toEqual({
+      message: originalError.message,
+      path: ['start'],
+      extensions: { class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
+  });
+
+  it.each([
+    ['42501', 'You do not have permission to do that.'],
+    ['42P01', 'An unexpected error occurred.'],
+    ['XX000', 'An unexpected error occurred.'],
+  ])('masks native SQLSTATE %s even beneath a P0001 application error', (code, message) => {
+    const cause = Object.assign(new Error('permission denied for table private_table'), { code, table: 'private_table' });
+    const originalError = Object.assign(new Error(cause.message, { cause }), {
+      code: 'P0001',
+      detail: JSON.stringify({ code: 'FEATURE_DISABLED', class: 'public', context: { table: cause.table } }),
+    });
+    const error = new GraphQLError(originalError.message, { originalError, path: ['record'] });
+
+    expect(formatError(error)).toEqual({
+      message,
+      path: ['record'],
+      extensions: code === '42501'
+        ? { code: 'FORBIDDEN', class: 'public' }
+        : { code: 'INTERNAL_SERVER_ERROR', class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
+  });
+
   it('passes a public database code the registry does not know through unchanged', () => {
     const result = formatError(raisedByDatabase('CODE_NO_REGISTRY_KNOWS', { id: 'abc' }, 'public')) as {
       message: string;
