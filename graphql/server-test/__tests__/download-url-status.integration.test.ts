@@ -163,12 +163,12 @@ describe('storage file downloadUrl', () => {
 
   it('serves the original on a table without image_versions and returns null for a named version', async () => {
     const rows = await files(aliceDatabaseId, aliceSchema, 'small');
-    for (const status of ['uploaded', 'processed']) {
+    for (const status of ['uploaded', 'processed', 'superseded']) {
       const row = rows.get(`status-${status}`);
       expect(new URL(row.downloadUrl).pathname).toBe(`/app-80a2eaaf-private-cc079c527e7d/status-${status}`);
       expect(row.selected).toBeNull();
     }
-    for (const status of ['requested', 'rejected', 'superseded']) {
+    for (const status of ['requested', 'rejected']) {
       expect(rows.get(`status-${status}`)).toMatchObject({ downloadUrl: null, selected: null });
     }
   });
@@ -182,15 +182,15 @@ describe('storage file downloadUrl', () => {
     }
   });
 
-  it('signs the named artifact for live files and withholds both URLs for unsettled or rejected files', async () => {
+  it('signs the named artifact for confirmed files and withholds both URLs for unsettled or rejected files', async () => {
     const rows = await files(bobDatabaseId, bobSchema, 'small');
-    for (const status of ['uploaded', 'processed']) {
+    for (const status of ['uploaded', 'processed', 'superseded']) {
       const url = new URL(rows.get(`status-${status}`).selected);
       expect(url.pathname).toBe(`/app-a1a1a1a1-public-4db6afbff1a2/derived/status-${status}/small-0123abcd.webp`);
       expect(url.searchParams.get('X-Amz-Signature')).toEqual(expect.any(String));
       expect(url.searchParams.get('response-content-disposition')).toBe('attachment; filename="small-0123abcd.webp"');
     }
-    for (const status of ['requested', 'rejected', 'superseded']) {
+    for (const status of ['requested', 'rejected']) {
       expect(rows.get(`status-${status}`)).toMatchObject({ downloadUrl: null, selected: null });
     }
   });

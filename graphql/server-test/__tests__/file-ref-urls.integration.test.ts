@@ -185,8 +185,7 @@ describe('file-reference column URLs', () => {
   });
 
   it('reads the files row as the reader: a file RLS hides gives no URL', async () => {
-    // The seed leaves Bob's rows `requested`; both must be live so that only RLS tells them apart.
-    await pg.query(`UPDATE "${bob.storageSchema}".app_files SET status = 'uploaded' WHERE id = ANY($1::uuid[])`, [
+    await pg.query(`UPDATE "${bob.storageSchema}".app_files SET status = 'superseded' WHERE id = ANY($1::uuid[])`, [
       [bobPrivateFileId, bobPublicFileId]
     ]);
     const hidden = await addProduct({
@@ -194,10 +193,13 @@ describe('file-reference column URLs', () => {
       key: 'seeded-private-hash',
       versions: [version('derived/seeded-private-hash/small-0a1b2c3d.webp', 'small', 320)]
     });
-    const visible = await addProduct({ id: bobPublicFileId, key: 'seeded-public-hash' });
+    const visibleVersion = version('derived/seeded-public-hash/small-0a1b2c3d.webp', 'small', 320);
+    const visible = await addProduct({ id: bobPublicFileId, key: 'seeded-public-hash', versions: [visibleVersion] });
 
     expect(await product(bob, hidden, 320)).toEqual({ photoUrl: null, source: null, photoVersions: null });
-    expect((await product(bob, visible, 320)).source).toContain('seeded-public-hash');
+    const got = await product(bob, visible, 320);
+    expect(got.source).toContain('seeded-public-hash');
+    expect(pathOf(got.photoUrl)).toContain(visibleVersion.key);
   });
 
   it('resolves each element of an image[] column on its own', async () => {

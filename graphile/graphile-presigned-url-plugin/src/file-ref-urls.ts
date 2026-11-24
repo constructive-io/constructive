@@ -39,7 +39,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
 import { FILE_REF_DOMAINS } from 'graphile-storage-registry';
 
-import { isLiveFileRow } from './file-lifecycle';
+import { isDownloadableFileRow } from './file-lifecycle';
 import { resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedGetUrl } from './s3-signer';
 import { loadAllStorageModules, readBucketPhysicalName } from './storage-module-cache';
@@ -178,7 +178,7 @@ class RequestFiles {
         values: [missing],
       });
       for (const row of rows as FilesRow[]) {
-        if (!row.key || !isLiveFileRow(row)) continue;
+        if (!row.key || !isDownloadableFileRow(row)) continue;
         const bucketKey = `${config.id}:${row.bucket_id}`;
         if (!this.buckets.has(bucketKey)) {
           this.buckets.set(bucketKey, await readBucketPhysicalName(pgClient, config, row.bucket_id));

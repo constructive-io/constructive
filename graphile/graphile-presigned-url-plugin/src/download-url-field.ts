@@ -28,7 +28,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
 import { DOWNLOAD_URL_FIELD } from 'graphile-storage-registry';
 
-import { isLiveFileRow } from './file-lifecycle';
+import { isDownloadableFileRow } from './file-lifecycle';
 import { isVersionKeyOf } from './file-ref-urls';
 import { resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedGetUrl } from './s3-signer';
@@ -92,7 +92,7 @@ export function createDownloadUrlPlugin(
                   description:
                     'URL to download this file. For public files, returns the public URL. ' +
                     'For private files, returns a time-limited presigned URL. ' +
-                    'Null unless the file is uploaded or processed.',
+                    'Null unless the file is uploaded, processed, or superseded.',
                   type: GraphQLString,
                   args: {
                     version: {
@@ -127,7 +127,7 @@ export function createDownloadUrlPlugin(
 
                     return lambda($combined, async ({ key, isPublic, filename, bucketId, status, version, imageVersions, withPgClient, pgSettings }: any) => {
                       if (!key) return null;
-                      if (!isLiveFileRow({ status })) return null;
+                      if (!isDownloadableFileRow({ status })) return null;
 
                       if (!withPgClient || !pgSettings) return null;
 
