@@ -384,7 +384,11 @@ describe('public tenant WebSocket subscriptions', () => {
 
   it('refuses mutations on the subscription-only transport', async () => {
     await expect(subscribe({ Authorization: `Bearer ${token}` }, {}, 'mutation { issueSession(input: {actor: "' + ACTOR + '"}) { result } }')).rejects.toEqual(expect.arrayContaining([
-      expect.objectContaining({ message: 'WebSocket transport only accepts subscriptions' })
+      expect.objectContaining({
+        message: 'WebSocket transport only accepts subscriptions',
+        locations: [{ line: 1, column: 1 }],
+        extensions: expect.objectContaining({ code: 'BAD_USER_INPUT' })
+      })
     ]));
   });
 

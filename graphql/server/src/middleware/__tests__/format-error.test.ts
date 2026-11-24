@@ -53,12 +53,12 @@ const schema = new GraphQLSchema({
 });
 
 /** The errors a request produces, as the client would receive them. */
-const run = async (query: string, variables?: Record<string, unknown>) => {
+const run = async (query: string, variables?: Record<string, unknown>, operationName?: string) => {
   const document = parse(query);
   const invalid = validate(schema, document);
   const raised: readonly GraphQLError[] = invalid.length
     ? invalid
-    : ((await execute({ schema, document, variableValues: variables })).errors ?? []);
+    : ((await execute({ schema, document, variableValues: variables, operationName })).errors ?? []);
 
   expect(raised.length).toBeGreaterThan(0);
   return raised.map(
@@ -112,6 +112,16 @@ describe('formatError', () => {
 
     expect(result.message).toContain('must not have a selection');
     expect(result.extensions?.code).toBe('BAD_USER_INPUT');
+    expect(result).toMatchObject({ locations: [{ line: 1, column: 64 }] });
+  });
+
+  it.each([
+    [undefined, 'Must provide operation name if query contains multiple operations.'],
+    ['Unknown', 'Unknown operation named "Unknown".']
+  ])('keeps the operation selection refusal with operationName %s', async (operationName, message) => {
+    const [result] = await run('query A { ok } query B { ok }', undefined, operationName);
+
+    expect(result).toEqual({ message, extensions: { code: 'BAD_USER_INPUT' } });
   });
 
   it('keeps a code the GraphQL layer supplied for itself', () => {

@@ -162,15 +162,19 @@ const buildPreset = (
                 const error = errors.REQUEST_TOO_LARGE({ bytes, limit });
                 return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
               }
-              let operation;
+              let document;
               try {
-                operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+                document = parse(event.message.payload.query);
               } catch (error) {
                 if (error instanceof GraphQLError) return [error];
                 throw error;
               }
+              const operation = getOperationAST(document, event.message.payload.operationName);
               if (operation?.operation !== 'subscription') {
-                return [new GraphQLError('WebSocket transport only accepts subscriptions')];
+                return [new GraphQLError('WebSocket transport only accepts subscriptions', {
+                  nodes: operation ?? document,
+                  extensions: { code: 'BAD_USER_INPUT' }
+                })];
               }
               const result = await next();
               if (result && !Array.isArray(result)) {

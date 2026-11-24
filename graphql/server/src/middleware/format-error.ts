@@ -78,6 +78,13 @@ const GRAPHQL_REQUEST_CODES = new Set([
   'PERSISTED_QUERY_NOT_SUPPORTED'
 ]);
 
+const isOperationSelectionError = (error: GraphQLError): boolean =>
+  error.originalError == null && (
+    error.message === 'Must provide operation name if query contains multiple operations.' ||
+    error.message === 'Must provide an operation.' ||
+    /^Unknown operation named "[\s\S]*"\.$/.test(error.message)
+  );
+
 /**
  * Normalize any GraphQL/database error into a canonical Constructive shape.
  *
@@ -102,7 +109,7 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
   const nativePg = sqlState && !declaredDbError && /^[A-Z0-9]{5}$/.test(sqlState);
   const nativeCode = nativePg ? SQLSTATE_TO_CODE[sqlState] : undefined;
   const requestError = !nativePg && isRequestError(error) &&
-    (code ? GRAPHQL_REQUEST_CODES.has(code) : Boolean(error.locations?.length));
+    (code ? GRAPHQL_REQUEST_CODES.has(code) : Boolean(error.locations?.length) || isOperationSelectionError(error));
   const internal = !nativeCode && !requestError && (nativePg || !code || errorClass === 'internal');
 
   const extensions: Record<string, unknown> = nativePg || (internal && !declaredDbError)
