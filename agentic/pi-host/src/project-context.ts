@@ -1,11 +1,9 @@
 // The cwd decision, made explicit.
 //
 // `@agentic-kit/pi`'s control-plane tools resolve their tenant through
-// `resolveProjectContext(cwd)`, which reads `<cwd>/.env` for `ACCESS_TOKEN` and
-// `DATABASE_ID`. In a Job the cwd is a git clone of someone's repository, and
-// writing platform credentials into a work tree the agent is about to `git add`
-// is a credential leak one `git add -A` away — so the coding lane never
-// establishes project context in the clone.
+// `resolveProjectContext(cwd)`, which reads database binding metadata from
+// `<cwd>/.env` and authenticates through the host. The coding lane never
+// establishes project context in its git clone.
 //
 // It is still legitimate to want both lanes in one run (edit the repo *and*
 // change the schema), so the context is materialized in a directory beside the
@@ -21,7 +19,6 @@ export interface ProjectContextRequest {
   /** The git clone the agent edits. */
   workTree: string;
   databaseId: string;
-  accessToken: string;
   /** Written as `DATABASE_NAME`, which the record tools need. */
   databaseName?: string;
 }
@@ -32,7 +29,7 @@ export class ProjectContextInsideWorkTreeError extends Error {
     readonly workTree: string
   ) {
     super(
-      `refusing to write project credentials to ${dir}: it is inside the work tree ${workTree}, where a commit would publish them`
+      `refusing to write project binding to ${dir}: it is inside the work tree ${workTree}`
     );
     this.name = 'ProjectContextInsideWorkTreeError';
   }
@@ -54,14 +51,13 @@ export async function materializeProjectContext(
   if (isInside(request.workTree, request.dir)) {
     throw new ProjectContextInsideWorkTreeError(request.dir, request.workTree);
   }
-  if (!request.databaseId || !request.accessToken) {
-    throw new Error('a project context needs both DATABASE_ID and ACCESS_TOKEN');
+  if (!request.databaseId) {
+    throw new Error('a project context needs DATABASE_ID');
   }
 
   await mkdir(request.dir, { recursive: true, mode: 0o700 });
   const lines = [
     `DATABASE_ID=${request.databaseId}`,
-    `ACCESS_TOKEN=${request.accessToken}`,
     ...(request.databaseName ? [`DATABASE_NAME=${request.databaseName}`] : [])
   ];
   await writeFile(path.join(request.dir, '.env'), `${lines.join('\n')}\n`, { mode: 0o600 });
