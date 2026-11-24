@@ -18,12 +18,11 @@ import {
   settlePrewarm,
 } from '../app-workspace';
 import { classifyBackendErrors, postGraphQL } from '../graphql-http';
-import { getHost } from '../host';
+import { getHost, noBackendReason } from '../host';
 import { readEnv } from '../provision-database/env-file';
 import { normalizeSdkBarrels } from '../run-codegen/barrels';
 import { codegenEndpointEnv, derivePlaneEndpoints, envLocalContent } from '../run-codegen/endpoints';
 
-const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
 
 const RunCodegenZod = z.object({});
 type Params = z.infer<typeof RunCodegenZod>;
@@ -191,8 +190,9 @@ export function createRunCodegenTool(
         return fail('DATABASE_NAME missing from .env — provision the database first, then re-run.');
       }
 
-      const backend = getHost().backendConfig();
-      const apiEndpoint = envApiEndpoint || backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
+      const host = getHost();
+      const apiEndpoint = envApiEndpoint || host.backendConfig()?.apiEndpoint;
+      if (!apiEndpoint) return fail(noBackendReason(host.signInHint));
       const planes = derivePlaneEndpoints(apiEndpoint, dbName);
 
       // The dev server reads .env.local (NEXT_PUBLIC_DB_NAME + per-DB endpoint

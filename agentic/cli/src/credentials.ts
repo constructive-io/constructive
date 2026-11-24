@@ -1,5 +1,5 @@
 import { loadSession } from './account-store';
-import { loadBackendConfig } from './backend-store';
+import { backendFromApiEndpoint, loadBackendConfig } from './backend-store';
 import { loadConfig } from './config';
 
 export type ResolvedAccount = {
@@ -9,8 +9,10 @@ export type ResolvedAccount = {
 };
 
 export type ResolvedBackendConfig = {
-  apiEndpoint?: string;
-  modulesEndpoint?: string;
+  apiEndpoint: string;
+  modulesEndpoint: string;
+  agentEndpoint: string;
+  computeEndpoint: string;
 };
 
 // Both resolvers run on every tool call and re-read the store, so a login or
@@ -28,11 +30,29 @@ export function resolveAccount(): ResolvedAccount | null {
   return { userId: session.userId, accessToken: session.accessToken, apiKey: session.apiKey };
 }
 
+// CONSTRUCTIVE_API_ENDPOINT picks the whole backend: the other planes derive
+// from it unless their own CONSTRUCTIVE_*_ENDPOINT is set. A plane override
+// without an api endpoint names no backend, so it is an error, never a partial
+// config the tools would complete with a guess.
 export function resolveBackendConfig(): ResolvedBackendConfig | undefined {
-  const apiEndpoint = process.env.CONSTRUCTIVE_API_ENDPOINT;
-  const modulesEndpoint = process.env.CONSTRUCTIVE_MODULES_ENDPOINT;
-  if (apiEndpoint || modulesEndpoint) return { apiEndpoint, modulesEndpoint };
-  const stored = loadBackendConfig(loadConfig(process.env.AGENT_HOME).store);
-  if (!stored) return undefined;
-  return { apiEndpoint: stored.apiEndpoint, modulesEndpoint: stored.modulesEndpoint };
+  const env = process.env;
+  const overrides = {
+    modulesEndpoint: env.CONSTRUCTIVE_MODULES_ENDPOINT,
+    agentEndpoint: env.CONSTRUCTIVE_AGENT_ENDPOINT,
+    computeEndpoint: env.CONSTRUCTIVE_COMPUTE_ENDPOINT
+  };
+  const backend = env.CONSTRUCTIVE_API_ENDPOINT
+    ? backendFromApiEndpoint(env.CONSTRUCTIVE_API_ENDPOINT)
+    : loadBackendConfig(loadConfig(env.AGENT_HOME).store);
+  if (!backend) {
+    const stray = Object.entries(overrides).find(([, value]) => value);
+    if (stray) throw new Error('CONSTRUCTIVE_API_ENDPOINT is required when any CONSTRUCTIVE_*_ENDPOINT override is set.');
+    return undefined;
+  }
+  return {
+    apiEndpoint: backend.apiEndpoint,
+    modulesEndpoint: overrides.modulesEndpoint || backend.modulesEndpoint,
+    agentEndpoint: overrides.agentEndpoint || backend.agentEndpoint,
+    computeEndpoint: overrides.computeEndpoint || backend.computeEndpoint
+  };
 }

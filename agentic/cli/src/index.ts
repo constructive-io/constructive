@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { refreshApiKeyIfNeeded } from './auth';
-import { BACKEND_PRESETS, loadBackendConfig } from './backend-store';
+import { loadBackendConfig } from './backend-store';
 import { init, login, logout, skillsList, skillsUpdate, usage, whoami } from './commands';
 import { loadConfig } from './config';
 import { materializeDbTools } from './db-tools';
@@ -48,12 +48,14 @@ async function run(args: string[]): Promise<void> {
   materializeDbTools(config, log);
   // Fire-and-forget: keep the stored API key fresh (<7 days to expiry re-mints)
   // without ever blocking startup. Only an expired login session gets a line.
-  const backend = loadBackendConfig(config.store) ?? BACKEND_PRESETS.localnet;
-  void refreshApiKeyIfNeeded({ store: config.store, authEndpoint: backend.authEndpoint })
-    .then((status) => {
-      if (status === 'reauth-required') log('API key expired — run `agent login`');
-    })
-    .catch(() => {});
+  const backend = loadBackendConfig(config.store);
+  if (backend) {
+    void refreshApiKeyIfNeeded({ store: config.store, authEndpoint: backend.authEndpoint })
+      .then((status) => {
+        if (status === 'reauth-required') log('API key expired — run `agent login`');
+      })
+      .catch(() => {});
+  }
   // pi is ESM-only; tsc's CJS output would downlevel a plain `await import()`
   // into `require()`, which cannot load it. Indirect the import so it survives
   // transpilation in the CJS build.

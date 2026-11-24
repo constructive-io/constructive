@@ -14,7 +14,7 @@ import path from 'node:path';
 
 import { prewarmAppWorkspace, run, type RunCommand } from '../app-workspace';
 import { type DatabaseProbe, probeDatabase } from '../db-probe';
-import { getHost, type ProjectBinding, reprovisionAdvice, type ToolsHost } from '../host';
+import { getHost, noBackendReason, type ProjectBinding, reprovisionAdvice, type ToolsHost } from '../host';
 import { selectProvisionCredential } from './credential';
 import { archiveBindingKeys, ARCHIVED_BINDING_KEYS, type EnvVars, mergeEnv, provisionEnvVars, readEnv } from './env-file';
 import { loadProvisionManifest } from './manifest';
@@ -41,8 +41,6 @@ import {
 } from './request-database';
 import { type ProvisionOverlay, resolveProvisionModules } from './resolve';
 
-const DEFAULT_API_ENDPOINT = 'http://api.localhost:3000/graphql';
-const DEFAULT_MODULES_ENDPOINT = 'http://modules.localhost:3000/graphql';
 
 export type ProvisionInput = {
   databaseName: string;
@@ -226,14 +224,16 @@ async function provision(input: ProvisionInput, cwd: string, exec: RunCommand, v
   const name = input.databaseName?.trim();
   if (!name) return failure('failed', 'database_name is required.');
 
-  // Unify endpoints onto the app's backend-config store (environment-aware:
-  // *.localhost:3000 in dev, *.launchql.dev packaged). A process.env override
-  // still wins for ad-hoc dev; the hardcoded default is a last resort if the
-  // store isn't ready.
+  // The host's backend config is the only endpoint source: the account bearer
+  // provisions with it, so an ambient env var or a guessed default must never
+  // redirect it.
   const host = getHost();
   const backend = host.backendConfig();
-  const apiEndpoint = process.env.API_ENDPOINT || backend?.apiEndpoint || DEFAULT_API_ENDPOINT;
-  const modulesEndpoint = process.env.MODULES_ENDPOINT || backend?.modulesEndpoint || DEFAULT_MODULES_ENDPOINT;
+  const apiEndpoint = backend?.apiEndpoint;
+  const modulesEndpoint = backend?.modulesEndpoint;
+  if (!apiEndpoint || !modulesEndpoint) {
+    return failure('failed', `Cannot provision a database: ${noBackendReason(host.signInHint)}`);
+  }
 
   // Every project provisions UNDER the account (requestDatabase owns the
   // database to the JWT user). The account bearer authenticates the mutation

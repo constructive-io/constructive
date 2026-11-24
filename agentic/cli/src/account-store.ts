@@ -1,6 +1,5 @@
 import { ConfigStore } from 'appstash';
 
-import { BACKEND_PRESETS, saveBackendConfig } from './backend-store';
 
 export interface AccountSession {
   userId: string;
@@ -23,9 +22,11 @@ function currentContextName(store: ConfigStore): string | null {
   return store.getCurrentContext()?.name ?? null;
 }
 
-/** The active context, defaulting to localnet the first time one is needed. */
+/** The active context; a session is never filed under a backend nobody chose. */
 function ensureContextName(store: ConfigStore): string {
-  return currentContextName(store) ?? saveBackendConfig(store, BACKEND_PRESETS.localnet);
+  const name = currentContextName(store);
+  if (!name) throw new Error('No backend chosen — run `agent login` first.');
+  return name;
 }
 
 export function loadSession(store: ConfigStore, context?: string): AccountSession | null {

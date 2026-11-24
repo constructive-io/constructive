@@ -3,16 +3,21 @@ import * as os from 'os';
 import * as path from 'path';
 
 import { saveSession } from '../src/account-store';
-import { BACKEND_PRESETS, saveBackendConfig } from '../src/backend-store';
+import { backendFromApiEndpoint, saveBackendConfig } from '../src/backend-store';
 import { loadConfig } from '../src/config';
 import { materializeDbTools } from '../src/db-tools';
+
+const LOCAL = backendFromApiEndpoint('http://api.localhost:3000/graphql');
+const REMOTE = backendFromApiEndpoint('https://api.example.com/graphql');
 
 const CONSTRUCTIVE_VARS = [
   'CONSTRUCTIVE_USER_ID',
   'CONSTRUCTIVE_ACCESS_TOKEN',
   'CONSTRUCTIVE_API_KEY',
   'CONSTRUCTIVE_API_ENDPOINT',
-  'CONSTRUCTIVE_MODULES_ENDPOINT'
+  'CONSTRUCTIVE_MODULES_ENDPOINT',
+  'CONSTRUCTIVE_AGENT_ENDPOINT',
+  'CONSTRUCTIVE_COMPUTE_ENDPOINT'
 ];
 
 describe('materializeDbTools', () => {
@@ -71,16 +76,31 @@ describe('materializeDbTools', () => {
     process.env.CONSTRUCTIVE_ACCESS_TOKEN = 't1';
     process.env.CONSTRUCTIVE_API_ENDPOINT = 'http://api.localhost:3000/graphql';
     expect(host.account()).toMatchObject({ userId: 'u1', accessToken: 't1' });
-    expect(host.backendConfig()).toMatchObject({
-      apiEndpoint: 'http://api.localhost:3000/graphql'
+    expect(host.backendConfig()).toEqual({
+      apiEndpoint: 'http://api.localhost:3000/graphql',
+      modulesEndpoint: 'http://modules.localhost:3000/graphql',
+      agentEndpoint: 'http://agent.localhost:3000/graphql',
+      computeEndpoint: 'http://compute.localhost:3000/graphql'
     });
+
+    process.env.CONSTRUCTIVE_MODULES_ENDPOINT = 'http://modules.other.test/graphql';
+    expect(host.backendConfig()).toMatchObject({
+      apiEndpoint: 'http://api.localhost:3000/graphql',
+      modulesEndpoint: 'http://modules.other.test/graphql'
+    });
+  });
+
+  it('rejects a plane override that names no api endpoint instead of completing it with a guess', () => {
+    const { host } = loadHost();
+    process.env.CONSTRUCTIVE_MODULES_ENDPOINT = 'https://modules.example.com/graphql';
+    expect(() => host.backendConfig()).toThrow('CONSTRUCTIVE_API_ENDPOINT is required');
   });
 
   it('reads the stored session and backend per call when env vars are absent', () => {
     const { config, host } = loadHost();
     expect(host.account()).toBeNull();
 
-    saveBackendConfig(config.store, BACKEND_PRESETS.devnet);
+    saveBackendConfig(config.store, REMOTE);
     saveSession(config.store, {
       userId: 'stored-user',
       email: 'dev@example.com',
@@ -95,13 +115,16 @@ describe('materializeDbTools', () => {
       apiKey: 'stored-key'
     });
     expect(host.backendConfig()).toEqual({
-      apiEndpoint: BACKEND_PRESETS.devnet.apiEndpoint,
-      modulesEndpoint: BACKEND_PRESETS.devnet.modulesEndpoint
+      apiEndpoint: REMOTE.apiEndpoint,
+      modulesEndpoint: REMOTE.modulesEndpoint,
+      agentEndpoint: REMOTE.agentEndpoint,
+      computeEndpoint: REMOTE.computeEndpoint
     });
   });
 
   it('lets env vars beat the stored session', () => {
     const { config, host } = loadHost();
+    saveBackendConfig(config.store, LOCAL);
     saveSession(config.store, {
       userId: 'stored-user',
       email: 'dev@example.com',

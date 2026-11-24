@@ -65,7 +65,7 @@ Env overrides: `AGENT_SKILLS_REPO`, `AGENT_SKILLS_PIN`, `AGENT_HOME` (appstash b
 
 ## Authentication
 
-`agent login` signs in to the Constructive platform with email and password. The flow asks for a backend first: `localnet` (a local backend on `*.localhost:3000`), `devnet` (`*.launchql.dev`), or a custom API URL. After sign-in, the CLI mints a 5-year API key for the db tools and checks it on each startup. `agent logout` revokes the key and deletes the session.
+`agent login` signs in to the Constructive platform with email and password. The CLI ships no backend URLs: the flow asks for the backend's API GraphQL endpoint (e.g. `https://api.example.com/graphql`, defaulting to the last one used or `CONSTRUCTIVE_API_ENDPOINT`) and derives the auth, modules, agent and compute endpoints from its host. With no backend chosen the db tools fail and say so; they never fall back to a default host. After sign-in, the CLI mints a 5-year API key for the db tools and checks it on each startup. `agent logout` revokes the key and deletes the session.
 
 Credential files (mode `0600`, plaintext):
 
@@ -75,7 +75,7 @@ Credential files (mode `0600`, plaintext):
 The db tools read these files on each tool call, so a login mid-session is picked up without a restart. Tokens never enter the environment of child processes.
 
 Env overrides for CI and headless use (these win over the stored session; read per tool call):
-`CONSTRUCTIVE_USER_ID`, `CONSTRUCTIVE_ACCESS_TOKEN`, `CONSTRUCTIVE_API_KEY` (optional), `CONSTRUCTIVE_API_ENDPOINT`, `CONSTRUCTIVE_MODULES_ENDPOINT` (default to the local backend).
+`CONSTRUCTIVE_USER_ID`, `CONSTRUCTIVE_ACCESS_TOKEN`, `CONSTRUCTIVE_API_KEY` (optional), `CONSTRUCTIVE_API_ENDPOINT` (picks the backend; the other planes derive from it), and `CONSTRUCTIVE_MODULES_ENDPOINT`, `CONSTRUCTIVE_AGENT_ENDPOINT`, `CONSTRUCTIVE_COMPUTE_ENDPOINT` to override one plane (only together with `CONSTRUCTIVE_API_ENDPOINT`).
 
 ## Roadmap
 

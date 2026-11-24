@@ -1,11 +1,9 @@
-import { deriveSubdomainEndpoint } from '@agentic-kit/pi';
 import { Inquirerer } from 'inquirerer';
 
 import { loadSession } from './account-store';
 import { signIn, signOut } from './auth';
 import {
-  BACKEND_PRESETS,
-  BackendConfig,
+  backendFromApiEndpoint,
   contextNameFor,
   loadBackendConfig,
   saveBackendConfig
@@ -72,36 +70,16 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
   try {
     const answers = await prompter.prompt(argv, [
       {
-        type: 'list',
-        name: 'backend',
-        message: 'Backend',
-        options: [...Object.keys(BACKEND_PRESETS), 'custom'],
-        default: saved ? contextNameFor(saved) : 'localnet'
-      },
-      {
         type: 'text',
         name: 'apiUrl',
         message: 'API GraphQL endpoint (e.g. https://api.example.com/graphql)',
-        default: saved?.apiEndpoint,
-        when: (a: Record<string, unknown>) => a.backend === 'custom'
+        default: saved?.apiEndpoint ?? process.env.CONSTRUCTIVE_API_ENDPOINT
       },
       { type: 'text', name: 'email', message: 'Email' },
       { type: 'password', name: 'password', message: 'Password' }
     ]);
 
-    let backend: BackendConfig;
-    if (answers.backend === 'custom') {
-      const apiUrl = String(answers.apiUrl ?? '').trim();
-      const authEndpoint = deriveSubdomainEndpoint(apiUrl, 'auth');
-      const modulesEndpoint = deriveSubdomainEndpoint(apiUrl, 'modules');
-      if (!apiUrl || !authEndpoint || !modulesEndpoint) {
-        throw new Error(`Invalid API endpoint URL: ${apiUrl || '(empty)'}`);
-      }
-      backend = { apiEndpoint: apiUrl, authEndpoint, modulesEndpoint };
-    } else {
-      backend = BACKEND_PRESETS[String(answers.backend)];
-      if (!backend) throw new Error(`Unknown backend preset: ${answers.backend}`);
-    }
+    const backend = backendFromApiEndpoint(String(answers.apiUrl ?? ''));
 
     // File the session under the backend's context name, then commit the backend
     // itself: a failed sign-in must leave neither behind.
@@ -129,7 +107,11 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
 }
 
 export async function logout(config: AgentCliConfig): Promise<void> {
-  const backend = loadBackendConfig(config.store) ?? BACKEND_PRESETS.localnet;
+  const backend = loadBackendConfig(config.store);
+  if (!backend) {
+    log('not signed in.');
+    return;
+  }
   const wasSignedIn = await signOut({
     store: config.store,
     authEndpoint: backend.authEndpoint

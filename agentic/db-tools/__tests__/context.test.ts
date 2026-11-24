@@ -172,7 +172,10 @@ describe('resolveProjectContext binding health', () => {
   it("gives the host's reprovision advice for a missing database instead of the tool's", async () => {
     configureHost({
       account: () => ({ userId: 'u1', accessToken: 'account-bearer' }),
-      backendConfig: () => null,
+      backendConfig: () => ({
+        apiEndpoint: 'http://api.localhost:3000/graphql',
+        modulesEndpoint: 'http://modules.localhost:3000/graphql',
+      }),
       reprovisionHint: 'Approve the rebuild card to re-provision.',
       toolReprovision: false,
     });
@@ -183,6 +186,20 @@ describe('resolveProjectContext binding health', () => {
     expect(resolved.code).toBe('db-missing');
     expect(resolved.reason).toMatch(/Approve the rebuild card/);
     expect(resolved.reason).not.toMatch(/reprovision: true/);
+  });
+
+  it('fails with no backend configured instead of sending the bearer to a default host', async () => {
+    configureHost({
+      account: () => ({ userId: 'u1', accessToken: 'account-bearer' }),
+      backendConfig: () => null,
+      signInHint: 'Run `agent login` to sign in.',
+    });
+
+    const resolved = await resolveProjectContext(source);
+
+    expect(resolved).toMatchObject({ context: null, code: 'no-backend' });
+    expect(resolved.reason).toMatch(/No Constructive backend is configured\. Run `agent login`/);
+    expect(mockProbe).not.toHaveBeenCalled();
   });
 });
 
