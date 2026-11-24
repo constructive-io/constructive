@@ -7,11 +7,12 @@
  * These bounds are therefore checked against the *document*, before any plan is
  * executed.
  *
- * Cost is measured as the number of rows the operation can pull: a connection
- * contributes its page size multiplied by the page sizes of every connection
- * above it, so `users(first: 100) { posts(first: 100) }` costs 100 + 10,000
- * rather than the 4 fields it looks like. A connection with no `first`/`last`
- * is charged `ASSUMED_PAGE_SIZE`, since it is unbounded in principle.
+ * A connection selecting rows contributes its page size per parent row, and
+ * multiplies the cost of nested connections. Without `first`/`last` it is
+ * charged `ASSUMED_PAGE_SIZE`, since it is unbounded in principle. Grouped
+ * aggregates ignore pagination and always incur at least that estimate.
+ * A connection selecting only metadata contributes one per parent row and
+ * does not multiply nested costs.
  *
  * The walk is manual rather than `visitWithTypeInfo` because fragment spreads
  * have to be followed (a document can hide its depth entirely inside
@@ -71,6 +72,39 @@ const PAGE_SIZE_ARGS = ['first', 'last'] as const;
 /** A connection is any object type that carries Relay's `pageInfo`. */
 const isConnectionType = (type: GraphQLNamedType | null | undefined): boolean =>
   Boolean(type && isObjectType(type) && 'pageInfo' in type.getFields());
+
+function connectionMultiplier(
+  selectionSet: SelectionSetNode | undefined,
+  fragments: Record<string, FragmentDefinitionNode>,
+  rowPageSize: number
+): number {
+  if (!selectionSet) return 1;
+  const pending = [selectionSet];
+  const seenFragments = new Set<string>();
+  let selectsRows = false;
+  let selectsGroups = false;
+  for (let current = pending.pop(); current; current = pending.pop()) {
+    for (const selection of current.selections) {
+      if (selection.kind === Kind.FIELD) {
+        const fieldName = selection.name.value;
+        if (fieldName === 'nodes' || fieldName === 'edges') selectsRows = true;
+        if (fieldName === 'groupedAggregates') selectsGroups = true;
+        if (selectsRows && selectsGroups) return Math.max(rowPageSize, ASSUMED_PAGE_SIZE);
+      } else if (selection.kind === Kind.INLINE_FRAGMENT) {
+        pending.push(selection.selectionSet);
+      } else {
+        const name = selection.name.value;
+        const fragment = fragments[name];
+        if (fragment && !seenFragments.has(name)) {
+          seenFragments.add(name);
+          pending.push(fragment.selectionSet);
+        }
+      }
+    }
+  }
+  if (selectsGroups) return ASSUMED_PAGE_SIZE;
+  return selectsRows ? rowPageSize : 1;
+}
 
 interface Walk {
   schema: GraphQLSchema;
@@ -171,11 +205,15 @@ function walkSelectionSet(
         );
       }
 
-      // A connection charges rows; every other field is free, so a wide but
+      // Only connections contribute to cost, so a wide but
       // flat selection is not penalized for being wide.
       let childMultiplier = multiplier;
       if (isConnectionType(fieldType)) {
-        childMultiplier = multiplier * (pageSize ?? ASSUMED_PAGE_SIZE);
+        childMultiplier *= connectionMultiplier(
+          selection.selectionSet,
+          walk.fragments,
+          pageSize ?? ASSUMED_PAGE_SIZE
+        );
         walk.cost += childMultiplier;
         if (walk.cost > walk.protection.maxQueryCost) {
           reject(

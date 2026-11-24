@@ -5,8 +5,8 @@ import { buildSchema, parse } from 'graphql';
 import { enforceDocumentProtection } from '../document-gate';
 
 /**
- * A miniature Graphile-shaped schema: two connections (one nested inside the
- * other) so cost multiplies, plus a self-referencing field so depth can be
+ * A miniature Graphile-shaped schema with nested connections so cost
+ * multiplies, plus a self-referencing field so depth can be
  * driven arbitrarily deep.
  */
 const schema = buildSchema(/* GraphQL */ `
@@ -18,12 +18,38 @@ const schema = buildSchema(/* GraphQL */ `
     id: ID!
     title: String
     author: User
+    comments: CommentsConnection
+  }
+
+  type Comment {
+    id: ID!
+  }
+
+  type CommentsConnection {
+    nodes: [Comment]
+    pageInfo: PageInfo!
+    totalCount: Int
+  }
+
+  type PostEdge {
+    node: Post
+  }
+
+  type PostAggregates {
+    distinctCount: Int
+  }
+
+  enum PostGroupBy {
+    TITLE
   }
 
   type PostsConnection {
     nodes: [Post]
+    edges: [PostEdge]
     pageInfo: PageInfo!
     totalCount: Int
+    aggregates: PostAggregates
+    groupedAggregates(groupBy: [PostGroupBy!]!): [PostAggregates!]
   }
 
   type User {
@@ -161,6 +187,43 @@ describe('cost', () => {
 
   it('charges an unpaged connection an assumed page size rather than nothing', () => {
     expect(enforce('{ users { nodes { id } } }').cost).toBe(100);
+  });
+
+  it('accepts a three-level read whose innermost connection only selects totalCount', () => {
+    expect(enforce('{ users { nodes { name posts { nodes { title comments { totalCount } } } } } }').cost)
+      .toBe(20_100);
+  });
+
+  it('still refuses fetching rows from all three levels at the default budget', () => {
+    const source = '{ users { nodes { posts { nodes { comments { nodes { id } } } } } } }';
+    expect(enforce(source, { maxQueryCost: 1_010_100 }).cost).toBe(1_010_100);
+    expect(codeOf(() => enforce(source))).toBe('QUERY_TOO_COSTLY');
+  });
+
+  it('uses field names rather than aliases in metadata-only connection fragments', () => {
+    expect(enforce(`
+      { users { nodes { posts(first: 50) { ...postCount } } } }
+      fragment postCount on PostsConnection {
+        ... on PostsConnection { nodes: totalCount edges: pageInfo { hasNextPage } }
+      }
+    `).cost).toBe(200);
+  });
+
+  it('multiplies when a named fragment and inline fragment select aliased edges', () => {
+    expect(enforce(`
+      { users { nodes { posts(first: 50) { ...postRows } } } }
+      fragment postRows on PostsConnection {
+        ... on PostsConnection { items: edges { node { id } } }
+      }
+    `).cost).toBe(5_100);
+  });
+
+  it('charges grouped aggregates as unpaged rows without charging plain aggregates as rows', () => {
+    expect(enforce('{ users { nodes { posts { aggregates { distinctCount } } } } }').cost)
+      .toBe(200);
+    expect(enforce(`{
+      users { nodes { posts(first: 1) { groups: groupedAggregates(groupBy: [TITLE]) { distinctCount } } } }
+    }`).cost).toBe(10_100);
   });
 });
 
