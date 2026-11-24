@@ -39,11 +39,12 @@ export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
   for (const option of read.options) {
     const v = option.value;
     if (!v) continue;
-    const sends = filesOf(option).length > 0;
+    const named = filesOf(option);
+    const sends = named.length > 0;
     if (isOption(option, ...CURL_DATA)) {
       dataForms = true;
       if (isOption(option, '-T', '--upload-file')) say(`curl ${option.name} ${v.raw} uploads a file`);
-      else if (sends) say(`curl ${option.name} ${v.raw} sends a file's contents`);
+      else if (sends) say(`curl ${option.name} ${v.raw} ${named.every((f) => f.kind === 'known') ? 'sends' : 'may send'} a file's contents`);
       else if (v.kind === 'unknown') say(`curl ${option.name} with a value from a variable or substitution`);
     } else if (sends && isOption(option, '-H', '--header')) {
       say(`curl ${option.name} ${v.raw} sends headers from a file`);
