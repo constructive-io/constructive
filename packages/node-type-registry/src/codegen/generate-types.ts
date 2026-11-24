@@ -416,24 +416,18 @@ function findTable(
   return tables.find((tbl) => tbl.schemaName === schemaName && tbl.name === tableName);
 }
 
-function buildBlueprintField(
-  meta?: MetaTableInfo[]
-): t.ExportNamedDeclaration {
-  const table = meta && findTable(meta, 'metaschema_public', 'field');
-  if (table) {
-    return deriveInterfaceFromTable(
-      table,
-      'BlueprintField',
-      'A custom field (column) to add to a blueprint table. Derived from _meta.'
-    );
-  }
-  // Static fallback
+function buildBlueprintField(): t.ExportNamedDeclaration {
+  // Blueprint field input is not the stored metaschema field row.
   return addJSDoc(
     exportInterface('BlueprintField', [
       addJSDoc(requiredProp('name', t.tsStringKeyword()), 'The column name.'),
-      addJSDoc(requiredProp('type', t.tsStringKeyword()), 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'),
+      addJSDoc(requiredProp('type', t.tsTypeReference(t.identifier('FieldType'))), 'The structured PostgreSQL type (e.g., { name: "text" }).'),
       addJSDoc(optionalProp('is_required', t.tsBooleanKeyword()), 'Whether the column has a NOT NULL constraint.'),
-      addJSDoc(optionalProp('default_value', t.tsStringKeyword()), 'SQL default value expression (e.g., "true", "now()").'),
+      addJSDoc(optionalProp('default', t.tsTypeReference(t.identifier('FieldDefault'))), 'The structured default (e.g., { value: "pending" }).'),
+      optionalProp('min', t.tsNumberKeyword()),
+      optionalProp('max', t.tsNumberKeyword()),
+      optionalProp('regexp', t.tsStringKeyword()),
+      optionalProp('index', t.tsStringKeyword()),
       addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.')
     ]),
     'A custom field (column) to add to a blueprint table.'
@@ -683,8 +677,8 @@ function buildRelationTypes(
         optionalProp('target_table', t.tsStringKeyword()),
         'Name of the target table. Required unless the end is given as target_module.'
       ),
-      optionalProp('source_schema_name', t.tsStringKeyword()),
-      optionalProp('target_schema_name', t.tsStringKeyword()),
+      optionalProp('source_schema', t.tsStringKeyword()),
+      optionalProp('target_schema', t.tsStringKeyword()),
       addJSDoc(
         optionalProp(
           'source_module',
@@ -1734,7 +1728,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     ? 'Derived from _meta'
     : 'Static fallback (no _meta provided)';
   statements.push(sectionComment(`Structural types — ${metaSource}`));
-  statements.push(buildBlueprintField(meta));
+  statements.push(buildBlueprintField());
   statements.push(buildBlueprintPolicyWithCheck(authzNodes));
   statements.push(buildBlueprintPolicy(authzNodes, meta));
   statements.push(buildBlueprintFtsSource());

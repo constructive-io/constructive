@@ -1773,12 +1773,16 @@ export interface ViewTableProjectionParams {
 export interface BlueprintField {
   /** The column name. */
   name: string;
-  /** The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid"). */
-  type: string;
+  /** The structured PostgreSQL type (e.g., { name: "text" }). */
+  type: FieldType;
   /** Whether the column has a NOT NULL constraint. */
   is_required?: boolean;
-  /** SQL default value expression (e.g., "true", "now()"). */
-  default_value?: string;
+  /** The structured default (e.g., { value: "pending" }). */
+  default?: FieldDefault;
+  min?: number;
+  max?: number;
+  regexp?: string;
+  index?: string;
   /** Comment/description for this field. */
   description?: string;
 }
@@ -2415,40 +2419,40 @@ export type BlueprintRelation = {
   $type: 'RelationBelongsTo';
   /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
   /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
+  source_schema?: string;
+  target_schema?: string;
   /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
   /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationBelongsToParams> | {
   $type: 'RelationHasMany';
   /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
   /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
+  source_schema?: string;
+  target_schema?: string;
   /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
   /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationHasManyParams> | {
   $type: 'RelationHasOne';
   /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
   /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
+  source_schema?: string;
+  target_schema?: string;
   /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
   /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationHasOneParams> | {
   $type: 'RelationManyToMany';
   /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
   /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
+  source_schema?: string;
+  target_schema?: string;
   /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
   /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
 } & Partial<RelationManyToManyParams> | {
   $type: 'RelationSpatial';
   /** Name of the source table. Required unless the end is given as source_module. */source_table?: string;
   /** Name of the target table. Required unless the end is given as target_module. */target_table?: string;
-  source_schema_name?: string;
-  target_schema_name?: string;
+  source_schema?: string;
+  target_schema?: string;
   /** Point the source end at a table an installed module generated, e.g. { type: "agent", scope: "org", table: "message" }. Mutually exclusive with source_table/source_schema. */source_module?: BlueprintModuleTableRef;
   /** Point the target end at a table an installed module generated, e.g. { type: "storage", scope: "app", table: "files" }. Mutually exclusive with target_table/target_schema. */target_module?: BlueprintModuleTableRef;
   /** Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag. */source_field: string;
