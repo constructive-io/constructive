@@ -34,7 +34,7 @@ This runs all migrations in your `pgpm.plan` and provisions the schema. If your 
 pgpm deploy --database myapp --createdb --yes
 ```
 
-For full deploy options, see the **pgpm** skill: [references/deploy.md](../pgpm/references/deploy.md)
+For full deploy options, see the **pgpm** skill: [references/deploy.md](../../pgpm/references/deploy-lifecycle.md)
 
 ## Start GraphQL Server
 

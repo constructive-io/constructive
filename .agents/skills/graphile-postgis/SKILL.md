@@ -100,7 +100,7 @@ With a parametric operator, add `param_name`:
 - Both fields must already exist — `RelationSpatial` is metadata-only, it doesn't create columns or junction tables.
 - **One direction per tag.** If you want the inverse, write a second `RelationSpatial` on the other side (e.g. `counties.contained_clinic` with `st_contains`). The system does not auto-generate symmetric entries.
 - **Idempotent.** Re-running the blueprint with the same `(source_table, name)` is a no-op — `provision_spatial_relation` returns the existing id without modifying the row.
-- Registered node type: [`graphql/node-type-registry/src/relation/relation-spatial.ts`](../../../graphql/node-type-registry/src/relation/relation-spatial.ts).
+- Registered node type: [`graphql/node-type-registry/src/relation/relation-spatial.ts`](../../../packages/node-type-registry/src/relation/relation-spatial.ts).
 - Dispatcher: `metaschema_modules_public.construct_blueprint` in `constructive-db` routes `$type=RelationSpatial` to `provision_spatial_relation`.
 
 ## Querying through the ORM (`where:`)
@@ -189,9 +189,9 @@ Opt a column out with `@spatialRelationSkipIndexCheck` on that column.
 
 ## Pointers
 
-- Plugin source: [`graphile/graphile-postgis/src/plugins/PostgisSpatialRelationsPlugin.ts`](../../../graphile/graphile-postgis/src/plugins/PostgisSpatialRelationsPlugin.ts)
+- Plugin source: [`graphile/graphile-postgis/src/plugins/PostgisSpatialRelationsPlugin.ts`](../../../graphile/graphile-postgis/src/plugins/spatial-relations.ts)
 - Plugin README (full reference + FAQ): [`graphile/graphile-postgis/README.md`](../../../graphile/graphile-postgis/README.md)
-- Blueprint node type: [`graphql/node-type-registry/src/relation/relation-spatial.ts`](../../../graphql/node-type-registry/src/relation/relation-spatial.ts)
+- Blueprint node type: [`graphql/node-type-registry/src/relation/relation-spatial.ts`](../../../packages/node-type-registry/src/relation/relation-spatial.ts)
 - Metaschema table, trigger, provisioner: `constructive-io/constructive-db`, `metaschema_public.spatial_relation` (PR #840) + `metaschema_modules_public.provision_spatial_relation` + `construct_blueprint` dispatcher (PR #844)
 - E2E test suite (66 live-PG cases): `graphql/orm-test/__tests__/postgis-spatial.test.ts`
 - Unit test suite (218 structural cases): `graphile/graphile-postgis/__tests__/`

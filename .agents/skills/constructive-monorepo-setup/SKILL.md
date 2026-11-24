@@ -1,3 +1,8 @@
+---
+name: constructive-monorepo-setup
+description: "Set up and navigate the Constructive monorepo for local development. Use for Node and pnpm prerequisites, Docker PostgreSQL, workspace builds and tests, SDK regeneration, or Graphile plugin development."
+---
+
 # Constructive Monorepo Setup
 
 Set up the Constructive monorepo for local development and testing.
@@ -37,11 +42,11 @@ pnpm test
 
 Use `docker.io/constructiveio/postgres-plus:18` which includes PostgreSQL with PostGIS, pgvector, pg_textsearch, pg_trgm, btree_gin, and uuid-ossp extensions.
 
-For detailed Docker and pgpm usage, see the [pgpm skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/pgpm) in the public skills repo.
+For detailed Docker and pgpm usage, see the [pgpm skill](../pgpm/SKILL.md) in this repo.
 
 ## Monorepo Navigation
 
-See [AGENTS.md](../../AGENTS.md) at the repo root for the full navigation guide covering:
+See [AGENTS.md](../../../AGENTS.md) at the repo root for the full navigation guide covering:
 - Package layout (`packages/*`, `pgpm/*`, `graphql/*`, `postgres/*`, `graphile/*`)
 - Entry points (PGPM CLI, Constructive CLI, GraphQL Server)
 - Environment configuration patterns
@@ -58,22 +63,22 @@ cnc codegen
 
 Skills are auto-generated to `.agents/skills/` when `docs.skills: true` is set in the codegen config.
 
-For detailed codegen configuration, see the [constructive-graphql skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql) — specifically the [codegen.md reference](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql/references/codegen.md).
+For detailed codegen configuration, see the [Constructive Codegen skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-codegen).
 
 ## Graphile Plugin Development
 
-Graphile plugins live under `graphile/*`. For PostGIS plugin development and testing, see the [constructive-graphql skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql) — specifically the [search-postgis.md reference](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql/references/search-postgis.md).
+Graphile plugins live under `graphile/*`. Start with the [Graphile PostGIS skill](../graphile-postgis/SKILL.md) for spatial plugin development.
 
 For exposing cross-table PostGIS queries to the ORM/GraphQL layer via `@spatialRelation` smart tags and the `RelationSpatial` blueprint node (point-in-polygon, radius search, etc. without sending GeoJSON to the client), see the [graphile-postgis skill](../graphile-postgis/SKILL.md) in this repo.
 
 ## Testing
 
-See [AGENTS.md](../../AGENTS.md) for the testing framework selection guide. For comprehensive database testing patterns, see the [constructive-testing skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-testing).
+See [AGENTS.md](../../../AGENTS.md) for the testing framework selection guide. For comprehensive database testing patterns, see the [constructive-testing skill](../constructive-testing/SKILL.md).
 
 ## Related Skills
 
-- [pgpm](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/pgpm) — Docker, migrations, deploy/verify/revert
-- [constructive-graphql](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql) — Codegen, search, PostGIS
-- [constructive-testing](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-testing) — pgsql-test, drizzle-orm-test
-- [constructive-tooling](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-tooling) — pnpm workspace, makage builds
-- [constructive-setup](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-setup) — Full setup guide (public skills repo)
+- [pgpm](../pgpm/SKILL.md) — Docker, migrations, deploy/verify/revert
+- [constructive-codegen](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-codegen) — GraphQL client generation
+- [constructive-testing](../constructive-testing/SKILL.md) — pgsql-test, drizzle-orm-test
+- [constructive-pnpm](../constructive-pnpm/SKILL.md) — pnpm workspace, makage builds
+- [constructive-setup](../constructive-setup/SKILL.md) — Full setup guide
