@@ -128,7 +128,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     const v = option.value;
     const moves = dirSpecOf(option);
     if (moves) {
-      if (v) cwd = movedBy(analyzer, moves, v, cwd ?? start, start);
+      cwd = movedBy(analyzer, moves, v, cwd ?? start, start) ?? cwd;
     } else if (isOption(option, '-c')) {
       configKey(ctx, 'git -c', v);
       const repointed = v?.kind === 'known' ? GIT_REMOTE_URL_CONFIG.exec(v.text) : null;

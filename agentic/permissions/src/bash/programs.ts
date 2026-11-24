@@ -399,6 +399,37 @@ export const ENV: ProgramSpec = {
   stopAtOperand: true
 };
 
+/** A flag that runs the program in the target user's home, which the analysis cannot know: a login. */
+const movesHome = (...names: string[]): OptionSpec => ({ names, value: 'none', effect: 'changes-dir', repeat: 'last-wins' });
+
+/**
+ * `sudo [options] [VAR=value …] [command …]`, read up to the first operand;
+ * doas and pkexec read the options they share with it. `-D` runs the command
+ * in a dir (sudo takes it once, from the dir it started in), and `-i` in the
+ * target user's home.
+ */
+export const SUDO: ProgramSpec = {
+  ...sub(
+    plain('-u', '--user', '-g', '--group', '-C', '--close-from', '-h', '--host', '-p', '--prompt', '-r', '--role', '-t', '--type', '-T', '--command-timeout'),
+    plain('-U', '--other-user', '-R', '--chroot', '-a', '--auth-type'),
+    flag('-A', '--askpass', '-b', '--background', '-B', '--bell', '-E', '-e', '--edit', '-H', '--set-home', '-K', '--remove-timestamp', '-k', '--reset-timestamp'),
+    flag('-l', '--list', '-n', '--non-interactive', '-N', '--no-update', '-P', '--preserve-groups', '-S', '--stdin', '-s', '--shell', '-V', '--version', '-v', '--validate'),
+    optionalPlain('--preserve-env'),
+    movesTo('last-wins', '-D', '--chdir'),
+    movesHome('-i', '--login')
+  ),
+  stopAtOperand: true
+};
+
+/** `su [options] [-] [user [argument …]]`, options anywhere: `-c` is a shell command, `-s` the shell it runs, and a login (`-l`, or `-`) starts in the target user's home. */
+export const SU: ProgramSpec = sub(
+  runsShell('required', '-c', '--command', '--session-command'),
+  does('runs-program', 'required', '-s', '--shell'),
+  plain('-g', '--group', '-G', '--supp-group', '-w', '--whitelist-environment'),
+  flag('-m', '-p', '--preserve-environment', '-f', '--fast', '-P', '--pty'),
+  movesHome('-l', '--login')
+);
+
 /** A file option whose value `-` is stdin or stdout. */
 const stdio = (spec: OptionSpec): OptionSpec => ({ ...spec, stdio: true });
 

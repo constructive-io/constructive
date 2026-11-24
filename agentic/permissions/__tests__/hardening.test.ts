@@ -343,7 +343,19 @@ const rows: Row[] = [
   ["export F=src/config.ts; su -l root -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
   // 39. an assignment before a program changes the HOME only that program sees, so bash 5.3's tilde does not read it later
   ['HOME=/tmp/x /usr/bin/true; cat ~/x', 'ask', 'allow', 'outside-workspace'],
-  ['env HOME=/tmp/x /usr/bin/true; cat ~/x', 'ask', 'allow', 'outside-workspace']
+  ['env HOME=/tmp/x /usr/bin/true; cat ~/x', 'ask', 'allow', 'outside-workspace'],
+  // 40. sudo's -D runs the command in the dir it names, and a login (sudo -i, su -l, su -) in the target user's home, which is unknown
+  ['sudo -D ~/.ssh cat id_ed25519', 'deny', 'deny', 'hard-deny'],
+  ['sudo --chdir=.pi touch ext.js', 'deny', 'deny'],
+  ['sudo -Eu root -D .pi touch ext.js', 'deny', 'deny'],
+  ['sudo -D "$D" cat src/config.ts', 'ask', 'ask', 'unresolvable-path'],
+  ['sudo "$X" cat src/config.ts', 'ask', 'ask', 'unresolvable-path'],
+  ['sudo -i cat src/config.ts', 'ask', 'ask', 'unresolvable-path'],
+  ['sudo --login cat src/config.ts', 'ask', 'ask', 'unresolvable-path'],
+  ["su -l root -c 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
+  ["su - root -c 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
+  ["su root -c 'cat src/config.ts'", 'ask', 'allow', 'sudo'],
+  ['sudo cat src/config.ts', 'ask', 'allow', 'sudo']
 ];
 
 describe('hardening: bash per mode', () => {

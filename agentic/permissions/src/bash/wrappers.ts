@@ -10,8 +10,8 @@ import { type Analyzer, type Arg, type Cwd, literalStart, type ShellEnv } from '
 import { builtArg, generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
 import type { ExpansionBudget, Variables } from './expand';
-import { hasOption, isOption, readArgs, valuesOf } from './options';
-import { ENV, XARGS } from './programs';
+import { hasOption, isOption, type ReadArgs, readArgs, type ReadOption, valuesOf } from './options';
+import { ENV, SU, SUDO, XARGS } from './programs';
 import { applyEffects, dirSpecOf, movedBy } from './scripts';
 
 /** How `xargs` feeds the command it runs. */
@@ -263,11 +263,21 @@ export function envSplit(text: string): string[] | null {
  * The policy may set HOME to the target user's, so HOME never carries. doas
  * and pkexec reset it too.
  */
-function rootKeeps(program: string, flags: readonly (string | undefined)[]): (name: string) => boolean {
-  if (program !== 'sudo' || flags.some((f) => f === '--login' || /^-[a-zA-Z]*i/.test(f ?? ''))) return () => false;
-  if (flags.some((f) => f === '--preserve-env' || /^-[a-zA-Z]*E/.test(f ?? ''))) return (name) => name !== 'HOME';
-  const listed = new Set(flags.flatMap((f) => /^--preserve-env=(.*)$/.exec(f ?? '')?.[1].split(',') ?? []));
+function rootKeeps(program: string, read: ReadArgs): (name: string) => boolean {
+  if (program !== 'sudo' || hasOption(read, '-i', '--login')) return () => false;
+  const preserve = read.options.filter((o) => isOption(o, '-E', '--preserve-env'));
+  if (preserve.some((o) => o.value === undefined)) return (name) => name !== 'HOME';
+  const listed = new Set(preserve.flatMap((o) => textOf(o.value)?.split(',') ?? []));
   return (name) => name !== 'HOME' && listed.has(name);
+}
+
+/** A wrapper's dir options, in order, each by its repeat rule from `start`, the dir the wrapper started in: the dir its command runs in, for this command only. */
+function wrapperDirs(analyzer: Analyzer, scope: WrapperScope, options: readonly ReadOption[], start: Cwd): void {
+  for (const option of options) {
+    const spec = dirSpecOf(option);
+    const dir = spec && movedBy(analyzer, spec, option.value, analyzer.cwdNow, start);
+    if (dir) analyzer.moveForOneCommand(scope, dir);
+  }
 }
 
 /** The command line `sudo -s` and `sudo -i` give the shell: each word with every character but a letter, digit, `_`, `-` or `$` escaped by a backslash. */
@@ -301,17 +311,16 @@ function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: 
     const read = readArgs(ENV, words);
     const split = read.options.find((o) => isOption(o, '-S', '--split-string'));
     const at = split ? words.indexOf(split.arg) : words.length;
-    for (const option of read.options) {
-      if (option === split) break;
+    const before = split ? read.options.slice(0, read.options.indexOf(split)) : read.options;
+    for (const option of before) {
       if (isOption(option, '-i', '--ignore-environment')) analyzer.programEnv(scope, (vars) => vars.emptied());
       if (isOption(option, '-u', '--unset') && option.value) {
         const name = textOf(option.value);
         if (name === undefined) analyzer.programEnv(scope, unknownEnv);
         else analyzer.programEnv(scope).unset(name);
       }
-      const moves = dirSpecOf(option);
-      if (moves && option.value) analyzer.moveForOneCommand(scope, movedBy(analyzer, moves, option.value, analyzer.cwdNow, start));
     }
+    wrapperDirs(analyzer, scope, before, start);
     const hidden = read.unknown.find((u) => words.indexOf(u) < at);
     if (hidden) {
       analyzer.moveForOneCommand(scope, { kind: 'unknown' });
@@ -391,11 +400,15 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
   case 'pkexec': {
     scope.sudo = true;
     analyzer.flag('sudo', `it runs ${name} to get root`);
-    const k = opts(/^(-[ugCDhprtTU]|--user|--group)$/, /^-/);
-    const flags = args.slice(i + 1, k).map(textOf);
-    analyzer.programEnv(scope, (vars) => vars.restricted(rootKeeps(name, flags)));
-    const shellFlag = flags.some((f) => /^-[a-zA-Z]*[si]/.test(f ?? ''));
-    if (shellFlag && k < args.length) {
+    const read = readArgs(SUDO, args.slice(i + 1));
+    const k = i + 1 + read.next;
+    analyzer.programEnv(scope, (vars) => vars.restricted(rootKeeps(name, read)));
+    wrapperDirs(analyzer, scope, read.options, analyzer.cwdNow);
+    if (read.unknown.length > 0) {
+      analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+      analyzer.dynamic(`it passes ${name} ${read.unknown[0].raw}, a value from a variable that may be an option that runs a shell or moves the dir`);
+    }
+    if (hasOption(read, '-s', '--shell', '-i', '--login') && k < args.length) {
       const words = knownTexts(args.slice(k));
       if (words === null) analyzer.dynamic(`it runs a shell with ${name} -s on words from a variable`);
       else analyzer.nested(sudoShellLine(words), `it runs a shell with ${name} -s`, { inherits: true });
@@ -406,11 +419,17 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
   case 'su': {
     scope.sudo = true;
     analyzer.flag('sudo', 'it runs su to switch user');
-    const c = args.findIndex((a, k) => k > i && (textOf(a) === '-c' || textOf(a) === '--command'));
-    // A login (`-`, `-l`) starts a new environment; otherwise su keeps it and sets HOME to the target user's.
-    const login = args.slice(i + 1, c > 0 ? c : args.length).some((a) => /^(-|--login|-[a-zA-Z]*l[a-zA-Z]*)$/.test(textOf(a) ?? ''));
+    const read = readArgs(SU, args.slice(i + 1));
+    // `-` before the user is `-l`.
+    const dash = textOf(read.operands[0]) === '-';
+    // A login starts a new environment; otherwise su keeps it and sets HOME to the target user's.
+    const login = dash || hasOption(read, '-l', '--login');
     analyzer.programEnv(scope, (vars) => vars.restricted(login ? () => false : (v) => v !== 'HOME'));
-    const script = c > 0 ? args[c + 1] : undefined;
+    wrapperDirs(analyzer, scope, read.options, analyzer.cwdNow);
+    if (dash || read.unknown.length > 0) analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+    if (read.unknown.length > 0) analyzer.dynamic(`it passes su ${read.unknown[0].raw}, a value from a variable that may be an option that runs a string`);
+    if (hasOption(read, '-s', '--shell')) analyzer.dynamic('it runs su -s, which runs a shell the analysis does not read');
+    const script = valuesOf(read, '-c', '--command', '--session-command').pop();
     if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c', { inherits: true });
     else if (script) analyzer.dynamic('it runs su -c with a string from a variable');
     return args.length;

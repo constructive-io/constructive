@@ -23,9 +23,11 @@ export interface DirChange {
  * Where a dir option moves the program, by its repeat rule: a cumulative one
  * (`git -C`, `tar -C`) from the dir the one before it reached, a last-wins one
  * (`env -C`, gdb's `--cd`) from the dir the program started in. Its value is
- * read as a path from there.
+ * read as a path from there. A flag (`sudo -i`) moves to a dir the analysis
+ * cannot know. `null` for an option that lacks its value, which moves nothing.
  */
-export function movedBy(analyzer: CommandContext['analyzer'], spec: DirSpec, value: Arg, reached: Cwd, start: Cwd): Cwd {
+export function movedBy(analyzer: CommandContext['analyzer'], spec: DirSpec, value: Arg | undefined, reached: Cwd, start: Cwd): Cwd | null {
+  if (value === undefined) return spec.value === 'none' ? { kind: 'unknown' } : null;
   const from = spec.repeat === 'cumulative' ? reached : start;
   analyzer.within(from, () => analyzer.addPath(value, 'read', true));
   return value.kind === 'known' ? analyzer.dirAt(value.text, from) : { kind: 'unknown' };
@@ -64,9 +66,11 @@ export function applyEffects(ctx: CommandContext, name: string, spec: ProgramSpe
       case 'writes-file':
         for (const file of namedFiles(s, value)) analyzer.addPath(file, 'write', true);
         break;
-      case 'changes-dir':
-        if (value) changes.push({ at: option.arg, dir: movedBy(analyzer, s, value, changes[changes.length - 1]?.dir ?? start, start) });
+      case 'changes-dir': {
+        const dir = movedBy(analyzer, s, value, changes[changes.length - 1]?.dir ?? start, start);
+        if (dir) changes.push({ at: option.arg, dir });
         break;
+      }
       // git, ssh and the prefix guard read these themselves.
       case 'sets-config':
       case 'sends-to':

@@ -78,9 +78,13 @@ interface ValueSpec extends SpecFields {
  */
 export type DirRepeat = 'last-wins' | 'cumulative';
 
-/** An option whose value is a dir the program moves to, and how a repeat of it moves. */
+/**
+ * An option whose value is a dir the program moves to, and how a repeat of it
+ * moves; a flag (`none`) moves it to a dir it does not name, which the
+ * analysis cannot know (a login's home: `sudo -i`, `su -l`).
+ */
 export interface DirSpec extends SpecFields {
-  readonly value: 'required' | 'optional';
+  readonly value: 'required' | 'optional' | 'none';
   readonly effect: 'changes-dir';
   readonly repeat: DirRepeat;
 }
