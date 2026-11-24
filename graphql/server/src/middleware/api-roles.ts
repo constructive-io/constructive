@@ -24,6 +24,7 @@ WITH privileged_roles AS MATERIALIZED (
         SELECT 1
         FROM served_rls_owners AS relation
         WHERE pg_catalog.pg_has_role(configured.oid, relation.relowner, 'USAGE')
+          OR pg_catalog.pg_has_role(configured.oid, relation.relowner, 'SET')
       ) THEN 'owner of served RLS table'
     END AS reason
   FROM pg_catalog.pg_roles AS configured

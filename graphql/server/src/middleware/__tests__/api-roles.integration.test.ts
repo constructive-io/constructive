@@ -85,8 +85,20 @@ describe('API role validation SQL', () => {
 
   it('rejects inherited ownership of a served RLS table', async () => {
     await createOwnedTable(schema, false, parent);
-    await pg.query(`GRANT ${quote(parent)} TO ${quote(role)} WITH INHERIT TRUE`);
+    await pg.query(`GRANT ${quote(parent)} TO ${quote(role)} WITH INHERIT TRUE, SET FALSE`);
     expect(await validate()).toEqual([{ rolname: role, reason: 'owner of served RLS table' }]);
+  });
+
+  it('rejects SET-accessible ownership without inheritance', async () => {
+    await createOwnedTable(schema, false, parent);
+    await pg.query(`GRANT ${quote(parent)} TO ${quote(role)} WITH INHERIT FALSE, SET TRUE`);
+    expect(await validate()).toEqual([{ rolname: role, reason: 'owner of served RLS table' }]);
+  });
+
+  it('accepts owner membership without inheritance or SET', async () => {
+    await createOwnedTable(schema, false, parent);
+    await pg.query(`GRANT ${quote(parent)} TO ${quote(role)} WITH INHERIT FALSE, SET FALSE`);
+    expect(await validate()).toEqual([]);
   });
 
   it('accepts the owner when FORCE RLS is enabled', async () => {
