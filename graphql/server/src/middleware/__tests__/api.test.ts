@@ -68,7 +68,7 @@ describe('api middleware routing priority', () => {
 
   it('uses the same X-Api-Name priority when resolving and caching API config', async () => {
     const query = jest.fn(async (_sql: string, params: unknown[]) => {
-      if (_sql.includes('FROM pg_roles')) return { rows: [] };
+      if (_sql.includes('pg_catalog.pg_roles')) return { rows: [] };
       if (Array.isArray(params[0])) {
         return {
           rows: (params[0] as string[]).map((schemaName) => ({
@@ -120,7 +120,7 @@ describe('api middleware routing priority', () => {
     const calls = query.mock.calls.length;
     await getApiConfig(createPrivateOptions(), req);
     expect(query).toHaveBeenCalledTimes(calls);
-    expect(query.mock.calls.filter(([sql]) => sql.includes('FROM pg_roles'))).toHaveLength(1);
+    expect(query.mock.calls.filter(([sql]) => sql.includes('pg_catalog.pg_roles'))).toHaveLength(1);
     expect(query.mock.calls).toEqual(expect.arrayContaining([
       [expect.stringContaining('FROM function_resolution.api_by_name($1, $2)'), ['db-123', 'customer-api']]
     ]));
@@ -139,7 +139,7 @@ describe('missing served role on an X-Api-Name row', () => {
 
   const poolWithApiRow = (row: Record<string, unknown>, forbidden: string[] = []): void => {
     const query = jest.fn(async (_sql: string, params: unknown[]) => {
-      if (_sql.includes('FROM pg_roles')) return { rows: forbidden.map((rolname) => ({ rolname })) };
+      if (_sql.includes('pg_catalog.pg_roles')) return { rows: forbidden.map((rolname) => ({ rolname, reason: 'superuser or BYPASSRLS' })) };
       if (Array.isArray(params[0])) {
         return { rows: (params[0] as string[]).map((schema_name) => ({ schema_name })) };
       }
@@ -227,7 +227,7 @@ describe('API resolution across listener recovery', () => {
     };
     let reads = 0;
     const query = jest.fn(async (_sql: string, params: unknown[]) => {
-      if (_sql.includes('FROM pg_roles')) return { rows: [] };
+      if (_sql.includes('pg_catalog.pg_roles')) return { rows: [] };
       if (Array.isArray(params[0])) return { rows: [{ schema_name: 'metaschema_public' }] };
       return ++reads === 1 ? pendingLookup : { rows: [{ ...row, schemas: ['new_schema'] }] };
     });
@@ -248,12 +248,12 @@ describe('API resolution across listener recovery', () => {
     async (oldRoleForbidden) => {
       let startValidation!: () => void;
       const validationStarted = new Promise<void>(resolve => { startValidation = resolve; });
-      let finishValidation!: (value: { rows: { rolname: string }[] }) => void;
-      const firstValidation = new Promise<{ rows: { rolname: string }[] }>(resolve => { finishValidation = resolve; });
+      let finishValidation!: (value: { rows: { rolname: string; reason: string }[] }) => void;
+      const firstValidation = new Promise<{ rows: { rolname: string; reason: string }[] }>(resolve => { finishValidation = resolve; });
       let reads = 0;
       let validations = 0;
       const query = jest.fn(async (sql: string) => {
-        if (sql.includes('FROM pg_roles')) {
+        if (sql.includes('pg_catalog.pg_roles')) {
           if (++validations !== 1) return { rows: [] };
           startValidation();
           return firstValidation;
@@ -271,7 +271,7 @@ describe('API resolution across listener recovery', () => {
 
       await validationStarted;
       evictAllServiceKeys();
-      finishValidation({ rows: oldRoleForbidden ? [{ rolname: 'old_role' }] : [] });
+      finishValidation({ rows: oldRoleForbidden ? [{ rolname: 'old_role', reason: 'superuser or BYPASSRLS' }] : [] });
 
       expect(await pending).toMatchObject({ roleName: 'new_role', schema: ['new_schema'] });
       expect(svcCache.get(req.svc_key!)).toMatchObject({ roleName: 'new_role', schema: ['new_schema'] });
