@@ -73,7 +73,7 @@ interface ValueSpec extends SpecFields {
 
 /**
  * How a dir option combines with one before it: `last-wins` replaces it and
- * starts from the dir the program started in (`env -C`, `npm --prefix`), and
+ * starts from the dir the program started in (`env -C`, gdb's `--cd`), and
  * `cumulative` starts from the dir the one before it reached (`git -C`, `tar -C`).
  */
 export type DirRepeat = 'last-wins' | 'cumulative';

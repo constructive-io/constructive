@@ -22,7 +22,7 @@ export interface DirChange {
 /**
  * Where a dir option moves the program, by its repeat rule: a cumulative one
  * (`git -C`, `tar -C`) from the dir the one before it reached, a last-wins one
- * (`env -C`, `npm --prefix`) from the dir the program started in. Its value is
+ * (`env -C`, gdb's `--cd`) from the dir the program started in. Its value is
  * read as a path from there.
  */
 export function movedBy(analyzer: CommandContext['analyzer'], spec: DirSpec, value: Arg, reached: Cwd, start: Cwd): Cwd {
