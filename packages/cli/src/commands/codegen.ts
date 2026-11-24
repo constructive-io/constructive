@@ -17,7 +17,7 @@ Database Options:
   --api-names <list>         Comma-separated API names
 
 Generator Options:
-  --react-query              Generate React Query hooks (default)
+  --react-query              Generate React Query hooks
   --orm                      Generate ORM client
   --output <dir>             Output directory (default: codegen)
   --target <name>            Target name (for multi-target configs)

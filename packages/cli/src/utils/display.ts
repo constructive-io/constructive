@@ -29,8 +29,8 @@ export const usageText = `
     cnc server                        Start GraphQL server
     cnc server --port 8080            Start server on custom port
     cnc explorer                      Launch GraphiQL explorer
-    cnc codegen --schema schema.graphql  Generate types from schema
-    cnc codegen --schema-enabled --output ./schemas  Export schema SDL
+    cnc codegen --schema-file schema.graphql --orm  Generate ORM client from schema
+    cnc codegen --schema-enabled --schema-output ./schemas  Export schema SDL
 
     # Execution Engine
     cnc context create my-api --endpoint https://api.example.com/graphql

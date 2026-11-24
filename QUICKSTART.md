@@ -19,10 +19,11 @@ cd myworkspace
 
 ### 3. Run Postgres locally
 
-The workspace includes a docker-compose.yml you can use to start Postgres and supporting services:
+Start a local PostgreSQL container with `pgpm`:
 
 ```bash
-docker-compose up -d
+pgpm docker start
+eval "$(pgpm env)"
 ```
 
 If you already have Postgres installed locally, just ensure it is running and accessible.
