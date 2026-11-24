@@ -52,14 +52,14 @@ describe('pgpm docker PostgreSQL ownership', () => {
   });
 
   it.each([true, false])('recreates a labeled container (running=%s)', async (running) => {
-    reply(`owned-id ${running} pgpm`);
+    reply(`owned-id ${running} pgpm postgres`);
     reply();
     reply();
     await docker({ _: ['start'], recreate: true }, undefined, undefined);
     expect(commands()).toEqual([
       expect.arrayContaining(['container', 'inspect', 'postgres']),
       ['rm', '-f', 'owned-id'],
-      expect.arrayContaining(['run', '--label', 'io.constructive.managed-by=pgpm'])
+      expect.arrayContaining(['run', '--label', 'io.constructive.managed-by=pgpm', 'io.constructive.pgpm.service=postgres'])
     ]);
   });
 
@@ -74,14 +74,14 @@ describe('pgpm docker PostgreSQL ownership', () => {
     ['start', false],
     ['stop', true]
   ])('uses the inspected ID for %s', async (action, running) => {
-    reply(`owned-id ${running} pgpm`);
+    reply(`owned-id ${running} pgpm postgres`);
     reply();
     await docker({ _: [action] }, undefined, undefined);
     expect(commands()[1]).toEqual([action, 'owned-id']);
   });
 
   it('does not stop an optional service owned by somebody else', async () => {
-    reply('owned-id false pgpm');
+    reply('owned-id false pgpm postgres');
     reply('foreign-id true');
     await expect(docker({ _: ['stop'], rustfs: true }, undefined, undefined)).rejects.toThrow(
       'Container "rustfs" is not managed by pgpm'
@@ -89,6 +89,18 @@ describe('pgpm docker PostgreSQL ownership', () => {
     expect(commands()).toEqual([
       expect.arrayContaining(['inspect', 'postgres']),
       expect.arrayContaining(['inspect', 'rustfs'])
+    ]);
+  });
+
+  it('does not recreate a pgpm Postgres named ollama as an Ollama service', async () => {
+    reply('main-id true pgpm postgres');
+    reply('postgres-id true pgpm postgres');
+    await expect(docker({ _: ['start'], ollama: true }, undefined, undefined)).rejects.toThrow(
+      'Container "ollama" is not managed by pgpm as ollama'
+    );
+    expect(commands()).toEqual([
+      expect.arrayContaining(['inspect', 'postgres']),
+      expect.arrayContaining(['inspect', 'ollama'])
     ]);
   });
 });
