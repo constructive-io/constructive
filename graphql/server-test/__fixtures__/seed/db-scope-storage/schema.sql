@@ -35,7 +35,6 @@ CREATE TABLE "tess-storage-public".files (
   bucket_id uuid NOT NULL REFERENCES "tess-storage-public".buckets(id),
   key text NOT NULL DEFAULT 'originals/' || gen_random_uuid()::text,
   logical_key text,
-  logical_key_retired boolean NOT NULL DEFAULT false,
   content_hash text NOT NULL,
   mime_type text NOT NULL,
   size bigint,

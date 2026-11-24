@@ -92,7 +92,7 @@ export function createDownloadUrlPlugin(
                   description:
                     'URL to download this file. For public files, returns the public URL. ' +
                     'For private files, returns a time-limited presigned URL. ' +
-                    'Null until the upload is confirmed (status uploaded or processed), and for a rejected file.',
+                    'Null unless the file is uploaded or processed.',
                   type: GraphQLString,
                   args: {
                     version: {

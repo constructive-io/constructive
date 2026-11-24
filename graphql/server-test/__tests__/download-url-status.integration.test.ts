@@ -40,7 +40,7 @@ const metaSchemas = [
   'metaschema_modules_public'
 ];
 
-const STATUSES = ['requested', 'uploaded', 'processed', 'rejected'];
+const STATUSES = ['requested', 'uploaded', 'processed', 'rejected', 'superseded'];
 
 const APP_FILES = `
   query AppFiles($version: String) {
@@ -168,7 +168,7 @@ describe('storage file downloadUrl', () => {
       expect(new URL(row.downloadUrl).pathname).toBe(`/app-80a2eaaf-private-cc079c527e7d/status-${status}`);
       expect(row.selected).toBeNull();
     }
-    for (const status of ['requested', 'rejected']) {
+    for (const status of ['requested', 'rejected', 'superseded']) {
       expect(rows.get(`status-${status}`)).toMatchObject({ downloadUrl: null, selected: null });
     }
   });
@@ -190,7 +190,7 @@ describe('storage file downloadUrl', () => {
       expect(url.searchParams.get('X-Amz-Signature')).toEqual(expect.any(String));
       expect(url.searchParams.get('response-content-disposition')).toBe('attachment; filename="small-0123abcd.webp"');
     }
-    for (const status of ['requested', 'rejected']) {
+    for (const status of ['requested', 'rejected', 'superseded']) {
       expect(rows.get(`status-${status}`)).toMatchObject({ downloadUrl: null, selected: null });
     }
   });

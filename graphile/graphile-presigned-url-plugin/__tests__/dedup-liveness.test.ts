@@ -83,16 +83,15 @@ const options: PresignedUrlPluginOptions = { credentials: { accessKeyId: 'test',
  * resolver probes by key (the custom key, or the hash's own key), so the row is
  * found only when the probed key is its own.
  */
-function fakeTx(rowKey: string, status: string, retired = false) {
+function fakeTx(rowKey: string, status: string) {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const txClient = {
     async query(opts: { text: string; values: unknown[] }) {
       queries.push(opts);
       if (/record_file\(/.test(opts.text)) return { rows: [{ id: NEW_FILE_ID, key: `originals/${NEW_FILE_ID}` }] };
       if (/^SELECT id/.test(opts.text)) {
-        if (retired && /AND NOT logical_key_retired/.test(opts.text)) return { rows: [] };
-        const confirmedOnly = opts.text.includes("status IN ('uploaded', 'processed')");
-        return { rows: opts.values[0] === rowKey && (!confirmedOnly || ['uploaded', 'processed'].includes(status))
+        const statuses = opts.text.match(/status IN \(([^)]+)\)/)?.[1];
+        return { rows: opts.values[0] === rowKey && (!statuses || statuses.includes(`'${status}'`))
           ? [{ id: OLD_FILE_ID, key: `originals/${OLD_FILE_ID}`, mime_type: 'text/plain', size: '32', filename: 'original.txt' }] : [] };
       }
       if (/^DELETE FROM storage_public\.app_files/.test(opts.text)) return { rows: [{ id: OLD_FILE_ID }] };
@@ -149,8 +148,8 @@ describe.each([
     expect(queries[0].text).toContain('status');
   });
 
-  it('does not deduplicate against a retired but still readable row', async () => {
-    const { txClient } = fakeTx(rowKey, 'uploaded', true);
+  it('does not deduplicate against a superseded but still readable row', async () => {
+    const { txClient } = fakeTx(rowKey, 'superseded');
     const result = await upload(txClient, fakeS3(), customKey);
 
     expect(result).toMatchObject({ fileId: NEW_FILE_ID, deduplicated: false });
@@ -174,6 +173,16 @@ describe('content-addressed upload whose hash a custom-key row carries', () => {
 });
 
 describe('site release requested before the deploy was canceled', () => {
+  it('does not report a superseded release as pending or deduplicated', async () => {
+    const logicalKey = `cas/sha256/${HASH}`;
+    const { txClient } = fakeTx(logicalKey, 'superseded');
+    const result = await processSingleFile(options, txClient, storageConfig(), 'db', bucket, fakeS3(),
+      { contentHash: HASH, contentType: 'text/html', size: 16, filename: SITE_KEY },
+      { release: true, checkOnly: true });
+
+    expect(result).toEqual({ logicalKey, deduplicated: false, pending: false });
+  });
+
   const retry = async (checkOnly: boolean, ageSeconds = 60) => {
     const key = `originals/${OLD_FILE_ID}`;
     const txClient = {
