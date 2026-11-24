@@ -49,7 +49,9 @@ describe('materializeDbTools', () => {
       on: () => {}
     });
     expect(registered).toContain('provision_database');
-    expect(registered).toHaveLength(18);
+    expect(registered).not.toContain('add_records');
+    expect(registered).not.toContain('create_api_key');
+    expect(registered).toHaveLength(16);
   });
 
   function loadHost() {

@@ -249,6 +249,32 @@ describe('run_codegen on a composed app', () => {
     expect(result.details.timings?.codegenMs).toEqual(expect.any(Number));
     expect(read(path.join(appDir, 'src', 'graphql', 'sdk', 'app', 'index.ts'))).toBe(STUB);
   });
+
+  it('reports a persistent connection reset without requiring a host-specific tool', async () => {
+    composedApp({ nodeModules: true });
+    let started!: () => void;
+    const firstAttempt = new Promise<void>((resolve) => { started = resolve; });
+    const { exec } = fakeExec(() => {
+      started();
+      return { ok: false, out: 'ECONNRESET' };
+    });
+
+    jest.useFakeTimers();
+    try {
+      const pending = createRunCodegenTool(exec).execute({}, { cwd });
+      await firstAttempt;
+      await jest.runAllTimersAsync();
+      const { details, content } = await pending;
+
+      expect(details).toMatchObject({ success: false, codegenAttempts: 4 });
+      const message = content[0]?.type === 'text' ? content[0].text : undefined;
+      expect(message).toContain('BACKEND OUTAGE');
+      expect(message).toContain('Check backend reachability once');
+      expect(message).not.toContain('run_preflight');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });
 
 describe('run_codegen when the app API refuses', () => {

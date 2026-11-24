@@ -34,7 +34,7 @@ module.exports = createDbTools({
   account: resolveAccount,
   backendConfig: resolveBackendConfig,
   signInHint: 'Run \`agent login\` to sign in.'
-});
+}, { excludeTools: ['add_records', 'create_api_key'] });
 `;
 }
 

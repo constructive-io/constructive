@@ -19,24 +19,31 @@ import { toPiTool } from './pi-tool';
  * `tool_call` event. A sibling adapter writes its own equivalent of this file
  * and registers the same `constructiveDbTools`.
  */
-export const dbTools: ExtensionFactory = (pi) => {
-  for (const tool of constructiveDbTools) {
-    pi.registerTool(toPiTool(tool));
-  }
+function bindDbTools(excludeTools: ReadonlySet<string>): ExtensionFactory {
+  return (pi) => {
+    for (const tool of constructiveDbTools) {
+      if (!excludeTools.has(tool.name)) pi.registerTool(toPiTool(tool));
+    }
 
-  const gate = createConfirmGate({
-    resolveProjectContext,
-    resolveDataToken,
-    createTemplatePreviewTables,
-  });
-  pi.on('agent_start', gate.onAgentStart);
-  pi.on('tool_call', gate.onToolCall);
-};
+    const gate = createConfirmGate({
+      resolveProjectContext,
+      resolveDataToken,
+      createTemplatePreviewTables,
+    });
+    pi.on('agent_start', gate.onAgentStart);
+    pi.on('tool_call', gate.onToolCall);
+  };
+}
+
+export const dbTools = bindDbTools(new Set());
 
 /** Configure the host and get the extension in one call. */
-export function createDbTools(host: ToolsHost): ExtensionFactory {
+export function createDbTools(
+  host: ToolsHost,
+  options?: { excludeTools?: readonly string[] },
+): ExtensionFactory {
   configureHost(host);
-  return dbTools;
+  return options?.excludeTools?.length ? bindDbTools(new Set(options.excludeTools)) : dbTools;
 }
 
 export {
