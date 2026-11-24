@@ -56,6 +56,13 @@ describe('expansions stay within one budget per command', () => {
     expect(heapMb).toBeLessThan(256);
   });
 
+  it('charges a trap action each time a subshell that keeps it reads it again', async () => {
+    const { d, ms } = await bounded(`trap '${'true;'.repeat(4000)}' DEBUG; ${'(:);'.repeat(4000)}`);
+    expect(d.decision).toBe('ask');
+    expect(d.request.signals).toContain('unresolvable-path');
+    expect(ms).toBeLessThan(1000);
+  });
+
   it('stops a variable that doubles itself before it builds the value', async () => {
     let command = 'v0=x';
     for (let k = 1; k <= 24; k++) command += `; v${k}=$v${k - 1}$v${k - 1}`;

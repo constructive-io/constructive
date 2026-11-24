@@ -277,7 +277,19 @@ const rows: Row[] = [
   ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap '' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
   ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'true' EXIT; F=~/.ssh/id_ed25519", 'allow', 'allow'],
   // 31. brace sequences with endpoints past 2^53 keep their digits, and past int64 they are text, as in both bashes
-  ['cat x{99999999999999999999999..99999999999999999999999}', 'allow', 'allow']
+  ['cat x{99999999999999999999999..99999999999999999999999}', 'allow', 'allow'],
+  // 32. a trap action that may run anytime may reset, ignore or replace another trap, so the trap it may replace still runs; one it sets runs too
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'trap - EXIT' INT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'trap \"\" EXIT' INT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["F=src/config.ts; trap 'cat \"$F\"' EXIT; trap 'trap true EXIT' INT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  ["F=src/config.ts; trap 'trap \"cat \\\"\\$F\\\"\" EXIT' INT; F=~/.ssh/id_ed25519", 'deny', 'deny', 'hard-deny'],
+  // 33. in a trap action read at exit, a name assigned after the trap was set stays unknown past a subshell in the action that sets a trap
+  ["F=src/config.ts; trap '(trap true EXIT); cat \"$F\"' INT; F=~/.ssh/id_ed25519; F=src/config.ts", 'ask', 'ask', 'unresolvable-path'],
+  // 34. a subshell keeps the DEBUG, RETURN and ERR traps, as it does under set -T and set -E, and resets the others
+  ["F=src/config.ts; trap 'cat \"$F\"' DEBUG; set -T; (F=~/.ssh/id_ed25519; true)", 'ask', 'ask', 'unresolvable-path'],
+  ["F=src/config.ts; trap 'cat \"$F\"' ERR; set -E; (F=~/.ssh/id_ed25519; false; true)", 'ask', 'ask', 'unresolvable-path'],
+  ["F=src/config.ts; trap 'cat \"$F\"' DEBUG; set -o functrace; echo \"$(F=~/.ssh/id_ed25519; true)\"", 'ask', 'ask', 'unresolvable-path'],
+  ["F=src/config.ts; trap 'cat \"$F\"' INT; (F=~/.ssh/id_ed25519; true)", 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
