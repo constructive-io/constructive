@@ -94,20 +94,43 @@ type Variable = { kind: 'set'; value: string } | { kind: 'unknown' } | { kind: '
 /** The command's record of one name, to put back later; `undefined` when it never touched the name. */
 export type VariableRecord = Variable | undefined;
 
+/** Names bash sets itself when it starts, whatever its environment holds. */
+const SET_AT_START: ReadonlySet<string> = new Set(['IFS', 'PWD']);
+
 /**
  * The shell variables as the command leaves them, at every assignment site:
  * a `NAME=value` word, `export`, `declare` and the like, `read`, `printf -v`,
  * `mapfile` and `unset`. A variable the command never touched comes from the
- * environment, which `outside` reads.
+ * environment, which `outside` reads; one `outside` knows (HOME) is in the
+ * environment, so a change to it is exported. `exported`: the names the
+ * command exported (`export`, `declare -x`, an assignment before a command).
  */
 export class Variables {
   private readonly vars: Map<string, Variable>;
+  private readonly exported: Set<string>;
 
   constructor(
     private readonly outside: (name: string) => string | null,
-    vars: ReadonlyMap<string, Variable> = new Map()
+    vars: ReadonlyMap<string, Variable> = new Map(),
+    exported: ReadonlySet<string> = new Set()
   ) {
     this.vars = new Map(vars);
+    this.exported = new Set(exported);
+  }
+
+  isExported(name: string): boolean {
+    return this.exported.has(name);
+  }
+
+  /** `export NAME`, `declare -x NAME` (`on`), or `export -n NAME`, `declare +x NAME`. */
+  setExported(name: string, on: boolean): void {
+    if (on) this.exported.add(name);
+    else this.exported.delete(name);
+  }
+
+  /** `export -n "$N"`: any name may have lost its export. */
+  unexportAll(): void {
+    this.exported.clear();
   }
 
   /** `name=value` or `name+=value`; a `null` value is unknown. `+=` on an unset variable is `=`, as in bash. */
@@ -117,8 +140,10 @@ export class Variables {
     else this.vars.set(name, { kind: 'set', value: (before ?? '') + value });
   }
 
+  /** bash drops the variable with its export, so a later assignment makes one that is not exported. */
   unset(name: string): void {
     this.vars.set(name, { kind: 'unset' });
+    this.exported.delete(name);
   }
 
   /** It holds the value it had before the command set it, or the one the command set: unknown, and still the environment's when it was untouched. */
@@ -136,9 +161,10 @@ export class Variables {
     else this.vars.set(name, record);
   }
 
-  /** The names whose record differs from `before`'s, a copy taken earlier: what was assigned or unset since. */
+  /** The names whose record or export differs from `before`'s, a copy taken earlier: what was assigned, unset, exported or unexported since. */
   changedFrom(before: Variables): string[] {
-    return [...new Set([...this.vars.keys(), ...before.vars.keys()])].filter((name) => this.vars.get(name) !== before.vars.get(name));
+    const names = new Set([...this.vars.keys(), ...before.vars.keys(), ...this.exported, ...before.exported]);
+    return [...names].filter((name) => this.vars.get(name) !== before.vars.get(name) || this.exported.has(name) !== before.exported.has(name));
   }
 
   /** The command set or unset it, so the environment does not decide it. */
@@ -165,7 +191,25 @@ export class Variables {
   }
 
   copy(): Variables {
-    return new Variables(this.outside, this.vars);
+    return new Variables(this.outside, this.vars, this.exported);
+  }
+
+  /**
+   * What a child shell (`sh -c`, a script on stdin) starts with: the
+   * environment. An exported name and one the environment holds carry their
+   * value, and an unset one stays unset (bash binds no HOME of its own when
+   * not interactive). A name the command set without exporting it is passed
+   * only when the environment had it, so its value there is unknown. bash
+   * sets IFS and PWD itself.
+   */
+  forChild(): Variables {
+    const vars = new Map<string, Variable>();
+    for (const [name, v] of this.vars) {
+      if (SET_AT_START.has(name)) continue;
+      const passed = v.kind !== 'set' || this.exported.has(name) || this.outside(name) !== null;
+      vars.set(name, passed ? v : { kind: 'unknown' });
+    }
+    return new Variables(this.outside, vars, this.exported);
   }
 }
 

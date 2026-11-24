@@ -182,9 +182,9 @@ class ShellState {
     return new ShellState(this.vars.copy(), this.cwd, copyTraps(this.traps, (key) => SUBSHELL_TRAPS.has(key)), new Set(this.trapAssigns), this.trapMovesDir);
   }
 
-  /** What a child shell (`sh -c`, a script on stdin) starts with: a copy with no traps. A name a trap may assign stays unknown. */
+  /** What a child shell (`sh -c`, a script on stdin) starts with: the exported environment, and no traps. */
   child(): ShellState {
-    return new ShellState(this.vars.copy(), this.cwd, new Map(), new Set(this.trapAssigns), this.trapMovesDir);
+    return new ShellState(this.vars.forChild(), this.cwd, new Map(), new Set(this.trapAssigns), this.trapMovesDir);
   }
 
   /** The same shell copied whole, to read an action in and throw away. */
@@ -255,8 +255,8 @@ const ASSIGNMENT_WORD = /^[A-Za-z_][A-Za-z0-9_]*\+?=/;
 /** POSIX special builtins: an assignment before one persists in POSIX sh (macOS /bin/sh, `set -o posix`), and not in bash. */
 const SPECIAL_BUILTINS: ReadonlySet<string> = new Set(['break', ':', 'continue', '.', 'source', 'eval', 'exec', 'exit', 'export', 'readonly', 'return', 'set', 'shift', 'times', 'trap', 'unset']);
 
-/** Assignments that hold for one command only, by name: the record before the first one, and the one the last one left. */
-type CommandScope = Map<string, { before: VariableRecord; set: VariableRecord }>;
+/** Assignments that hold for one command only, by name: the record and export before the first one, and the record the last one left. */
+type CommandScope = Map<string, { before: VariableRecord; set: VariableRecord; exported: boolean }>;
 
 /** How many leading words are assignments or keywords, before the command word. */
 function assignmentLead(words: readonly Word[]): number {
@@ -599,7 +599,8 @@ class Analyzer implements ExpansionScope {
    * one the analysis cannot see (a pager, tar's `--to-command`). `shared`: it
    * runs in the current shell (`eval`, a trap's action), so what it assigns,
    * the dir it moves to and the traps it sets hold after it; otherwise it runs
-   * in a shell of its own, which exits at its end.
+   * in a child shell, which starts from the exported environment and exits at
+   * its end.
    */
   nested(text: string, why: string | null, how: Nesting = {}): void {
     if (why !== null) this.dynamic(why);
@@ -646,23 +647,36 @@ class Analyzer implements ExpansionScope {
     this.state.vars.assign(name, op, value);
   }
 
-  /** An assignment before a command, or after a wrapper (`env A=1 cmd`): it holds for this command only. */
+  /** `export NAME`, `declare -x NAME` (`on`), or `export -n NAME`, `declare +x NAME`: whether a child shell sees the value. */
+  setExported(name: string, on: boolean): void {
+    this.state.vars.setExported(name, on);
+  }
+
+  unexportAll(): void {
+    this.state.vars.unexportAll();
+  }
+
+  /** An assignment before a command, or after a wrapper (`env A=1 cmd`): it holds, exported, for this command only. */
   private assignForCommand(scope: CommandScope, name: string, op: AssignOp, value: string | null): void {
-    if (!scope.has(name)) scope.set(name, { before: this.state.vars.record(name), set: undefined });
+    const { vars } = this.state;
+    if (!scope.has(name)) scope.set(name, { before: vars.record(name), set: undefined, exported: vars.isExported(name) });
     this.assign(name, op, value);
-    scope.get(name).set = this.state.vars.record(name);
+    vars.setExported(name, true);
+    scope.get(name).set = vars.record(name);
   }
 
   /**
-   * After the command: each name its assignments set is put back. Before a
-   * special builtin it holds either value; one the command changed itself
-   * (`X=1 read X`) is unknown.
+   * After the command: each name its assignments set is put back, with its
+   * export. Before a special builtin it holds either value; one the command
+   * changed itself (`X=1 read X`) is unknown.
    */
   private endCommandScope(scope: CommandScope, special: boolean): void {
-    for (const [name, { before, set }] of scope) {
-      if (this.state.vars.record(name) !== set) this.state.vars.assign(name, '=', null);
-      else if (special) this.state.vars.either(name, before);
-      else this.state.vars.restore(name, before);
+    const { vars } = this.state;
+    for (const [name, { before, set, exported }] of scope) {
+      if (vars.record(name) !== set) vars.assign(name, '=', null);
+      else if (special) vars.either(name, before);
+      else vars.restore(name, before);
+      vars.setExported(name, exported);
     }
   }
 

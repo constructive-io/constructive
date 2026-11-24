@@ -24,7 +24,7 @@ import {
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
-import { hasOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
+import { hasOption, mayBeOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
 import { CD, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
@@ -130,6 +130,29 @@ function assignNamed(ctx: CommandContext, builtin: string, variable: Arg): void 
   if (variable.text.includes('[')) return analyzer.dynamic(`it runs ${builtin} on an array element, whose subscript runs as code`);
   if (builtin === 'unset') analyzer.unset(variable.text);
   else analyzer.assign(variable.text, '=', null);
+}
+
+/**
+ * What a declaration builtin does to the export of the names it takes:
+ * `export` and `declare -x` export them (`true`), `export -n` and
+ * `declare +x` take the export off (`false`), and `-f`, `-p` and `readonly`
+ * leave it (`undefined`). An option from a variable may be any of them
+ * (`null`), so the export is taken off: a child shell then does not know the
+ * value. Options end at the first operand, as in bash.
+ */
+function exportsNames(name: string, rest: readonly Arg[]): boolean | null | undefined {
+  if (name === 'readonly') return undefined;
+  let exports: boolean | undefined = name === 'export' ? true : undefined;
+  for (const arg of rest) {
+    if (arg.kind === 'unknown') return mayBeOption(arg) ? null : exports;
+    const { text } = arg;
+    if (text === '--' || !/^[-+]./.test(text)) break;
+    const letters = text.slice(1);
+    if (/[fFp]/.test(letters)) return undefined;
+    if (name === 'export' && text.startsWith('-') && letters.includes('n')) exports = false;
+    if (name !== 'export' && letters.includes('x')) exports = text.startsWith('-');
+  }
+  return exports;
 }
 
 /**
@@ -365,12 +388,19 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     if (name !== 'export' && name !== 'readonly' && rest.some((a) => /^-[A-Za-z]*n/.test(literalStart(a)))) {
       analyzer.dynamic(`it runs ${name} -n, which makes a name reference whose target is read as a subscript that can run code`);
     }
-    for (const arg of rest) {
-      const start = literalStart(arg);
-      if (/^[^=-][^=]*\[/.test(start)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
-      if (arg.kind === 'unknown' && !/^[A-Za-z_]/.test(start) && arg.raw.includes('=')) analyzer.assignUnknownName(arg.raw);
-      const m = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(start);
-      if (m) analyzer.assign(m[1], m[2] ? '+=' : '=', arg.kind === 'known' ? m[3] : null);
+    {
+      const exports = exportsNames(name, rest);
+      for (const arg of rest) {
+        const start = literalStart(arg);
+        if (/^[^=-][^=]*\[/.test(start)) analyzer.dynamic(`it runs ${name} on an array element, whose subscript runs as code`);
+        if (arg.kind === 'unknown' && !/^[A-Za-z_]/.test(start) && arg.raw.includes('=')) analyzer.assignUnknownName(arg.raw);
+        const m = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(start);
+        if (m) analyzer.assign(m[1], m[2] ? '+=' : '=', arg.kind === 'known' ? m[3] : null);
+        const named = m?.[1] ?? (arg.kind === 'known' && /^[A-Za-z_][A-Za-z0-9_]*$/.test(arg.text) ? arg.text : undefined);
+        if (named !== undefined && exports !== undefined) analyzer.setExported(named, exports === true);
+        // A name from a variable may be any name, so no export can be trusted.
+        else if (named === undefined && arg.kind === 'unknown' && exports !== undefined && exports !== true) analyzer.unexportAll();
+      }
     }
     return;
   case 'trap':

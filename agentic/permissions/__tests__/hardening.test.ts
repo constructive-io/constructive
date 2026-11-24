@@ -289,7 +289,19 @@ const rows: Row[] = [
   ["F=src/config.ts; trap 'cat \"$F\"' DEBUG; set -T; (F=~/.ssh/id_ed25519; true)", 'ask', 'ask', 'unresolvable-path'],
   ["F=src/config.ts; trap 'cat \"$F\"' ERR; set -E; (F=~/.ssh/id_ed25519; false; true)", 'ask', 'ask', 'unresolvable-path'],
   ["F=src/config.ts; trap 'cat \"$F\"' DEBUG; set -o functrace; echo \"$(F=~/.ssh/id_ed25519; true)\"", 'ask', 'ask', 'unresolvable-path'],
-  ["F=src/config.ts; trap 'cat \"$F\"' INT; (F=~/.ssh/id_ed25519; true)", 'allow', 'allow']
+  ["F=src/config.ts; trap 'cat \"$F\"' INT; (F=~/.ssh/id_ed25519; true)", 'allow', 'allow'],
+  // 35. a child shell starts from the exported environment: a name the command set but did not export is unknown there, and an unset one stays unset
+  ["F=src/config.ts; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=src/config.ts; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'allow', 'shell-dynamic'],
+  ["F=src/config.ts; export F; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'allow', 'shell-dynamic'],
+  ["F=src/config.ts bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'allow', 'shell-dynamic'],
+  ["env F=src/config.ts bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'allow', 'shell-dynamic'],
+  ["export F=src/config.ts; export -n F; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
+  ["declare -x F=src/config.ts; declare +x F; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=src/config.ts; unset F; F=src/config.ts; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
+  ["read -r O <<< x; export F=src/config.ts; export $O F; bash -c 'cat ${F:-~/.ssh/id_ed25519}'", 'ask', 'ask', 'unresolvable-path'],
+  ["HOME=~/.ssh; bash -c 'cat ~/id_ed25519'", 'deny', 'deny', 'hard-deny'],
+  ["unset HOME; bash -c 'cd; touch .pi/ext.js'", 'deny', 'deny']
 ];
 
 describe('hardening: bash per mode', () => {
