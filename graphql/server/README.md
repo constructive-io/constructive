@@ -131,7 +131,8 @@ For the operational workflow, sampler output, and heap snapshot usage, see [docs
 
 Browsers authenticate with the `constructive_session` cookie; every other client sends `Authorization: Bearer <accessToken>`.
 
-- A successful sign-in mutation (`signIn`, `signUp`, `signInSso`, `signInMagicLink`, `signInEmailOtp`, `completeMfaChallenge`, …) returns the access token in the response body and also sets `constructive_session` (plus `constructive_device_token` when the mutation returns a device id). `Max-Age` comes from the API's auth settings (default 86400 s; `rememberMe: true` uses the remember-me duration).
+- A successful sign-in mutation (`signIn`, `signInSso`, `signInMagicLink`, `signInEmailOtp`, `completeMfaChallenge`, …) returns the access token in the response body and also sets `constructive_session` (plus `constructive_device_token` when the mutation returns a device id). `Max-Age` comes from the API's auth settings (default 86400 s; `rememberMe: true` uses the remember-me duration).
+- `signUp` never signs anyone in: it returns no access token and sets no session cookie, so its answer is the same whether or not the address already has an account. Verify the email (`verifyEmail`), then call `signIn`.
 - `signOut` always answers with expired `constructive_session` and `constructive_device_token` cookies (`Max-Age=0`), however the request authenticated and whether or not the mutation succeeded. `revokeSession` / `revokeAllSessions` clear them on success.
 - Every request gets a `csrf_token` cookie (readable by JS, one day). A `POST /graphql` that carries `constructive_session` and no Bearer header must echo that value in `X-CSRF-Token`, or it is refused with 403 `CSRF_TOKEN_MISSING` / `CSRF_TOKEN_INVALID`. Bearer requests and requests without a session cookie skip the check.
 
