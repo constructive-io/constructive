@@ -6,10 +6,10 @@
 
 import * as path from 'node:path';
 
-import { type Analyzer, type Arg, type Cwd, literalStart } from './analyze';
+import { type Analyzer, type Arg, type Cwd, literalStart, type ShellEnv } from './analyze';
 import { builtArg, generic, knownTexts, leadingOptions, literalArg, textOf } from './args';
 import { NO_OPERANDS } from './commands';
-import type { ExpansionBudget } from './expand';
+import type { ExpansionBudget, Variables } from './expand';
 import { hasOption, isOption, readArgs, valuesOf } from './options';
 import { ENV, XARGS } from './programs';
 import { applyEffects, dirSpecOf, movedBy } from './scripts';
@@ -31,6 +31,8 @@ export interface WrapperScope {
   xargs: XargsInput | null;
   /** The working dir before `env -C dir` moved it for this one command. */
   outerCwd: Cwd | null;
+  /** The shell's own environment before a wrapper changed the one its program gets (`env -i`, sudo). */
+  outerEnv: ShellEnv | null;
 }
 
 function xargs(analyzer: Analyzer, args: Arg[], i: number, scope: WrapperScope): number {
@@ -253,6 +255,21 @@ export function envSplit(text: string): string[] | null {
   return words;
 }
 
+/**
+ * The names sudo, doas or pkexec pass on from the environment they were
+ * given. sudo's default `env_reset` builds a new one from its policy, which
+ * the analysis cannot read, so none carries; `-E` keeps the environment and
+ * `--preserve-env=A,B` the names it lists, but a login (`-i`) starts over.
+ * The policy may set HOME to the target user's, so HOME never carries. doas
+ * and pkexec reset it too.
+ */
+function rootKeeps(program: string, flags: readonly (string | undefined)[]): (name: string) => boolean {
+  if (program !== 'sudo' || flags.some((f) => f === '--login' || /^-[a-zA-Z]*i/.test(f ?? ''))) return () => false;
+  if (flags.some((f) => f === '--preserve-env' || /^-[a-zA-Z]*E/.test(f ?? ''))) return (name) => name !== 'HOME';
+  const listed = new Set(flags.flatMap((f) => /^--preserve-env=(.*)$/.exec(f ?? '')?.[1].split(',') ?? []));
+  return (name) => name !== 'HOME' && listed.has(name);
+}
+
 /** The command line `sudo -s` and `sudo -i` give the shell: each word with every character but a letter, digit, `_`, `-` or `$` escaped by a backslash. */
 function sudoShellLine(words: readonly string[]): string {
   return words.map((w) => w.replace(/[^A-Za-z0-9_$-]/g, (c) => `\\${c}`)).join(' ');
@@ -264,13 +281,18 @@ function runCall(analyzer: Analyzer, call: Arg | null, what: string): void {
   else analyzer.nested(call.text, `it runs a string with ${what}`, { inherits: true });
 }
 
+/** No name of the program's environment can be known: an `env` option from a variable may be `-i` or `-u NAME`. */
+const unknownEnv = (vars: Variables): Variables => vars.restricted(() => false);
+
 /**
  * env's arguments, read as env reads them: `-S` splits its string into words
  * that env reads as arguments again, before the ones after it, and each `-C`
  * moves by its repeat rule (the last one counts, from the dir env started in).
- * An argument from a variable before an `-S` may be `-C dir` or `-S string`
- * too. Each pass after a split reads its words again, so they are charged to
- * the budget. Returns the words from its command on.
+ * `-i`, and a lone `-` after the options, empty the environment the command
+ * gets, and `-u NAME` removes a name from it. An argument from a variable
+ * before an `-S` may be any of these options. Each pass after a split reads
+ * its words again, so they are charged to the budget. Returns the words from
+ * its command on.
  */
 function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: Arg[] } {
   const start = analyzer.cwdNow;
@@ -281,15 +303,26 @@ function envArgs(analyzer: Analyzer, rest: Arg[], scope: WrapperScope): { argv: 
     const at = split ? words.indexOf(split.arg) : words.length;
     for (const option of read.options) {
       if (option === split) break;
+      if (isOption(option, '-i', '--ignore-environment')) analyzer.programEnv(scope, (vars) => vars.emptied());
+      if (isOption(option, '-u', '--unset') && option.value) {
+        const name = textOf(option.value);
+        if (name === undefined) analyzer.programEnv(scope, unknownEnv);
+        else analyzer.programEnv(scope).unset(name);
+      }
       const moves = dirSpecOf(option);
       if (moves && option.value) analyzer.moveForOneCommand(scope, movedBy(analyzer, moves, option.value, analyzer.cwdNow, start));
     }
     const hidden = read.unknown.find((u) => words.indexOf(u) < at);
     if (hidden) {
       analyzer.moveForOneCommand(scope, { kind: 'unknown' });
+      analyzer.programEnv(scope, unknownEnv);
       analyzer.dynamic(`it passes env ${hidden.raw}, a value from a variable that may be an option that runs a string`);
     }
-    if (!split) return { argv: words.slice(read.next) };
+    if (!split) {
+      if (textOf(words[read.next]) !== '-') return { argv: words.slice(read.next) };
+      analyzer.programEnv(scope, (vars) => vars.emptied());
+      return { argv: words.slice(read.next + 1) };
+    }
     const after = words.slice(split.value !== undefined && split.value === words[at + 1] ? at + 2 : at + 1);
     const text = textOf(split.value);
     const parts = text === undefined ? null : envSplit(text);
@@ -333,8 +366,12 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     return opts(/^$/);
   case 'time':
     return opts(/^$/, /^-[pv]+$/);
-  case 'exec':
-    return opts(/^-a$/, /^-[cl]+$/);
+  case 'exec': {
+    const k = opts(/^-a$/, /^-[cl]+$/);
+    // `-c` runs the program with an empty environment.
+    if (args.slice(i + 1, k).some((a) => /^-l*c[cl]*$/.test(textOf(a) ?? ''))) analyzer.programEnv(scope, (vars) => vars.emptied());
+    return k;
+  }
   case 'nice':
     return opts(/^(-n|--adjustment)$/, /^-/);
   case 'ionice':
@@ -348,15 +385,16 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     return k + 1;
   }
   case 'env':
-    // `env -` is `env -i`.
-    return envArgs(analyzer, args.slice(textOf(args[i + 1]) === '-' ? i + 2 : i + 1), scope);
+    return envArgs(analyzer, args.slice(i + 1), scope);
   case 'sudo':
   case 'doas':
   case 'pkexec': {
     scope.sudo = true;
     analyzer.flag('sudo', `it runs ${name} to get root`);
     const k = opts(/^(-[ugCDhprtTU]|--user|--group)$/, /^-/);
-    const shellFlag = args.slice(i + 1, k).some((a) => /^-[a-zA-Z]*[si]/.test(textOf(a) ?? ''));
+    const flags = args.slice(i + 1, k).map(textOf);
+    analyzer.programEnv(scope, (vars) => vars.restricted(rootKeeps(name, flags)));
+    const shellFlag = flags.some((f) => /^-[a-zA-Z]*[si]/.test(f ?? ''));
     if (shellFlag && k < args.length) {
       const words = knownTexts(args.slice(k));
       if (words === null) analyzer.dynamic(`it runs a shell with ${name} -s on words from a variable`);
@@ -369,6 +407,9 @@ export function stripWrapper(analyzer: Analyzer, args: Arg[], i: number, scope: 
     scope.sudo = true;
     analyzer.flag('sudo', 'it runs su to switch user');
     const c = args.findIndex((a, k) => k > i && (textOf(a) === '-c' || textOf(a) === '--command'));
+    // A login (`-`, `-l`) starts a new environment; otherwise su keeps it and sets HOME to the target user's.
+    const login = args.slice(i + 1, c > 0 ? c : args.length).some((a) => /^(-|--login|-[a-zA-Z]*l[a-zA-Z]*)$/.test(textOf(a) ?? ''));
+    analyzer.programEnv(scope, (vars) => vars.restricted(login ? () => false : (v) => v !== 'HOME'));
     const script = c > 0 ? args[c + 1] : undefined;
     if (script?.kind === 'known') analyzer.nested(script.text, 'it runs a string with su -c', { inherits: true });
     else if (script) analyzer.dynamic('it runs su -c with a string from a variable');

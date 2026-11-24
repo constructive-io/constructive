@@ -101,7 +101,8 @@ const SET_AT_START: ReadonlySet<string> = new Set(['IFS', 'PWD']);
  * The shell variables as the command leaves them, at every assignment site:
  * a `NAME=value` word, `export`, `declare` and the like, `read`, `printf -v`,
  * `mapfile` and `unset`. A variable the command never touched comes from the
- * environment, which `outside` reads; one `outside` knows (HOME) is in the
+ * environment, which `outside` reads: `null` for a value it cannot know,
+ * `undefined` for a name it does not hold; one it knows (HOME) is in the
  * environment, so a change to it is exported. `exported`: the names the
  * command exported (`export`, `declare -x`, an assignment before a command).
  */
@@ -110,7 +111,7 @@ export class Variables {
   private readonly exported: Set<string>;
 
   constructor(
-    private readonly outside: (name: string) => string | null,
+    private readonly outside: (name: string) => string | null | undefined,
     vars: ReadonlyMap<string, Variable> = new Map(),
     exported: ReadonlySet<string> = new Set()
   ) {
@@ -206,10 +207,28 @@ export class Variables {
     const vars = new Map<string, Variable>();
     for (const [name, v] of this.vars) {
       if (SET_AT_START.has(name)) continue;
-      const passed = v.kind !== 'set' || this.exported.has(name) || this.outside(name) !== null;
+      const passed = v.kind !== 'set' || this.exported.has(name) || typeof this.outside(name) === 'string';
       vars.set(name, passed ? v : { kind: 'unknown' });
     }
     return new Variables(this.outside, vars, this.exported);
+  }
+
+  /** The empty environment `env -i`, `env -` and `exec -c` give the program they run: every name unset, HOME too. */
+  emptied(): Variables {
+    return new Variables((name) => (SET_AT_START.has(name) ? this.outside(name) : undefined));
+  }
+
+  /**
+   * An environment the analysis cannot know (sudo's reset, a login shell):
+   * each name `keeps` takes carries what it holds here, and every other name
+   * is unknown.
+   */
+  restricted(keeps: (name: string) => boolean): Variables {
+    return new Variables(
+      (name) => (SET_AT_START.has(name) || keeps(name) ? this.outside(name) : null),
+      new Map([...this.vars].filter(([name]) => keeps(name))),
+      new Set([...this.exported].filter(keeps))
+    );
   }
 }
 

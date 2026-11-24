@@ -861,6 +861,22 @@
       "bash5": [
         "/h/a"
       ]
+    },
+    "HOME=/x /usr/bin/true; w ~/a": {
+      "bash3": [
+        "/h/a"
+      ],
+      "bash5": [
+        "/h/a"
+      ]
+    },
+    "env HOME=/x /usr/bin/true; w ~/a": {
+      "bash3": [
+        "/h/a"
+      ],
+      "bash5": [
+        "/h/a"
+      ]
     }
   }
 }

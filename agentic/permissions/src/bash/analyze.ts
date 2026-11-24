@@ -154,6 +154,12 @@ interface Trap {
  */
 const SUBSHELL_TRAPS: ReadonlySet<string> = new Set(['DEBUG', 'RETURN', 'ERR']);
 
+/** A shell's variables and the values HOME held, as a wrapper found them before it changed its program's environment. */
+export interface ShellEnv {
+  readonly vars: Variables;
+  readonly homes: ReadonlySet<string | undefined> | null;
+}
+
 /** A copy of each condition's list, with the same trap objects in it. */
 function copyTraps(traps: ReadonlyMap<string, readonly Trap[]>, keep: (key: string) => boolean = () => true): Map<string, Trap[]> {
   return new Map([...traps].filter(([key]) => keep(key)).map(([key, list]) => [key, [...list]]));
@@ -589,6 +595,21 @@ class Analyzer implements ExpansionScope {
     this.moveTo(next);
   }
 
+  /**
+   * The environment of the program a wrapper runs (`env A=1`, `env -u`,
+   * `env -i`, sudo's reset), which a child shell it starts begins from. It
+   * holds for this one command: the first change takes a copy, `change`
+   * replaces it, and `runArgs` puts the shell's variables and HOME values back.
+   */
+  programEnv(scope: WrapperScope, change?: (vars: Variables) => Variables): Variables {
+    if (!scope.outerEnv) {
+      scope.outerEnv = { vars: this.state.vars, homes: this.state.homes };
+      this.state.vars = this.state.vars.copy();
+    }
+    if (change) this.state.vars = change(this.state.vars);
+    return this.state.vars;
+  }
+
   /** The shell's working dir at this point of the command. */
   get cwdNow(): Cwd {
     return this.state.cwd;
@@ -670,11 +691,13 @@ class Analyzer implements ExpansionScope {
     this.state.vars.unexportAll();
   }
 
-  /** An assignment before a command, or after a wrapper (`env A=1 cmd`): it holds, exported, for this command only. */
+  /** An assignment before a command: it holds, exported, for this command only. */
   private assignForCommand(scope: CommandScope, name: string, op: AssignOp, value: string | null): void {
-    const { vars } = this.state;
+    const { vars, homes } = this.state;
     if (!scope.has(name)) scope.set(name, { before: vars.record(name), set: undefined, exported: vars.isExported(name) });
     this.assign(name, op, value);
+    // Only the command's own environment holds it, so bash 5.3's tilde does not read it later.
+    this.state.homes = homes;
     vars.setExported(name, true);
     scope.get(name).set = vars.record(name);
   }
@@ -953,11 +976,15 @@ class Analyzer implements ExpansionScope {
    * A wrapper's working dir (`env -C`) holds for this command only.
    */
   runArgs(args: Arg[], stdinFed: boolean): Run | null {
-    const scope: WrapperScope = { sudo: false, xargs: null, outerCwd: null };
+    const scope: WrapperScope = { sudo: false, xargs: null, outerCwd: null, outerEnv: null };
     try {
       return this.run(args, stdinFed, scope);
     } finally {
       if (scope.outerCwd) this.state.cwd = scope.outerCwd;
+      if (scope.outerEnv) {
+        this.state.vars = scope.outerEnv.vars;
+        this.state.homes = scope.outerEnv.homes;
+      }
     }
   }
 
@@ -968,9 +995,10 @@ class Analyzer implements ExpansionScope {
       const arg = args[i];
       const assignment = /^([A-Za-z_][A-Za-z0-9_]*)(\+?)=(.*)$/s.exec(literalStart(arg));
       if (assignment && ASSIGNMENT_WORD.test(arg.raw)) {
-        const value = arg.kind === 'known' ? assignment[3] : null;
-        if (this.scope) this.assignForCommand(this.scope, assignment[1], assignment[2] ? '+=' : '=', value);
-        else this.assign(assignment[1], assignment[2] ? '+=' : '=', value);
+        // After a wrapper (`env A=1`, `sudo A=1`) it sets the environment of the program the wrapper runs.
+        this.programEnv(scope);
+        this.assign(assignment[1], assignment[2] ? '+=' : '=', arg.kind === 'known' ? assignment[3] : null);
+        this.state.vars.setExported(assignment[1], true);
         i++;
         continue;
       }

@@ -318,7 +318,32 @@ const rows: Row[] = [
   ['HOME=/tmp; F=~/x; cat src/config.ts', 'allow', 'allow'],
   ['HOME=/tmp; F=~/x; cat "$F"', 'ask', 'ask', 'unresolvable-path'],
   // 37. an env argument from a variable may be -C before an -S string too
-  ["env \"$X\" -S 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path']
+  ["env \"$X\" -S 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
+  // 38. a wrapper sets the environment the child shell starts from: env -u removes a name, env -i, env - and exec -c empty it (HOME too), and
+  // sudo, doas, pkexec and su give one the analysis cannot know, apart from what sudo passes or keeps; it holds through nohup, xargs and find -exec
+  ["export F=README.md; env -u F bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; env -i bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; env - bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; env -u G - bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; exec -c bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; env -i F=src/config.ts bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'ask', 'allow', 'shell-dynamic'],
+  ["env -i bash -c 'cd; touch .pi/ext.js'", 'deny', 'deny'],
+  ["export F=README.md; env -u \"$N\" bash -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=README.md; env -u F nohup bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; echo x | env -u F xargs bash -c 'cat ${F-~/.ssh/id_ed25519}'", 'deny', 'deny', 'hard-deny'],
+  ["export F=README.md; env -u F find src -exec bash -c 'cat ${F-~/.ssh/id_ed25519}' \\;", 'deny', 'deny', 'hard-deny'],
+  ["export F=src/config.ts; sudo bash -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=src/config.ts; sudo -E bash -c 'cat \"$F\"'", 'ask', 'allow', 'sudo'],
+  ["export F=src/config.ts; sudo --preserve-env=F bash -c 'cat \"$F\"'", 'ask', 'allow', 'sudo'],
+  ["export F=src/config.ts; sudo --preserve-env=G bash -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
+  ["sudo F=src/config.ts bash -c 'cat \"$F\"'", 'ask', 'allow', 'sudo'],
+  ["sudo -E bash -c 'cat ~/x'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=src/config.ts; doas bash -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
+  ["export F=src/config.ts; su root -c 'cat \"$F\"'", 'ask', 'allow', 'sudo'],
+  ["export F=src/config.ts; su -l root -c 'cat \"$F\"'", 'ask', 'ask', 'unresolvable-path'],
+  // 39. an assignment before a program changes the HOME only that program sees, so bash 5.3's tilde does not read it later
+  ['HOME=/tmp/x /usr/bin/true; cat ~/x', 'ask', 'allow', 'outside-workspace'],
+  ['env HOME=/tmp/x /usr/bin/true; cat ~/x', 'ask', 'allow', 'outside-workspace']
 ];
 
 describe('hardening: bash per mode', () => {
