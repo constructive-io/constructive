@@ -311,6 +311,7 @@ describe('parseGrantMatch', () => {
     ['six prefixes', { type: 'command-prefix', prefixes: ['ls', 'cat', 'git status', 'git log', 'npm test', 'pnpm test'] }],
     ['a prefix that is not text', { type: 'command-prefix', prefixes: [1] }],
     ['a sparse list of prefixes', { type: 'command-prefix', prefixes: new Array(1) }],
+    ['a sparse list that claims billions of prefixes', { type: 'command-prefix', prefixes: new Array(2 ** 32 - 1) }],
     ['an exact command that is not its own key', { type: 'command', command: 'git  status' }],
     ['an empty exact command', { type: 'command', command: '' }],
     ['a blank exact command', { type: 'command', command: '\n' }],
