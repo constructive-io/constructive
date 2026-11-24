@@ -29,7 +29,9 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@dataplan/pg": "1.1.1",
     "deepmerge": "^4.3.1",
+    "grafast": "1.1.2",
     "graphile-build": "5.1.1",
     "graphile-config": "1.1.0",
     "graphile-settings": "workspace:^",
