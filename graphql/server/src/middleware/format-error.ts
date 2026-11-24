@@ -13,6 +13,12 @@ import { type GraphQLError, type GraphQLFormattedError } from 'graphql';
 
 const formatErrorLog = new Logger('graphile:formatError');
 
+export const logInternalError = (error: unknown, label?: string): string => {
+  const errorId = crypto.randomBytes(8).toString('hex');
+  formatErrorLog.error(`[graphql-error:${errorId}]${label ? ` ${label}` : ''}`, error);
+  return errorId;
+};
+
 /**
  * An error the GraphQL layer raised about the *request*, before any resolver
  * ran: an unknown input field, a value of the wrong type, a missing required
@@ -121,14 +127,12 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
   }
 
   if (internal) {
-    const errorId = crypto.randomBytes(8).toString('hex');
     if (!declaredDbError) {
       message = format('UNKNOWN_ERROR');
       extensions.code = (nativePg ? error.extensions?.code : code) ?? INTERNAL_SERVER_ERROR;
       extensions.class = 'internal';
     }
-    extensions.errorId = errorId;
-    formatErrorLog.error(`[graphql-error:${errorId}]`, error);
+    extensions.errorId = logInternalError(error);
   }
 
   // grafserv strips originalError before serializing to the client.
