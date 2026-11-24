@@ -1,0 +1,1626 @@
+{
+  "_meta": {
+    "tables": [
+      {
+        "name": "Company",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "companies",
+          "one": "company",
+          "create": "createCompany",
+          "update": "updateCompany",
+          "delete": "deleteCompany"
+        },
+        "inflection": {
+          "tableType": "Company",
+          "allRows": "companies",
+          "connection": "CompanyConnection",
+          "edge": "CompanyEdge",
+          "filterType": "CompanyFilter",
+          "orderByType": "CompanyOrderBy",
+          "conditionType": "CompanyCondition",
+          "patchType": "CompanyPatch",
+          "createInputType": "CreateCompanyInput",
+          "createPayloadType": "CreateCompanyPayload",
+          "updatePayloadType": "UpdateCompanyPayload",
+          "deletePayloadType": "DeleteCompanyPayload"
+        },
+        "fields": [
+          {
+            "name": "name",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "website",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "industry",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": {
+              "name": "companyIndustry",
+              "values": ["software", "retail", "healthcare", "finance"]
+            },
+            "type": {
+              "gqlType": "companyIndustry",
+              "isArray": false,
+              "pgType": "companyIndustry",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "employeeCount",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Int",
+              "isArray": false,
+              "pgType": "int4",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "contactsByTheirCompanyId",
+              "isUnique": false,
+              "type": "contacts",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contacts"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "contactsByTheirCompanyId",
+              "isUnique": false,
+              "type": "contacts",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contacts"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "companies_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": []
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "Contact",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "contacts",
+          "one": "contact",
+          "create": "createContact",
+          "update": "updateContact",
+          "delete": "deleteContact"
+        },
+        "inflection": {
+          "tableType": "Contact",
+          "allRows": "contacts",
+          "connection": "ContactConnection",
+          "edge": "ContactEdge",
+          "filterType": "ContactFilter",
+          "orderByType": "ContactOrderBy",
+          "conditionType": "ContactCondition",
+          "patchType": "ContactPatch",
+          "createInputType": "CreateContactInput",
+          "createPayloadType": "CreateContactPayload",
+          "updatePayloadType": "UpdateContactPayload",
+          "deletePayloadType": "DeleteContactPayload"
+        },
+        "fields": [
+          {
+            "name": "firstName",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "lastName",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "email",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "phone",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "status",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": {
+              "name": "contactStatus",
+              "values": ["lead", "customer", "churned"]
+            },
+            "type": {
+              "gqlType": "contactStatus",
+              "isArray": false,
+              "pgType": "contactStatus",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "companyId",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "notes",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "birthday",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Date",
+              "isArray": false,
+              "pgType": "date",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "companiesByCompanyId",
+              "isUnique": false,
+              "type": "companies",
+              "keys": [
+                {
+                  "name": "companyId"
+                }
+              ],
+              "references": {
+                "name": "companies"
+              }
+            }
+          ],
+          "has": [
+            {
+              "fieldName": "dealsByTheirContactId",
+              "isUnique": false,
+              "type": "deals",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "deals"
+              }
+            },
+            {
+              "fieldName": "contact_tagsByTheirContactId",
+              "isUnique": false,
+              "type": "contact_tags",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contact_tags"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "dealsByTheirContactId",
+              "isUnique": false,
+              "type": "deals",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "deals"
+              }
+            },
+            {
+              "fieldName": "contact_tagsByTheirContactId",
+              "isUnique": false,
+              "type": "contact_tags",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contact_tags"
+              }
+            }
+          ],
+          "manyToMany": [
+            {
+              "fieldName": "tagsByContactTagContactIdAndTagId",
+              "type": "tags",
+              "junctionTable": {
+                "name": "contact_tags"
+              },
+              "rightTable": {
+                "name": "tags"
+              }
+            }
+          ]
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "contacts_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": [
+            {
+              "name": "companiesByCompanyId",
+              "fields": [
+                {
+                  "name": "companyId"
+                }
+              ],
+              "refTable": {
+                "name": "companies"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "Deal",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "deals",
+          "one": "deal",
+          "create": "createDeal",
+          "update": "updateDeal",
+          "delete": "deleteDeal"
+        },
+        "inflection": {
+          "tableType": "Deal",
+          "allRows": "deals",
+          "connection": "DealConnection",
+          "edge": "DealEdge",
+          "filterType": "DealFilter",
+          "orderByType": "DealOrderBy",
+          "conditionType": "DealCondition",
+          "patchType": "DealPatch",
+          "createInputType": "CreateDealInput",
+          "createPayloadType": "CreateDealPayload",
+          "updatePayloadType": "UpdateDealPayload",
+          "deletePayloadType": "DeleteDealPayload"
+        },
+        "fields": [
+          {
+            "name": "title",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "amount",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "BigFloat",
+              "isArray": false,
+              "pgType": "numeric",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "stage",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": {
+              "name": "dealStage",
+              "values": ["open", "won", "lost"]
+            },
+            "type": {
+              "gqlType": "dealStage",
+              "isArray": false,
+              "pgType": "dealStage",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "closeDate",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Date",
+              "isArray": false,
+              "pgType": "date",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "contactId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "contactsByContactId",
+              "isUnique": false,
+              "type": "contacts",
+              "keys": [
+                {
+                  "name": "contactId"
+                }
+              ],
+              "references": {
+                "name": "contacts"
+              }
+            }
+          ],
+          "has": [],
+          "hasOne": [],
+          "hasMany": [],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "deals_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": [
+            {
+              "name": "contactsByContactId",
+              "fields": [
+                {
+                  "name": "contactId"
+                }
+              ],
+              "refTable": {
+                "name": "contacts"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "Tag",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "tags",
+          "one": "tag",
+          "create": "createTag",
+          "update": "updateTag",
+          "delete": "deleteTag"
+        },
+        "inflection": {
+          "tableType": "Tag",
+          "allRows": "tags",
+          "connection": "TagConnection",
+          "edge": "TagEdge",
+          "filterType": "TagFilter",
+          "orderByType": "TagOrderBy",
+          "conditionType": "TagCondition",
+          "patchType": "TagPatch",
+          "createInputType": "CreateTagInput",
+          "createPayloadType": "CreateTagPayload",
+          "updatePayloadType": "UpdateTagPayload",
+          "deletePayloadType": "DeleteTagPayload"
+        },
+        "fields": [
+          {
+            "name": "name",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "color",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "contact_tagsByTheirTagId",
+              "isUnique": false,
+              "type": "contact_tags",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contact_tags"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "contact_tagsByTheirTagId",
+              "isUnique": false,
+              "type": "contact_tags",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "contact_tags"
+              }
+            }
+          ],
+          "manyToMany": [
+            {
+              "fieldName": "contactsByContactTagTagIdAndContactId",
+              "type": "contacts",
+              "junctionTable": {
+                "name": "contact_tags"
+              },
+              "rightTable": {
+                "name": "contacts"
+              }
+            }
+          ]
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "tags_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "tags_name_key",
+              "fields": [
+                {
+                  "name": "name"
+                }
+              ]
+            }
+          ],
+          "foreignKey": []
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "ContactTag",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "contactTags",
+          "one": "contactTag",
+          "create": "createContactTag",
+          "update": "updateContactTag",
+          "delete": "deleteContactTag"
+        },
+        "inflection": {
+          "tableType": "ContactTag",
+          "allRows": "contactTags",
+          "connection": "ContactTagConnection",
+          "edge": "ContactTagEdge",
+          "filterType": "ContactTagFilter",
+          "orderByType": "ContactTagOrderBy",
+          "conditionType": "ContactTagCondition",
+          "patchType": "ContactTagPatch",
+          "createInputType": "CreateContactTagInput",
+          "createPayloadType": "CreateContactTagPayload",
+          "updatePayloadType": "UpdateContactTagPayload",
+          "deletePayloadType": "DeleteContactTagPayload"
+        },
+        "fields": [
+          {
+            "name": "contactId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "tagId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "contactsByContactId",
+              "isUnique": false,
+              "type": "contacts",
+              "keys": [
+                {
+                  "name": "contactId"
+                }
+              ],
+              "references": {
+                "name": "contacts"
+              }
+            },
+            {
+              "fieldName": "tagsByTagId",
+              "isUnique": false,
+              "type": "tags",
+              "keys": [
+                {
+                  "name": "tagId"
+                }
+              ],
+              "references": {
+                "name": "tags"
+              }
+            }
+          ],
+          "has": [],
+          "hasOne": [],
+          "hasMany": [],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "contact_tags_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "contact_tags_contactId_tagId_key",
+              "fields": [
+                {
+                  "name": "contactId"
+                },
+                {
+                  "name": "tagId"
+                }
+              ]
+            }
+          ],
+          "foreignKey": [
+            {
+              "name": "contactsByContactId",
+              "fields": [
+                {
+                  "name": "contactId"
+                }
+              ],
+              "refTable": {
+                "name": "contacts"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            },
+            {
+              "name": "tagsByTagId",
+              "fields": [
+                {
+                  "name": "tagId"
+                }
+              ],
+              "refTable": {
+                "name": "tags"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "Bucket",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "buckets",
+          "one": "bucket",
+          "create": "createBucket",
+          "update": "updateBucket",
+          "delete": "deleteBucket"
+        },
+        "inflection": {
+          "tableType": "Bucket",
+          "allRows": "buckets",
+          "connection": "BucketConnection",
+          "edge": "BucketEdge",
+          "filterType": "BucketFilter",
+          "orderByType": "BucketOrderBy",
+          "conditionType": "BucketCondition",
+          "patchType": "BucketPatch",
+          "createInputType": "CreateBucketInput",
+          "createPayloadType": "CreateBucketPayload",
+          "updatePayloadType": "UpdateBucketPayload",
+          "deletePayloadType": "DeleteBucketPayload"
+        },
+        "fields": [
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "key",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "isPublic",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Boolean",
+              "isArray": false,
+              "pgType": "bool",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "filesByTheirBucketId",
+              "isUnique": false,
+              "type": "files",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "files"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "filesByTheirBucketId",
+              "isUnique": false,
+              "type": "files",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "files"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "buckets_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": []
+        },
+        "storage": {
+          "isFilesTable": false,
+          "isBucketsTable": true
+        },
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "File",
+        "schemaName": "crm-fixture-app-public",
+        "query": {
+          "all": "files",
+          "one": "file",
+          "create": "createFile",
+          "update": "updateFile",
+          "delete": "deleteFile"
+        },
+        "inflection": {
+          "tableType": "File",
+          "allRows": "files",
+          "connection": "FileConnection",
+          "edge": "FileEdge",
+          "filterType": "FileFilter",
+          "orderByType": "FileOrderBy",
+          "conditionType": "FileCondition",
+          "patchType": "FilePatch",
+          "createInputType": "CreateFileInput",
+          "createPayloadType": "CreateFilePayload",
+          "updatePayloadType": "UpdateFilePayload",
+          "deletePayloadType": "DeleteFilePayload"
+        },
+        "fields": [
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "key",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "bucketId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "tags",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": true,
+              "pgType": "textArray",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "status",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": {
+              "name": "fileStatus",
+              "values": ["requested", "uploaded", "processed"]
+            },
+            "type": {
+              "gqlType": "fileStatus",
+              "isArray": false,
+              "pgType": "fileStatus",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "upload",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "upload",
+              "isArray": false,
+              "pgType": "upload",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "bucketsByBucketId",
+              "isUnique": false,
+              "type": "buckets",
+              "keys": [
+                {
+                  "name": "bucketId"
+                }
+              ],
+              "references": {
+                "name": "buckets"
+              }
+            }
+          ],
+          "has": [],
+          "hasOne": [],
+          "hasMany": [],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "files_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": [
+            {
+              "name": "bucketsByBucketId",
+              "fields": [
+                {
+                  "name": "bucketId"
+                }
+              ],
+              "refTable": {
+                "name": "buckets"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": {
+          "isFilesTable": true,
+          "isBucketsTable": false
+        },
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,844 @@
+{
+  "_meta": {
+    "tables": [
+      {
+        "name": "Entry",
+        "schemaName": "diary-app-61d6f146-app-public",
+        "query": {
+          "all": "entrys",
+          "one": "entry",
+          "create": "createEntry",
+          "update": "updateEntry",
+          "delete": "deleteEntry"
+        },
+        "inflection": {
+          "tableType": "Entry",
+          "allRows": "entrys",
+          "connection": "EntryConnection",
+          "edge": "EntryEdge",
+          "filterType": "EntryFilter",
+          "orderByType": "EntryOrderBy",
+          "conditionType": "EntryCondition",
+          "patchType": "EntryPatch",
+          "createInputType": "CreateEntryInput",
+          "createPayloadType": "CreateEntryPayload",
+          "updatePayloadType": "UpdateEntryPayload",
+          "deletePayloadType": "DeleteEntryPayload"
+        },
+        "fields": [
+          {
+            "name": "title",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "body",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "entryDate",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Date",
+              "isArray": false,
+              "pgType": "date",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "mood",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [],
+          "hasOne": [],
+          "hasMany": [],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "entrys_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": []
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "Bucket",
+        "schemaName": "diary-app-61d6f146-storage-public",
+        "query": {
+          "all": "buckets",
+          "one": "bucket",
+          "create": "createBucket",
+          "update": "updateBucket",
+          "delete": "deleteBucket"
+        },
+        "inflection": {
+          "tableType": "Bucket",
+          "allRows": "buckets",
+          "connection": "BucketConnection",
+          "edge": "BucketEdge",
+          "filterType": "BucketFilter",
+          "orderByType": "BucketOrderBy",
+          "conditionType": "BucketCondition",
+          "patchType": "BucketPatch",
+          "createInputType": "CreateBucketInput",
+          "createPayloadType": "CreateBucketPayload",
+          "updatePayloadType": "UpdateBucketPayload",
+          "deletePayloadType": "DeleteBucketPayload"
+        },
+        "fields": [
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": false,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": false,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "key",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Unique bucket identifier used in S3 key paths (e.g. avatars, documents, temp)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "type",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Bucket CDN access type: public (CDN-served), private (presigned GET), temp (staging uploads)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "isPublic",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Whether bucket contents are publicly readable. Set to true when type is public.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Boolean",
+              "isArray": false,
+              "pgType": "bool",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "description",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Human-readable description of the bucket purpose",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "actorId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who created this bucket. Forced to current_user_id() on INSERT.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "maxFileSize",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Maximum file size in bytes allowed in this bucket (NULL = no limit, enforcement deferred)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "BigInt",
+              "isArray": false,
+              "pgType": "int8",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "allowedMimeTypes",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Whitelist of allowed MIME types for files in this bucket (NULL = all allowed, enforcement deferred)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": true,
+              "pgType": "textArray",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "allowedOrigins",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Per-bucket CORS allowed origins override (NULL = inherit from storage_module/plugin defaults). Use ARRAY['*'] for open/CDN mode.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": true,
+              "pgType": "textArray",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "allowCustomKeys",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "When true, clients can provide custom S3 keys (e.g. reports/2024/Q1.pdf). When false (default), S3 key = content hash (automatic dedup). contentHash always required for integrity.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Boolean",
+              "isArray": false,
+              "pgType": "bool",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "filesByTheirBucketId",
+              "isUnique": false,
+              "type": "files",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "files"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "filesByTheirBucketId",
+              "isUnique": false,
+              "type": "files",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "files"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "buckets_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "buckets_key_key",
+              "fields": [
+                {
+                  "name": "key"
+                }
+              ]
+            }
+          ],
+          "foreignKey": []
+        },
+        "storage": {
+          "isFilesTable": false,
+          "isBucketsTable": true
+        },
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      },
+      {
+        "name": "File",
+        "schemaName": "diary-app-61d6f146-storage-public",
+        "query": {
+          "all": "files",
+          "one": "file",
+          "create": "createFile",
+          "update": "updateFile",
+          "delete": "deleteFile"
+        },
+        "inflection": {
+          "tableType": "File",
+          "allRows": "files",
+          "connection": "FileConnection",
+          "edge": "FileEdge",
+          "filterType": "FileFilter",
+          "orderByType": "FileOrderBy",
+          "conditionType": "FileCondition",
+          "patchType": "FilePatch",
+          "createInputType": "CreateFileInput",
+          "createPayloadType": "CreateFilePayload",
+          "updatePayloadType": "UpdateFilePayload",
+          "deletePayloadType": "DeleteFilePayload"
+        },
+        "fields": [
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": false,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": false,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "key",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "S3 object key for this file, unique within its bucket",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "contentHash",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "SHA-256 content hash for integrity verification and dedup. In default mode, equals the S3 key. In custom key mode, stored separately.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "bucketId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": "Bucket this file belongs to. Determines owner_id and is_public via inheritance trigger.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "actorId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who uploaded this file. Forced to current_user_id() on INSERT. Used for UPDATE/DELETE authorization.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "isPublic",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Whether this file is publicly readable. Inherited from bucket on INSERT.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Boolean",
+              "isArray": false,
+              "pgType": "bool",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "mimeType",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "MIME type of the file (e.g. image/png, application/pdf). Immutable after INSERT.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "size",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "File size in bytes. Immutable after INSERT.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "BigInt",
+              "isArray": false,
+              "pgType": "int8",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "description",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Human-readable description or alt text for the file (mutable)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "tags",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User-defined tags for categorization and search (mutable)",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": true,
+              "pgType": "textArray",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "filename",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Original filename provided by the uploader. Used for display and Content-Disposition header on download.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          },
+          {
+            "name": "status",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "File lifecycle status: requested (presigned URL generated, not yet in S3), uploaded (file in S3, ready for basic use), processed (MIME verified, image resized, embedding computed).",
+            "enumValues": {
+              "name": "fileStatus",
+              "values": [
+                "requested",
+                "uploaded",
+                "processed"
+              ]
+            },
+            "type": {
+              "gqlType": "fileStatus",
+              "isArray": false,
+              "pgType": "fileStatus",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            }
+          },
+          {
+            "name": "upload",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Processed file reference (upload domain). Populated by processing jobs after file is uploaded. Copy this value to other tables to reference the file.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "upload",
+              "isArray": false,
+              "pgType": "upload",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            }
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "bucketsByMyBucketId",
+              "isUnique": false,
+              "type": "buckets",
+              "keys": [
+                {
+                  "name": "bucketId"
+                }
+              ],
+              "references": {
+                "name": "buckets"
+              }
+            }
+          ],
+          "has": [],
+          "hasOne": [],
+          "hasMany": [],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "files_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "files_bucket_id_key_key",
+              "fields": [
+                {
+                  "name": "bucketId"
+                },
+                {
+                  "name": "key"
+                }
+              ]
+            }
+          ],
+          "foreignKey": [
+            {
+              "name": "bucketsByMyBucketId",
+              "fields": [
+                {
+                  "name": "bucketId"
+                }
+              ],
+              "refTable": {
+                "name": "buckets"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": {
+          "isFilesTable": true,
+          "isBucketsTable": false
+        },
+        "search": null,
+        "i18n": null,
+        "realtime": null
+      }
+    ]
+  }
+}

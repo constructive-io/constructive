@@ -22,6 +22,9 @@ export default [
       'postgres/pg-ast/src/wrapped.ts',
       // read verbatim at codegen time and written into generated clients
       'graphql/codegen/src/core/codegen/templates/**',
+      // the AppSpec contract, vendored byte for byte from sandbox-templates by
+      // `pnpm sync:app-spec`; a test compares it with the template's copy
+      'agentic/fast-app/src/app-spec/contract/**',
       // codegen output snapshots and standalone sqitch/pgpm fixture projects
       '__fixtures__/**',
       '**/__fixtures__/**'

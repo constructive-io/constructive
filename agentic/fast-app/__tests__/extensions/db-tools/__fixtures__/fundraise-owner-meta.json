@@ -1,0 +1,1379 @@
+{
+  "_meta": {
+    "tables": [
+      {
+        "name": "DataRoom",
+        "tableName": "data_rooms",
+        "schemaName": "veve-c14edd5b-app-public",
+        "query": {
+          "all": "dataRooms",
+          "one": null,
+          "create": "createDataRoom",
+          "update": "updateDataRoom",
+          "delete": "deleteDataRoom"
+        },
+        "inflection": {
+          "tableType": "DataRoom",
+          "allRows": "dataRooms",
+          "connection": "DataRoomConnection",
+          "edge": "DataRoomEdge",
+          "filterType": "DataRoomFilter",
+          "orderByType": "DataRoomOrderBy",
+          "conditionType": "DataRoomCondition",
+          "patchType": "DataRoomPatch",
+          "createInputType": "CreateDataRoomInput",
+          "createPayloadType": "CreateDataRoomPayload",
+          "updatePayloadType": "UpdateDataRoomPayload",
+          "deletePayloadType": "DeleteDataRoomPayload"
+        },
+        "fields": [
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "name",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Name of this data_room",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "name",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "The parent entity that owns this data_room",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "owner_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "ownedDataRoomBuckets",
+              "isUnique": false,
+              "type": "DataRoomBucketConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DataRoomBucket"
+              }
+            },
+            {
+              "fieldName": "ownedDataRoomFiles",
+              "isUnique": false,
+              "type": "DataRoomFileConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DataRoomFile"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "ownedDataRoomBuckets",
+              "isUnique": false,
+              "type": "DataRoomBucketConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DataRoomBucket"
+              }
+            },
+            {
+              "fieldName": "ownedDataRoomFiles",
+              "isUnique": false,
+              "type": "DataRoomFileConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DataRoomFile"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "dataRooms_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [],
+          "foreignKey": []
+        },
+        "storage": null,
+        "search": null,
+        "i18n": null,
+        "realtime": null,
+        "scope": null,
+        "isJunction": false
+      },
+      {
+        "name": "Deal",
+        "tableName": "deals",
+        "schemaName": "veve-c14edd5b-app-public",
+        "query": {
+          "all": "deals",
+          "one": null,
+          "create": "createDeal",
+          "update": "updateDeal",
+          "delete": "deleteDeal"
+        },
+        "inflection": {
+          "tableType": "Deal",
+          "allRows": "deals",
+          "connection": "DealConnection",
+          "edge": "DealEdge",
+          "filterType": "DealFilter",
+          "orderByType": "DealOrderBy",
+          "conditionType": "DealCondition",
+          "patchType": "DealPatch",
+          "createInputType": "CreateDealInput",
+          "createPayloadType": "CreateDealPayload",
+          "updatePayloadType": "UpdateDealPayload",
+          "deletePayloadType": "DeleteDealPayload"
+        },
+        "fields": [
+          {
+            "name": "name",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "name",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "value",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "BigFloat",
+              "isArray": false,
+              "pgType": "numeric",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "value",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "currency",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "currency",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "expectedCloseDate",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Date",
+              "isArray": false,
+              "pgType": "date",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "expected_close_date",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "notesText",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "notes_text",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "dataRoomId",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "The Data Room shared with this investor. A pointer only: it grants no access to the room or its files - the investor must be added as a room member.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "data_room_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "created_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "updated_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record within the entity",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "owner_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "entityId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": "Entity this record belongs to",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "entity_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "stage",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Current status of this record",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "stage",
+            "allowedValues": [
+              "lead",
+              "contacted",
+              "meeting",
+              "diligence",
+              "term_sheet",
+              "committed",
+              "closed",
+              "passed"
+            ],
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embeddingText",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Auto-generated composite text derived from source fields",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding_text",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "searchTsv",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "FullText",
+              "isArray": false,
+              "pgType": "tsvector",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "search_tsv",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embedding",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Vector",
+              "isArray": false,
+              "pgType": "vector",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embeddingUpdatedAt",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding_updated_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": false,
+            "isWritableOnUpdate": false
+          },
+          {
+            "name": "companyId",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": true,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "company_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          }
+        ],
+        "relations": {
+          "belongsTo": [
+            {
+              "fieldName": "company",
+              "isUnique": false,
+              "type": "Company",
+              "keys": [
+                {
+                  "name": "companyId"
+                }
+              ],
+              "references": {
+                "name": "Company"
+              }
+            }
+          ],
+          "has": [
+            {
+              "fieldName": "dealsChunksByDealsId",
+              "isUnique": false,
+              "type": "DealsChunkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DealsChunk"
+              }
+            },
+            {
+              "fieldName": "interactions",
+              "isUnique": false,
+              "type": "InteractionConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Interaction"
+              }
+            },
+            {
+              "fieldName": "notes",
+              "isUnique": false,
+              "type": "NoteConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Note"
+              }
+            },
+            {
+              "fieldName": "dealContacts",
+              "isUnique": false,
+              "type": "DealContactConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DealContact"
+              }
+            },
+            {
+              "fieldName": "tagLinks",
+              "isUnique": false,
+              "type": "TagLinkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "TagLink"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "dealsChunksByDealsId",
+              "isUnique": false,
+              "type": "DealsChunkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DealsChunk"
+              }
+            },
+            {
+              "fieldName": "interactions",
+              "isUnique": false,
+              "type": "InteractionConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Interaction"
+              }
+            },
+            {
+              "fieldName": "notes",
+              "isUnique": false,
+              "type": "NoteConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Note"
+              }
+            },
+            {
+              "fieldName": "dealContacts",
+              "isUnique": false,
+              "type": "DealContactConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "DealContact"
+              }
+            },
+            {
+              "fieldName": "tagLinks",
+              "isUnique": false,
+              "type": "TagLinkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "TagLink"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "deals_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "deals_id_entity_id_key",
+              "fields": [
+                {
+                  "name": "id"
+                },
+                {
+                  "name": "entityId"
+                }
+              ]
+            }
+          ],
+          "foreignKey": [
+            {
+              "name": "companiesByMyCompanyIdAndEntityId",
+              "fields": [
+                {
+                  "name": "companyId"
+                },
+                {
+                  "name": "entityId"
+                }
+              ],
+              "refTable": {
+                "name": "companies"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                },
+                {
+                  "name": "entityId"
+                }
+              ]
+            },
+            {
+              "name": "companiesByMyCompanyId",
+              "fields": [
+                {
+                  "name": "companyId"
+                }
+              ],
+              "refTable": {
+                "name": "companies"
+              },
+              "refFields": [
+                {
+                  "name": "id"
+                }
+              ]
+            }
+          ]
+        },
+        "storage": null,
+        "search": {
+          "hasUnifiedSearch": true,
+          "columns": [
+            {
+              "name": "searchTsv",
+              "algorithm": "tsvector"
+            },
+            {
+              "name": "embedding",
+              "algorithm": "vector"
+            }
+          ]
+        },
+        "i18n": null,
+        "realtime": null,
+        "scope": {
+          "scope": "app",
+          "tier": "global",
+          "keyColumn": null,
+          "entityTable": null,
+          "source": "smartTag"
+        },
+        "isJunction": false
+      },
+      {
+        "name": "Company",
+        "tableName": "companies",
+        "schemaName": "veve-c14edd5b-app-public",
+        "query": {
+          "all": "companies",
+          "one": null,
+          "create": "createCompany",
+          "update": "updateCompany",
+          "delete": "deleteCompany"
+        },
+        "inflection": {
+          "tableType": "Company",
+          "allRows": "companies",
+          "connection": "CompanyConnection",
+          "edge": "CompanyEdge",
+          "filterType": "CompanyFilter",
+          "orderByType": "CompanyOrderBy",
+          "conditionType": "CompanyCondition",
+          "patchType": "CompanyPatch",
+          "createInputType": "CreateCompanyInput",
+          "createPayloadType": "CreateCompanyPayload",
+          "updatePayloadType": "UpdateCompanyPayload",
+          "deletePayloadType": "DeleteCompanyPayload"
+        },
+        "fields": [
+          {
+            "name": "name",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "name",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "domain",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "domain",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "industry",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "industry",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "description",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "description",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "logo",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Company logo: a projection of an org_files row in the public images bucket.",
+            "enumValues": null,
+            "type": {
+              "gqlType": "ConstructiveInternalTypeImage",
+              "isArray": false,
+              "pgType": "image",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "logo",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "id",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": true,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "createdAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was created",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "created_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "updatedAt",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Timestamp when this record was last updated",
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "updated_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "ownerId",
+            "isNotNull": true,
+            "hasDefault": true,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "User who owns this record within the entity",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": true
+            },
+            "columnName": "owner_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "entityId",
+            "isNotNull": true,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Entity this record belongs to",
+            "enumValues": null,
+            "type": {
+              "gqlType": "UUID",
+              "isArray": false,
+              "pgType": "uuid",
+              "subtype": null,
+              "isNotNull": true,
+              "hasDefault": false
+            },
+            "columnName": "entity_id",
+            "allowedValues": null,
+            "isRequiredOnCreate": true,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embeddingText",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": "Auto-generated composite text derived from source fields",
+            "enumValues": null,
+            "type": {
+              "gqlType": "String",
+              "isArray": false,
+              "pgType": "text",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding_text",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "searchTsv",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "FullText",
+              "isArray": false,
+              "pgType": "tsvector",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "search_tsv",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embedding",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Vector",
+              "isArray": false,
+              "pgType": "vector",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": true,
+            "isWritableOnUpdate": true
+          },
+          {
+            "name": "embeddingUpdatedAt",
+            "isNotNull": false,
+            "hasDefault": false,
+            "isPrimaryKey": false,
+            "isForeignKey": false,
+            "description": null,
+            "enumValues": null,
+            "type": {
+              "gqlType": "Datetime",
+              "isArray": false,
+              "pgType": "timestamptz",
+              "subtype": null,
+              "isNotNull": false,
+              "hasDefault": false
+            },
+            "columnName": "embedding_updated_at",
+            "allowedValues": null,
+            "isRequiredOnCreate": false,
+            "isWritableOnCreate": false,
+            "isWritableOnUpdate": false
+          }
+        ],
+        "relations": {
+          "belongsTo": [],
+          "has": [
+            {
+              "fieldName": "companiesChunksByCompaniesId",
+              "isUnique": false,
+              "type": "CompaniesChunkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "CompaniesChunk"
+              }
+            },
+            {
+              "fieldName": "deals",
+              "isUnique": false,
+              "type": "DealConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Deal"
+              }
+            },
+            {
+              "fieldName": "notes",
+              "isUnique": false,
+              "type": "NoteConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Note"
+              }
+            },
+            {
+              "fieldName": "contactCompanies",
+              "isUnique": false,
+              "type": "ContactCompanyConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "ContactCompany"
+              }
+            },
+            {
+              "fieldName": "tagLinks",
+              "isUnique": false,
+              "type": "TagLinkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "TagLink"
+              }
+            },
+            {
+              "fieldName": "projectContacts",
+              "isUnique": false,
+              "type": "ProjectContactConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "ProjectContact"
+              }
+            }
+          ],
+          "hasOne": [],
+          "hasMany": [
+            {
+              "fieldName": "companiesChunksByCompaniesId",
+              "isUnique": false,
+              "type": "CompaniesChunkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "CompaniesChunk"
+              }
+            },
+            {
+              "fieldName": "deals",
+              "isUnique": false,
+              "type": "DealConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Deal"
+              }
+            },
+            {
+              "fieldName": "notes",
+              "isUnique": false,
+              "type": "NoteConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "Note"
+              }
+            },
+            {
+              "fieldName": "contactCompanies",
+              "isUnique": false,
+              "type": "ContactCompanyConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "ContactCompany"
+              }
+            },
+            {
+              "fieldName": "tagLinks",
+              "isUnique": false,
+              "type": "TagLinkConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "TagLink"
+              }
+            },
+            {
+              "fieldName": "projectContacts",
+              "isUnique": false,
+              "type": "ProjectContactConnection",
+              "keys": [
+                {
+                  "name": "id"
+                }
+              ],
+              "referencedBy": {
+                "name": "ProjectContact"
+              }
+            }
+          ],
+          "manyToMany": []
+        },
+        "constraints": {
+          "primaryKey": {
+            "name": "companies_pkey",
+            "fields": [
+              {
+                "name": "id"
+              }
+            ]
+          },
+          "unique": [
+            {
+              "name": "companies_id_entity_id_key",
+              "fields": [
+                {
+                  "name": "id"
+                },
+                {
+                  "name": "entityId"
+                }
+              ]
+            }
+          ],
+          "foreignKey": []
+        },
+        "storage": null,
+        "search": {
+          "hasUnifiedSearch": true,
+          "columns": [
+            {
+              "name": "searchTsv",
+              "algorithm": "tsvector"
+            },
+            {
+              "name": "embedding",
+              "algorithm": "vector"
+            }
+          ]
+        },
+        "i18n": null,
+        "realtime": null,
+        "scope": {
+          "scope": "app",
+          "tier": "global",
+          "keyColumn": null,
+          "entityTable": null,
+          "source": "smartTag"
+        },
+        "isJunction": false
+      }
+    ]
+  }
+}

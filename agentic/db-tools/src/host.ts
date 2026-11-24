@@ -11,6 +11,8 @@
  * on behalf of, so the same contract serves whichever adapter runs the tools.
  */
 
+import type { ContextSource } from './context';
+
 export type HostAccount = {
   userId: string;
   accessToken: string;
@@ -167,6 +169,16 @@ export interface ToolsHost {
    * the call fails with `binding-not-saved`.
    */
   persistBinding?(binding: ProjectBinding): Promise<void>;
+  /**
+   * The project values for a folder, in place of its `.env`. A headless host
+   * (a cloud Job) has no `.env` in its clone, because that file holds the
+   * account's API key: it answers the values it was launched with. When it
+   * answers a source, the folder's `.env` is not read; null or undefined
+   * reads `<cwd>/.env`.
+   */
+  contextSource?(
+    cwd: string
+  ): ContextSource | null | undefined | Promise<ContextSource | null | undefined>;
 }
 
 export const DEFAULT_DATA_TOKEN_SKEW_MS = 30_000;
@@ -185,6 +197,11 @@ let currentHost: ToolsHost | null = null;
 
 export function configureHost(host: ToolsHost): void {
   currentHost = host;
+}
+
+/** The configured host, or null before configureHost: for reads that work without one. */
+export function findHost(): ToolsHost | null {
+  return currentHost;
 }
 
 export function getHost(): ToolsHost {
