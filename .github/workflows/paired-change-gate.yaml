@@ -1,0 +1,45 @@
+name: Paired-change gate
+
+# Blocks API PRs that add/modify SQL in API sources (or declare `Paired-DB:`)
+# until a green `storage-integration.yml` (`scenario=all`) run in
+# constructive-io/constructive-db-integration-tests has verified both refs, and
+# enforces DB-first merge order when paired with a constructive-db PR.
+#
+# Runs on `edited` so updating the PR body with `Paired-DB:` or
+# `Kitchen-sink-run:` re-checks immediately. Needs no pnpm install (~5s).
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+    branches:
+      - main
+      - v1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paired-change-gate:
+    name: Paired-change gate
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check paired kitchen-sink run
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_REF: origin/${{ github.event.pull_request.base.ref }}
+          GH_TOKEN: ${{ secrets.GH_SUBMODULE_PAT }}
+        run: node .github/scripts/paired-change-gate.cjs

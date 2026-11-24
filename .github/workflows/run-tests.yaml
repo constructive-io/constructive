@@ -68,7 +68,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Validate release notification gate
-        run: node --test .github/scripts/wait-for-npm-packages.test.cjs
+        run: node --test .github/scripts/wait-for-npm-packages.test.cjs .github/scripts/paired-change-gate.test.cjs
 
       - name: Install dependencies
         run: pnpm install
