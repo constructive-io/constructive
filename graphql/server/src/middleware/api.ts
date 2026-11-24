@@ -15,8 +15,9 @@ import { getPgPool } from 'pg-cache';
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
 import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, DatabaseSettings, PubkeyChallengeSettings, RlsModule, WebauthnSettings } from '../types';
+import { validateApiRoles } from './api-roles';
 import { generationOf } from './cache-generation';
-import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool, validateApiRoles } from './routing';
+import { requireApiRole, resolveRouteAcrossPlanes, routeToApiStructure, servedDatabasePool } from './routing';
 
 const log = new Logger('api');
 
