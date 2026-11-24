@@ -2,9 +2,8 @@
 // account gate a signed-in session is guaranteed, so every new project provisions
 // UNDER the account (account-owned + enumerable): the database's owner_id is the
 // account's own userId, and the account's API key (falling back to its session
-// token) is the bearer that authenticates the provision mutation and lands in the
-// project .env as ACCESS_TOKEN (refreshed on every provision run, including the
-// skip path). A signed-in session with no usable bearer (keychain locked) is an
+// token) is the bearer that authenticates the provision mutation. A
+// signed-in session with no usable bearer (keychain locked) is an
 // explicit error, never a silent throwaway owner.
 // Side-effect-free so the branch is unit-testable without runtime/network.
 

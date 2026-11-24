@@ -113,7 +113,7 @@ describe('a binding is DATABASE_ID alone', () => {
 
     expect(mockRequestDatabase).not.toHaveBeenCalled();
     expect(result.details).toMatchObject({ success: true, skipped: true, databaseId: 'db-1', databaseName: 'myapp' });
-    expect(envFile()).toMatch(/^ACCESS_TOKEN=account-token$/m);
+    expect(envFile()).not.toMatch(/ACCESS_TOKEN|account-token/);
     expect(envFile()).toMatch(/^DATABASE_NAME=myapp$/m);
     expect(envFile()).toMatch(/^OWNER_ID=user-1$/m);
     expect(persistBinding).toHaveBeenCalledWith(expect.objectContaining({ databaseId: 'db-1', skipped: true }));

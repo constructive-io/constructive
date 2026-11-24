@@ -237,8 +237,7 @@ async function provision(input: ProvisionInput, cwd: string, exec: RunCommand, v
 
   // Every project provisions UNDER the account (requestDatabase owns the
   // database to the JWT user). The account bearer authenticates the mutation
-  // and the probes, and is the ACCESS_TOKEN written to .env; it expires with
-  // the login session, and any provision run (the skip path too) refreshes it.
+  // and the probes.
   const credential = selectProvisionCredential(host.account(), host.signInHint);
   if (credential.mode === 'error') {
     return failure('signed-out', `Cannot provision a database: ${credential.reason}`);
@@ -317,12 +316,10 @@ async function keepBinding(r: Run, env: EnvVars, bound: string, adopt?: string):
     );
   }
 
-  // Heal .env on the skip path: a stale token (relogin), missing or stale
-  // endpoint pins, and the binding keys a partial .env lacks.
+  // Heal stale endpoint pins and missing binding keys on the skip path.
   const databaseName = env.DATABASE_NAME || probe.name || '';
   const ownerId = probe.ownerId ?? r.ownerId;
   const refresh: Record<string, string> = {};
-  if (env.ACCESS_TOKEN !== r.bearer) refresh.ACCESS_TOKEN = r.bearer;
   if (env.API_ENDPOINT !== r.apiEndpoint) refresh.API_ENDPOINT = r.apiEndpoint;
   if (env.MODULES_ENDPOINT !== r.modulesEndpoint) refresh.MODULES_ENDPOINT = r.modulesEndpoint;
   if (!env.DATABASE_NAME && databaseName) refresh.DATABASE_NAME = databaseName;
@@ -739,7 +736,6 @@ async function bindDatabase(
           databaseId,
           databaseName: r.name,
           ownerId: r.ownerId,
-          accessToken: r.bearer,
           apiEndpoint: r.apiEndpoint,
           modulesEndpoint: r.modulesEndpoint,
         }),
@@ -765,8 +761,8 @@ async function bindDatabase(
       : '',
   ].join('');
   const message = bind.adopted
-    ? `Bound database "${r.name}" (ID: ${databaseId}), which this account provisioned earlier. Credentials written to .env.${notes}`
-    : `Provisioned database "${r.name}" (ID: ${databaseId}). Credentials written to .env.${notes}`;
+    ? `Bound database "${r.name}" (ID: ${databaseId}), which this account provisioned earlier. Binding written to .env.${notes}`
+    : `Provisioned database "${r.name}" (ID: ${databaseId}). Binding written to .env.${notes}`;
   return {
     success: true,
     message,

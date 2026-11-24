@@ -74,7 +74,7 @@ beforeEach(() => {
   mockProbe.mockReset();
   mockProbe.mockImplementation(async ({ databaseId }) => ({ status: 'found', databaseId, ownerId: 'user-1' }));
   configureHost({
-    account: () => ({ userId: 'user-1', accessToken: 'account-token' }),
+    account: () => ({ userId: 'user-1', accessToken: 'account-token', apiKey: 'account-api-key' }),
     backendConfig: () => ({ apiEndpoint: API, modulesEndpoint: 'http://modules.localhost:3000/graphql' }),
     provisionPollDeadlineMs: 1,
   });
@@ -186,14 +186,13 @@ describe('provision_database pending tickets', () => {
     expect(envLines()).toEqual(expect.arrayContaining(['ADDED_WHILE_WAITING=yes', 'DATABASE_ID=db-2']));
   });
 
-  it('reads and replaces quoted and exported keys the way the .env parser does', async () => {
+  it('resumes a quoted and exported ticket without writing the account bearer', async () => {
     writeEnv(
-      'export ACCESS_TOKEN="stale"\n' +
-        record()
-          .trim()
-          .split('\n')
-          .map((line) => `export ${line.replace('=', '="')}"`)
-          .join('\n') +
+      record()
+        .trim()
+        .split('\n')
+        .map((line) => `export ${line.replace('=', '="')}"`)
+        .join('\n') +
         '\n',
     );
     mockFindTicket.mockResolvedValue(ticketRead(completed('ticket-1', 'db-1')));
@@ -201,9 +200,8 @@ describe('provision_database pending tickets', () => {
     const result = await provision('myapp');
 
     expect(result.details).toMatchObject({ success: true, resumed: true });
-    expect(envLines().filter((line) => line.includes('ACCESS_TOKEN'))).toEqual([
-      'export ACCESS_TOKEN=account-token',
-    ]);
+    expect(envLines()).toContain('DATABASE_ID=db-1');
+    expect(envFile()).not.toMatch(/ACCESS_TOKEN|account-token|account-api-key/);
     expect(envFile()).not.toMatch(/PROVISION_TICKET/);
   });
 
