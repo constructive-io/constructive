@@ -72,6 +72,10 @@ describe('CNC-owned scoped introspection SQL', () => {
       expect(query.text).toContain('installed_extensions');
       expect(query.text).toContain('select pg_language.oid as _id');
       expect(query.text).toContain('select pg_am.oid as _id');
+      expect(query.text).toContain("'^[ \\t]*@foreignKey\\s(.*)$'");
+      expect(query.text).toContain(
+        'inner join pg_catalog.pg_class as foreign_key_target'
+      );
     }
     expect(all.text).toContain(
       "or pg_type.typnamespace = 'pg_catalog'::regnamespace"
