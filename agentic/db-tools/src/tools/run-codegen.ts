@@ -260,9 +260,8 @@ export function createRunCodegenTool(
             'codegen failed: BACKEND OUTAGE — the Constructive backend reset the connection ' +
               'during schema introspection, and it stayed down across every internal retry. ' +
               'This is an EXTERNAL outage, not a code or install problem; re-running run_codegen ' +
-              'will NOT fix it. Call run_preflight once — if the backend is down, mark ' +
-              'sdk-codegen `blocked` (SERVER-001, BLOCKED-PROCEED-001) and hand back to ' +
-              'build-orchestrator. Do NOT loop on run_codegen (THRASH-001).\n\n' +
+              'will NOT fix it. Check backend reachability once, then report the blocker and wait ' +
+              'for the backend to recover. Do NOT loop on run_codegen (THRASH-001).\n\n' +
               codegen.out,
             stepDetails(),
           );
