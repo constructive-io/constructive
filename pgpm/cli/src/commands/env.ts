@@ -59,11 +59,11 @@ const OBJECT_STORE_PROFILE: ObjectStoreConfig = {
 
 function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Record<string, string> {
   const vars: Record<string, string> = {
-    PGHOST: config.host,
-    PGPORT: String(config.port),
-    PGUSER: config.user,
-    PGPASSWORD: config.password,
-    PGDATABASE: config.database
+    PGHOST: process.env.PGHOST ?? config.host,
+    PGPORT: process.env.PGPORT ?? String(config.port),
+    PGUSER: process.env.PGUSER ?? config.user,
+    PGPASSWORD: process.env.PGPASSWORD ?? config.password,
+    PGDATABASE: process.env.PGDATABASE ?? config.database
   };
 
   if (objectStore) {
@@ -77,7 +77,8 @@ function configToEnvVars(config: PgConfig, objectStore?: ObjectStoreConfig): Rec
 function printExports(config: PgConfig, objectStore?: ObjectStoreConfig): void {
   const envVars = configToEnvVars(config, objectStore);
   for (const [key, value] of Object.entries(envVars)) {
-    console.log(`export ${key}=${value}`);
+    const quoted = /^[\w./:@%+,=-]*$/.test(value) ? value : "'" + value.replace(/'/g, "'\"'\"'") + "'";
+    console.log(`export ${key}=${quoted}`);
   }
 }
 

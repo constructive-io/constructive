@@ -166,60 +166,74 @@ async function isContainerRunning(name: string): Promise<boolean | null> {
       return result.stdout.trim() === 'true';
     }
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-async function containerExists(name: string): Promise<boolean> {
-  try {
-    const result = await run('docker', ['inspect', name]);
-    return result.code === 0;
-  } catch (error) {
+const OWNER_KEY = 'io.constructive.managed-by';
+const OWNER_LABEL = `${OWNER_KEY}=pgpm`;
+
+async function inspectManagedContainer(name: string): Promise<{ id: string; running: boolean } | null> {
+  const format = `{{.Id}} {{.State.Running}} {{index .Config.Labels "${OWNER_KEY}"}}`;
+  const result = await run('docker', ['container', 'inspect', '--format', format, '--', name]);
+  if (result.code !== 0) {
+    if (/^(?:Error response from daemon: |Error: )?No such container: /i.test(result.stderr)) {
+      return null;
+    }
+    throw new Error(`Could not inspect Docker container "${name}": ${result.stderr}`);
+  }
+
+  const [id, running, ...owner] = result.stdout.split(' ');
+  if (owner.join(' ') !== 'pgpm') {
+    throw new Error(
+      `Container "${name}" is not managed by pgpm (missing ${OWNER_LABEL}). ` +
+      'If it is your old local container, back up its data, remove it manually, and run pgpm docker start again.'
+    );
+  }
+  return { id, running: running === 'true' };
+}
+
+async function reuseContainer(name: string, recreate: boolean): Promise<boolean> {
+  const existing = await inspectManagedContainer(name);
+  if (!existing) return false;
+
+  if (recreate) {
+    console.log(`🗑️  Removing existing container "${name}"...`);
+    const removeResult = await run('docker', ['rm', '-f', existing.id], { stdio: 'inherit' });
+    if (removeResult.code !== 0) {
+      await cliExitWithError(`Failed to remove container "${name}"`);
+      return true;
+    }
     return false;
   }
+
+  if (existing.running) {
+    console.log(`✅ Container "${name}" is already running`);
+    return true;
+  }
+  console.log(`🔄 Starting existing container "${name}"...`);
+  const startResult = await run('docker', ['start', existing.id], { stdio: 'inherit' });
+  if (startResult.code === 0) {
+    console.log(`✅ Container "${name}" started successfully`);
+  } else {
+    await cliExitWithError(`Failed to start container "${name}"`);
+  }
+  return true;
 }
 
 async function startContainer(options: DockerRunOptions): Promise<void> {
   const { name, image, port, user, password, shmSize, recreate } = options;
 
-  if (!(await ensureDockerReady())) {
+  if (!(await ensureDockerReady()) || await reuseContainer(name, recreate)) {
     return;
   }
-
-  const exists = await containerExists(name);
-  const running = await isContainerRunning(name);
-
-  if (running === true) {
-    console.log(`✅ Container "${name}" is already running`);
-    return;
-  }
-
-  if (recreate && exists) {
-    console.log(`🗑️  Removing existing container "${name}"...`);
-    const removeResult = await run('docker', ['rm', '-f', name], { stdio: 'inherit' });
-    if (removeResult.code !== 0) {
-      await cliExitWithError(`Failed to remove container "${name}"`);
-      return;
-    }
-  }
-
-  if (exists && running === false) {
-    console.log(`🔄 Starting existing container "${name}"...`);
-    const startResult = await run('docker', ['start', name], { stdio: 'inherit' });
-    if (startResult.code === 0) {
-      console.log(`✅ Container "${name}" started successfully`);
-    } else {
-      await cliExitWithError(`Failed to start container "${name}"`);
-    }
-    return;
-  }
-
   console.log(`🚀 Creating and starting new container "${name}"...`);
   const runArgs = [
     'run',
     '-d',
     '--name', name,
+    '--label', OWNER_LABEL,
     '--shm-size', shmSize,
     '-e', `POSTGRES_USER=${user}`,
     '-e', `POSTGRES_PASSWORD=${password}`,
@@ -243,20 +257,19 @@ async function stopContainer(name: string): Promise<void> {
     return;
   }
 
-  const exists = await containerExists(name);
-  if (!exists) {
+  const existing = await inspectManagedContainer(name);
+  if (!existing) {
     console.log(`ℹ️  Container "${name}" not found`);
     return;
   }
 
-  const running = await isContainerRunning(name);
-  if (running === false) {
+  if (!existing.running) {
     console.log(`ℹ️  Container "${name}" is already stopped`);
     return;
   }
 
   console.log(`🛑 Stopping container "${name}"...`);
-  const stopResult = await run('docker', ['stop', name], { stdio: 'inherit' });
+  const stopResult = await run('docker', ['stop', existing.id], { stdio: 'inherit' });
   if (stopResult.code === 0) {
     console.log(`✅ Container "${name}" stopped successfully`);
   } else {
@@ -267,31 +280,7 @@ async function stopContainer(name: string): Promise<void> {
 async function startService(service: ServiceDefinition, recreate: boolean, gpu: boolean = false): Promise<void> {
   const { name, image, ports, env: serviceEnv, command } = service;
 
-  const exists = await containerExists(name);
-  const running = await isContainerRunning(name);
-
-  if (running === true) {
-    console.log(`✅ Container "${name}" is already running`);
-    return;
-  }
-
-  if (recreate && exists) {
-    console.log(`🗑️  Removing existing container "${name}"...`);
-    const removeResult = await run('docker', ['rm', '-f', name], { stdio: 'inherit' });
-    if (removeResult.code !== 0) {
-      await cliExitWithError(`Failed to remove container "${name}"`);
-      return;
-    }
-  }
-
-  if (exists && running === false) {
-    console.log(`🔄 Starting existing container "${name}"...`);
-    const startResult = await run('docker', ['start', name], { stdio: 'inherit' });
-    if (startResult.code === 0) {
-      console.log(`✅ Container "${name}" started successfully`);
-    } else {
-      await cliExitWithError(`Failed to start container "${name}"`);
-    }
+  if (await reuseContainer(name, recreate)) {
     return;
   }
 
@@ -299,7 +288,8 @@ async function startService(service: ServiceDefinition, recreate: boolean, gpu: 
   const runArgs = [
     'run',
     '-d',
-    '--name', name
+    '--name', name,
+    '--label', OWNER_LABEL
   ];
 
   for (const [key, value] of Object.entries(serviceEnv)) {
@@ -335,10 +325,6 @@ async function startService(service: ServiceDefinition, recreate: boolean, gpu: 
     const portInfo = ports.map(p => String(p.host)).join(', ');
     await cliExitWithError(`Failed to create container "${name}". Check if port ${portInfo} is already in use.`);
   }
-}
-
-async function stopService(service: ServiceDefinition): Promise<void> {
-  await stopContainer(service.name);
 }
 
 function resolveServiceFlags(args: Partial<Record<string, any>>): ServiceDefinition[] {
@@ -442,7 +428,7 @@ export default async (
   case 'stop':
     await stopContainer(name);
     for (const service of includedServices) {
-      await stopService(service);
+      await stopContainer(service.name);
     }
     break;
 
