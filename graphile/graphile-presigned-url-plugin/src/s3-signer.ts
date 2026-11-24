@@ -108,6 +108,7 @@ export async function generatePresignedPutUrl(
   try {
     url = await getSignedUrl(s3Config.client as any, command, {
       expiresIn,
+      signableHeaders: new Set(['content-type']),
       ...(unhoistableHeaders.size > 0 ? { unhoistableHeaders } : {}),
     });
   } catch (err) {

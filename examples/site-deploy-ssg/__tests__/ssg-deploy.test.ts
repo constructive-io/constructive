@@ -40,8 +40,19 @@ const deployOptions = (server: ReturnType<typeof createMockServer>) => ({
   putObject: server.putObject,
   siteId: 'site-1',
   databaseId: 'db-1',
-  bucketKey: 'site-example',
   source: dist,
+});
+
+test('the mock reports an absent release asset without issuing a PUT URL', async () => {
+  const server = createMockServer();
+  const contentHash = 'a'.repeat(64);
+  const result = await server.api('mutation { uploadSiteFiles(input: $input) { files { key } } }', {
+    input: { checkOnly: true, files: [{ contentHash }] },
+  });
+
+  expect(result.uploadSiteFiles).toEqual({
+    files: [{ logicalKey: `cas/sha256/${contentHash}`, key: null, deduplicated: false, pending: false }],
+  });
 });
 
 test('builds every page, the stylesheet and a 404', async () => {
@@ -82,7 +93,7 @@ test('deploys the build to a play preview without touching production', async ()
 
   // Bytes are addressed by content, and the manifest carries served types.
   expect(server.storedKeys).toHaveLength(5);
-  for (const key of server.storedKeys) expect(key).toMatch(/^cas\/sha256\/[0-9a-f]{64}$/);
+  for (const key of server.storedKeys) expect(key).toMatch(/^originals\/[0-9a-f]{64}$/);
   expect(result.manifest.files['assets/site.css'].content_type).toBe('text/css; charset=utf-8');
   expect(result.manifest.files['index.html'].content_type).toBe('text/html; charset=utf-8');
 });

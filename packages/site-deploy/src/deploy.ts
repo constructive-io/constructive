@@ -11,7 +11,7 @@
  * live site exactly as it was.
  */
 
-import { diffCas, errorMessage, throwIfAborted, uploadMissing } from './cas-upload';
+import { diffCas, errorMessage, throwIfAborted, uploadMissing, waitForConfirmation } from './cas-upload';
 import {
   buildCreateReleaseMutation,
   buildProvisionPreviewMutation,
@@ -56,10 +56,8 @@ interface ExistingRelease {
 export async function deploySite(options: DeploySiteOptions): Promise<DeploySiteResult> {
   const {
     api,
-    storage = options.api,
     siteId,
     databaseId,
-    bucketKey,
     scope = 'database',
     publish = false,
     preview,
@@ -128,22 +126,23 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
 
   // 3. Register the bytes and learn which ones are missing.
   const uploadOptions = {
-    storage,
+    storage: api,
     mutation: names.bulkUploadMutation,
-    bucketKey,
+    siteId,
     batchSize,
     concurrency,
     retries,
     putObject: options.putObject,
     signal,
   };
-  const diff = await diffCas(files, uploadOptions);
+  const diff = await diffCas(files, uploadOptions, dryRun);
+  const toUpload = dryRun ? diff.absent : diff.missing.map(({ file }) => file);
   onProgress?.({
     type: 'diffed',
     files: manifest.file_count,
-    toUpload: diff.missing.length,
+    toUpload: toUpload.length,
     skipped: diff.deduplicated.length,
-    bytesToUpload: diff.missing.reduce((sum, entry) => sum + entry.file.size, 0),
+    bytesToUpload: toUpload.reduce((sum, file) => sum + file.size, 0),
   });
 
   if (dryRun) {
@@ -167,18 +166,20 @@ export async function deploySite(options: DeploySiteOptions): Promise<DeploySite
   let done = 0;
   const uploadResult = await uploadMissing(diff, {
     ...uploadOptions,
-    onUploaded: (file) => {
+    onUploaded: (file, physicalKey) => {
       done += 1;
       onProgress?.({
         type: 'uploaded',
         path: file.path,
-        key: file.key,
+        key: physicalKey,
         size: file.size,
         done,
         total: diff.missing.length,
       });
     },
   });
+  await waitForConfirmation([...diff.missing.map(({ file }) => file), ...diff.pending], uploadOptions);
+  throwIfAborted(signal);
 
   // 5. Write the manifest — this is the commit.
   const release = existing

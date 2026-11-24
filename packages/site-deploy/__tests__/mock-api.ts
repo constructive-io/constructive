@@ -81,18 +81,23 @@ export function createMockServer(options: MockServerOptions = {}): MockServer {
   function handle(operation: string, variables: Record<string, unknown>) {
     const input = (variables.input ?? {}) as Record<string, any>;
     switch (operation) {
-    case 'uploadFiles':
+    case 'uploadSiteFiles':
       return {
-        uploadFiles: {
+        uploadSiteFiles: {
           files: (input.files as any[]).map((file) => {
             const deduplicated = stored.has(file.contentHash);
+            const logicalKey = casKey(file.contentHash);
+            if (input.checkOnly && !deduplicated) {
+              return { logicalKey, key: null as string | null, deduplicated: false, pending: false };
+            }
             const key =
                 file.filename === options.corruptKeyFor
-                  ? 'uploads/wrong-key'
-                  : (file.key as string);
+                  ? casKey(file.contentHash)
+                  : `originals/${file.contentHash}`;
             return {
               fileId: `file-${file.contentHash.slice(0, 8)}`,
               key,
+              logicalKey,
               deduplicated,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
               uploadHeaders: deduplicated ? null : signedHeaders(file),
@@ -154,7 +159,7 @@ export function createMockServer(options: MockServerOptions = {}): MockServer {
   return server;
 }
 
-/** The mutation/query field being selected, e.g. `uploadFiles`. */
+/** The mutation/query field being selected, e.g. `uploadSiteFiles`. */
 function operationName(query: string): string {
   const match = query.match(/\{\s*(\w+)\(/);
   if (!match) throw new Error(`Could not read an operation from: ${query}`);
@@ -164,11 +169,6 @@ function operationName(query: string): string {
 /** A build file from a string body. */
 export function file(path: string, body: string): DeployFile {
   return { path, bytes: new TextEncoder().encode(body) };
-}
-
-/** The CAS key a body will be stored under. */
-export function keyOf(body: string): string {
-  return casKey(hashBytes(new TextEncoder().encode(body)));
 }
 
 /** The hash of a body, as the bucket's dedupe set records it. */

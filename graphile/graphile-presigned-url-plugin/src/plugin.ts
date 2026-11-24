@@ -19,6 +19,7 @@
 import 'graphile-build';
 
 import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
 import { access, context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { withRequestPgClient } from 'graphile-plugin-utils';
@@ -27,8 +28,6 @@ import { checkTypeAgreement } from 'mime-bytes';
 
 import { validateCustomKey } from './custom-key';
 import { resolveDefaultBucket } from './default-bucket';
-import { isLiveFileRow } from './file-lifecycle';
-import { fileNotReplaceable } from './file-not-replaceable';
 import { buildFileProjection, type FileProjection } from './file-projection';
 import { assertBucketReconciled, resolveS3ForDatabase } from './physical-bucket';
 import { generatePresignedPutUrl, presignedPutHeaders } from './s3-signer';
@@ -43,15 +42,12 @@ const log = new Logger('graphile-presigned-url:plugin');
 const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
+const RELEASE_SLOT_PREFIX = 'cas/sha256/';
 
 // --- Helpers ---
 
 function isValidSha256(hash: string): boolean {
   return SHA256_HEX_REGEX.test(hash);
-}
-
-function buildS3Key(contentHash: string): string {
-  return contentHash;
 }
 
 function derivePathFromKey(key: string): string | null {
@@ -165,7 +161,8 @@ export function createPresignedUrlPlugin(
           // Each @storageFiles table is paired with its @storageBuckets table
           // through the registry's actual FK relation; a tagged table that cannot
           // be paired is a provisioning bug and throws at schema build.
-          const planes = discoverStoragePlanes((build.input as any).pgRegistry as any);
+          const registry = (build.input as any).pgRegistry;
+          const planes = discoverStoragePlanes(registry);
 
           if (planes.length === 0) return fields;
 
@@ -201,7 +198,7 @@ export function createPresignedUrlPlugin(
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
                 size: { type: new GraphQLNonNull(GraphQLInt), description: 'File size in bytes' },
                 filename: { type: GraphQLString, description: 'Original filename (optional)' },
-                key: { type: GraphQLString, description: 'Custom S3 key (only when bucket has allow_custom_keys=true)' },
+                key: { type: GraphQLString, description: 'Custom logical key (only when bucket has allow_custom_keys=true)' },
               },
             });
 
@@ -338,7 +335,7 @@ export function createPresignedUrlPlugin(
                 contentType: { type: new GraphQLNonNull(GraphQLString), description: 'MIME type of the file' },
                 size: { type: new GraphQLNonNull(GraphQLInt), description: 'File size in bytes' },
                 filename: { type: GraphQLString, description: 'Original filename (optional)' },
-                key: { type: GraphQLString, description: 'Custom S3 key (only when bucket has allow_custom_keys=true)' },
+                key: { type: GraphQLString, description: 'Custom logical key (only when bucket has allow_custom_keys=true)' },
               },
             });
 
@@ -478,6 +475,104 @@ export function createPresignedUrlPlugin(
                   },
                 },
             );
+
+            for (const siteCodec of Object.values(registry.pgCodecs) as any[]) {
+              const scope = siteCodec.extensions?.tags?.siteUploads;
+              if (scope !== 'platform' && scope !== 'database') continue;
+              const refs = Object.values(registry.pgRelations[siteCodec.name] ?? {}) as any[];
+              if (!refs.some((ref) =>
+                !ref.isReferencee && ref.localAttributes.length === 1 &&
+                ref.localAttributes[0] === 'bucket_id' && ref.remoteResource?.codec === matchingBucketCodec,
+              )) continue;
+              const site = siteCodec.extensions.pg;
+              const sites = QuoteUtils.quoteQualifiedIdentifier(site.schemaName, site.name);
+              const stem = scope === 'platform' ? 'PlatformSiteFile' : 'SiteFile';
+              const name = `upload${stem}s`;
+              const SiteFilePayload = new GraphQLObjectType({
+                name: `${stem}UploadResult`,
+                fields: {
+                  ...BulkFilePayloadType.toConfig().fields,
+                  key: { type: GraphQLString },
+                  fileId: { type: GraphQLString },
+                  logicalKey: { type: new GraphQLNonNull(GraphQLString) },
+                  pending: { type: GraphQLBoolean },
+                },
+              });
+              const SitePayload = new GraphQLObjectType({
+                name: `${stem}UploadPayload`,
+                fields: { files: { type: new GraphQLList(new GraphQLNonNull(SiteFilePayload)) } },
+              });
+              const FileInput = new GraphQLInputObjectType({
+                name: `Upload${stem}Input`,
+                fields: {
+                  contentHash: { type: new GraphQLNonNull(GraphQLString) },
+                  contentType: { type: new GraphQLNonNull(GraphQLString) },
+                  size: { type: new GraphQLNonNull(GraphQLInt) },
+                  filename: { type: GraphQLString },
+                  route: { type: GraphQLString, description: 'Mutable route. Omit for release content.' },
+                },
+              });
+              const Input = new GraphQLInputObjectType({
+                name: `Upload${stem}BulkInput`,
+                fields: {
+                  siteId: { type: new GraphQLNonNull(uuidGqlType) },
+                  files: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(FileInput))) },
+                  checkOnly: { type: GraphQLBoolean, description: 'Read upload status without issuing PUT URLs.' },
+                },
+              });
+              newFields[name] = context.fieldWithHooks({ fieldName: name } as any, {
+                type: SitePayload,
+                args: { input: { type: new GraphQLNonNull(Input) } },
+                plan(_$mutation: any, fieldArgs: any) {
+                  const $input = fieldArgs.getRaw('input');
+                  return lambda(object({
+                    siteId: access($input, 'siteId'),
+                    files: access($input, 'files'),
+                    checkOnly: access($input, 'checkOnly'),
+                    withPgClient: (grafastContext() as any).get('withPgClient'),
+                    pgSettings: (grafastContext() as any).get('pgSettings'),
+                  }), (vals: any) => withRequestPgClient(vals.withPgClient, vals.pgSettings, async (txClient) => {
+                    const databaseId = await resolveDatabaseId(txClient);
+                    if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                    const configs = await loadAllStorageModules(txClient, databaseId);
+                    const config = resolveStorageConfigFromCodec(capturedFilesCodec, configs);
+                    if (!config) throw new Error('STORAGE_MODULE_NOT_FOUND');
+                    const { rows } = await txClient.query({
+                      text: `SELECT b.id, b.key, b.type, b.is_public, b.allowed_mime_types,
+                                    b.max_file_size, b.allow_custom_keys, b.physical_name
+                               FROM ${sites} AS s
+                               JOIN ${config.bucketsQualifiedName} AS b ON b.id = s.bucket_id
+                              WHERE s.id = $1::uuid AND b.is_public
+                              ${vals.checkOnly ? 'FOR SHARE OF s' : 'FOR UPDATE OF s'}`,
+                      values: [vals.siteId],
+                    });
+                    const bucket = rows[0] as unknown as BucketConfig | undefined;
+                    if (!bucket) throw new Error('SITE_UPLOAD_NOT_AUTHORIZED');
+                    const files = vals.files as any[];
+                    if (files.length > config.maxBulkFiles) throw new Error('BULK_UPLOAD_FILES_EXCEEDED');
+                    if (files.reduce((sum, file) => sum + file.size, 0) > config.maxBulkTotalSize) {
+                      throw new Error('BULK_UPLOAD_SIZE_EXCEEDED');
+                    }
+                    if (!vals.checkOnly && files.some((file) => file.route == null)) {
+                      await txClient.query({
+                        text: "SELECT pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('site-release:' || $1::text, 0))",
+                        values: [bucket.id],
+                      });
+                    }
+                    const s3 = resolveS3ForDatabase(options, config, assertBucketReconciled(bucket, databaseId));
+                    const results = [];
+                    for (const file of files) {
+                      results.push(await processSingleFile(
+                        options, txClient, config, databaseId, bucket, s3,
+                        { ...file, key: file.route },
+                        { release: file.route == null, checkOnly: vals.checkOnly === true },
+                      ));
+                    }
+                    return { files: results };
+                  }));
+                },
+              });
+            }
           }
 
           return build.extend(
@@ -501,6 +596,7 @@ export async function processSingleFile(
   bucket: BucketConfig,
   s3ForDb: S3Config,
   input: any,
+  siteUpload?: { release: boolean; checkOnly: boolean },
 ) {
   const { contentHash, contentType, size, filename, key: customKey } = input;
 
@@ -560,156 +656,115 @@ export async function processSingleFile(
   // collecting an object a document still points at.
   const projectFile = (fileId: string, key: string): FileProjection =>
     buildFileProjection({ id: fileId, key, bucketId: bucket.id, mime: contentType, size, filename });
+  const projectStoredFile = (row: { id: string; key: string; mime_type: string; size: string | number; filename: string | null }): FileProjection =>
+    buildFileProjection({
+      id: row.id, key: row.key, bucketId: bucket.id,
+      mime: row.mime_type, size: Number(row.size), filename: row.filename,
+    });
 
-  // Determine S3 key
-  let s3Key: string;
-  let isCustomKey = false;
-  if (customKey) {
-    if (!bucket.allow_custom_keys) {
+  const signUpload = async (fileId: string, key: string, mime: string, bytes: number, ttl: number) => ({
+    uploadUrl: await generatePresignedPutUrl(s3ForDb, key, mime, bytes, ttl, contentHash, fileId),
+    uploadHeaders: presignedPutHeaders(mime, contentHash, fileId),
+    expiresAt: new Date(Date.now() + ttl * 1000).toISOString(),
+  });
+
+  // The user names a logical slot, never an object-store location. Only the
+  // recorder allocates the physical key, independently for every new request.
+  const logicalKey = siteUpload?.release ? RELEASE_SLOT_PREFIX + contentHash : customKey || contentHash;
+  if (customKey || (siteUpload && !siteUpload.release)) {
+    if (!customKey) throw new Error('INVALID_ROUTE');
+    if (customKey.startsWith(RELEASE_SLOT_PREFIX)) {
+      throw new Error('RESERVED_RELEASE_SLOT');
+    }
+    if (!siteUpload && !bucket.allow_custom_keys) {
       throw new Error('CUSTOM_KEY_NOT_ALLOWED: bucket does not allow custom keys');
     }
     const keyError = validateCustomKey(customKey);
-    if (keyError) {
-      throw new Error(keyError);
-    }
-    s3Key = customKey;
-    isCustomKey = true;
-  } else {
-    s3Key = buildS3Key(contentHash);
+    if (keyError) throw new Error(keyError);
   }
 
-  // Dedup check. A key is one stored object: a row at the key with the same
-  // hash already describes these bytes, and a live one is a dedup hit.
-  //
-  // A row whose bytes never landed must not be reported as a dedup hit: the
-  // caller would store a reference to an object that is not in S3. Such a row is
-  // dropped instead, and the upload proceeds as a fresh one below — the insert is
-  // what enqueues the confirm-upload job, so restarting the lifecycle is the only
-  // way the retry can ever leave `requested`. Dropping it is also what keeps the
-  // retry insertable at all for a content-addressed key, where the key *is* the
-  // hash and a second row would collide on (bucket_id, key). The GC job the
-  // delete enqueues re-takes the reference count when it runs (≥5s later), by
-  // which point the replacement row exists, so it no-ops.
-  //
-  // A custom key holding different bytes is replaced in place, by the database:
-  // the new row is inserted as `requested` beside the current one (its BEFORE
-  // INSERT trigger refuses a key held by a row this caller cannot read), the PUT
-  // through its URL overwrites the object, and its confirm deletes the row it
-  // replaced. Until then the current row stays listable and downloadable, so
-  // nothing is deleted here and no version link is made — a custom key has no
-  // version chain.
-  let staleFileId: string | null = null;
-
-  if (isCustomKey) {
-    const existingResult = await txClient.query({
-      text: `SELECT id, status
-       FROM ${storageConfig.filesQualifiedName}
-       WHERE key = $1
-         AND bucket_id = $2
-         AND content_hash = $3
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      values: [s3Key, bucket.id, contentHash],
+  if (siteUpload?.release || siteUpload?.checkOnly) {
+    const { rows } = await txClient.query({
+      text: `SELECT id, key, status::text AS status, mime_type, size, filename, created_at
+               FROM ${storageConfig.filesQualifiedName}
+              WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
+                AND NOT logical_key_retired AND status IN ('requested', 'uploaded', 'processed')
+              ORDER BY CASE WHEN status = 'requested' THEN 1 ELSE 0 END LIMIT 1`,
+      values: [logicalKey, bucket.id, contentHash],
     });
-
-    if (existingResult.rows.length > 0) {
-      const existing = existingResult.rows[0];
-      if (isLiveFileRow(existing)) {
-        log.info(`Dedup hit (custom key): file ${existing.id} for key ${s3Key}`);
+    const row = rows[0];
+    if (row) {
+      if (row.status === 'requested' && !siteUpload.checkOnly) {
+        const deadline = new Date(row.created_at).getTime() + storageConfig.uploadUrlExpirySeconds * 1000;
+        const remainingMs = deadline - Date.now();
+        if (remainingMs <= 0) throw new Error('SITE_RELEASE_UPLOAD_EXPIRED');
         return {
-          uploadUrl: null as string | null,
-          uploadHeaders: null as Record<string, string> | null,
-          fileId: existing.id as string,
-          key: s3Key,
-          deduplicated: true,
-          expiresAt: null as string | null,
-          file: projectFile(existing.id as string, s3Key),
+          ...await signUpload(row.id, row.key, row.mime_type, Number(row.size), Math.ceil(remainingMs / 1000)),
+          expiresAt: new Date(deadline).toISOString(),
+          fileId: row.id, key: row.key, logicalKey,
+          deduplicated: false, pending: false,
+          file: projectStoredFile(row),
         };
       }
-      staleFileId = existing.id as string;
-      log.info(`Restarting upload of key ${s3Key}: file ${staleFileId} has no bytes behind it`);
+      return {
+        uploadUrl: null as string | null, uploadHeaders: null as Record<string, string> | null,
+        fileId: row.id, key: row.key, logicalKey,
+        deduplicated: row.status !== 'requested', pending: row.status === 'requested',
+        expiresAt: null as string | null, file: projectStoredFile(row),
+      };
     }
-  } else {
-    // Only the row at the hash's own key names these bytes for good: a custom-key
-    // row carrying the hash holds them at a key whose next upload replaces them.
-    const dedupResult = await txClient.query({
-      text: `SELECT id, status
+    if (siteUpload.checkOnly) return { logicalKey, deduplicated: false, pending: false };
+  }
+
+  // Dedup is a read of confirmed identical content in the same logical slot.
+  // It issues no PUT URL. Pending/rejected attempts are not reused or deleted:
+  // each retry gets its own object and lifecycle, including its expiry/GC.
+  const existingResult = await txClient.query({
+    text: `SELECT id, key, mime_type, size, filename
        FROM ${storageConfig.filesQualifiedName}
-       WHERE key = $1
-         AND bucket_id = $2
+       WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
+         AND NOT logical_key_retired
+         AND status IN ('uploaded', 'processed')
        LIMIT 1`,
-      values: [s3Key, bucket.id],
-    });
-
-    if (dedupResult.rows.length > 0) {
-      const existingFile = dedupResult.rows[0];
-      if (isLiveFileRow(existingFile)) {
-        log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
-
-        return {
-          uploadUrl: null as string | null,
-          uploadHeaders: null as Record<string, string> | null,
-          fileId: existingFile.id as string,
-          key: s3Key,
-          deduplicated: true,
-          expiresAt: null as string | null,
-          file: projectFile(existingFile.id as string, s3Key),
-        };
-      }
-      staleFileId = existingFile.id as string;
-      log.info(`Restarting upload of hash ${contentHash}: file ${staleFileId} has no bytes behind it`);
-    }
+    values: [logicalKey, bucket.id, contentHash],
+  });
+  if (existingResult.rows.length > 0) {
+    const existing = existingResult.rows[0];
+    log.info(`Dedup hit: file ${existing.id} for hash ${contentHash}`);
+    return {
+      uploadUrl: null as string | null,
+      uploadHeaders: null as Record<string, string> | null,
+      fileId: existing.id as string,
+      key: existing.key as string,
+      logicalKey,
+      deduplicated: true,
+      expiresAt: null as string | null,
+      file: projectStoredFile(existing),
+    };
   }
 
-  if (staleFileId !== null) {
-    // The DELETE runs under the request role, so RLS decides whether this caller
-    // may drop the row. A row the caller can see but not delete stays, and the
-    // upload fails here rather than colliding on (bucket_id, key) below.
-    const deleted = await txClient.query({
-      text: `DELETE FROM ${storageConfig.filesQualifiedName} WHERE id = $1 RETURNING id`,
-      values: [staleFileId],
-    });
-    if (deleted.rows.length === 0) {
-      throw fileNotReplaceable(staleFileId, s3Key);
-    }
-  }
-
-  // Auto-derive ltree path from custom key directory (only when has_path_shares)
-  const derivedPath = isCustomKey && storageConfig.hasPathShares ? derivePathFromKey(s3Key) : null;
-
-  const fileId = await recordManagedFile(txClient, storageConfig, {
+  const derivedPath = customKey && storageConfig.hasPathShares ? derivePathFromKey(logicalKey) : null;
+  const recorded = await recordManagedFile(txClient, storageConfig, {
     bucketId: bucket.id,
-    key: s3Key,
+    key: logicalKey,
     contentHash,
     mimeType: contentType,
     size,
     filename: filename || null,
     path: derivedPath,
   });
+  const fileId = recorded.id;
+  const s3Key = recorded.key;
 
   // Generate presigned PUT URL, signed over the client's SHA-256 so the store
-  // only accepts bytes that hash to the content hash the row (and, for
-  // content-addressed buckets, the key and any later dedup hit) is named by.
-  const uploadUrl = await generatePresignedPutUrl(
-    s3ForDb,
-    s3Key,
-    contentType,
-    size,
-    storageConfig.uploadUrlExpirySeconds,
-    contentHash,
-    fileId,
-  );
-  const uploadHeaders = presignedPutHeaders(contentType, contentHash, fileId);
-
-  const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
-
+  // only accepts bytes that hash to the content hash on this row and any
+  // later dedup hit. Neither logical keys nor checksums locate the object.
   return {
-    uploadUrl,
-    uploadHeaders,
+    ...await signUpload(fileId, s3Key, contentType, size, storageConfig.uploadUrlExpirySeconds),
     fileId,
     key: s3Key,
+    logicalKey,
     deduplicated: false,
-    expiresAt,
     file: projectFile(fileId, s3Key),
   };
 }

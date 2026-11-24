@@ -228,9 +228,10 @@ describe('s3-signer integration (RustFS)', () => {
       return generatePresignedPutUrl(s3Config, key, 'text/plain', Buffer.byteLength(content), 300, hash, fileId);
     }
 
-    it('signs the upload id as a header, not a query parameter', async () => {
+    it('signs the upload id and content type as headers', async () => {
       const url = new URL(await boundUrl(`row-bound/${Date.now()}-q`));
       expect(url.searchParams.get('X-Amz-SignedHeaders')).toContain(UPLOAD_ID_HEADER);
+      expect(url.searchParams.get('X-Amz-SignedHeaders')?.split(';')).toContain('content-type');
       expect(url.searchParams.has(UPLOAD_ID_HEADER)).toBe(false);
     });
 

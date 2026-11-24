@@ -2,7 +2,7 @@
  * Types for the site deploy pipeline.
  *
  * A deploy is bytes plus one manifest: every file's bytes live in the site's
- * bucket at `cas/sha256/<hash>`, and one `siteRelease` row maps logical paths
+ * bucket under an independently allocated key, and one `siteRelease` row maps logical paths
  * to those hashes. Writing that row commits it into the site's own merkle
  * store, so the returned commit id *is* the release id.
  */
@@ -56,7 +56,7 @@ export interface ReleaseManifest {
  * names when a plane's inflection differs.
  */
 export interface SiteDeployNames {
-  /** Bulk presigned-upload mutation, e.g. `uploadFiles`. */
+  /** Site-scoped bulk presigned-upload mutation, e.g. `uploadSiteFiles`. */
   bulkUploadMutation: string;
   /** Site release collection query, e.g. `siteReleases`. */
   releasesQuery: string;
@@ -114,10 +114,8 @@ export type PutObject = (
 ) => Promise<void>;
 
 export interface DeploySiteOptions {
-  /** Executor for the tenant API target (releases, sites, previews). */
+  /** Executor for the site API target (site uploads, releases, and previews). */
   api: GraphQLExecutor;
-  /** Executor for the storage target. Defaults to `api`. */
-  storage?: GraphQLExecutor;
   /** The site to deploy to. */
   siteId: string;
   /**
@@ -125,8 +123,6 @@ export interface DeploySiteOptions {
    * site at `database` scope, where the column is NOT NULL.
    */
   databaseId?: string;
-  /** Bucket key of the site's bucket (`allow_custom_keys` must be on). */
-  bucketKey: string;
   /** The build: a directory path, or the files themselves. */
   source: DeploySource;
   /** Which generated surface to talk to. Defaults to `database`. */

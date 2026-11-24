@@ -20,7 +20,7 @@ interface ReleaseRow {
 export interface MockServer {
   api: GraphQLExecutor;
   putObject: PutObject;
-  /** CAS keys whose bytes the bucket holds. */
+  /** Managed object keys whose bytes the bucket holds. */
   storedKeys: string[];
   /** Hashes the bucket holds, as dedupe sees them. */
   storedHashes: Set<string>;
@@ -47,7 +47,7 @@ export function createMockServer(): MockServer {
       assertSignedHeaders(url, headers);
       const hash = url.slice(url.lastIndexOf('/') + 1);
       hashes.add(hash);
-      server.storedKeys.push(`cas/sha256/${hash}`);
+      server.storedKeys.push(`originals/${hash}`);
       void body;
       void contentType;
     },
@@ -56,15 +56,21 @@ export function createMockServer(): MockServer {
   function handle(operation: string, variables: Record<string, unknown>) {
     const input = (variables.input ?? {}) as Record<string, any>;
     switch (operation) {
-    case 'uploadFiles':
+    case 'uploadSiteFiles':
       return {
-        uploadFiles: {
+        uploadSiteFiles: {
           files: (input.files as any[]).map((file) => {
             const deduplicated = hashes.has(file.contentHash);
+            const logicalKey = `cas/sha256/${file.contentHash}`;
+            if (input.checkOnly && !deduplicated) {
+              return { logicalKey, key: null as string | null, deduplicated: false, pending: false };
+            }
             return {
               fileId: `file-${file.contentHash.slice(0, 8)}`,
-              key: file.key as string,
+              key: `originals/${file.contentHash}`,
+              logicalKey,
               deduplicated,
+              pending: false,
               uploadUrl: deduplicated ? null : `https://s3.test/put/${file.contentHash}`,
               uploadHeaders: deduplicated ? null : signedHeaders(file),
             };

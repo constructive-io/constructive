@@ -38,8 +38,8 @@ describe('normalizePath', () => {
     expect(() => normalizePath('../secrets.env')).toThrow(DeployError);
   });
 
-  it('rejects logical paths that would shadow the byte namespace', () => {
-    expect(() => normalizePath(`cas/sha256/${HELLO_WORLD}`)).toThrow(/byte namespace/);
+  it('rejects logical paths reserved for release slots', () => {
+    expect(() => normalizePath(`cas/sha256/${HELLO_WORLD}`)).toThrow(/reserved for release slots/);
   });
 });
 
