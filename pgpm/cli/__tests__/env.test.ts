@@ -33,12 +33,24 @@ it('prints explicit PG settings, including empty and shell-sensitive values', as
   ]);
 });
 
-it('uses Supabase defaults for unset values and preserves an explicit override', async () => {
-  process.env.PGUSER = 'developer';
+it('uses the Supabase profile instead of inherited settings in exports and wrapped commands', async () => {
+  process.env = { PGHOST: 'dev.local', PGPORT: '6543', PGUSER: 'developer', PGPASSWORD: 'test', PGDATABASE: 'dev' };
+  const expected = { PGHOST: 'localhost', PGPORT: '54322', PGUSER: 'supabase_admin', PGPASSWORD: 'postgres', PGDATABASE: 'postgres' };
   process.argv.push('--supabase');
   await env({ supabase: true }, undefined);
-  expect(console.log).toHaveBeenCalledWith('export PGPORT=54322');
-  expect(console.log).toHaveBeenCalledWith('export PGUSER=developer');
+  expect(jest.mocked(console.log).mock.calls.flat()).toEqual(
+    Object.entries(expected).map(([key, value]) => `export ${key}=${value}`)
+  );
+
+  jest.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+  jest.mocked(spawn).mockImplementation(() => {
+    const child = new EventEmitter();
+    queueMicrotask(() => child.emit('close', 0));
+    return child as ReturnType<typeof spawn>;
+  });
+  process.argv.push('test-command');
+  await env({ supabase: true }, undefined);
+  expect(spawn).toHaveBeenCalledWith('test-command', [], expect.objectContaining({ env: expected }));
 });
 
 it('passes explicit settings and profile defaults to a wrapped command', async () => {
