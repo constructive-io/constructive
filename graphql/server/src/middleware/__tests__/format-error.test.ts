@@ -1,3 +1,4 @@
+import { parseFunctionSource } from 'graphile-function-source';
 import {
   execute,
   GraphQLEnumType,
@@ -130,6 +131,25 @@ describe('formatError', () => {
     expect(result.message).toBe('An unexpected error occurred.');
     expect(result.extensions?.code).toBe('INTERNAL_SERVER_ERROR');
     expect(result.extensions?.errorId).toMatch(/^[0-9a-f]{16}$/);
+  });
+
+  it.each([
+    ['CREATE FUNCTION f() RETURNS int LANGUAGE sql AS $$ SELEC 1 $$', 'FUNCTION_SOURCE_PARSE_ERROR', 'SELEC', 'syntax error at or near "SELEC"'],
+    ['CREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$', 'FUNCTION_SOURCE_UNSUPPORTED', undefined, 'the function name must be unqualified; schemaId chooses its schema']
+  ])('preserves the public function-source refusal %s', async (source, code, token, message) => {
+    const parseError = await parseFunctionSource(source).catch((error: GraphQLError) => error);
+    expect(parseError).toBeInstanceOf(GraphQLError);
+    const originalError = parseError as GraphQLError;
+    const result = formatError(new GraphQLError(originalError.message, {
+      path: ['createFunctionFromSource'],
+      originalError
+    }));
+
+    expect(result).toEqual({
+      message,
+      path: ['createFunctionFromSource'],
+      extensions: { code, class: 'public', ...(token ? { position: source.indexOf(token) } : {}) }
+    });
   });
 
   it('masks errors without request locations even when Grafserv omits the original error', () => {

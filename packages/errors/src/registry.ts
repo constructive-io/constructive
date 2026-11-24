@@ -567,6 +567,18 @@ export const registry = {
     http: 400,
     message: 'Validation failed. Please check your input and try again.'
   }),
+  FUNCTION_SOURCE_PARSE_ERROR: defineError({
+    code: 'FUNCTION_SOURCE_PARSE_ERROR',
+    class: 'public',
+    http: 400,
+    message: 'The function source could not be parsed.'
+  }),
+  FUNCTION_SOURCE_UNSUPPORTED: defineError({
+    code: 'FUNCTION_SOURCE_UNSUPPORTED',
+    class: 'public',
+    http: 400,
+    message: 'The function source uses an unsupported construct.'
+  }),
   UNKNOWN_ERROR: defineError({
     code: 'UNKNOWN_ERROR',
     class: 'internal',
