@@ -95,11 +95,25 @@ describe('pgpm docker PostgreSQL ownership', () => {
   it('does not recreate a pgpm Postgres named ollama as an Ollama service', async () => {
     reply('main-id true pgpm postgres');
     reply('postgres-id true pgpm postgres');
-    await expect(docker({ _: ['start'], ollama: true }, undefined, undefined)).rejects.toThrow(
+    await expect(docker({ _: ['start'], ollama: true, recreate: true }, undefined, undefined)).rejects.toThrow(
       'Container "ollama" is not managed by pgpm as ollama'
     );
     expect(commands()).toEqual([
       expect.arrayContaining(['inspect', 'postgres']),
+      expect.arrayContaining(['inspect', 'ollama'])
+    ]);
+  });
+
+  it('checks every requested container before recreating any of them', async () => {
+    reply('main-id true pgpm postgres');
+    reply('store-id true pgpm rustfs');
+    reply('foreign-id true');
+    await expect(docker({ _: ['start'], rustfs: true, ollama: true, recreate: true }, undefined, undefined)).rejects.toThrow(
+      'Container "ollama" is not managed by pgpm'
+    );
+    expect(commands()).toEqual([
+      expect.arrayContaining(['inspect', 'postgres']),
+      expect.arrayContaining(['inspect', 'rustfs']),
       expect.arrayContaining(['inspect', 'ollama'])
     ]);
   });

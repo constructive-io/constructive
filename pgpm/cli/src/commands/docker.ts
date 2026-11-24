@@ -175,7 +175,12 @@ const OWNER_KEY = 'io.constructive.managed-by';
 const OWNER_LABEL = `${OWNER_KEY}=pgpm`;
 const SERVICE_KEY = 'io.constructive.pgpm.service';
 
-async function inspectManagedContainer(name: string, service: string): Promise<{ id: string; running: boolean } | null> {
+interface ManagedContainer {
+  id: string;
+  running: boolean;
+}
+
+async function inspectManagedContainer(name: string, service: string): Promise<ManagedContainer | null> {
   const format = `{{.Id}} {{.State.Running}} {{index .Config.Labels "${OWNER_KEY}"}} {{index .Config.Labels "${SERVICE_KEY}"}}`;
   const result = await run('docker', ['container', 'inspect', '--format', format, '--', name]);
   if (result.code !== 0) {
@@ -195,8 +200,7 @@ async function inspectManagedContainer(name: string, service: string): Promise<{
   return { id, running: running === 'true' };
 }
 
-async function reuseContainer(name: string, service: string, recreate: boolean): Promise<boolean> {
-  const existing = await inspectManagedContainer(name, service);
+async function reuseContainer(name: string, existing: ManagedContainer | null, recreate: boolean): Promise<boolean> {
   if (!existing) return false;
 
   if (recreate) {
@@ -223,10 +227,10 @@ async function reuseContainer(name: string, service: string, recreate: boolean):
   return true;
 }
 
-async function startContainer(options: DockerRunOptions): Promise<void> {
+async function startContainer(options: DockerRunOptions, existing: ManagedContainer | null): Promise<void> {
   const { name, image, port, user, password, shmSize, recreate } = options;
 
-  if (!(await ensureDockerReady()) || await reuseContainer(name, 'postgres', recreate)) {
+  if (await reuseContainer(name, existing, recreate)) {
     return;
   }
   console.log(`🚀 Creating and starting new container "${name}"...`);
@@ -254,12 +258,7 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
   }
 }
 
-async function stopContainer(name: string, service: string): Promise<void> {
-  if (!(await ensureDockerReady())) {
-    return;
-  }
-
-  const existing = await inspectManagedContainer(name, service);
+async function stopContainer(name: string, existing: ManagedContainer | null): Promise<void> {
   if (!existing) {
     console.log(`ℹ️  Container "${name}" not found`);
     return;
@@ -279,10 +278,10 @@ async function stopContainer(name: string, service: string): Promise<void> {
   }
 }
 
-async function startService(service: ServiceDefinition, recreate: boolean, gpu: boolean = false): Promise<void> {
+async function startService(service: ServiceDefinition, existing: ManagedContainer | null, recreate: boolean, gpu: boolean): Promise<void> {
   const { name, image, ports, env: serviceEnv, command } = service;
 
-  if (await reuseContainer(name, service.name, recreate)) {
+  if (await reuseContainer(name, existing, recreate)) {
     return;
   }
 
@@ -413,6 +412,18 @@ export default async (
   const recreate = args.recreate === true;
   const gpu = args.gpu === true;
   const includedServices = resolveServiceFlags(args);
+  const inspectTargets = async () => {
+    if (!(await ensureDockerReady())) return null;
+    if (includedServices.some(service => service.name === name)) {
+      throw new Error(`Both PostgreSQL and an additional service use the container name "${name}". Choose a different --name.`);
+    }
+    const postgres = await inspectManagedContainer(name, 'postgres');
+    const services = [];
+    for (const service of includedServices) {
+      services.push({ service, existing: await inspectManagedContainer(service.name, service.name) });
+    }
+    return { postgres, services };
+  };
 
   switch (subcommand) {
   case 'start': {
@@ -421,19 +432,24 @@ export default async (
       await cliExitWithError(conflict);
       return;
     }
-    await startContainer({ name, image, port, user, password, shmSize, recreate });
-    for (const service of includedServices) {
-      await startService(service, recreate, gpu);
+    const targets = await inspectTargets();
+    if (!targets) return;
+    await startContainer({ name, image, port, user, password, shmSize, recreate }, targets.postgres);
+    for (const { service, existing } of targets.services) {
+      await startService(service, existing, recreate, gpu);
     }
     break;
   }
 
-  case 'stop':
-    await stopContainer(name, 'postgres');
-    for (const service of includedServices) {
-      await stopContainer(service.name, service.name);
+  case 'stop': {
+    const targets = await inspectTargets();
+    if (!targets) return;
+    await stopContainer(name, targets.postgres);
+    for (const { service, existing } of targets.services) {
+      await stopContainer(service.name, existing);
     }
     break;
+  }
 
   case 'ls':
     await listServices();
