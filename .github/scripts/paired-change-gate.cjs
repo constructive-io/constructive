@@ -39,8 +39,8 @@ const API_SQL_SOURCES = [
 const NOT_API =
   /(^|\/)(__tests__|__fixtures__|test|tests)\/|\.(test|spec)\.ts$|\.d\.ts$|^graphile\/graphile-(realtime-)?test\/|\/(src\/)?scripts\//;
 
-const PAIRED_DB_LINE = /^\s*Paired-DB:\s*(.+?)\s*$/im;
-const RUN_LINE = /^\s*Kitchen-sink-run:\s*(.+?)\s*$/im;
+const PAIRED_DB_LINE = /^[ \t]*Paired-DB:[ \t]*([^\r\n]*)$/im;
+const RUN_LINE = /^[ \t]*Kitchen-sink-run:[ \t]*([^\r\n]*)$/im;
 const SHA40 = /^[0-9a-f]{40}$/i;
 const SUMMARY_PAIR_RE =
   /constructive-db\s+`([0-9a-f]{40})`\s*·\s*constructive\s+`([0-9a-f]{40})`/i;
@@ -59,10 +59,12 @@ function isApiSqlFile(relPath) {
 function extractSqlStatements(source) {
   const found = new Set();
   if (!source) return found;
-  const literalRe = /`((?:[^`\\]|\\.)*)`|'((?:[^'\\\n]|\\.)*)'/g;
+  const literalRe = /`((?:[^`\\]|\\.)*)`|'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"/g;
+  const sqlStart =
+    /^\s*(?:SELECT\s+(?:\*|\d+\b|[a-z_][a-z0-9_.]*\s*\(|[\s\S]*\bFROM\b)|INSERT\s+INTO\b|UPDATE\s+\S+[\s\S]*\bSET\b|DELETE\s+FROM\b|WITH\s+[a-z_][a-z0-9_]*[\s\S]*\bAS\s*\()/i;
   for (const m of source.matchAll(literalRe)) {
-    const raw = m[1] ?? m[2];
-    if (!/^\s*(SELECT|INSERT|UPDATE|DELETE|WITH)\s+\S+\s+\S/i.test(raw)) continue;
+    const raw = m[1] ?? m[2] ?? m[3];
+    if (!sqlStart.test(raw)) continue;
     found.add(raw.replace(/\s+/g, ' ').trim());
   }
   return found;
@@ -153,6 +155,7 @@ function parsePairFromArtifact(zipBuffer) {
           constructiveDb: String(parsed.constructiveDb).toLowerCase(),
           constructive: String(parsed.constructive).toLowerCase(),
           scenario: parsed.scenario || null,
+          grep: parsed.grep || '',
         };
       }
     }
@@ -172,10 +175,10 @@ function parsePairFromArtifact(zipBuffer) {
   return null;
 }
 
-function findChangedApiSqlFiles(baseRef, cwd = process.cwd()) {
+function findChangedApiSqlFiles(baseRef, cwd = process.cwd(), headRef = 'HEAD') {
   const diffOut = execFileSync(
     'git',
-    ['diff', '--name-only', `${baseRef}...HEAD`, '--', 'graphql/server/src', 'graphile', 'packages/express-context/src'],
+    ['diff', '--name-only', `${baseRef}...${headRef}`, '--', 'graphql/server/src', 'graphile', 'packages/express-context/src'],
     { cwd, encoding: 'utf8', maxBuffer: 32 << 20 },
   );
   const candidates = diffOut
@@ -185,9 +188,17 @@ function findChangedApiSqlFiles(baseRef, cwd = process.cwd()) {
 
   const changed = [];
   for (const relPath of candidates) {
-    const absPath = path.join(cwd, relPath);
-    if (!fs.existsSync(absPath)) continue;
-    const headSrc = fs.readFileSync(absPath, 'utf8');
+    let headSrc = '';
+    try {
+      headSrc = execFileSync('git', ['show', `${headRef}:${relPath}`], {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        maxBuffer: 32 << 20,
+      });
+    } catch {
+      continue;
+    }
     let baseSrc = '';
     try {
       baseSrc = execFileSync('git', ['show', `${baseRef}:${relPath}`], {
@@ -321,6 +332,9 @@ async function inspectRunForPair(run, expectedConstructiveSha, acceptedDbShas, g
   if (pair.scenario && pair.scenario !== 'all') {
     return { ok: false, reason: `run ${run.id} ran scenario=${pair.scenario}, not all` };
   }
+  if (pair.grep) {
+    return { ok: false, reason: `run ${run.id} was filtered with grep="${pair.grep}"` };
+  }
   if (pair.constructive !== expectedConstructiveSha) {
     return {
       ok: false,
@@ -450,8 +464,9 @@ module.exports = {
 
 if (require.main === module) {
   (async () => {
-    const baseRef = process.env.PR_BASE_REF || 'origin/main';
-    const changedSqlFiles = findChangedApiSqlFiles(baseRef);
+    const baseRef = process.env.PR_BASE_SHA || process.env.PR_BASE_REF || 'origin/main';
+    const headRef = process.env.PR_HEAD_SHA || 'HEAD';
+    const changedSqlFiles = findChangedApiSqlFiles(baseRef, process.cwd(), headRef);
     const result = await evaluateGate({
       prBody: process.env.PR_BODY || '',
       headSha: process.env.PR_HEAD_SHA || '',

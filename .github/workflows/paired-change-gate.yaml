@@ -6,10 +6,11 @@ name: Paired-change gate
 # enforces DB-first merge order when paired with a constructive-db PR.
 #
 # Runs on `edited` so updating the PR body with `Paired-DB:` or
-# `Kitchen-sink-run:` re-checks immediately. Needs no pnpm install (~5s).
+# `Kitchen-sink-run:` re-checks immediately, and on `ready_for_review` so draft
+# promotion cannot bypass the gate. Needs no pnpm install (~5s).
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, edited, reopened, synchronize, ready_for_review]
     branches:
       - main
       - v1
@@ -25,21 +26,53 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout
+      - name: Checkout PR
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           filter: blob:none
+
+      # Always execute the gate script from the trusted base branch when
+      # GH_SUBMODULE_PAT is in the environment, so a PR cannot modify the
+      # script to read the cross-repository token.
+      - name: Checkout trusted gate script from base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: .gate-trusted
+          sparse-checkout: |
+            .github/scripts/paired-change-gate.cjs
+          sparse-checkout-cone-mode: false
+
+      - name: Locate trusted gate script
+        id: locate
+        run: |
+          if [ -f .gate-trusted/.github/scripts/paired-change-gate.cjs ]; then
+            echo "trusted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "trusted=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Check paired kitchen-sink run
+      - name: Check paired kitchen-sink run (trusted base script)
+        if: steps.locate.outputs.trusted == 'true'
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_BASE_REF: origin/${{ github.event.pull_request.base.ref }}
           GH_TOKEN: ${{ secrets.GH_SUBMODULE_PAT }}
+        run: node .gate-trusted/.github/scripts/paired-change-gate.cjs
+
+      - name: Check paired kitchen-sink run (bootstrap without token)
+        if: steps.locate.outputs.trusted != 'true'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BASE_REF: origin/${{ github.event.pull_request.base.ref }}
         run: node .github/scripts/paired-change-gate.cjs

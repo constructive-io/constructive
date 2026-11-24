@@ -142,6 +142,7 @@ test('parsePairFromArtifact reads deflated pair.json and falls back to summary.m
     constructiveDb: dbSha,
     constructive: cSha,
     scenario: 'all',
+    grep: '',
   });
 
   const zipMd = makeZip(
@@ -288,4 +289,74 @@ test('evaluateGate fails an API SQL PR with no matching green kitchen-sink run',
   });
   assert.equal(res.ok, false);
   assert.match(res.errors.join('\n'), /gh workflow run storage-integration\.yml/);
+});
+
+test('extractSqlStatements detects double-quoted and single-expression SELECT queries', () => {
+  const src = `
+    await pgClient.query("SELECT pg_advisory_xact_lock(hashtext($1))", [key]);
+    await pgClient.query(\`SELECT 1\`);
+    const label = "Select an option to continue";
+  `;
+  const stmts = [...extractSqlStatements(src)];
+  assert.equal(stmts.length, 2);
+  assert.ok(stmts.includes('SELECT pg_advisory_xact_lock(hashtext($1))'));
+  assert.ok(stmts.includes('SELECT 1'));
+});
+
+test('blank Paired-DB or Kitchen-sink-run lines do not swallow the following line', () => {
+  assert.deepEqual(
+    parsePairedDb('Paired-DB:\nKitchen-sink-run: 12345'),
+    { kind: 'none', raw: '' },
+  );
+  assert.equal(
+    parseKitchenSinkRun('Kitchen-sink-run:\n## Summary'),
+    null,
+  );
+});
+
+test('evaluateGate rejects a grep-filtered kitchen-sink run', async () => {
+  const cSha = 'c'.repeat(40);
+  const dbSha = 'd'.repeat(40);
+  const zip = makeZip(
+    {
+      'pair.json': JSON.stringify({
+        constructiveDb: dbSha,
+        constructive: cSha,
+        scenario: 'all',
+        grep: 'smoke',
+      }),
+    },
+    true,
+  );
+  const fetchImpl = mockFetch({
+    'https://api.github.com/repos/constructive-io/constructive-db-integration-tests/actions/runs/777': {
+      id: 777,
+      status: 'completed',
+      conclusion: 'success',
+      html_url: 'https://github.com/constructive-io/constructive-db-integration-tests/actions/runs/777',
+    },
+    'https://api.github.com/repos/constructive-io/constructive-db-integration-tests/actions/runs/777/jobs?per_page=100': {
+      jobs: [{ name: 'summary · all', conclusion: 'success' }],
+    },
+    'https://api.github.com/repos/constructive-io/constructive-db-integration-tests/actions/runs/777/artifacts?per_page=100': {
+      artifacts: [
+        {
+          name: 'storage-integration-summary-777',
+          expired: false,
+          archive_download_url: 'https://artifacts.example/777.zip',
+        },
+      ],
+    },
+    'https://artifacts.example/777.zip': zip,
+  });
+
+  const res = await evaluateGate({
+    prBody: `Paired-DB: ${dbSha}\nKitchen-sink-run: 777`,
+    headSha: cSha,
+    changedSqlFiles: [{ file: 'graphile/graphile-presigned-url-plugin/src/plugin.ts', addedCount: 1 }],
+    token: 'tok',
+    fetchImpl,
+  });
+  assert.equal(res.ok, false);
+  assert.match(res.errors.join('\n'), /filtered with grep/);
 });
