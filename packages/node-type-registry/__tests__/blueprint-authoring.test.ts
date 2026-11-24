@@ -1,4 +1,4 @@
-import type { BlueprintDefinition } from '../src/blueprint-types.generated';
+import type { BlueprintDefinition, BlueprintField } from '../src/blueprint-types.generated';
 
 test('types accept the builder field and schema-qualified relation inputs', () => {
   const definition = {
@@ -8,7 +8,8 @@ test('types accept the builder field and schema-qualified relation inputs', () =
         name: 'status',
         type: { name: 'text' },
         default: { value: 'pending' },
-        is_required: true
+        is_required: true,
+        index: 'btree'
       }]
     }],
     relations: [{
@@ -22,4 +23,14 @@ test('types accept the builder field and schema-qualified relation inputs', () =
   } satisfies BlueprintDefinition;
 
   expect(definition.tables[0].fields[0].default.value).toBe('pending');
+});
+
+test('field indexes accept lowercase methods only', () => {
+  const invalid: BlueprintField = {
+    name: 'status',
+    type: { name: 'text' },
+    // @ts-expect-error Field shorthand does not normalize uppercase methods.
+    index: 'BTREE'
+  };
+  expect(invalid.index).toBe('BTREE');
 });

@@ -427,7 +427,7 @@ function buildBlueprintField(): t.ExportNamedDeclaration {
       optionalProp('min', t.tsNumberKeyword()),
       optionalProp('max', t.tsNumberKeyword()),
       optionalProp('regexp', t.tsStringKeyword()),
-      optionalProp('index', t.tsStringKeyword()),
+      optionalProp('index', strUnion(['btree', 'gin', 'gist', 'brin', 'hash'])),
       addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.')
     ]),
     'A custom field (column) to add to a blueprint table.'

@@ -1782,7 +1782,7 @@ export interface BlueprintField {
   min?: number;
   max?: number;
   regexp?: string;
-  index?: string;
+  index?: 'btree' | 'gin' | 'gist' | 'brin' | 'hash';
   /** Comment/description for this field. */
   description?: string;
 }
