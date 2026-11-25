@@ -379,7 +379,9 @@ const rows: Row[] = [
   ["printf '%s\\n' '-C src' config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands'],
   ["printf '%s\\n' -C src config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands'],
   // 48. a sequence cut at the word limit is an incomplete analysis: here the first word leaves no room, and the second makes ~/.ssh/id_ed25519 eighth
-  ['cat {1..2049} ~/.ss{a..h}/id_ed25519', 'ask', 'ask', 'unresolvable-path']
+  ['cat {1..2049} ~/.ss{a..h}/id_ed25519', 'ask', 'ask', 'unresolvable-path'],
+  // 49. bash expands braces before parameters, so each word they make reads its parameters in turn, and an `=` form in one is set for the next
+  ['unset V; cat {a,}$V${V:=../}.ssh/id_ed25519', 'deny', 'deny', 'hard-deny']
 ];
 
 describe('hardening: bash per mode', () => {
@@ -408,6 +410,13 @@ describe('hardening: base64 -i', () => {
     const targets = async (command: string) => (await sb.bash(command, 'workspace')).request.targets.map((t) => `${t.access} ${path.relative(sb.ws, t.path)}`);
     expect(await targets('base64 -i -w 0 src/config.ts')).toEqual(['read src/config.ts']);
     expect(await targets('base64 -i src/config.ts')).toEqual(['read src/config.ts']);
+  });
+});
+
+describe('hardening: braces before parameters', () => {
+  it("reads each word's parameters in turn, as bash 3.2 and 5.3 do", async () => {
+    const d = await sb.bash('unset V; cat {a,b}$V${V:=/x}', 'workspace');
+    expect(d.request.targets.map((t) => path.relative(sb.ws, t.path))).toEqual(['a/x', 'b/x/x']);
   });
 });
 

@@ -5,8 +5,9 @@
  * characters bash lets it act on, so every character keeps a kind: `l` for an
  * unquoted literal (braces, tildes and globs act on it), `v` for the result of
  * an unquoted expansion (splitting and globs act on it), `q` for settled text
- * (quoted text, a tilde's home dir, the unknown mark), and `e` for the mark an
- * empty quoted part leaves, which no character of the word can be taken for.
+ * (quoted text, a tilde's home dir, the unknown mark), `e` for the mark an
+ * empty quoted part leaves, which no character of the word can be taken for,
+ * and `p` for the mark a parameter leaves until brace expansion is done.
  *
  * One `ExpansionBudget` per command bounds the text and the words that the
  * expansions build. It is charged before anything is built, and past it the
@@ -16,7 +17,7 @@
 import { unreachable } from '../unreachable';
 import type { Arg } from './analyze';
 import type { Limit } from './limits';
-import type { Word } from './tokenize';
+import type { Part, Word } from './tokenize';
 
 /** The most characters the expansions of one command may build. */
 export const MAX_EXPANSION_CHARS = 1024 * 1024;
@@ -29,6 +30,10 @@ const UNKNOWN = '\u0000';
 
 /** Stands, with kind `e`, for an empty quoted part (`""`): it keeps a word that is otherwise empty, and it stops a tilde. */
 const EMPTY_QUOTE = '\u0001';
+
+/** With kind `p`, `PARAM`, the index of a parameter part of the word and `PARAM_END` stand for that part until its words read it. */
+const PARAM = '\u0002';
+const PARAM_END = '\u0003';
 
 /** The characters bash's default IFS splits on. */
 const IFS_WHITESPACE = new Set([' ', '\t', '\n']);
@@ -269,77 +274,128 @@ export type WordUse = 'argument' | 'assignment';
 
 /** The arguments a word expands to, in order. */
 export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budget: ExpansionBudget): Arg[] {
-  const built = build(word, scope, budget);
-  const arg = (piece: Piece, globs: boolean) => toArg(piece, word.raw, globs, built.splits);
+  const shape = template(word, scope, budget);
   if (use === 'assignment') {
+    const built = parameters(shape, shape.splits, word, scope, budget);
+    const arg = (piece: Piece) => toArg(piece, word.raw, false, built.splits);
     const readings = tildes(built, true, scope, budget);
-    if (readings.length === 1) return [arg(readings[0], false)];
+    if (readings.length === 1) return [arg(readings[0])];
     // A variable holds one value, so where the bashes differ it is unknown, which asks where the command uses it.
-    return [arg(withHome(built, tildeSpans(built, true), null, budget), false)];
+    return [arg(withHome(built, tildeSpans(built, true), null, budget))];
   }
   const args: Arg[] = [];
   let differ = false;
-  for (const piece of bothBashes(built, word.raw, scope, budget)) {
+  for (const braced of bothBashes(shape, word.raw, scope, budget)) {
+    const piece = parameters(braced, shape.splits, word, scope, budget);
+    const arg = (field: Piece) => toArg(field, word.raw, true, piece.splits);
     const readings = tildes(piece, NAME_EQUALS.test(piece.text) && allLiteral(piece.kinds, 0, piece.text.indexOf('=')), scope, budget);
     differ ||= readings.length > 1;
     for (const reading of readings) {
       const fields = split(reading);
       if (fields.length > 1 && !budget.takeWords(fields.length - 1)) {
-        args.push(arg(fields[0], true));
+        args.push(arg(fields[0]));
         return args;
       }
-      for (const field of fields) args.push(arg(field, true));
+      for (const field of fields) args.push(arg(field));
     }
   }
   if (differ) scope.tildesDiffer(word.raw);
   return args;
 }
 
-/** The word's parts as one piece, with each known variable's value in place and an unknown part marked. */
-/** The built word, and whether an unknown unquoted value in it may split it further. */
-function build(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece & { splits: boolean } {
-  let text = '';
-  let kinds = '';
-  let unknown = false;
-  let splits = false;
-  const markUnknown = (split: boolean) => {
-    splits ||= split;
-    if (unknown) return;
-    unknown = true;
-    text += UNKNOWN;
-    kinds += 'q';
-  };
-  const add = (piece: string, kind: 'l' | 'v' | 'q' | 'e') => {
-    if (!budget.takeChars(piece.length)) return markUnknown(kind === 'v');
-    text += piece;
-    kinds += kind.repeat(piece.length);
-  };
-  for (const part of word.parts) {
+type VarPart = Extract<Part, { kind: 'var' }>;
+
+/** A piece as it is built, with each character's kind, and whether an unknown unquoted value in it may split it further. */
+class PieceBuilder {
+  text = '';
+  kinds = '';
+  splits = false;
+  private unknown = false;
+
+  constructor(private readonly budget: ExpansionBudget) {}
+
+  markUnknown(split: boolean): void {
+    this.splits ||= split;
+    if (this.unknown) return;
+    this.unknown = true;
+    this.text += UNKNOWN;
+    this.kinds += 'q';
+  }
+
+  add(piece: string, kind: 'l' | 'v' | 'q' | 'e' | 'p'): void {
+    if (!this.budget.takeChars(piece.length)) return this.markUnknown(kind === 'v');
+    this.text += piece;
+    this.kinds += kind.repeat(piece.length);
+  }
+
+  /** A run of characters that keep their kinds. */
+  copy(text: string, kinds: string): void {
+    this.text += text;
+    this.kinds += kinds;
+    if (text.includes(UNKNOWN)) this.unknown = true;
+  }
+
+  get piece(): Piece & { splits: boolean } {
+    return { text: this.text, kinds: this.kinds, splits: this.splits };
+  }
+}
+
+/**
+ * The word's parts as one piece: its text, an unknown part marked, and each
+ * parameter as a mark that `parameters` reads, since bash expands braces
+ * before parameters.
+ */
+function template(word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece & { splits: boolean } {
+  const out = new PieceBuilder(budget);
+  word.parts.forEach((part, k) => {
     switch (part.kind) {
     case 'lit':
-      if (part.text === '' && part.quoted) add(EMPTY_QUOTE, 'e');
-      else add(part.text, part.quoted ? 'q' : 'l');
+      if (part.text === '' && part.quoted) out.add(EMPTY_QUOTE, 'e');
+      else out.add(part.text, part.quoted ? 'q' : 'l');
       break;
     case 'unknown':
       if (part.ref) scope.noteRef(part.ref);
-      markUnknown(part.splits);
+      out.markUnknown(part.splits);
       break;
-    case 'var': {
+    case 'var':
       scope.noteRef(part.name);
-      // Looked up even when IFS may differ, since an `=` form assigns.
-      const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true, part.tilde === true);
-      const raw = !part.quoted && scope.ifsMayDiffer() ? null : looked;
-      const value = raw === null || part.transform === undefined ? raw : transformed(raw, part.transform);
-      if (value === null) markUnknown(!part.quoted);
-      else if (value === '' && part.quoted) add(EMPTY_QUOTE, 'e');
-      else add(value, part.quoted ? 'q' : 'v');
+      out.add(`${PARAM}${k}${PARAM_END}`, 'p');
       break;
-    }
     default:
       return unreachable(part);
     }
+  });
+  return out.piece;
+}
+
+/**
+ * One word the braces made, with each parameter mark replaced by its value,
+ * read from left to right: an `=` form a word reads is set for the marks
+ * after it, in this word and the next ones.
+ */
+function parameters(piece: Piece, splits: boolean, word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece & { splits: boolean } {
+  const out = new PieceBuilder(budget);
+  out.splits = splits;
+  for (let k = 0; k < piece.text.length; ) {
+    const mark = piece.kinds.indexOf('p', k);
+    const next = mark < 0 ? piece.text.length : mark;
+    out.copy(piece.text.slice(k, next), piece.kinds.slice(k, next));
+    if (mark < 0) break;
+    const end = piece.text.indexOf(PARAM_END, mark);
+    readParameter(word.parts[Number(piece.text.slice(mark + 1, end))] as VarPart, scope, out);
+    k = end + 1;
   }
-  return { text, kinds, splits };
+  return out.piece;
+}
+
+function readParameter(part: VarPart, scope: ExpansionScope, out: PieceBuilder): void {
+  // Looked up even when IFS may differ, since an `=` form assigns.
+  const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true, part.tilde === true);
+  const raw = !part.quoted && scope.ifsMayDiffer() ? null : looked;
+  const value = raw === null || part.transform === undefined ? raw : transformed(raw, part.transform);
+  if (value === null) out.markUnknown(!part.quoted);
+  else if (value === '' && part.quoted) out.add(EMPTY_QUOTE, 'e');
+  else out.add(value, part.quoted ? 'q' : 'v');
 }
 
 /**
