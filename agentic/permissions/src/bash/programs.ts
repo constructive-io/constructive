@@ -486,7 +486,8 @@ export const WGET = tool(
 export const TAR: ProgramSpec = sub(
   runsShell('required', '--to-command', '-I', '--use-compress-program', '--rsh-command', '--rmt-command', '-F', '--info-script', '--new-volume-script'),
   { names: ['--checkpoint-action'], value: 'required', effect: 'runs-program', when: /^exec=/, shell: /^exec=([\s\S]*)$/ },
-  does('reads-file', 'required', '-T', '--files-from', '-X', '--exclude-from'),
+  stdio(does('reads-file', 'required', '-T', '--files-from')),
+  does('reads-file', 'required', '-X', '--exclude-from'),
   movesTo('cumulative', '-C', '--directory'),
   flag('-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete', '-x', '--extract', '--get', '-t', '--list', '-d', '--diff', '--compare'),
   // The archive: read, and written too in a mode that writes it, which `tar` adds.
@@ -550,7 +551,7 @@ export const SCP: ProgramSpec = {
 /** rsync: `-e`/`--rsh` is the remote shell command, which rsync runs here. */
 export const RSYNC: ProgramSpec = sub(
   runsShell('required', '-e', '--rsh'),
-  does('reads-file', 'required', '--exclude-from', '--include-from', '--files-from', '--password-file'),
+  stdio(does('reads-file', 'required', '--exclude-from', '--include-from', '--files-from', '--password-file')),
   does('writes-file', 'required', '--log-file', '-T', '--temp-dir', '--backup-dir', '--partial-dir'),
   does('reads-file', 'required', '--compare-dest', '--copy-dest', '--link-dest'),
   plain('-f', '--filter', '--exclude', '--include', '--rsync-path')

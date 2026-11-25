@@ -83,7 +83,7 @@ export function remoteCopy(name: 'scp' | 'rsync', ctx: CommandContext, rest: rea
   const read = readArgs(spec, rest);
   const fromStdin = valuesRead(read, '--exclude-from', '--include-from', '--files-from').some((v) => textOf(v) === '-');
   if (fromStdin) analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
-  applyEffects(ctx, name, spec, { ...read, options: read.options.filter((o) => textOf(o.value) !== '-') });
+  applyEffects(ctx, name, spec, read);
   const ops = read.operands;
   if (ops.length === 0) return;
   const dest = ops[ops.length - 1];
