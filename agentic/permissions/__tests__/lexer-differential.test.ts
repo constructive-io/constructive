@@ -244,7 +244,11 @@ describe('an exact grant key keeps what bash reads differently', () => {
   it.each(keys)('%j does not cover %j', async (granted, other, modes) => {
     const grant = grantFrom(asAsk(await sb.bash(granted, 'ask')).grantOptions[1]);
     expect(grant.match.type).toBe('command');
-    for (const mode of modes) expect([mode, (await sb.bash(other, mode, [grant])).decision]).toEqual([mode, 'ask']);
+    for (const mode of modes) {
+      // The grant covers the command it was saved for, so the ask for the other one comes from the key.
+      expect([mode, granted, (await sb.bash(granted, mode, [grant])).decision]).toEqual([mode, granted, 'allow']);
+      expect([mode, (await sb.bash(other, mode, [grant])).decision]).toEqual([mode, 'ask']);
+    }
   });
 
   it('still treats runs of spaces and tabs between words as one', async () => {
