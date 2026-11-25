@@ -393,7 +393,9 @@ const rows: Row[] = [
   // 52. curl writes an -o file in the last --output-dir of its transfer group, up to --next, also one written before it
   ['curl --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write'],
   ['curl -o hooks/pre-commit --output-dir .git https://example.com', 'ask', 'allow', 'ask-write'],
-  ['curl --output-dir src -o x https://example.com --next --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write']
+  ['curl --output-dir src -o x https://example.com --next --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write'],
+  // 53. git reads .git/config.worktree as config when extensions.worktreeConfig is on
+  ["printf '[core]\\n' > .git/config.worktree", 'ask', 'allow', 'ask-write']
 ];
 
 describe('hardening: bash per mode', () => {
@@ -467,6 +469,13 @@ describe('hardening: a dir through a link', () => {
       await fs.rm(path.join(sb.ws, 'pkg'), { recursive: true, force: true });
       await fs.rm(path.join(sb.ws, '.pi'), { recursive: true, force: true });
     }
+  });
+});
+
+describe('hardening: git config --worktree', () => {
+  it('writes .git/config.worktree, or .git/config when extensions.worktreeConfig is off', async () => {
+    const d = await sb.bash('git config --worktree user.name Example', 'workspace');
+    expect(d.request.targets.map((t) => `${t.access} ${path.relative(sb.ws, t.path)}`)).toEqual(['write .git/config.worktree', 'write .git/config']);
   });
 });
 

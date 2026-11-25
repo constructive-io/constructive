@@ -111,7 +111,11 @@ function config(ctx: CommandContext, read: ReadArgs, here: Arg, raw: string): vo
     analyzer.addPath(home === null ? { kind: 'unknown', knownPrefix: '', raw, splits: false } : literalArg(`${home ?? analyzer.home}/.gitconfig`, raw), 'write', true);
   }
   else if (hasOption(read, '--system')) analyzer.addPath(literalArg('/etc/gitconfig', raw), 'write', true);
-  else analyzer.addPath(analyzer.base === null ? here : literalArg('.git/config'), 'write', true);
+  else {
+    // `--worktree` writes .git/config.worktree when extensions.worktreeConfig is on, and .git/config when it is off.
+    const files = hasOption(read, '--worktree') ? ['.git/config.worktree', '.git/config'] : ['.git/config'];
+    for (const file of files) analyzer.addPath(analyzer.base === null ? here : literalArg(file), 'write', true);
+  }
 }
 
 export function git(ctx: CommandContext, rest: readonly Arg[]): void {

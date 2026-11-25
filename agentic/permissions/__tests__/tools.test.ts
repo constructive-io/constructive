@@ -37,6 +37,8 @@ const rows: Row[] = [
   ['write', { path: '.pi/extensions/x.ts', content: 'x' }, 'deny', 'deny', 'deny'],
   ['read', { path: '.pi/settings.json' }, 'allow', 'allow', 'allow'],
   ['edit', { path: '.git/config', edits: [{ oldText: 'a', newText: 'b' }] }, 'ask', 'ask', 'allow'],
+  // git reads it as config when extensions.worktreeConfig is on (git sparse-checkout turns it on)
+  ['write', { path: '.git/config.worktree', content: '[core]\n\tfsmonitor = ./x.sh' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.husky/pre-commit', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.envrc', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.vscode/tasks.json', content: '{}' }, 'ask', 'ask', 'allow'],

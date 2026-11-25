@@ -62,6 +62,8 @@ export const WORKSPACE_PROTECTED_WRITE: readonly KnownPath[] = [{ rel: '.pi', la
 export const WORKSPACE_ASK_WRITE: readonly KnownPath[] = [
   { rel: '.git/hooks', label: 'git hook' },
   { rel: '.git/config', label: 'git config' },
+  // git reads it as config when extensions.worktreeConfig is on.
+  { rel: '.git/config.worktree', label: 'git config' },
   { rel: '.husky', label: 'git hook' },
   { rel: '.envrc', label: 'direnv script' },
   { rel: '.vscode/tasks.json', label: 'editor task config' },
