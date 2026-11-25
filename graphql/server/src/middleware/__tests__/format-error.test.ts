@@ -143,6 +143,17 @@ describe('formatError', () => {
     expect(result.extensions?.errorId).toMatch(/^[0-9a-f]{16}$/);
   });
 
+  it('preserves the public bucket MIME refusal', () => {
+    const message = 'CONTENT_TYPE_NOT_ALLOWED: text/html not in bucket allowed types';
+    const originalError = new GraphQLError(message, { extensions: { code: 'CONTENT_TYPE_NOT_ALLOWED' } });
+
+    expect(formatError(new GraphQLError(message, { originalError, path: ['requestUploadUrl'] }))).toEqual({
+      message,
+      path: ['requestUploadUrl'],
+      extensions: { code: 'CONTENT_TYPE_NOT_ALLOWED', class: 'public' }
+    });
+  });
+
   it.each([
     ['CREATE FUNCTION f() RETURNS int LANGUAGE sql AS $$ SELEC 1 $$', 'FUNCTION_SOURCE_PARSE_ERROR', 'SELEC', 'syntax error at or near "SELEC"'],
     ['CREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$', 'FUNCTION_SOURCE_UNSUPPORTED', undefined, 'the function name must be unqualified; schemaId chooses its schema']
