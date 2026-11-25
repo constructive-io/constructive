@@ -8,7 +8,7 @@
 
 import * as path from 'node:path';
 
-import { type Arg, literalStart } from './analyze';
+import { type Arg, type Cwd, literalStart } from './analyze';
 import {
   type CommandContext,
   files,
@@ -24,10 +24,11 @@ import {
 import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './file-commands';
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
-import { hasOption, mayBeOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
+import { hasOption, isOption, mayBeOption, operandWords, type ProgramSpec, type ReadArgs, readArgs, valuesOf as valuesRead } from './options';
 import { CD, MAKERS, MAPFILE, PRINTF, PUSHD, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
+import { hasDotDot } from './words';
 
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh', 'mksh', 'fish', 'ash']);
 const AWKS = new Set(['awk', 'gawk', 'mawk', 'nawk']);
@@ -301,6 +302,18 @@ function interpret(name: string, spec: Interpreter, ctx: CommandContext, rest: r
   }
 }
 
+/**
+ * Where `cd` or `pushd` goes: physically with `-P`, logically with `-L` or by
+ * default, as bash does. After a `set -P` the command may hold, a `..` may go
+ * either way.
+ */
+function cdDir(analyzer: CommandContext['analyzer'], read: ReadArgs, text: string): Cwd {
+  const mode = read.options.filter((o) => isOption(o, '-L', '-P')).at(-1);
+  if (mode && isOption(mode, '-P')) return analyzer.dirAt(text, undefined, true);
+  if (!mode && analyzer.mayCdPhysically && hasDotDot(text)) return { kind: 'unknown' };
+  return analyzer.dirAt(text);
+}
+
 export function runCommand(name: string, rest: readonly Arg[], ctx: CommandContext): void {
   const { analyzer } = ctx;
   publishes(name, ctx, rest);
@@ -375,7 +388,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
       analyzer.moveTo({ kind: 'unknown' });
     } else {
       analyzer.addPath(target, 'read', true);
-      analyzer.moveTo(analyzer.dirAt(target.text));
+      analyzer.moveTo(cdDir(analyzer, read, target.text));
     }
     return;
   }

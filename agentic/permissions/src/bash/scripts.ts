@@ -23,14 +23,15 @@ export interface DirChange {
  * Where a dir option moves the program, by its repeat rule: a cumulative one
  * (`git -C`, `tar -C`) from the dir the one before it reached, a last-wins one
  * (`env -C`, gdb's `--cd`) from the dir the program started in. Its value is
- * read as a path from there. A flag (`sudo -i`) moves to a dir the analysis
- * cannot know. `null` for an option that lacks its value, which moves nothing.
+ * read as a path from there, and the program moves to it physically, as the
+ * kernel's chdir does. A flag (`sudo -i`) moves to a dir the analysis cannot
+ * know. `null` for an option that lacks its value, which moves nothing.
  */
 export function movedBy(analyzer: CommandContext['analyzer'], spec: DirSpec, value: Arg | undefined, reached: Cwd, start: Cwd): Cwd | null {
   if (value === undefined) return spec.value === 'none' ? { kind: 'unknown' } : null;
   const from = spec.repeat === 'cumulative' ? reached : start;
   analyzer.within(from, () => analyzer.addPath(value, 'read', true));
-  return value.kind === 'known' ? analyzer.dirAt(value.text, from) : { kind: 'unknown' };
+  return value.kind === 'known' ? analyzer.dirAt(value.text, from, true) : { kind: 'unknown' };
 }
 
 /** The spec of the dir option a read option can be, if any. */

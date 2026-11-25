@@ -446,6 +446,30 @@ describe('hardening: operands after --', () => {
   });
 });
 
+describe('hardening: a dir through a link', () => {
+  it('moves a program physically and bash cd logically, as the kernel and bash do', async () => {
+    await fs.mkdir(path.join(sb.ws, '.pi', 'sub'), { recursive: true });
+    await fs.mkdir(path.join(sb.ws, 'pkg'), { recursive: true });
+    await fs.symlink(path.join(sb.ws, '.pi', 'sub'), path.join(sb.ws, 'pkg', 'link'));
+    try {
+      const rows: [string, string, string][] = [
+        ['env -C pkg/link/.. touch ext.js', 'deny', 'deny'],
+        ['tar -C pkg/link/.. -xf x.tar', 'deny', 'deny'],
+        ['cd -P pkg/link/..; touch ext.js', 'deny', 'deny'],
+        ['set -P; cd pkg/link/..; touch ext.js', 'ask', 'ask'],
+        ['cd pkg/link/..; touch ext.js', 'allow', 'allow']
+      ];
+      for (const [command, workspace, full] of rows) {
+        const verdicts = [(await sb.bash(command, 'workspace')).decision, (await sb.bash(command, 'full')).decision];
+        expect([command, ...verdicts]).toEqual([command, workspace, full]);
+      }
+    } finally {
+      await fs.rm(path.join(sb.ws, 'pkg'), { recursive: true, force: true });
+      await fs.rm(path.join(sb.ws, '.pi'), { recursive: true, force: true });
+    }
+  });
+});
+
 describe('hardening: HOME', () => {
   it('reads a tilde from every HOME the shell held, since bash 5.3 reads the one it last exported to a program', async () => {
     const command = `HOME=~/.ssh; ls; HOME=${sb.home}; cat ~/id_ed25519`;

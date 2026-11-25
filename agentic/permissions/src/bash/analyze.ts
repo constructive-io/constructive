@@ -24,7 +24,7 @@ import { type ContentFlow, FlowTracker, NO_INPUT, type Source, type Stdin, unsee
 import type { Limit } from './limits';
 import { commandParts } from './parts';
 import { type Compound, type Heredoc, heredocsOf, type Lexed, MAX_SUBSTITUTION_DEPTH, type Redirect, type SimpleCommand, type Subshell, tokenize, type Word } from './tokenize';
-import { isPathLike, isUrl, SHELL_KEYWORDS } from './words';
+import { hasDotDot, isPathLike, isUrl, SHELL_KEYWORDS } from './words';
 import { stripWrapper, type WrapperScope, xargsRuns } from './wrappers';
 
 /** One argument after the expansions the analyzer can do. */
@@ -404,6 +404,9 @@ class Analyzer implements ExpansionScope {
   /** The command mentions `lastpipe`, which runs a pipeline's last element in the shell itself. */
   lastpipe = false;
 
+  /** The command mentions `set -P` or `physical`, which may make a later `cd` physical. */
+  mayCdPhysically = false;
+
   /** The command's one text budget, for the texts the analysis builds beyond its words (printed output, heredocs). */
   get textBudget(): ExpansionBudget {
     return this.budget;
@@ -578,9 +581,23 @@ class Analyzer implements ExpansionScope {
   }
 
   /** The dir `text` names from `from` (the working dir by default). */
-  dirAt(text: string, from: Cwd = this.state.cwd): Cwd {
-    const abs = this.toAbs(text, this.dirOf(from));
-    return abs === null ? { kind: 'unknown' } : { kind: 'moved', dir: path.resolve(abs) };
+  /**
+   * The dir `text` names from `from`. A program's chdir (`git -C`, `env -C`,
+   * `tar -C`, `cd -P`) is `physical`: the kernel follows a link before a
+   * `..`, so a path with `..` stays as written, and the check resolves it
+   * where it lands. bash's `cd` is logical: a `..` drops the name before it.
+   * From a dir still as written, where the kernel resolves that `..`, a
+   * logical `..` lands where the analysis cannot know.
+   */
+  dirAt(text: string, from: Cwd = this.state.cwd, physical = false): Cwd {
+    const base = this.dirOf(from);
+    const abs = this.toAbs(text, base);
+    if (abs === null) return { kind: 'unknown' };
+    if (physical) return { kind: 'moved', dir: hasDotDot(abs) ? abs : path.resolve(abs) };
+    if (base !== null && hasDotDot(base) && !path.isAbsolute(text)) {
+      return hasDotDot(text) ? { kind: 'unknown' } : { kind: 'moved', dir: abs };
+    }
+    return { kind: 'moved', dir: path.resolve(abs) };
   }
 
   /** `cd`, `pushd`, `popd`: the shell moves for the rest of the command. */
@@ -1069,6 +1086,7 @@ class Analyzer implements ExpansionScope {
 export function analyzeBash(command: string, ctx: AnalyzeContext, findings: Findings): BashAnalysis {
   const analyzer = new Analyzer(ctx, findings);
   analyzer.lastpipe = /lastpipe/.test(command);
+  analyzer.mayCdPhysically = /\bphysical\b|\bset\s+[-+][A-Za-z]*P/.test(command);
   const lexed = analyzer.analyzeString(command);
   analyzer.exitShell();
   for (const pattern of CRITICAL_PATTERNS) {

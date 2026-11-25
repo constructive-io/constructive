@@ -19,6 +19,11 @@ export function isRemoteSpec(text: string): boolean {
   return colon > 0 && (slash < 0 || colon < slash);
 }
 
+/** The path has a `..` part. */
+export function hasDotDot(text: string): boolean {
+  return text.split('/').includes('..');
+}
+
 /** `localhost`, `127.x.x.x`, `::1` and `*.localhost`: reachable only from this machine. */
 export function isLoopbackHost(host: string): boolean {
   const h = host.toLowerCase().replace(/^\[|\]$/g, '');
