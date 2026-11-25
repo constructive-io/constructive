@@ -12,7 +12,7 @@ beforeAll(async () => {
   sb = await makeSandbox();
   await sb.engine.refreshSecrets();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, workspace: PermissionVerdict, full: PermissionVerdict, signal?: Signal];
 

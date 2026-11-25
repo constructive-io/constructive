@@ -6,7 +6,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, ask: PermissionVerdict, workspace: PermissionVerdict, full: PermissionVerdict, signals: Signal[]];
 

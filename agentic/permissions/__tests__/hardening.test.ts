@@ -13,7 +13,7 @@ beforeAll(async () => {
   // An env value the host marks secret by its shape, under a name that does not look secret.
   await sb.engine.refreshSecrets({ env: { GH_HELPER: GH_TOKEN } });
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, workspace: PermissionVerdict, full: PermissionVerdict, signal?: Signal];
 

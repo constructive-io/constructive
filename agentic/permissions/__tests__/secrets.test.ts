@@ -18,7 +18,7 @@ beforeAll(async () => {
   await fs.writeFile(path.join(sb.ws, 'node_modules', 'pkg', '.env'), 'VENDOR_TOKEN=vendor-token-value-123\n');
   await sb.engine.refreshSecrets();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 const text = (s: string) => [{ type: 'text', text: s }];
 const redact = (s: string, details?: unknown) => sb.engine.redactResult({ toolName: 'read', content: text(s), details });

@@ -17,7 +17,7 @@ beforeAll(async () => {
   // A link that leaves the project to an existing folder.
   await fs.symlink(path.join(sb.home, 'work', 'lib'), path.join(sb.ws, 'lib-link'));
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [tool: string, input: Record<string, unknown>, ask: PermissionVerdict, workspace: PermissionVerdict, full: PermissionVerdict];
 

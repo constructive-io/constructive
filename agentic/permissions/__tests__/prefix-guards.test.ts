@@ -6,7 +6,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 const prefix = prefixGrant;
 const exact = exactGrant;

@@ -19,7 +19,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 const projectGrant = (d: PermissionDecision): Grant => {
   return grantFrom(asAsk(d).grantOptions.find((o) => o.scope === 'project'));

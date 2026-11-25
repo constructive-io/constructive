@@ -14,7 +14,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 const prefixes = storedPrefixes;
 const exact = storedCommand;

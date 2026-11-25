@@ -5,7 +5,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 describe('approval prompt', () => {
   it('describes an upload with the command, the reason, and the exact pattern a grant saves', async () => {

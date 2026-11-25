@@ -12,7 +12,7 @@ beforeAll(async () => {
   // A link with no slash in its name that leads to a credential.
   await fs.symlink(path.join(sb.home, '.ssh', 'id_ed25519'), path.join(sb.ws, 'deploykey'));
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, ask: PermissionVerdict, workspace: PermissionVerdict, full: PermissionVerdict, signal?: Signal];
 

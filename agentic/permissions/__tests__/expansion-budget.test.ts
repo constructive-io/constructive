@@ -5,7 +5,7 @@ let sb: Sandbox;
 beforeAll(async () => {
   sb = await makeSandbox();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 /** The engine runs on the host's main process, so a command must not make it build gigabytes of text. */
 async function bounded(command: string) {
