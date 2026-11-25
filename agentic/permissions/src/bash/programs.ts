@@ -519,6 +519,9 @@ export const SORT: ProgramSpec = sub(
 /** ssh's `-o` keys whose value is a command ssh runs on this machine through a shell. */
 // OpenSSH ends a key at whitespace or one `=` (with whitespace around it), in any case.
 const SSH_COMMAND_KEYS = /^\s*(ProxyCommand|LocalCommand|KnownHostsCommand)(?:\s*=|\s)/i;
+/** ssh's and scp's `-F` config file; `-F none` reads none. */
+const SSH_CONFIG: OptionSpec = { names: ['-F'], value: 'required', effect: 'reads-file', when: /^(?!none$)/ };
+
 const SSH_OPTION: OptionSpec = {
   names: ['-o'],
   value: 'required',
@@ -533,7 +536,8 @@ export const SSH: ProgramSpec = {
   stopAtOperand: true,
   options: [
     SSH_OPTION,
-    does('reads-file', 'required', '-i', '-F'),
+    does('reads-file', 'required', '-i'),
+    SSH_CONFIG,
     does('writes-file', 'required', '-E'),
     // `-I` loads a PKCS#11 library, which is native code.
     does('runs-program', 'required', '-I'),
@@ -547,7 +551,7 @@ export const SCP: ProgramSpec = {
   abbreviations: false,
   stopAtOperand: false,
   // `-S` is the program it runs in place of ssh, and `-D` a local SFTP server it runs.
-  options: [SSH_OPTION, does('runs-program', 'required', '-S', '-D'), does('reads-file', 'required', '-i', '-F'), plain('-P', '-c', '-l', '-J', '-X')]
+  options: [SSH_OPTION, does('runs-program', 'required', '-S', '-D'), does('reads-file', 'required', '-i'), SSH_CONFIG, plain('-P', '-c', '-l', '-J', '-X')]
 };
 
 /** rsync: `-e`/`--rsh` is the remote shell command, which rsync runs here. */

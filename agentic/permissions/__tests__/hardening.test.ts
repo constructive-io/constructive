@@ -493,6 +493,15 @@ describe('hardening: git config --worktree', () => {
   });
 });
 
+describe('hardening: ssh -F none', () => {
+  it('reads no config file for none, and the file for any other name', async () => {
+    const targets = async (command: string) => (await sb.bash(command, 'workspace')).request.targets.map((t) => `${t.access} ${path.relative(sb.ws, t.path)}`);
+    expect(await targets('ssh -F none example.invalid')).toEqual([]);
+    expect(await targets('scp -F none a.txt example.invalid:b')).toEqual(['read a.txt']);
+    expect(await targets('ssh -F my.conf example.invalid')).toEqual(['read my.conf']);
+  });
+});
+
 describe('hardening: HOME', () => {
   it('reads a tilde from every HOME the shell held, since bash 5.3 reads the one it last exported to a program', async () => {
     const command = `HOME=~/.ssh; ls; HOME=${sb.home}; cat ~/id_ed25519`;
