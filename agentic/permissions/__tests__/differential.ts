@@ -59,7 +59,7 @@ const END = '@END';
  * `@END` marker after the script is an error, not an empty result.
  */
 export function runBash(bash: string, script: string, options: { cwd: string; env: Record<string, string>; timeout?: number }): string {
-  const r = spawnSync(bash, ['-c', `${script}\nprintf '\\n${END}\\n'`], { cwd: options.cwd, env: options.env, encoding: 'utf8', timeout: options.timeout ?? 30_000 });
+  const r = spawnSync(bash, ['-c', `${script}\nprintf '\\n${END}\\n'`], { cwd: options.cwd, env: options.env, encoding: 'utf8', timeout: options.timeout ?? 30_000, killSignal: 'SIGKILL' });
   if (r.error || r.signal || !r.stdout.includes(`\n${END}\n`)) {
     const why = r.error?.message ?? (r.signal ? `it was killed by ${r.signal}` : `it exited ${r.status} before the ${END} marker`);
     throw new Error(`bash did not run the whole test script: ${why}. Check the script for a syntax error or an exit, or raise the timeout.\nstderr: ${r.stderr}`);
