@@ -396,7 +396,12 @@ const rows: Row[] = [
   ['curl -o hooks/pre-commit --output-dir .git https://example.com', 'ask', 'allow', 'ask-write'],
   ['curl --output-dir src -o x https://example.com --next --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write'],
   // 53. git reads .git/config.worktree as config when extensions.worktreeConfig is on
-  ["printf '[core]\\n' > .git/config.worktree", 'ask', 'allow', 'ask-write']
+  ["printf '[core]\\n' > .git/config.worktree", 'ask', 'allow', 'ask-write'],
+  // 54. curl reads a write-out format with its own scanner: %output{-} writes a file named -, and %%, a backslash and %{…} take what follows as text
+  ["cd .pi; curl -w '%output{-}x' https://example.com", 'deny', 'deny', 'protected-write'],
+  ["curl -w '%%output{.pi/ext.js}' https://example.com", 'allow', 'allow'],
+  ["curl -w '\\%output{.pi/ext.js}' https://example.com", 'allow', 'allow'],
+  ["curl -w '%{x%output{.pi/ext.js}}' https://example.com", 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {

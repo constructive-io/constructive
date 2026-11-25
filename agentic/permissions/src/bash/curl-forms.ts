@@ -45,12 +45,31 @@ export const VARIABLE_FILE: FileForm = (text, whole) => {
 
 /**
  * `-w '%output{file}…'` and `%output{>>file}` (curl 8.3): the rest of the
- * write-out goes to the file. A format curl reads from a file or stdin
- * (`@file`, `@-`) may name one the analysis cannot see.
+ * write-out goes to the file, `-` included. curl scans the format from the
+ * left: `%%` and a backslash take the next character as text, `%{var}`,
+ * `%header{…}` and `%time{…}` run to their `}`, and any other `%` takes one
+ * character. A format curl reads from a file or stdin (`@file`, `@-`) may
+ * name one the analysis cannot see.
  */
 export const WRITE_OUT_FILES: FileForm = (text, whole) => {
   if (text.startsWith('@')) return OPEN;
-  const paths = [...text.matchAll(/%output\{(?:>>)?([^}]*)\}/g)].map((m) => m[1]).filter((p) => p !== '-');
+  const paths: string[] = [];
+  // The first `}` at or after `i`, kept until `i` passes it, so the scan is linear.
+  let close = -1;
+  for (let i = 0; i < text.length - 1; ) {
+    if (text[i] !== '%') {
+      i += text[i] === '\\' ? 2 : 1;
+      continue;
+    }
+    const name = /^(?:\{|header\{|time\{|output\{)/.exec(text.slice(i + 1, i + 9))?.[0];
+    if (close < i) close = text.indexOf('}', i);
+    if (!name || close < 0) {
+      i += 2;
+      continue;
+    }
+    if (name === 'output{') paths.push(text.slice(i + 8, close).replace(/^>>/, ''));
+    i = close + 1;
+  }
   return { paths, open: !whole };
 };
 
