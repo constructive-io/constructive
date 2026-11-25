@@ -704,8 +704,10 @@ class Analyzer implements ExpansionScope {
 
   /**
    * After the command: each name its assignments set is put back, with its
-   * export. Before a special builtin it holds either value; one the command
-   * changed itself (`X=1 read X`) is unknown.
+   * export. Where the shell may keep it (before a special builtin, or a
+   * command word from a variable, which may be one or expand to nothing) it
+   * holds either value; one the command changed itself (`X=1 read X`) is
+   * unknown.
    */
   private endCommandScope(scope: CommandScope, special: boolean): void {
     const { vars } = this.state;
@@ -907,9 +909,10 @@ class Analyzer implements ExpansionScope {
     const stdinFed = stdin.fed;
     const lead = assignmentLead(cmd.words);
     const prefix = cmd.words.slice(0, lead);
-    const bare = lead === cmd.words.length;
-    if (bare) this.assignPrefix(prefix, null);
     const args = this.expandWords(cmd.words.slice(lead));
+    // No command word is left, also when the words expand to nothing (`F=x $EMPTY`), so the assignments hold in the shell.
+    const bare = args.length === 0;
+    if (bare) this.assignPrefix(prefix, null);
     this.stdin = stdin;
     for (const doc of heredocsOf(cmd)) {
       if (!doc.quoted) for (const m of doc.body.matchAll(BODY_VAR_RE)) this.noteRef(m[1]);
@@ -927,7 +930,8 @@ class Analyzer implements ExpansionScope {
     } finally {
       this.scope = outer;
     }
-    if (scope) this.endCommandScope(scope, args[0]?.kind === 'known' && SPECIAL_BUILTINS.has(args[0].text));
+    const name = args[0];
+    if (scope) this.endCommandScope(scope, name.kind === 'unknown' || SPECIAL_BUILTINS.has(name.text));
     const reads = this.paths.slice(from).filter((p) => p.access === 'read' && !p.quiet);
     const sources = [...reads.map(({ raw, abs }) => ({ raw, abs })), ...stdin.sources];
     this.tracker.record(cmd, run, sources, stdout);

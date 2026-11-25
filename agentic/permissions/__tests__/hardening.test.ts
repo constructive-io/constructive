@@ -381,7 +381,10 @@ const rows: Row[] = [
   // 48. a sequence cut at the word limit is an incomplete analysis: here the first word leaves no room, and the second makes ~/.ssh/id_ed25519 eighth
   ['cat {1..2049} ~/.ss{a..h}/id_ed25519', 'ask', 'ask', 'unresolvable-path'],
   // 49. bash expands braces before parameters, so each word they make reads its parameters in turn, and an `=` form in one is set for the next
-  ['unset V; cat {a,}$V${V:=../}.ssh/id_ed25519', 'deny', 'deny', 'hard-deny']
+  ['unset V; cat {a,}$V${V:=../}.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
+  // 50. a command word that expands to nothing leaves no command, so bash keeps the assignments before it; one from a variable may be empty
+  ['F=src/config.ts; unset E; F=~/.ssh/id_ed25519 $E; cat "$F"', 'deny', 'deny', 'hard-deny'],
+  ['F=src/config.ts; F=~/.ssh/id_ed25519 $X; cat "$F"', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {
