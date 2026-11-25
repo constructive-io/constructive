@@ -30,8 +30,8 @@ const HOME = '/h';
 /** A function prints each word, so no words and one empty word differ, and it runs no program, which would export HOME again. */
 const PRINT_WORDS = `w() { for a in "$@"; do printf '%s\\037' "$a"; done; }`;
 
-/** The words the kit makes of a form, and whether it says the two bashes differ. */
-function kitWords(form: string): { words: string[]; differ: boolean } {
+/** The words the kit makes of a form: the ones it knows, the known starts of the ones it does not, and whether it says the two bashes differ. */
+function kitWords(form: string): { known: string[]; prefixes: string[]; differ: boolean } {
   const word = tokenize(`printf %s ${form}`).commands[0].words[2];
   let differ = false;
   const scope: ExpansionScope = {
@@ -47,8 +47,12 @@ function kitWords(form: string): { words: string[]; differ: boolean } {
       differ = true;
     }
   };
-  const words = expandWord(word, 'argument', scope, new ExpansionBudget(() => undefined)).map((a) => (a.kind === 'known' ? a.text : `?${a.knownPrefix}`));
-  return { words, differ };
+  const args = expandWord(word, 'argument', scope, new ExpansionBudget(() => undefined));
+  return {
+    known: args.flatMap((a) => (a.kind === 'known' ? [a.text] : [])),
+    prefixes: args.flatMap((a) => (a.kind === 'unknown' ? [a.knownPrefix] : [])),
+    differ
+  };
 }
 
 function bashWords(bash: string, root: string): Record<string, string[]> {
@@ -101,10 +105,10 @@ describe('braces and tildes under bash 3.2 and bash 5', () => {
 
   it.each(FORMS)('%s: the kit checks every word either bash makes, and says when they differ', (form) => {
     const { bash3, bash5 } = fixture.forms[form];
-    const { words, differ } = kitWords(form);
-    // A word the kit cannot know (`?` and its known start, such as `~user`) covers any word with that start.
-    const covers = (w: string) => words.some((k) => k === w || (k.startsWith('?') && w.startsWith(k.slice(1))));
-    expect(words.filter((w) => !w.startsWith('?') && !bash3.includes(w) && !bash5.includes(w))).toEqual([]);
+    const { known, prefixes, differ } = kitWords(form);
+    // A word the kit cannot know (such as `~user`) covers any word that starts with its known start.
+    const covers = (w: string) => known.includes(w) || prefixes.some((p) => w.startsWith(p));
+    expect(known.filter((w) => !bash3.includes(w) && !bash5.includes(w))).toEqual([]);
     expect([...bash3, ...bash5].filter((w) => !covers(w))).toEqual([]);
     if (JSON.stringify(bash3) !== JSON.stringify(bash5)) expect(differ).toBe(true);
   });
