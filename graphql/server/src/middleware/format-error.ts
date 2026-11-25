@@ -1,10 +1,23 @@
 import crypto from 'node:crypto';
 
-import { type ErrorContext, parse } from '@constructive-io/errors';
+import {
+  type ErrorContext,
+  extractPgErrorFields,
+  format,
+  parse,
+  RAISE_EXCEPTION_SQLSTATE,
+  SQLSTATE_TO_CODE
+} from '@constructive-io/errors';
 import { Logger } from '@pgpmjs/logger';
 import { type GraphQLError, type GraphQLFormattedError } from 'graphql';
 
 const formatErrorLog = new Logger('graphile:formatError');
+
+export const logInternalError = (error: unknown, label?: string): string => {
+  const errorId = crypto.randomBytes(8).toString('hex');
+  formatErrorLog.error(`[graphql-error:${errorId}]${label ? ` ${label}` : ''}`, error);
+  return errorId;
+};
 
 /**
  * An error the GraphQL layer raised about the *request*, before any resolver
@@ -58,6 +71,20 @@ const BAD_USER_INPUT = 'BAD_USER_INPUT';
 /** The code any other error carries when nothing supplied one. */
 const INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR';
 
+const GRAPHQL_REQUEST_CODES = new Set([
+  'GRAPHQL_PARSE_FAILED',
+  'GRAPHQL_VALIDATION_FAILED',
+  'PERSISTED_QUERY_NOT_FOUND',
+  'PERSISTED_QUERY_NOT_SUPPORTED'
+]);
+
+const isOperationSelectionError = (error: GraphQLError): boolean =>
+  error.originalError == null && (
+    error.message === 'Must provide operation name if query contains multiple operations.' ||
+    error.message === 'Must provide an operation.' ||
+    /^Unknown operation named "[\s\S]*"\.$/.test(error.message)
+  );
+
 /**
  * Normalize any GraphQL/database error into a canonical Constructive shape.
  *
@@ -75,25 +102,52 @@ export const normalizeError = (
   return { code: parsed.code, context: parsed.context, class: parsed.class };
 };
 
-/**
- * Format every GraphQL error the same way, in every environment. Nothing is
- * masked: the client always receives the real message.
- *
- * 1. Lift the structured code onto `extensions.code`/`class`/`context` from the
- *    parsed error, so database errors reach clients with a machine-readable
- *    code instead of a bare message with empty `extensions`.
- * 2. A request error graphql-js raised without a code is `BAD_USER_INPUT`.
- * 3. Any other error without a code is `INTERNAL_SERVER_ERROR`.
- * 4. Every internal error (unknown, or registered as internal) carries an
- *    `errorId` and is logged under it, so a report can be matched to the log.
- */
-export const formatError = (error: GraphQLError): GraphQLFormattedError => {
-  const { code, context, class: errorClass } = normalizeError(error);
+const findPostgresError = (error: GraphQLError) => {
+  const pending: unknown[] = [error];
+  const seen = new Set<object>();
+  let raised: object | undefined;
+  for (const candidate of pending) {
+    if (!candidate || typeof candidate !== 'object' || seen.has(candidate)) continue;
+    seen.add(candidate);
+    const sqlState = extractPgErrorFields(candidate)?.code;
+    if (sqlState === RAISE_EXCEPTION_SQLSTATE) {
+      raised ??= candidate;
+    } else if (sqlState && /^[A-Z0-9]{5}$/.test(sqlState)) {
+      return { sqlState };
+    }
+    const { originalError, cause } = candidate as { originalError?: unknown; cause?: unknown };
+    pending.push(originalError, cause);
+  }
+  return raised ? { raised } : {};
+};
 
-  // `extensions` is read-only on GraphQLError, so build a formatted error
-  // rather than mutating it.
-  const extensions: Record<string, unknown> = { ...error.extensions };
-  if (code) {
+export const formatError = (error: GraphQLError): GraphQLFormattedError => {
+  const { sqlState, raised } = findPostgresError(error);
+  const applicationError = raised ? parse(raised) : undefined;
+  const { code, context, class: errorClass } = applicationError ?? normalizeError(error);
+  const nativeCode = sqlState ? SQLSTATE_TO_CODE[sqlState] : undefined;
+  const requestError = !sqlState && !applicationError && isRequestError(error) &&
+    (code ? GRAPHQL_REQUEST_CODES.has(code) : Boolean(error.locations?.length) || isOperationSelectionError(error));
+  const internal = !nativeCode && !requestError && (Boolean(sqlState) || !code || errorClass === 'internal');
+
+  const extensions: Record<string, unknown> = sqlState || applicationError || internal
+    ? {}
+    : { ...error.extensions };
+  let message = error.message;
+
+  if (nativeCode) {
+    message = format(nativeCode);
+    extensions.code = nativeCode;
+    extensions.class = 'public';
+  } else if (applicationError) {
+    message = applicationError.rawMessage;
+    if (code) extensions.code = code;
+    extensions.class = errorClass;
+    if (Object.keys(context).length > 0) extensions.context = context;
+  } else if (requestError) {
+    message = withoutInputValues(error);
+    extensions.code = code ?? BAD_USER_INPUT;
+  } else if (code && !internal) {
     extensions.code = code;
     extensions.class = errorClass;
     if (Object.keys(context).length > 0) {
@@ -101,19 +155,13 @@ export const formatError = (error: GraphQLError): GraphQLFormattedError => {
     }
   }
 
-  let internal = Boolean(code) && errorClass === 'internal';
-  let message = error.message;
-  if (!code && !error.extensions?.code) {
-    const requestError = isRequestError(error);
-    if (requestError) message = withoutInputValues(error);
-    extensions.code = requestError ? BAD_USER_INPUT : INTERNAL_SERVER_ERROR;
-    internal = !requestError;
-  }
-
   if (internal) {
-    const errorId = crypto.randomBytes(8).toString('hex');
-    extensions.errorId = errorId;
-    formatErrorLog.error(`[graphql-error:${errorId}]`, error);
+    if (!applicationError) {
+      message = format('UNKNOWN_ERROR');
+      extensions.code = (sqlState ? error.extensions?.code : code) ?? INTERNAL_SERVER_ERROR;
+      extensions.class = 'internal';
+    }
+    extensions.errorId = logInternalError(error);
   }
 
   // grafserv strips originalError before serializing to the client.

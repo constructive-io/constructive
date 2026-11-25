@@ -14,11 +14,41 @@ export { type DefinedError,defineError } from './define';
  * code is present via generation; these just refine a subset.
  */
 export const registry = {
+  DATABASE_ACCESS_DENIED: defineError({
+    code: 'DATABASE_ACCESS_DENIED',
+    class: 'public',
+    http: 403,
+    message: 'You do not have access to that database.'
+  }),
   STORAGE_BUCKET_NOT_RECONCILED: defineError({
     code: 'STORAGE_BUCKET_NOT_RECONCILED',
     class: 'public',
     http: 409,
     message: 'The storage bucket has not yet been reconciled.'
+  }),
+  INVALID_FILE_SIZE: defineError({
+    code: 'INVALID_FILE_SIZE',
+    class: 'public',
+    http: 400,
+    message: 'The file size is outside the allowed range.'
+  }),
+  FILE_TOO_LARGE: defineError({
+    code: 'FILE_TOO_LARGE',
+    class: 'public',
+    http: 413,
+    message: 'The file exceeds the bucket size limit.'
+  }),
+  BULK_UPLOAD_FILES_EXCEEDED: defineError({
+    code: 'BULK_UPLOAD_FILES_EXCEEDED',
+    class: 'public',
+    http: 400,
+    message: 'The upload exceeds the allowed file count.'
+  }),
+  BULK_UPLOAD_SIZE_EXCEEDED: defineError({
+    code: 'BULK_UPLOAD_SIZE_EXCEEDED',
+    class: 'public',
+    http: 413,
+    message: 'The upload exceeds the allowed total size.'
   }),
 
   // ===========================================================================
@@ -566,6 +596,18 @@ export const registry = {
     class: 'public',
     http: 400,
     message: 'Validation failed. Please check your input and try again.'
+  }),
+  FUNCTION_SOURCE_PARSE_ERROR: defineError({
+    code: 'FUNCTION_SOURCE_PARSE_ERROR',
+    class: 'public',
+    http: 400,
+    message: 'The function source could not be parsed.'
+  }),
+  FUNCTION_SOURCE_UNSUPPORTED: defineError({
+    code: 'FUNCTION_SOURCE_UNSUPPORTED',
+    class: 'public',
+    http: 400,
+    message: 'The function source uses an unsupported construct.'
   }),
   UNKNOWN_ERROR: defineError({
     code: 'UNKNOWN_ERROR',

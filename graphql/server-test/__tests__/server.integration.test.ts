@@ -305,8 +305,11 @@ describe('scoped private via X-Meta-Schema', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data?.[field] ?? null).toBeNull();
-    expect(res.body.errors?.map((e: { message: string }) => e.message)).toEqual([
-      expect.stringMatching(/^permission denied for (table|schema) /)
+    expect(res.body.errors).toEqual([
+      expect.objectContaining({
+        message: 'You do not have permission to do that.',
+        extensions: { code: 'FORBIDDEN', class: 'public' }
+      })
     ]);
   });
 

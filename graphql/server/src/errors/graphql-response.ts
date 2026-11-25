@@ -16,6 +16,8 @@ import type { Request, Response } from 'express';
 
 /** Transport-level overrides for a short-circuited response. */
 export interface GraphQLErrorResponseInit {
+  /** Reference to the logged exception, if one was recorded. */
+  errorId?: string;
   /**
    * HTTP status to answer with, when 200 would hide the refusal from the
    * machinery that has to act on it. Admission control is the case that needs
@@ -42,7 +44,10 @@ export function respondWithGraphQLError(
 ): void {
   if (init.headers) res.set(init.headers);
   res.status(init.status ?? 200).json({
-    errors: [{ message: error.message, extensions: error.toExtensions() }],
+    errors: [{
+      message: error.message,
+      extensions: { ...error.toExtensions(), ...(init.errorId ? { errorId: init.errorId } : {}) }
+    }],
   });
 }
 

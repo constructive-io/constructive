@@ -1,3 +1,4 @@
+import { parseFunctionSource } from 'graphile-function-source';
 import {
   execute,
   GraphQLEnumType,
@@ -52,12 +53,12 @@ const schema = new GraphQLSchema({
 });
 
 /** The errors a request produces, as the client would receive them. */
-const run = async (query: string, variables?: Record<string, unknown>) => {
+const run = async (query: string, variables?: Record<string, unknown>, operationName?: string) => {
   const document = parse(query);
   const invalid = validate(schema, document);
   const raised: readonly GraphQLError[] = invalid.length
     ? invalid
-    : ((await execute({ schema, document, variableValues: variables })).errors ?? []);
+    : ((await execute({ schema, document, variableValues: variables, operationName })).errors ?? []);
 
   expect(raised.length).toBeGreaterThan(0);
   return raised.map(
@@ -111,6 +112,16 @@ describe('formatError', () => {
 
     expect(result.message).toContain('must not have a selection');
     expect(result.extensions?.code).toBe('BAD_USER_INPUT');
+    expect(result).toMatchObject({ locations: [{ line: 1, column: 64 }] });
+  });
+
+  it.each([
+    [undefined, 'Must provide operation name if query contains multiple operations.'],
+    ['Unknown', 'Unknown operation named "Unknown".']
+  ])('keeps the operation selection refusal with operationName %s', async (operationName, message) => {
+    const [result] = await run('query A { ok } query B { ok }', undefined, operationName);
+
+    expect(result).toEqual({ message, extensions: { code: 'BAD_USER_INPUT' } });
   });
 
   it('keeps a code the GraphQL layer supplied for itself', () => {
@@ -124,26 +135,102 @@ describe('formatError', () => {
     expect(result.extensions?.code).toBe('PERSISTED_QUERY_NOT_FOUND');
   });
 
-  it('surfaces an unrecognized resolver error with its real message', async () => {
+  it('masks an unrecognized resolver error behind an errorId', async () => {
     const [result] = await run('mutation{ brokenField }');
 
-    expect(result.message).toBe('relation "internal_secrets" does not exist');
+    expect(result.message).toBe('An unexpected error occurred.');
     expect(result.extensions?.code).toBe('INTERNAL_SERVER_ERROR');
     expect(result.extensions?.errorId).toMatch(/^[0-9a-f]{16}$/);
   });
 
-  it('surfaces a permission refusal from postgres as FORBIDDEN', () => {
+  it.each([
+    ['CREATE FUNCTION f() RETURNS int LANGUAGE sql AS $$ SELEC 1 $$', 'FUNCTION_SOURCE_PARSE_ERROR', 'SELEC', 'syntax error at or near "SELEC"'],
+    ['CREATE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$', 'FUNCTION_SOURCE_UNSUPPORTED', undefined, 'the function name must be unqualified; schemaId chooses its schema']
+  ])('preserves the public function-source refusal %s', async (source, code, token, message) => {
+    const parseError = await parseFunctionSource(source).catch((error: GraphQLError) => error);
+    expect(parseError).toBeInstanceOf(GraphQLError);
+    const originalError = parseError as GraphQLError;
+    const result = formatError(new GraphQLError(originalError.message, {
+      path: ['createFunctionFromSource'],
+      originalError
+    }));
+
+    expect(result).toEqual({
+      message,
+      path: ['createFunctionFromSource'],
+      extensions: { code, class: 'public', ...(token ? { position: source.indexOf(token) } : {}) }
+    });
+  });
+
+  it('masks errors without request locations even when Grafserv omits the original error', () => {
+    const error = new GraphQLError('relation "internal_secrets" does not exist');
+
+    expect(formatError(error)).toEqual({
+      message: 'An unexpected error occurred.',
+      extensions: { code: 'INTERNAL_SERVER_ERROR', class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
+  });
+
+  it('surfaces a permission refusal from postgres as FORBIDDEN without database identifiers', () => {
     const pgError = Object.assign(new Error('permission denied for table agent_thread'), {
       code: '42501',
+      table: 'agent_thread',
+      schema: 'app_private',
     });
-    const error = new GraphQLError(pgError.message, { path: ['agentThreads'], originalError: pgError });
+    const error = new GraphQLError(pgError.message, {
+      path: ['agentThreads'],
+      originalError: pgError,
+      extensions: { context: { schema: pgError.schema } },
+    });
 
     const result = formatError(error) as { message: string; extensions?: Record<string, unknown> };
 
-    expect(result.message).toBe('permission denied for table agent_thread');
+    expect(result.message).toBe('You do not have permission to do that.');
     expect(result.extensions?.code).toBe('FORBIDDEN');
     expect(result.extensions?.class).toBe('public');
     expect(result.extensions?.errorId).toBeUndefined();
+    expect(result.extensions?.context).toBeUndefined();
+  });
+
+  it.each([
+    ['23505', 'UNIQUE_VIOLATION', 'That value already exists.'],
+    ['23503', 'FOREIGN_KEY_VIOLATION', 'A related record is required or still referenced.'],
+    ['23502', 'NOT_NULL_VIOLATION', 'A required value is missing.'],
+    ['23514', 'CHECK_VIOLATION', 'A value did not satisfy a constraint.'],
+    ['23P01', 'EXCLUSION_VIOLATION', 'A value conflicts with an existing record.'],
+  ])('normalizes native constraint SQLSTATE %s without exposing error details', (sqlState, code, message) => {
+    const pgError = Object.assign(new Error('constraint private_constraint on app_private.internal_table failed'), {
+      code: sqlState,
+      schema: 'app_private',
+      table: 'internal_table',
+      column: 'internal_column',
+      constraint: 'private_constraint',
+      detail: 'private value',
+    });
+    const error = new GraphQLError(pgError.message, {
+      originalError: pgError,
+      path: ['updateRecord'],
+    });
+
+    expect(formatError(error)).toEqual({
+      message,
+      path: ['updateRecord'],
+      extensions: { code, class: 'public' },
+    });
+  });
+
+  it('masks an unmapped PostgreSQL error even if the wrapper has a public code', () => {
+    const pgError = Object.assign(new Error('column "internal_column" does not exist'), { code: '42703' });
+    const error = new GraphQLError(pgError.message, {
+      originalError: pgError,
+      path: ['record'],
+      extensions: { code: 'FORBIDDEN', context: { column: 'internal_column' } },
+    });
+    expect(formatError(error)).toEqual({
+      message: 'An unexpected error occurred.',
+      path: ['record'],
+      extensions: { code: 'FORBIDDEN', class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
   });
 
   /** What node-postgres hands over for `errors.raise_error(code, context, class)`. */
@@ -154,6 +241,55 @@ describe('formatError', () => {
     });
     return new GraphQLError(pgError.message, { path: ['confirmUpload'], originalError: pgError });
   };
+
+  it('preserves a plain PostgreSQL RAISE EXCEPTION with positional context', () => {
+    const originalError = Object.assign(new Error('FEATURE_DISABLED (cloud_agents)'), {
+      code: 'P0001',
+      where: 'PL/pgSQL function private_feature_trigger()',
+    });
+    const error = new GraphQLError(originalError.message, {
+      originalError,
+      path: ['databaseStartExecution'],
+    });
+
+    expect(formatError(error)).toEqual({
+      message: 'FEATURE_DISABLED (cloud_agents)',
+      path: ['databaseStartExecution'],
+      extensions: { code: 'FEATURE_DISABLED', class: 'public', context: { arg0: 'cloud_agents' } },
+    });
+  });
+
+  it('preserves an author-written P0001 message without a machine code', () => {
+    const originalError = Object.assign(new Error('This action requires a paid plan.'), { code: 'P0001' });
+    const error = new GraphQLError(originalError.message, { originalError, path: ['start'] });
+
+    expect(formatError(error)).toEqual({
+      message: originalError.message,
+      path: ['start'],
+      extensions: { class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
+  });
+
+  it.each([
+    ['42501', 'You do not have permission to do that.'],
+    ['42P01', 'An unexpected error occurred.'],
+    ['XX000', 'An unexpected error occurred.'],
+  ])('masks native SQLSTATE %s even beneath a P0001 application error', (code, message) => {
+    const cause = Object.assign(new Error('permission denied for table private_table'), { code, table: 'private_table' });
+    const originalError = Object.assign(new Error(cause.message, { cause }), {
+      code: 'P0001',
+      detail: JSON.stringify({ code: 'FEATURE_DISABLED', class: 'public', context: { table: cause.table } }),
+    });
+    const error = new GraphQLError(originalError.message, { originalError, path: ['record'] });
+
+    expect(formatError(error)).toEqual({
+      message,
+      path: ['record'],
+      extensions: code === '42501'
+        ? { code: 'FORBIDDEN', class: 'public' }
+        : { code: 'INTERNAL_SERVER_ERROR', class: 'internal', errorId: expect.stringMatching(/^[0-9a-f]{16}$/) },
+    });
+  });
 
   it('passes a public database code the registry does not know through unchanged', () => {
     const result = formatError(raisedByDatabase('CODE_NO_REGISTRY_KNOWS', { id: 'abc' }, 'public')) as {
@@ -204,7 +340,7 @@ describe('formatError', () => {
       else process.env.NODE_ENV = env;
       try {
         const [result] = await run('mutation{ brokenField }');
-        expect(result.message).toBe('relation "internal_secrets" does not exist');
+        expect(result.message).toBe('An unexpected error occurred.');
         expect(result.extensions?.code).toBe('INTERNAL_SERVER_ERROR');
       } finally {
         if (previous === undefined) delete process.env.NODE_ENV;

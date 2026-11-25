@@ -1,6 +1,6 @@
 import './types'; // for Request type
 
-import { errors } from '@constructive-io/errors';
+import { ConstructiveError, errors, format } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
 import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
@@ -38,7 +38,7 @@ import { recordRefusal } from '../refusals/recorder';
 import type { ApiOptions, DatabaseSettings } from '../types';
 import { getApiConfig, isApiError } from './api';
 import { generationOf } from './cache-generation';
-import { formatError } from './format-error';
+import { formatError, logInternalError } from './format-error';
 import { makeIntrospectionWiring } from './graphile-introspection';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
 import { authenticatedWebSocketRequest, forwardWebSocketUpgrade } from './websocket';
@@ -162,15 +162,19 @@ const buildPreset = (
                 const error = errors.REQUEST_TOO_LARGE({ bytes, limit });
                 return [new GraphQLError(error.message, { extensions: error.toExtensions() })];
               }
-              let operation;
+              let document;
               try {
-                operation = getOperationAST(parse(event.message.payload.query), event.message.payload.operationName);
+                document = parse(event.message.payload.query);
               } catch (error) {
                 if (error instanceof GraphQLError) return [error];
                 throw error;
               }
+              const operation = getOperationAST(document, event.message.payload.operationName);
               if (operation?.operation !== 'subscription') {
-                return [new GraphQLError('WebSocket transport only accepts subscriptions')];
+                return [new GraphQLError('WebSocket transport only accepts subscriptions', {
+                  nodes: operation ?? document,
+                  extensions: { code: 'BAD_USER_INPUT' }
+                })];
               }
               const result = await next();
               if (result && !Array.isArray(result)) {
@@ -599,18 +603,22 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         if (forwardWebSocketUpgrade(req, res, instance)) return;
         return instance.handler(req, res, next);
       }
-    } catch (e: any) {
-      log.error(`${label} PostGraphile middleware error`, e);
+    } catch (error) {
+      const errorId = logInternalError(error, `${label} PostGraphile middleware error`);
       if (!res.headersSent) {
         respondWithGraphQLError(
           res,
-          errors.INTERNAL_FAILURE({
-            details: e?.message ?? String(e)
-          })
+          new ConstructiveError({
+            code: 'INTERNAL_FAILURE',
+            message: format('UNKNOWN_ERROR'),
+            errorClass: 'internal',
+            http: 500
+          }),
+          { errorId }
         );
         return;
       }
-      next(e);
+      next(error);
     }
   };
 };

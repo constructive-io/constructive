@@ -187,6 +187,7 @@ describe('VectorNearbyInput over HTTP: vector or text', () => {
 
     expect(res.body.errors).toHaveLength(1);
     expect(res.body.errors[0].message).toMatch(/exactly one of `vector` or `text`/);
+    expect(res.body.errors[0].extensions.code).toBe('BAD_USER_INPUT');
     expect(res.body.data?.articles ?? null).toBeNull();
     expect(embedCalls).toEqual([]);
   });

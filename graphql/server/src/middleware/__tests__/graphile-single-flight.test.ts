@@ -34,6 +34,7 @@ jest.mock('../api', () => ({
     !!result && typeof result.errorHtml === 'string'
 }));
 
+import { Logger } from '@pgpmjs/logger';
 import type { Request, Response } from 'express';
 
 import { clearGenerations, evictAllServiceKeys, evictServiceKey, generationOf } from '../cache-generation';
@@ -168,6 +169,39 @@ describe('graphile single-flight handler creation', () => {
       expect(error.message).toContain(budgetError.message);
     }
     expect(getInFlightCount()).toBe(0);
+  });
+
+  it('masks a failed handler build and logs the error under the returned ID', async () => {
+    const cause = new Error('permission denied for schema tenant_private');
+    mockCreateGraphileInstance.mockRejectedValueOnce(cause);
+    mockMakeIntrospectionWiring.mockReturnValue({ presets: [], pgService: {} });
+    const json = jest.fn();
+    const status = jest.fn(() => ({ json }));
+    const next = jest.fn();
+    const logError = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+
+    try {
+      const middleware = graphile({ graphile: {} } as any);
+      await middleware(makeRequest(), { headersSent: false, status } as unknown as Response, next);
+
+      expect(mockCreateGraphileInstance).toHaveBeenCalledTimes(1);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(next).not.toHaveBeenCalled();
+      const [payload] = json.mock.calls[0];
+      expect(payload).toEqual({
+        errors: [{
+          message: 'An unexpected error occurred.',
+          extensions: { code: 'INTERNAL_FAILURE', class: 'internal', http: 500, errorId: expect.stringMatching(/^[0-9a-f]{16}$/) }
+        }]
+      });
+      const { errorId } = payload.errors[0].extensions;
+      expect(logError).toHaveBeenCalledWith(
+        expect.stringContaining(`[graphql-error:${errorId}]`),
+        expect.objectContaining({ message: expect.stringContaining(cause.message) })
+      );
+    } finally {
+      logError.mockRestore();
+    }
   });
 
   it.each(['database flush', 'listener recovery'])('rejects a stale pending build after %s and serves a fresh rebuild', async (reason) => {
