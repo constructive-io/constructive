@@ -52,10 +52,12 @@ function runsCommand(ctx: CommandContext, sub: string | undefined, read: ReadArg
 
 /**
  * `git push`: destructive when it rewrites or deletes refs, and an upload when
- * it goes to a URL or to a remote this command added or repointed.
+ * it goes to a URL, to a remote this command added or repointed, or to one
+ * this git run repoints (`git -c remote.<name>.url=…`, in `repointed`).
  */
-function push(ctx: CommandContext, read: ReadArgs): void {
+function push(ctx: CommandContext, read: ReadArgs, repointed: ReadonlySet<string>): void {
   const { analyzer } = ctx;
+  const changed = new Set([...analyzer.gitRemotes, ...repointed]);
   const force =
     hasOption(read, '-f', '--force', '--force-if-includes', '--force-with-lease', '--mirror', '-d', '--delete', '--prune') ||
     read.operands.some((a) => literalStart(a).startsWith('+') || literalStart(a).startsWith(':'));
@@ -63,12 +65,12 @@ function push(ctx: CommandContext, read: ReadArgs): void {
   // git keeps the last --repo, and a repository operand wins over it.
   const remote = read.positionals[0] ?? lastValueOf(read, '--repo');
   if (!remote) {
-    if (analyzer.gitRemotes.size > 0) analyzer.flag('upload', 'it uploads data: git push goes to a remote this command changed');
+    if (changed.size > 0) analyzer.flag('upload', 'it uploads data: git push goes to a remote this command changed');
     return;
   }
   if (remote.kind === 'unknown' || isUrl(remote.text) || isRemoteSpec(remote.text)) {
     analyzer.flag('upload', `it uploads data: git push sends commits to ${remote.raw}`);
-  } else if (analyzer.gitRemotes.has(remote.text) || analyzer.gitRemotes.has(ANY_REMOTE)) {
+  } else if (changed.has(remote.text) || changed.has(ANY_REMOTE)) {
     analyzer.flag('upload', `it uploads data: git push goes to ${remote.raw}, a remote this command set`);
   }
 }
@@ -129,6 +131,8 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   }
   let cwd: Cwd | null = null;
   const start = analyzer.cwdNow;
+  // `-c` holds for this git run only.
+  const repointed = new Set<string>();
   for (const option of global.options) {
     const v = option.value;
     const moves = dirSpecOf(option);
@@ -136,8 +140,8 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
       cwd = movedBy(analyzer, moves, v, cwd ?? start, start) ?? cwd;
     } else if (isOption(option, '-c')) {
       configKey(ctx, 'git -c', v);
-      const repointed = v?.kind === 'known' ? GIT_REMOTE_URL_CONFIG.exec(v.text) : null;
-      if (repointed) analyzer.gitRemotes.add(repointed[1]);
+      const url = v?.kind === 'known' ? GIT_REMOTE_URL_CONFIG.exec(v.text) : null;
+      if (url) repointed.add(url[1]);
     } else if (isOption(option, '--config-env')) {
       if (v?.kind === 'unknown') analyzer.dynamic(`git --config-env ${v.raw} takes a config key from a variable`);
       else if (v && GIT_EXEC_CONFIG.test(v.text)) analyzer.dynamic(`git --config-env ${v.text} makes git run a program from the environment`);
@@ -156,7 +160,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
   const handle = (): void => {
     applyEffects(ctx, `git ${sub}`, spec, read);
     if (sub === 'remote') return remote(ctx, read);
-    if (sub === 'push') return push(ctx, read);
+    if (sub === 'push') return push(ctx, read, repointed);
     const raw = subword?.raw ?? '.';
     const here: Arg = analyzer.base === null ? { kind: 'unknown', knownPrefix: '', raw, splits: false } : literalArg('.', raw);
     if (sub === 'config') return config(ctx, read, here, raw);

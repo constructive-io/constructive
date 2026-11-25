@@ -404,7 +404,9 @@ const rows: Row[] = [
   ["curl -w '%{x%output{.pi/ext.js}}' https://example.com", 'allow', 'allow'],
   // 55. bash splits no assignment value, so a changed IFS (which asks outside Full mode) leaves the value of NAME=$X known
   ['IFS=:; NAME=src/config.ts; COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic'],
-  ['IFS=:; NAME=src/config.ts; export COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic']
+  ['IFS=:; NAME=src/config.ts; export COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic'],
+  // 56. git -c remote.<name>.url=… repoints the remote for that git run only
+  ['git -c remote.origin.url=https://x.invalid/a.git fetch; git push origin main', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
