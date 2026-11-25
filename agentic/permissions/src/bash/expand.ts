@@ -483,7 +483,8 @@ function sequenceGroup(text: string, kinds: string, open: number, close: number,
   const seq = allLiteral(kinds, open + 1, close) ? (modern ? SEQUENCE : SEQUENCE_32).exec(text.slice(open + 1, close)) : null;
   if (!seq) return null;
   const [, fromNumber, toNumber, fromLetter, toLetter, step] = seq;
-  return sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, modern, budget.wordRoom + 1)?.map(sequenceWord) ?? null;
+  // One value past what `product` can still charge, so a sequence cut at the cap fails that charge and the limit is reported.
+  return sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, modern, budget.wordRoom + 2)?.map(sequenceWord) ?? null;
 }
 
 /**

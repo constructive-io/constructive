@@ -377,7 +377,9 @@ const rows: Row[] = [
   ['cat <<`touch q`\nbody\n`touch q`\n', 'allow', 'allow'],
   // 47. GNU tar reads a line of its name list that starts with - as an option (-C dir), and bsdtar a -C line, so the names after it may be in another dir
   ["printf '%s\\n' '-C src' config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands'],
-  ["printf '%s\\n' -C src config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands']
+  ["printf '%s\\n' -C src config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands'],
+  // 48. a sequence cut at the word limit is an incomplete analysis: here the first word leaves no room, and the second makes ~/.ssh/id_ed25519 eighth
+  ['cat {1..2049} ~/.ss{a..h}/id_ed25519', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {
