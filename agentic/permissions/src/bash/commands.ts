@@ -25,7 +25,7 @@ import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './fi
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
 import { hasOption, mayBeOption, operandWords, type ProgramSpec, readArgs, valuesOf as valuesRead } from './options';
-import { CD, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
+import { CD, MAKERS, MAPFILE, PRINTF, PUSHD, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 
@@ -354,7 +354,9 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   switch (name) {
   case 'cd':
   case 'pushd': {
-    const target = operandWords(readArgs(CD, rest), rest)[0];
+    const read = readArgs(name === 'cd' ? CD : PUSHD, rest);
+    if (name === 'pushd' && hasOption(read, '-n')) return;
+    const target = operandWords(read, rest)[0];
     if (!target && name === 'pushd') {
       // It swaps the top two dirs of the stack, which the analysis does not keep.
       analyzer.moveTo({ kind: 'unknown' });

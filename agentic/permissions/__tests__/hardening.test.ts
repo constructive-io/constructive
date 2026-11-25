@@ -355,7 +355,10 @@ const rows: Row[] = [
   ["su -l root -c 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
   ["su - root -c 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
   ["su root -c 'cat src/config.ts'", 'ask', 'allow', 'sudo'],
-  ['sudo cat src/config.ts', 'ask', 'allow', 'sudo']
+  ['sudo cat src/config.ts', 'ask', 'allow', 'sudo'],
+  // 41. pushd -n changes only the dir stack, so the command stays in its dir
+  ['pushd -n src; touch .pi/ext.js', 'deny', 'deny', 'protected-write'],
+  ['pushd -n -- src; touch .pi/ext.js', 'deny', 'deny', 'protected-write']
 ];
 
 describe('hardening: bash per mode', () => {

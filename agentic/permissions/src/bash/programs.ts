@@ -368,6 +368,9 @@ export const CHANGERS: ProgramSpec = {
 /** `cd`/`pushd [-L|-P] [-e] [-@] [dir]`. */
 export const CD = builtin(flag('-L', '-P', '-e', '-@'));
 
+/** `pushd [-n] [+N | -N | dir]`: `-n` changes only the dir stack. */
+export const PUSHD = builtin(flag('-n'));
+
 /** `defaults [-currentHost | -host name | -container name] action …`. */
 export const DEFAULTS: ProgramSpec = { abbreviations: false, stopAtOperand: true, singleDash: true, options: [flag('-currentHost'), plain('-host', '-container')] };
 
