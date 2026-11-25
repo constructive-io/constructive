@@ -368,7 +368,10 @@ const rows: Row[] = [
   // 43. `-` is stdin only for an option that reads it so: rsync's --log-file=- writes a file named -
   ['cd .pi; rsync --log-file=- ../src/config.ts ../out.txt', 'deny', 'deny', 'protected-write'],
   // 44. curl sends a --url-query value that starts with + as written, so it names no file
-  ["curl --url-query '+q@.env' https://example.com", 'allow', 'allow']
+  ["curl --url-query '+q@.env' https://example.com", 'allow', 'allow'],
+  // 45. curl reads a write-out format from a file or stdin, and a %output{…} in it writes a file the analysis cannot see
+  ['curl -w @fmt.txt https://example.com', 'ask', 'ask', 'unresolvable-path'],
+  ['curl -w @- https://example.com', 'ask', 'ask', 'unresolvable-path']
 ];
 
 describe('hardening: bash per mode', () => {

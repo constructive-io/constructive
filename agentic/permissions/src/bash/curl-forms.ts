@@ -43,8 +43,13 @@ export const VARIABLE_FILE: FileForm = (text, whole) => {
   return whole ? file(text.slice(at + 1)) : OPEN;
 };
 
-/** `-w '%output{file}…'` and `%output{>>file}` (curl 8.3): the rest of the write-out goes to the file. */
+/**
+ * `-w '%output{file}…'` and `%output{>>file}` (curl 8.3): the rest of the
+ * write-out goes to the file. A format curl reads from a file or stdin
+ * (`@file`, `@-`) may name one the analysis cannot see.
+ */
 export const WRITE_OUT_FILES: FileForm = (text, whole) => {
+  if (text.startsWith('@')) return OPEN;
   const paths = [...text.matchAll(/%output\{(?:>>)?([^}]*)\}/g)].map((m) => m[1]).filter((p) => p !== '-');
   return { paths, open: !whole };
 };
