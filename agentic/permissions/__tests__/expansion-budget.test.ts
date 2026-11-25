@@ -1,3 +1,5 @@
+import { analyzeBash } from '../src/bash/analyze';
+import { Findings } from '../src/findings';
 import { makeSandbox, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
@@ -42,6 +44,12 @@ describe('expansions stay within one budget per command', () => {
       const { ms } = await bounded(`xargs -I{} echo ${word}`);
       expect([word.slice(0, 6), ms < 1000]).toEqual([word.slice(0, 6), true]);
     }
+  });
+
+  it('places the members of a tar command with thousands of -C dirs in one pass', () => {
+    const started = Date.now();
+    analyzeBash(`tar -cf x.tar${' -C . m'.repeat(3000)}`, { cwd: sb.ws, homeDir: sb.home }, new Findings());
+    expect(Date.now() - started).toBeLessThan(1000);
   });
 
   it('expands a word of thousands of brace groups, one after another, without a deep recursion', async () => {

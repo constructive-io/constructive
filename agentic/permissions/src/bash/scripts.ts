@@ -177,23 +177,30 @@ export function tar(ctx: CommandContext, rest: readonly Arg[]): void {
   const changes = applyEffects(ctx, 'tar', TAR, read);
   const writes = hasOption(read, '-c', '--create', '-r', '--append', '-u', '--update', '-A', '--catenate', '--concatenate', '--delete');
   if (writes) for (const archive of valuesOf(read, '-f', '--file')) if (textOf(archive) !== '-') analyzer.addPath(archive, 'write', true);
-  const start = analyzer.cwdNow;
-  const at = (arg: Arg) => words.indexOf(arg);
-  const dirBefore = (index: number): Cwd => changes.filter((c) => at(c.at) < index).pop()?.dir ?? start;
   const members = read.positionals;
-  const bsd = dirBefore(members.length > 0 ? at(members[0]) : words.length);
-  const dirsOf = (member: Arg): Cwd[] => {
-    const gnu = dirBefore(at(member));
-    return sameCwd(gnu, bsd) ? [gnu] : [gnu, bsd];
-  };
+  // The dir the -C chain reached before each member, in one walk over the changes, which come in the order of the words.
+  const position = new Map(words.map((word, k) => [word, k] as const));
+  const gnu: Cwd[] = [];
+  let reached = analyzer.cwdNow;
+  let next = 0;
+  for (const member of [...members, null]) {
+    const before = member ? position.get(member) : words.length;
+    for (; next < changes.length && position.get(changes[next].at) < before; next++) reached = changes[next].dir;
+    gnu.push(reached);
+  }
+  const bsd = gnu[0];
+  const dirsOf = (k: number): Cwd[] => (sameCwd(gnu[k], bsd) ? [gnu[k]] : [gnu[k], bsd]);
   if (hasOption(read, '-x', '--extract', '--get')) {
-    const dirs = members.length > 0 ? members.flatMap(dirsOf) : [bsd];
-    const distinct = dirs.filter((d, k) => dirs.findIndex((e) => sameCwd(d, e)) === k);
+    const dirs = members.length > 0 ? members.flatMap((_, k) => dirsOf(k)) : [bsd];
+    const distinct: Cwd[] = [];
+    for (const dir of dirs) if (!distinct.some((d) => sameCwd(d, dir))) distinct.push(dir);
     for (const dir of distinct) analyzer.within(dir, () => analyzer.addPath(literalArg('.'), 'write', true));
     return;
   }
   if (!writes) return;
-  for (const member of members) for (const dir of dirsOf(member)) analyzer.within(dir, () => operands(ctx, [member], 'read'));
+  members.forEach((member, k) => {
+    for (const dir of dirsOf(k)) analyzer.within(dir, () => operands(ctx, [member], 'read'));
+  });
 }
 
 /** zip: its first operand is the archive it writes, the rest are files it reads. */
