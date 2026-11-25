@@ -34,9 +34,12 @@ export function seeded(seed: number) {
 const LAUNCHERS = ['open', 'xdg-open', 'osascript', 'gio', 'vi', 'vim', 'nano', 'emacs', 'less', 'more'];
 
 /**
- * The environment a test runs real bash in: PATH starts with no-op launchers,
- * HOME and TMPDIR sit under `root`, and every editor and pager is `true`, so
- * nothing a case runs can open an app or touch files outside the test.
+ * The environment a test runs real bash in. PATH is the no-op launchers in
+ * `root`, then /usr/bin and /bin; TMPDIR is a dir in `root`; HOME is `home`,
+ * which the caller picks and which need not be in `root`; EDITOR, VISUAL,
+ * PAGER and BROWSER are `true`. It is not a sandbox: a launcher shadows only
+ * its name on PATH, so a command that names `/usr/bin/open` runs it, and a
+ * command can reach any file the test process can.
  */
 export function fencedEnv(root: string, home: string, extra: Record<string, string> = {}): Record<string, string> {
   const shims = path.join(root, 'launchers');
