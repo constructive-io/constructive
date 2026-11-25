@@ -388,7 +388,11 @@ const rows: Row[] = [
   // 51. a ${F:-…} fallback reads with bash's quote removal; quoted and unquoted text mixed in a fallback that may split is unknown
   ['unset F; cat ${F:-../../.ss\\h/id_ed25519}', 'deny', 'deny', 'hard-deny'],
   ['unset F; cat ${F:-./a\\ b}', 'ask', 'ask', 'unresolvable-path'],
-  ["unset F; cat \"${F:-'../../.ssh/id_ed25519'}\"", 'ask', 'allow', 'shell-dynamic']
+  ["unset F; cat \"${F:-'../../.ssh/id_ed25519'}\"", 'ask', 'allow', 'shell-dynamic'],
+  // 52. curl writes an -o file in the last --output-dir of its transfer group, up to --next, also one written before it
+  ['curl --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write'],
+  ['curl -o hooks/pre-commit --output-dir .git https://example.com', 'ask', 'allow', 'ask-write'],
+  ['curl --output-dir src -o x https://example.com --next --output-dir .git -o hooks/pre-commit https://example.com', 'ask', 'allow', 'ask-write']
 ];
 
 describe('hardening: bash per mode', () => {

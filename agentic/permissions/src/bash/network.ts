@@ -5,7 +5,7 @@
  */
 
 import { type Arg, literalStart } from './analyze';
-import { type CommandContext, firstOperand, generic, looksLikePath, pathLikeArgs, textOf } from './args';
+import { type CommandContext, firstOperand, generic, literalArg, looksLikePath, pathLikeArgs, textOf } from './args';
 import { effectOf, hasEffect, hasOption, isOption, namedFiles, type ReadArgs, readArgs, type ReadOption, valuesOf as valuesRead } from './options';
 import { CURL, RSYNC, SCP, SSH, WGET } from './programs';
 import { applyEffects } from './scripts';
@@ -25,16 +25,48 @@ function filesOf(option: ReadOption): Arg[] {
   return option.specs.flatMap((s) => (effectOf(s) === 'reads-file' && hasEffect(s, 'reads-file', option.value) ? namedFiles(s, option.value) : []));
 }
 
+/** curl's options that name the file a transfer writes, which its group's `--output-dir` holds. */
+const CURL_OUTPUT = ['-o', '--output'];
+
+/** `dir/name`, as curl joins them: it puts the dir before the name even when the name is absolute. */
+function inDir(dir: Arg, name: Arg): Arg {
+  if (dir.kind === 'unknown') return { kind: 'unknown', knownPrefix: dir.knownPrefix, raw: name.raw, splits: false };
+  if (name.kind === 'unknown') return { ...name, knownPrefix: `${dir.text}/${name.knownPrefix}` };
+  return literalArg(`${dir.text}/${name.text}`, name.raw);
+}
+
+/**
+ * curl's `-o` files. Each is in the dir of the last `--output-dir` of its
+ * transfer group, wherever that option is in the group; `--next` starts a
+ * new group, and `-o -` is stdout.
+ */
+function curlOutputs(ctx: CommandContext, read: ReadArgs): void {
+  const groups: ReadOption[][] = [[]];
+  for (const option of read.options) {
+    if (isOption(option, '--next', '-:')) groups.push([]);
+    else groups[groups.length - 1].push(option);
+  }
+  for (const group of groups) {
+    const dir = group.filter((o) => o.value && isOption(o, '--output-dir')).at(-1)?.value;
+    for (const option of group) {
+      if (!option.value || !isOption(option, ...CURL_OUTPUT) || textOf(option.value) === '-') continue;
+      ctx.analyzer.addPath(dir ? inDir(dir, option.value) : option.value, 'write', true);
+    }
+  }
+}
+
 /**
  * curl: the registry reads every file a value names, in the form curl reads
- * for that option; here a data option that sends a file, or a value the
- * analysis cannot see, is an upload.
+ * for that option, and `curlOutputs` places each `-o` file in its group's
+ * dir; here a data option that sends a file, or a value the analysis cannot
+ * see, is an upload.
  */
 export function curl(ctx: CommandContext, rest: readonly Arg[]): void {
   const { analyzer } = ctx;
   const read = readArgs(CURL, rest);
   const say = (detail: string) => analyzer.flag('upload', `it uploads data: ${detail}`);
-  applyEffects(ctx, 'curl', CURL, read);
+  applyEffects(ctx, 'curl', CURL, { ...read, options: read.options.filter((o) => !isOption(o, ...CURL_OUTPUT)) });
+  curlOutputs(ctx, read);
   let dataForms = false;
   for (const option of read.options) {
     const v = option.value;
