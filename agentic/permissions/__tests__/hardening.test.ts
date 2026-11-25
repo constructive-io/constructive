@@ -406,7 +406,10 @@ const rows: Row[] = [
   ['IFS=:; NAME=src/config.ts; COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic'],
   ['IFS=:; NAME=src/config.ts; export COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic'],
   // 56. git -c remote.<name>.url=… repoints the remote for that git run only
-  ['git -c remote.origin.url=https://x.invalid/a.git fetch; git push origin main', 'allow', 'allow']
+  ['git -c remote.origin.url=https://x.invalid/a.git fetch; git push origin main', 'allow', 'allow'],
+  // 57. rsync --list-only, or one operand alone, lists the sources and copies nothing
+  ['rsync --list-only src/ .pi/', 'allow', 'allow'],
+  ['rsync .pi/', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {

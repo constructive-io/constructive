@@ -118,11 +118,13 @@ export function remoteCopy(name: 'scp' | 'rsync', ctx: CommandContext, rest: rea
   applyEffects(ctx, name, spec, read);
   const ops = read.operands;
   if (ops.length === 0) return;
-  const dest = ops[ops.length - 1];
-  const sources = ops.slice(0, -1);
-  if (dest.kind === 'unknown' || isRemoteSpec(dest.text)) {
+  // rsync lists its sources and copies nothing with --list-only, or with one operand alone.
+  const lists = name === 'rsync' && (hasOption(read, '--list-only') || ops.length === 1);
+  const dest = lists ? undefined : ops[ops.length - 1];
+  const sources = lists ? ops : ops.slice(0, -1);
+  if (dest && (dest.kind === 'unknown' || isRemoteSpec(dest.text))) {
     analyzer.flag('upload', `it uploads data: ${name} copies to the remote ${dest.raw}`);
-  } else {
+  } else if (dest) {
     analyzer.addPath(dest, 'write', true);
   }
   for (const s of sources) if (s.kind === 'unknown' || !isRemoteSpec(s.text)) analyzer.addPath(s, 'read', true);
