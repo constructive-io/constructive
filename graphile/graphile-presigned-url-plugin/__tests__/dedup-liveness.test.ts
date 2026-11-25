@@ -127,6 +127,19 @@ it.each([
   expect(queries).toEqual([]);
 });
 
+it('refuses a disallowed MIME type with a public code before recording the file', async () => {
+  const { txClient, queries } = fakeTx(HASH, 'uploaded');
+  await expect(processSingleFile(options, txClient, storageConfig(), 'db', {
+    ...bucket, allowed_mime_types: ['text/plain'],
+  }, fakeS3(), {
+    contentHash: HASH, contentType: 'text/html', size: 16, filename: SITE_KEY,
+  })).rejects.toMatchObject({
+    message: 'CONTENT_TYPE_NOT_ALLOWED: text/html not in bucket allowed types',
+    extensions: { code: 'CONTENT_TYPE_NOT_ALLOWED' },
+  });
+  expect(queries).toEqual([]);
+});
+
 describe.each([
   ['content-addressed key', undefined, HASH],
   ['custom key', SITE_KEY, SITE_KEY],

@@ -32,6 +32,12 @@ export const registry = {
     http: 400,
     message: 'The file size is outside the allowed range.'
   }),
+  CONTENT_TYPE_NOT_ALLOWED: defineError({
+    code: 'CONTENT_TYPE_NOT_ALLOWED',
+    class: 'public',
+    http: 400,
+    message: 'The content type is not allowed by the bucket.'
+  }),
   FILE_TOO_LARGE: defineError({
     code: 'FILE_TOO_LARGE',
     class: 'public',
