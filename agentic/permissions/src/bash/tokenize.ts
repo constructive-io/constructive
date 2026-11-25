@@ -410,11 +410,12 @@ class Lexer {
       throw new LexError(`redirection ${op} has no target`);
     }
     const start = this.i;
-    const parts = this.readWord();
+    const heredoc = op === '<<' || op === '<<-';
+    const parts = heredoc ? this.delimiterWord() : this.readWord();
     if (!parts) throw new LexError(`redirection ${op} has no target`);
     const target: Word = { parts, raw: s.slice(start, this.i) };
     const cmd = this.current;
-    if (op === '<<' || op === '<<-') {
+    if (heredoc) {
       const { delim, quoted } = heredocDelimiter(target.raw);
       const doc: Heredoc = { quoted, body: '', commands: [] };
       this.pending.push({ delim, stripTabs: op === '<<-', doc });
@@ -430,6 +431,15 @@ class Lexer {
       return;
     }
     cmd.redirects.push({ kind: 'file', op: op as FileOp, fd, target });
+  }
+
+  /** A heredoc's delimiter: bash expands nothing in it, so a lexer of its own reads the word, and the substitutions it finds there are dropped. */
+  private delimiterWord(): Part[] | null {
+    const reader = new Lexer(this.s, this.depth);
+    reader.i = this.i;
+    const parts = reader.readWord();
+    this.i = reader.i;
+    return parts;
   }
 
   /** Commands bash runs here, in order; the first opens the compound commands opened since the last one. */

@@ -371,7 +371,10 @@ const rows: Row[] = [
   ["curl --url-query '+q@.env' https://example.com", 'allow', 'allow'],
   // 45. curl reads a write-out format from a file or stdin, and a %output{…} in it writes a file the analysis cannot see
   ['curl -w @fmt.txt https://example.com', 'ask', 'ask', 'unresolvable-path'],
-  ['curl -w @- https://example.com', 'ask', 'ask', 'unresolvable-path']
+  ['curl -w @- https://example.com', 'ask', 'ask', 'unresolvable-path'],
+  // 46. bash expands nothing in a heredoc's delimiter, so a substitution there never runs
+  ['cat <<$(cat ~/.ssh/id_ed25519)\nbody\n$(cat ~/.ssh/id_ed25519)\n', 'allow', 'allow'],
+  ['cat <<`touch q`\nbody\n`touch q`\n', 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {
