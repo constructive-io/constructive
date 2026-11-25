@@ -401,7 +401,10 @@ const rows: Row[] = [
   ["cd .pi; curl -w '%output{-}x' https://example.com", 'deny', 'deny', 'protected-write'],
   ["curl -w '%%output{.pi/ext.js}' https://example.com", 'allow', 'allow'],
   ["curl -w '\\%output{.pi/ext.js}' https://example.com", 'allow', 'allow'],
-  ["curl -w '%{x%output{.pi/ext.js}}' https://example.com", 'allow', 'allow']
+  ["curl -w '%{x%output{.pi/ext.js}}' https://example.com", 'allow', 'allow'],
+  // 55. bash splits no assignment value, so a changed IFS (which asks outside Full mode) leaves the value of NAME=$X known
+  ['IFS=:; NAME=src/config.ts; COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic'],
+  ['IFS=:; NAME=src/config.ts; export COPY=$NAME; cat "$COPY"', 'ask', 'allow', 'shell-dynamic']
 ];
 
 describe('hardening: bash per mode', () => {

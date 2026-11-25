@@ -276,7 +276,7 @@ export type WordUse = 'argument' | 'assignment';
 export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budget: ExpansionBudget): Arg[] {
   const shape = template(word, scope, budget);
   if (use === 'assignment') {
-    const built = parameters(shape, shape.splits, word, scope, budget);
+    const built = parameters(shape, shape.splits, word, scope, budget, false);
     const arg = (piece: Piece) => toArg(piece, word.raw, false, built.splits);
     const readings = tildes(built, true, scope, budget);
     if (readings.length === 1) return [arg(readings[0])];
@@ -286,7 +286,7 @@ export function expandWord(word: Word, use: WordUse, scope: ExpansionScope, budg
   const args: Arg[] = [];
   let differ = false;
   for (const braced of bothBashes(shape, word.raw, scope, budget)) {
-    const piece = parameters(braced, shape.splits, word, scope, budget);
+    const piece = parameters(braced, shape.splits, word, scope, budget, true);
     const arg = (field: Piece) => toArg(field, word.raw, true, piece.splits);
     const readings = tildes(piece, NAME_EQUALS.test(piece.text) && allLiteral(piece.kinds, 0, piece.text.indexOf('=')), scope, budget);
     differ ||= readings.length > 1;
@@ -371,9 +371,10 @@ function template(word: Word, scope: ExpansionScope, budget: ExpansionBudget): P
 /**
  * One word the braces made, with each parameter mark replaced by its value,
  * read from left to right: an `=` form a word reads is set for the marks
- * after it, in this word and the next ones.
+ * after it, in this word and the next ones. `fields`: bash splits the word
+ * into fields, as it does an argument and not an assignment.
  */
-function parameters(piece: Piece, splits: boolean, word: Word, scope: ExpansionScope, budget: ExpansionBudget): Piece & { splits: boolean } {
+function parameters(piece: Piece, splits: boolean, word: Word, scope: ExpansionScope, budget: ExpansionBudget, fields: boolean): Piece & { splits: boolean } {
   const out = new PieceBuilder(budget);
   out.splits = splits;
   for (let k = 0; k < piece.text.length; ) {
@@ -382,16 +383,17 @@ function parameters(piece: Piece, splits: boolean, word: Word, scope: ExpansionS
     out.copy(piece.text.slice(k, next), piece.kinds.slice(k, next));
     if (mark < 0) break;
     const end = piece.text.indexOf(PARAM_END, mark);
-    readParameter(word.parts[Number(piece.text.slice(mark + 1, end))] as VarPart, scope, out);
+    readParameter(word.parts[Number(piece.text.slice(mark + 1, end))] as VarPart, scope, out, fields);
     k = end + 1;
   }
   return out.piece;
 }
 
-function readParameter(part: VarPart, scope: ExpansionScope, out: PieceBuilder): void {
+function readParameter(part: VarPart, scope: ExpansionScope, out: PieceBuilder, fields: boolean): void {
   // Looked up even when IFS may differ, since an `=` form assigns.
   const looked = scope.value(part.name, part.fallback, part.colon === true, part.assigns === true, part.tilde === true);
-  const raw = !part.quoted && scope.ifsMayDiffer() ? null : looked;
+  // A changed IFS splits an unquoted value where the analysis cannot follow; an assignment splits none.
+  const raw = fields && !part.quoted && scope.ifsMayDiffer() ? null : looked;
   const value = raw === null || part.transform === undefined ? raw : transformed(raw, part.transform);
   if (value === null) out.markUnknown(!part.quoted);
   else if (value === '' && part.quoted) out.add(EMPTY_QUOTE, 'e');
