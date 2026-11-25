@@ -261,6 +261,28 @@ export function unescapeBackticks(inner: string): string {
   return inner.replace(/\\([`$\\])/g, '$1');
 }
 
-export function stripQuotes(text: string): string {
-  return text.replace(/^(['"])(.*)\1$/s, '$2');
+/**
+ * The text of a `${NAME-word}` fallback after bash's quote removal. Outside
+ * double quotes `\x`, `'…'`, `"…"` and `$'…'` quote what they hold; inside
+ * them a backslash quotes only `$`, `` ` ``, `"`, `\` and a newline, a single
+ * quote is text, and a `"` is dropped (bash 3.2 and 5.3 agree). `null`
+ * outside double quotes for a fallback with quoting and a blank or a glob
+ * character in its text: the unquoted value splits and globs, and one string
+ * cannot say which of its characters are quoted.
+ */
+export function fallbackText(word: string, inDoubleQuotes: boolean): string | null {
+  if (!inDoubleQuotes) {
+    const { delim, quoted } = heredocDelimiter(word);
+    return quoted && /[ \t\n*?[]/.test(delim) ? null : delim;
+  }
+  let text = '';
+  for (let i = 0; i < word.length; i++) {
+    if (word[i] === '\\' && '$`"\\\n'.includes(word[i + 1] ?? '')) {
+      if (word[i + 1] !== '\n') text += word[i + 1];
+      i++;
+    } else if (word[i] !== '"') {
+      text += word[i];
+    }
+  }
+  return text;
 }

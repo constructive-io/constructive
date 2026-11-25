@@ -19,13 +19,13 @@ import {
   arithmeticEnd,
   decodeAnsiC,
   findAnsiClose,
+  fallbackText,
   heredocDelimiter,
   LexError,
   matchBacktick,
   matchBrace,
   matchBracket,
   matchParen,
-  stripQuotes,
   unescapeBackticks
 } from './quoting';
 import { SHELL_KEYWORDS } from './words';
@@ -34,10 +34,10 @@ import { SHELL_KEYWORDS } from './words';
 export type Part =
   | { kind: 'lit'; text: string; quoted: boolean }
   /**
-   * `fallback` from `${name-…}` or `${name:-…}`; `assigns` for `${name=…}` and `${name:=…}`, which also set the variable to it;
+   * `fallback` from `${name-…}` or `${name:-…}`, after quote removal (`null` for one the analysis cannot read); `assigns` for `${name=…}` and `${name:=…}`, which also set the variable to it;
    * `tilde` when a `~` that starts the fallback expands, which needs it and the whole expansion unquoted.
    */
-  | { kind: 'var'; name: string; quoted: boolean; fallback?: string; colon?: boolean; assigns?: boolean; tilde?: boolean; transform?: string }
+  | { kind: 'var'; name: string; quoted: boolean; fallback?: string | null; colon?: boolean; assigns?: boolean; tilde?: boolean; transform?: string }
   /**
    * `ref` names the variable a complex `${…}` reads (`${TOKEN:0:4}`). `splits`: bash may split its
    * value into more words (it is unquoted, or `$@`), which may be options.
@@ -715,7 +715,7 @@ class Lexer {
           kind: 'var',
           name: withDefault[1],
           quoted,
-          fallback: stripQuotes(withDefault[4]),
+          fallback: fallbackText(withDefault[4], quoted),
           colon: withDefault[2] === ':',
           assigns: withDefault[3] === '=',
           tilde: !quoted && withDefault[4].startsWith('~')

@@ -253,7 +253,7 @@ export interface ExpansionScope {
    * fallback when they take it. `tilde`: a `~` that starts the fallback
    * expands; otherwise it is text.
    */
-  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null;
+  value(name: string, fallback: string | null | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null;
   /** IFS may differ from bash's default, so an unquoted expansion splits where the analysis cannot follow. */
   ifsMayDiffer(): boolean;
   noteRef(name: string): void;

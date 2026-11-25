@@ -796,11 +796,11 @@ class Analyzer implements ExpansionScope {
    * outside may hold anything. The `=` forms (`assigns`) also set the variable
    * to the fallback they take.
    */
-  value(name: string, fallback: string | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null {
+  value(name: string, fallback: string | null | undefined, colon: boolean, assigns: boolean, tilde: boolean): string | null {
     const value = this.lookup(name);
     if (fallback === undefined) return value === undefined ? '' : value;
     if (value === null || (value !== undefined && !(colon && value === ''))) return value;
-    const taken = this.fallbackValue(fallback, tilde);
+    const taken = fallback === null ? null : this.fallbackValue(fallback, tilde);
     if (assigns) this.assign(name, '=', taken);
     return taken;
   }

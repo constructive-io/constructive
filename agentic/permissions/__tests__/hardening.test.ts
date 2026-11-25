@@ -384,7 +384,11 @@ const rows: Row[] = [
   ['unset V; cat {a,}$V${V:=../}.ssh/id_ed25519', 'deny', 'deny', 'hard-deny'],
   // 50. a command word that expands to nothing leaves no command, so bash keeps the assignments before it; one from a variable may be empty
   ['F=src/config.ts; unset E; F=~/.ssh/id_ed25519 $E; cat "$F"', 'deny', 'deny', 'hard-deny'],
-  ['F=src/config.ts; F=~/.ssh/id_ed25519 $X; cat "$F"', 'ask', 'ask', 'unresolvable-path']
+  ['F=src/config.ts; F=~/.ssh/id_ed25519 $X; cat "$F"', 'ask', 'ask', 'unresolvable-path'],
+  // 51. a ${F:-…} fallback reads with bash's quote removal; quoted and unquoted text mixed in a fallback that may split is unknown
+  ['unset F; cat ${F:-../../.ss\\h/id_ed25519}', 'deny', 'deny', 'hard-deny'],
+  ['unset F; cat ${F:-./a\\ b}', 'ask', 'ask', 'unresolvable-path'],
+  ["unset F; cat \"${F:-'../../.ssh/id_ed25519'}\"", 'ask', 'allow', 'shell-dynamic']
 ];
 
 describe('hardening: bash per mode', () => {
