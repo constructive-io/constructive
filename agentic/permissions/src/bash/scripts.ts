@@ -209,13 +209,14 @@ export function sort(ctx: CommandContext, rest: readonly Arg[]): void {
   const read = readArgs(SORT, rest);
   applyEffects(ctx, 'sort', SORT, read);
   for (const op of read.operands) if (op.kind === 'unknown') ctx.analyzer.addPath(op, 'read', true);
-  generic(ctx, read.operands);
+  // A lone `-` is stdin.
+  generic(ctx, read.operands.filter((op) => textOf(op) !== '-'), true);
 }
 
 export function man(ctx: CommandContext, rest: readonly Arg[]): void {
   const read = readArgs(MAN, rest);
   applyEffects(ctx, 'man', MAN, read);
-  generic(ctx, read.operands.filter((op) => op.kind === 'unknown' || op.text.includes('/')));
+  generic(ctx, read.operands.filter((op) => op.kind === 'unknown' || op.text.includes('/')), true);
 }
 
 /** tar and zip take file names from stdin: `tar -T -`, `zip -@`. */

@@ -1,3 +1,4 @@
+import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 
 import { type PermissionVerdict, scrubEnv, type Signal } from '../src';
@@ -428,6 +429,20 @@ describe('hardening: braces before parameters', () => {
   it("reads each word's parameters in turn, as bash 3.2 and 5.3 do", async () => {
     const d = await sb.bash('unset V; cat {a,b}$V${V:=/x}', 'workspace');
     expect(d.request.targets.map((t) => path.relative(sb.ws, t.path))).toEqual(['a/x', 'b/x/x']);
+  });
+});
+
+describe('hardening: operands after --', () => {
+  it('reads an operand that starts with - as a file, through a link too', async () => {
+    const link = path.join(sb.ws, '-k');
+    await fs.symlink(path.join(sb.home, '.ssh', 'id_ed25519'), link);
+    try {
+      for (const command of ['sort -- -k', 'git diff --no-index -- -k /dev/null']) {
+        expect([command, (await sb.bash(command, 'full')).decision]).toEqual([command, 'deny']);
+      }
+    } finally {
+      await fs.unlink(link);
+    }
   });
 });
 

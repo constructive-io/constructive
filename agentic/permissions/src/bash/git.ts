@@ -159,7 +159,7 @@ export function git(ctx: CommandContext, rest: readonly Arg[]): void {
     if (sub === 'add') add(ctx, read);
     if (sub === 'reset' && hasOption(read, '--hard')) analyzer.destroy(here, 'git reset --hard');
     if (sub === 'clean' && hasOption(read, '-f', '--force')) analyzer.destroy(here, 'git clean -f');
-    generic(ctx, read.operands.filter((a) => !isUrl(literalStart(a))));
+    generic(ctx, read.operands.filter((a) => !isUrl(literalStart(a))), true);
   };
   return cwd ? analyzer.within(cwd, handle) : handle();
 }

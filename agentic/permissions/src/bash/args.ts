@@ -136,10 +136,14 @@ export function hiddenLeadingOption(rest: readonly Arg[]): Arg | undefined {
 /** Options that load an env file into the program without printing it. */
 const ENV_FILE_OPTIONS = new Set(['--env-file', '--env-file-if-exists']);
 
-/** The generic rule: operands are reads; `--opt=path` and `KEY=path` values too. */
-export function generic(ctx: CommandContext, rest: readonly Arg[]): void {
+/**
+ * The generic rule: operands are reads; `--opt=path` and `KEY=path` values
+ * too. `operandsOnly`: the registry already read the options (and a `--`), so
+ * a word that starts with `-` is an operand too.
+ */
+export function generic(ctx: CommandContext, rest: readonly Arg[], operandsOnly = false): void {
   const { analyzer } = ctx;
-  let afterDashes = false;
+  let afterDashes = operandsOnly;
   for (let k = 0; k < rest.length; k++) {
     const arg = rest[k];
     const t = literalStart(arg);
