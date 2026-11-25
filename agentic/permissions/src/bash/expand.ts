@@ -83,6 +83,10 @@ export class ExpansionBudget {
   get wordRoom(): number {
     return this.words;
   }
+
+  get charRoom(): number {
+    return this.chars;
+  }
 }
 
 /** How an assignment sets a variable: `=` replaces it, `+=` appends to it. */
@@ -584,8 +588,8 @@ function sequenceGroup(text: string, kinds: string, open: number, close: number,
   const seq = allLiteral(kinds, open + 1, close) ? (modern ? SEQUENCE : SEQUENCE_32).exec(text.slice(open + 1, close)) : null;
   if (!seq) return null;
   const [, fromNumber, toNumber, fromLetter, toLetter, step] = seq;
-  // One value past what `product` can still charge, so a sequence cut at the cap fails that charge and the limit is reported.
-  return sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, modern, budget.wordRoom + 2)?.map(sequenceWord) ?? null;
+  // One value past what `product` can still charge, in words and in text, so a sequence cut at either cap fails that charge and the limit is reported.
+  return sequence(fromNumber ?? fromLetter, toNumber ?? toLetter, step, modern, budget.wordRoom + 2, budget.charRoom)?.map(sequenceWord) ?? null;
 }
 
 /**
@@ -617,14 +621,14 @@ const literal = (text: string): Piece => ({ text, kinds: 'l'.repeat(text.length)
 const INT64_MAX = 2n ** 63n - 1n;
 
 /**
- * The first `limit` values of `{from..to..step}`: numbers, or the characters
- * between two letters. Both bashes read the numbers as 64-bit integers, so a
+ * The first `limit` values of `{from..to..step}`, up to the first that takes
+ * their text past `chars`: numbers, or the characters between two letters. Both bashes read the numbers as 64-bit integers, so a
  * group with one past that range is no sequence (`null`). bash 3.2 then keeps
  * the low 32 bits of each end, takes no step and pads nothing; bash 4 and
  * later (`modern`) take the step's size and pad every number to the wider end
  * when an end has a leading zero (`{01..10}`).
  */
-function sequence(from: string, to: string, step: string | undefined, modern: boolean, limit: number): string[] | null {
+function sequence(from: string, to: string, step: string | undefined, modern: boolean, limit: number, chars: number): string[] | null {
   const numeric = /\d/.test(from);
   const fits = (n: bigint) => -INT64_MAX - 1n <= n && n <= INT64_MAX;
   const inc = step === undefined ? 1n : BigInt(step);
@@ -640,8 +644,11 @@ function sequence(from: string, to: string, step: string | undefined, modern: bo
   const width = modern && numeric && (/^-?0\d/.test(from) || /^-?0\d/.test(to)) ? Math.max(from.length, to.length) : 0;
   const pad = (v: bigint) => (v < 0n ? `-${String(-v).padStart(width - 1, '0')}` : String(v).padStart(width, '0'));
   const texts: string[] = [];
-  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit; v += a <= b ? size : -size) {
-    texts.push(numeric ? pad(v) : String.fromCharCode(Number(v)));
+  let built = 0;
+  for (let v = a; (a <= b ? v <= b : v >= b) && texts.length < limit && built <= chars; v += a <= b ? size : -size) {
+    const text = numeric ? pad(v) : String.fromCharCode(Number(v));
+    built += text.length;
+    texts.push(text);
   }
   return texts;
 }
