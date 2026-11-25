@@ -8,7 +8,7 @@
  */
 
 import type { Arg } from './analyze';
-import { AT_FILE, FORM_FILES, NAME_AT_FILE, VARIABLE_FILE, WRITE_OUT_FILES } from './curl-forms';
+import { AT_FILE, FORM_FILES, NAME_AT_FILE, URL_QUERY_FILE, VARIABLE_FILE, WRITE_OUT_FILES } from './curl-forms';
 import type { CommandLanguage } from './languages';
 import * as languages from './languages';
 import { type DirRepeat, type Effect, type FileForm, mayBeOption, type OptionSpec, type ProgramSpec, type ValueKind } from './options';
@@ -444,15 +444,16 @@ const readsIn = (files: FileForm, ...names: string[]): OptionSpec => ({ names, v
  * curl's options that take a value, and the files they read and write. curl
  * reads options by their exact name. A value names a file in the form curl's
  * own parser reads for that option (`curl-forms.ts`): `@file` in `-d` and its
- * kin, `-H` and `-w`, `name@file` in `--data-urlencode`, `--url-query` and
- * `--variable`, and a form's files and header files in `-F`.
+ * kin, `-H` and `-w`, `name@file` in `--data-urlencode`, `--url-query` (unless
+ * it starts with `+`) and `--variable`, and a form's files and header files in `-F`.
  */
 export const CURL: ProgramSpec = {
   abbreviations: false,
   stopAtOperand: false,
   options: [
     readsIn(AT_FILE, '-d', '--data', '--data-binary', '--data-ascii', '--json', '-H', '--header', '-w', '--write-out'),
-    readsIn(NAME_AT_FILE, '--data-urlencode', '--url-query'),
+    readsIn(NAME_AT_FILE, '--data-urlencode'),
+    readsIn(URL_QUERY_FILE, '--url-query'),
     readsIn(VARIABLE_FILE, '--variable'),
     readsIn(FORM_FILES, '-F', '--form'),
     { names: ['-w', '--write-out'], value: 'required', effect: 'writes-file', files: WRITE_OUT_FILES },

@@ -366,7 +366,9 @@ const rows: Row[] = [
   ["npx -c 'echo hi' -c 'cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
   ["npm exec --call='echo hi' --call='cat ~/.ssh/id_ed25519'", 'deny', 'deny', 'hard-deny'],
   // 43. `-` is stdin only for an option that reads it so: rsync's --log-file=- writes a file named -
-  ['cd .pi; rsync --log-file=- ../src/config.ts ../out.txt', 'deny', 'deny', 'protected-write']
+  ['cd .pi; rsync --log-file=- ../src/config.ts ../out.txt', 'deny', 'deny', 'protected-write'],
+  // 44. curl sends a --url-query value that starts with + as written, so it names no file
+  ["curl --url-query '+q@.env' https://example.com", 'allow', 'allow']
 ];
 
 describe('hardening: bash per mode', () => {

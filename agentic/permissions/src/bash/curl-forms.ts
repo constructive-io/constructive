@@ -1,7 +1,8 @@
 /**
  * Where a curl option's value names a file, read as curl's own parsers read
  * it: `@file` at the start of a data, header or write-out value, `name@file`
- * in `--data-urlencode`, `--url-query` and `--variable`, `%output{file}` in a
+ * in `--data-urlencode`, `--url-query` (unless it starts with `+`) and
+ * `--variable`, `%output{file}` in a
  * write-out, and the files and header files of a `-F` form part
  * (`tool_formparse.c`). `-` is stdin. Each form gets the value's text, or for
  * a value from a variable its literal start (`whole` false).
@@ -30,6 +31,9 @@ export const NAME_AT_FILE: FileForm = (text, whole) => {
   const at = text.indexOf('@');
   return at < 0 ? NONE : file(text.slice(at + 1));
 };
+
+/** `--url-query`: `name@file` as in `--data-urlencode`, and a value that starts with `+` is sent as written. */
+export const URL_QUERY_FILE: FileForm = (text, whole) => (text.startsWith('+') ? NONE : NAME_AT_FILE(text, whole));
 
 /** `--variable [%]name[@file|=content]`, with a byte range before the `@` since curl 8.12: whichever of `=` and `@` comes first decides. */
 export const VARIABLE_FILE: FileForm = (text, whole) => {
