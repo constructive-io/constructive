@@ -9,7 +9,7 @@
 import { isSecretFile } from '../secret-files';
 import { type Arg, type Cwd, literalStart } from './analyze';
 import { type CommandContext, generic, literalArg, textOf } from './args';
-import { hasOption, isOption, type ReadArgs, readArgs, valuesOf, withEffect } from './options';
+import { hasOption, isOption, lastValueOf, type ReadArgs, readArgs, withEffect } from './options';
 import { GIT, gitSubcommand } from './programs';
 import { applyEffects, dirSpecOf, movedBy } from './scripts';
 import { isRemoteSpec, isUrl } from './words';
@@ -60,7 +60,8 @@ function push(ctx: CommandContext, read: ReadArgs): void {
     hasOption(read, '-f', '--force', '--force-if-includes', '--force-with-lease', '--mirror', '-d', '--delete', '--prune') ||
     read.operands.some((a) => literalStart(a).startsWith('+') || literalStart(a).startsWith(':'));
   if (force) analyzer.flag('destructive', 'it force-pushes or deletes refs on the remote');
-  const remote = valuesOf(read, '--repo')[0] ?? read.positionals[0];
+  // git keeps the last --repo, and a repository operand wins over it.
+  const remote = read.positionals[0] ?? lastValueOf(read, '--repo');
   if (!remote) {
     if (analyzer.gitRemotes.size > 0) analyzer.flag('upload', 'it uploads data: git push goes to a remote this command changed');
     return;
@@ -102,7 +103,7 @@ function config(ctx: CommandContext, read: ReadArgs, here: Arg, raw: string): vo
   const edits = hasOption(read, '--add', '--unset', '--unset-all', '--replace-all', '--rename-section', '--remove-section', '-e', '--edit');
   const writes = !reads && (edits || read.operands.length >= 2 || read.unknown.length > 0);
   // The registry reads the file; an edit writes it too.
-  const file = valuesOf(read, '--file', '-f')[0];
+  const file = lastValueOf(read, '--file', '-f');
   if (file && writes) analyzer.addPath(file, 'write', true);
   if (!writes || file) return;
   if (hasOption(read, '--global')) {

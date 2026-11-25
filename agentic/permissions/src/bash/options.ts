@@ -389,3 +389,8 @@ export function hasOption(read: ReadArgs, ...names: string[]): boolean {
 export function valuesOf(read: ReadArgs, ...names: string[]): Arg[] {
   return read.options.flatMap((o) => (o.value && isOption(o, ...names) ? [o.value] : []));
 }
+
+/** The value of an option a program takes once and keeps the last of when it is repeated (git's and npm's string options). */
+export function lastValueOf(read: ReadArgs, ...names: string[]): Arg | undefined {
+  return valuesOf(read, ...names).at(-1);
+}

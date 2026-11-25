@@ -179,7 +179,8 @@ const RUNNER_VALUE_OPTIONS = new Set(['-c', '--call', '-p', '--package']);
  */
 function runnerOptions(args: Arg[], from: number): { call: Arg | null | undefined; next: number } {
   const { options, next } = leadingOptions(args.slice(from), RUNNER_VALUE_OPTIONS);
-  const call = options.find((o) => o.key === '-c' || o.key === '--call');
+  // npm keeps the last -c.
+  const call = options.filter((o) => o.key === '-c' || o.key === '--call').at(-1);
   return { call: call ? (call.value ?? null) : undefined, next: from + next };
 }
 
