@@ -374,7 +374,10 @@ const rows: Row[] = [
   ['curl -w @- https://example.com', 'ask', 'ask', 'unresolvable-path'],
   // 46. bash expands nothing in a heredoc's delimiter, so a substitution there never runs
   ['cat <<$(cat ~/.ssh/id_ed25519)\nbody\n$(cat ~/.ssh/id_ed25519)\n', 'allow', 'allow'],
-  ['cat <<`touch q`\nbody\n`touch q`\n', 'allow', 'allow']
+  ['cat <<`touch q`\nbody\n`touch q`\n', 'allow', 'allow'],
+  // 47. GNU tar reads a line of its name list that starts with - as an option (-C dir), and bsdtar a -C line, so the names after it may be in another dir
+  ["printf '%s\\n' '-C src' config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands'],
+  ["printf '%s\\n' -C src config.ts | tar -cf x.tar -T -", 'ask', 'allow', 'stdin-operands']
 ];
 
 describe('hardening: bash per mode', () => {

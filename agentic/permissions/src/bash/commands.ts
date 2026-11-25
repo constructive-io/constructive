@@ -308,6 +308,8 @@ export function runCommand(name: string, rest: readonly Arg[], ctx: CommandConte
     const names = stdinLines(analyzer);
     if (names === null) analyzer.flag('stdin-operands', `${name} takes file names from its input, which cannot be checked before it runs`);
     else for (const n of names) analyzer.addPath(n, 'read', true);
+    // GNU tar reads a line that starts with `-` as an option (`-C dir`), and bsdtar a `-C` line, so the names after it may be in another dir.
+    if (name === 'tar' && names?.some((n) => textOf(n)?.startsWith('-'))) analyzer.flag('stdin-operands', 'tar reads an option from a line of its name list, so the names after it may be in a dir that cannot be checked before it runs');
   }
   if (SHELLS.has(name)) return shell(name, ctx, rest);
   const language = TEXT_PROGRAMS.get(name);
