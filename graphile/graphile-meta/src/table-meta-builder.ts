@@ -29,6 +29,7 @@ import {
   buildRealtimeMeta,
   buildSearchMeta,
   buildStorageMeta,
+  filesTypeNameForField,
   soleFilesTypeName
 } from './storage-search-meta-builders';
 import {
@@ -156,7 +157,10 @@ function buildTableMeta(
     // hidden column contributes nothing.
     fieldMeta.allowedValues = readAllowedValues(attr);
     fieldMeta.isComputed = readIsComputed(attr);
-    fieldMeta.file = buildFileFieldMeta(attr, context.filesType ?? null);
+    fieldMeta.file = buildFileFieldMeta(
+      attr,
+      filesTypeNameForField(attr, context.build, context.schema, context.filesType ?? null)
+    );
 
     if (writeInputs) {
       const { create, patch } = writeInputs;
