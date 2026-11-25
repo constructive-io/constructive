@@ -442,27 +442,70 @@ function braces(piece: Piece, budget: ExpansionBudget): Piece[] {
 }
 
 /**
+ * Where the brace groups of a word end, from one pass over it. From each
+ * point, a group's search sees the characters at its own level: it skips a
+ * `{…}` that opens after that point, and passes a `}` that ends no group, as
+ * bash does (`{a}b,c}` is one group). `separator[k]` is the first unquoted
+ * `,` or `..` (one not right before a `}`) it sees from `k`, and `close[k]`
+ * the first unquoted `}`; -1 for none.
+ */
+class BraceIndex {
+  private readonly separator: Int32Array;
+  private readonly close: Int32Array;
+
+  constructor(
+    readonly text: string,
+    readonly kinds: string
+  ) {
+    const n = text.length;
+    const match = new Int32Array(n).fill(-1);
+    const opens: number[] = [];
+    for (let k = 0; k < n; k++) {
+      if (kinds[k] !== 'l') continue;
+      if (text[k] === '{') opens.push(k);
+      else if (text[k] === '}' && opens.length > 0) match[opens.pop()] = k;
+    }
+    this.separator = new Int32Array(n + 1).fill(-1);
+    this.close = new Int32Array(n + 1).fill(-1);
+    for (let k = n - 1; k >= 0; k--) {
+      let separator = this.separator[k + 1];
+      let close = this.close[k + 1];
+      const c = kinds[k] === 'l' ? text[k] : '';
+      if (c === '{') {
+        // A `{` that no `}` ends holds the rest of the word, so nothing after it is at this level.
+        separator = match[k] < 0 ? -1 : this.separator[match[k] + 1];
+        close = match[k] < 0 ? -1 : this.close[match[k] + 1];
+      } else if (c === '}') {
+        close = k;
+      } else if (c === ',' || (c === '.' && text[k + 1] === '.' && kinds[k + 1] === 'l' && !(text[k + 2] === '}' && kinds[k + 2] === 'l'))) {
+        separator = k;
+      }
+      this.separator[k] = separator;
+      this.close[k] = close;
+    }
+  }
+
+  /** The `}` of a group opened at `open`: the first at its level after a `,` or `..` at its level; -1 for none. */
+  closeOf(open: number): number {
+    const separator = this.separator[open + 1];
+    return separator < 0 ? -1 : this.close[separator + 1];
+  }
+}
+
+/**
  * The next group from `from` that both bashes look at: from an unquoted `{`
  * to the first `}` at its level after an unquoted `,` or `..` (one not right
  * before that `}`) at its level. A `{` that starts the word, or the rest of
  * the word after a group (`start`), and is followed by `}` (find's `{}`)
  * starts none.
  */
-function group(text: string, kinds: string, from: number, start: number): { open: number; close: number } | null {
+function group(index: BraceIndex, from: number, start: number): { open: number; close: number } | null {
+  const { text, kinds } = index;
   for (let open = from; open < text.length; open++) {
     if (text[open] !== '{' || kinds[open] !== 'l') continue;
     if (open === start && text[open + 1] === '}' && kinds[open + 1] === 'l') continue;
-    let level = 0;
-    let counts = 0;
-    for (let j = open + 1; j < text.length; j++) {
-      if (kinds[j] !== 'l') continue;
-      const c = text[j];
-      if (c === '}' && level === 0 && counts > 0) return { open, close: j };
-      if (c === '{') level++;
-      else if (c === '}' && level > 0) level--;
-      else if (level === 0 && c === ',') counts++;
-      else if (level === 0 && c === '.' && text[j + 1] === '.' && kinds[j + 1] === 'l' && !(text[j + 2] === '}' && kinds[j + 2] === 'l')) counts++;
-    }
+    const close = index.closeOf(open);
+    if (close >= 0) return { open, close };
   }
   return null;
 }
@@ -549,8 +592,9 @@ function sequenceGroup(text: string, kinds: string, open: number, close: number,
  * and the search goes on after its `{`.
  */
 function expand5(text: string, kinds: string, budget: ExpansionBudget): Piece[] | null {
+  const index = new BraceIndex(text, kinds);
   return expandGroups(text, kinds, budget, (start) => {
-    for (let found = group(text, kinds, start, start); found; found = group(text, kinds, found.open + 1, start)) {
+    for (let found = group(index, start, start); found; found = group(index, found.open + 1, start)) {
       const { open, close } = found;
       const commas = levelCommas(text, kinds, open, close);
       if (commas.length > 0) return { open, close, middles: alternatives(text, kinds, open, commas, close, budget, expand5) };
@@ -627,8 +671,9 @@ function braces32(piece: Piece, budget: ExpansionBudget): Piece[] {
 }
 
 function expand32(text: string, kinds: string, budget: ExpansionBudget): Piece[] | null {
+  const index = new BraceIndex(text, kinds);
   return expandGroups(text, kinds, budget, (start) => {
-    const found = group(text, kinds, start, start);
+    const found = group(index, start, start);
     if (!found) return null;
     const { open, close } = found;
     // bash 3.2 looks for a comma anywhere in the group, nested or quoted; the kit cannot tell an escaped one from a quoted one, so it counts both.

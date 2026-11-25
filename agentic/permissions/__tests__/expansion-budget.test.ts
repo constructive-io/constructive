@@ -37,6 +37,13 @@ describe('expansions stay within one budget per command', () => {
     expect(heapMb).toBeLessThan(256);
   });
 
+  it('finds the brace groups of a word in one pass, so tens of thousands of braces that make no group take no quadratic search', async () => {
+    for (const word of ['{}'.repeat(30_000), '{a}'.repeat(20_000), `{${'{a}'.repeat(19_000)}`, '{'.repeat(60_000)]) {
+      const { ms } = await bounded(`xargs -I{} echo ${word}`);
+      expect([word.slice(0, 6), ms < 1000]).toEqual([word.slice(0, 6), true]);
+    }
+  });
+
   it('expands a word of thousands of brace groups, one after another, without a deep recursion', async () => {
     const { d, ms } = await bounded(`echo ${'{a,b}'.repeat(2000)}`);
     expect([d.decision, d.request.signals]).toEqual(['ask', ['unresolvable-path']]);
