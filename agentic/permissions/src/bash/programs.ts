@@ -287,7 +287,8 @@ export const READERS: ReadonlyMap<string, ProgramSpec> = new Map([
   ['head', tool(plain('-n', '--lines', '-c', '--bytes'))],
   ['tail', tool(plain('-n', '--lines', '-c', '--bytes', '-b', '-s', '--sleep-interval', '--pid', '--max-unchanged-stats'))],
   ['uniq', tool(plain('-f', '--skip-fields', '-s', '--skip-chars', '-w', '--check-chars'), optionalPlain('--group', '--all-repeated'))],
-  ['base64', tool(does('reads-file', 'required', '-i', '--input'), does('writes-file', 'required', '-o', '--output'), plain('-b', '--break', '-w', '--wrap'))],
+  // GNU reads -i as a flag and its file as an operand; BSD reads `-i file`, `-ifile` and --input, so a glued value is the file.
+  ['base64', tool(does('reads-file', 'optional', '-i'), does('reads-file', 'required', '--input'), does('writes-file', 'required', '-o', '--output'), plain('-b', '--break', '-w', '--wrap'))],
   ['xxd', tool(plain('-c', '-cols', '-g', '-groupsize', '-l', '-len', '-s', '-seek', '-o', '-offset', '-n', '-name'))],
   ['od', tool(plain('-A', '--address-radix', '-j', '--skip-bytes', '-N', '--read-bytes', '-t', '--format', '-S'), optionalPlain('-w', '--width', '--strings'))],
   ['hexdump', tool(does('reads-file', 'required', '-f'), plain('-e', '-n', '-s'))]

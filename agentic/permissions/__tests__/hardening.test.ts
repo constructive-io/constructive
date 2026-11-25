@@ -390,6 +390,14 @@ describe('hardening: a `-` value', () => {
   });
 });
 
+describe('hardening: base64 -i', () => {
+  it("is GNU's flag and BSD's input file, so the file is read either way and the next option keeps its value", async () => {
+    const targets = async (command: string) => (await sb.bash(command, 'workspace')).request.targets.map((t) => `${t.access} ${path.relative(sb.ws, t.path)}`);
+    expect(await targets('base64 -i -w 0 src/config.ts')).toEqual(['read src/config.ts']);
+    expect(await targets('base64 -i src/config.ts')).toEqual(['read src/config.ts']);
+  });
+});
+
 describe('hardening: HOME', () => {
   it('reads a tilde from every HOME the shell held, since bash 5.3 reads the one it last exported to a program', async () => {
     const command = `HOME=~/.ssh; ls; HOME=${sb.home}; cat ~/id_ed25519`;
