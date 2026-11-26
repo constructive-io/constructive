@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.25.4](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.3...graphile-llm@1.25.4) (2026-11-26)
+
+### Bug Fixes
+
+- **server:** mask raw PostgreSQL error text in GraphQL responses ([#2080](https://github.com/constructive-io/constructive/issues/2080)) ([0242696](https://github.com/constructive-io/constructive/commit/02426968c375cf7f6f51bef197ea5dfa96047162))
+
 ## [1.25.3](https://github.com/constructive-io/constructive/compare/graphile-llm@1.25.2...graphile-llm@1.25.3) (2026-11-23)
 
 ### Bug Fixes

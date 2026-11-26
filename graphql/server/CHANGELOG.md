@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.36.14](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.13...@constructive-io/graphql-server@5.36.14) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+- **server:** don't charge row-less connections at page size in query cost gate ([#2072](https://github.com/constructive-io/constructive/issues/2072)) ([4cd53ea](https://github.com/constructive-io/constructive/commit/4cd53ea92a7ce8546e75890d57362c6f5524e0b9))
+- **server:** mask raw PostgreSQL error text in GraphQL responses ([#2080](https://github.com/constructive-io/constructive/issues/2080)) ([0242696](https://github.com/constructive-io/constructive/commit/02426968c375cf7f6f51bef197ea5dfa96047162))
+
+### Features
+
+- **graphql-server:** disable GraphiQL by default in production ([#2068](https://github.com/constructive-io/constructive/issues/2068)) ([e0767f1](https://github.com/constructive-io/constructive/commit/e0767f1a5a6b7680cf292f61a80e69a042d79d4f))
+
 ## [5.36.13](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.12...@constructive-io/graphql-server@5.36.13) (2026-11-24)
 
 ### Bug Fixes

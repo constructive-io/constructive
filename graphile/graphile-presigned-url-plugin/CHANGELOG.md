@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.29.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.29.0...graphile-presigned-url-plugin@1.29.1) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+- **server:** mask raw PostgreSQL error text in GraphQL responses ([#2080](https://github.com/constructive-io/constructive/issues/2080)) ([0242696](https://github.com/constructive-io/constructive/commit/02426968c375cf7f6f51bef197ea5dfa96047162))
+
 # [1.29.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.28.6...graphile-presigned-url-plugin@1.29.0) (2026-11-24)
 
 ### Bug Fixes

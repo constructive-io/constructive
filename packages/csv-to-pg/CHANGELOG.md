@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.9](https://github.com/constructive-io/constructive/compare/csv-to-pg@4.16.8...csv-to-pg@4.16.9) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+
 ## [4.16.8](https://github.com/constructive-io/constructive/compare/csv-to-pg@4.16.7...csv-to-pg@4.16.8) (2026-11-23)
 
 ### Bug Fixes

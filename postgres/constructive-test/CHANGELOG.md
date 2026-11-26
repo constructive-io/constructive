@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.17](https://github.com/constructive-io/constructive/compare/constructive-test@1.19.16...constructive-test@1.19.17) (2026-11-26)
+
+**Note:** Version bump only for package constructive-test
+
 ## [1.19.16](https://github.com/constructive-io/constructive/compare/constructive-test@1.19.15...constructive-test@1.19.16) (2026-11-23)
 
 **Note:** Version bump only for package constructive-test

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.12](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.11...@pgpmjs/transform@0.32.12) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+
 ## [0.32.11](https://github.com/constructive-io/constructive/compare/@pgpmjs/transform@0.32.10...@pgpmjs/transform@0.32.11) (2026-11-23)
 
 ### Bug Fixes

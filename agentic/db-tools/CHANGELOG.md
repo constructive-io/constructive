@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.44](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.43...@agentic-kit/db-tools@0.12.44) (2026-11-26)
+
+### Bug Fixes
+
+- **agentic:** agent CLI ships no backend URLs, keeps all five planes, never defaults to localhost ([#2077](https://github.com/constructive-io/constructive/issues/2077)) ([5bec015](https://github.com/constructive-io/constructive/commit/5bec015dabe0ade709e66d68c5c81d28b02ed1d9))
+- **agentic:** make CLI tool support and approval limits explicit ([#2076](https://github.com/constructive-io/constructive/issues/2076)) ([3576a8b](https://github.com/constructive-io/constructive/commit/3576a8b03059b70348d50ea02a0a3e349229ea3c))
+- **agentic:** never write the account bearer into the project .env ([#2075](https://github.com/constructive-io/constructive/issues/2075)) ([86cda2e](https://github.com/constructive-io/constructive/commit/86cda2ef91520c2adcc162cb913cfe74459f53b5))
+
 ## [0.12.43](https://github.com/constructive-io/constructive/compare/@agentic-kit/db-tools@0.12.42...@agentic-kit/db-tools@0.12.43) (2026-11-24)
 
 **Note:** Version bump only for package @agentic-kit/db-tools

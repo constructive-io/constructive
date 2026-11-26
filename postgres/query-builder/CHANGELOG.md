@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.17](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.16...@constructive-io/query-builder@3.18.17) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+
 ## [3.18.16](https://github.com/constructive-io/constructive/compare/@constructive-io/query-builder@3.18.15...@constructive-io/query-builder@3.18.16) (2026-11-23)
 
 **Note:** Version bump only for package @constructive-io/query-builder

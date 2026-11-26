@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.16](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.15...@pgpmjs/slice@0.21.16) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+
 ## [0.21.15](https://github.com/constructive-io/constructive/compare/@pgpmjs/slice@0.21.14...@pgpmjs/slice@0.21.15) (2026-11-23)
 
 **Note:** Version bump only for package @pgpmjs/slice

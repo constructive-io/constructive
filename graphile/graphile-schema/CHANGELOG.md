@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.48](https://github.com/constructive-io/constructive/compare/graphile-schema@2.21.47...graphile-schema@2.21.48) (2026-11-26)
+
+### Bug Fixes
+
+- **codegen:** pin @dataplan/pg and grafast to prevent duplicate grafast install ([#2073](https://github.com/constructive-io/constructive/issues/2073)) ([cb5dfea](https://github.com/constructive-io/constructive/commit/cb5dfea3ec6e5427fd8c429b96465c549040484d))
+
 ## [2.21.47](https://github.com/constructive-io/constructive/compare/graphile-schema@2.21.46...graphile-schema@2.21.47) (2026-11-24)
 
 **Note:** Version bump only for package graphile-schema

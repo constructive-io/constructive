@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.17](https://github.com/constructive-io/constructive/compare/graphile-scoped-introspection@0.6.16...graphile-scoped-introspection@0.6.17) (2026-11-26)
+
+### Bug Fixes
+
+- **graphile-scoped-introspection:** retain [@foreign](https://github.com/foreign)Key smart tag targets ([#2063](https://github.com/constructive-io/constructive/issues/2063)) ([eb4f113](https://github.com/constructive-io/constructive/commit/eb4f113d94af835aa2fc0d0ba4e462592153a0e2))
+
 ## [0.6.16](https://github.com/constructive-io/constructive/compare/graphile-scoped-introspection@0.6.15...graphile-scoped-introspection@0.6.16) (2026-11-23)
 
 **Note:** Version bump only for package graphile-scoped-introspection

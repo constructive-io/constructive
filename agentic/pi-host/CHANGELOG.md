@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.52](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.51...@agentic-kit/pi-host@0.7.52) (2026-11-26)
+
+### Bug Fixes
+
+- **agentic:** never write the account bearer into the project .env ([#2075](https://github.com/constructive-io/constructive/issues/2075)) ([86cda2e](https://github.com/constructive-io/constructive/commit/86cda2ef91520c2adcc162cb913cfe74459f53b5))
+
 ## [0.7.51](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.50...@agentic-kit/pi-host@0.7.51) (2026-11-24)
 
 **Note:** Version bump only for package @agentic-kit/pi-host

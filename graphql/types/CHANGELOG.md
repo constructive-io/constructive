@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.36.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.36.5...@constructive-io/graphql-types@3.36.6) (2026-11-26)
+
+### Features
+
+- **graphql-server:** disable GraphiQL by default in production ([#2068](https://github.com/constructive-io/constructive/issues/2068)) ([e0767f1](https://github.com/constructive-io/constructive/commit/e0767f1a5a6b7680cf292f61a80e69a042d79d4f))
+
 ## [3.36.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-types@3.36.4...@constructive-io/graphql-types@3.36.5) (2026-11-23)
 
 **Note:** Version bump only for package @constructive-io/graphql-types

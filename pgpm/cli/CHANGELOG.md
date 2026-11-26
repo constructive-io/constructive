@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.41.31](https://github.com/constructive-io/constructive/compare/pgpm@5.41.30...pgpm@5.41.31) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+- **pgpm:** only stop/recreate Postgres containers pgpm owns; pgpm env keeps explicit PG* ([#2079](https://github.com/constructive-io/constructive/issues/2079)) ([d89a366](https://github.com/constructive-io/constructive/commit/d89a3668701250b887b936ecebe8262308876cc7))
+
 ## [5.41.30](https://github.com/constructive-io/constructive/compare/pgpm@5.41.29...pgpm@5.41.30) (2026-11-24)
 
 **Note:** Version bump only for package pgpm

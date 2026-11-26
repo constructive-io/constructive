@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.32.19](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.18...graphile-settings@6.32.19) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** update PostgreSQL parser packages ([#2083](https://github.com/constructive-io/constructive/issues/2083)) ([fda98b1](https://github.com/constructive-io/constructive/commit/fda98b15d79addede9aef463bd55e3061e8a3ef9))
+
 ## [6.32.18](https://github.com/constructive-io/constructive/compare/graphile-settings@6.32.17...graphile-settings@6.32.18) (2026-11-24)
 
 **Note:** Version bump only for package graphile-settings
