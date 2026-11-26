@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.7...graphql-server-test@3.43.8) (2026-11-26)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** drop logical_key_retired, treat superseded as non-live ([#2070](https://github.com/constructive-io/constructive/issues/2070)) ([6db3646](https://github.com/constructive-io/constructive/commit/6db364658ed02cad58f5963475828567c41e506b))
+
 ## [3.43.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.6...graphql-server-test@3.43.7) (2026-11-26)
 
 ### Bug Fixes

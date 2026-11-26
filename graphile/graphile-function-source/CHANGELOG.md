@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.20](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.19...graphile-function-source@0.3.20) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser packages ([#2087](https://github.com/constructive-io/constructive/issues/2087)) ([692df96](https://github.com/constructive-io/constructive/commit/692df96ef577462927bf1432d1b5a2aebe7485aa))
+
 ## [0.3.19](https://github.com/constructive-io/constructive/compare/graphile-function-source@0.3.18...graphile-function-source@0.3.19) (2026-11-26)
 
 **Note:** Version bump only for package graphile-function-source

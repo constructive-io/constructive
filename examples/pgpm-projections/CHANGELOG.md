@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.50](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.49...@constructive-io/examples-pgpm-projections@0.11.50) (2026-11-26)
+
+**Note:** Version bump only for package @constructive-io/examples-pgpm-projections
+
 ## [0.11.49](https://github.com/constructive-io/constructive/compare/@constructive-io/examples-pgpm-projections@0.11.48...@constructive-io/examples-pgpm-projections@0.11.49) (2026-11-26)
 
 **Note:** Version bump only for package @constructive-io/examples-pgpm-projections

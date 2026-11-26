@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.29.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.29.2...graphile-presigned-url-plugin@1.29.3) (2026-11-26)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** drop logical_key_retired, treat superseded as non-live ([#2070](https://github.com/constructive-io/constructive/issues/2070)) ([6db3646](https://github.com/constructive-io/constructive/commit/6db364658ed02cad58f5963475828567c41e506b))
+
 ## [1.29.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.29.1...graphile-presigned-url-plugin@1.29.2) (2026-11-26)
 
 ### Bug Fixes
