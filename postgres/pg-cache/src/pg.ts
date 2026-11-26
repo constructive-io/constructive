@@ -97,6 +97,30 @@ export const defaultPgPoolFactory: PgPoolFactory = (pgConfig): pg.Pool => {
     }
   });
 
+  /**
+   * Client-level error handler for checked-out connections.
+   *
+   * The pool handler above covers idle clients only: pg-pool removes its own
+   * listener while a client is checked out (a request's transaction, a schema
+   * introspection). When the server ends such a connection (a restart, a
+   * failover, pg_terminate_backend), pg rejects the query in flight AND emits
+   * 'error' on the client itself. With no listener that event is fatal: the
+   * whole process exits, dropping every other request. PostGraphile adds this
+   * listener to pools it creates and leaves it to callers that pass their own
+   * pool, as the GraphQL server does with this one.
+   *
+   * This listener only keeps the process alive; it does not swallow anything.
+   * The owner still sees the error through the rejected query (and any later
+   * query on that client), and the pool discards the broken client when it is
+   * released. An idle client's error also reaches the pool handler above, so
+   * this one logs at debug level instead of reporting it twice.
+   */
+  pgPool.on('connect', (client) => {
+    client.on('error', (err: Error & { code?: string }) => {
+      log.debug(`Pool ${database} client connection error [${err.code || 'unknown'}]: ${err.message}`);
+    });
+  });
+
   return pgPool;
 };
 
