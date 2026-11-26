@@ -24,9 +24,10 @@ function fileKindOf(codec: PgCodec | null | undefined): FileKind | null {
 
 /**
  * File details for a column whose type is a file domain, or a list of one.
- * `filesType` is the API's only storage files table (see `soleFilesTypeName`).
- * The bucket binding comes from the `@fileBucketKey` / `@fileIsPublic` tags
- * constructive-db's DataFileRef generator writes on the column.
+ * `filesType` is resolved from the column's explicit storage binding, or from
+ * the API's only storage files table. Bucket details come from the
+ * `@fileBucketKey` / `@fileIsPublic` tags constructive-db's DataFileRef
+ * generator writes on the column.
  */
 export function buildFileFieldMeta(
   attr: PgAttribute | null | undefined,
