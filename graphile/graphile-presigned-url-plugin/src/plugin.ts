@@ -701,7 +701,7 @@ export async function processSingleFile(
       text: `SELECT id, key, status::text AS status, mime_type, size, filename, created_at
                FROM ${storageConfig.filesQualifiedName}
               WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
-                AND NOT logical_key_retired AND status IN ('requested', 'uploaded', 'processed')
+                AND status IN ('requested', 'uploaded', 'processed')
               ORDER BY CASE WHEN status = 'requested' THEN 1 ELSE 0 END LIMIT 1`,
       values: [logicalKey, bucket.id, contentHash],
     });
@@ -736,7 +736,6 @@ export async function processSingleFile(
     text: `SELECT id, key, mime_type, size, filename
        FROM ${storageConfig.filesQualifiedName}
        WHERE logical_key = $1 AND bucket_id = $2 AND content_hash = $3
-         AND NOT logical_key_retired
          AND status IN ('uploaded', 'processed')
        LIMIT 1`,
     values: [logicalKey, bucket.id, contentHash],
