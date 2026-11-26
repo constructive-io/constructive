@@ -396,7 +396,7 @@ async function evaluateGate(options) {
     return {
       ok: false,
       errors: [
-        'Paired-change gate requires GH_SUBMODULE_PAT to verify a green kitchen-sink run (unavailable on fork PRs).',
+        'Paired-change gate requires GH_PAIRED_CHANGE_READ_TOKEN to verify a green kitchen-sink run (unavailable on fork PRs).',
       ],
     };
   }

@@ -32,9 +32,7 @@ jobs:
           fetch-depth: 0
           filter: blob:none
 
-      # Always execute the gate script from the trusted base branch when
-      # GH_SUBMODULE_PAT is in the environment, so a PR cannot modify the
-      # script to read the cross-repository token.
+      # Only pass the cross-repository read token to the base branch's script.
       - name: Checkout trusted gate script from base branch
         uses: actions/checkout@v4
         with:
@@ -65,7 +63,7 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_BASE_REF: origin/${{ github.event.pull_request.base.ref }}
-          GH_TOKEN: ${{ secrets.GH_SUBMODULE_PAT }}
+          GH_TOKEN: ${{ secrets.GH_PAIRED_CHANGE_READ_TOKEN }}
         run: node .gate-trusted/.github/scripts/paired-change-gate.cjs
 
       - name: Check paired kitchen-sink run (bootstrap without token)
