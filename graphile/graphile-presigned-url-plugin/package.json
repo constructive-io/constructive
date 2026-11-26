@@ -45,7 +45,7 @@
     "@constructive-io/errors": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/quotes": "^18.2.5",
+    "@pgsql/quotes": "^18.2.6",
     "graphile-plugin-utils": "workspace:^",
     "graphile-storage-registry": "workspace:^",
     "lru-cache": "^11.2.7",

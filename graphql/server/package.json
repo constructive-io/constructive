@@ -55,7 +55,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "@pgsql/quotes": "^18.2.5",
+    "@pgsql/quotes": "^18.2.6",
     "@simplewebauthn/server": "13.3.2",
     "accept-language-parser": "^1.5.0",
     "cookie-parser": "^1.4.7",

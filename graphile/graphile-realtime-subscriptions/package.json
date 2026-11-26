@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",
-    "@pgsql/quotes": "^18.2.5"
+    "@pgsql/quotes": "^18.2.6"
   },
   "peerDependencies": {
     "grafast": "^1.1.2",
