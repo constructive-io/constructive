@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 
 import { createPermissionEngine, nodeFsProbe, type PermissionVerdict } from '../src';
+import { NEXT_STEP } from '../src/guidance';
 import { canonicalize, resolveLikePi } from '../src/paths';
 import { makeSandbox, type Sandbox } from './sandbox';
 
@@ -16,7 +17,7 @@ beforeAll(async () => {
   // A link that leaves the project to an existing folder.
   await fs.symlink(path.join(sb.home, 'work', 'lib'), path.join(sb.ws, 'lib-link'));
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [tool: string, input: Record<string, unknown>, ask: PermissionVerdict, workspace: PermissionVerdict, full: PermissionVerdict];
 
@@ -36,9 +37,19 @@ const rows: Row[] = [
   ['write', { path: '.pi/extensions/x.ts', content: 'x' }, 'deny', 'deny', 'deny'],
   ['read', { path: '.pi/settings.json' }, 'allow', 'allow', 'allow'],
   ['edit', { path: '.git/config', edits: [{ oldText: 'a', newText: 'b' }] }, 'ask', 'ask', 'allow'],
+  // git reads it as config when extensions.worktreeConfig is on (git sparse-checkout turns it on)
+  ['write', { path: '.git/config.worktree', content: '[core]\n\tfsmonitor = ./x.sh' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.husky/pre-commit', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.envrc', content: 'x' }, 'ask', 'ask', 'allow'],
   ['write', { path: '.vscode/tasks.json', content: '{}' }, 'ask', 'ask', 'allow'],
+  // package-manager config that runs code on a later install or script run
+  ['write', { path: '.npmrc', content: 'script-shell=./x.sh' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarnrc', content: 'yarn-path "./x.js"' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarnrc.yml', content: 'yarnPath: ./x.cjs' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarn/releases/yarn-4.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.yarn/plugins/p.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: '.pnpmfile.cjs', content: 'x' }, 'ask', 'ask', 'allow'],
+  ['write', { path: 'bunfig.toml', content: 'preload = ["./x.ts"]' }, 'ask', 'ask', 'allow'],
   // path escapes
   ['read', { path: 'src/../../lib/util.ts' }, 'ask', 'ask', 'allow'],
   ['read', { path: 'lib-link/util.ts' }, 'ask', 'ask', 'allow'],
@@ -67,10 +78,10 @@ describe('file tools per mode', () => {
 
   it('names what it blocks', async () => {
     const read = await sb.run('read', { path: '~/.ssh/id_ed25519' });
-    expect(read.reason).toBe('permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode)');
+    expect(read.reason).toBe(`permissions: reading ~/.ssh/id_ed25519 is not allowed (SSH keys; blocked in every mode). ${NEXT_STEP.blocked}`);
     const write = await sb.run('write', { path: '.pi/extensions/x.ts', content: 'x' });
     expect(write.reason).toBe(
-      'permissions: writing .pi/extensions/x.ts is not allowed (agent extension dir; protected in every mode)'
+      `permissions: writing .pi/extensions/x.ts is not allowed (agent extension dir; protected in every mode). ${NEXT_STEP.blocked}`
     );
     const outside = await sb.run('write', { path: '/etc/hosts', content: 'x' });
     expect(outside.reason).toBe('permissions: writing /etc/hosts needs approval: /etc/hosts is outside the project');

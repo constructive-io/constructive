@@ -3,12 +3,33 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 
 import {
+  type BashRequest,
+  type CommandKey,
+  type CommandMatch,
+  type CommandPrefixMatch,
   createPermissionEngine,
   type Grant,
+  type ListedPrefix,
   type PermissionDecision,
   type PermissionEngine,
   type PermissionMode
 } from '../src';
+
+/**
+ * Matches and grants as a host may hold them on disk, built without the
+ * kit's checks: some (an unlisted prefix, an unnormalized key) the kit's own
+ * constructors would never make, which is what these tests need.
+ */
+export const storedPrefixes = (...prefixes: string[]): CommandPrefixMatch => ({ type: 'command-prefix', prefixes: prefixes as ListedPrefix[] });
+export const storedCommand = (command: string): CommandMatch => ({ type: 'command', command: command as CommandKey });
+export const prefixGrant = (...prefixes: string[]): Grant => ({ scope: 'project', match: storedPrefixes(...prefixes), createdAt: '' });
+export const exactGrant = (command: string): Grant => ({ scope: 'project', match: storedCommand(command), createdAt: '' });
+
+/** The request of a decision on a bash call (fails the test otherwise). */
+export function bashRequestOf(d: PermissionDecision): BashRequest {
+  expect(d.request.toolName).toBe('bash');
+  return d.request as BashRequest;
+}
 
 export const ENV_FILE = [
   'ACCESS_TOKEN=tok_live_9f8e7d6c5b4a39281706',
@@ -48,6 +69,12 @@ let counter = 0;
  */
 export async function makeSandbox(): Promise<Sandbox> {
   const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'agentic-perm-')));
+  if (/\s/.test(root)) {
+    await fs.rm(root, { recursive: true, force: true });
+    throw new Error(
+      `The test sandbox ${JSON.stringify(root)} has a blank in its path, so an unquoted path in a test row splits into two words and the row checks another command. Set TMPDIR to a dir whose path has no blanks, then run the tests again.`
+    );
+  }
   const home = path.join(root, 'home');
   const ws = path.join(home, 'work', 'app');
   const scratch = path.join(root, 'scratch');

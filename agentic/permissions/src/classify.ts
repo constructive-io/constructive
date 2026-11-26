@@ -15,7 +15,17 @@ import { globZoneOf, isRootItself, type Roots, zoneOf } from './roots';
 import { globNamesSecretFiles, isSecretFile } from './secret-files';
 import { SECRET_KEY_PATTERN, type SecretVault } from './secrets';
 import { newTexts, stringField } from './tool-input';
-import { type Access, type BuiltinTool, type FsProbe, type PermissionRequest, type Signal, type Target, TOOL_KIND, type Zone } from './types';
+import {
+  type Access,
+  type BuiltinTool,
+  type CommandPart,
+  type FsProbe,
+  type PermissionRequest,
+  type Signal,
+  type Target,
+  TOOL_KIND,
+  type Zone
+} from './types';
 
 export interface ClassifyContext {
   cwd: string;
@@ -172,7 +182,12 @@ async function isDir(abs: string, fs: FsProbe): Promise<boolean> {
   }
 }
 
-async function bashTargets(command: string, ctx: ClassifyContext, findings: Findings): Promise<Target[]> {
+/** A bash call's targets, and its simple commands when it is a plain list or pipeline. */
+async function bashTargets(
+  command: string,
+  ctx: ClassifyContext,
+  findings: Findings
+): Promise<{ targets: Target[]; parts: CommandPart[] | null }> {
   const analysis = analyzeBash(command, { cwd: ctx.cwd, homeDir: ctx.homeDir }, findings);
   const targets: Target[] = [];
   for (const p of analysis.paths) {
@@ -190,7 +205,7 @@ async function bashTargets(command: string, ctx: ClassifyContext, findings: Find
       `it expands ${secretVars.map((n) => `$${n}`).join(', ')}, which ${secretVars.length === 1 ? 'holds a secret' : 'hold secrets'} the command can send or print`
     );
   }
-  return targets;
+  return { targets, parts: analysis.parts };
 }
 
 async function fileTarget(toolName: BuiltinTool, input: Record<string, unknown>, ctx: ClassifyContext): Promise<Target> {
@@ -222,9 +237,8 @@ export async function classify(
   const { toolName, input } = call;
   const findings = new Findings();
   const command = toolName === 'bash' ? stringField(input, 'command') ?? '' : undefined;
-  const targets = uniqueTargets(
-    command === undefined ? [await fileTarget(toolName, input, ctx)] : await bashTargets(command, ctx, findings)
-  );
+  const bash = command === undefined ? undefined : await bashTargets(command, ctx, findings);
+  const targets = uniqueTargets(bash ? bash.targets : [await fileTarget(toolName, input, ctx)]);
 
   const glob = toolName === 'grep' ? stringField(input, 'glob') : undefined;
   if (glob && globNamesSecretFiles(glob)) findings.flag('secret-file', `the glob ${glob} names secret files; matches are redacted`);
@@ -252,14 +266,10 @@ export async function classify(
     }
   }
 
-  return {
-    toolCallId: call.toolCallId,
-    toolName,
-    kind: TOOL_KIND[toolName],
-    targets,
-    ...(command === undefined ? {} : { command: normalizeCommand(command) }),
-    signals: [...findings.signals],
-    signalReasons: findings.reasons
-  };
+  const base = { toolCallId: call.toolCallId, targets, signals: [...findings.signals], signalReasons: findings.reasons };
+  if (toolName === 'bash') {
+    return { ...base, toolName, kind: TOOL_KIND[toolName], command: normalizeCommand(command ?? ''), ...(bash?.parts ? { parts: bash.parts } : {}) };
+  }
+  return { ...base, toolName, kind: TOOL_KIND[toolName] };
 }
 

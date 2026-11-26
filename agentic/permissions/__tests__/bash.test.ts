@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 
 import type { PermissionVerdict, Signal } from '../src';
+import { NEXT_STEP } from '../src/guidance';
 import { makeSandbox, type Sandbox } from './sandbox';
 
 let sb: Sandbox;
@@ -11,7 +12,7 @@ beforeAll(async () => {
   // A link with no slash in its name that leads to a credential.
   await fs.symlink(path.join(sb.home, '.ssh', 'id_ed25519'), path.join(sb.ws, 'deploykey'));
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, ask: PermissionVerdict, workspace: PermissionVerdict, full: PermissionVerdict, signal?: Signal];
 
@@ -45,7 +46,10 @@ const rows: Row[] = [
   ['cat setup.sh | sh', 'ask', 'ask', 'allow', 'shell-dynamic'],
   ['node -e "process.exit(0)"', 'ask', 'ask', 'allow', 'shell-dynamic'],
   ["python3 -c 'print(1)'", 'ask', 'ask', 'allow', 'shell-dynamic'],
-  ['echo "unterminated', 'ask', 'ask', 'allow', 'shell-dynamic'],
+  // what the lexer cannot parse is unread, so it asks in every mode
+  ['echo "unterminated', 'ask', 'ask', 'ask', 'unresolvable-path'],
+  ["echo `'`", 'ask', 'ask', 'ask', 'unresolvable-path'],
+  ["eval \"echo '\"", 'ask', 'ask', 'ask', 'unresolvable-path'],
   ['PATH=./bin:$PATH ls', 'ask', 'ask', 'allow', 'shell-dynamic'],
   // substitution and nesting still find credential reads, in every mode
   ['echo `cat ~/.ssh/id_ed25519`', 'deny', 'deny', 'deny', 'hard-deny'],
@@ -108,7 +112,7 @@ describe('bash commands per mode', () => {
   it('names the denied path in the reason', async () => {
     const d = await sb.bash('cat ~/.ssh/id_ed25519');
     expect(d.reason).toBe(
-      'permissions: this command reads ~/.ssh/id_ed25519, which is not allowed (SSH keys; blocked in every mode)'
+      `permissions: this command reads ~/.ssh/id_ed25519, which is not allowed (SSH keys; blocked in every mode). ${NEXT_STEP.blocked}`
     );
   });
 });

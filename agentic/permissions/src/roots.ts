@@ -62,9 +62,19 @@ export const WORKSPACE_PROTECTED_WRITE: readonly KnownPath[] = [{ rel: '.pi', la
 export const WORKSPACE_ASK_WRITE: readonly KnownPath[] = [
   { rel: '.git/hooks', label: 'git hook' },
   { rel: '.git/config', label: 'git config' },
+  // git reads it as config when extensions.worktreeConfig is on.
+  { rel: '.git/config.worktree', label: 'git config' },
   { rel: '.husky', label: 'git hook' },
   { rel: '.envrc', label: 'direnv script' },
-  { rel: '.vscode/tasks.json', label: 'editor task config' }
+  { rel: '.vscode/tasks.json', label: 'editor task config' },
+  // Package-manager config that runs code on a later install or script run.
+  { rel: '.npmrc', label: 'npm config' },
+  { rel: '.yarnrc', label: 'yarn config' },
+  { rel: '.yarnrc.yml', label: 'yarn config' },
+  { rel: '.yarn/releases', label: 'yarn release' },
+  { rel: '.yarn/plugins', label: 'yarn plugin' },
+  { rel: '.pnpmfile.cjs', label: 'pnpm hooks' },
+  { rel: 'bunfig.toml', label: 'bun config' }
 ];
 
 /** One root: the canonical path plus the lexical spelling, and what it is for. */

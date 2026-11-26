@@ -19,8 +19,31 @@ export function isRemoteSpec(text: string): boolean {
   return colon > 0 && (slash < 0 || colon < slash);
 }
 
+/** The path has a `..` part. */
+export function hasDotDot(text: string): boolean {
+  return text.split('/').includes('..');
+}
+
 /** `localhost`, `127.x.x.x`, `::1` and `*.localhost`: reachable only from this machine. */
 export function isLoopbackHost(host: string): boolean {
   const h = host.toLowerCase().replace(/^\[|\]$/g, '');
   return h === 'localhost' || h === '::1' || /^127\.\d+\.\d+\.\d+$/.test(h) || h.endsWith('.localhost');
 }
+
+/** Shell keywords: an unquoted word that is one of these is syntax, not a program. */
+export const SHELL_KEYWORDS: ReadonlySet<string> = new Set([
+  '!',
+  '{',
+  '}',
+  'if',
+  'then',
+  'else',
+  'elif',
+  'fi',
+  'do',
+  'done',
+  'while',
+  'until',
+  'esac',
+  'coproc'
+]);

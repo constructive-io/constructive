@@ -18,6 +18,7 @@ import {
   type Grant,
   grantFrom,
   type GrantStore,
+  parseGrantMatch,
   type PermissionDecision,
   type PermissionEngine,
   type PermissionMode,
@@ -34,6 +35,18 @@ import type {
 
 /** The session entry that carries one chat-scope grant. Not sent to the model. */
 export const PERMISSION_GRANT_ENTRY = 'agentic.permissions.grant';
+
+/**
+ * A chat grant read back from a session entry, checked by the rules the kit
+ * saves grants with; `null` for one the kit would not have saved (an edited or
+ * damaged entry), which the lane drops.
+ */
+function restoredGrant(data: unknown): Grant | null {
+  if (typeof data !== 'object' || data === null) return null;
+  const { scope, match, createdAt } = data as Record<string, unknown>;
+  const parsed = parseGrantMatch(match);
+  return scope === 'chat' && parsed !== null && typeof createdAt === 'string' ? { scope, match: parsed, createdAt } : null;
+}
 
 export const PERMISSION_INTERNAL_ERROR = 'permissions: internal error — the call was blocked';
 
@@ -185,9 +198,9 @@ export function createPermissionsExtension(options: PermissionsExtensionOptions)
       chatGrants.length = 0;
       try {
         for (const entry of ctx.sessionManager.getEntries()) {
-          if (entry.type === 'custom' && entry.customType === PERMISSION_GRANT_ENTRY && entry.data) {
-            chatGrants.push(entry.data as Grant);
-          }
+          if (entry.type !== 'custom' || entry.customType !== PERMISSION_GRANT_ENTRY) continue;
+          const grant = restoredGrant(entry.data);
+          if (grant) chatGrants.push(grant);
         }
       } catch (error) {
         options.onError?.(error, 'session_start');

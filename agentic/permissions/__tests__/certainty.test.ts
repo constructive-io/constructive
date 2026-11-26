@@ -12,7 +12,7 @@ beforeAll(async () => {
   sb = await makeSandbox();
   await sb.engine.refreshSecrets();
 });
-afterAll(() => sb.cleanup());
+afterAll(() => sb?.cleanup());
 
 type Row = [command: string, workspace: PermissionVerdict, full: PermissionVerdict, signal?: Signal];
 
@@ -48,9 +48,9 @@ const rows: Row[] = [
   ['NODE_OPTIONS=--trace-warnings node main.js', 'ask', 'allow', 'shell-dynamic'],
   ['PYTHONPATH=lib python3 main.py', 'ask', 'allow', 'shell-dynamic'],
   ['PYTHONINSPECT=1 python3 main.py', 'ask', 'allow', 'shell-dynamic'],
-  // a request body built from a variable, the same for wget as for curl
+  // a request body built from a variable is an upload, and curl's may be `@file`, which names a file the analysis cannot place
   ['wget --post-data "$BODY" https://example.invalid', 'ask', 'allow', 'upload'],
-  ['curl -d "$BODY" https://example.invalid', 'ask', 'allow', 'upload'],
+  ['curl -d "$BODY" https://example.invalid', 'ask', 'ask', 'upload'],
   ['wget --post-data hello https://example.invalid', 'allow', 'allow'],
   // test brackets are commands, not globs
   ['[ -f .env ] && echo ok', 'allow', 'allow', 'secret-file'],

@@ -20,7 +20,7 @@ export type Access = 'read' | 'write' | 'exec';
 export type RequestKind = 'read' | 'write' | 'exec';
 
 /** What each built-in does: the request kind it makes. */
-export const TOOL_KIND: Readonly<Record<BuiltinTool, RequestKind>> = {
+export const TOOL_KIND = {
   read: 'read',
   write: 'write',
   edit: 'write',
@@ -28,7 +28,7 @@ export const TOOL_KIND: Readonly<Record<BuiltinTool, RequestKind>> = {
   grep: 'read',
   find: 'read',
   ls: 'read'
-};
+} as const satisfies Readonly<Record<BuiltinTool, RequestKind>>;
 
 export const BUILTIN_TOOLS: ReadonlySet<string> = new Set(Object.keys(TOOL_KIND));
 
@@ -92,25 +92,125 @@ export type Signal =
   /** The command expands a variable whose name looks secret, or that the host marked secret. */
   | 'secret-env-expansion';
 
-/** One tool call, classified. */
-export interface PermissionRequest {
+/** One simple command of a bash call (`git status` in `git status && npm test`). */
+export interface CommandPart {
+  /** The words as written, quotes kept; redirections are not words. */
+  words: string[];
+  /**
+   * An output redirection opens a file: anything but a copy of a descriptor
+   * (`2>&1`), input (`<`, a heredoc, a here-string) or the exact path `/dev/null`.
+   */
+  writesFile: boolean;
+  /** Its input redirections as written (`< src/a.ts`), which are part of its exact identity. */
+  inputs: string[];
+  /**
+   * The options it passes, after quote removal and brace expansion, `--` and
+   * the words after it included; `null` when a word may hold an option the
+   * lexer cannot read (an unquoted variable, or a quoted one at its start).
+   */
+  options: string[] | null;
+}
+
+interface RequestBase {
   toolCallId: string;
-  toolName: BuiltinTool;
-  kind: RequestKind;
   targets: Target[];
-  /** bash only: the command with whitespace collapsed (the grant key). */
-  command?: string;
   signals: Signal[];
   /** One specific sentence for each signal ("it uploads data: curl -d @.env sends a file's contents"). */
   signalReasons: Partial<Record<Signal, string>>;
 }
 
+/** A bash call, classified. */
+export interface BashRequest extends RequestBase {
+  toolName: 'bash';
+  kind: 'exec';
+  /** The command as its exact-grant key: runs of spaces and tabs made one space where that keeps its meaning. */
+  command: CommandKey;
+  /**
+   * The simple commands of a plain list or pipeline, in order. Absent when
+   * the command uses other shell syntax (`if`, `for`, `{ … }`, a function, a
+   * substitution, a heredoc), changes dir (`cd`, `pushd`, `popd`) or does not
+   * parse: only an exact grant covers it.
+   */
+  parts?: CommandPart[];
+}
+
+/** The built-in tools that work on a path: everything but `bash`. */
+export type FileTool = Exclude<BuiltinTool, 'bash'>;
+
+/** A file tool call (`read`, `write`, `edit`, `grep`, `find`, `ls`), classified: its targets are the paths it touches. */
+export interface FileRequest extends RequestBase {
+  toolName: FileTool;
+  kind: 'read' | 'write';
+}
+
+/** One tool call, classified: a bash call or a file tool call, told apart by `toolName`. */
+export type PermissionRequest = BashRequest | FileRequest;
+
 export type PermissionVerdict = 'allow' | 'ask' | 'deny';
 
+declare const commandKeyBrand: unique symbol;
+declare const listedPrefixBrand: unique symbol;
+
+/**
+ * A bash command as an exact-grant key, normalized by the kit. Only the kit
+ * makes one (a classified request's `command`, `grantFrom`,
+ * `parseCommandPattern`, `parseGrantMatch`); on disk it is a plain string.
+ */
+export type CommandKey = string & { readonly [commandKeyBrand]: true };
+
+/**
+ * A prefix on the kit's table, written as a card writes it (`git status`,
+ * `npm run test`). Only the kit makes one (a card's option,
+ * `parseCommandPattern`, `parseGrantMatch`); on disk it is a plain string.
+ */
+export type ListedPrefix = string & { readonly [listedPrefixBrand]: true };
+
+export type PathMatch = { type: 'path'; access: Access; pathPrefix: string };
+
+/** A bash command, by its exact-grant key. */
+export type CommandMatch = { type: 'command'; command: CommandKey };
+
+/**
+ * Bash commands by their leading words. Each prefix covers a part that
+ * writes no file and starts with those words. A call is covered only when it
+ * raises no signal and every part is covered.
+ */
+export type CommandPrefixMatch = { type: 'command-prefix'; prefixes: ListedPrefix[] };
+
 /** What a grant matches. Never a tool name alone. */
-export type GrantMatch =
-  | { type: 'path'; access: Access; pathPrefix: string }
-  | { type: 'command'; command: string };
+export type GrantMatch = PathMatch | CommandMatch | CommandPrefixMatch;
+
+/** The kind of a command rule: the leading words of a command, or one exact command. */
+export type CommandRuleKind = 'prefix' | 'exact';
+
+/**
+ * A command grant as text, the way a card shows it and the Settings editor
+ * takes it. A `prefix` rule's text is its prefixes, separated by commas
+ * (`git status, npm run test`); an `exact` rule's text is the command as
+ * written, `*` and commas kept (`rm *`).
+ */
+export interface CommandPattern {
+  kind: CommandRuleKind;
+  text: string;
+}
+
+/** A path grant's folder as text (`~/work/lib/`). */
+export interface PathPattern {
+  kind: 'path';
+  text: string;
+}
+
+/** What a grant option shows of the rule it saves, told apart by `kind`. */
+export type GrantPattern = CommandPattern | PathPattern;
+
+/**
+ * Something a host should say beside a rule, because the rule lets a call run
+ * that the kit does not fully check. `script-unchecked`: the prefix runs a
+ * script the kit never reads, which the agent may have changed: one by its
+ * path (`node scripts/build.js`), a package script (`npm run build`), or the
+ * project's tests (`npm test`).
+ */
+export type GrantCaveat = 'script-unchecked';
 
 export type GrantScope = 'chat' | 'project';
 
@@ -123,10 +223,12 @@ export interface Grant {
 /** A scope the user can pick on an ASK, with the exact pattern it would save. */
 export interface GrantOption {
   scope: GrantScope;
-  /** "Allow in this chat", "Always: reads in ~/work/lib/". */
+  /** What the option saves, in words: "Always allow commands that start with git status", "Always allow exactly: rm *". */
   label: string;
-  /** The human-readable pattern ("~/work/lib/", "pnpm dlx shadcn add button"). */
-  pattern: string;
+  /** The rule as text, with its kind: `{ kind: 'prefix', text: 'git status' }`, `{ kind: 'path', text: '~/work/lib/' }`. */
+  pattern: GrantPattern;
+  /** Set when the saved rule needs a caveat beside it; absent otherwise. */
+  caveat?: GrantCaveat;
   match: GrantMatch;
 }
 
@@ -158,7 +260,7 @@ export interface PermissionPrompt {
   signals: Signal[];
   /** One plain sentence per signal, in order. */
   reasons: string[];
-  grantOptions: { scope: GrantScope; label: string; pattern: string }[];
+  grantOptions: Omit<GrantOption, 'match'>[];
 }
 
 /** The filesystem the engine needs. Injected so the pure modules stay testable. */

@@ -5,10 +5,12 @@
  * which sources are secret files, since that needs the real paths.
  */
 
-import type { Analyzer, Arg, Run } from './analyze';
-import { literalArg } from './args';
+import { unreachable } from '../unreachable';
+import { type Analyzer, type Arg, literalStart, type Run } from './analyze';
+import { isKnown, knownTexts, literalArg } from './args';
 import { findRoots } from './file-commands';
-import type { SimpleCommand } from './tokenize';
+import { heredocText, printedText } from './printed';
+import type { Compound, Input, Redirect, SimpleCommand } from './tokenize';
 
 export interface Source {
   raw: string;
@@ -31,15 +33,32 @@ export interface ContentFlow {
 
 /** What one command reads on stdin. */
 export interface Stdin {
+  /** Something feeds it: a pipe, a redirection, or the compound command or runner around it. The shell's own stdin is empty. */
+  fed: boolean;
   /** Files whose contents arrive on stdin. */
   sources: Source[];
-  /** The words on stdin when they are known (`echo a b |`, `<<< a`); `null` when they are not. */
-  words: Arg[] | null;
+  /**
+   * The texts stdin may carry: one when it is sure, more when it depends on
+   * the shell (`echo`'s escapes); `['']` for none; `null` when it cannot be
+   * seen or does not fit the command's text budget. Built only when a
+   * program reads them.
+   */
+  texts: () => readonly string[] | null;
+  /** stdin is a file a `<` redirect names, which a program reads like a script it runs by name (`psql -f`). */
+  file: boolean;
   /**
    * When stdin is a file listing (`find src |`, `git ls-files |`): the roots
    * every listed name lies under. `null` when it is anything else.
    */
   listedUnder: Arg[] | null;
+}
+
+/** The shell's own stdin: nothing. */
+export const NO_INPUT: Stdin = { fed: false, sources: [], texts: () => [''], file: false, listedUnder: null };
+
+/** A stdin the analysis cannot see, carrying the contents of `sources`. */
+export function unseenInput(sources: Source[] = []): Stdin {
+  return { fed: true, sources, texts: () => null, file: false, listedUnder: null };
 }
 
 /** Readers whose output is the file's text unchanged, so redaction still matches it. */
@@ -98,6 +117,7 @@ const NO_CONTENT = new Set([
   'git',
   'source',
   '.',
+  'trap',
   'cp',
   'mv',
   'install',
@@ -111,7 +131,7 @@ const NO_CONTENT = new Set([
 
 /** `head -c`, `grep -o`, `rg -r`: a verbatim reader that cuts values apart. */
 function trims(name: string, rest: readonly Arg[]): boolean {
-  const flags = rest.map((a) => a.text).filter((t) => t.startsWith('-'));
+  const flags = rest.map(literalStart).filter((t) => t.startsWith('-'));
   if (name === 'head' || name === 'tail') return flags.some((t) => /^(-c|--bytes)/.test(t));
   if (name === 'rg' && flags.some((t) => /^(-r|--replace)/.test(t))) return true;
   return flags.some((t) => t === '--only-matching' || /^-[a-zA-Z]*o[a-zA-Z]*$/.test(t));
@@ -123,23 +143,38 @@ export function keepsContent(name: string, rest: readonly Arg[]): boolean {
   return VERBATIM.has(name) && !trims(name, rest);
 }
 
-/** Split words the way `xargs` does (on whitespace). `null` when one is not known. */
-function splitWords(args: readonly Arg[]): Arg[] | null {
-  if (args.some((a) => a.unknown)) return null;
-  return args.flatMap((a) =>
-    a.text
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((text) => literalArg(text, a.raw))
-  );
+/** `fn`'s value, computed on the first call. */
+function once<T>(fn: () => T): () => T {
+  let done = false;
+  let value: T;
+  return () => {
+    if (!done) {
+      value = fn();
+      done = true;
+    }
+    return value;
+  };
 }
 
-/** The words `echo` or `printf` prints; `null` when one is not known. */
-function printedWords(name: string, rest: readonly Arg[]): Arg[] | null {
-  if (name === 'printf') return rest[0]?.text === '-v' ? [] : splitWords(rest);
-  let k = 0;
-  while (k < rest.length && /^-[neE]+$/.test(rest[k].text)) k++;
-  return splitWords(rest.slice(k));
+/** The redirection sets fd 0: an input one with no fd, or any one on fd 0. */
+function setsStdin(r: Redirect): boolean {
+  if (r.fd !== null) return r.fd === 0;
+  switch (r.kind) {
+  case 'heredoc':
+  case 'here-string':
+    return true;
+  case 'file':
+    return r.op === '<' || r.op === '<>' || r.op === '<&';
+  case 'dup':
+    return r.op === '<&';
+  default:
+    return unreachable(r);
+  }
+}
+
+/** The redirection bash applies to fd 0 last, which wins over a pipe and every one before it (`cat <<< a <<< b` reads `b`). */
+function stdinRedirect(redirects: readonly Redirect[]): Redirect | undefined {
+  return redirects.filter(setsStdin).pop();
 }
 
 /**
@@ -148,7 +183,7 @@ function printedWords(name: string, rest: readonly Arg[]): Arg[] | null {
  * that follows symlinks (`-L`), whose names can leave its roots.
  */
 function listedRoots(name: string, rest: readonly Arg[]): Arg[] | null {
-  if (rest.some((a) => a.unknown)) return null;
+  if (!rest.every(isKnown)) return null;
   if (name === 'find') {
     if (rest.some((a) => a.text === '-L' || a.text === '-follow')) return null;
     return findRoots(rest).roots;
@@ -168,8 +203,10 @@ export class FlowTracker {
   readonly flows: ContentFlow[] = [];
   /** The files whose contents each command's stdout carries. */
   private readonly outputs = new Map<SimpleCommand, Source[]>();
-  /** The words each `echo` or `printf` printed. */
-  private readonly printed = new Map<SimpleCommand, Arg[] | null>();
+  /** The stdin of each compound command, which every command in it reads. */
+  private readonly compounds = new Map<Compound, Stdin>();
+  /** The texts each `echo` or `printf` may have printed, built when a program reads them. */
+  private readonly printedTexts = new Map<SimpleCommand, () => readonly string[] | null>();
   /** The roots each file-listing command printed names under. */
   private readonly listed = new Map<SimpleCommand, Arg[]>();
   /** Every source seen so far: what a `( … ) |` group may print. */
@@ -177,39 +214,76 @@ export class FlowTracker {
 
   constructor(private readonly analyzer: Analyzer) {}
 
-  /** What arrives on the command's stdin: from `<`, a here-string, a heredoc, or a pipe. */
+  /** What arrives on the command's stdin: the last redirection of fd 0, or else what feeds it. */
   stdinOf(cmd: SimpleCommand): Stdin {
+    const r = stdinRedirect(cmd.redirects);
+    return r ? this.fromRedirect(r) : this.fromInput(cmd.input);
+  }
+
+  private fromRedirect(r: Redirect): Stdin {
     const { analyzer } = this;
-    const sources: Source[] = [];
-    let words: Arg[] | null = [];
-    let listedUnder: Arg[] | null = null;
-    for (const r of cmd.redirects) {
-      if (r.op !== '<' || !r.target) continue;
-      words = null;
+    const text = (built: () => string | null): Stdin => ({
+      fed: true,
+      sources: [],
+      texts: once(() => {
+        const t = built();
+        return t === null ? null : [t];
+      }),
+      file: false,
+      listedUnder: null
+    });
+    switch (r.kind) {
+    case 'heredoc':
+      return text(() => heredocText(r.doc.body, r.doc.quoted, analyzer.textBudget));
+    case 'here-string': {
+      const known = knownTexts(analyzer.resolveWord(r.word));
+      return text(() => (known?.length === 1 && analyzer.textBudget.takeChars(known[0].length + 1) ? `${known[0]}\n` : null));
+    }
+    case 'file': {
+      if (r.op !== '<' && r.op !== '<>') return unseenInput();
+      const sources: Source[] = [];
       for (const t of analyzer.resolveWord(r.target)) {
-        const abs = t.unknown ? null : analyzer.toAbs(t.text);
+        const abs = t.kind === 'unknown' ? null : analyzer.toAbs(t.text);
         if (abs) sources.push({ raw: t.raw, abs });
       }
+      return { ...unseenInput(sources), file: true };
     }
-    if (cmd.heredocs.length > 0) words = null;
-    for (const w of cmd.hereStrings) {
-      const said = splitWords(analyzer.resolveWord(w));
-      words = words && said ? [...words, ...said] : null;
+    case 'dup':
+      return unseenInput();
+    default:
+      return unreachable(r);
     }
-    if (cmd.pipedIn) {
-      const up = cmd.upstream;
-      if (!up || up === 'group' || up.words.every((w) => GROUP_END.has(w.raw))) {
-        sources.push(...this.all);
-        words = null;
-      } else {
-        sources.push(...(this.outputs.get(up) ?? []));
-        const said = this.printed.get(up);
-        words = words && said ? [...words, ...said] : null;
-        const onlyPipe = cmd.redirects.every((r) => r.op !== '<') && cmd.hereStrings.length === 0 && cmd.heredocs.length === 0;
-        listedUnder = onlyPipe ? (this.listed.get(up) ?? null) : null;
+  }
+
+  private fromInput(input: Input): Stdin {
+    switch (input.kind) {
+    case 'inherited':
+      return this.analyzer.inheritedStdin;
+    case 'group-pipe':
+      return unseenInput([...this.all]);
+    case 'pipe': {
+      const up = input.from;
+      if (up.words.every((w) => GROUP_END.has(w.raw))) return unseenInput([...this.all]);
+      return {
+        fed: true,
+        sources: this.outputs.get(up) ?? [],
+        texts: this.printedTexts.get(up) ?? (() => null),
+        file: false,
+        listedUnder: this.listed.get(up) ?? null
+      };
+    }
+    case 'compound': {
+      let stdin = this.compounds.get(input.of);
+      if (!stdin) {
+        const r = stdinRedirect(input.of.redirects);
+        stdin = r ? this.fromRedirect(r) : this.fromInput(input.of.input);
+        this.compounds.set(input.of, stdin);
       }
+      return stdin;
     }
-    return { sources, words, listedUnder };
+    default:
+      return unreachable(input);
+    }
   }
 
   /**
@@ -218,10 +292,16 @@ export class FlowTracker {
    */
   record(cmd: SimpleCommand, run: Run | null, sources: Source[], redirects: Source[]): void {
     this.outputs.set(cmd, sources);
-    this.all.push(...sources);
+    for (const source of sources) this.all.push(source);
     if (!run) return;
-    if (run.name === 'echo' || run.name === 'printf') this.printed.set(cmd, printedWords(run.name, run.rest));
-    const roots = listedRoots(run.name, run.rest);
+    // What a command xargs runs prints is the output of every run it makes, which the analysis does not build.
+    if (!run.xargs && (run.name === 'echo' || run.name === 'printf')) {
+      const texts = knownTexts(run.rest);
+      const { name } = run;
+      const budget = this.analyzer.textBudget;
+      this.printedTexts.set(cmd, once(() => (texts === null ? null : printedText(name, texts, budget))));
+    }
+    const roots = run.xargs ? null : listedRoots(run.name, run.rest);
     if (roots) this.listed.set(cmd, roots);
     if (sources.length === 0) return;
     if (!keepsContent(run.name, run.rest)) this.flows.push({ sources, to: { kind: 'transform' }, what: run.name });

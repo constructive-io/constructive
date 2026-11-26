@@ -1,10 +1,13 @@
 import type { ApprovalOutcome, ApprovalRequest } from '@agentic-kit/harness';
 import type {
+  CommandKey,
+  FileTool,
   Grant,
   GrantOption,
   PermissionDecision,
   PermissionEngine,
   PermissionPrompt,
+  PermissionRequest,
   PermissionVerdict
 } from '@agentic-kit/permissions';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
@@ -55,7 +58,7 @@ const fakePi = (entries: unknown[] = []) => {
 const chatOption: GrantOption = {
   scope: 'chat',
   label: 'Allow in this chat',
-  pattern: '~/work/lib/',
+  pattern: { kind: 'path', text: '~/work/lib/' },
   match: { type: 'path', access: 'read', pathPrefix: '/home/u/work/lib' }
 };
 const projectOption: GrantOption = { ...chatOption, scope: 'project', label: 'Always: reads in ~/work/lib/' };
@@ -63,16 +66,19 @@ const projectOption: GrantOption = { ...chatOption, scope: 'project', label: 'Al
 const CARD = { title: 'Read a file outside the project' } as PermissionPrompt;
 
 const decisionFor = (toolName: string, verdict: PermissionVerdict, toolCallId = 'call-1'): PermissionDecision => {
-  const request: PermissionDecision['request'] = {
+  const base = {
     toolCallId,
-    toolName: toolName as PermissionDecision['request']['toolName'],
-    kind: 'read',
     targets: [
-      { raw: 'x', path: '/home/u/work/lib/x', access: 'read', zone: 'outside', secretFile: false, label: 'outside' }
+      { raw: 'x', path: '/home/u/work/lib/x', access: 'read' as const, zone: 'outside' as const, secretFile: false, label: 'outside' }
     ],
-    signals: ['outside-workspace'],
+    signals: ['outside-workspace' as const],
     signalReasons: {}
   };
+  // A fake engine decision: the command key is made up, not normalized by the kit.
+  const request: PermissionRequest =
+    toolName === 'bash'
+      ? { ...base, toolName: 'bash', kind: 'exec', command: 'x' as CommandKey }
+      : { ...base, toolName: toolName as FileTool, kind: 'read' };
   const reason = `permissions: ${toolName} ${verdict}`;
   return verdict === 'ask'
     ? { decision: verdict, reason, request, prompt: CARD, grantOptions: [chatOption, projectOption] }
@@ -202,6 +208,24 @@ describe('createPermissionsExtension', () => {
     await expect(host.toolCall('read', { path: '/home/u/work/lib/a.ts' })).resolves.toBeUndefined();
     expect(lane.chatGrants).toEqual([grant]);
     expect(seenGrants[0]).toEqual([grant]);
+  });
+
+  it('drops a restored chat grant that the kit would not have saved', async () => {
+    const { engine } = fakeEngine({ read: 'ask' });
+    const grant: Grant = { scope: 'chat', match: chatOption.match, createdAt: 'earlier' };
+    const entry = (data: unknown) => ({ type: 'custom', customType: PERMISSION_GRANT_ENTRY, data });
+    const host = fakePi([
+      entry({ scope: 'chat', match: { type: 'command-prefix', prefixes: new Array(1) }, createdAt: 'x' }),
+      entry({ scope: 'chat', match: { type: 'path', access: 'read', pathPrefix: 'relative' }, createdAt: 'x' }),
+      entry({ scope: 'project', match: chatOption.match, createdAt: 'x' }),
+      entry('not a grant'),
+      entry({ ...grant, match: { ...grant.match, extra: 1 } })
+    ]);
+    const lane = createPermissionsExtension({ runId: 'r', engine, getMode: () => 'workspace' });
+    lane.extension(host.pi);
+
+    await host.start();
+    expect(lane.chatGrants).toEqual([grant]);
   });
 
   it('hands a project grant to the host store, not to the session', async () => {

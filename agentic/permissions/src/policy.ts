@@ -8,15 +8,20 @@
  * 5. the mode default (see `modeDefault`)
  */
 
-import { ACCESS_VERB, findGrant, grantOptionsFor, matchCovers } from './grants';
+import { ACCESS_VERB } from './grant-copy';
+import { findGrants, grantOptionsFor, matchCovers } from './grants';
+import { NEXT_STEP } from './guidance';
 import { showPath } from './paths';
 import { buildPrompt, type PromptDisplay } from './prompt';
 import { SIGNAL_RULES } from './signals';
-import type { Grant, GrantMatch, PermissionDecision, PermissionMode, PermissionRequest, Signal, Target } from './types';
+import type { CommandMatch, Grant, PathMatch, PermissionDecision, PermissionMode, PermissionRequest, Signal, Target } from './types';
+
+/** What a rule matches. A command prefix is left out: it covers only calls that raise no signal, so a deny rule built on one would skip the risky calls. */
+export type RuleMatch = PathMatch | CommandMatch;
 
 export interface PolicyRules {
-  deny?: readonly GrantMatch[];
-  allow?: readonly GrantMatch[];
+  deny?: readonly RuleMatch[];
+  allow?: readonly RuleMatch[];
 }
 
 export interface PolicyContext extends PromptDisplay {
@@ -41,10 +46,16 @@ function denyReason(request: PermissionRequest, target: Target, ctx: PromptDispl
   const bash = request.toolName === 'bash';
   if (target.zone === 'hard-deny') {
     const what = bash ? `this command ${ACCESS_VERB[target.access]} ${shown}, which` : `${ING[target.access]} ${shown}`;
-    return `permissions: ${what} is not allowed (${target.label}; blocked in every mode)`;
+    return `permissions: ${what} is not allowed (${target.label}; blocked in every mode). ${NEXT_STEP.blocked}`;
   }
   const what = bash ? `this command writes ${shown}, which` : `writing ${shown}`;
-  return `permissions: ${what} is not allowed (${target.label}; protected in every mode)`;
+  return `permissions: ${what} is not allowed (${target.label}; protected in every mode). ${NEXT_STEP.blocked}`;
+}
+
+/** "a chat grant", "project grants", "chat and project grants". */
+function grantsPhrase(grants: readonly Grant[]): string {
+  const scopes = [...new Set(grants.map((g) => g.scope))].sort();
+  return grants.length === 1 ? `a ${scopes[0]} grant` : `${scopes.join(' and ')} grants`;
 }
 
 /** What the request is, for a reason: "reading /etc/hosts", "this command". */
@@ -76,10 +87,10 @@ export function decide(request: PermissionRequest, ctx: PolicyContext): Permissi
   const blocked = blockedTarget(request);
   if (blocked) return deny(denyReason(request, blocked, ctx));
   if (ctx.rules?.deny?.some((m) => matchCovers(m, request))) {
-    return deny(`permissions: ${describe(request, ctx)} is blocked by a deny rule`);
+    return deny(`permissions: ${describe(request, ctx)} is blocked by a deny rule. ${NEXT_STEP.blocked}`);
   }
-  const grant = findGrant(ctx.grants, request);
-  if (grant) return allow(`permissions: allowed by a ${grant.scope} grant`);
+  const covering = findGrants(ctx.grants, request);
+  if (covering.length > 0) return allow(`permissions: allowed by ${grantsPhrase(covering)}`);
   if (ctx.rules?.allow?.some((m) => matchCovers(m, request)) && !request.signals.includes('unresolvable-path')) {
     return allow('permissions: allowed by an allow rule');
   }
@@ -90,7 +101,7 @@ export function decide(request: PermissionRequest, ctx: PolicyContext): Permissi
   // (a secret file's values reach the model only as placeholders).
   const explained = request.signals.map((s) => reasonFor(s, request));
   const reasons = [...new Set([...asks, ...explained])];
-  const grantOptions = grantOptionsFor(request, ctx.homeDir);
+  const grantOptions = grantOptionsFor(request, ctx.homeDir, ctx.grants);
   return {
     decision: 'ask',
     reason: `permissions: ${describe(request, ctx)} needs approval: ${asks.join('; ')}`,
