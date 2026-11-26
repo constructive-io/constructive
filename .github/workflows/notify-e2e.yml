@@ -20,6 +20,12 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Setup Node.js
+        if: "${{ startsWith(github.event.head_commit.message, 'chore(release): publish') }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Wait for release packages to reach npm
         if: "${{ startsWith(github.event.head_commit.message, 'chore(release): publish') }}"
         run: |
