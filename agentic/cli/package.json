@@ -34,9 +34,8 @@
   "dependencies": {
     "@agentic-kit/harness": "workspace:*",
     "@agentic-kit/pi": "workspace:*",
-    "@constructive-io/sdk": "workspace:^",
+    "@agentic-kit/session": "workspace:^",
     "@earendil-works/pi-coding-agent": "1.4.0",
-    "appstash": "^0.8.0",
     "inquirerer": "^4.9.8"
   },
   "keywords": [

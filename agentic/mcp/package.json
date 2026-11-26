@@ -1,0 +1,44 @@
+{
+  "name": "@agentic-kit/mcp",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "serves HarnessTools as MCP tools: each write is marked for the host to ask the person, and its result carries its plan",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/harness": "workspace:^",
+    "@modelcontextprotocol/server": "2.4.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.4.0"
+  },
+  "keywords": [
+    "agentic-kit",
+    "mcp",
+    "tools"
+  ]
+}

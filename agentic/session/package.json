@@ -1,0 +1,43 @@
+{
+  "name": "@agentic-kit/session",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "the shared Constructive sign-in: backend contexts, email and password sign-in, the stored session, agent credentials and the CONSTRUCTIVE_* environment overrides, for every binary",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@agentic-kit/db-tools": "workspace:^",
+    "@constructive-io/fetch": "^1.2.0",
+    "@constructive-io/sdk": "workspace:^",
+    "appstash": "^0.8.0"
+  },
+  "keywords": [
+    "agentic-kit",
+    "constructive",
+    "auth",
+    "session"
+  ]
+}

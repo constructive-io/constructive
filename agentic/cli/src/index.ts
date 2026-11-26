@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-import { refreshApiKeyIfNeeded } from './auth';
-import { loadBackendConfig } from './backend-store';
-import { init, login, logout, skillsList, skillsUpdate, usage, whoami } from './commands';
+import { keyEndsSoon, resolveSession, sessionProblem } from '@agentic-kit/session';
+
+import { init, login, logout, REPAIR_HINT, skillsList, skillsUpdate, usage, whoami } from './commands';
 import { loadConfig } from './config';
 import { materializeDbTools } from './db-tools';
 import { assembleSkills } from './skills';
 
 export { AgentCliConfig, loadConfig } from './config';
-export { HOST_ENV_VARS, materializeDbTools } from './db-tools';
+export { materializeDbTools } from './db-tools';
 export { assembleSkills } from './skills';
 
 async function run(args: string[]): Promise<void> {
-  const config = loadConfig(process.env.AGENT_HOME);
+  const config = loadConfig();
   // pi resolves its agent dir (skills, sessions, auth) from this env var;
   // point it at the appstash-owned dir before the SDK loads.
   process.env.PI_CODING_AGENT_DIR ??= config.agentDir;
@@ -34,7 +34,7 @@ async function run(args: string[]): Promise<void> {
     return;
   }
   if (first === 'whoami') {
-    whoami(config);
+    await whoami(config);
     return;
   }
   if (first === 'skills') {
@@ -46,15 +46,12 @@ async function run(args: string[]): Promise<void> {
   const log = (msg: string) => console.log(`[agent] ${msg}`);
   await assembleSkills(config, log);
   materializeDbTools(config, log);
-  // Fire-and-forget: keep the stored API key fresh (<7 days to expiry re-mints)
-  // without ever blocking startup. Only an expired login session gets a line.
-  const backend = loadBackendConfig(config.store);
-  if (backend) {
-    void refreshApiKeyIfNeeded({ store: config.store, authEndpoint: backend.authEndpoint })
-      .then((status) => {
-        if (status === 'reauth-required') log('API key expired — run `agent login`');
-      })
-      .catch(() => {});
+  const session = resolveSession({ store: config.store });
+  const problem = sessionProblem(session, REPAIR_HINT);
+  if (problem) log(`warning: ${problem}`);
+  const key = session.kind === 'signed-in' ? session.account.key : null;
+  if (key?.kind === 'active' && keyEndsSoon({ expiresAt: key.expiresAt })) {
+    log(`warning: the API key ${Date.parse(key.expiresAt) <= Date.now() ? 'ended' : 'ends'} at ${key.expiresAt}. Run \`agent login\` to sign in again and get a new one.`);
   }
   // pi is ESM-only; tsc's CJS output would downlevel a plain `await import()`
   // into `require()`, which cannot load it. Indirect the import so it survives

@@ -1,17 +1,9 @@
 import { FetchLike, HarnessDirs, harnessDirs, SkillsManifest } from '@agentic-kit/harness';
-import { ConfigStore, createConfigStore } from 'appstash';
+import { ConfigStore, openStore, STASH_NAME, stashBaseDir } from '@agentic-kit/session';
 import * as fs from 'fs';
 import * as path from 'path';
 
 export const DEFAULT_SKILLS_REPO = 'constructive-io/constructive-skills';
-
-/**
- * Directory identity shared with the csdk CLI and the desktop app, so a sign-in
- * here is a sign-in there. `agent` is only the tool's own name (env prefixes,
- * help text).
- */
-export const STASH_NAME = 'constructive';
-export const TOOL_NAME = 'agent';
 export const DEFAULT_SKILLS_PIN = 'main';
 
 /** Layer names understood by the assembler. */
@@ -51,12 +43,12 @@ export function defaultManifest(): SkillsManifest {
   };
 }
 
-export function loadConfig(baseDir?: string): AgentCliConfig {
-  const dirs = harnessDirs('constructive', baseDir);
+export function loadConfig(baseDir: string | undefined = stashBaseDir()): AgentCliConfig {
+  const dirs = harnessDirs(STASH_NAME, baseDir);
   const agentDir = path.join(dirs.stash.data, 'agent');
   const overlayDir = path.join(dirs.stash.config, 'skills-overlay');
   const manifestFile = path.join(dirs.stash.config, 'skills-manifest.json');
-  const store = createConfigStore(TOOL_NAME, { stashName: STASH_NAME, baseDir });
+  const store = openStore(baseDir);
   fs.mkdirSync(agentDir, { recursive: true });
   fs.mkdirSync(overlayDir, { recursive: true });
 

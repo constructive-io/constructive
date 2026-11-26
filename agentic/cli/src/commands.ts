@@ -1,13 +1,15 @@
+import {
+  backendFromEndpoints,
+  listBackends,
+  type PreviousKey,
+  resolveSession,
+  sessionProblem,
+  signIn,
+  signOut,
+  verifySession
+} from '@agentic-kit/session';
 import { Inquirerer } from 'inquirerer';
 
-import { loadSession } from './account-store';
-import { signIn, signOut } from './auth';
-import {
-  backendFromApiEndpoint,
-  contextNameFor,
-  loadBackendConfig,
-  saveBackendConfig
-} from './backend-store';
 import { AgentCliConfig, defaultManifest, saveManifestFile } from './config';
 import { assembleSkills } from './skills';
 
@@ -61,11 +63,12 @@ function maskKey(token: string): string {
 export async function login(config: AgentCliConfig, argv: Record<string, unknown>): Promise<void> {
   if (!process.stdin.isTTY && !(argv.email && argv.password)) {
     throw new Error(
-      'agent login is interactive and needs a terminal. For headless use, set CONSTRUCTIVE_USER_ID, CONSTRUCTIVE_ACCESS_TOKEN, and CONSTRUCTIVE_API_KEY.'
+      'agent login is interactive and needs a terminal. For headless use, set CONSTRUCTIVE_API_ENDPOINT, CONSTRUCTIVE_USER_ID, CONSTRUCTIVE_ACCESS_TOKEN, and CONSTRUCTIVE_API_KEY.'
     );
   }
 
-  const saved = loadBackendConfig(config.store);
+  const current = listBackends(config.store).find((backend) => backend.current);
+  const savedEndpoint = current?.status === 'complete' ? current.backend.apiEndpoint : current?.status === 'incomplete' ? current.apiEndpoint : undefined;
   const prompter = new Inquirerer({ noTty: !process.stdin.isTTY });
   try {
     const answers = await prompter.prompt(argv, [
@@ -73,71 +76,94 @@ export async function login(config: AgentCliConfig, argv: Record<string, unknown
         type: 'text',
         name: 'apiUrl',
         message: 'API GraphQL endpoint (e.g. https://api.example.com/graphql)',
-        default: saved?.apiEndpoint ?? process.env.CONSTRUCTIVE_API_ENDPOINT
+        default: savedEndpoint ?? process.env.CONSTRUCTIVE_API_ENDPOINT
       },
       { type: 'text', name: 'email', message: 'Email' },
       { type: 'password', name: 'password', message: 'Password' }
     ]);
 
-    const backend = backendFromApiEndpoint(String(answers.apiUrl ?? ''));
-
-    // File the session under the backend's context name, then commit the backend
-    // itself: a failed sign-in must leave neither behind.
-    const contextName = contextNameFor(backend);
-    const session = await signIn({
+    const backend = backendFromEndpoints({ api: String(answers.apiUrl ?? '') });
+    const { session, context, apiKey, previousKey } = await signIn({
       store: config.store,
-      context: contextName,
-      authEndpoint: backend.authEndpoint,
+      backend,
       email: String(answers.email ?? ''),
       password: String(answers.password ?? '')
     });
-    saveBackendConfig(config.store, backend);
 
     log(`signed in as ${session.email}`);
     log(`backend: ${backend.apiEndpoint}`);
     if (session.apiKey) {
       log(`API key ${maskKey(session.apiKey)} (expires ${session.apiKeyExpiresAt ?? 'unknown'})`);
-    } else {
-      log('warning: API key mint failed — db tools stay signed out. Run `agent login` again to retry.');
     }
-    log(`session stored in context ${contextName}`);
+    if (apiKey.kind === 'not-minted') {
+      log(`warning: no new API key was minted (${apiKey.reason}); the previous key stays in use. Run \`agent login\` again to retry.`);
+    }
+    const replaced = previousKeyWarning(previousKey);
+    if (replaced) log(`warning: ${replaced}`);
+    log(`session stored in context ${context}`);
   } finally {
     prompter.close();
   }
 }
 
+function previousKeyWarning(previousKey: PreviousKey): string | null {
+  if (previousKey.kind !== 'failed') return null;
+  return `the API key ${previousKey.keyId} of the replaced session could not be revoked (${previousKey.reason}); it stays valid until it expires.`;
+}
+
 export async function logout(config: AgentCliConfig): Promise<void> {
-  const backend = loadBackendConfig(config.store);
-  if (!backend) {
+  const result = await signOut({ store: config.store, session: resolveSession({ store: config.store }) });
+  if (result.kind === 'not-signed-in') {
     log('not signed in.');
     return;
   }
-  const wasSignedIn = await signOut({
-    store: config.store,
-    authEndpoint: backend.authEndpoint
-  });
-  if (wasSignedIn) log('signed out — API key revoked and session cleared.');
-  else log('not signed in.');
+  if (result.kind === 'from-environment') {
+    log('nothing to sign out of: the session comes from the environment (CONSTRUCTIVE_USER_ID, CONSTRUCTIVE_ACCESS_TOKEN). Unset them to sign out.');
+    return;
+  }
+  switch (result.key.kind) {
+  case 'revoked':
+    log('signed out — API key revoked and session cleared.');
+    break;
+  case 'absent':
+    log('signed out — session cleared (it had no API key).');
+    break;
+  case 'failed':
+    log(`signed out — session cleared, but the API key ${result.key.keyId} could not be revoked (${result.key.reason}); it stays valid until it expires.`);
+    break;
+  }
 }
 
-export function whoami(config: AgentCliConfig): void {
-  const session = loadSession(config.store);
-  if (!session) {
-    log('not signed in — run `agent login`');
+/** The `agent` command that stores a complete backend context. */
+export const REPAIR_HINT = 'Run `agent login` to store a complete backend.';
+
+export async function whoami(config: AgentCliConfig): Promise<void> {
+  const session = resolveSession({ store: config.store });
+  if (session.kind !== 'signed-in') {
+    log(sessionProblem(session, REPAIR_HINT) ?? 'not signed in — run `agent login`');
     process.exitCode = 1;
     return;
   }
-  const backend = loadBackendConfig(config.store);
-  log(`signed in as ${session.email}`);
-  log(`user id: ${session.userId}`);
-  log(`backend: ${backend?.apiEndpoint ?? 'unknown'}`);
-  if (session.apiKey) {
-    log(`API key: ${maskKey(session.apiKey)} (expires ${session.apiKeyExpiresAt ?? 'unknown'})`);
+  const { account, backend } = session;
+  log(`signed in as ${account.email ?? `user ${account.userId}`}${session.source === 'env' ? ' (from the environment)' : ''}`);
+  log(`user id: ${account.userId}`);
+  log(`backend: ${backend.apiEndpoint}`);
+  if (account.key.kind === 'active') {
+    log(`API key: ${maskKey(account.key.apiKey)} (expires ${account.key.expiresAt ?? 'unknown'})`);
   } else {
     log('API key: none — db tools stay signed out. Run `agent login` to mint one.');
   }
-  if (session.accessTokenExpiresAt) log(`access token expires: ${session.accessTokenExpiresAt}`);
-  log(`context: ${config.store.getCurrentContext()?.name ?? 'none'}`);
+  if (account.key.kind === 'none' && account.accessTokenExpiresAt) log(`access token expires: ${account.accessTokenExpiresAt}`);
+  log(`context: ${session.context ?? 'none'}`);
+  const check = await verifySession(session);
+  if (check.kind === 'accepted') {
+    log('credential: accepted by the backend');
+  } else if (check.kind === 'rejected') {
+    log(`credential: rejected — ${check.reason} Run \`agent login\` to sign in again.`);
+    process.exitCode = 1;
+  } else {
+    log(`credential: not checked — ${check.reason}`);
+  }
 }
 
 export function usage(): void {
