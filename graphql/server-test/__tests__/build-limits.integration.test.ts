@@ -7,7 +7,26 @@
  *   pnpm test -- --testPathPattern=build-limits.integration
  */
 
+// A test-only gate in front of the real handler build: the first build holds
+// the only slot at the gate until the test releases it, so the overlap the
+// test asserts on does not depend on timing.
+let mockGate: Promise<void> | undefined;
+let mockBuildStarted: (() => void) | undefined;
+
+jest.mock('graphile-cache', () => {
+  const actual = jest.requireActual('graphile-cache');
+  return {
+    ...actual,
+    createGraphileInstance: async (...args: Parameters<typeof actual.createGraphileInstance>) => {
+      mockBuildStarted?.();
+      if (mockGate) await mockGate;
+      return actual.createGraphileInstance(...args);
+    }
+  };
+});
+
 import path from 'path';
+import type { PgTestClient } from 'pgsql-test';
 import type supertest from 'supertest';
 
 import { getConnections, seed } from '../src';
@@ -35,6 +54,8 @@ const schemaSets = [
 
 describe('bounded cold handler builds', () => {
   let request: supertest.Agent;
+  let pg: PgTestClient;
+  let db: PgTestClient;
   let teardown: () => Promise<void>;
 
   const post = (schemata: string[]) =>
@@ -45,7 +66,7 @@ describe('bounded cold handler builds', () => {
       .send({ query: '{ __typename }' });
 
   beforeAll(async () => {
-    ({ request, teardown } = await getConnections(
+    ({ request, pg, db, teardown } = await getConnections(
       {
         schemas: schemaSets[2],
         authRole: 'anonymous',
@@ -68,22 +89,37 @@ describe('bounded cold handler builds', () => {
     ));
   });
 
+  beforeEach(async () => {
+    await pg.beforeEach();
+    await db.beforeEach();
+  });
+
+  afterEach(async () => {
+    mockGate = undefined;
+    mockBuildStarted = undefined;
+    await db.afterEach();
+    await pg.afterEach();
+  });
+
   afterAll(async () => {
     await teardown();
   });
 
-  it('refuses builds beyond the limit with 503 and serves them on retry', async () => {
-    const first = await Promise.all(schemaSets.map((schemata) => post(schemata)));
+  it('refuses builds while the only slot is taken and serves them once it is free', async () => {
+    let releaseGate!: () => void;
+    mockGate = new Promise<void>((resolve) => {
+      releaseGate = resolve;
+    });
+    const firstBuildStarted = new Promise<void>((resolve) => {
+      mockBuildStarted = resolve;
+    });
 
-    const served = first.filter((res) => res.status === 200);
-    const refused = first.filter((res) => res.status !== 200);
-    // The first build to take the slot holds it for the whole schema build,
-    // while the other requests arrive within a few milliseconds of it.
-    expect(served.length).toBeGreaterThanOrEqual(1);
-    expect(refused.length).toBeGreaterThanOrEqual(1);
-    for (const res of served) {
-      expect(res.body).toEqual({ data: { __typename: 'Query' } });
-    }
+    // `then` sends the request; the first build takes the slot and waits at the gate.
+    const first = post(schemaSets[0]).then((res) => res);
+    await firstBuildStarted;
+    mockBuildStarted = undefined;
+
+    const refused = await Promise.all(schemaSets.slice(1).map((schemata) => post(schemata)));
     for (const res of refused) {
       expect(res.status).toBe(503);
       expect(res.headers['retry-after']).toBe('2');
@@ -92,8 +128,14 @@ describe('bounded cold handler builds', () => {
       expect(res.body.data).toBeUndefined();
     }
 
-    // Retried one at a time, every service gets its slot and is served.
-    for (const schemata of schemaSets) {
+    mockGate = undefined;
+    releaseGate();
+    const served = await first;
+    expect(served.status).toBe(200);
+    expect(served.body).toEqual({ data: { __typename: 'Query' } });
+
+    // The slot is free again: the refused services are built and served on retry.
+    for (const schemata of schemaSets.slice(1)) {
       const retry = await post(schemata);
       expect(retry.status).toBe(200);
       expect(retry.body).toEqual({ data: { __typename: 'Query' } });

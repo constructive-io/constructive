@@ -15,8 +15,9 @@ const UNAVAILABLE_SQLSTATES = new Set([
   '57P03' // cannot_connect_now
 ]);
 
-/** Socket-level failures reported by Node. */
+/** Socket-level failures reported by Node, and a temporary DNS failure. */
 const UNAVAILABLE_SOCKET_CODES = new Set([
+  'EAI_AGAIN',
   'ECONNREFUSED',
   'ECONNRESET',
   'ETIMEDOUT',

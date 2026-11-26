@@ -16,7 +16,7 @@ describe('isDatabaseUnavailableError', () => {
     expect(isDatabaseUnavailableError(withCode(code))).toBe(true);
   });
 
-  it.each(['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'EPIPE', 'EHOSTUNREACH', 'ENETUNREACH'])(
+  it.each(['EAI_AGAIN', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'EPIPE', 'EHOSTUNREACH', 'ENETUNREACH'])(
     'treats socket error %s as unavailable',
     (code) => {
       expect(isDatabaseUnavailableError(withCode(code))).toBe(true);
@@ -45,6 +45,7 @@ describe('isDatabaseUnavailableError', () => {
     ['a permission error', withCode('42501')],
     ['a cancelled statement', withCode('57014')],
     ['a plain error', new Error('boom')],
+    ['an unknown host', withCode('ENOTFOUND')],
     ['a near-miss code', withCode('0800')]
   ])('does not treat %s as unavailable', (_label, error) => {
     expect(isDatabaseUnavailableError(error)).toBe(false);
