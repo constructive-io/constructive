@@ -409,7 +409,7 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.errors).toEqual([
-        expect.objectContaining({ extensions: expect.objectContaining({ code }) })
+        expect.objectContaining({ extensions: expect.objectContaining({ code, class: 'public' }) })
       ]);
     });
 
