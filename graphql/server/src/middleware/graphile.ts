@@ -2,8 +2,13 @@ import './types'; // for Request type
 
 import { ConstructiveError, errors, format } from '@constructive-io/errors';
 import type { ComputeConfig } from '@constructive-io/express-context';
-import { DEFAULT_REQUEST_PROTECTION, protectionPgSettings } from '@constructive-io/express-context';
-import type { ConstructiveOptions } from '@constructive-io/graphql-types';
+import {
+  ConcurrencyLimiter,
+  DEFAULT_REQUEST_PROTECTION,
+  protectionPgSettings
+} from '@constructive-io/express-context';
+import type { ConstructiveOptions, GraphileBuildLimits } from '@constructive-io/graphql-types';
+import { graphileBuildLimitDefaults } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import { parse as parseAcceptLanguage } from 'accept-language-parser';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
@@ -27,6 +32,7 @@ import type { IncomingMessage } from 'http';
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import errorPage404Message from '../errors/404-message';
 import { HandlerCreationError } from '../errors/api-errors';
+import { isDatabaseUnavailableError } from '../errors/database-availability';
 import { respondWithGraphQLError } from '../errors/graphql-response';
 import { AuthCookiePlugin } from '../plugins/auth-cookie-plugin';
 import { CaptchaPlugin } from '../plugins/captcha-plugin';
@@ -76,6 +82,33 @@ export function getInFlightKeys(): string[] {
 export function clearInFlightMap(): void {
   creating.clear();
 }
+
+// =============================================================================
+// Build Slots: bounded concurrent handler builds
+// =============================================================================
+
+/**
+ * Bounds distinct handler builds across the process. Coalesced requests share
+ * one build and one slot. Every build introspects through the served pool, so
+ * one process-wide key bounds what that pool has to absorb.
+ */
+const buildSlots = new ConcurrencyLimiter();
+const BUILD_SLOTS = 'graphile-build';
+
+/**
+ * Returns how many handler builds hold a slot and how many wait for one.
+ * Useful for monitoring and debugging.
+ */
+export function getBuildSlotStats(): { active: number; queued: number } {
+  return { active: buildSlots.activeFor(BUILD_SLOTS), queued: buildSlots.queuedFor(BUILD_SLOTS) };
+}
+
+/** A retryable refusal: the build could not start, or the database was unreachable. */
+const isBuildUnavailable = (error: unknown): error is ConstructiveError =>
+  error instanceof ConstructiveError && error.code === 'SCHEMA_BUILD_UNAVAILABLE';
+
+/** Seconds for a `Retry-After` header: the configured wait, at least one. */
+const retryAfterSeconds = (ms: number): string => String(Math.max(Math.ceil(ms / 1000), 1));
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
@@ -415,6 +448,12 @@ const MAX_SERVICE_RESOLUTIONS = 3;
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+  const configuredLimits = opts.graphile?.buildLimits;
+  const buildLimits: Required<GraphileBuildLimits> = {
+    concurrency: configuredLimits?.concurrency ?? graphileBuildLimitDefaults.concurrency,
+    queueMax: configuredLimits?.queueMax ?? graphileBuildLimitDefaults.queueMax,
+    queueWaitMs: configuredLimits?.queueWaitMs ?? graphileBuildLimitDefaults.queueWaitMs
+  };
 
   /** A cached, coalesced or newly built handler for one resolution of the service. */
   const handlerFor = async (
@@ -454,6 +493,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       } catch (error) {
         // The service this waiter resolved is gone too: resolve it again.
         if (error instanceof ServiceInvalidatedError) throw error;
+        // Retrying a build that could not start, or could not reach the
+        // database, only adds load to what refused it: answer every waiter.
+        if (isBuildUnavailable(error)) throw error;
         log.warn(`${label} Coalesced request failed for PostGraphile[${key}], retrying`, error);
         // Fall through to Phase C to retry creation
       }
@@ -483,10 +525,8 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
     const pool = api.tenantPool;
 
-    // Register the creation promise before any asynchronous preset work so
-    // concurrent requests coalesce while optional plugin modules load.
     const startedUnder = generationOf(key);
-    const creationPromise = (async () => {
+    const buildHandler = async (): Promise<GraphileCacheEntry> => {
       const compute = api.apiId ? await req.constructive?.useModule('compute') : undefined;
       const platform = api.databaseId ? await req.constructive?.useModule('platform') : undefined;
       const preset = buildPreset(
@@ -532,6 +572,40 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // has been released, so coalesced waiters must not be handed it.
       await cacheGraphileInstance(key, instance);
       return instance;
+    };
+
+    // Register the creation promise before any asynchronous preset work so
+    // concurrent requests coalesce while optional plugin modules load.
+    const creationPromise = (async () => {
+      const slot = await buildSlots.acquire(BUILD_SLOTS, {
+        limit: buildLimits.concurrency,
+        queueLimit: buildLimits.queueMax,
+        queueWaitMs: buildLimits.queueWaitMs
+      });
+      if (!slot.granted) {
+        log.warn(
+          `${label} PostGraphile[${key}] build refused: ${slot.refusal} after ${slot.queuedMs}ms ` +
+            `(concurrency=${buildLimits.concurrency} queueMax=${buildLimits.queueMax})`
+        );
+        throw errors.SCHEMA_BUILD_UNAVAILABLE();
+      }
+      try {
+        // The service changed while this build waited for a slot: the handler
+        // would be discarded at admission, so the requests resolve it again now.
+        if (generationOf(key) !== startedUnder) throw new ServiceInvalidatedError(key);
+        return await buildHandler();
+      } catch (error) {
+        // The database was unreachable or dropped the connection: nothing about
+        // the request has to change for a later attempt to succeed, so every
+        // request waiting on this build is told to retry instead of rebuilding.
+        if (isDatabaseUnavailableError(error)) {
+          log.error(`${label} PostGraphile[${key}] build could not reach the database:`, error);
+          throw errors.SCHEMA_BUILD_UNAVAILABLE();
+        }
+        throw error;
+      } finally {
+        slot.release();
+      }
     })();
     creating.set(key, creationPromise);
 
@@ -540,7 +614,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       log.info(`${label} Cached PostGraphile v5 handler key=${key} databaseId=${databaseLabel}`);
       return instance;
     } catch (error) {
-      if (error instanceof ServiceInvalidatedError) throw error;
+      if (error instanceof ServiceInvalidatedError || isBuildUnavailable(error)) throw error;
       log.error(`${label} Failed to create PostGraphile[${key}]:`, error);
       const cause = error instanceof Error ? error.message : String(error);
       throw handlerFailure(cause, { cacheKey: key, cause });
@@ -604,6 +678,15 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         return instance.handler(req, res, next);
       }
     } catch (error) {
+      // As with admission control, a 200 would hide a refusal that clients,
+      // proxies and load balancers have to act on: answer 503 with a retry hint.
+      if (isBuildUnavailable(error) && !res.headersSent) {
+        respondWithGraphQLError(res, error, {
+          status: 503,
+          headers: { 'Retry-After': retryAfterSeconds(buildLimits.queueWaitMs) }
+        });
+        return;
+      }
       const errorId = logInternalError(error, `${label} PostGraphile middleware error`);
       if (!res.headersSent) {
         respondWithGraphQLError(

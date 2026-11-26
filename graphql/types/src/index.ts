@@ -3,6 +3,8 @@ export {
   apiDefaults,
   ApiOptions,
   GrafastCacheLimits,
+  graphileBuildLimitDefaults,
+  GraphileBuildLimits,
   graphileDefaults,
   graphileFeatureDefaults,
   GraphileFeatureOptions,

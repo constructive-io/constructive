@@ -1,6 +1,7 @@
 import { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { parseEnvBoolean, parseEnvNumber } from '12factor-env';
 
+import { getBuildLimitsEnv } from './build-limits';
 import {
   normalizeGrafastCacheLimits,
   parseGrafastCacheLimitEnv
@@ -12,6 +13,7 @@ import { getScopedIntrospectionEnv } from './scoped-introspection';
  */
 export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial<ConstructiveOptions> => {
   const scopedIntrospection = getScopedIntrospectionEnv(env);
+  const buildLimits = getBuildLimitsEnv(env);
   const {
     GRAPHILE_SCHEMA,
     GRAPHILE_EXPLAIN,
@@ -90,6 +92,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
           )
         })
       }),
+      ...(buildLimits !== undefined && { buildLimits }),
       ...(GRAPHILE_EXPLAIN && { explain: parseEnvBoolean(GRAPHILE_EXPLAIN) }),
       ...(graphiql !== undefined && { graphiql }),
       ...(GRAPHILE_SCHEMA && {

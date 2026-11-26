@@ -2,6 +2,7 @@ import { constructiveGraphqlDefaults,ConstructiveOptions } from '@constructive-i
 import { getEnvOptions as getPgpmEnvOptions, loadConfigSync, replaceArrays } from '@pgpmjs/env';
 import deepmerge from 'deepmerge';
 
+import { normalizeGraphileBuildLimits } from './build-limits';
 import { getGraphQLEnvVars } from './env';
 import { normalizeGrafastCacheLimits } from './grafast-cache-limits';
 
@@ -58,6 +59,10 @@ export const getEnvOptions = (
   );
   if (grafastCache !== undefined && options.graphile) {
     options.graphile = { ...options.graphile, grafastCache };
+  }
+  const buildLimits = normalizeGraphileBuildLimits(options.graphile?.buildLimits);
+  if (buildLimits !== undefined && options.graphile) {
+    options.graphile = { ...options.graphile, buildLimits };
   }
   return options;
 };

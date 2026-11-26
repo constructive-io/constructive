@@ -1,4 +1,5 @@
 // Export Constructive-specific env functions
+export { normalizeGraphileBuildLimits } from './build-limits';
 export { getGraphQLEnvVars } from './env';
 export { normalizeGrafastCacheLimits } from './grafast-cache-limits';
 export { getConstructiveEnvOptions,getEnvOptions } from './merge';

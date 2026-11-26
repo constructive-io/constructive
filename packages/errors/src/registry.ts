@@ -646,6 +646,12 @@ export const registry = {
     message: 'Too many requests are in flight for this API. Please retry in a moment.',
     positional: ['limit', 'waitedMs']
   }),
+  SCHEMA_BUILD_UNAVAILABLE: defineError({
+    code: 'SCHEMA_BUILD_UNAVAILABLE',
+    class: 'public',
+    http: 503,
+    message: "This API's schema cannot be prepared right now. Please retry in a moment."
+  }),
   INTROSPECTION_DISABLED: defineError({
     code: 'INTROSPECTION_DISABLED',
     class: 'public',
