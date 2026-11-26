@@ -62,6 +62,7 @@
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
     "express": "^5.2.1",
+    "find-and-require-package-json": "^0.9.1",
     "gql-ast": "workspace:^",
     "grafast": "1.1.2",
     "grafserv": "1.0.1",

@@ -120,6 +120,8 @@ export interface ServerOptions {
     origin?: string;
     /** Whether to enforce strict authentication */
     strictAuth?: boolean;
+    /** The source commit the running build was made from; unset when unknown */
+    commit?: string;
 }
 
 /**

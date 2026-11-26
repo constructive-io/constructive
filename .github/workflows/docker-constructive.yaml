@@ -92,6 +92,8 @@ jobs:
           file: ./Dockerfile
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            SERVER_COMMIT=${{ github.sha }}
           outputs: type=image,name=${{ env.REPO }}/${{ env.IMAGE_NAME }},push-by-digest=true,push=true
           cache-from: type=gha
           cache-to: type=gha,mode=max

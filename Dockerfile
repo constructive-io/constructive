@@ -54,5 +54,11 @@ RUN set -eux; \
     printf '#!/usr/bin/env bash\nnode /app/pgpm/pgpm/dist/index.js "$@"\n' > /usr/local/bin/pgpm; \
     chmod +x /usr/local/bin/cnc /usr/local/bin/constructive /usr/local/bin/pgpm
 
+# The commit the image is built from, answered by the server's GET /version.
+# Declared last so that a new commit rebuilds no other layer; without the
+# argument it is empty and the route answers null.
+ARG SERVER_COMMIT=
+ENV SERVER_COMMIT=${SERVER_COMMIT}
+
 ENTRYPOINT ["/usr/local/bin/constructive"]
 CMD ["--help"]
