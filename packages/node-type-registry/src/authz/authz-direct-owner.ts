@@ -1,4 +1,5 @@
 import type { NodeTypeDefinition } from '../types';
+import { AGENT_IDENTITY_RISK } from './plain-words';
 
 export const AuthzDirectOwner: NodeTypeDefinition = {
   name: 'AuthzDirectOwner',
@@ -18,10 +19,23 @@ export const AuthzDirectOwner: NodeTypeDefinition = {
     },
     required: [
       'entity_field'
-    ]
+    ],
+    additionalProperties: false
   },
   tags: [
     'ownership',
     'authz'
+  ],
+  summary: 'Only the person whose id is in the row\'s owner column gets access, with no check on team or app membership.',
+  use_when: [
+    'Personal account rows with no team or app membership around them, such as a person\'s own devices or settings.'
+  ],
+  avoid_when: [
+    'Rows that belong to a team or the app: use AuthzMemberOwner or AuthzAppMemberOwner, so a person who leaves loses access.',
+    'Next to a membership policy on the same table: a removed member keeps access to every row they own.'
+  ],
+  risks: [
+    'Access does not end when the person leaves the team or the app, or is banned.',
+    AGENT_IDENTITY_RISK
   ]
 };

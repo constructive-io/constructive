@@ -5,7 +5,7 @@ export const RelationSpatial: NodeTypeDefinition = {
   slug: 'relation_spatial',
   category: 'relation',
   display_name: 'Spatial Relation',
-  description: "Declares a spatial predicate between two existing geometry/geography columns. Inserts a metaschema_public.spatial_relation row; the sync_spatial_relation_tags trigger then projects a @spatialRelation smart tag onto the owner column so graphile-postgis' PostgisSpatialRelationsPlugin can expose it as a cross-table filter in GraphQL. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired.",
+  description: 'Declares a spatial predicate between two existing geometry/geography columns. It records the relation, and the backend tags the owner column with a @spatialRelation smart tag, so the GraphQL API can expose it as a cross-table filter. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired.',
   parameter_schema: {
     type: 'object',
     properties: {

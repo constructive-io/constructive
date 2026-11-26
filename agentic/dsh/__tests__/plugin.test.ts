@@ -1,5 +1,5 @@
 import { constructiveDbTools } from '@agentic-kit/db-tools';
-import { defineHarnessTool } from '@agentic-kit/harness';
+import { defineHarnessTool, type GateReadiness } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import type {
@@ -20,6 +20,7 @@ class FakeContext implements DshPluginContext {
   registered: DshToolDefinition[] = [];
   listeners: PreExecuteListener[] = [];
   asked: { toolName: string; callId?: string }[] = [];
+  reasons: string[] = [];
   outcome: DshApprovalOutcome = 'allowed-once';
   approval: DshPluginContext['approval'];
 
@@ -28,6 +29,7 @@ class FakeContext implements DshPluginContext {
       this.approval = {
         request: async (request) => {
           this.asked.push({ toolName: request.toolName, callId: request.callId });
+          this.reasons.push(request.reason);
           return this.outcome;
         }
       };
@@ -56,14 +58,18 @@ const mutating = defineHarnessTool({
   label: 'Delete table',
   description: 'Delete a table.',
   parameters: z.object({ table: z.string() }),
+  effect: 'destructive',
   async execute() {
     return { content: [{ type: 'text' as const, text: 'deleted' }], details: null };
   }
 });
 
 const gate = {
-  isProjectRunnable: async () => true,
-  hasDataToken: async () => true,
+  effectOf: (toolName: string) => (toolName === mutating.name ? mutating.effect : undefined),
+  precondition: async (): Promise<GateReadiness> => ({
+    kind: 'ready',
+    target: { kind: 'database', database: { name: 'shop', id: 'db-1' }, apiEndpoint: 'http://api.localhost:3000/graphql', account: { userId: 'user-1' } }
+  }),
   resolveTemplatePreview: async (): Promise<undefined> => undefined
 };
 
@@ -103,6 +109,11 @@ describe('createConstructivePlugin', () => {
     });
 
     expect(ctx.asked).toEqual([{ toolName: 'delete_table', callId: 'c1' }]);
+    expect(ctx.reasons[0].split('\n').slice(0, 3)).toEqual([
+      'Database: "shop" (ID db-1)',
+      'Backend: http://api.localhost:3000/graphql',
+      'Account: user-1',
+    ]);
     expect(decision).toEqual({ kind: 'allow' });
   });
 

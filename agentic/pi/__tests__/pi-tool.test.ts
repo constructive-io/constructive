@@ -11,6 +11,7 @@ const echoTool = defineHarnessTool({
   description: 'Echo a message back.',
   promptSnippet: 'echo: say it back.',
   parameters: z.object({ message: z.string().describe('What to echo.') }),
+  effect: 'read',
   async execute(params, ctx) {
     return {
       content: [{ type: 'text', text: `${params.message} @ ${ctx.cwd}` }],
@@ -89,7 +90,7 @@ describe('dbTools', () => {
     expect(registered.map((tool) => tool.name)).toEqual(
       constructiveDbTools.map((tool) => tool.name),
     );
-    expect(registered).toHaveLength(18);
+    expect(registered).toHaveLength(25);
     for (const tool of registered) {
       expect(typeof tool.execute).toBe('function');
       expect(tool.parameters).toMatchObject({ type: 'object' });

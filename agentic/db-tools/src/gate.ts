@@ -1,22 +1,61 @@
-import type { ConstructiveGateDeps } from '@agentic-kit/harness';
+import type { ConstructiveGateDeps, GateReadiness, ToolFailure } from '@agentic-kit/harness';
+import type { z } from 'zod';
 
-import {
-  type ProjectContext,
-  resolveDataToken as defaultResolveDataToken,
-  resolveProjectContext as defaultResolveProjectContext,
-} from './context';
+import { resolveProjectContext as defaultResolveProjectContext } from './context';
+import { thrownText } from './graphql-http';
+import { constructiveDbTools, toolPreconditions } from './tools';
 import { createTemplatePreviewTables as defaultCreateTemplatePreviewTables } from './tools/templates';
 
-/** The resolvers the deps are built from, so a test can substitute fakes. */
+/** What the deps are built from, so a test can substitute fakes. */
 export type ConstructiveGateResolvers = {
+  /** Default: the check the tool itself runs first (`toolPreconditions`). */
+  precondition: ConstructiveGateDeps['precondition'];
   resolveProjectContext: typeof defaultResolveProjectContext;
-  resolveDataToken: typeof defaultResolveDataToken;
   createTemplatePreviewTables: typeof defaultCreateTemplatePreviewTables;
 };
 
+const tools = new Map(constructiveDbTools.map((tool) => [tool.name, tool]));
+
+function invalidInput(error: z.ZodError): ToolFailure {
+  const issues = error.issues.map((issue) => `${issue.path.join('.') || 'the input'}: ${issue.message.replace(/\.$/, '')}`);
+  return { code: 'invalid-input', message: `The input is not valid: ${issues.join('; ')}.` };
+}
+
+const blocked = (failure: ToolFailure): GateReadiness => ({ kind: 'blocked', failure });
+
+/** The tool's own first check, on the params it would parse, and the target it resolved. */
+async function toolPrecondition(
+  toolName: string,
+  input: Record<string, unknown> | undefined,
+  cwd: string
+): Promise<GateReadiness> {
+  const tool = tools.get(toolName);
+  const check = toolPreconditions.get(toolName);
+  if (!tool || !check) {
+    // Every db tool has a check (tool-contract.test.ts), so this is a tool of another set.
+    return blocked({
+      code: 'unsupported',
+      message: `The Constructive gate does not know the tool "${toolName}", so it cannot say what the call acts on.`,
+    });
+  }
+  const parsed = tool.parameters.safeParse(input);
+  if (!parsed.success) return blocked(invalidInput(parsed.error));
+  try {
+    const ready = await check(parsed.data, cwd);
+    return ready.kind === 'ok' ? { kind: 'ready', ...ready.value } : blocked(ready.failure);
+  } catch (err) {
+    // A check that cannot finish blocks the call rather than let it through.
+    return blocked({
+      code: 'failed',
+      message: `Could not check whether the call can run: ${thrownText(err)}`,
+    });
+  }
+}
+
 /**
  * The Constructive gate's host capabilities, answered by this package's own
- * project/token/template resolvers.
+ * tools: their effects say what is gated, and their first checks say whether
+ * a gated call can run at all.
  *
  * Every adapter gates the same tools against the same project state, so the
  * mapping lives here rather than once per harness — an adapter's job is only
@@ -26,26 +65,18 @@ export function constructiveGateDeps(
   resolvers: Partial<ConstructiveGateResolvers> = {}
 ): ConstructiveGateDeps {
   const resolveProjectContext = resolvers.resolveProjectContext ?? defaultResolveProjectContext;
-  const resolveDataToken = resolvers.resolveDataToken ?? defaultResolveDataToken;
   const createTemplatePreviewTables =
     resolvers.createTemplatePreviewTables ?? defaultCreateTemplatePreviewTables;
 
-  const context = async (cwd: string): Promise<ProjectContext | null> =>
-    (await resolveProjectContext(cwd)).context;
-
   return {
-    isProjectRunnable: async (cwd) => (await context(cwd)) !== null,
+    effectOf: (toolName) => tools.get(toolName)?.effect,
 
-    hasDataToken: async (cwd) => {
-      const resolved = await context(cwd);
-      if (!resolved) return false;
-      return Boolean((await resolveDataToken(resolved)).token);
-    },
+    precondition: resolvers.precondition ?? toolPrecondition,
 
     resolveTemplatePreview: async (cwd, blueprintName, displayName) => {
-      const resolved = await context(cwd);
-      if (!resolved) return undefined;
-      const result = await createTemplatePreviewTables(resolved, blueprintName);
+      const { context } = await resolveProjectContext(cwd);
+      if (!context) return undefined;
+      const result = await createTemplatePreviewTables(context, blueprintName);
       if (result.tables.length === 0) return undefined;
       return {
         kind: 'template',

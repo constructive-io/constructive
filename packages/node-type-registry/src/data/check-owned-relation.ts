@@ -11,7 +11,7 @@ export const CheckOwnedRelation: NodeTypeDefinition = {
     properties: {
       link_schema_name: {
         type: 'string',
-        description: 'Schema holding the link tables the ownership is proven through (e.g. catalog_private)'
+        description: 'Schema holding the link tables the ownership is proven through'
       },
       owner_scope: {
         type: 'string',

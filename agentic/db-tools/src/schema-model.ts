@@ -3,11 +3,11 @@
 // checks, foreign keys and policies. The ids are the metaschema's own, so they
 // stay put across renames.
 
-import { isInternalPolicy } from '@agentic-kit/harness';
 import type { QueryResult } from '@constructive-io/graphql-query/runtime';
 
+import { isInternalPolicy } from './blueprint/internal-policies';
 import type { ProjectContext } from './context';
-import { errorsText, type GraphQLError } from './graphql-http';
+import { answerText, type GraphQLError, thrownText } from './graphql-http';
 import { columnDefault, fkAction, normalizeType, readCheck } from './schema-model/normalize';
 
 export type ObjectCategory = 'APP' | 'AUTH' | 'CAPABILITIES' | 'CORE' | 'MEMBERSHIPS' | 'MODULE';
@@ -180,12 +180,12 @@ async function read<T>(step: string, query: Executable<T>): Promise<T> {
     result = await query.execute();
   } catch (err) {
     throw new SchemaReadError(
-      `Could not read ${step}: ${err instanceof Error ? err.message : String(err)}`,
+      `Could not read ${step}: ${thrownText(err)}`,
       step,
     );
   }
   if (!result.ok) {
-    throw new SchemaReadError(`Could not read ${step}: ${errorsText(result.errors ?? [])}`, step, result.errors);
+    throw new SchemaReadError(`Could not read ${step}: ${answerText(result.errors ?? [])}`, step, result.errors);
   }
   return result.data;
 }
@@ -402,7 +402,6 @@ export async function readSchemaModel(context: ProjectContext): Promise<SchemaMo
       .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 
     const policies = (policiesByTable.get(table.id) ?? [])
-      .filter((policy) => !isInternalPolicy(policy.policyType))
       .map(
         (policy): ModelPolicy => ({
           id: policy.id,

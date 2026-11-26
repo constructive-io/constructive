@@ -1,24 +1,4 @@
-export interface FieldType {
-  name: string;
-  schema?: string;
-  args?: (string | number | boolean)[];
-  array_dimensions?: number;
-  range?: string[];
-}
-
-export type FieldDefault =
-  | {
-      value: string | number | boolean | null | unknown[] | Record<string, unknown>;
-      cast?: FieldType;
-    }
-  | {
-      function: string;
-      schema?: string;
-      args?: (FieldDefault | string | number | boolean | null)[];
-      cast?: FieldType;
-    }
-  | { operator: '+' | '-'; left: FieldDefault; right: FieldDefault }
-  | { sql_keyword: string };
+import type { FieldDefault, FieldType } from 'node-type-registry';
 
 const SQL_KEYWORDS = new Set([
   'CURRENT_TIMESTAMP',
@@ -77,8 +57,10 @@ function parseScalarLiteral(token: string): string | number | boolean | null {
   return t;
 }
 
-export function toFieldDefault(def?: string | null): FieldDefault | undefined {
+export function toFieldDefault(def?: string | number | boolean | null): FieldDefault | undefined {
   if (def === undefined || def === null) return undefined;
+  // A number or a boolean is a constant, sent as the value it is.
+  if (typeof def === 'number' || typeof def === 'boolean') return { value: def };
   const raw = String(def).trim();
   if (raw === '') return undefined;
 
@@ -90,9 +72,7 @@ export function toFieldDefault(def?: string | null): FieldDefault | undefined {
   if (fnMatch) {
     const fnName = fnMatch[1];
     const argsRaw = fnMatch[2].trim();
-    const result: { function: string; args?: (string | number | boolean | null)[] } = {
-      function: fnName,
-    };
+    const result: FieldDefault = { function: fnName };
     if (argsRaw !== '') {
       const args = argsRaw.split(',').map((a) => parseScalarLiteral(a));
       if (args.length > 0) result.args = args;

@@ -15,7 +15,6 @@ import { getHost } from '../src/host';
 import {
   createApiKeyTool,
   describeScope,
-  isStepUpError,
   toEnvVar,
 } from '../src/tools/create-api-key';
 
@@ -33,7 +32,7 @@ const MINTED = {
 const STEP_UP = {
   ok: false,
   data: undefined as unknown,
-  errors: [{ message: 'STEP_UP_REQUIRED: verify your password' }],
+  errors: [{ message: 'STEP_UP_REQUIRED', extensions: { code: 'STEP_UP_REQUIRED', class: 'public' } }],
 };
 
 function makeClient(
@@ -119,12 +118,6 @@ describe('helpers', () => {
     expect(toEnvVar('  CI API key ')).toBe('CI_API_KEY');
   });
 
-  it('detects step-up errors', () => {
-    expect(isStepUpError(['STEP_UP_REQUIRED: verify'])).toBe(true);
-    expect(isStepUpError(['Step-up required'])).toBe(true);
-    expect(isStepUpError(['permission denied'])).toBe(false);
-  });
-
   it('summarizes scope', () => {
     expect(describeScope(['a'], true)).toBe('scoped to 1 entity, read-only');
     expect(describeScope(undefined, false)).toMatch(/unscoped/);
@@ -145,9 +138,13 @@ describe('create_api_key execute', () => {
   it('returns the needs-auth prompt without a data token', async () => {
     useContext();
     mockGetHost.mockReturnValue(makeHost() as never);
-    mockToken.mockResolvedValue({ reason: 'Not signed in to the app database yet.' });
+    mockToken.mockResolvedValue({
+      reason: 'Not signed in to the app database yet.',
+      failure: { code: 'app-signed-out', message: 'Not signed in to the app database yet.' },
+    });
     const result = await run({ key_name: 'deploy bot' });
     expect(result.details).toMatchObject({ success: false, needsAuth: true });
+    expect(result.failure?.code).toBe('app-signed-out');
     expect(mockCreateClient).not.toHaveBeenCalled();
   });
 
@@ -320,7 +317,7 @@ describe('create_api_key execute', () => {
 
     const result = await run({ key_name: 'deploy bot' });
     expect(result.details.success).toBe(false);
-    expect(result.details.message).toMatch(/step-up/i);
+    expect(result.failure).toMatchObject({ code: 'step-up-required', hint: expect.stringMatching(/sign in again/i) });
     expect(client.mutation.createApiKey).toHaveBeenCalledTimes(1);
   });
 

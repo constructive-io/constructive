@@ -43,10 +43,21 @@ export const AuthzTemporal: NodeTypeDefinition = {
           'valid_until_field'
         ]
       }
-    ]
+    ],
+    additionalProperties: false
   },
   tags: [
     'temporal',
     'authz'
+  ],
+  summary: 'Anyone who can use the table gets the row while it is inside its time window; it does not check who is asking.',
+  use_when: [
+    'Limited-time or embargoed rows, inside AuthzComposite with a rule about people.'
+  ],
+  avoid_when: [
+    'As the only policy on an operation: anyone who can use the table passes during the window.'
+  ],
+  risks: [
+    'It does not check who is asking: as the only policy on an operation, anyone who can use the table passes for matching rows.'
   ]
 };

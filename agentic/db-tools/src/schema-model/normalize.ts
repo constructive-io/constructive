@@ -1,8 +1,7 @@
 // Pure readers for the metaschema's stored shapes: field types, structured
 // defaults, check expressions (Postgres AST JSON) and foreign key actions.
 
-import { fieldTypeToTypeName, toFieldDefault } from '@agentic-kit/harness';
-
+import { fieldTypeToTypeName, toFieldDefault } from '../blueprint/field-type';
 import type { ColumnDefault, FkAction } from '../schema-model';
 
 const TYPE_ALIASES: Record<string, string> = {

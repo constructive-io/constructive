@@ -1,11 +1,13 @@
 import { existsSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import type { HarnessTool } from '@agentic-kit/harness';
+import { type HarnessTool, type HarnessToolResult, strictObject, type ToolFailure } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import {
+  type AppKind,
+  composedInstallComplete,
   detectAppKind,
   ensureAppScaffold,
   ensureComposedInstall,
@@ -17,14 +19,16 @@ import {
   type RunCommand,
   settlePrewarm,
 } from '../app-workspace';
+import type { ProjectContext } from '../context';
+import { failedResult, failureText, type Result, suggest } from '../failure';
 import { classifyBackendErrors, postGraphQL } from '../graphql-http';
-import { getHost, noBackendReason } from '../host';
-import { readEnv } from '../provision-database/env-file';
+import { getHost } from '../host';
+import { projectReady } from '../ready';
 import { normalizeSdkBarrels } from '../run-codegen/barrels';
 import { codegenEndpointEnv, derivePlaneEndpoints, envLocalContent } from '../run-codegen/endpoints';
 
 
-const RunCodegenZod = z.object({});
+const RunCodegenZod = strictObject('the input', {});
 type Params = z.infer<typeof RunCodegenZod>;
 
 /** Wall-clock milliseconds per step; a step that didn't run reports 0. */
@@ -49,36 +53,117 @@ export type RunCodegenDetails = {
   timings?: RunCodegenTimings;
   /** The app API answered ACCESS_SUSPENDED: the database is deleted or suspended. */
   code?: 'database-unavailable';
+  /** With `app-missing`: the app data plane endpoint the SDK is generated from. */
+  appEndpoint?: string;
 };
 
-type ToolResult = { content: { type: 'text'; text: string }[]; details: RunCodegenDetails };
+type ToolResult = HarnessToolResult<RunCodegenDetails>;
 
-function fail(message: string, extra?: Omit<RunCodegenDetails, 'success' | 'message'>): ToolResult {
-  return {
-    content: [{ type: 'text', text: message }],
-    details: { ...extra, success: false, message },
-  };
+function fail(failure: ToolFailure, extra?: Omit<RunCodegenDetails, 'success' | 'message'>): ToolResult {
+  return failedResult<RunCodegenDetails>(failure, { ...extra, success: false, message: failureText(failure) });
 }
+
+const failed = (message: string): ToolFailure => ({ code: 'failed', message });
 
 const FETCH_RESET_RE = /Failed to fetch schema|Connection reset|ECONNRESET|socket hang up/i;
 // A refusal is an answer, not a dropped connection: retrying it only waits.
 const REFUSED_RE = /\b403\b|Forbidden|ACCESS_SUSPENDED/;
 
-// Read the binding provision_database wrote to the project .env. The
-// API_ENDPOINT pin identifies which backend owns the binding — it wins over
-// the app's current backend config, matching context.ts data-plane precedence.
-async function readProjectEnv(
-  cwd: string,
-): Promise<{ databaseName?: string; apiEndpoint?: string }> {
-  try {
-    const env = readEnv(await readFile(path.join(cwd, '.env'), 'utf8'));
-    return {
-      databaseName: env.DATABASE_NAME?.trim() || undefined,
-      apiEndpoint: env.API_ENDPOINT?.trim() || undefined,
-    };
-  } catch {
-    return {};
+// A composed marker that is not sound: the template fixups would rewrite a composed app, so nothing runs.
+const invalidApp = (reason: string): ToolFailure => ({
+  code: 'failed',
+  message: reason,
+  hint: 'Recompose packages/app, or remove the marker to use the template flow.',
+});
+
+/** What run_codegen runs on: the project's database, the app in packages/app, and what it does to the app first. */
+export type RunCodegenReady = {
+  context: ProjectContext;
+  app: Exclude<AppKind, { kind: 'invalid' }>;
+  /** Whether this host lets run_codegen create packages/app and install its packages (`ToolsHost.prewarmApp`). */
+  preparesApp: boolean;
+  /** What the plan says it runs, in words: the project's own code generator, and the steps it takes on the app first when the host prepares the app. */
+  notes: string[];
+};
+
+// The app's steps before codegen, when the host lets run_codegen prepare the app.
+function appStepsOf(app: RunCodegenReady['app'], scaffolded: boolean): string[] {
+  if (app.kind === 'composed') {
+    return ["This writes the app's endpoints to packages/app/.env.local and installs the app's packages from its lockfile when they are missing, then generates the SDK."];
   }
+  return [
+    scaffolded
+      ? "This writes the app's endpoints to packages/app/.env.local, sets the workspace's package settings, moves the code generator to its latest version and installs the packages, then generates the SDK."
+      : "This creates packages/app from the app template, writes the app's endpoints to packages/app/.env.local, sets the workspace's package settings and installs the packages, then generates the SDK.",
+  ];
+}
+
+/**
+ * The endpoints codegen reads, from the API endpoint the session trusts: never from an API_ENDPOINT pin in the
+ * project's .env, since the schema at the endpoint decides the code that lands in the project.
+ */
+const planesOf = (context: ProjectContext) => derivePlaneEndpoints(context.controlApiEndpoint, context.databaseName);
+
+// The app data plane endpoint codegen reads: the per-database api host.
+const appEndpointOf = (context: ProjectContext): string | undefined => planesOf(context)?.app;
+
+/** What the plan says before any app step: the generator is the project's own code, which runs as the person. */
+const PROJECT_CODEGEN =
+  "This runs the project's own code generator in packages/app: graphql-codegen with the project's graphql-codegen.config.ts, or the app's own codegen script. That is code from the project, and it runs on this machine as you.";
+
+// A host that prepares no app runs codegen only in an app that is there and installed.
+function noApp(context: ProjectContext, message: string, hint: string): ToolFailure {
+  const appEndpoint = appEndpointOf(context);
+  return { code: 'app-missing', message, hint, ...(appEndpoint ? { context: { appEndpoint } } : {}) };
+}
+
+/**
+ * What run_codegen checks before it changes anything: the project's database
+ * on the data plane (codegen reads the app's own API, as the Preview does), by
+ * name, and the app in packages/app. Its API endpoint is the .env pin when
+ * there is one, as the data plane resolves it. A host that prepares no app
+ * (`prewarmApp: false`) needs an app there, installed when it is composed.
+ */
+export async function runCodegenReady(cwd: string): Promise<Result<RunCodegenReady>> {
+  const ready = await projectReady(cwd, 'data');
+  if (ready.kind === 'failed') return ready;
+  const appDir = path.join(cwd, 'packages', 'app');
+  const app = detectAppKind(appDir);
+  if (app.kind === 'invalid') return { kind: 'failed', failure: invalidApp(app.reason) };
+  if (!ready.value.databaseName) {
+    return {
+      kind: 'failed',
+      failure: {
+        code: 'missing-credentials',
+        message: 'DATABASE_NAME is missing from .env, and the backend reported no name for the database.',
+        hint: "Add DATABASE_NAME with the database's name to .env, then call again.",
+        calls: [suggest('run_codegen', {}, 'Generate the SDK once DATABASE_NAME is in .env')],
+      },
+    };
+  }
+  const preparesApp = getHost().prewarmApp !== false;
+  const scaffolded = existsSync(path.join(appDir, 'package.json'));
+  if (!preparesApp && !scaffolded) {
+    return {
+      kind: 'failed',
+      failure: noApp(
+        ready.value,
+        'There is no app in packages/app to generate the SDK into, and this host does not create one, so nothing was written.',
+        'Generate the SDK from the endpoint in the result, or add an app in packages/app, then call again.',
+      ),
+    };
+  }
+  if (!preparesApp && app.kind === 'composed' && !composedInstallComplete(appDir)) {
+    return {
+      kind: 'failed',
+      failure: noApp(
+        ready.value,
+        'The app in packages/app has no installed packages, and this host does not install them, so nothing was written.',
+        "Install the app's packages from its lockfile, then call again.",
+      ),
+    };
+  }
+  return { kind: 'ok', value: { context: ready.value, app, preparesApp, notes: [PROJECT_CODEGEN, ...(preparesApp ? appStepsOf(app, scaffolded) : [])] } };
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -105,7 +190,7 @@ function codegenCommand(appDir: string, composed: boolean): { cmd: string; args:
 // ("Failed to fetch schema: Connection reset"), which is transient — a retry
 // almost always clears it. Re-run the whole generate (it rebuilds all targets)
 // up to `attempts` times, only on a fetch/reset failure; any other failure is
-// real and returned immediately (CODEGEN-RETRY-001).
+// real and returned immediately.
 async function runCodegenWithRetry(
   appDir: string,
   env: Record<string, string>,
@@ -139,22 +224,30 @@ export function createRunCodegenTool(
     name: 'run_codegen',
     label: 'Run codegen',
     description:
-      "Generate the typed GraphQL SDK for the project's Next.js app (packages/app). Runs the exact deterministic sequence — scaffold packages/app from the constructive-app template if it doesn't exist yet, hoist the graphql override to the root workspace so a single grafast resolves, pin codegen to latest, do one clean install, run codegen (retrying transient backend connection resets), and normalize SDK barrels for Turbopack. A composed app (packages/app/.constructive/compose.json) skips the scaffold and those fixups: it installs from its own lockfile only when node_modules is missing and runs its local codegen. Run AFTER provisioning the database and creating schema; it scaffolds packages/app itself, so no separate `pgpm init` step is needed. The scaffold + install are usually prewarmed during provision_database, so this is fast.",
-    promptSnippet:
-      'run_codegen: scaffold packages/app (if missing) + regenerate the typed SDK (workspace-config + clean install + codegen-with-retry + barrel-normalize; a composed app keeps its lockfile and local codegen). Run after schema changes. Gated.',
+      "Generate the typed GraphQL SDK of the project's app (packages/app) from the database: run the project's own code generator (its graphql-codegen.config.ts, or the app's codegen script), retrying transient backend connection resets, and normalize the SDK barrels. " +
+      "Where the host prepares the app, it first creates packages/app from the app template when it is missing, writes the app's endpoints to packages/app/.env.local and installs the packages; " +
+      'a composed app (packages/app/.constructive/compose.json) installs from its own lockfile only when its packages are missing. ' +
+      'Where the host prepares no app, it runs the codegen of the app that is there and installs nothing, and answers app-missing, with the endpoint to generate from, when there is no app. Run after the schema changes.',
+    promptSnippet: "run_codegen: regenerate the typed SDK of the project's app after schema changes. Gated.",
     parameters: RunCodegenZod,
+    effect: 'write',
     async execute(_params: Params, ctx): Promise<ToolResult> {
       const started = Date.now();
       const since = (t: number) => Date.now() - t;
       const cwd = ctx.cwd;
+      const ready = await runCodegenReady(cwd);
+      if (ready.kind === 'failed') {
+        const appEndpoint = ready.failure.code === 'app-missing' ? (ready.failure.context?.appEndpoint as string) : undefined;
+        return fail(ready.failure, appEndpoint ? { appEndpoint } : undefined);
+      }
+      const { databaseName: dbName } = ready.value.context;
+      const { preparesApp } = ready.value;
       const appDir = path.join(cwd, 'packages', 'app');
       // A prewarm provision_database started may still be installing; let it
       // finish so this run's install never races it.
       await settlePrewarm(cwd);
       const app = detectAppKind(appDir);
-      if (app.kind === 'invalid') {
-        return fail(`${app.reason} Recompose packages/app, or remove the marker to use the template flow.`);
-      }
+      if (app.kind === 'invalid') return fail(invalidApp(app.reason));
       const composed = app.kind === 'composed';
       const appKind: RunCodegenDetails['appKind'] = composed ? 'composed' : 'template';
       const timings: RunCodegenTimings = {
@@ -173,61 +266,46 @@ export function createRunCodegenTool(
         timings: { ...timings, totalMs: since(started) },
       });
 
-      // Materialize packages/app deterministically if it isn't there yet — this
-      // replaces the flaky `pgpm init` scaffold step (PGPM-001). When
-      // provision_database prewarmed it, this no-ops.
-      if (!composed) {
+      // Materialize packages/app if it isn't there yet. When provision_database
+      // prewarmed it, this no-ops.
+      if (preparesApp && !composed) {
         const t = Date.now();
         const scaffold = await ensureAppScaffold(cwd, exec);
         timings.scaffoldMs = since(t);
-        if (!scaffold.ok) {
-          return fail(scaffold.out, stepDetails());
-        }
+        if (!scaffold.ok) return fail(failed(scaffold.out), stepDetails());
       }
 
-      const { databaseName: dbName, apiEndpoint: envApiEndpoint } = await readProjectEnv(cwd);
-      if (!dbName) {
-        return fail('DATABASE_NAME missing from .env — provision the database first, then re-run.');
-      }
-
-      const host = getHost();
-      const apiEndpoint = envApiEndpoint || host.backendConfig()?.apiEndpoint;
-      if (!apiEndpoint) return fail(noBackendReason(host.signInHint));
-      const planes = derivePlaneEndpoints(apiEndpoint, dbName);
+      const planes = planesOf(ready.value.context);
 
       // The dev server reads .env.local (NEXT_PUBLIC_DB_NAME + per-DB endpoint
       // overrides so it doesn't fall back to localhost vhosts on a remote
       // backend); the codegen config reads process.env (passed directly below).
-      try {
-        await writeFile(path.join(appDir, '.env.local'), envLocalContent(dbName, planes));
-      } catch (err) {
-        return fail(
-          `Failed to write packages/app/.env.local: ${err instanceof Error ? err.message : String(err)}`,
-        );
+      if (preparesApp) {
+        try {
+          await writeFile(path.join(appDir, '.env.local'), envLocalContent(dbName, planes));
+        } catch (err) {
+          return fail(failed(`Failed to write packages/app/.env.local: ${err instanceof Error ? err.message : String(err)}`));
+        }
       }
 
       const tInstall = Date.now();
-      if (composed) {
+      if (!preparesApp) {
+        installed = false;
+      } else if (composed) {
         const install = await ensureComposedInstall(cwd, exec);
         timings.installMs = since(tInstall);
         installed = install.installed;
-        if (!install.ok) {
-          return fail(install.out, stepDetails());
-        }
+        if (!install.ok) return fail(failed(install.out), stepDetails());
       } else {
-        // Hoist the graphql override to the root workspace (PNPM-GRAPHQL-OVERRIDE-001)
-        // and pin codegen to latest (TS-001) before the single clean install. When
-        // prewarmed by provision_database these are idempotent and the install is a
-        // fast no-op; otherwise this is the first install (PNPM-BUILDS-001).
+        // Hoist the graphql override to the root workspace and pin codegen to
+        // latest before the single clean install. When prewarmed these are
+        // idempotent and the install is a fast no-op.
         await ensureWorkspaceConfig(cwd);
         await pinCodegenLatest(appDir);
-
         const install = await exec('pnpm', ['install', '--no-frozen-lockfile'], cwd);
         timings.installMs = since(tInstall);
         installed = true;
-        if (!install.ok && !IGNORED_BUILDS_RE.test(install.out)) {
-          return fail(`pnpm install failed:\n${install.out}`, stepDetails());
-        }
+        if (!install.ok && !IGNORED_BUILDS_RE.test(install.out)) return fail(failed(`pnpm install failed:\n${install.out}`), stepDetails());
       }
 
       const tCodegen = Date.now();
@@ -247,29 +325,33 @@ export function createRunCodegenTool(
         // suspended databases answer ACCESS_SUSPENDED on every app API.
         if (REFUSED_RE.test(codegen.out) && planes && (await isDatabaseUnavailable(planes.app))) {
           return fail(
-            `codegen failed: the app database "${dbName}" is unavailable (the backend answered ACCESS_SUSPENDED: it was deleted or is suspended). Re-running run_codegen won't help until it is restored.`,
+            {
+              code: 'database-unavailable',
+              message: `codegen failed: the app database "${dbName}" is unavailable: it was deleted or is suspended. Running it again won't help until it is restored.`,
+            },
             { ...stepDetails(), code: 'database-unavailable' },
           );
         }
-        // A reset that survives every internal retry is a backend OUTAGE, not a code
-        // or install problem — re-running run_codegen cannot fix it. Say so explicitly
-        // so the agent marks sdk-codegen `blocked` instead of looping the tool to the
-        // time cap (CODEGEN-OUTAGE-001 / THRASH-001).
+        // A reset that survives every internal retry is a backend outage, not a code
+        // or install problem, and running the tool again cannot fix it: say so, so
+        // an agent stops instead of looping on the tool.
         if (FETCH_RESET_RE.test(codegen.out)) {
           return fail(
-            'codegen failed: BACKEND OUTAGE — the Constructive backend reset the connection ' +
-              'during schema introspection, and it stayed down across every internal retry. ' +
-              'This is an EXTERNAL outage, not a code or install problem; re-running run_codegen ' +
-              'will NOT fix it. Check backend reachability once, then report the blocker and wait ' +
-              'for the backend to recover. Do NOT loop on run_codegen (THRASH-001).\n\n' +
-              codegen.out,
+            {
+              code: 'backend-unreachable',
+              message:
+                'codegen failed: the Constructive backend reset the connection during schema introspection, and it stayed down ' +
+                'across every retry. The backend is down; this is not a code or install problem, and running it again now will ' +
+                'not fix it. Check that the backend answers once, then wait for it to recover.\n\n' +
+                codegen.out,
+            },
             stepDetails(),
           );
         }
-        return fail(`codegen failed:\n${codegen.out}`, stepDetails());
+        return fail(failed(`codegen failed:\n${codegen.out}`), stepDetails());
       }
 
-      // Normalize directory barrels so Turbopack can resolve them (TURBOPACK-BARREL-001).
+      // Normalize directory barrels so Turbopack can resolve them.
       // Only directories that exist are rewritten, so a config without an admin
       // target leaves nothing pointing at one.
       const tBarrels = Date.now();
@@ -284,15 +366,22 @@ export function createRunCodegenTool(
         existsSync(path.join(appSdk, sub)),
       );
 
-      const message =
-        generatedSubmodules.length > 0
-          ? `Codegen complete. Generated app submodules: ${generatedSubmodules.join(', ')}. Normalized ${barrelsRewritten} barrel file(s).`
-          : `Codegen ran, but no app submodules (hooks/orm/types) were generated — the database may have no entity tables yet. Normalized ${barrelsRewritten} barrel file(s).`;
+      if (generatedSubmodules.length === 0) {
+        return fail(
+          {
+            code: 'failed',
+            message: `Codegen ran, but no app submodules (hooks/orm/types) were generated — the database may have no entity tables yet. Normalized ${barrelsRewritten} barrel file(s).`,
+            hint: 'Create tables first, then generate the SDK again.',
+          },
+          { barrelsRewritten, generatedSubmodules, ...stepDetails() },
+        );
+      }
 
+      const message = `Codegen complete. Generated app submodules: ${generatedSubmodules.join(', ')}. Normalized ${barrelsRewritten} barrel file(s).`;
       return {
         content: [{ type: 'text', text: message }],
         details: {
-          success: generatedSubmodules.length > 0,
+          success: true,
           message,
           barrelsRewritten,
           generatedSubmodules,

@@ -33,6 +33,7 @@
     "@agentic-kit/harness": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/sdk": "workspace:^",
+    "ajv": "^8.20.0",
     "node-type-registry": "workspace:^",
     "zod": "^4.4.3"
   },

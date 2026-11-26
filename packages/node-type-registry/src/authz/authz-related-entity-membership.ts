@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { MASK_COLUMN, MEMBER_CHECKS, MEMBER_LIST, OBJ_FIELD_GIVEN, OBJ_TABLE_GIVEN, SEL_OBJ, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
+import { ACTIVE_MEMBER_RISK, OTHER_TABLE_RISK } from './plain-words';
 
 export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
   name: 'AuthzRelatedEntityMembership',
@@ -25,14 +27,7 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
         description: 'SPRT column to join on with the related table',
         default: 'entity_id'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
-      },
-      entity_type: {
-        type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
-      },
+      ...TEAM_KIND,
       obj_table_id: {
         type: 'string',
         format: 'uuid',
@@ -80,14 +75,32 @@ export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
       is_owner: {
         type: 'boolean',
         description: 'If true, require is_owner flag'
-      }
+      },
+      sel_obj: SEL_OBJ,
+      mask_column: MASK_COLUMN,
+      ...MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
     required: [
       'entity_field'
-    ]
+    ],
+    allOf: [TEAM_KIND_GIVEN, OBJ_FIELD_GIVEN, OBJ_TABLE_GIVEN],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'authz'
+  ],
+  summary: 'Members of the team that owns a related row get access; the row reaches that team through another table.',
+  use_when: [
+    'Rows keyed by database_id, where the database belongs to an organization.'
+  ],
+  avoid_when: [
+    'Rows that name their team directly: use AuthzEntityMembership.'
+  ],
+  risks: [
+    'The registry does not list sel_obj. The backend\'s own policies set sel_obj to true and sel_field to id; without them the row\'s column is compared with the team id itself, not with the related row.',
+    ACTIVE_MEMBER_RISK,
+    OTHER_TABLE_RISK
   ]
 };

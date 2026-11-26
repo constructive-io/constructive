@@ -19,6 +19,23 @@ const SUSPENDED_BODY = {
 };
 
 describe('postGraphQL', () => {
+  it('sends the operation name only when it is set', async () => {
+    const bodies: Record<string, unknown>[] = [];
+    const fetchFn = jest.fn(async (_url: unknown, init: { body: string }) => {
+      bodies.push(JSON.parse(init.body));
+      return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }) as unknown as typeof fetch;
+    const query = 'query First { __typename } query Second { __typename }';
+
+    await postGraphQL({ endpoint: ENDPOINT, query, operationName: 'Second', fetchFn });
+    await postGraphQL({ endpoint: ENDPOINT, query: '{ __typename }', fetchFn });
+
+    expect(bodies).toEqual([
+      { query, variables: {}, operationName: 'Second' },
+      { query: '{ __typename }', variables: {} },
+    ]);
+  });
+
   it('keeps the code of a 403 body and adds the status', async () => {
     const result = await postGraphQL({ endpoint: ENDPOINT, query: '{ __typename }', fetchFn: respond(403, SUSPENDED_BODY, 'Forbidden') });
 
@@ -75,15 +92,41 @@ describe('classifyBackendErrors', () => {
     ['ACCESS_SUSPENDED beats the 403 it came with', [error('x', { code: 'ACCESS_SUSPENDED', httpStatus: 403 })], 'suspended'],
     ['no response', [error('fetch failed', { code: 'NETWORK' })], 'network'],
     ['a 5xx', [error('Bad Gateway', { httpStatus: 502 })], 'server'],
-    ['a 429', [error('Too Many Requests', { httpStatus: 429 })], 'server'],
+    ['a 429', [error('Too Many Requests', { httpStatus: 429 })], 'rate-limited'],
     ["the SDK adapter's HTTP 503 text", [error('HTTP 503: Service Unavailable')], 'server'],
+    [
+      'a 429 the server put inside an HTTP 200 answer',
+      [error('Too many requests are in flight for this API. Please retry in a moment.', { code: 'CONCURRENCY_LIMIT_REACHED', class: 'public', http: 429 })],
+      'rate-limited',
+    ],
     ['a 401', [error('Unauthorized', { httpStatus: 401 })], 'auth'],
     ['UNAUTHENTICATED', [error('x', { code: 'UNAUTHENTICATED' })], 'auth'],
-    ['an expired jwt', [error('jwt expired')], 'auth'],
     ['FORBIDDEN', [error('x', { code: 'FORBIDDEN' })], 'forbidden'],
-    ['permission denied', [error('permission denied for table database')], 'forbidden'],
+    // The text never decides: the server sends a code for what it means to show.
+    ['the text of an expired jwt with no code', [error('jwt expired')], 'graphql'],
+    ['the text of a permission refusal with no code', [error('permission denied for table database')], 'graphql'],
+    [
+      'an internal error that keeps a FORBIDDEN code',
+      [error('An unexpected error occurred.', { code: 'FORBIDDEN', class: 'internal', errorId: '0123456789abcdef' })],
+      'graphql',
+    ],
     ['anything else', [error('Cannot query field "hash" on type "Database".')], 'graphql'],
   ])('%s', (_case, errors, kind) => {
     expect(classifyBackendErrors(errors)).toBe(kind);
+  });
+});
+
+describe('a 429 with Retry-After', () => {
+  it('keeps the seconds the backend asks to wait on each error', async () => {
+    const fetchFn = jest.fn(async () =>
+      new Response(JSON.stringify({ errors: [{ message: 'Too many requests.', extensions: { code: 'RATE_LIMITED', class: 'public' } }] }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Retry-After': '12' },
+      }),
+    ) as unknown as typeof fetch;
+
+    const result = await postGraphQL({ endpoint: ENDPOINT, query: '{ __typename }', fetchFn });
+
+    expect(result.errors[0].extensions).toMatchObject({ code: 'RATE_LIMITED', httpStatus: 429, retryAfterSeconds: 12 });
   });
 });

@@ -1,3 +1,4 @@
+import { constructiveDbTools } from '@agentic-kit/pi';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -56,7 +57,8 @@ describe('materializeDbTools', () => {
     expect(registered).toContain('provision_database');
     expect(registered).not.toContain('add_records');
     expect(registered).not.toContain('create_api_key');
-    expect(registered).toHaveLength(16);
+    const expected = constructiveDbTools.map((tool) => tool.name).filter((name) => name !== 'add_records' && name !== 'create_api_key');
+    expect(registered.sort()).toEqual(expected.sort());
   });
 
   function loadHost() {
@@ -151,7 +153,7 @@ describe('materializeDbTools', () => {
 
     const project = path.join(home, 'project');
     fs.mkdirSync(project);
-    fs.writeFileSync(path.join(project, '.env'), 'DATABASE_ID=db1\n');
+    fs.writeFileSync(path.join(project, '.env'), 'DATABASE_ID=00000000-0000-4000-8000-000000000001\n');
 
     const result = await resolveProjectContext(project);
     expect(result.context).toBeNull();

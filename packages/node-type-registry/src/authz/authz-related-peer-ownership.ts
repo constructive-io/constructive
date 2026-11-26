@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { MASK_COLUMN, MEMBER_CHECKS, MEMBER_LIST, OBJ_FIELD_GIVEN, OBJ_TABLE_GIVEN, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
+import { ACTIVE_MEMBER_RISK, OTHER_TABLE_RISK } from './plain-words';
 
 export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
   name: 'AuthzRelatedPeerOwnership',
@@ -15,14 +17,7 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
         'x-column-scope': 'local',
         description: 'Column name on protected table referencing the related table (e.g., message_id)'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
-      },
-      entity_type: {
-        type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
-      },
+      ...TEAM_KIND,
       obj_table_id: {
         type: 'string',
         format: 'uuid',
@@ -77,15 +72,32 @@ export const AuthzRelatedPeerOwnership: NodeTypeDefinition = {
       is_owner: {
         type: 'boolean',
         description: 'If true, require is_owner flag on current user membership'
-      }
+      },
+      mask_column: MASK_COLUMN,
+      ...MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
     required: [
       'entity_field'
-    ]
+    ],
+    allOf: [TEAM_KIND_GIVEN, OBJ_FIELD_GIVEN, OBJ_TABLE_GIVEN],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'peer',
     'authz'
+  ],
+  summary: 'Anyone who shares a team with the person who owns a related row gets access.',
+  use_when: [
+    'Reactions or replies that the co-members of the message author may see.'
+  ],
+  avoid_when: [
+    'Rows that belong to one team: use AuthzRelatedEntityMembership.'
+  ],
+  risks: [
+    'Sharing any one team of that kind with the owner is enough, even a team that has nothing to do with the row.',
+    ACTIVE_MEMBER_RISK,
+    OTHER_TABLE_RISK
   ]
 };

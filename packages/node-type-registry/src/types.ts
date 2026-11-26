@@ -3,7 +3,7 @@
 /**
  * Structured representation of a PostgreSQL data type.
  *
- * Stored as JSONB in `metaschema_public.field.type`.
+ * Stored as JSONB in a field's `type`.
  *
  * @example Simple type
  * { name: "text" }
@@ -44,7 +44,7 @@ export type FieldDefaultArg = string | number | boolean | null | FieldDefault;
 /**
  * Structured representation of a PostgreSQL default value expression.
  *
- * Stored as JSONB in `metaschema_public.field.default_value`.
+ * Stored as JSONB in a field's `default_value`.
  *
  * @example Literal values
  * { value: false }
@@ -110,7 +110,7 @@ export interface JSONSchema {
   properties?: { [key: string]: JSONSchema };
   required?: string[];
   type?: string | string[];
-  const?: string;
+  const?: string | number | boolean;
   enum?: (string | number | boolean)[];
   items?: JSONSchema | JSONSchema[];
   $defs?: { [key: string]: JSONSchema };
@@ -129,6 +129,8 @@ export interface JSONSchema {
    * the node references. Absent means 'local'.
    */
   'x-column-scope'?: 'local' | 'foreign';
+  /** The backend writes this key when it stores the node; a caller does not send it. */
+  readOnly?: boolean;
 }
 
 /**
@@ -158,4 +160,12 @@ export interface NodeTypeDefinition {
   parameter_schema: JSONSchema;
   /** Tags for categorization and filtering */
   tags: string[];
+  /** Authz nodes: one plain sentence saying who gets access. */
+  summary?: string;
+  /** Authz nodes: when to choose this node, in plain words. */
+  use_when?: string[];
+  /** Authz nodes: when another node fits better, in plain words. */
+  avoid_when?: string[];
+  /** Authz nodes: what can go wrong with this node, in plain words. */
+  risks?: string[];
 }

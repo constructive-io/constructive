@@ -13,7 +13,7 @@
 // `notifyToolSkipped` returns void, so its write is queued and `drain()` —
 // awaited when the turn ends — rethrows the first failure rather than losing it.
 
-import type { ApprovalRequest, GateHost } from '@agentic-kit/harness';
+import { type ApprovalRequest, type GateHost, type PlanTarget, planTargetLines } from '@agentic-kit/harness';
 
 import type { RunLogApprovalsOptions } from './approvals';
 import { runLogApprovals } from './approvals';
@@ -23,6 +23,8 @@ export interface RunLogGateRequest {
   toolCallId: string;
   title: string;
   message: string;
+  /** What the call acts on, where, and as whom. */
+  target: PlanTarget;
 }
 
 export interface RunLogGateDecision {
@@ -48,8 +50,8 @@ export interface RunLogGateHost extends GateHost {
   drain(): Promise<void>;
 }
 
-/** The text a human sees: the harness's title, then its message. */
-export const gatePrompt = (title: string, message: string): string => `${title}\n\n${message}`;
+/** The text a human sees: what the call acts on, where and as whom, then the harness's title and its message. */
+export const gatePrompt = (title: string, message: string, target: PlanTarget): string => [...planTargetLines(target), '', title, '', message].join('\n');
 
 /** Reason filed for a repeat of a declined call the gate skipped without asking. */
 export const SKIPPED_REASON = 'skipped: a repeat of a tool call the user already declined';
@@ -76,9 +78,9 @@ export function createRunLogGateHost(options: RunLogGateHostOptions): RunLogGate
   return {
     hasUI: true,
 
-    async confirmTool(toolCallId, title, message) {
-      prompts.set(toolCallId, gatePrompt(title, message));
-      onRequested?.({ toolCallId, title, message });
+    async confirmTool(toolCallId, title, message, _preview, target) {
+      prompts.set(toolCallId, gatePrompt(title, message, target));
+      onRequested?.({ toolCallId, title, message, target });
       try {
         const outcome = await channel.request({
           runId,

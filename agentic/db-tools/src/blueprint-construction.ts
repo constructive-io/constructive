@@ -1,5 +1,5 @@
 // Building a blueprint: constructBlueprint enqueues a `blueprint:construct`
-// job and returns the construction id at once (constructive-db#4156). A worker
+// job and returns the construction id at once. A worker
 // builds one blueprint at a time, each under a 120 s statement timeout, and
 // moves the construction row pending → constructing → constructed | failed,
 // with a failed build's coded error in `error`. A backend from before that
@@ -7,6 +7,7 @@
 // first read already says constructed, and the same wait serves both.
 
 import type { ModulesClient } from './context';
+import { thrownText } from './graphql-http';
 import { isTransientProvisionError } from './provision-database/request-database';
 
 /**
@@ -39,8 +40,6 @@ export type WaitForConstructionOptions = {
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
 };
 
-const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
-
 function stopped(): Error {
   return new Error(`Stopped waiting for the blueprint build. ${MAY_STILL_FINISH}`);
 }
@@ -68,26 +67,27 @@ function tableMapOf(raw: unknown): ConstructionTableMap {
 }
 
 /**
- * A failed construction's coded error on one line: `CODE: message` for a
- * database error, `CODE {context}` for one raised through errors.raise_error.
+ * A failed construction's error in words. The backend stores the `{ code, context, class }` an errors.raise_error
+ * carried, or a database error's own code and text. Only a code it marked public is for the person, with its context;
+ * anything else is named by the construction id alone, which the backend operator can look up.
  */
-function describeConstructionError(error: unknown): string | null {
-  if (!error || typeof error !== 'object') return null;
-  const { code, message, context } = error as { code?: unknown; message?: unknown; context?: unknown };
-  const head = [code, message].filter((part) => typeof part === 'string' && part).join(': ');
+function constructionFailureWords(error: unknown, constructionId: string): string {
+  const id = `Construction id: ${constructionId}.`;
+  if (!error || typeof error !== 'object') return `The blueprint build failed, and the backend gave no reason. ${id}`;
+  const { code, context, class: kind } = error as { code?: unknown; context?: unknown; class?: unknown };
+  if (kind !== 'public' || typeof code !== 'string' || !code) return `The blueprint build failed with an error the backend does not show. ${id}`;
   const hasContext = Boolean(context && typeof context === 'object' && Object.keys(context).length);
-  const tail = hasContext ? JSON.stringify(context) : '';
-  return [head, tail].filter(Boolean).join(' ') || null;
+  return `The blueprint build failed with the code ${code}${hasContext ? ` ${JSON.stringify(context)}` : ''}. ${id}`;
 }
 
 type ConstructionSelect = Parameters<ModulesClient['blueprintConstruction']['findOne']>[0]['select'];
 
 /**
- * Why a construction failed, from its `error` column. That column came with
- * the queued build, and the modules SDK predates it, so it is read on its own
- * after a failure: the status reads stay valid on a backend without it. The
- * SDK's select type doesn't list `error`, but the ORM writes each select key
- * as the field name.
+ * Why a construction failed, in one sentence with its id, from its `error`
+ * column. That column came with the queued build, and the modules SDK predates
+ * it, so it is read on its own after a failure: the status reads stay valid on
+ * a backend without it. The SDK's select type doesn't list `error`, but the
+ * ORM writes each select key as the field name.
  */
 export async function readConstructionFailure(
   modules: ModulesClient,
@@ -98,15 +98,15 @@ export async function readConstructionFailure(
       .findOne({ id: constructionId, select: { error: true } as ConstructionSelect })
       .unwrap();
     const row = result.blueprintConstruction as { error?: unknown } | null;
-    return describeConstructionError(row?.error) ?? 'the backend gave no reason';
+    return constructionFailureWords(row?.error, constructionId);
   } catch (err) {
-    return `the backend gave no reason (reading it failed: ${errorText(err)})`;
+    return `The blueprint build failed, and its reason could not be read (${thrownText(err)}). Construction id: ${constructionId}.`;
   }
 }
 
 /**
  * Wait for a construction to finish. Resolves with its table map once it is
- * constructed, and throws with the backend's coded error once it failed, or
+ * constructed, and throws with the words of its error once it failed, or
  * when the deadline passes, the signal aborts, or its status can't be read.
  */
 export async function waitForConstruction(
@@ -138,17 +138,13 @@ export async function waitForConstruction(
       // A GraphQL error is the backend's answer and won't change on a reread.
       if (!isTransientProvisionError(err) || ++readFailures >= MAX_CONSECUTIVE_READ_FAILURES) {
         throw new Error(
-          `Could not read the blueprint build's status: ${errorText(err)}. ${MAY_STILL_FINISH}`,
+          `Could not read the blueprint build's status: ${thrownText(err)}. ${MAY_STILL_FINISH}`,
         );
       }
     }
     if (row === null) throw new Error(`The backend has no blueprint construction ${constructionId}.`);
     if (row?.status === 'constructed') return tableMapOf(row.tableMap);
-    if (row?.status === 'failed') {
-      throw new Error(
-        `The blueprint build failed: ${await readConstructionFailure(modules, constructionId)}`,
-      );
-    }
+    if (row?.status === 'failed') throw new Error(await readConstructionFailure(modules, constructionId));
     status = row?.status ?? status;
     if (now() >= deadline) {
       const where = status === 'pending' ? "waiting in the backend's build queue" : 'building';
@@ -165,6 +161,14 @@ export async function waitForConstruction(
  * on. The construction carries on without the caller, so constructing again
  * would queue the same tables a second time.
  */
+/** constructBlueprint answered without an error but without the construction it queued. */
+export class BuildNotQueuedError extends Error {
+  constructor() {
+    super('constructBlueprint answered with no construction id');
+    this.name = 'BuildNotQueuedError';
+  }
+}
+
 export class BlueprintBuildError extends Error {
   readonly constructionId: string;
 
@@ -189,10 +193,10 @@ export async function buildBlueprint(
     .constructBlueprint({ input }, { select: { result: true } })
     .unwrap();
   const constructionId = result.constructBlueprint?.result;
-  if (!constructionId) throw new Error('constructBlueprint returned no construction id');
+  if (!constructionId) throw new BuildNotQueuedError();
   try {
     return { constructionId, tables: await waitForConstruction(modules, constructionId, options) };
   } catch (err) {
-    throw new BlueprintBuildError(errorText(err), constructionId);
+    throw new BlueprintBuildError(thrownText(err), constructionId);
   }
 }

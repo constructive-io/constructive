@@ -1,5 +1,4 @@
-// Client-side mirror of the backend's modules_hash normalization
-// (constructive-db: metaschema_private.modules_hash), used to decide whether a
+// Client-side mirror of the backend's normalization of a module set, used to decide whether a
 // resolved module set can be requested by preset slug — the warm-pool-eligible
 // path — or must be sent as an explicit modules array:
 //   1. A bare module name normalizes to [name, {}]; a missing/null options

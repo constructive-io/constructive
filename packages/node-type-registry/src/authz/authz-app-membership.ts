@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { APP_MEMBER_LIST, MASK_COLUMN, MEMBER_CHECKS } from './parameters';
+import { ACTIVE_MEMBER_RISK, NO_APP_READ_ONLY_RISK } from './plain-words';
 
 export const AuthzAppMembership: NodeTypeDefinition = {
   name: 'AuthzAppMembership',
@@ -34,8 +36,32 @@ export const AuthzAppMembership: NodeTypeDefinition = {
         type: 'boolean',
         description: 'If true, require is_owner flag',
       },
+      membership_type: {
+        type: 'integer',
+        const: 1,
+        readOnly: true,
+        description: 'Always 1 (the app); the backend sets it.'
+      },
+      mask_column: MASK_COLUMN,
+      ...APP_MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
     required: [],
+    additionalProperties: false
   },
   tags: ['membership', 'authz'],
+  summary: 'Any active member of the app gets every row; the row itself is not checked.',
+  use_when: [
+    'Rows that belong to the whole app, not to one team or person.',
+    'App-wide admin screens, with is_admin or a capability.'
+  ],
+  avoid_when: [
+    'Rows that belong to a team: use AuthzEntityMembership, which checks the team named in the row.',
+    'Next to AuthzDirectOwner on a team table: use AuthzEntityMembership instead.'
+  ],
+  risks: [
+    'Every active member reaches every row, whatever team or person the row is about.',
+    ACTIVE_MEMBER_RISK,
+    NO_APP_READ_ONLY_RISK
+  ]
 };

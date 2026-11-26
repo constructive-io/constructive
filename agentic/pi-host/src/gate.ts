@@ -1,11 +1,11 @@
 // The GateHost the harness already defines, answered by the conversation.
 //
-// `@agentic-kit/harness` owns *what* is gated (`MUTATING_DB_TOOLS`), the prompt
-// wording (`buildConfirmPrompt`) and the decline guard; a host only supplies the
-// three capabilities in `GateHost`. Desktop answers `confirmTool` with a dialog.
-// A Job answers it with a message: it writes the tool call into the thread at
-// `approval-requested` and waits for the human to echo the part back at
-// `approval-responded`. That is the same contract, resolved asynchronously —
+// `@agentic-kit/harness` owns *what* is gated (a call whose tool effect is not
+// `read`), the prompt wording (`buildConfirmPrompt`) and the decline guard; a
+// host only supplies the three capabilities in `GateHost`. Desktop answers
+// `confirmTool` with a dialog. A Job answers it with a message: it writes the
+// tool call into the thread at `approval-requested` and waits for the human to
+// echo the part back at `approval-responded`. That is the same contract, resolved asynchronously —
 // which is exactly why the runner reports `hasUI: true`. Reporting false would
 // tell the gate no decision can ever be obtained and block every mutating tool.
 
@@ -18,7 +18,7 @@ import {
   respondToApproval,
   toolPart
 } from '@agentic-kit/agent-conversation';
-import type { ConfirmPreview, GateHost } from '@agentic-kit/harness';
+import type { ConfirmPreview, GateHost, PlanTarget } from '@agentic-kit/harness';
 
 export interface ThreadGateHostOptions {
   transcript: Transcript;
@@ -72,12 +72,13 @@ export function createThreadGateHost(options: ThreadGateHostOptions): ThreadGate
     toolCallId: string,
     title: string,
     message: string,
-    preview?: ConfirmPreview
+    preview: ConfirmPreview | undefined,
+    target: PlanTarget
   ): Promise<boolean> => {
     const pending = toolPart({
       toolName: 'confirm',
       toolCallId,
-      input: { title, message, ...(preview ? { preview } : {}) }
+      input: { title, message, target, ...(preview ? { preview } : {}) }
     });
     const requested = emit(requestApproval(pending, newApprovalId()));
     const written = await transcript.appendToolPart(requested);

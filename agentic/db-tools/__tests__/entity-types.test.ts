@@ -5,11 +5,7 @@ jest.mock('../src/context', () => ({
 }));
 
 import { resolveProjectContext } from '../src/context';
-import {
-  defaultPrefix,
-  manageEntityTypesTool,
-  validateManageEntityTypes,
-} from '../src/tools/manage-entity-types';
+import { createEntityTypeTool, defaultPrefix, deleteEntityTypeTool, listEntityTypesTool } from '../src/tools/entity-types';
 
 const mockResolve = resolveProjectContext as jest.MockedFunction<typeof resolveProjectContext>;
 
@@ -53,29 +49,11 @@ function useContext(modules: ReturnType<typeof makeModules>) {
 
 const ctx: HarnessToolContext = { cwd: '/tmp/project' };
 
-function run(params: Record<string, unknown>) {
-  return manageEntityTypesTool.execute(params as never, ctx);
-}
+const list = () => listEntityTypesTool.execute({}, ctx);
+const create = (params: Record<string, unknown>) => createEntityTypeTool.execute(params as never, ctx);
+const remove = (params: Record<string, unknown>) => deleteEntityTypeTool.execute(params as never, ctx);
 
 afterEach(() => jest.clearAllMocks());
-
-describe('validateManageEntityTypes', () => {
-  it('requires a name for create', () => {
-    expect(validateManageEntityTypes({ action: 'create' } as never)).toMatch(/requires "name"/);
-    expect(validateManageEntityTypes({ action: 'create', name: 'org' } as never)).toBeNull();
-  });
-
-  it('rejects an entity_type_id on create', () => {
-    expect(
-      validateManageEntityTypes({ action: 'create', name: 'org', entity_type_id: 'etp-1' } as never),
-    ).toMatch(/does not take "entity_type_id"/);
-  });
-
-  it('requires an id for delete and lets list through', () => {
-    expect(validateManageEntityTypes({ action: 'delete' } as never)).toMatch(/entity_type_id/);
-    expect(validateManageEntityTypes({ action: 'list' } as never)).toBeNull();
-  });
-});
 
 describe('defaultPrefix', () => {
   it('snake_cases the name', () => {
@@ -84,17 +62,22 @@ describe('defaultPrefix', () => {
   });
 });
 
-describe('manage_entity_types execute', () => {
-  it('returns the resolve reason when there is no project context', async () => {
-    mockResolve.mockResolvedValue({ context: null, reason: 'no project' } as never);
-    const result = await run({ action: 'list' });
+describe('the entity type tools', () => {
+  it('returns the resolve failure when there is no project context', async () => {
+    mockResolve.mockResolvedValue({
+      context: null,
+      reason: 'no project',
+      failure: { code: 'no-env', message: 'no project' },
+    } as never);
+    const result = await list();
     expect(result.details).toEqual({ success: false, message: 'no project' });
+    expect(result.failure).toEqual({ code: 'no-env', message: 'no project' });
   });
 
   it('lists entity types scoped to the project database', async () => {
     const modules = makeModules();
     useContext(modules);
-    const result = await run({ action: 'list' });
+    const result = await list();
     expect(modules.entityTypeProvision.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { databaseId: { equalTo: 'db-1' } } }),
     );
@@ -107,7 +90,7 @@ describe('manage_entity_types execute', () => {
   it('creates with the database id and a defaulted snake_case prefix', async () => {
     const modules = makeModules();
     useContext(modules);
-    const result = await run({ action: 'create', name: 'Team Space', has_profiles: true });
+    const result = await create({ name: 'Team Space', has_profiles: true });
     expect(modules.entityTypeProvision.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -122,13 +105,14 @@ describe('manage_entity_types execute', () => {
     expect(data).not.toHaveProperty('description');
     expect(data).not.toHaveProperty('storage');
     expect(result.details.success).toBe(true);
-    expect(result.details.message).toMatch(/run_codegen/);
+    expect(result.details.message).toMatch(/Generate the typed SDK again/);
+    expect(result.calls).toEqual([expect.objectContaining({ tool: 'run_codegen', input: {} })]);
   });
 
   it('deletes by id and says the entity table remains', async () => {
     const modules = makeModules();
     useContext(modules);
-    const result = await run({ action: 'delete', entity_type_id: 'etp-1' });
+    const result = await remove({ entity_type_id: 'etp-1' });
     expect(modules.entityTypeProvision.delete).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'etp-1' } }),
     );
@@ -143,7 +127,8 @@ describe('manage_entity_types execute', () => {
       },
     });
     useContext(modules);
-    const result = await run({ action: 'create', name: 'org' });
-    expect(result.details).toEqual({ success: false, message: 'duplicate prefix' });
+    const result = await create({ name: 'team' });
+    expect(result.details).toEqual({ success: false, message: 'Failed to create entity type "team": duplicate prefix' });
+    expect(result.failure?.code).toBe('failed');
   });
 });

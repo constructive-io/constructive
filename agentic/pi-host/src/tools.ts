@@ -1,8 +1,8 @@
 // Putting the harness gate in front of the agent's tools.
 //
-// `createConfirmGate` is the harness's, unchanged: it decides which tools are
-// gated (`MUTATING_DB_TOOLS`), writes the prompt, and remembers declines so a
-// retry is skipped rather than re-asked. All this adds is the seam — the gate
+// `createConfirmGate` is the harness's, unchanged: its policy decides which calls
+// are gated (by the effect its deps report), writes the prompt, and remembers
+// declines so a retry is skipped rather than re-asked. All this adds is the seam — the gate
 // runs inside `execute`, and a blocked call returns the gate's reason to the
 // model as an ordinary tool result, which is how the model learns it was
 // declined.
@@ -31,10 +31,18 @@ export interface GatedToolset {
   onAgentStart: () => void;
 }
 
-/** The gate's deps for a workspace that is a git clone, not a Constructive project. */
+/**
+ * The gate's deps for a workspace that is a git clone, not a Constructive
+ * project. Its lane carries no Constructive db tool, so no tool has an effect
+ * this policy gates.
+ */
 export const CLONE_GATE_DEPS: ConfirmGateDeps = {
-  isProjectRunnable: async () => false,
-  hasDataToken: async () => false,
+  effectOf: () => undefined,
+  // No tool has an effect here, so nothing is gated and this never runs.
+  precondition: async () => ({
+    kind: 'blocked',
+    failure: { code: 'unsupported', message: 'A git clone workspace has no Constructive database to act on.' }
+  }),
   resolveTemplatePreview: async () => undefined
 };
 

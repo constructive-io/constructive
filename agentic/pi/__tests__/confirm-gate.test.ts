@@ -1,11 +1,16 @@
+import type { GateReadiness, PlanTarget } from '@agentic-kit/harness';
 import type { ExtensionContext, ToolCallEvent } from '@earendil-works/pi-coding-agent';
 
 import { createConfirmGate } from '../src/confirm-gate';
 
+const target: PlanTarget = {
+  kind: 'database',
+  database: { name: 'shop', id: 'db-1' },
+  apiEndpoint: 'http://api.localhost:3000/graphql',
+  account: { userId: 'user-1' },
+};
 const deps = {
-  resolveProjectContext: async () =>
-    ({ context: { databaseId: 'db1' }, reason: '' }) as never,
-  resolveDataToken: async () => ({ token: 'tok' }) as never,
+  precondition: async (): Promise<GateReadiness> => ({ kind: 'ready', target }),
   createTemplatePreviewTables: async () => ({ blueprintName: '', tables: [] }) as never,
 };
 
@@ -35,20 +40,26 @@ describe('confirm gate pi adapter', () => {
     expect(result).toBeUndefined(); // approved -> tool proceeds
     expect(calls).toHaveLength(1);
     expect(calls[0][0]).toBe('tc-1');
+    expect(calls[0][4]).toEqual(target);
   });
 
   it("falls back to pi's built-in ui.confirm when no rich surface exists", async () => {
-    const confirms: string[] = [];
+    const confirms: string[][] = [];
     const ui = {
-      confirm: async (title: string) => {
-        confirms.push(title);
+      confirm: async (title: string, message: string) => {
+        confirms.push([title, message]);
         return false;
       },
     };
     const gate = createConfirmGate(deps);
     gate.onAgentStart();
     const result = await gate.onToolCall(event('delete_table', { table_name: 't' }), fakeCtx(ui));
-    expect(confirms).toHaveLength(1);
+    expect(confirms).toEqual([
+      [
+        'Delete table?',
+        'Database: "shop" (ID db-1)\nBackend: http://api.localhost:3000/graphql\nAccount: user-1\n\nPermanently delete the table "t" and its data.',
+      ],
+    ]);
     expect(result).toMatchObject({ block: true });
   });
 });

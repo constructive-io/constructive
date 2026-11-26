@@ -47,10 +47,10 @@ const graphqlError = (message: string) =>
 
 const record = (fields: Partial<Record<'id' | 'name' | 'api' | 'user' | 'attempts', string>> = {}) =>
   [
-    `PROVISION_TICKET_ID=${fields.id ?? 'ticket-1'}`,
+    `PROVISION_TICKET_ID=${fields.id ?? 'a0000000-0000-4000-8000-000000000001'}`,
     `PROVISION_TICKET_DATABASE_NAME=${fields.name ?? 'myapp'}`,
     `PROVISION_TICKET_API_ENDPOINT=${fields.api ?? API}`,
-    `PROVISION_TICKET_USER_ID=${fields.user ?? 'user-1'}`,
+    `PROVISION_TICKET_USER_ID=${fields.user ?? 'b0000000-0000-4000-8000-000000000001'}`,
     `PROVISION_TICKET_ATTEMPTS=${fields.attempts ?? '1'}`,
   ].join('\n') + '\n';
 
@@ -72,9 +72,9 @@ beforeEach(() => {
   mockListOwn.mockReset();
   mockListOwn.mockResolvedValue({ databaseProvisionModules: { nodes: [] } });
   mockProbe.mockReset();
-  mockProbe.mockImplementation(async ({ databaseId }) => ({ status: 'found', databaseId, ownerId: 'user-1' }));
+  mockProbe.mockImplementation(async ({ databaseId }) => ({ status: 'found', databaseId, ownerId: 'b0000000-0000-4000-8000-000000000001' }));
   configureHost({
-    account: () => ({ userId: 'user-1', accessToken: 'account-token', apiKey: 'account-api-key' }),
+    account: () => ({ userId: 'b0000000-0000-4000-8000-000000000001', accessToken: 'account-token', apiKey: 'account-api-key' }),
     backendConfig: () => ({ apiEndpoint: API, modulesEndpoint: 'http://modules.localhost:3000/graphql' }),
     provisionPollDeadlineMs: 1,
   });
@@ -84,43 +84,70 @@ afterEach(() => {
   rmSync(cwd, { recursive: true, force: true });
 });
 
-describe('provision_database pending tickets', () => {
-  it('records the ticket with its backend and account when it stops waiting, and changes nothing else', async () => {
-    writeEnv('KEEP=me\n');
-    mockRequestDatabase.mockResolvedValue(requested(pending('ticket-1')));
-    mockFindTicket.mockResolvedValue(ticketRead(pending('ticket-1')));
+// An SDK error for an answer that says the sign-in has ended.
+const signedOutError = (code: string) =>
+  Object.assign(new Error(`GraphQL Error: ${code}`), { errors: [{ message: code, extensions: { code, class: 'public' } }] });
+
+describe('provision_database when the sign-in has ended', () => {
+  it('a request answered NOT_AUTHENTICATED is signed-out', async () => {
+    mockRequestDatabase.mockRejectedValue(signedOutError('NOT_AUTHENTICATED'));
 
     const result = await provision('myapp');
 
-    expect(result.details).toMatchObject({ success: false, pending: true, ticketId: 'ticket-1' });
-    expect(result.details.message).toMatch(/call provision_database again with database_name "myapp"/);
+    expect(result.details).toMatchObject({ success: false, code: 'signed-out' });
+  });
+
+  it('a recorded ticket whose read is refused is signed-out, and stays recorded', async () => {
+    writeEnv(`KEEP=me\n${record()}`);
+    mockFindTicket.mockRejectedValue(signedOutError('UNAUTHENTICATED'));
+
+    const result = await provision('myapp');
+
+    expect(mockRequestDatabase).not.toHaveBeenCalled();
+    expect(result.details).toMatchObject({ success: false, code: 'signed-out' });
+    expect(result.details.message).toMatch(/a0000000-0000-4000-8000-000000000001/);
+    expect(envFile()).toMatch(/PROVISION_TICKET_ID=a0000000-0000-4000-8000-000000000001/);
+  });
+});
+
+describe('provision_database pending tickets', () => {
+  it('records the ticket with its backend and account when it stops waiting, and changes nothing else', async () => {
+    writeEnv('KEEP=me\n');
+    mockRequestDatabase.mockResolvedValue(requested(pending('a0000000-0000-4000-8000-000000000001')));
+    mockFindTicket.mockResolvedValue(ticketRead(pending('a0000000-0000-4000-8000-000000000001')));
+
+    const result = await provision('myapp');
+
+    expect(result.details).toMatchObject({ success: false, pending: true, ticketId: 'a0000000-0000-4000-8000-000000000001' });
+    expect(result.details.message).toMatch(/call again with the same name, "myapp"/);
     expect(envLines()).toEqual(['KEEP=me', ...record().trim().split('\n')]);
   });
 
   it('resumes the recorded ticket for the same name, backend and account, and clears it once bound', async () => {
     writeEnv(`KEEP=me\n${record()}`);
-    mockFindTicket.mockResolvedValue(ticketRead(completed('ticket-1', 'db-1')));
+    mockFindTicket.mockResolvedValue(ticketRead(completed('a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001')));
 
     const result = await provision('myapp');
 
     expect(mockRequestDatabase).not.toHaveBeenCalled();
-    expect(mockFindTicket).toHaveBeenCalledWith('ticket-1');
-    expect(result.details).toMatchObject({ success: true, resumed: true, databaseId: 'db-1' });
-    expect(envLines().slice(0, 2)).toEqual(['KEEP=me', 'DATABASE_ID=db-1']);
+    expect(mockFindTicket).toHaveBeenCalledWith('a0000000-0000-4000-8000-000000000001');
+    expect(result.details).toMatchObject({ success: true, resumed: true, databaseId: 'd0000000-0000-4000-8000-000000000001' });
+    expect(envLines().slice(0, 2)).toEqual(['KEEP=me', 'DATABASE_ID=d0000000-0000-4000-8000-000000000001']);
     expect(envFile()).not.toMatch(/PROVISION_TICKET/);
   });
 
-  it("surfaces a failed ticket's error and clears the record", async () => {
+  it('names a failed ticket, not its stored text, and clears the record', async () => {
     writeEnv(`KEEP=me\n${record()}`);
     mockFindTicket.mockResolvedValue(
-      ticketRead({ ...pending('ticket-1'), status: 'failed', errorMessage: 'provision job crashed' }),
+      ticketRead({ ...pending('a0000000-0000-4000-8000-000000000001'), status: 'failed', errorMessage: 'provision job crashed' }),
     );
 
     const result = await provision('myapp');
 
     expect(mockRequestDatabase).not.toHaveBeenCalled();
     expect(result.details.success).toBe(false);
-    expect(result.details.message).toMatch(/provision job crashed/);
+    expect(result.details.message).toMatch(/the backend's provisioning job failed \(ticket a0000000-0000-4000-8000-000000000001\)/);
+    expect(result.details.message).not.toMatch(/provision job crashed/);
     expect(envFile()).toBe('KEEP=me\n');
   });
 
@@ -131,7 +158,7 @@ describe('provision_database pending tickets', () => {
     const result = await provision('myapp');
 
     expect(mockRequestDatabase).not.toHaveBeenCalled();
-    expect(result.details).toMatchObject({ success: false, pending: true, ticketId: 'ticket-1' });
+    expect(result.details).toMatchObject({ success: false, pending: true, ticketId: 'a0000000-0000-4000-8000-000000000001' });
     expect(envLines()).toContain('PROVISION_TICKET_ATTEMPTS=2');
   });
 
@@ -143,29 +170,29 @@ describe('provision_database pending tickets', () => {
 
     expect(mockRequestDatabase).not.toHaveBeenCalled();
     expect(result.details.pending).toBeUndefined();
-    expect(result.details.message).toMatch(/ticket-1 could not be read: .*jwt expired/);
+    expect(result.details.message).toMatch(/a0000000-0000-4000-8000-000000000001 could not be read: the backend answered with an error without a public code/);
     expect(envFile()).toBe('KEEP=me\n');
   });
 
   it.each([
     ['another backend', { api: 'http://api.example.test/graphql' }],
-    ['another account', { user: 'user-2' }],
+    ['another account', { user: 'b0000000-0000-4000-8000-000000000002' }],
   ])('never follows a ticket recorded for %s', async (_case, fields) => {
     writeEnv(record(fields));
-    mockRequestDatabase.mockResolvedValue(requested(completed('ticket-2', 'db-2')));
+    mockRequestDatabase.mockResolvedValue(requested(completed('a0000000-0000-4000-8000-000000000002', 'd0000000-0000-4000-8000-000000000002')));
 
     const result = await provision('myapp');
 
-    expect(mockFindTicket).not.toHaveBeenCalledWith('ticket-1');
+    expect(mockFindTicket).not.toHaveBeenCalledWith('a0000000-0000-4000-8000-000000000001');
     expect(mockRequestDatabase).toHaveBeenCalledTimes(1);
-    expect(result.details).toMatchObject({ success: true, databaseId: 'db-2' });
+    expect(result.details).toMatchObject({ success: true, databaseId: 'd0000000-0000-4000-8000-000000000002' });
     expect(result.details.resumed).toBeUndefined();
   });
 
   it('does not bind a database the signed-in account does not own', async () => {
     writeEnv(`KEEP=me\n${record()}`);
-    mockFindTicket.mockResolvedValue(ticketRead(completed('ticket-1', 'db-1')));
-    mockProbe.mockResolvedValue({ status: 'found', databaseId: 'db-1', ownerId: 'user-2' });
+    mockFindTicket.mockResolvedValue(ticketRead(completed('a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001')));
+    mockProbe.mockResolvedValue({ status: 'found', databaseId: 'd0000000-0000-4000-8000-000000000001', ownerId: 'b0000000-0000-4000-8000-000000000002' });
 
     const result = await provision('myapp');
 
@@ -178,12 +205,12 @@ describe('provision_database pending tickets', () => {
     writeEnv('KEEP=me\n');
     mockRequestDatabase.mockImplementation(async () => {
       writeEnv('KEEP=me\nADDED_WHILE_WAITING=yes\n');
-      return requested(completed('ticket-2', 'db-2'));
+      return requested(completed('a0000000-0000-4000-8000-000000000002', 'd0000000-0000-4000-8000-000000000002'));
     });
 
     await provision('myapp');
 
-    expect(envLines()).toEqual(expect.arrayContaining(['ADDED_WHILE_WAITING=yes', 'DATABASE_ID=db-2']));
+    expect(envLines()).toEqual(expect.arrayContaining(['ADDED_WHILE_WAITING=yes', 'DATABASE_ID=d0000000-0000-4000-8000-000000000002']));
   });
 
   it('resumes a quoted and exported ticket without writing the account bearer', async () => {
@@ -195,17 +222,17 @@ describe('provision_database pending tickets', () => {
         .join('\n') +
         '\n',
     );
-    mockFindTicket.mockResolvedValue(ticketRead(completed('ticket-1', 'db-1')));
+    mockFindTicket.mockResolvedValue(ticketRead(completed('a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001')));
 
     const result = await provision('myapp');
 
     expect(result.details).toMatchObject({ success: true, resumed: true });
-    expect(envLines()).toContain('DATABASE_ID=db-1');
+    expect(envLines()).toContain('DATABASE_ID=d0000000-0000-4000-8000-000000000001');
     expect(envFile()).not.toMatch(/ACCESS_TOKEN|account-token|account-api-key/);
     expect(envFile()).not.toMatch(/PROVISION_TICKET/);
   });
 
-  it('joins the install a retry finds still running instead of starting a second one', async () => {
+  it('starts the install while the database is built, and a retry joins it instead of starting a second one', async () => {
     // A composed app with no node_modules: the prewarm installs it, and this
     // install never finishes.
     const appDir = path.join(cwd, 'packages', 'app');
@@ -218,8 +245,9 @@ describe('provision_database pending tickets', () => {
       installs.push([cmd, ...args].join(' '));
       return new Promise(() => {});
     };
-    mockRequestDatabase.mockResolvedValue(requested(pending('ticket-1')));
-    mockFindTicket.mockResolvedValue(ticketRead(pending('ticket-1')));
+    // The backend has not made the database yet.
+    mockRequestDatabase.mockResolvedValue(requested(pending('a0000000-0000-4000-8000-000000000001')));
+    mockFindTicket.mockResolvedValue(ticketRead(pending('a0000000-0000-4000-8000-000000000001')));
 
     const first = await provision('myapp', hangingInstall);
     const second = await provision('myapp', hangingInstall);

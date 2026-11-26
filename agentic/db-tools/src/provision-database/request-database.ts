@@ -9,11 +9,12 @@
 // bootstrap completes the new database has zero users, so its per-DB API
 // would reject the owner token under RLS. requestDatabase owns the database
 // to the JWT user — there is no owner input. The generated ORM's default
-// adapter is plain fetch, so the SDK's FetchAdapter is injected to keep
-// *.localhost DNS/Host routing working in Node.
+// adapter is plain fetch, so the SDK's FetchAdapter is injected to keep the
+// routing of per-database subdomains working in Node.
 
 import { api, modules } from '@constructive-io/sdk';
 
+import { answersSignedOut, type GraphQLError, statusOf, thrownText } from '../graphql-http';
 import type { ProvisionModule } from './presets';
 
 /**
@@ -82,6 +83,18 @@ export class ProvisionPendingError extends Error {
  * see it. Nothing says the provision stopped, so a caller must not request
  * the same database again on this alone.
  */
+/** A ticket read the backend refused because the sign-in has ended: the provision may still be running. */
+export class ProvisionSignedOutError extends Error {
+  constructor(
+    message: string,
+    readonly ticketId: string,
+    options?: { cause?: unknown },
+  ) {
+    super(message, options);
+    this.name = 'ProvisionSignedOutError';
+  }
+}
+
 export class ProvisionTicketLostError extends Error {
   constructor(
     message: string,
@@ -89,6 +102,25 @@ export class ProvisionTicketLostError extends Error {
   ) {
     super(message);
     this.name = 'ProvisionTicketLostError';
+  }
+}
+
+/**
+ * The provision ticket failed. `ticketError` is the text the backend's job
+ * stored on the ticket, a column rather than a GraphQL error, so it carries no
+ * extensions: a refusal the job raised reads as its code ("[run]
+ * BILLING_PLAN_REQUIRED", or "LIMIT_REACHED"), anything else as the job's own
+ * text, which is for decisions only. The message names the ticket instead,
+ * which the backend operator can look up.
+ */
+export class ProvisionJobError extends Error {
+  constructor(
+    readonly ticketError: string,
+    step: 'provisioning' | 'owner bootstrap',
+    ticketId: string,
+  ) {
+    super(`the backend's ${step} job failed (ticket ${ticketId})`);
+    this.name = 'ProvisionJobError';
   }
 }
 
@@ -167,21 +199,25 @@ const NETWORK_ERROR_RE =
 /**
  * Whether an error reading or requesting a ticket says only that the backend
  * couldn't be reached or failed: a network error thrown before any response,
- * or an HTTP 5xx/429 the adapter reports as the only error. A GraphQL error
- * (validation, permission, an expired or rejected token) is an answer, so the
- * ticket can't be followed any further.
+ * or errors that all carry an HTTP 5xx or 429 (inside the error, or from the
+ * adapter). Any other GraphQL error (validation, permission, an expired or
+ * rejected token) is an answer, so the ticket can't be followed any further.
  */
 export function isTransientProvisionError(err: unknown): boolean {
-  const errors = (err as { errors?: { message?: string }[] } | null)?.errors;
+  const errors = (err as { errors?: GraphQLError[] } | null)?.errors;
   if (Array.isArray(errors)) {
-    return errors.length > 0 && errors.every((e) => /^HTTP (5\d\d|429)\b/.test(e?.message ?? ''));
+    return (
+      errors.length > 0 &&
+      errors.every((e) => {
+        const status = statusOf(e);
+        return status !== undefined && (status >= 500 || status === 429);
+      })
+    );
   }
   if (!(err instanceof Error)) return false;
   const code = (err.cause as { code?: unknown } | undefined)?.code;
   return NETWORK_ERROR_RE.test(`${err.message} ${typeof code === 'string' ? code : ''}`);
 }
-
-const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -231,9 +267,10 @@ export async function requestDatabaseProvision(args: {
       resumedTicket = await executor.poll(args.resumeTicketId);
     } catch (err) {
       if (isTransientProvisionError(err)) {
-        throw new ProvisionPendingError(errorText(err), args.resumeTicketId, { cause: err });
+        throw new ProvisionPendingError(thrownText(err), args.resumeTicketId, { cause: err });
       }
-      throw new Error(`provision ticket ${args.resumeTicketId} could not be read: ${errorText(err)}`, {
+      if (answersSignedOut(err)) throw new ProvisionSignedOutError(thrownText(err), args.resumeTicketId, { cause: err });
+      throw new Error(`provision ticket ${args.resumeTicketId} could not be read: ${thrownText(err)}`, {
         cause: err,
       });
     }
@@ -260,10 +297,10 @@ export async function requestDatabaseProvision(args: {
   let failures = 0;
   for (;;) {
     if (ticket.status === 'failed') {
-      throw new Error(ticket.errorMessage ?? 'provisioning failed');
+      throw new ProvisionJobError(ticket.errorMessage ?? '', 'provisioning', ticketId);
     }
     if (ticket.bootstrapStatus === 'failed') {
-      throw new Error(ticket.bootstrapError ?? 'owner bootstrap failed');
+      throw new ProvisionJobError(ticket.bootstrapError ?? '', 'owner bootstrap', ticketId);
     }
     if (ticket.status === 'completed' && ticket.bootstrapStatus === 'completed') {
       if (!ticket.databaseId) throw new Error('provisioning completed but returned no databaseId.');
@@ -288,13 +325,14 @@ export async function requestDatabaseProvision(args: {
     try {
       polled = await executor.poll(ticketId);
     } catch (err) {
+      if (answersSignedOut(err)) throw new ProvisionSignedOutError(thrownText(err), ticketId, { cause: err });
       if (!isTransientProvisionError(err)) {
-        throw new Error(`provision ticket ${ticketId} could not be read: ${errorText(err)}`, {
+        throw new Error(`provision ticket ${ticketId} could not be read: ${thrownText(err)}`, {
           cause: err,
         });
       }
       if (++failures > MAX_CONSECUTIVE_POLL_FAILURES) {
-        throw new ProvisionPendingError(errorText(err), ticketId, { cause: err });
+        throw new ProvisionPendingError(thrownText(err), ticketId, { cause: err });
       }
       continue;
     }

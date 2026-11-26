@@ -7,13 +7,21 @@ jest.mock('../src/graphql-http', () => ({
   ...jest.requireActual('../src/graphql-http'),
   postGraphQL: jest.fn(),
 }));
+// The project binding the codegen reads; resolving it needs a backend.
+jest.mock('../src/context', () => ({
+  ...jest.requireActual('../src/context'),
+  resolveProjectContext: jest.fn(),
+}));
 
 import { prewarmAppWorkspace, type RunCommand } from '../src/app-workspace';
+import { type ProjectContext, resolveProjectContext } from '../src/context';
 import { postGraphQL } from '../src/graphql-http';
 import { configureHost } from '../src/host';
+import { toolPreconditions } from '../src/tools';
 import { createRunCodegenTool } from '../src/tools/run-codegen';
 
 const mockPost = postGraphQL as jest.MockedFunction<typeof postGraphQL>;
+const mockResolve = resolveProjectContext as jest.MockedFunction<typeof resolveProjectContext>;
 
 type Call = { cmd: string; args: string[]; cwd: string; env?: Record<string, string> };
 
@@ -107,6 +115,11 @@ beforeEach(() => {
   configureHost({
     account: () => null,
     backendConfig: () => ({ apiEndpoint: 'http://api.localhost:3000/graphql' }),
+  });
+  // The project's .env pins another API endpoint than the one the session trusts: codegen never reads that pin.
+  mockResolve.mockResolvedValue({
+    context: { databaseName: 'myapp', controlApiEndpoint: 'http://api.localhost:3000/graphql', apiEndpoint: 'http://api.pinned.example/graphql' } as ProjectContext,
+    reason: '',
   });
 });
 
@@ -268,8 +281,8 @@ describe('run_codegen on a composed app', () => {
 
       expect(details).toMatchObject({ success: false, codegenAttempts: 4 });
       const message = content[0]?.type === 'text' ? content[0].text : undefined;
-      expect(message).toContain('BACKEND OUTAGE');
-      expect(message).toContain('Check backend reachability once');
+      expect(message).toContain('The backend is down');
+      expect(message).toContain('Check that the backend answers once');
       expect(message).not.toContain('run_preflight');
     } finally {
       jest.useRealTimers();
@@ -371,5 +384,70 @@ describe('run_codegen on a constructive-app template', () => {
     expect(existsSync(path.join(appDir, 'pnpm-workspace.yaml'))).toBe(false);
     expect(read(path.join(cwd, 'pnpm-workspace.yaml'))).toContain('packages:\n  - "packages/*"');
     expect(result.details).toMatchObject({ success: true, appKind: 'template', installed: true });
+  });
+});
+
+describe('run_codegen for a host that prepares no app (prewarmApp: false)', () => {
+  const APP_ENDPOINT = 'http://api-myapp.localhost:3000/graphql';
+  beforeEach(() => {
+    configureHost({
+      account: () => null,
+      backendConfig: () => ({ apiEndpoint: 'http://api.localhost:3000/graphql' }),
+      prewarmApp: false,
+    });
+  });
+
+  it('refuses with app-missing and the endpoint the generator needs when there is no packages/app, and writes nothing', async () => {
+    const { exec, calls } = fakeExec();
+
+    const result = await createRunCodegenTool(exec).execute({}, { cwd });
+    const planned = await toolPreconditions.get('run_codegen')({}, cwd);
+
+    expect(calls).toEqual([]);
+    expect(existsSync(appDir)).toBe(false);
+    expect(existsSync(path.join(cwd, 'pnpm-workspace.yaml'))).toBe(false);
+    expect(result.failure).toMatchObject({ code: 'app-missing', context: { appEndpoint: APP_ENDPOINT } });
+    expect(result.details).toMatchObject({ success: false, appEndpoint: APP_ENDPOINT });
+    expect(planned).toMatchObject({ kind: 'failed', failure: { code: 'app-missing', context: { appEndpoint: APP_ENDPOINT } } });
+  });
+
+  it('runs the template app\'s own codegen only: no workspace rewrite, no pin, no .env.local and no install', async () => {
+    const packageJson = JSON.stringify({ devDependencies: { '@constructive-io/graphql-codegen': '^4.9.0' } });
+    write(path.join(appDir, 'package.json'), packageJson);
+    const { exec, calls } = fakeExec((call) => {
+      if (isCodegen(call)) writeGeneratedSdk();
+      return { ok: true, out: '' };
+    });
+
+    const result = await createRunCodegenTool(exec).execute({}, { cwd });
+    const planned = await toolPreconditions.get('run_codegen')({}, cwd);
+
+    expect(calls.map(({ cmd, args, cwd }) => ({ cmd, args, cwd }))).toEqual([
+      { cmd: 'npx', args: ['@constructive-io/graphql-codegen', 'generate', '--config', './graphql-codegen.config.ts'], cwd: appDir },
+    ]);
+    expect(read(path.join(appDir, 'package.json'))).toBe(packageJson);
+    expect(existsSync(path.join(cwd, 'pnpm-workspace.yaml'))).toBe(false);
+    expect(existsSync(path.join(appDir, '.env.local'))).toBe(false);
+    expect(result.details).toMatchObject({ success: true, appKind: 'template', installed: false });
+    expect(planned).toMatchObject({ kind: 'ok' });
+    expect(planned.kind === 'ok' && planned.value.notes).toEqual([expect.stringContaining("runs the project's own code generator")]);
+  });
+
+  it('refuses a composed app whose packages are not installed, and installs nothing', async () => {
+    composedApp();
+    const { exec, calls } = fakeExec();
+
+    const result = await createRunCodegenTool(exec).execute({}, { cwd });
+
+    expect(calls).toEqual([]);
+    expect(result.failure).toMatchObject({ code: 'app-missing', context: { appEndpoint: APP_ENDPOINT } });
+  });
+});
+
+describe('the plan of run_codegen for a host that prepares the app', () => {
+  it('names the app steps it runs', async () => {
+    const planned = await toolPreconditions.get('run_codegen')({}, cwd);
+
+    expect(planned.kind === 'ok' && planned.value.notes).toEqual([expect.stringContaining("runs the project's own code generator"), expect.stringContaining('creates packages/app from the app template')]);
   });
 });

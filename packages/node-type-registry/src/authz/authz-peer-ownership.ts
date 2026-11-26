@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { MASK_COLUMN, MEMBER_CHECKS, MEMBER_LIST, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
+import { ACTIVE_MEMBER_RISK } from './plain-words';
 
 export const AuthzPeerOwnership: NodeTypeDefinition = {
   name: 'AuthzPeerOwnership',
@@ -15,14 +17,7 @@ export const AuthzPeerOwnership: NodeTypeDefinition = {
         'x-column-scope': 'local',
         description: 'Column name on protected table referencing the owning user (e.g., owner_id)'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
-      },
-      entity_type: {
-        type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
-      },
+      ...TEAM_KIND,
       levels: {
         type: 'array',
         items: {
@@ -46,15 +41,31 @@ export const AuthzPeerOwnership: NodeTypeDefinition = {
       is_owner: {
         type: 'boolean',
         description: 'If true, require is_owner flag on current user membership'
-      }
+      },
+      mask_column: MASK_COLUMN,
+      ...MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
     required: [
       'owner_field'
-    ]
+    ],
+    allOf: [TEAM_KIND_GIVEN],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'peer',
     'authz'
+  ],
+  summary: 'Anyone who shares a team with the person who owns the row gets access.',
+  use_when: [
+    'Profiles or posts that the co-members of any shared team may see.'
+  ],
+  avoid_when: [
+    'Rows that belong to one team: use AuthzEntityMembership.'
+  ],
+  risks: [
+    'Sharing any one team of that kind is enough, even a team that has nothing to do with the row.',
+    ACTIVE_MEMBER_RISK
   ]
 };

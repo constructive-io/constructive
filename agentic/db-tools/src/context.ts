@@ -1,11 +1,22 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import type { PlanAgent, ToolFailure, ToolFailureCode } from '@agentic-kit/harness';
 import { api, auth, modules } from '@constructive-io/sdk';
 import { parseDotenv } from '12factor-env/dotenv';
 
 import { probeDatabase, type UnreachableCause } from './db-probe';
-import { DEFAULT_DATA_TOKEN_SKEW_MS, getHost, noBackendReason, reprovisionAdvice } from './host';
+import { failureFromError, failureFromErrors, failureText, invalidBinding, NEW_DATABASE, noBackendFailure } from './failure';
+import {
+  DEFAULT_DATA_TOKEN_SKEW_MS,
+  getHost,
+  type PreviewToken,
+  readAccount,
+  readBackendConfig,
+  replaceCall,
+  reprovisionAdvice,
+} from './host';
+import { invalidBindingKeys } from './provision-database/env-file';
 
 export type ApiClient = ReturnType<typeof api.createClient>;
 export type ModulesClient = ReturnType<typeof modules.createClient>;
@@ -16,11 +27,17 @@ export type ProjectContext = {
   databaseId: string;
   schemaId: string;
   ownerId: string | undefined;
+  /** The signed-in account every control-plane request is made as, and its email when the host gives it. */
+  accountUserId: string;
+  accountEmail?: string;
+  accountAgent?: PlanAgent;
+  /** The host's api endpoint: every control-plane request goes there, whatever .env pins. */
+  controlApiEndpoint: string;
   apiEndpoint: string;
   modulesEndpoint: string;
   databaseName: string;
   accessToken?: string;
-  // Per-DB data/CRUD endpoint (api-<db>.localhost). Empty when DATABASE_NAME is
+  // Per-DB data/CRUD endpoint (api-<db>.<domain>). Empty when DATABASE_NAME is
   // absent — record tools need it; schema tools use `api` and ignore it.
   dataEndpoint: string;
   // The database's schema hash as the binding probe read it; it changes on
@@ -44,7 +61,21 @@ export type ResolveResult = {
   code?: ProjectContextFailureCode;
   /** Why the backend couldn't answer, with code 'backend-unreachable'. */
   cause?: UnreachableCause;
+  /**
+   * Why there is no context, for a tool to report as is; present exactly when
+   * `context` is null. `reason` is its text. Its code is `signed-out` where
+   * `code` says a missing or rejected account credential less directly.
+   */
+  failure?: ToolFailure;
 };
+
+type Why = Omit<ToolFailure, 'code'> & { code?: ToolFailureCode };
+
+// The failure's code is `code` unless `why.code` names a more precise one.
+function unresolved(code: ProjectContextFailureCode, why: Why, cause?: UnreachableCause): ResolveResult {
+  const failure: ToolFailure = { ...why, code: why.code ?? code };
+  return { context: null, reason: failureText(failure), code, ...(cause ? { cause } : {}), failure };
+}
 
 // The project values pi needs, and where they come from. A scaffolded project
 // folder carries binding metadata in `.env`; a headless host — a container,
@@ -122,35 +153,43 @@ export async function resolveProjectContext(
   const fileBacked = typeof input === 'string';
   const source = fileBacked ? await fromEnvFile(input) : input;
   if (!source) {
-    return {
-      context: null,
-      reason:
-        'No .env found in the project. Provision a Constructive database first (scaffold the project), then retry.',
-      code: 'no-env',
-    };
+    return unresolved('no-env', {
+      message: 'No .env found in the project.',
+      hint: 'Create a database for this directory (the person approves it), then retry.',
+      calls: [NEW_DATABASE],
+    });
   }
 
   const env = Object.fromEntries(
     CONTEXT_ENV_KEYS.map((key) => [key, fileBacked && key === 'ACCESS_TOKEN' ? undefined : readContextValue(source, key)]),
   ) as Record<ContextEnvKey, string | undefined>;
+  const invalid = invalidBindingKeys(env);
+  if (invalid.length) return unresolved('missing-credentials', invalidBinding(invalid, fileBacked ? '.env' : 'the injected project context'));
   const accessToken = env.ACCESS_TOKEN;
   const databaseId = env.DATABASE_ID;
 
   if (!databaseId || (!fileBacked && !accessToken)) {
-    return {
-      context: null,
-      reason: fileBacked
-        ? 'Project is not connected to a Constructive database yet (missing DATABASE_ID in .env). Provision the database first, then retry.'
-        : `Missing ${CONTEXT_ENV_PREFIX}ACCESS_TOKEN or ${CONTEXT_ENV_PREFIX}DATABASE_ID from the injected project context.`,
-      code: 'missing-credentials',
-    };
+    return unresolved(
+      'missing-credentials',
+      fileBacked
+        ? {
+          message: 'Project is not connected to a Constructive database yet (missing DATABASE_ID in .env).',
+          hint: 'Bind this directory to a database (the person approves it), then retry.',
+          calls: [NEW_DATABASE],
+        }
+        : {
+          message: `Missing ${CONTEXT_ENV_PREFIX}ACCESS_TOKEN or ${CONTEXT_ENV_PREFIX}DATABASE_ID from the injected project context.`,
+        },
+    );
   }
 
   // A source-supplied pin wins for the DATA plane (the access key belongs to
   // whatever backend wrote it); otherwise fall back to the app's backend-config
   // store (environment-aware) so app + harness share one endpoint source.
   const host = getHost();
-  const backend = host.backendConfig();
+  const backendRead = readBackendConfig(host);
+  if (backendRead.kind === 'failed') return unresolved('no-backend', backendRead.failure);
+  const backend = backendRead.value;
   const controlApiEndpoint = backend?.apiEndpoint;
   const controlModulesEndpoint = backend?.modulesEndpoint;
 
@@ -160,19 +199,19 @@ export async function resolveProjectContext(
   // surfaces. An explicitly injected key stays in the context for the data plane only.
   // The bearer is only ever sent to the app-configured backend — never a
   // source-pinned endpoint, which an untrusted cloned project controls.
-  const account = host.account();
+  const accountRead = await readAccount(host);
+  if (accountRead.kind === 'failed') return unresolved('missing-credentials', accountRead.failure);
+  const account = accountRead.value;
   const accountBearer = account?.apiKey ?? account?.accessToken;
   if (!accountBearer) {
-    return {
-      context: null,
-      reason: `No usable account credential to reach the Constructive control plane. ${
-        host.signInHint ?? 'Sign in to the app, then retry.'
-      }`,
-      code: 'missing-credentials',
-    };
+    return unresolved('missing-credentials', {
+      code: 'signed-out',
+      message: 'No usable account credential to reach the Constructive control plane.',
+      hint: host.signInHint ?? 'Sign in to the app, then retry.',
+    });
   }
   if (!controlApiEndpoint || !controlModulesEndpoint) {
-    return { context: null, reason: noBackendReason(host.signInHint), code: 'no-backend' };
+    return unresolved('no-backend', noBackendFailure(host.signInHint));
   }
   const apiEndpoint = env.API_ENDPOINT || controlApiEndpoint;
   const modulesEndpoint = env.MODULES_ENDPOINT || controlModulesEndpoint;
@@ -190,19 +229,18 @@ export async function resolveProjectContext(
     signInHint: host.signInHint,
   });
   if (probe.status === 'unreachable') {
-    return {
-      context: null,
-      reason: unreachableReason(controlApiEndpoint, probe.cause, probe.detail),
-      code: 'backend-unreachable',
-      cause: probe.cause,
-    };
+    return unresolved(
+      'backend-unreachable',
+      unreachableFailure(controlApiEndpoint, probe.cause, probe.detail),
+      probe.cause,
+    );
   }
   if (probe.status === 'missing') {
-    return {
-      context: null,
-      reason: `The bound database (DATABASE_ID=${databaseId}) no longer exists on this backend, or this account lost access to it. ${reprovisionAdvice(host)}`,
-      code: 'db-missing',
-    };
+    return unresolved('db-missing', {
+      message: `The bound database (DATABASE_ID=${databaseId}) no longer exists on this backend, or this account lost access to it.`,
+      hint: reprovisionAdvice(host),
+      ...replaceCall(host),
+    });
   }
 
   // Schemas are account-scoped: a live binding under a different account is
@@ -218,22 +256,20 @@ export async function resolveProjectContext(
     sessionUserId &&
     probe.ownerId !== sessionUserId
   ) {
-    return {
-      context: null,
-      reason: `The bound database (DATABASE_ID=${databaseId}) was provisioned under a different account than the one signed in. ${reprovisionAdvice(host)}`,
-      code: 'account-mismatch',
-    };
+    return unresolved('account-mismatch', {
+      message: `The bound database (DATABASE_ID=${databaseId}) was provisioned under a different account than the one signed in.`,
+      hint: reprovisionAdvice(host),
+      ...replaceCall(host),
+    });
   }
 
   // A suspended database still holds its data, so it is never a reason to
   // reprovision: nothing can read or change it until the hold is lifted.
   if (probe.status === 'suspended') {
     const why = probe.suspendedReason ? ` (${probe.suspendedReason})` : '';
-    return {
-      context: null,
-      reason: `The bound database (DATABASE_ID=${databaseId}) is suspended${why} since ${probe.suspendedAt}. Its data is kept, but nothing can read or change it until the suspension is lifted.`,
-      code: 'db-suspended',
-    };
+    return unresolved('db-suspended', {
+      message: `The bound database (DATABASE_ID=${databaseId}) is suspended${why} since ${probe.suspendedAt}. Its data is kept, but nothing can read or change it until the suspension is lifted.`,
+    });
   }
 
   const databaseName = env.DATABASE_NAME || probe.name || '';
@@ -243,9 +279,7 @@ export async function resolveProjectContext(
     : '';
 
   const schema = await resolveSchemaId(apiClient, databaseId);
-  if ('reason' in schema) {
-    return { context: null, reason: schema.reason, code: 'schema-unresolved' };
-  }
+  if ('failure' in schema) return unresolved('schema-unresolved', schema.failure);
   const schemaId = schema.id;
 
   return {
@@ -255,6 +289,10 @@ export async function resolveProjectContext(
       databaseId,
       schemaId,
       ownerId,
+      accountUserId: account.userId,
+      ...(account.email ? { accountEmail: account.email } : {}),
+      ...(account.agent ? { accountAgent: account.agent } : {}),
+      controlApiEndpoint,
       apiEndpoint,
       modulesEndpoint,
       databaseName,
@@ -266,27 +304,58 @@ export async function resolveProjectContext(
   };
 }
 
-function unreachableReason(endpoint: string, cause: UnreachableCause, detail: string): string {
+function unreachableFailure(endpoint: string, cause: UnreachableCause, detail: string): ToolFailure {
   switch (cause) {
   case 'auth':
     // The probe's detail says the credential was rejected and how to sign in.
-    return `Could not check the bound database on the Constructive backend at ${endpoint}: ${detail}`;
+    return {
+      code: 'signed-out',
+      message: `Could not check the bound database on the Constructive backend at ${endpoint}: ${detail}`,
+    };
   case 'error':
-    return `The Constructive backend at ${endpoint} answered with an error while checking the bound database (${detail}). Retry; if it keeps failing, check the backend's logs.`;
+    return {
+      code: 'backend-unreachable',
+      message: `The Constructive backend at ${endpoint} answered with an error while checking the bound database (${detail}).`,
+      hint: "Retry; if it keeps failing, check the backend's logs.",
+      retryable: true,
+    };
   case 'server':
-    return `The Constructive backend at ${endpoint} is failing (${detail}). Check it is running, then retry.`;
+    return {
+      code: 'backend-unreachable',
+      message: `The Constructive backend at ${endpoint} is failing (${detail}).`,
+      hint: 'Check it is running, then retry.',
+      retryable: true,
+    };
+  case 'rate-limited':
+    return {
+      code: 'rate-limited',
+      message: `The Constructive backend at ${endpoint} is limiting how many requests it takes (${detail}).`,
+      hint: 'Wait, as long as the message says when the backend gave a time, then call again.',
+      retryable: true,
+    };
   default:
-    return `Could not reach the Constructive backend at ${endpoint} (${detail}). Check it is running, then retry.`;
+    return {
+      code: 'backend-unreachable',
+      message: `Could not reach the Constructive backend at ${endpoint} (${detail}).`,
+      hint: 'Check it is running, then retry.',
+      retryable: true,
+    };
   }
 }
 
-const needsAuthReason = (): string =>
-  `Not signed in to the app database yet. ${
-    getHost().signInHint ??
-    'Sign in from the Sheets tab, or open the Preview and sign in to your app, then try again.'
-  }`;
+function appSignedOut(why = 'Not signed in to the app database yet.'): DataTokenResult {
+  const failure: ToolFailure = {
+    code: 'app-signed-out',
+    message: why,
+    hint:
+      getHost().signInHint ??
+      'Sign in from the Sheets tab, or open the Preview and sign in to your app, then try again.',
+  };
+  return { reason: failureText(failure), failure };
+}
 
-export type DataTokenResult = { token?: string; userId?: string; reason?: string };
+/** A token, or the `reason` and `failure` that say why there is none. */
+export type DataTokenResult = { token?: string; userId?: string; reason?: string; failure?: ToolFailure };
 
 // Resolve a data-plane token for record operations: serve the broker's active
 // account while valid, otherwise harvest the token the user created by signing
@@ -300,16 +369,19 @@ export async function resolveDataToken(context: ProjectContext): Promise<DataTok
   const active = broker?.getActiveToken(context.databaseId);
   if (active) return { token: active.token, userId: active.userId };
 
-  const preview = host.previewToken ? await host.previewToken() : null;
-  if (!preview) return { reason: needsAuthReason() };
-  if (broker?.isInvalidToken(context.databaseId, preview.accessToken)) {
-    return { reason: needsAuthReason() };
+  let preview: PreviewToken | null = null;
+  try {
+    preview = host.previewToken ? await host.previewToken() : null;
+  } catch (err) {
+    return appSignedOut(`Could not read the app sign-in: ${err instanceof Error ? err.message : String(err)}`);
   }
+  if (!preview) return appSignedOut();
+  if (broker?.isInvalidToken(context.databaseId, preview.accessToken)) return appSignedOut();
 
   const parsed = preview.accessTokenExpiresAt ? Date.parse(preview.accessTokenExpiresAt) : NaN;
   const expiresAt = Number.isNaN(parsed) ? Date.now() + 60 * 60 * 1000 : parsed;
   const skewMs = host.dataTokenSkewMs ?? DEFAULT_DATA_TOKEN_SKEW_MS;
-  if (expiresAt <= Date.now() + skewMs) return { reason: needsAuthReason() };
+  if (expiresAt <= Date.now() + skewMs) return appSignedOut();
 
   broker?.adoptToken(context.databaseId, {
     userId: preview.userId,
@@ -322,7 +394,7 @@ export async function resolveDataToken(context: ProjectContext): Promise<DataTok
 
 // Per-DB endpoints are deterministic on the provisioning subdomain (= DATABASE_NAME):
 // each plane swaps the first host label of its control-plane endpoint
-// (e.g. api.localhost -> api-myapp.localhost, auth.localhost -> auth-myapp.localhost).
+// (e.g. api.example.com -> api-myapp.example.com, auth.example.com -> auth-myapp.example.com).
 export function deriveSubdomainEndpoint(baseEndpoint: string, firstLabel: string): string {
   try {
     const url = new URL(baseEndpoint);
@@ -343,7 +415,7 @@ export function deriveSubdomainEndpoint(baseEndpoint: string, firstLabel: string
 export async function resolveOrgName(ownerId: string): Promise<string | undefined> {
   try {
     const host = getHost();
-    const account = host.account();
+    const account = await host.account();
     const bearer = account?.apiKey ?? account?.accessToken;
     if (!bearer) return undefined;
     const apiEndpoint = host.backendConfig()?.apiEndpoint;
@@ -373,23 +445,33 @@ export async function resolveOrgName(ownerId: string): Promise<string | undefine
 async function resolveSchemaId(
   apiClient: ApiClient,
   databaseId: string,
-): Promise<{ id: string } | { reason: string }> {
-  const result = await apiClient.schema
-    .findMany({
-      select: { id: true, name: true },
-      where: { databaseId: { equalTo: databaseId }, name: { equalTo: 'app_public' } },
-    })
-    .execute();
-
-  if (!result.ok) {
-    const detail = result.errors?.[0]?.message ?? 'unknown error';
-    return { reason: `Could not query the app_public schema for database ${databaseId}: ${detail}` };
+): Promise<{ id: string } | { failure: ToolFailure }> {
+  // The answer's code decides (a sign-in that ended is signed-out); an answer no code explains is this step's.
+  const action = `Could not query the app_public schema for database ${databaseId}`;
+  const queryFailed = (failure: ToolFailure): { failure: ToolFailure } => ({
+    failure: failure.code === 'failed' ? { ...failure, code: 'schema-unresolved' } : failure,
+  });
+  let result;
+  try {
+    result = await apiClient.schema
+      .findMany({
+        select: { id: true, name: true },
+        where: { databaseId: { equalTo: databaseId }, name: { equalTo: 'app_public' } },
+      })
+      .execute();
+  } catch (err) {
+    return queryFailed(failureFromError(err, action));
   }
+
+  if (!result.ok) return queryFailed(failureFromErrors(result.errors ?? [], action));
 
   const appPublic = (result.data.schemas?.nodes ?? []).find((s) => s?.name === 'app_public');
   if (!appPublic?.id) {
     return {
-      reason: `Database ${databaseId} has no app_public schema. The database may not be fully provisioned yet.`,
+      failure: {
+        code: 'schema-unresolved',
+        message: `Database ${databaseId} has no app_public schema. The database may not be fully provisioned yet.`,
+      },
     };
   }
   return { id: appPublic.id };

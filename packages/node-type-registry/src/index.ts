@@ -1,4 +1,5 @@
 export * from './authz';
+export * from './blueprint-schema.generated';
 export * from './blueprint-types.generated';
 export * from './conditions';
 export * from './content-presets';
@@ -42,3 +43,9 @@ export const allNodeTypes: NodeTypeDefinition[] = [
   ...Object.values(relation),
   ...Object.values(view)
 ];
+
+/**
+ * The Authz nodes a table's rule (a policy) can be: every Authz node but AuthzColumnSecurity, which guards writes to
+ * columns from a table's nodes and is not a policy.
+ */
+export const policyNodeTypes: NodeTypeDefinition[] = allNodeTypes.filter((nt) => nt.category === 'authz' && nt.name !== 'AuthzColumnSecurity');

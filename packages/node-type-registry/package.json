@@ -28,18 +28,15 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "generate:types": "ts-node src/codegen/generate-types.ts",
-    "generate:json": "ts-node src/codegen/generate-json.ts --outdir dist"
-  },
-  "dependencies": {
-    "@babel/generator": "^7.29.0",
-    "@babel/types": "^7.29.0",
-    "@pgsql/types": "^18.0.0",
-    "@pgsql/utils": "^18.3.15",
-    "pgsql-deparser": "^18.5.8",
-    "schema-typescript": "^0.14.4"
+    "generate:json": "ts-node src/codegen/generate-json.ts --outdir dist",
+    "generate:reference": "ts-node src/codegen/generate-reference.ts"
   },
   "devDependencies": {
-    "makage": "^0.8.0"
+    "@babel/generator": "^7.29.0",
+    "@babel/types": "^7.29.0",
+    "ajv": "^8.20.0",
+    "makage": "^0.8.0",
+    "schema-typescript": "^0.14.4"
   },
   "keywords": [
     "constructive",

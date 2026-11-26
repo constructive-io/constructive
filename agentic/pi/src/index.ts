@@ -1,11 +1,4 @@
-import {
-  configureHost,
-  constructiveDbTools,
-  createTemplatePreviewTables,
-  resolveDataToken,
-  resolveProjectContext,
-  type ToolsHost,
-} from '@agentic-kit/db-tools';
+import { configureHost, constructiveDbTools, type ToolsHost } from '@agentic-kit/db-tools';
 import type { ExtensionFactory } from '@earendil-works/pi-coding-agent';
 
 import { createConfirmGate } from './confirm-gate';
@@ -25,11 +18,7 @@ function bindDbTools(excludeTools: ReadonlySet<string>): ExtensionFactory {
       if (!excludeTools.has(tool.name)) pi.registerTool(toPiTool(tool));
     }
 
-    const gate = createConfirmGate({
-      resolveProjectContext,
-      resolveDataToken,
-      createTemplatePreviewTables,
-    });
+    const gate = createConfirmGate({});
     pi.on('agent_start', gate.onAgentStart);
     pi.on('tool_call', gate.onToolCall);
   };

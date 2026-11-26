@@ -1,11 +1,10 @@
 export type PlaneEndpoints = { admin: string; auth: string; app: string };
 
-// Codegen and the Next.js dev server default every per-DB vhost to
-// *-<db>.localhost:3000, which only exists on a local backend. Derive the real
-// vhosts from the api endpoint the binding belongs to by swapping its first
-// host label (api.launchql.dev -> admin-<db>.launchql.dev) — the same scheme
-// context.ts uses for the data plane. The app DATA plane is `api-<db>`, not
-// `app-<db>` (SUBDOMAIN-001).
+// Codegen and the Next.js dev server default every per-DB vhost to a local
+// host, which only exists on a local backend. Derive the real vhosts from the
+// api endpoint the binding belongs to by swapping its first host label
+// (api.example.com -> admin-<db>.example.com) — the same scheme context.ts uses
+// for the data plane. The app DATA plane is `api-<db>`, not `app-<db>`.
 export function derivePlaneEndpoints(
   apiEndpoint: string,
   databaseName: string,

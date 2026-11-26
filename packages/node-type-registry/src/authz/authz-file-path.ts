@@ -1,4 +1,5 @@
 import type { NodeTypeDefinition } from '../types';
+import { OTHER_TABLE_RISK } from './plain-words';
 
 export const AuthzFilePath: NodeTypeDefinition = {
   name: 'AuthzFilePath',
@@ -58,10 +59,26 @@ export const AuthzFilePath: NodeTypeDefinition = {
     },
     required: [
       'capability_field'
-    ]
+    ],
+    allOf: [
+      { anyOf: [{ required: ['shares_table_id'] }, { required: ['shares_schema', 'shares_table'] }] },
+      { anyOf: [{ required: ['files_table_id'] }, { required: ['files_schema', 'files_table'] }] }
+    ],
+    additionalProperties: false
   },
   tags: [
     'storage',
     'authz'
+  ],
+  summary: 'People a file or folder has been shared with get access, even people outside the team, while the share is valid.',
+  use_when: [
+    'Data rooms and drives where a folder is shared with someone outside the team.'
+  ],
+  avoid_when: [
+    'Tables that are not file tables with a path column.'
+  ],
+  risks: [
+    'It reaches people outside the team on purpose. A membership check that every policy must also pass would cut them off.',
+    OTHER_TABLE_RISK
   ]
 };

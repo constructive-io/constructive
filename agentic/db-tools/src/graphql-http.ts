@@ -5,6 +5,7 @@
 // the body's errors keep their `extensions.code`, and every error carries the
 // HTTP status it arrived with.
 
+import { listed } from '@agentic-kit/harness';
 import {
   createFetch,
   type GraphQLAdapter,
@@ -31,6 +32,8 @@ export type PostGraphQLArgs = {
   headers?: Record<string, string>;
   query: string;
   variables?: Record<string, unknown>;
+  /** The operation to run, when the document holds more than one. */
+  operationName?: string;
   fetchFn?: typeof fetch;
 };
 
@@ -47,7 +50,11 @@ export async function postGraphQL<T>(args: PostGraphQLArgs): Promise<HttpGraphQL
         Accept: 'application/json',
         ...args.headers,
       },
-      body: JSON.stringify({ query: args.query, variables: args.variables ?? {} }),
+      body: JSON.stringify({
+        query: args.query,
+        variables: args.variables ?? {},
+        ...(args.operationName === undefined ? {} : { operationName: args.operationName }),
+      }),
     });
   } catch (err) {
     const cause = (err as { cause?: { code?: unknown } } | null)?.cause?.code;
@@ -64,6 +71,8 @@ export async function postGraphQL<T>(args: PostGraphQLArgs): Promise<HttpGraphQL
   }
 
   const httpStatus = response.status;
+  const retryAfter = retryAfterSeconds(response.headers?.get?.('Retry-After') ?? null);
+  const waited = retryAfter === undefined ? {} : { retryAfterSeconds: retryAfter };
   let body: { data?: T | null; errors?: GraphQLError[] } | null = null;
   try {
     body = (await response.json()) as typeof body;
@@ -79,7 +88,7 @@ export async function postGraphQL<T>(args: PostGraphQLArgs): Promise<HttpGraphQL
       errors: bodyErrors.map((error) => ({
         ...error,
         message: error?.message ?? '',
-        extensions: { ...error?.extensions, httpStatus },
+        extensions: { ...error?.extensions, httpStatus, ...waited },
       })),
     };
   }
@@ -91,7 +100,7 @@ export async function postGraphQL<T>(args: PostGraphQLArgs): Promise<HttpGraphQL
       errors: [
         {
           message: response.ok ? `HTTP ${httpStatus}${text} (the body was not JSON)` : `HTTP ${httpStatus}${text}`,
-          extensions: { code: 'HTTP_ERROR', httpStatus },
+          extensions: { code: 'HTTP_ERROR', httpStatus, ...waited },
         },
       ],
     };
@@ -123,57 +132,119 @@ export function statusAdapter(
   };
 }
 
-export type BackendErrorKind = 'suspended' | 'auth' | 'forbidden' | 'server' | 'network' | 'graphql';
+export type BackendErrorKind = 'suspended' | 'auth' | 'forbidden' | 'rate-limited' | 'server' | 'network' | 'graphql';
 
+// The backend's own codes for a request it limits (admission-control.ts), which it answers with 429.
+const LIMITED = new Set(['RATE_LIMITED', 'CONCURRENCY_LIMIT_REACHED']);
+
+/** Whether the backend limited the request (a 429, or its code): the step is to wait. */
+export const isRateLimited = (error: GraphQLError): boolean => LIMITED.has(codeOf(error) ?? '') || statusOf(error) === 429;
+
+/** The seconds the backend asked to wait (its Retry-After), when it said. */
+export function retryAfterOf(errors: readonly GraphQLError[]): number | undefined {
+  const seconds = (errors ?? []).map((error) => error?.extensions?.retryAfterSeconds).find((value) => typeof value === 'number');
+  return seconds as number | undefined;
+}
+
+// Retry-After is seconds, or an HTTP date.
+function retryAfterSeconds(value: string | null): number | undefined {
+  if (!value) return undefined;
+  if (/^\d+$/.test(value.trim())) return Number(value.trim());
+  const at = Date.parse(value);
+  return Number.isNaN(at) ? undefined : Math.max(0, Math.ceil((at - Date.now()) / 1000));
+}
+
+// The code of a public error. An internal error may keep a public-looking
+// code (FORBIDDEN) over a masked message, so its code means nothing.
 const codeOf = (error: GraphQLError): string | undefined => {
   const code = error?.extensions?.code;
-  return typeof code === 'string' ? code : undefined;
+  return typeof code === 'string' && error?.extensions?.class !== 'internal' ? code : undefined;
 };
-
-// The status an error arrived with: ours from extensions, or the SDK
-// adapter's `HTTP 503: …` message.
-const statusOf = (error: GraphQLError): number | undefined => {
-  const status = error?.extensions?.httpStatus;
-  if (typeof status === 'number') return status;
-  const match = /^HTTP (\d{3})\b/.exec(error?.message ?? '');
-  return match ? Number(match[1]) : undefined;
-};
-
-const AUTH_MESSAGE_RE = /jwt|unauthenticated|invalid token/i;
-const FORBIDDEN_MESSAGE_RE = /permission denied/i;
 
 /**
- * What a failed backend answer says, first match wins: the database is
- * suspended or gone (`ACCESS_SUSPENDED`), no response, the backend failing
- * (5xx, 429), a rejected credential (401), a refusal (403), or anything else.
+ * The HTTP status of one error: the one the server put inside it
+ * (`extensions.http`, since it answers every GraphQL request with HTTP 200),
+ * else the response's own (`extensions.httpStatus`, added by `postGraphQL`),
+ * else the one in the SDK FetchAdapter's "HTTP 503: …" message, which drops
+ * the body.
  */
+export function statusOf(error: GraphQLError): number | undefined {
+  for (const status of [error?.extensions?.http, error?.extensions?.httpStatus]) {
+    if (typeof status === 'number') return status;
+  }
+  const match = /^HTTP (\d{3})\b/.exec(error?.message ?? '');
+  return match ? Number(match[1]) : undefined;
+}
+
+/**
+ * What a failed backend answer says, by its code and status, first match
+ * wins: the database is suspended or gone (`ACCESS_SUSPENDED`), no response,
+ * the backend limiting requests (429), the backend failing (5xx), a rejected credential (401,
+ * `UNAUTHENTICATED`), a refusal (403, `FORBIDDEN`), or anything else.
+ */
+const SIGNED_OUT_CODES = new Set(['UNAUTHENTICATED', 'NOT_AUTHENTICATED', 'USER_NOT_AUTHENTICATED']);
+
+/** Whether a public code says the request's sign-in has ended or is missing (packages/errors registry). */
+export const isSignedOutCode = (code: string | undefined): boolean => SIGNED_OUT_CODES.has(code ?? '');
+
+/** Whether an error says the backend did not accept the request's credential: one of those codes, or a 401. */
+export const isSignedOut = (error: GraphQLError): boolean => statusOf(error) === 401 || isSignedOutCode(codeOf(error));
+
+/** Whether a thrown SDK error carries an answer that says so. */
+export const answersSignedOut = (err: unknown): boolean => {
+  const errors = (err as { errors?: unknown } | null)?.errors;
+  return Array.isArray(errors) && (errors as GraphQLError[]).some(isSignedOut);
+};
+
 export function classifyBackendErrors(errors: readonly GraphQLError[]): BackendErrorKind {
   const list = errors ?? [];
   const some = (test: (error: GraphQLError) => boolean) => list.some((error) => test(error));
   if (some((e) => codeOf(e) === 'ACCESS_SUSPENDED')) return 'suspended';
   if (some((e) => codeOf(e) === 'NETWORK')) return 'network';
+  if (some(isRateLimited)) return 'rate-limited';
   if (
     some((e) => {
       const status = statusOf(e);
-      return status !== undefined && (status >= 500 || status === 429);
+      return status !== undefined && status >= 500;
     })
   ) {
     return 'server';
   }
-  if (
-    some((e) => statusOf(e) === 401 || codeOf(e) === 'UNAUTHENTICATED' || AUTH_MESSAGE_RE.test(e?.message ?? ''))
-  ) {
-    return 'auth';
-  }
-  if (
-    some((e) => statusOf(e) === 403 || codeOf(e) === 'FORBIDDEN' || FORBIDDEN_MESSAGE_RE.test(e?.message ?? ''))
-  ) {
-    return 'forbidden';
-  }
+  if (some(isSignedOut)) return 'auth';
+  if (some((e) => statusOf(e) === 403 || codeOf(e) === 'FORBIDDEN')) return 'forbidden';
   return 'graphql';
 }
 
-/** The messages of a failed answer, joined for a reason string. */
-export function errorsText(errors: readonly GraphQLError[]): string {
-  return (errors ?? []).map((error) => error?.message || codeOf(error) || 'unknown error').join('; ');
+// A code a server means for its caller is a word in capitals (FORBIDDEN, UNIQUE_VIOLATION). A database error's own
+// code has a digit in its first word, so it is never named.
+const PUBLIC_CODE = /^[A-Z]+(?:_[A-Z0-9]+)*$/;
+
+// One error in fixed words: a logged error by its id, else its public code, else its HTTP status.
+function errorWords(error: GraphQLError): string {
+  const id = error?.extensions?.errorId;
+  if (typeof id === 'string') return `an internal error (error id ${id})`;
+  const code = codeOf(error);
+  if (code && PUBLIC_CODE.test(code)) return `the code ${code}`;
+  const status = statusOf(error);
+  return status === undefined || status === 200 ? 'an error without a public code' : `HTTP ${status}`;
+}
+
+/**
+ * What a failed answer was, in fixed words: each error's public code, HTTP status or error id. The text a server writes
+ * is never in them, since a server can pass the database's own text through, with internal table names and error
+ * codes. Only a request that got no answer keeps its text, which postGraphQL made from the local fetch failure.
+ */
+export function answerText(errors: readonly GraphQLError[]): string {
+  const list = errors ?? [];
+  const unanswered = list.find((error) => codeOf(error) === 'NETWORK' && error?.extensions?.httpStatus === undefined);
+  if (unanswered) return `the backend did not answer (${unanswered.message || 'no response'})`;
+  const words = [...new Set(list.map(errorWords))];
+  return `the backend answered with ${words.length ? listed(words) : 'an error without a public code'}`;
+}
+
+/** A thrown error in words that hold no server text: an SDK error by its GraphQL errors, any other by its own message. */
+export function thrownText(err: unknown): string {
+  const errors = (err as { errors?: unknown } | null)?.errors;
+  if (Array.isArray(errors) && errors.length > 0) return answerText(errors as GraphQLError[]);
+  return err instanceof Error ? err.message : String(err);
 }

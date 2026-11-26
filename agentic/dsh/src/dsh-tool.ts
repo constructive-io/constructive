@@ -26,6 +26,7 @@ const OUTPUT_SCHEMA: DshJsonSchema = {
   properties: {
     content: { type: 'array', items: { type: 'object' } },
     details: {},
+    failure: { type: 'object' },
     terminate: { type: 'boolean' }
   },
   required: ['content']
@@ -70,6 +71,7 @@ export function toDshTool<TParams extends z.ZodType, TDetails>(
       return {
         content: result.content,
         details: result.details === undefined ? null : result.details,
+        ...(result.failure === undefined ? {} : { failure: result.failure }),
         ...(result.terminate === undefined ? {} : { terminate: result.terminate })
       };
     }

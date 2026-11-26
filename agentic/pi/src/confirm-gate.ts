@@ -1,10 +1,5 @@
-import type {
-  createTemplatePreviewTables,
-  resolveDataToken,
-  resolveProjectContext
-} from '@agentic-kit/db-tools';
-import { constructiveGateDeps } from '@agentic-kit/db-tools';
-import type { ConfirmPreview } from '@agentic-kit/harness';
+import { constructiveGateDeps, type ConstructiveGateResolvers } from '@agentic-kit/db-tools';
+import { type ConfirmPreview, type PlanTarget, planTargetLines } from '@agentic-kit/harness';
 import {
   type ConfirmGate as HarnessConfirmGate,
   createConfirmGate as createHarnessConfirmGate,
@@ -26,6 +21,7 @@ type RichConfirmUi = {
     title: string,
     message: string,
     preview?: ConfirmPreview,
+    target?: PlanTarget,
   ) => Promise<boolean>;
   notifyToolSkipped?: (toolCallId: string) => void;
 };
@@ -33,15 +29,10 @@ type RichConfirmUi = {
 // Thin pi adapter over the host-neutral gate in @agentic-kit/harness: pi's
 // ToolCallEvent/ExtensionContext are mapped onto the package's
 // GateToolCallEvent/GateHost, and the host-backed resolvers below become its
-// deps through db-tools' `constructiveGateDeps`. index.ts wires the real
-// resolvers, tests substitute fakes.
-export type ConfirmGateDeps = {
-  resolveProjectContext: typeof resolveProjectContext;
-  resolveDataToken: typeof resolveDataToken;
-  createTemplatePreviewTables: typeof createTemplatePreviewTables;
-  /** Tool names to gate; defaults to the harness's `MUTATING_DB_TOOLS`. */
-  gatedTools?: ReadonlySet<string>;
-};
+// deps through db-tools' `constructiveGateDeps`, which gates by the db tools'
+// effects and blocks a call whose own first check fails. index.ts passes none,
+// so the tools' own checks apply; tests substitute fakes.
+export type ConfirmGateDeps = Partial<ConstructiveGateResolvers>;
 
 /**
  * Constructive's database deps, or a `GatePolicy` of the host's own — a pi
@@ -60,9 +51,7 @@ export type ConfirmGate = {
 
 export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
   const gate: HarnessConfirmGate = createHarnessConfirmGate(
-    'policy' in options
-      ? options
-      : { gatedTools: options.gatedTools, ...constructiveGateDeps(options) },
+    'policy' in options ? options : constructiveGateDeps(options),
   );
 
   return {
@@ -72,10 +61,10 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
       const ui = ctx.ui as ExtensionContext['ui'] & RichConfirmUi;
       const host: GateHost = {
         hasUI: ctx.hasUI,
-        confirmTool: (toolCallId, title, message, preview) =>
+        confirmTool: (toolCallId, title, message, preview, target) =>
           ui.confirmTool
-            ? ui.confirmTool(toolCallId, title, message, preview)
-            : ui.confirm(title, message),
+            ? ui.confirmTool(toolCallId, title, message, preview, target)
+            : ui.confirm(title, [...planTargetLines(target), '', message].join('\n')),
         notifyToolSkipped: (toolCallId) => ui.notifyToolSkipped?.(toolCallId),
       };
       return gate.onToolCall(

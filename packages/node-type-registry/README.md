@@ -83,6 +83,18 @@ cd graphql/node-type-registry && pnpm generate:types
 
 This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
 
+## Authz nodes: plain words and closed parameters
+
+Every `Authz*` node carries plain words, so a person or an agent can tell who a policy lets in without reading SQL: `summary` (one sentence), and `use_when`, `avoid_when` and `risks`.
+
+Each Authz node's `parameter_schema` is closed (`additionalProperties: false`), so a key the backend would store and ignore is refused instead of making a policy wider than meant. Keys the backend writes when it stores a policy (the member list it resolves, a capability mask, a compiled condition) are listed with `readOnly: true`: a stored policy may hold them, and a rule a caller writes leaves them out. A value that holds an Authz expression (`AuthzComposite`'s data, its `AND`/`OR`/`NOT` parts, `AuthzColumnSecurity.authz`) is marked `format: 'authz-expression'`: one key, which is `AND` or `OR` with a list, `NOT` with one expression, or the name of an Authz node with that node's data. A raw expression cannot be written.
+
+`pnpm generate:reference --outdir <folder>` writes the nodes as a Markdown reference page, `authz-node-reference.md`, with no date or version in it, so a copy that differs from a fresh render is stale. The page is made at dev time and is not part of the runtime exports.
+
+## Blueprint JSON Schema
+
+`pnpm generate:types` also writes `src/blueprint-schema.generated.ts`, exported as `blueprintDefinitionJsonSchema`: a draft-07 JSON Schema of a blueprint definition, made from the same structural types as `blueprint-types.generated.ts`. Each node's, policy's and check constraint's `data` points at that node's `parameter_schema` in the form a caller writes it (without its `readOnly` keys), so an Authz policy in a blueprint is checked against its closed parameters. A validator needs the formats `column-ref`, `uuid`, `function-ref` and `labeled` registered.
+
 ## JSON artifacts (data distribution)
 
 The build also emits the registry as pure-data JSON alongside the JS, so it can be consumed **as data** rather than as executable code:

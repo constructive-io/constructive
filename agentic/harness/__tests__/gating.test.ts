@@ -1,7 +1,20 @@
 import { ConfirmGate, ConfirmGateDeps, createConfirmGate, GateHost } from '../src/gating/confirm-gate';
+import { createConstructiveGatePolicy, type GateReadiness } from '../src/gating/constructive-policy';
 import { createDeclineGuard } from '../src/gating/decline-guard';
 import type { GatePolicy } from '../src/gating/policy';
-import { buildConfirmPrompt, MUTATING_DB_TOOLS } from '../src/gating/prompts';
+import type { PlanRule, PlanTableAccess, PlanTarget } from '../src/gating/preview';
+import { buildConfirmPrompt } from '../src/gating/prompts';
+import type { ToolEffect, ToolFailure } from '../src/tools/tool';
+
+// What the precondition resolved: the bound database of the directory, and a new database's backend and account.
+const TARGET: PlanTarget = {
+  kind: 'database',
+  database: { name: 'shop', id: '019a1d47-5c2e-7a1b-8f00-112233445566' },
+  apiEndpoint: 'http://api.localhost:3000/graphql',
+  account: { userId: 'user-1' },
+};
+const NEW_DATABASE: PlanTarget = { kind: 'account', apiEndpoint: 'http://api.localhost:3000/graphql', account: { userId: 'user-1' } };
+const READY: GateReadiness = { kind: 'ready', target: TARGET };
 
 type Harness = {
   gate: ConfirmGate;
@@ -9,6 +22,16 @@ type Harness = {
   confirmCalls: () => number;
   skipNotices: () => string[];
   setApproved: (value: boolean) => void;
+};
+
+// The effects the db tools these cases call declare; db-tools checks the real
+// tools against the policy.
+const EFFECTS: Record<string, ToolEffect> = {
+  provision_database: 'write',
+  delete_table: 'destructive',
+  add_records: 'write',
+  create_api_key: 'write',
+  describe_schema: 'read',
 };
 
 function createHarness(deps?: Partial<ConfirmGateDeps>): Harness {
@@ -26,8 +49,8 @@ function createHarness(deps?: Partial<ConfirmGateDeps>): Harness {
     },
   };
   const gateDeps: ConfirmGateDeps = {
-    isProjectRunnable: async () => false,
-    hasDataToken: async () => false,
+    effectOf: (toolName) => EFFECTS[toolName],
+    precondition: async () => READY,
     resolveTemplatePreview: async () => undefined,
     ...deps,
   };
@@ -121,8 +144,8 @@ describe('confirm gate: declines are respected', () => {
     expect(confirmCalls()).toBe(3);
   });
 
-  it('guards gated non-bootstrap tools through the runnable-project path too', async () => {
-    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
+  it('guards gated non-bootstrap tools too', async () => {
+    const { gate, host, confirmCalls } = createHarness();
     const input = { tableName: 'users' };
 
     const first = await gate.onToolCall(call('delete_table', 'tc-1', input), host, CWD);
@@ -136,20 +159,61 @@ describe('confirm gate: declines are respected', () => {
     expect(confirmCalls()).toBe(1);
   });
 
-  it('skips the confirm entirely for unrunnable projects and tokenless add_records', async () => {
-    const { gate, host, confirmCalls } = createHarness();
-    expect(await gate.onToolCall(call('delete_table', 'tc-1', {}), host, CWD)).toBeUndefined();
-    expect(confirmCalls()).toBe(0);
+  it('blocks a call whose precondition fails with that failure, and never asks', async () => {
+    const failure: ToolFailure = {
+      code: 'no-env',
+      message: 'No .env found in the project.',
+      hint: 'Provision a Constructive database first, then retry.',
+    };
+    const { gate, host, confirmCalls } = createHarness({ precondition: async () => ({ kind: 'blocked', failure }) });
+    const headless: GateHost = { ...host, hasUI: false };
 
-    const withProject = createHarness({ isProjectRunnable: async () => true });
-    expect(
-      await withProject.gate.onToolCall(
-        call('add_records', 'tc-1', { table_name: 't' }),
-        withProject.host,
-        CWD
-      )
-    ).toBeUndefined();
-    expect(withProject.confirmCalls()).toBe(0);
+    for (const target of [host, headless]) {
+      const result = await gate.onToolCall(call('add_records', 'tc-1', { table_name: 't' }), target, CWD);
+      expect(result).toEqual({
+        block: true,
+        reason: 'No .env found in the project. Provision a Constructive database first, then retry.',
+        failure,
+      });
+    }
+    expect(confirmCalls()).toBe(0);
+  });
+
+  it('checks the precondition of the call it gates', async () => {
+    const seen: unknown[] = [];
+    const { gate, host } = createHarness({
+      precondition: async (toolName, input, cwd) => {
+        seen.push([toolName, input, cwd]);
+        return READY;
+      },
+    });
+    await gate.onToolCall(call('delete_table', 'tc-1', { table_name: 'posts' }), host, CWD);
+    await gate.onToolCall(call('describe_schema', 'tc-2', {}), host, CWD);
+    expect(seen).toEqual([['delete_table', { table_name: 'posts' }, CWD]]);
+  });
+
+  it('puts what the precondition resolved into the plan as its target, and shows it to the host', async () => {
+    const policy = createConstructiveGatePolicy({
+      effectOf: (toolName) => EFFECTS[toolName],
+      precondition: async () => READY,
+      resolveTemplatePreview: async () => undefined,
+    });
+    const decision = await policy.resolvePrompt(call('delete_table', 'tc-1', { table_name: 'posts' }), CWD);
+    expect(decision).toEqual({
+      kind: 'ask',
+      prompt: { title: 'Delete table?', message: 'Permanently delete the table "posts" and its data.', target: TARGET },
+    });
+
+    const shown: unknown[][] = [];
+    const { gate, host } = createHarness();
+    await gate.onToolCall(call('delete_table', 'tc-2', { table_name: 'posts' }), {
+      ...host,
+      confirmTool: async (...args) => {
+        shown.push(args);
+        return false;
+      },
+    }, CWD);
+    expect(shown).toEqual([['tc-2', 'Delete table?', 'Permanently delete the table "posts" and its data.', undefined, TARGET]]);
   });
 
   it('blocks mutating tools when no confirmation UI is available', async () => {
@@ -165,101 +229,41 @@ describe('confirm gate: declines are respected', () => {
     expect(confirmCalls()).toBe(0);
   });
 
-  it('ignores tools outside the mutating set', async () => {
+  it('lets a read call through without a prompt', async () => {
     const { gate, host, confirmCalls } = createHarness();
     const result = await gate.onToolCall(call('describe_schema', 'tc-1', {}), host, CWD);
     expect(result).toBeUndefined();
     expect(confirmCalls()).toBe(0);
   });
+});
 
-  it('lets manage_entity_types list pass without a prompt', async () => {
-    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
-    const result = await gate.onToolCall(
-      call('manage_entity_types', 'tc-1', { action: 'list' }),
-      host,
-      CWD
-    );
-    expect(result).toBeUndefined();
+describe('confirm gate: the Constructive policy gates by effect', () => {
+  it('gates write and destructive calls, and lets a read through', async () => {
+    const effects: Record<string, ToolEffect> = { shell: 'destructive', note: 'write', list: 'read' };
+    const { gate, host, confirmCalls } = createHarness({ effectOf: (toolName) => effects[toolName] });
+
+    expect((await gate.onToolCall(call('shell', 'tc-1', { command: 'rm -rf /' }), host, CWD))?.block).toBe(true);
+    expect((await gate.onToolCall(call('note', 'tc-2', { text: 'hi' }), host, CWD))?.block).toBe(true);
+    expect(await gate.onToolCall(call('list', 'tc-3', {}), host, CWD)).toBeUndefined();
+    expect(confirmCalls()).toBe(2);
+  });
+
+  it('leaves a tool it has no effect for ungated', async () => {
+    const { gate, host, confirmCalls } = createHarness({
+      effectOf: () => undefined,
+    });
+    expect(await gate.onToolCall(call('delete_table', 'tc-1', {}), host, CWD)).toBeUndefined();
     expect(confirmCalls()).toBe(0);
   });
 
-  it('gates manage_entity_types mutations', async () => {
-    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
-    const result = await gate.onToolCall(
-      call('manage_entity_types', 'tc-1', { action: 'create', name: 'org' }),
-      host,
-      CWD
-    );
-    expect(result?.block).toBe(true);
-    expect(confirmCalls()).toBe(1);
-  });
-
-  it('skips the confirm for tokenless create_api_key but gates it with a token', async () => {
-    const tokenless = createHarness({ isProjectRunnable: async () => true });
-    expect(
-      await tokenless.gate.onToolCall(
-        call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
-        tokenless.host,
-        CWD
-      )
-    ).toBeUndefined();
-    expect(tokenless.confirmCalls()).toBe(0);
-
-    const withToken = createHarness({
-      isProjectRunnable: async () => true,
-      hasDataToken: async () => true,
-    });
-    const result = await withToken.gate.onToolCall(
-      call('create_api_key', 'tc-1', { key_name: 'deploy bot' }),
-      withToken.host,
-      CWD
-    );
-    expect(result?.block).toBe(true);
-    expect(withToken.confirmCalls()).toBe(1);
-  });
-});
-
-describe('confirm gate: the gated-tool set is injectable', () => {
-  it('gates the default MUTATING_DB_TOOLS set when none is injected', async () => {
-    const { gate, host, confirmCalls } = createHarness({ isProjectRunnable: async () => true });
-    for (const toolName of MUTATING_DB_TOOLS) {
-      if (toolName === 'add_records' || toolName === 'create_api_key') continue; // tokenless: skipped
-      const result = await gate.onToolCall(call(toolName, `tc-${toolName}`, {}), host, CWD);
-      expect(result?.block).toBe(true);
-    }
-    expect(confirmCalls()).toBe(MUTATING_DB_TOOLS.size - 2);
-  });
-
-  it('gates only the injected set: a custom tool is gated, a default one is not', async () => {
-    const { gate, host, confirmCalls } = createHarness({
-      isProjectRunnable: async () => true,
-      gatedTools: new Set(['bash']),
-    });
-
-    const gated = await gate.onToolCall(call('bash', 'tc-1', { command: 'rm -rf /' }), host, CWD);
-    expect(gated?.block).toBe(true);
-    expect(gated?.reason).toMatch(/declined it/);
-    expect(confirmCalls()).toBe(1);
-
-    // delete_table is in MUTATING_DB_TOOLS but not in the injected set.
-    const ungated = await gate.onToolCall(
-      call('delete_table', 'tc-2', { table_name: 'users' }),
-      host,
-      CWD
-    );
-    expect(ungated).toBeUndefined();
-    expect(confirmCalls()).toBe(1);
-  });
-
-  it('applies the decline guard and headless block to injected tools too', async () => {
+  it('applies the decline guard and headless block to every gated call', async () => {
     const { gate, host, confirmCalls, skipNotices } = createHarness({
-      isProjectRunnable: async () => true,
-      gatedTools: new Set(['bash']),
+      effectOf: () => 'write',
     });
     const input = { command: 'git push --force' };
 
-    await gate.onToolCall(call('bash', 'tc-1', input), host, CWD);
-    const retry = await gate.onToolCall(call('bash', 'tc-2', input), host, CWD);
+    await gate.onToolCall(call('shell', 'tc-1', input), host, CWD);
+    const retry = await gate.onToolCall(call('shell', 'tc-2', input), host, CWD);
     expect(retry?.reason).toMatch(/already declined/);
     expect(confirmCalls()).toBe(1);
     expect(skipNotices()).toEqual(['tc-2']);
@@ -269,19 +273,8 @@ describe('confirm gate: the gated-tool set is injectable', () => {
       confirmTool: async () => true,
       notifyToolSkipped: () => undefined,
     };
-    const blocked = await gate.onToolCall(call('bash', 'tc-3', {}), headless, CWD);
+    const blocked = await gate.onToolCall(call('shell', 'tc-3', {}), headless, CWD);
     expect(blocked?.reason).toMatch(/no confirmation UI/);
-  });
-
-  it('gates nothing when an empty set is injected', async () => {
-    const { gate, host, confirmCalls } = createHarness({
-      isProjectRunnable: async () => true,
-      gatedTools: new Set<string>(),
-    });
-    expect(
-      await gate.onToolCall(call('provision_database', 'tc-1', {}), host, CWD)
-    ).toBeUndefined();
-    expect(confirmCalls()).toBe(0);
   });
 });
 
@@ -298,18 +291,19 @@ describe('confirm gate: a host can supply its own policy', () => {
       },
       notifyToolSkipped: () => undefined,
     };
+    const commandOf = (input: Record<string, unknown> | undefined) =>
+      typeof input?.command === 'string' ? input.command : '';
     const policy: GatePolicy = {
-      isGated: (event) => event.toolName === 'bash',
-      resolvePrompt: async (event) => {
-        const command = typeof event.input?.command === 'string' ? event.input.command : '';
-        if (!/rm -rf|push --force/.test(command)) return null;
-        return { title: 'Run a destructive command?', message: `Allow \`${command}\`?` };
-      },
+      isGated: (event) => event.toolName === 'bash' && /rm -rf|push --force/.test(commandOf(event.input)),
+      resolvePrompt: async (event, cwd) => ({
+        kind: 'ask',
+        prompt: { title: 'Run a destructive command?', message: `Allow \`${commandOf(event.input)}\`?`, target: { kind: 'workspace', cwd } },
+      }),
     };
     return { gate: createConfirmGate({ policy }), host, confirmed: () => confirmed };
   }
 
-  it('gates the host\'s tool and ignores the Constructive default set', async () => {
+  it('gates the host\'s tool and ignores the Constructive policy', async () => {
     const { gate, host, confirmed } = createShellHostHarness();
 
     const gated = await gate.onToolCall(call('bash', 'tc-1', { command: 'rm -rf /src' }), host, CWD);
@@ -318,13 +312,13 @@ describe('confirm gate: a host can supply its own policy', () => {
     expect(confirmed()?.title).toBe('Run a destructive command?');
     expect(confirmed()?.message).toContain('rm -rf /src');
 
-    // delete_table is in MUTATING_DB_TOOLS, but this host's policy never gates it.
+    // delete_table is destructive, but this host's policy never gates it.
     expect(
       await gate.onToolCall(call('delete_table', 'tc-2', { table_name: 'users' }), host, CWD)
     ).toBeUndefined();
   });
 
-  it('lets the policy wave a gated tool through on its arguments', async () => {
+  it('leaves a call its policy does not gate alone', async () => {
     const { gate, host, confirmed } = createShellHostHarness();
     expect(
       await gate.onToolCall(call('bash', 'tc-1', { command: 'ls -la' }), host, CWD)
@@ -366,55 +360,258 @@ describe('decline guard canonicalization', () => {
 });
 
 describe('buildConfirmPrompt', () => {
-  it('summarizes blueprint provisioning with a table preview', () => {
-    const prompt = buildConfirmPrompt('provision_blueprint', {
-      name: 'crm',
-      definition: {
-        tables: [
-          {
-            table_name: 'contacts',
-            fields: [{ name: 'email', type: 'email', is_required: true }],
-            policies: [{ $type: 'AuthzDirectOwner' }, { $type: 'AuthzNotReadOnly' }],
-          },
-        ],
-        relations: [{ source_table: 'contacts', target_table: 'orgs' }],
+  // The access the precondition resolved: one sentence per rule.
+  const OWNER: PlanRule = { $type: 'AuthzDirectOwner', privileges: ['select', 'update'], permissive: true, policy_role: 'authenticated', words: 'The person the row names in owner_id.' };
+  const ALL: PlanRule = { $type: 'AuthzAllowAll', privileges: ['select'], permissive: true, policy_role: 'anonymous', words: 'Everyone, for every row.' };
+  const GRANTS = ['select, insert, update and delete to authenticated'];
+  const created = (table: string, rules: PlanRule[], findings: PlanTableAccess['findingsAdded'] = []): PlanTableAccess => ({
+    table,
+    after: { rules, grants: GRANTS, rowSecurity: true },
+    findingsAdded: findings,
+    findingsRemoved: [],
+  });
+  const ACCESS: PlanTableAccess[] = [
+    created('contacts', [OWNER], [{ id: 'bare-owner', level: 'high', summary: 'A removed member keeps their rows.' }]),
+    created('notes', [ALL]),
+  ];
+
+  it('says which tables are made, with their fields and each rule they get in words', () => {
+    const prompt = buildConfirmPrompt(
+      'provision_blueprint',
+      {
+        name: 'crm',
+        definition: {
+          tables: [
+            {
+              table_name: 'contacts',
+              fields: [{ name: 'email', type: 'email', is_required: true }, { name: 'phone', type: 'text' }],
+              policies: [{ $type: 'AuthzDirectOwner' }, { $type: 'AuthzNotReadOnly' }],
+            },
+            { table_name: 'notes', schema_name: 'app_private', policies: [{ $type: 'AuthzAllowAll' }] },
+          ],
+          relations: [{ source_table: 'contacts', target_table: 'orgs' }],
+        },
       },
-    });
+      { target: TARGET, access: ACCESS },
+    );
     expect(prompt.title).toBe('Create tables?');
-    expect(prompt.message).toContain('"crm"');
+    expect(prompt.message).toBe(
+      [
+        'Create 2 tables in the project database.',
+        'Table "contacts" with the fields email (email, required), phone (text).',
+        '  Rule (select, update): The person the row names in owner_id.',
+        '  Grants: select, insert, update and delete to authenticated',
+        '  Finding (high): A removed member keeps their rows.',
+        'Table "notes" in the schema app_private, with no fields of its own.',
+        '  Rule (select; role anonymous): Everyone, for every row.',
+        '  Grants: select, insert, update and delete to authenticated',
+      ].join('\n'),
+    );
+    expect(prompt.access).toEqual(ACCESS);
     expect(prompt.preview).toEqual({
       kind: 'blueprint',
       tables: [
         {
           name: 'contacts',
-          fields: [{ name: 'email', type: 'email', isRequired: true, defaultValue: null }],
-          policies: ['AuthzDirectOwner'], // internal AuthzNotReadOnly filtered out
+          fields: [
+            { name: 'email', type: 'email', isRequired: true, defaultValue: null },
+            { name: 'phone', type: 'text', isRequired: false, defaultValue: null },
+          ],
+          policies: ['AuthzDirectOwner', 'AuthzNotReadOnly'],
           relationCount: 1,
         },
+        { name: 'notes', fields: [], policies: ['AuthzAllowAll'], relationCount: 0 },
       ],
     });
   });
 
+  it('says a new database is bound to the directory, and nothing it does not do', () => {
+    const prompt = buildConfirmPrompt('provision_database', { database_name: 'shop' }, { target: NEW_DATABASE });
+    expect(prompt).toEqual({
+      title: 'Create database?',
+      message:
+        'Create a new Constructive database "shop" under the signed-in account and bind this directory to it: ' +
+        'its id and endpoints are written to .env.',
+      target: NEW_DATABASE,
+    });
+  });
+
+  it('says a replacement binds a new, empty database, and the old one keeps its data', () => {
+    const replacing: PlanTarget = { ...NEW_DATABASE, kind: 'account', replaces: { name: 'shop', id: 'db-old' } };
+    const prompt = buildConfirmPrompt('replace_database', { database_name: 'shop' }, { target: replacing });
+    expect(prompt).toEqual({
+      title: 'Replace database?',
+      message:
+        'Bind this directory to a new, empty database "shop". The database it is bound to now keeps its data, ' +
+        'but this directory no longer uses it; its tables must be created again in the new one.',
+      target: replacing,
+    });
+  });
+
+  it('lists the changes of update_field, and says a type change converts the data', () => {
+    const update = buildConfirmPrompt('update_field', {
+      table_name: 'posts',
+      field_name: 'title',
+      new_name: 'headline',
+      is_required: true,
+      is_unique: false,
+    }, { target: TARGET });
+    expect(update.message).toBe('Change field "title" on table "posts": rename it to "headline"; make it required; remove its unique constraint.');
+    const retype = buildConfirmPrompt('retype_field', { table_name: 'posts', field_name: 'title', type: 'citext' }, { target: TARGET });
+    expect(retype.title).toBe('Change field type?');
+    expect(retype.message).toBe(
+      'Change the type of field "title" on table "posts" to citext, which converts every value and fails or loses data when a value does not fit.',
+    );
+  });
+
+  it('says the rules of add_policies after and now, a limit as a limit, and the findings', () => {
+    const limit: PlanRule = { $type: 'AuthzNotReadOnly', privileges: ['update'], permissive: false, policy_role: 'authenticated', words: 'Members who are not read-only.' };
+    const access: PlanTableAccess = {
+      table: 'posts',
+      before: { rules: [], grants: GRANTS, rowSecurity: true },
+      after: { rules: [OWNER, limit], grants: GRANTS, rowSecurity: true },
+      findingsAdded: [
+        { id: 'bare-owner', level: 'high', summary: 'A removed member keeps their rows.' },
+        { id: 'required-column-not-set', level: 'medium', summary: 'A required column is left from a rule the table no longer has.', columns: ['entity_id'] },
+      ],
+      findingsRemoved: [{ id: 'no-policy', level: 'medium', summary: 'No one can read the rows.' }],
+    };
+    const prompt = buildConfirmPrompt(
+      'add_policies',
+      { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner', privileges: ['select', 'update'] }] },
+      { target: TARGET, access: [access] },
+    );
+    expect(prompt.title).toBe('Add access rules?');
+    expect(prompt.preview).toEqual({ kind: 'policies', tableName: 'posts', policies: ['AuthzDirectOwner'] });
+    expect(prompt.message).toBe(
+      [
+        'Add 1 access rule to table "posts"; the rules it has stay.',
+        '  Rules after the change:',
+        '    Rule (select, update): The person the row names in owner_id.',
+        '    Limit (update), which every row must also pass: Members who are not read-only.',
+        '  Rules now:',
+        '    none',
+        '  Grants: select, insert, update and delete to authenticated (unchanged)',
+        '  New finding (high): A removed member keeps their rows.',
+        '  New finding (medium): A required column is left from a rule the table no longer has. Column: entity_id.',
+        '  Finding removed: No one can read the rows.',
+      ].join('\n'),
+    );
+  });
+
+  it('says when the rules stay, when the grants change and when row security turns on', () => {
+    const access: PlanTableAccess = {
+      table: 'posts',
+      before: { rules: [OWNER], grants: [], rowSecurity: false },
+      after: { rules: [OWNER], grants: GRANTS, rowSecurity: true },
+      findingsAdded: [],
+      findingsRemoved: [],
+    };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
+    expect(prompt.message.split('\n').slice(2)).toEqual([
+      '  Rules: unchanged',
+      '    Rule (select, update): The person the row names in owner_id.',
+      '  Grants after the change: select, insert, update and delete to authenticated',
+      '  Grants now: none',
+      '  Row security: on after the change, off now',
+    ]);
+  });
+
+  it('lists the columns a change adds, and says when the rows of the table would make it fail', () => {
+    const access: PlanTableAccess = {
+      ...created('posts', [OWNER]),
+      before: { rules: [OWNER], grants: GRANTS, rowSecurity: true },
+      columnsAdded: [
+        { name: 'entity_id', type: 'uuid', required: true, default: null },
+        { name: 'owner_id', type: 'uuid', required: true, default: 'jwt_public.current_user_id()', computed: true },
+        { name: 'is_published', type: 'boolean', required: true, default: 'false' },
+        { name: 'note', type: 'text', required: false },
+      ],
+      columnsReused: [{ name: 'title', type: 'text', required: true, default: "'untitled'" }],
+      failsIfRows: ['entity_id', 'owner_id'],
+    };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
+    expect(prompt.message.split('\n').slice(-6)).toEqual([
+      '  Adds column entity_id (uuid, required, no default).',
+      '  Adds column owner_id (uuid, required, default jwt_public.current_user_id() for new rows).',
+      '  Adds column is_published (boolean, required, default false).',
+      '  Adds column note (text, optional, default not known).',
+      "  Reuses the existing column title (text, required, default 'untitled'), as it is.",
+      '  This change fails if the table has rows, because entity_id and owner_id are required and the rows there now would get no value; this tool cannot see whether the table has rows.',
+    ]);
+  });
+
+  it('prints the details of a finding under it', () => {
+    const access: PlanTableAccess = {
+      ...created('posts', [OWNER]),
+      before: { rules: [], grants: GRANTS, rowSecurity: true },
+      findingsAdded: [
+        {
+          id: 'reused-column-differs',
+          level: 'medium',
+          summary: 'A column the rules reuse is not as their node makes it.',
+          columns: ['owner_id'],
+          details: ['A create must send owner_id itself: the table has no default for it.'],
+        },
+      ],
+    };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
+    expect(prompt.message.split('\n').slice(-2)).toEqual([
+      '  New finding (medium): A column the rules reuse is not as their node makes it. Column: owner_id.',
+      '    A create must send owner_id itself: the table has no default for it.',
+    ]);
+  });
+
+  it('says what set_access replaces, and that the grants stay', () => {
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [created('posts', [OWNER])] });
+    expect(prompt.title).toBe('Replace access?');
+    expect(prompt.message.split('\n').slice(0, 2)).toEqual([
+      'Replace every access rule of table "posts" with 1 rule; its grants stay.',
+      'Rules derived from them (history and translation copies) follow the new set.',
+    ]);
+    expect(prompt.message).toContain('  Rule (select, update): The person the row names in owner_id.');
+  });
+
+  it('ends the message with the notes the precondition resolved, and keeps them as data', () => {
+    const notes = ['The backend stores the field name "is_a" as "isa".'];
+    const prompt = buildConfirmPrompt('create_field', { table_name: 'posts', field_name: 'is_a', type: 'boolean' }, { target: TARGET, notes });
+    expect(prompt.message.split('\n').slice(-1)).toEqual(['Note: The backend stores the field name "is_a" as "isa".']);
+    expect(prompt.notes).toEqual(notes);
+  });
+
+  it('says a constant default of a number or a boolean as it is, and null as removing it', () => {
+    const update = (default_value: unknown) =>
+      buildConfirmPrompt('update_field', { table_name: 'posts', field_name: 'count', default_value }, { target: TARGET }).message;
+    expect(update(0)).toBe('Change field "count" on table "posts": set its default to 0.');
+    expect(update(false)).toBe('Change field "count" on table "posts": set its default to false.');
+    expect(update(null)).toBe('Change field "count" on table "posts": remove its default.');
+    const created = buildConfirmPrompt('create_field', { table_name: 'posts', field_name: 'count', type: 'integer', default_value: 0 }, { target: TARGET });
+    expect(created.preview).toMatchObject({ field: { defaultValue: '0' } });
+    const blueprint = buildConfirmPrompt(
+      'provision_blueprint',
+      { name: 'n', definition: { tables: [{ table_name: 'notes', fields: [{ name: 'done', type: 'boolean', default: false }] }] } },
+      { target: TARGET },
+    );
+    expect(blueprint.message).toContain('done (boolean, default false)');
+  });
+
   it('falls back to a generic prompt for unknown tools', () => {
-    const prompt = buildConfirmPrompt('mystery_tool', {});
+    const prompt = buildConfirmPrompt('mystery_tool', {}, { target: TARGET });
     expect(prompt.message).toContain('mystery_tool');
   });
 
-  it('builds action-specific prompts for manage_entity_types', () => {
-    const create = buildConfirmPrompt('manage_entity_types', { action: 'create', name: 'org' });
+  it('builds a prompt for each entity type change', () => {
+    const create = buildConfirmPrompt('create_entity_type', { name: 'org' }, { target: TARGET });
     expect(create.title).toBe('Create entity type?');
     expect(create.message).toContain('"org"');
 
-    const remove = buildConfirmPrompt('manage_entity_types', {
-      action: 'delete',
-      entity_type_id: 'etp-1',
-    });
+    const remove = buildConfirmPrompt('delete_entity_type', { entity_type_id: 'etp-1' }, { target: TARGET });
     expect(remove.title).toBe('Delete entity type?');
-    expect(remove.message).toMatch(/stay in the API schema/);
+    expect(remove.message).toMatch(/stay in the database/);
   });
 
   it('summarizes scope in the create_api_key prompt', async () => {
-    const unscoped = buildConfirmPrompt('create_api_key', { key_name: 'deploy bot' });
+    const unscoped = buildConfirmPrompt('create_api_key', { key_name: 'deploy bot' }, { target: TARGET });
     expect(unscoped.title).toBe('Create API key?');
     expect(unscoped.message).toContain('"deploy bot"');
     expect(unscoped.message).toContain('unscoped');
@@ -424,7 +621,7 @@ describe('buildConfirmPrompt', () => {
       key_name: 'ci',
       entity_ids: ['e-1', 'e-2'],
       read_only: true,
-    });
+    }, { target: TARGET });
     expect(scoped.message).toContain('scoped to 2 entities');
     expect(scoped.message).toContain('read-only');
   });

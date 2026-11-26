@@ -62,6 +62,7 @@ const echo = defineHarnessTool({
     message: z.string().describe('Text to echo'),
     times: z.number().int().min(1).max(5).optional()
   }),
+  effect: 'read',
   async execute(params, ctx) {
     return {
       content: [{ type: 'text' as const, text: `${params.message} @ ${ctx.cwd}` }],
@@ -104,6 +105,22 @@ describe('toDshTool', () => {
     ]);
   });
 
+  it('keeps a failed call’s failure in the canonical value', async () => {
+    const failure = { code: 'not-found' as const, message: 'Table "posts" not found.', hint: 'Call describe_schema.' };
+    const failing = defineHarnessTool({
+      ...echo,
+      async execute() {
+        return { content: [{ type: 'text' as const, text: failure.message }], details: null, failure };
+      }
+    });
+
+    await expect(toDshTool(failing).execute({ message: 'hi' }, runContext())).resolves.toEqual({
+      content: [{ type: 'text', text: failure.message }],
+      details: null,
+      failure
+    });
+  });
+
   it('parses arguments with the tool’s own schema, so dropped constraints still hold', async () => {
     const tool = toDshTool(echo);
     await expect(tool.execute({ message: 'hi', times: 9 }, runContext())).rejects.toThrow();
@@ -126,6 +143,7 @@ describe('toDshTool', () => {
       label: 'Shot',
       description: 'Screenshot.',
       parameters: z.object({}),
+      effect: 'read',
       async execute() {
         return {
           content: [{ type: 'image' as const, data: 'aGk=', mimeType: 'image/png' }],

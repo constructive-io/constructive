@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { APP_MEMBER_LIST, MASK_COLUMN, MEMBER_CHECKS } from './parameters';
+import { ACTIVE_MEMBER_RISK, AGENT_IDENTITY_RISK, NO_APP_READ_ONLY_RISK } from './plain-words';
 
 export const AuthzAppMemberOwner: NodeTypeDefinition = {
   name: 'AuthzAppMemberOwner',
@@ -39,9 +41,32 @@ export const AuthzAppMemberOwner: NodeTypeDefinition = {
       is_owner: {
         type: 'boolean',
         description: 'If true, require is_owner flag'
-      }
+      },
+      membership_type: {
+        type: 'integer',
+        const: 1,
+        readOnly: true,
+        description: 'Always 1 (the app); the backend sets it.'
+      },
+      mask_column: MASK_COLUMN,
+      ...APP_MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
-    required: ['owner_field']
+    required: ['owner_field'],
+    additionalProperties: false
   },
-  tags: ['ownership', 'membership', 'authz']
+  tags: ['ownership', 'membership', 'authz'],
+  summary: 'Only the person whose id is in the row\'s owner column, and only while they are an active member of the app.',
+  use_when: [
+    'A private list per person in the app: use it for read, create, update and delete.',
+    'App-wide rows that only their author may change: use it for update and delete.'
+  ],
+  avoid_when: [
+    'Rows that belong to a team: use AuthzMemberOwner.'
+  ],
+  risks: [
+    ACTIVE_MEMBER_RISK,
+    AGENT_IDENTITY_RISK,
+    NO_APP_READ_ONLY_RISK
+  ]
 };
