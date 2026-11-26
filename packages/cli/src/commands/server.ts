@@ -7,10 +7,10 @@ import { getPgPool } from 'pg-cache';
 
 const log = new Logger('server');
 
-const serverUsageText = `
+export const usage = `
 Constructive GraphQL Server:
 
-  cnc server [OPTIONS]
+  constructive server [OPTIONS]
 
   Start Constructive GraphQL development server.
 
@@ -24,10 +24,10 @@ Options:
   --cwd <directory>       Working directory (default: current directory)
 
 Examples:
-  cnc server                    Start server with defaults
-  cnc server --port 8080        Start server on custom port
-  cnc server --no-postgis       Start server without PostGIS
-  cnc server --origin http://localhost:3000  Set CORS origin
+  constructive server                    Start server with defaults
+  constructive server --port 8080        Start server on custom port
+  constructive server --no-postgis       Start server without PostGIS
+  constructive server --origin https://app.example.com  Set CORS origin
 `;
 
 const questions: Question[] = [
@@ -77,11 +77,6 @@ export default async (
   prompter: Inquirerer,
   _options: CLIOptions
 ) => {
-  // Show usage if explicitly requested
-  if (argv.help || argv.h) {
-    console.log(serverUsageText);
-    process.exit(0);
-  }
 
   log.info('🔧 Constructive GraphQL Server Configuration:\n');
 

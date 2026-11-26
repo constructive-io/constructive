@@ -17,23 +17,6 @@ describe('codegen command', () => {
     jest.clearAllMocks();
   });
 
-  it('prints usage and exits with code 0 when --help is set', async () => {
-    const spyLog = jest.spyOn(console, 'log').mockImplementation(() => {});
-    const spyExit = jest.spyOn(process, 'exit').mockImplementation(((code?: number) => { throw new Error('exit:' + code); }) as any);
-
-    const argv: Partial<ParsedArgs> = { help: true };
-    const mockPrompter = createMockPrompter();
-
-    await expect(codegenCommand(argv, mockPrompter as any, {} as any)).rejects.toThrow('exit:0');
-    expect(spyLog).toHaveBeenCalled();
-    const first = (spyLog.mock.calls[0]?.[0] as string) || '';
-    expect(first).toContain('Constructive GraphQL Codegen');
-    expect(mockRunCodegenHandler).not.toHaveBeenCalled();
-
-    spyLog.mockRestore();
-    spyExit.mockRestore();
-  });
-
   it('delegates to runCodegenHandler for endpoint flow', async () => {
     const argv: Partial<ParsedArgs> = {
       endpoint: 'http://localhost:3000/graphql',
