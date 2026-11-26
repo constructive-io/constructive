@@ -40,9 +40,9 @@
     "pgsql-test": "workspace:^"
   },
   "dependencies": {
-    "@pgsql/quotes": "^18.2.5",
+    "@pgsql/quotes": "^18.2.6",
     "pg-ast": "workspace:^",
-    "pgsql-deparser": "^18.5.4",
+    "pgsql-deparser": "^18.5.6",
     "query-spec": "workspace:^"
   }
 }
