@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.35.20](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.19...@pgpmjs/core@7.35.20) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser packages and libpg-query to 18.3.0 ([#2090](https://github.com/constructive-io/constructive/issues/2090)) ([3a342b8](https://github.com/constructive-io/constructive/commit/3a342b83da3e0a83a34eaef33b25154f5218d9fd))
+
 ## [7.35.19](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@7.35.18...@pgpmjs/core@7.35.19) (2026-11-26)
 
 ### Bug Fixes

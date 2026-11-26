@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.11](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.10...pg-ast@3.15.11) (2026-11-26)
+
+### Bug Fixes
+
+- **deps:** bump pgsql-parser packages and libpg-query to 18.3.0 ([#2090](https://github.com/constructive-io/constructive/issues/2090)) ([3a342b8](https://github.com/constructive-io/constructive/commit/3a342b83da3e0a83a34eaef33b25154f5218d9fd))
+
 ## [3.15.10](https://github.com/constructive-io/constructive/compare/pg-ast@3.15.9...pg-ast@3.15.10) (2026-11-26)
 
 ### Bug Fixes

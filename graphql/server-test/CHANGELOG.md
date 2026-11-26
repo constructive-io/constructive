@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.43.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.8...graphql-server-test@3.43.9) (2026-11-26)
+
+### Bug Fixes
+
+- **pg-cache:** keep the server alive when a checked-out connection drops ([#2085](https://github.com/constructive-io/constructive/issues/2085)) ([b714bee](https://github.com/constructive-io/constructive/commit/b714beed620d523c61c5035c7462c46e93d48c4f))
+
 ## [3.43.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.7...graphql-server-test@3.43.8) (2026-11-26)
 
 ### Bug Fixes

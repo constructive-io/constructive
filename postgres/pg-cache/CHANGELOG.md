@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.30.7](https://github.com/constructive-io/constructive/compare/pg-cache@3.30.6...pg-cache@3.30.7) (2026-11-26)
+
+### Bug Fixes
+
+- **pg-cache:** keep the server alive when a checked-out connection drops ([#2085](https://github.com/constructive-io/constructive/issues/2085)) ([b714bee](https://github.com/constructive-io/constructive/commit/b714beed620d523c61c5035c7462c46e93d48c4f))
+
 ## [3.30.6](https://github.com/constructive-io/constructive/compare/pg-cache@3.30.5...pg-cache@3.30.6) (2026-11-26)
 
 **Note:** Version bump only for package pg-cache
