@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.19.19](https://github.com/constructive-io/constructive/compare/graphile-test@5.19.18...graphile-test@5.19.19) (2026-11-26)
+
+**Note:** Version bump only for package graphile-test
+
 ## [5.19.18](https://github.com/constructive-io/constructive/compare/graphile-test@5.19.17...graphile-test@5.19.18) (2026-11-26)
 
 **Note:** Version bump only for package graphile-test

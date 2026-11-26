@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.29.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.29.1...graphile-presigned-url-plugin@1.29.2) (2026-11-26)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** return coded errors for upload input refusals ([#2084](https://github.com/constructive-io/constructive/issues/2084)) ([0ff62e6](https://github.com/constructive-io/constructive/commit/0ff62e6fde4165502b00435a7c2d92898f50b0e6))
+
 ## [1.29.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@1.29.0...graphile-presigned-url-plugin@1.29.1) (2026-11-26)
 
 ### Bug Fixes

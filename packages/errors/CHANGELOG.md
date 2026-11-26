@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.3](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.26.2...@constructive-io/errors@0.26.3) (2026-11-26)
+
+### Bug Fixes
+
+- **presigned-url-plugin:** return coded errors for upload input refusals ([#2084](https://github.com/constructive-io/constructive/issues/2084)) ([0ff62e6](https://github.com/constructive-io/constructive/commit/0ff62e6fde4165502b00435a7c2d92898f50b0e6))
+
 ## [0.26.2](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.26.1...@constructive-io/errors@0.26.2) (2026-11-26)
 
 ### Bug Fixes
