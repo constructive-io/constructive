@@ -98,8 +98,8 @@ upstream default for that cache remains in effect.
 
 A request whose API has no cached handler waits for a build slot. When the
 queue is full or the wait expires, the request is refused with HTTP 503, a
-`Retry-After` header and the `SCHEMA_BUILD_UNAVAILABLE` error code, so clients
-and load balancers can retry. A build that cannot reach the database is
+`Retry-After` header (the queue wait in seconds, at most 60) and the
+`SCHEMA_BUILD_UNAVAILABLE` error code, so clients and load balancers can retry. A build that cannot reach the database is
 answered the same way. Invalid values fail option resolution with the variable
 name.
 

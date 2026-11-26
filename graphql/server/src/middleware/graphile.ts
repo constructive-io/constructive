@@ -107,8 +107,16 @@ export function getBuildSlotStats(): { active: number; queued: number } {
 const isBuildUnavailable = (error: unknown): error is ConstructiveError =>
   error instanceof ConstructiveError && error.code === 'SCHEMA_BUILD_UNAVAILABLE';
 
-/** Seconds for a `Retry-After` header: the configured wait, at least one. */
-const retryAfterSeconds = (ms: number): string => String(Math.max(Math.ceil(ms / 1000), 1));
+/**
+ * Seconds for a `Retry-After` header: the configured wait, from one second to
+ * a minute. By the end of the wait every queued build has started or been
+ * refused, so the queue has turned over. The ceiling keeps a long configured
+ * wait from asking clients to stay away for hours; admission control's queue
+ * wait, and so its `Retry-After`, has the same ceiling.
+ */
+const MAX_RETRY_AFTER_SECONDS = 60;
+const retryAfterSeconds = (ms: number): string =>
+  String(Math.min(Math.max(Math.ceil(ms / 1000), 1), MAX_RETRY_AFTER_SECONDS));
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');

@@ -243,6 +243,22 @@ describe('graphile handler build limits', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  it('caps Retry-After at a minute however long the configured wait', async () => {
+    const builds = gateBuilds();
+    const middleware = middlewareWith({ concurrency: 1, queueMax: 0, queueWaitMs: 2_147_483_647 });
+    const next = jest.fn();
+    const running = middleware(makeRequest('a'), makeResponse().res, next);
+    const refused = makeResponse();
+    await middleware(makeRequest('b'), refused.res, next);
+    await settle();
+
+    expectRefused(refused.captured, '60');
+
+    builds[0].finish();
+    await running;
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it('refuses a build that waits longer than queueWaitMs', async () => {
     const builds = gateBuilds();
     const middleware = middlewareWith({ concurrency: 1, queueMax: 4, queueWaitMs: 20 });
@@ -279,6 +295,38 @@ describe('graphile handler build limits', () => {
     expect(builds).toHaveLength(1);
     expect(next).not.toHaveBeenCalled();
     expect(getInFlightCount()).toBe(0);
+  });
+
+  it('starts one retry build for requests coalesced on a failed build, even while it waits for a slot', async () => {
+    const builds = gateBuilds();
+    const middleware = middlewareWith({ concurrency: 1, queueMax: 4 });
+    const next = jest.fn();
+    const failed = makeResponse();
+    const first = middleware(makeRequest('a'), failed.res, next);
+    const waiters = [1, 2, 3].map(() => middleware(makeRequest('a'), makeResponse().res, next));
+    // Queued behind 'a', so the slot 'a' frees goes to 'b' and the retry has to wait.
+    const other = middleware(makeRequest('b'), makeResponse().res, next);
+    await settle();
+    expect(builds.map((build) => build.key)).toEqual(['a']);
+
+    builds[0].fail(new Error('permission denied for schema tenant_private'));
+    await first;
+    await settle();
+    expect(failed.captured.body?.errors[0].extensions).toEqual(
+      expect.objectContaining({ code: 'INTERNAL_FAILURE' })
+    );
+    // One retry for the three coalesced requests, registered while it waits.
+    expect(builds.map((build) => build.key)).toEqual(['a', 'b']);
+    expect(getBuildSlotStats()).toEqual({ active: 1, queued: 1 });
+    expect(getInFlightCount()).toBe(2);
+
+    builds[1].finish();
+    await settle();
+    expect(builds.map((build) => build.key)).toEqual(['a', 'b', 'a']);
+    builds[2].finish();
+    await Promise.all([...waiters, other]);
+    expect(builds[2].handler).toHaveBeenCalledTimes(3);
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('keeps masking other build failures and frees their slot', async () => {
