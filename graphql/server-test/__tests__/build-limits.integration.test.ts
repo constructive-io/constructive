@@ -53,6 +53,7 @@ const schemaSets = [
 ];
 
 describe('bounded cold handler builds', () => {
+  let releaseGate: (() => void) | undefined;
   let request: supertest.Agent;
   let pg: PgTestClient;
   let db: PgTestClient;
@@ -95,6 +96,9 @@ describe('bounded cold handler builds', () => {
   });
 
   afterEach(async () => {
+    // Never leave a build waiting at the gate, whatever the test did.
+    releaseGate?.();
+    releaseGate = undefined;
     mockGate = undefined;
     mockBuildStarted = undefined;
     await db.afterEach();
@@ -106,7 +110,6 @@ describe('bounded cold handler builds', () => {
   });
 
   it('refuses builds while the only slot is taken and serves them once it is free', async () => {
-    let releaseGate!: () => void;
     mockGate = new Promise<void>((resolve) => {
       releaseGate = resolve;
     });
@@ -116,20 +119,27 @@ describe('bounded cold handler builds', () => {
 
     // `then` sends the request; the first build takes the slot and waits at the gate.
     const first = post(schemaSets[0]).then((res) => res);
-    await firstBuildStarted;
-    mockBuildStarted = undefined;
+    try {
+      await firstBuildStarted;
+      mockBuildStarted = undefined;
 
-    const refused = await Promise.all(schemaSets.slice(1).map((schemata) => post(schemata)));
-    for (const res of refused) {
-      expect(res.status).toBe(503);
-      expect(res.headers['retry-after']).toBe('2');
-      expect(res.body.errors).toHaveLength(1);
-      expect(res.body.errors[0].extensions.code).toBe('SCHEMA_BUILD_UNAVAILABLE');
-      expect(res.body.data).toBeUndefined();
+      const refused = await Promise.all(schemaSets.slice(1).map((schemata) => post(schemata)));
+      for (const res of refused) {
+        expect(res.status).toBe(503);
+        expect(res.headers['retry-after']).toBe('2');
+        expect(res.body.errors).toHaveLength(1);
+        expect(res.body.errors[0].extensions.code).toBe('SCHEMA_BUILD_UNAVAILABLE');
+        expect(res.body.data).toBeUndefined();
+      }
+    } finally {
+      // Open the gate however the checks went, so the first build never stays
+      // blocked, and let its request finish before the suite cleans up.
+      mockGate = undefined;
+      releaseGate?.();
+      releaseGate = undefined;
+      await first.catch((): undefined => undefined);
     }
 
-    mockGate = undefined;
-    releaseGate();
     const served = await first;
     expect(served.status).toBe(200);
     expect(served.body).toEqual({ data: { __typename: 'Query' } });
