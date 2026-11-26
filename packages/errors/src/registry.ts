@@ -26,6 +26,84 @@ export const registry = {
     http: 409,
     message: 'The storage bucket has not yet been reconciled.'
   }),
+  BUCKET_NOT_FOUND: defineError({
+    code: 'BUCKET_NOT_FOUND',
+    class: 'public',
+    http: 404,
+    message: 'The upload bucket could not be found.'
+  }),
+  SITE_UPLOAD_NOT_AUTHORIZED: defineError({
+    code: 'SITE_UPLOAD_NOT_AUTHORIZED',
+    class: 'public',
+    http: 403,
+    message: 'You are not authorized to upload to this site.'
+  }),
+  INVALID_CONTENT_HASH: defineError({
+    code: 'INVALID_CONTENT_HASH',
+    class: 'public',
+    http: 400,
+    message: 'The content hash is missing or invalid.'
+  }),
+  INVALID_CONTENT_HASH_FORMAT: defineError({
+    code: 'INVALID_CONTENT_HASH_FORMAT',
+    class: 'public',
+    http: 400,
+    message: 'The content hash must be a 64-character lowercase hexadecimal SHA-256 hash.'
+  }),
+  INVALID_CONTENT_TYPE: defineError({
+    code: 'INVALID_CONTENT_TYPE',
+    class: 'public',
+    http: 400,
+    message: 'The content type is missing or invalid.'
+  }),
+  INVALID_FILENAME: defineError({
+    code: 'INVALID_FILENAME',
+    class: 'public',
+    http: 400,
+    message: 'The filename is invalid.'
+  }),
+  UPLOAD_TYPE_MISMATCH: defineError({
+    code: 'UPLOAD_TYPE_MISMATCH',
+    class: 'public',
+    http: 400,
+    message: 'The content type does not match the filename.'
+  }),
+  INVALID_ROUTE: defineError({
+    code: 'INVALID_ROUTE',
+    class: 'public',
+    http: 400,
+    message: 'The upload route is invalid.'
+  }),
+  RESERVED_RELEASE_SLOT: defineError({
+    code: 'RESERVED_RELEASE_SLOT',
+    class: 'public',
+    http: 400,
+    message: 'The upload key uses a reserved release slot.'
+  }),
+  CUSTOM_KEY_NOT_ALLOWED: defineError({
+    code: 'CUSTOM_KEY_NOT_ALLOWED',
+    class: 'public',
+    http: 400,
+    message: 'The bucket does not allow custom keys.'
+  }),
+  INVALID_KEY: defineError({
+    code: 'INVALID_KEY',
+    class: 'public',
+    http: 400,
+    message: 'The upload key is invalid.'
+  }),
+  INVALID_KEY_LENGTH: defineError({
+    code: 'INVALID_KEY_LENGTH',
+    class: 'public',
+    http: 400,
+    message: 'The upload key must be between 1 and 1024 characters.'
+  }),
+  SITE_RELEASE_UPLOAD_EXPIRED: defineError({
+    code: 'SITE_RELEASE_UPLOAD_EXPIRED',
+    class: 'public',
+    http: 409,
+    message: 'The site release upload has expired.'
+  }),
   INVALID_FILE_SIZE: defineError({
     code: 'INVALID_FILE_SIZE',
     class: 'public',

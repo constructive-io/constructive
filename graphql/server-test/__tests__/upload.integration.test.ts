@@ -388,6 +388,31 @@ describe('Integration tests (uploads, tenant isolation, RLS)', () => {
   // ==========================================================================
 
   describe('Presigned URL uploads (Alice)', () => {
+    it.each([
+      ['an invalid hash', { contentHash: 'not-a-sha256' }, 'INVALID_CONTENT_HASH_FORMAT'],
+      ['a missing bucket', { bucketKey: 'missing-bucket' }, 'BUCKET_NOT_FOUND']
+    ])('returns a public GraphQL error for %s', async (_scenario, overrides, code) => {
+      const fileContent = 'upload error contract';
+      const res = await postGraphQL({
+        query: UPLOAD_APP_FILE,
+        variables: {
+          input: {
+            bucketKey: 'public',
+            contentHash: await hashContent(fileContent),
+            contentType: 'text/plain',
+            size: Buffer.byteLength(fileContent),
+            filename: 'upload-error.txt',
+            ...overrides
+          }
+        }
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.errors).toEqual([
+        expect.objectContaining({ extensions: expect.objectContaining({ code, class: 'public' }) })
+      ]);
+    });
+
     describe('Public file upload', () => {
       const fileContent = 'Hello, public world!';
       const contentType = 'text/plain';

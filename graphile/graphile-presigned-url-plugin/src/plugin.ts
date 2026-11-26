@@ -291,7 +291,7 @@ export function createPresignedUrlPlugin(
                       const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw uploadInputError('DATABASE_NOT_FOUND');
                       // The input's databaseId selects the row's scope; identity stays on the claims.
                       const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
@@ -313,7 +313,7 @@ export function createPresignedUrlPlugin(
                         ),
                       );
                       if (!bucket && vals.databaseId != null) throw databaseAccessDenied();
-                      if (!bucket) throw new Error('BUCKET_NOT_FOUND');
+                      if (!bucket) throw uploadInputError('BUCKET_NOT_FOUND');
 
                       // The reconciler records the coordinate; consumers never
                       // recompute it from the logical bucket row.
@@ -420,7 +420,7 @@ export function createPresignedUrlPlugin(
                       const claimDatabaseId = await withRequestPgClient(vals.withPgClient, vals.pgSettings, (pgClient) =>
                         resolveDatabaseId(pgClient),
                       );
-                      if (!claimDatabaseId) throw new Error('DATABASE_NOT_FOUND');
+                      if (!claimDatabaseId) throw uploadInputError('DATABASE_NOT_FOUND');
                       // The input's databaseId selects the row's scope; identity stays on the claims.
                       const databaseId: string = vals.databaseId ?? claimDatabaseId;
 
@@ -442,7 +442,7 @@ export function createPresignedUrlPlugin(
                         ),
                       );
                       if (!bucket && vals.databaseId != null) throw databaseAccessDenied();
-                      if (!bucket) throw new Error('BUCKET_NOT_FOUND');
+                      if (!bucket) throw uploadInputError('BUCKET_NOT_FOUND');
 
                       // Enforce bulk upload limits
                       const filesArray = vals.files as any[];
@@ -543,7 +543,7 @@ export function createPresignedUrlPlugin(
                     pgSettings: (grafastContext() as any).get('pgSettings'),
                   }), (vals: any) => withRequestPgClient(vals.withPgClient, vals.pgSettings, async (txClient) => {
                     const databaseId = await resolveDatabaseId(txClient);
-                    if (!databaseId) throw new Error('DATABASE_NOT_FOUND');
+                    if (!databaseId) throw uploadInputError('DATABASE_NOT_FOUND');
                     const configs = await loadAllStorageModules(txClient, databaseId);
                     const config = resolveStorageConfigFromCodec(capturedFilesCodec, configs);
                     if (!config) throw new Error('STORAGE_MODULE_NOT_FOUND');
@@ -557,7 +557,7 @@ export function createPresignedUrlPlugin(
                       values: [vals.siteId],
                     });
                     const bucket = rows[0] as unknown as BucketConfig | undefined;
-                    if (!bucket) throw new Error('SITE_UPLOAD_NOT_AUTHORIZED');
+                    if (!bucket) throw uploadInputError('SITE_UPLOAD_NOT_AUTHORIZED');
                     const files = vals.files as any[];
                     if (files.length > config.maxBulkFiles) throw uploadInputError('BULK_UPLOAD_FILES_EXCEEDED');
                     if (files.reduce((sum, file) => sum + file.size, 0) > config.maxBulkTotalSize) {
@@ -611,20 +611,20 @@ export async function processSingleFile(
   const { contentHash, contentType, size, filename, key: customKey } = input;
 
   if (!contentHash || typeof contentHash !== 'string' || contentHash.length > MAX_CONTENT_HASH_LENGTH) {
-    throw new Error('INVALID_CONTENT_HASH');
+    throw uploadInputError('INVALID_CONTENT_HASH');
   }
   if (!isValidSha256(contentHash)) {
-    throw new Error('INVALID_CONTENT_HASH_FORMAT: must be a 64-char lowercase hex SHA-256');
+    throw uploadInputError('INVALID_CONTENT_HASH_FORMAT', 'must be a 64-char lowercase hex SHA-256');
   }
   if (!contentType || typeof contentType !== 'string' || contentType.length > MAX_CONTENT_TYPE_LENGTH) {
-    throw new Error('INVALID_CONTENT_TYPE');
+    throw uploadInputError('INVALID_CONTENT_TYPE');
   }
   if (typeof size !== 'number' || size <= 0 || size > storageConfig.defaultMaxFileSize) {
     throw uploadInputError('INVALID_FILE_SIZE', `must be between 1 and ${storageConfig.defaultMaxFileSize} bytes`);
   }
   if (filename !== undefined && filename !== null) {
     if (typeof filename !== 'string' || filename.length > storageConfig.maxFilenameLength) {
-      throw new Error('INVALID_FILENAME');
+      throw uploadInputError('INVALID_FILENAME');
     }
   }
 
@@ -636,7 +636,7 @@ export async function processSingleFile(
   // `requested`.
   const agreement = checkTypeAgreement({ filename, declaredMime: contentType });
   if (!agreement.ok) {
-    throw new Error(`UPLOAD_TYPE_MISMATCH: ${agreement.violation.message}`);
+    throw uploadInputError('UPLOAD_TYPE_MISMATCH', 'the content type does not match the filename');
   }
 
   // Validate content type against bucket's allowed_mime_types
@@ -682,15 +682,18 @@ export async function processSingleFile(
   // recorder allocates the physical key, independently for every new request.
   const logicalKey = siteUpload?.release ? RELEASE_SLOT_PREFIX + contentHash : customKey || contentHash;
   if (customKey || (siteUpload && !siteUpload.release)) {
-    if (!customKey) throw new Error('INVALID_ROUTE');
+    if (!customKey) throw uploadInputError('INVALID_ROUTE');
     if (customKey.startsWith(RELEASE_SLOT_PREFIX)) {
-      throw new Error('RESERVED_RELEASE_SLOT');
+      throw uploadInputError('RESERVED_RELEASE_SLOT');
     }
     if (!siteUpload && !bucket.allow_custom_keys) {
-      throw new Error('CUSTOM_KEY_NOT_ALLOWED: bucket does not allow custom keys');
+      throw uploadInputError('CUSTOM_KEY_NOT_ALLOWED', 'bucket does not allow custom keys');
     }
     const keyError = validateCustomKey(customKey);
-    if (keyError) throw new Error(keyError);
+    if (keyError) {
+      const [code, message] = keyError.split(': ', 2);
+      throw uploadInputError(code, message);
+    }
   }
 
   if (siteUpload?.release || siteUpload?.checkOnly) {
@@ -707,7 +710,7 @@ export async function processSingleFile(
       if (row.status === 'requested' && !siteUpload.checkOnly) {
         const deadline = new Date(row.created_at).getTime() + storageConfig.uploadUrlExpirySeconds * 1000;
         const remainingMs = deadline - Date.now();
-        if (remainingMs <= 0) throw new Error('SITE_RELEASE_UPLOAD_EXPIRED');
+        if (remainingMs <= 0) throw uploadInputError('SITE_RELEASE_UPLOAD_EXPIRED');
         return {
           ...await signUpload(row.id, row.key, row.mime_type, Number(row.size), Math.ceil(remainingMs / 1000)),
           expiresAt: new Date(deadline).toISOString(),
