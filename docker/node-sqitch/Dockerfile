@@ -64,11 +64,13 @@ RUN mkdir -p /usr/share/man/man1 /usr/share/man/man7 \
         ca-certificates \
         g++ \
         git \
+        less \
         libdbd-pg-perl \
         make \
         perl \
         postgresql-client \
         python3-dev \
+        vim-tiny \
     && mkdir -p /etc/pki/tls && ln -s /etc/ssl/certs /etc/pki/tls/ \
     && rm -rf /var/cache/apt/* /var/lib/apt/lists/* /usr/bin/mysql?* \
     && rm -rf /plibs /man /usr/share/man /usr/share/doc /usr/share/postgresql \
