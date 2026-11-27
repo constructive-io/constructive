@@ -86,6 +86,8 @@ export async function runCodegenHandler(
       const { results, hasError } = await generateMulti({
         configs: selectedTargets,
         cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
+        verbose: args.verbose !== undefined ? Boolean(args.verbose) : undefined,
+        dryRun: args.dryRun !== undefined ? Boolean(args.dryRun) : undefined,
         schema: schemaConfig,
       });
 
@@ -113,6 +115,8 @@ export async function runCodegenHandler(
   if (expanded) {
     const { results, hasError } = await generateMulti({
       configs: expanded,
+      verbose: options.verbose,
+      dryRun: options.dryRun,
       schema: schemaConfig,
     });
     for (const { name, result } of results) {
