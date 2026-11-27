@@ -116,6 +116,9 @@ export const createAdmissionControlMiddleware = (
     // An upgraded socket holds one slot for its entire lifetime.
     const lifetime = isWebSocketUpgrade(req) ? req.socket : res;
     lifetime.once('close', onClose);
+    // A client that hung up during an earlier async middleware closed
+    // `lifetime` before this listener existed, so its 'close' never reaches it.
+    if ((lifetime as { destroyed?: boolean }).destroyed) gone.abort();
 
     let lease: AdmissionLease;
     try {
