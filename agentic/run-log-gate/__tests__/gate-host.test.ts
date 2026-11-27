@@ -45,7 +45,7 @@ describe('createRunLogGateHost', () => {
     expect(projectToolState(records).pendingApprovals).toEqual([
       expect.objectContaining({
         toolCallId: 'call-1',
-        prompt: 'Directory: /project\n\nAllow bash?\n\nThe agent wants to run `ls`.'
+        prompt: 'directory  /project\n\nAllow bash?\n\nThe agent wants to run `ls`.'
       })
     ]);
 

@@ -123,7 +123,7 @@ export const listEntityTypesTool: HarnessTool<typeof ListEntityTypesZod, EntityT
       const entityTypes = result.entityTypeProvisions.nodes.map((row) => toSummary(row as SummaryRow));
       const message =
         entityTypes.length === 0
-          ? 'No entity types are provisioned in this database yet.'
+          ? 'No entity types yet.'
           : `${entityTypes.length} entity type${entityTypes.length === 1 ? '' : 's'}:\n${entityTypes.map(formatSummary).join('\n')}`;
       return done(message, entityTypes);
     } catch (err) {

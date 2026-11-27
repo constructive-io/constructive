@@ -407,7 +407,7 @@ export const deleteFieldTool: HarnessTool<typeof DeleteFieldZod, MutationDetails
       if (!result.deleteField?.field) {
         return fail(noRowsChanged(`Failed to delete field "${params.field_name}" from "${params.table_name}"`, DESCRIBE_SCHEMA));
       }
-      return ok(`Deleted field ${params.table_name}.${params.field_name}`);
+      return ok(`Deleted field ${params.table_name}.${params.field_name}.`);
     } catch (err) {
       return fail(failureFromError(err, `Failed to delete field "${params.field_name}" from "${params.table_name}"`));
     }

@@ -1025,18 +1025,17 @@ async function bindDatabase(r: Run, bind: Bind, prewarm: Prewarm): Promise<Outco
 
   // Settle the concurrent prewarm so the scaffold + install are in place before
   // run_codegen runs. A failure here is non-fatal: run_codegen redoes the work.
-  const prewarmed = (await prewarm).ok ? ' packages/app prewarmed.' : '';
+  const prewarmed = (await prewarm).ok ? ' packages/app is ready.' : '';
   const notes = [
-    bind.resumed ? ' Finished the provision an earlier call had started.' : '',
-    bind.recovered ? ' Found it on the backend by name: its ticket was no longer recorded.' : '',
+    bind.resumed ? ' Finished an earlier request.' : '',
+    bind.recovered ? ' Found it on the backend by name.' : '',
     prewarmed,
-    bind.replaced
-      ? ' Previous binding archived in .env (old database kept); build the schema again in the new one, then generate the SDK again.'
-      : '',
+    bind.replaced ? ' The old binding is archived in .env, and the old database keeps its data. Build the schema again here.' : '',
   ].join('');
+  const named = `${r.name} (${databaseId.slice(0, 8)})`;
   const message = bind.adopted
-    ? `Bound database "${r.name}" (ID: ${databaseId}), which this account provisioned earlier. Binding written to .env.${notes}`
-    : `Provisioned database "${r.name}" (ID: ${databaseId}). Binding written to .env.${notes}`;
+    ? `Bound this directory to ${named}. Wrote .env.${notes}`
+    : `Created ${named} and bound this directory to it. Wrote .env.${notes}`;
   return {
     success: true,
     message,

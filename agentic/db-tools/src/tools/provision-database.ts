@@ -18,7 +18,7 @@ const ProvisionDatabaseZod = strictObject('the input', {
     .max(63)
     .regex(DATABASE_NAME_PATTERN, { message: 'must start with a letter and hold only letters, digits, _ and -' })
     .describe(
-      'Name for the app database: 3 to 63 characters, a letter first, then letters, digits, _ or -. It doubles as the deterministic provisioning subdomain (api-<name>/auth-<name>/app-<name>.<domain>), so keep it short; lowercase letters, digits and - make the cleanest host names.',
+      '3 to 63 characters: a letter, then letters, digits, _ or -. It becomes the subdomain (api-<name>.<domain>), so keep it short and lowercase.',
     ),
 });
 

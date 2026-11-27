@@ -1,10 +1,10 @@
-import { type HarnessTool, type HarnessToolResult, strictObject } from '@agentic-kit/harness';
+import { alignColumns, type HarnessTool, type HarnessToolResult, strictObject } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import type { ProjectContext } from '../context';
 import { failedResult, failureFromError } from '../failure';
 import { projectReady } from '../ready';
-import { accessInputOf, asWritten, readTables, type SchemaField, type WrittenRule } from '../table-access';
+import { accessInputOf, asWritten, defaultText, readTables, type SchemaField, type WrittenRule } from '../table-access';
 
 const ParamZod = strictObject('the input', {});
 type Params = z.infer<typeof ParamZod>;
@@ -18,34 +18,27 @@ type SchemaTable = {
   policyRules: WrittenRule[];
 };
 
-const ruleText = (rule: WrittenRule): string => {
-  const notes = [rule.privileges.join(', '), ...(rule.permissive ? [] : ['restrictive'])];
-  return `${rule.$type} (${notes.filter(Boolean).join('; ')})`;
-};
+const ruleCells = (rule: WrittenRule): string[] => [
+  rule.permissive ? 'rule' : 'limit',
+  rule.$type,
+  rule.privileges.join(' '),
+  rule.policy_role === 'authenticated' ? '' : `role ${rule.policy_role}`
+];
 
 export type DescribeSchemaDetails = {
   tables: SchemaTable[];
 };
 
 function formatText(details: DescribeSchemaDetails): string {
-  const lines: string[] = [];
-  if (details.tables.length === 0) {
-    lines.push('No application tables yet.');
-  } else {
-    lines.push(`Tables (${details.tables.length}):`);
-    for (const table of details.tables) {
-      lines.push(`  ${table.name}`);
-      for (const field of table.fields) {
-        const req = field.isRequired ? ' required' : '';
-        const def = field.defaultValue != null ? ` default=${field.defaultValue}` : '';
-        lines.push(`    - ${field.name}: ${field.type}${req}${def}`);
-      }
-      if (table.policyRules.length > 0) {
-        lines.push(`    policies: ${table.policyRules.map(ruleText).join(', ')}`);
-      }
-    }
-  }
-  return lines.join('\n');
+  if (details.tables.length === 0) return 'No tables yet.';
+  const indent = (lines: string[]) => lines.map((line) => `  ${line}`);
+  return details.tables
+    .map((table) => [
+      table.name,
+      ...indent(alignColumns(table.fields.map((field) => [field.name, field.type, field.isRequired ? 'required' : '', defaultText(field.defaultValue)]))),
+      ...indent(alignColumns(table.policyRules.map(ruleCells)))
+    ].join('\n'))
+    .join('\n\n');
 }
 
 export const describeSchemaTool: HarnessTool<typeof ParamZod, DescribeSchemaDetails> = {

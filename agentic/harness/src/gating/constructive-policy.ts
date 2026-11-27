@@ -1,6 +1,7 @@
 import type { ToolEffect, ToolFailure } from '../tools/tool';
 import type { GatePolicy, GateToolCallEvent } from './policy';
 import type { ConfirmPreview, PlanTableAccess, PlanTarget } from './preview';
+import { templateTableLines } from './preview';
 import { buildConfirmPrompt } from './prompts';
 
 /**
@@ -69,7 +70,10 @@ export function createConstructiveGatePolicy(deps: ConstructiveGateDeps): GatePo
           typeof input?.blueprintName === 'string' ? input.blueprintName : undefined;
         const displayName = typeof input?.displayName === 'string' ? input.displayName : '';
         const preview = await deps.resolveTemplatePreview(cwd, blueprintName, displayName);
-        if (preview) return { kind: 'ask', prompt: { ...prompt, preview } };
+        if (preview) {
+          const tables = preview.kind === 'template' ? templateTableLines(preview.tables).map((line) => `    ${line}`) : [];
+          return { kind: 'ask', prompt: { ...prompt, message: [prompt.message, ...tables].join('\n'), preview } };
+        }
       }
       return { kind: 'ask', prompt };
     },

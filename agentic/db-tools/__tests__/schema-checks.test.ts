@@ -133,7 +133,7 @@ describe('describe_schema', () => {
       { $type: 'AuthzNotReadOnly', privileges: ['insert', 'update', 'delete'], permissive: false, policy_role: 'authenticated', data: MEMBERS },
     ]);
     const text = result.content.map((block) => (block.type === 'text' ? block.text : '')).join('');
-    expect(text).toContain('AuthzNotReadOnly (insert, update, delete; restrictive)');
+    expect(text).toMatch(/\n {2}limit\s+AuthzNotReadOnly\s+insert update delete\n?/);
   });
 });
 

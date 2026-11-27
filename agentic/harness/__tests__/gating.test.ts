@@ -193,6 +193,7 @@ describe('confirm gate: declines are respected', () => {
   });
 
   it('puts what the precondition resolved into the plan as its target, and shows it to the host', async () => {
+    const DELETE_POSTS = ['- posts  the table and all its rows', '! This cannot be undone.'].join('\n');
     const policy = createConstructiveGatePolicy({
       effectOf: (toolName) => EFFECTS[toolName],
       precondition: async () => READY,
@@ -201,7 +202,7 @@ describe('confirm gate: declines are respected', () => {
     const decision = await policy.resolvePrompt(call('delete_table', 'tc-1', { table_name: 'posts' }), CWD);
     expect(decision).toEqual({
       kind: 'ask',
-      prompt: { title: 'Delete table?', message: 'Permanently delete the table "posts" and its data.', target: TARGET },
+      prompt: { title: 'Delete table posts', message: DELETE_POSTS, target: TARGET },
     });
 
     const shown: unknown[][] = [];
@@ -213,7 +214,7 @@ describe('confirm gate: declines are respected', () => {
         return false;
       },
     }, CWD);
-    expect(shown).toEqual([['tc-2', 'Delete table?', 'Permanently delete the table "posts" and its data.', undefined, TARGET]]);
+    expect(shown).toEqual([['tc-2', 'Delete table posts', DELETE_POSTS, undefined, TARGET]]);
   });
 
   it('blocks mutating tools when no confirmation UI is available', async () => {
@@ -394,17 +395,20 @@ describe('buildConfirmPrompt', () => {
       },
       { target: TARGET, access: ACCESS },
     );
-    expect(prompt.title).toBe('Create tables?');
+    expect(prompt.title).toBe('Add 2 tables');
     expect(prompt.message).toBe(
       [
-        'Create 2 tables in the project database.',
-        'Table "contacts" with the fields email (email, required), phone (text).',
-        '  Rule (select, update): The person the row names in owner_id.',
-        '  Grants: select, insert, update and delete to authenticated',
-        '  Finding (high): A removed member keeps their rows.',
-        'Table "notes" in the schema app_private, with no fields of its own.',
-        '  Rule (select; role anonymous): Everyone, for every row.',
-        '  Grants: select, insert, update and delete to authenticated',
+        '+ contacts',
+        '    email  email  required',
+        '    phone  text',
+        '    rule   select update  The person the row names in owner_id.',
+        '    grant  select, insert, update and delete to authenticated',
+        '    ! finding (high): A removed member keeps their rows.',
+        '+ notes (schema app_private)',
+        '    (no fields)',
+        '    rule   select  Everyone, for every row. (role anonymous)',
+        '    grant  select, insert, update and delete to authenticated',
+        '+ link  contacts -> orgs',
       ].join('\n'),
     );
     expect(prompt.access).toEqual(ACCESS);
@@ -428,10 +432,8 @@ describe('buildConfirmPrompt', () => {
   it('says a new database is bound to the directory, and nothing it does not do', () => {
     const prompt = buildConfirmPrompt('provision_database', { database_name: 'shop' }, { target: NEW_DATABASE });
     expect(prompt).toEqual({
-      title: 'Create database?',
-      message:
-        'Create a new Constructive database "shop" under the signed-in account and bind this directory to it: ' +
-        'its id and endpoints are written to .env.',
+      title: 'Create database shop',
+      message: ['+ database  shop', '+ .env      binds this directory to shop'].join('\n'),
       target: NEW_DATABASE,
     });
   });
@@ -440,10 +442,12 @@ describe('buildConfirmPrompt', () => {
     const replacing: PlanTarget = { ...NEW_DATABASE, kind: 'account', replaces: { name: 'shop', id: 'db-old' } };
     const prompt = buildConfirmPrompt('replace_database', { database_name: 'shop' }, { target: replacing });
     expect(prompt).toEqual({
-      title: 'Replace database?',
-      message:
-        'Bind this directory to a new, empty database "shop". The database it is bound to now keeps its data, ' +
-        'but this directory no longer uses it; its tables must be created again in the new one.',
+      title: 'Replace the database of this directory',
+      message: [
+        '+ database  shop (empty)',
+        '~ .env      shop (db-old) -> shop',
+        '= shop (db-old) keeps its data. This directory stops using it.',
+      ].join('\n'),
       target: replacing,
     });
   });
@@ -456,12 +460,10 @@ describe('buildConfirmPrompt', () => {
       is_required: true,
       is_unique: false,
     }, { target: TARGET });
-    expect(update.message).toBe('Change field "title" on table "posts": rename it to "headline"; make it required; remove its unique constraint.');
+    expect(update.message).toBe('~ posts.title  rename -> headline; required; not unique');
     const retype = buildConfirmPrompt('retype_field', { table_name: 'posts', field_name: 'title', type: 'citext' }, { target: TARGET });
-    expect(retype.title).toBe('Change field type?');
-    expect(retype.message).toBe(
-      'Change the type of field "title" on table "posts" to citext, which converts every value and fails or loses data when a value does not fit.',
-    );
+    expect(retype.title).toBe('Change the type of posts.title');
+    expect(retype.message).toBe(['~ posts.title  -> citext', '! A value that does not convert fails the change or is lost.'].join('\n'));
   });
 
   it('says the rules of add_policies after and now, a limit as a limit, and the findings', () => {
@@ -481,20 +483,17 @@ describe('buildConfirmPrompt', () => {
       { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner', privileges: ['select', 'update'] }] },
       { target: TARGET, access: [access] },
     );
-    expect(prompt.title).toBe('Add access rules?');
+    expect(prompt.title).toBe('Add 1 rule to posts');
     expect(prompt.preview).toEqual({ kind: 'policies', tableName: 'posts', policies: ['AuthzDirectOwner'] });
     expect(prompt.message).toBe(
       [
-        'Add 1 access rule to table "posts"; the rules it has stay.',
-        '  Rules after the change:',
-        '    Rule (select, update): The person the row names in owner_id.',
-        '    Limit (update), which every row must also pass: Members who are not read-only.',
-        '  Rules now:',
-        '    none',
-        '  Grants: select, insert, update and delete to authenticated (unchanged)',
-        '  New finding (high): A removed member keeps their rows.',
-        '  New finding (medium): A required column is left from a rule the table no longer has. Column: entity_id.',
-        '  Finding removed: No one can read the rows.',
+        '~ posts',
+        '    +  rule   select update  The person the row names in owner_id.',
+        '    +  limit  update         Members who are not read-only.',
+        '    =  grant  select, insert, update and delete to authenticated',
+        '    ! finding (high): A removed member keeps their rows.',
+        '    ! finding (medium): A required column is left from a rule the table no longer has. Column: entity_id.',
+        '    - finding: No one can read the rows.',
       ].join('\n'),
     );
   });
@@ -508,12 +507,11 @@ describe('buildConfirmPrompt', () => {
       findingsRemoved: [],
     };
     const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
-    expect(prompt.message.split('\n').slice(2)).toEqual([
-      '  Rules: unchanged',
-      '    Rule (select, update): The person the row names in owner_id.',
-      '  Grants after the change: select, insert, update and delete to authenticated',
-      '  Grants now: none',
-      '  Row security: on after the change, off now',
+    expect(prompt.message.split('\n')).toEqual([
+      '~ posts',
+      '    =  rule          select update  The person the row names in owner_id.',
+      '    +  grant         select, insert, update and delete to authenticated',
+      '    ~  row security  off -> on',
     ]);
   });
 
@@ -532,12 +530,12 @@ describe('buildConfirmPrompt', () => {
     };
     const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
     expect(prompt.message.split('\n').slice(-6)).toEqual([
-      '  Adds column entity_id (uuid, required, no default).',
-      '  Adds column owner_id (uuid, required, default jwt_public.current_user_id() for new rows).',
-      '  Adds column is_published (boolean, required, default false).',
-      '  Adds column note (text, optional, default not known).',
-      "  Reuses the existing column title (text, required, default 'untitled'), as it is.",
-      '  This change fails if the table has rows, because entity_id and owner_id are required and the rows there now would get no value; this tool cannot see whether the table has rows.',
+      '    +  column  entity_id     uuid     required',
+      '    +  column  owner_id      uuid     required  jwt_public.current_user_id() (new rows only)',
+      '    +  column  is_published  boolean  required  false',
+      '    +  column  note          text               default not known',
+      "    =  column  title         text     required  'untitled'                                    kept as it is",
+      '    ! Fails if the table has rows: entity_id and owner_id are required, and those rows get no value. This tool cannot see the rows.',
     ]);
   });
 
@@ -557,19 +555,27 @@ describe('buildConfirmPrompt', () => {
     };
     const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
     expect(prompt.message.split('\n').slice(-2)).toEqual([
-      '  New finding (medium): A column the rules reuse is not as their node makes it. Column: owner_id.',
-      '    A create must send owner_id itself: the table has no default for it.',
+      '    ! finding (medium): A column the rules reuse is not as their node makes it. Column: owner_id.',
+      '      A create must send owner_id itself: the table has no default for it.',
     ]);
   });
 
   it('says what set_access replaces, and that the grants stay', () => {
-    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [created('posts', [OWNER])] });
-    expect(prompt.title).toBe('Replace access?');
-    expect(prompt.message.split('\n').slice(0, 2)).toEqual([
-      'Replace every access rule of table "posts" with 1 rule; its grants stay.',
-      'Rules derived from them (history and translation copies) follow the new set.',
+    const access: PlanTableAccess = { ...created('posts', [OWNER]), before: { rules: [ALL], grants: GRANTS, rowSecurity: true } };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
+    expect(prompt.title).toBe('Replace the rules of posts');
+    expect(prompt.message.split('\n')).toEqual([
+      '~ posts',
+      '    +  rule   select update  The person the row names in owner_id.',
+      '    -  rule   select         Everyone, for every row. (role anonymous)',
+      '    =  grant  select, insert, update and delete to authenticated',
     ]);
-    expect(prompt.message).toContain('  Rule (select, update): The person the row names in owner_id.');
+  });
+
+  it('says a set_access that keeps every rule, grant and column changes nothing', () => {
+    const access: PlanTableAccess = { ...created('posts', [OWNER]), before: { rules: [OWNER], grants: GRANTS, rowSecurity: true } };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts', policies: [{ $type: 'AuthzDirectOwner' }] }, { target: TARGET, access: [access] });
+    expect(prompt.message.split('\n')[0]).toBe('= posts  no change');
   });
 
   it('ends the message with the notes the precondition resolved, and keeps them as data', () => {
@@ -582,9 +588,9 @@ describe('buildConfirmPrompt', () => {
   it('says a constant default of a number or a boolean as it is, and null as removing it', () => {
     const update = (default_value: unknown) =>
       buildConfirmPrompt('update_field', { table_name: 'posts', field_name: 'count', default_value }, { target: TARGET }).message;
-    expect(update(0)).toBe('Change field "count" on table "posts": set its default to 0.');
-    expect(update(false)).toBe('Change field "count" on table "posts": set its default to false.');
-    expect(update(null)).toBe('Change field "count" on table "posts": remove its default.');
+    expect(update(0)).toBe('~ posts.count  default -> 0');
+    expect(update(false)).toBe('~ posts.count  default -> false');
+    expect(update(null)).toBe('~ posts.count  no default');
     const created = buildConfirmPrompt('create_field', { table_name: 'posts', field_name: 'count', type: 'integer', default_value: 0 }, { target: TARGET });
     expect(created.preview).toMatchObject({ field: { defaultValue: '0' } });
     const blueprint = buildConfirmPrompt(
@@ -592,7 +598,7 @@ describe('buildConfirmPrompt', () => {
       { name: 'n', definition: { tables: [{ table_name: 'notes', fields: [{ name: 'done', type: 'boolean', default: false }] }] } },
       { target: TARGET },
     );
-    expect(blueprint.message).toContain('done (boolean, default false)');
+    expect(blueprint.message).toContain('    done  boolean    false');
   });
 
   it('falls back to a generic prompt for unknown tools', () => {
@@ -602,18 +608,18 @@ describe('buildConfirmPrompt', () => {
 
   it('builds a prompt for each entity type change', () => {
     const create = buildConfirmPrompt('create_entity_type', { name: 'org' }, { target: TARGET });
-    expect(create.title).toBe('Create entity type?');
-    expect(create.message).toContain('"org"');
+    expect(create.title).toBe('Create entity type org');
+    expect(create.message).toContain('+ entity type org');
 
     const remove = buildConfirmPrompt('delete_entity_type', { entity_type_id: 'etp-1' }, { target: TARGET });
-    expect(remove.title).toBe('Delete entity type?');
-    expect(remove.message).toMatch(/stay in the database/);
+    expect(remove.title).toBe('Delete entity type etp-1');
+    expect(remove.message).toMatch(/Its table and rows stay/);
   });
 
   it('summarizes scope in the create_api_key prompt', async () => {
     const unscoped = buildConfirmPrompt('create_api_key', { key_name: 'deploy bot' }, { target: TARGET });
-    expect(unscoped.title).toBe('Create API key?');
-    expect(unscoped.message).toContain('"deploy bot"');
+    expect(unscoped.title).toBe('Create API key deploy bot');
+    expect(unscoped.message).toContain('+ API key deploy bot');
     expect(unscoped.message).toContain('unscoped');
     expect(unscoped.message).toMatch(/never to the agent/);
 

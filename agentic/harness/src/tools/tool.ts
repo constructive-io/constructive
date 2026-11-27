@@ -91,45 +91,43 @@ export type ToolFailureCode = (typeof TOOL_FAILURE_CODES)[number];
  * that returns it. A new code does not compile without its sentence.
  */
 export const TOOL_FAILURE_MEANINGS: Record<ToolFailureCode, string> = {
-  'invalid-input': 'The input is not valid for the tool, or not what the backend accepts: the caller fixes the value the message names and calls again.',
-  'query-too-large': 'The request asks for more than this backend allows at once (rows, nesting, page size or body size): the caller asks for less and calls again.',
-  'rate-limited': 'The backend is limiting how many requests it takes, and nothing is wrong with the call: the caller waits, as long as the message says when the backend gave a time, and calls again.',
-  'not-found': 'Something the call names does not exist where the call looks, or this account cannot see it: the caller checks what exists and calls again with a name that does.',
-  'name-taken': 'A name the call would create is already used, possibly in the form the backend stores it under: the caller chooses another name, or works with the one that exists.',
-  conflict:
-    'The change does not fit the state the database is in now (a unique or related value, rows a new required column cannot fill, a column of another type, or another change at the same moment): the caller reads the current state and changes it or the input before calling again.',
-  'no-rows-changed': 'The backend answered without an error but changed or returned no row, because the row does not exist or this account may not change or read it: the caller checks that it exists before calling again.',
-  partial: 'Part of what was asked was done and part was not, and the message says which: the caller repeats only the part that was not done.',
-  'permission-denied': 'The backend refused the call for this account or person, by a grant or a rule: the access is for the person or an administrator of the database to give, so the same call fails until it changes.',
-  'read-only': 'The request was read-only, so nothing changed, usually because the credential may only read: the person gives a credential that may write; the same credential fails the same way.',
-  unsupported: 'This host or backend cannot do what the call needs, so nothing was changed: the same call fails until the host or the backend can do it.',
+  'invalid-input': 'The input is not valid, or the backend does not accept it: fix the value the message names.',
+  'query-too-large': 'The request asks for more than the backend allows at once: ask for less.',
+  'rate-limited': 'The backend is limiting requests, and the call is fine: wait (the message says how long, when it knows), then retry.',
+  'not-found': 'What the call names does not exist, or this account cannot see it: check what exists.',
+  'name-taken': 'The name is used already, maybe in the form the backend stores: choose another, or use that one.',
+  conflict: 'The change does not fit the current state (a unique value, rows a required column cannot fill, another change): read the state first.',
+  'no-rows-changed': 'No row changed: it does not exist, or this account may not change or read it. Check that it exists.',
+  partial: 'Part of the call was done, and the message says which: repeat only the rest.',
+  'permission-denied': 'A grant or a rule refused this account: the person or a database administrator must give the access.',
+  'read-only': 'The credential may only read, so nothing changed: use a credential that may write.',
+  unsupported: 'This host or backend cannot do this, so nothing changed: the same call fails until it can.',
   'plan-required': 'The account needs an active billing plan before the backend does this: the person chooses a plan for the account, then the caller calls again.',
   'limit-reached': 'The account reached a limit of its plan: the person removes what the account no longer needs or chooses a larger plan, then the caller calls again.',
-  'signed-out': 'There is no usable account credential (no one is signed in, the session expired, or the credential was rejected): the person signs in again, then the caller calls again.',
-  'step-up-required': 'The change needs a recent sign-in: the person signs in again, then the caller repeats the call.',
-  'app-signed-out': 'The call acts as a person signed in to the app, not as the account, and no one is signed in there: the person signs in to the app, then the caller calls again.',
-  'no-env': 'The directory has no .env, so no database is bound to it: a database is created or bound for the directory (the person approves it), then the caller calls again.',
-  'no-backend': 'No Constructive backend is chosen here: the person chooses one by signing in to it, then the caller calls again.',
-  'missing-credentials': 'The binding or the session lacks something the call needs (a key of .env, an owner, or a credential): the caller follows the message, which usually binds the directory again, then calls again.',
-  'backend-unreachable': 'The backend did not answer, or answered with a server error: the caller retries later, and tells the backend operator when it lasts.',
-  'account-mismatch': 'The directory is bound to a database of another account than the one signed in: the person signs in to that account, or binds the directory to a database of this one.',
-  'db-missing': 'The database the directory is bound to no longer exists on this backend, or this account lost access to it: the person binds the directory to another database, which replaces the binding only with their approval.',
-  'db-suspended': 'The bound database is suspended: its data is kept, but nothing can read or change it until the person or the backend operator lifts the suspension.',
-  'database-unavailable': 'The backend answered that the database is deleted or suspended: a retry fails until it is restored, which is for the person or the backend operator.',
-  'app-missing':
-    'The call works in the project\'s app, the directory has none, and this host does not create one: the person adds the app, or the code is generated another way from what the result gives, then the caller calls again.',
-  'schema-unresolved': "The bound database's app schema could not be read, so nothing was changed: the caller retries, and tells the backend operator when it lasts.",
-  'binding-live': 'The directory is bound to a live database already, so it was kept and nothing was replaced: replacing it is a separate change the person approves.',
-  'binding-changed': "The directory's binding changed while the call ran, so nothing was replaced: the caller reads the binding again before deciding what to do.",
-  'binding-not-saved': 'The database is ready, but its binding was not saved, so the directory is not bound to it: the caller calls again with the same name to bind it.',
-  'env-write-failed': 'The database was created, but writing its binding to .env failed: the person fixes what the message says about the file, then the caller calls again with the same name to bind it.',
-  'reprovision-not-allowed': 'This host replaces a database only after the person approves it in its own window, so nothing was replaced: the person replaces it there.',
-  'pending-other': 'A database request with another name is still recorded for this directory: the caller finishes that one by calling again with its name, because another name starts a second database.',
-  'provision-pending': 'The database was requested and is not ready yet: the caller calls again with the same input to keep waiting, because another name starts a second database.',
-  'provision-stuck': 'The database is still not ready after many waits, and its request stays recorded, so no other database is requested meanwhile: the backend operator checks the provisioning jobs.',
-  'ticket-lost': 'The recorded database request can no longer be found on the backend and nothing was created, so the record is cleared: calling again requests a new database.',
-  unverified: 'The change was sent and the backend answered that it applied it, but reading the state back failed: it may or may not be as planned, so the caller reads it before anything else.',
-  failed: 'The backend or the tool failed in a way no other code says, and the message says what: the caller decides from the message, and gives an error id, when there is one, to the backend operator.'
+  'signed-out': 'No usable credential (signed out, expired or rejected): the person signs in again, then retry.',
+  'step-up-required': 'The change needs a recent sign-in: the person signs in again, then retry.',
+  'app-signed-out': 'The call acts as a person signed in to the app, and no one is: sign in to the app, then retry.',
+  'no-env': 'There is no .env here, so no database is bound: create or bind one (the person approves), then retry.',
+  'no-backend': 'No backend is chosen: the person signs in to one, then retry.',
+  'missing-credentials': 'The binding or the session lacks a value the call needs: follow the message (usually bind again), then retry.',
+  'backend-unreachable': 'The backend did not answer, or failed: retry later, and tell its operator if it lasts.',
+  'account-mismatch': 'The directory is bound to a database of another account: sign in to that account, or bind a database of this one.',
+  'db-missing': 'The bound database is gone, or this account lost access to it: bind another database (the person approves).',
+  'db-suspended': 'The bound database is suspended: its data is kept, but nothing can use it until the suspension is lifted.',
+  'database-unavailable': 'The backend says the database is deleted or suspended: retries fail until it is restored.',
+  'app-missing': 'The call needs the project app, and the directory has none: add the app, or generate the code another way.',
+  'schema-unresolved': 'The app schema of the database could not be read, so nothing changed: retry, and tell the operator if it lasts.',
+  'binding-live': 'The directory is bound to a live database, so nothing was replaced: replacing it is a separate change the person approves.',
+  'binding-changed': 'The binding changed during the call, so nothing was replaced: read the binding again.',
+  'binding-not-saved': 'The database is ready, but its binding was not saved: call again with the same name to bind it.',
+  'env-write-failed': 'The database was created, but .env could not be written: fix the file, then call again with the same name.',
+  'reprovision-not-allowed': 'This host replaces a database only after approval in its own window: replace it there.',
+  'pending-other': 'A request for a database with another name is pending here: call again with that name to finish it.',
+  'provision-pending': 'The database is not ready yet: call again with the same input to keep waiting. Another name starts a second database.',
+  'provision-stuck': 'The database is still not ready after many waits: the backend operator checks the provisioning jobs.',
+  'ticket-lost': 'The recorded request is gone from the backend, and nothing was created: calling again requests a new database.',
+  unverified: 'The backend says the change applied, but reading it back failed: read the state before anything else.',
+  failed: 'A failure no other code covers: read the message, and give its error id to the backend operator.'
 };
 
 /** Why a call failed, for a caller that is not a model (a CLI, an MCP client); `TOOL_FAILURE_MEANINGS` says what each code means. */
@@ -281,6 +279,12 @@ export function nearestName(word: string, candidates: readonly string[]): string
     .map((candidate) => ({ candidate, edits: distance(word.toLowerCase(), candidate.toLowerCase()) }))
     .sort((a, b) => a.edits - b.edits);
   return nearest && nearest.edits <= Math.max(2, Math.floor(word.length / 3)) ? nearest.candidate : undefined;
+}
+
+/** Rows of cells as text lines, each column padded to its widest cell and two spaces apart: a table for a terminal. */
+export function alignColumns(rows: readonly (readonly string[])[]): string[] {
+  const widths = rows.reduce<number[]>((max, row) => row.map((cell, index) => Math.max(max[index] ?? 0, cell.length)), []);
+  return rows.map((row) => row.map((cell, index) => cell.padEnd(widths[index])).join('  ').trimEnd());
 }
 
 /** Words as one list in a sentence: "a", "a and b", "a, b and c" (or "or"). */

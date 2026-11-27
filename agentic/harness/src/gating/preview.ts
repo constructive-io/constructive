@@ -3,7 +3,7 @@
  * so hosts can render it for review before the user approves.
  */
 
-import { listed } from '../tools/tool';
+import { alignColumns as columns, listed } from '../tools/tool';
 
 export type ConfirmPreviewField = {
   name: string;
@@ -124,112 +124,126 @@ export type ConfirmPrompt = {
   preview?: ConfirmPreview;
 };
 
-const databaseWords = (database: PlanDatabase): string =>
-  database.name ? `"${database.name}" (ID ${database.id})` : `ID ${database.id}`;
-
-// One rule as one line: what it applies to, whether it is a limit, the role when it is not the signed-in one, and its words.
-function ruleLine(rule: PlanRule): string {
-  const on = [rule.privileges.join(', '), ...(rule.policy_role === 'authenticated' ? [] : [`role ${rule.policy_role}`])].join('; ');
-  return rule.permissive ? `Rule (${on}): ${rule.words}` : `Limit (${on}), which every row must also pass: ${rule.words}`;
-}
-
-const grantLine = (grants: string[]): string => (grants.length ? listed(grants) : 'none');
-
-const sameRules = (a: PlanRule[], b: PlanRule[]): boolean => JSON.stringify(a.map(ruleLine).sort()) === JSON.stringify(b.map(ruleLine).sort());
-
-function stateLines(access: PlanTableAccess): string[] {
-  const { before, after } = access;
-  if (!before) {
-    return [
-      ...(after.rules.length ? after.rules.map((rule) => `  ${ruleLine(rule)}`) : ['  Rules: none']),
-      `  Grants: ${grantLine(after.grants)}`,
-      ...(after.rowSecurity ? [] : ['  Row security: off, so the rules do not apply']),
-    ];
-  }
-  const lines: string[] = [];
-  if (sameRules(before.rules, after.rules)) lines.push('  Rules: unchanged', ...after.rules.map((rule) => `    ${ruleLine(rule)}`));
-  else {
-    lines.push('  Rules after the change:', ...(after.rules.length ? after.rules.map((rule) => `    ${ruleLine(rule)}`) : ['    none']));
-    lines.push('  Rules now:', ...(before.rules.length ? before.rules.map((rule) => `    ${ruleLine(rule)}`) : ['    none']));
-  }
-  if (grantLine(before.grants) === grantLine(after.grants)) lines.push(`  Grants: ${grantLine(after.grants)} (unchanged)`);
-  else lines.push(`  Grants after the change: ${grantLine(after.grants)}`, `  Grants now: ${grantLine(before.grants)}`);
-  if (before.rowSecurity !== after.rowSecurity) lines.push(`  Row security: ${after.rowSecurity ? 'on' : 'off'} after the change, ${before.rowSecurity ? 'on' : 'off'} now`);
-  else if (!after.rowSecurity) lines.push('  Row security: off, so the rules do not apply');
-  return lines;
-}
-
-/**
- * The access of one table as indented lines: each rule in words (after and now, when they differ), the grants and
- * row security, the findings, and the columns the change adds or reuses.
- */
-export function planAccessLines(access: PlanTableAccess): string[] {
-  const lines = stateLines(access);
-  for (const finding of access.findingsAdded) {
-    lines.push(`  ${access.before ? 'New finding' : 'Finding'} (${finding.level}): ${finding.summary}${findingColumns(finding)}`);
-    for (const detail of finding.details ?? []) lines.push(`    ${detail}`);
-  }
-  for (const finding of access.findingsRemoved) lines.push(`  Finding removed: ${finding.summary}${findingColumns(finding)}`);
-  for (const column of access.columnsAdded ?? []) lines.push(`  Adds column ${column.name} (${columnWords(column)}).`);
-  for (const column of access.columnsReused ?? []) lines.push(`  Reuses the existing column ${column.name} (${columnWords(column)}), as it is.`);
-  if (access.failsIfRows?.length) {
-    const verb = access.failsIfRows.length === 1 ? 'is' : 'are';
-    lines.push(
-      `  This change fails if the table has rows, because ${listed(access.failsIfRows)} ${verb} required and the rows there now would get no value; ` +
-        'this tool cannot see whether the table has rows.'
-    );
-  }
-  for (const note of access.notes ?? []) lines.push(`  Note: ${note}`);
-  return lines;
-}
-
-const findingColumns = (finding: PlanFinding): string =>
-  finding.columns?.length ? ` Column${finding.columns.length === 1 ? '' : 's'}: ${listed(finding.columns)}.` : '';
-
-function columnWords(column: PlanColumn): string {
-  const fallback = column.default === undefined ? 'default not known' : column.default === null ? 'no default' : `default ${column.default}`;
-  return [column.type, column.required ? 'required' : 'optional', column.computed ? `${fallback} for new rows` : fallback].join(', ');
-}
-
-/** The target as lines of plain text, for a host that shows the plan as text: what, where, and as whom. */
-export function planTargetLines(target: PlanTarget): string[] {
-  if (target.kind === 'workspace') return [`Directory: ${target.cwd}`];
-  if (target.kind === 'no-credential') {
-    return [`Endpoint: ${target.endpoint}`, 'Account: none (no one is signed in, so the request carries no credential)'];
-  }
-  const { userId, email, agent } = target.account;
-  const account = `Account: ${email ? `${email} (${userId})` : userId}${agent ? `, as the agent ${agent.name} (ID ${agent.principalId})` : ''}`;
-  if (target.kind === 'account') {
-    return [
-      `Backend: ${target.apiEndpoint}`,
-      account,
-      ...(target.replaces ? [`Replaces: database ${databaseWords(target.replaces)}`] : []),
-    ];
-  }
-  return [
-    `Database: ${databaseWords(target.database)}`,
-    `Backend: ${target.apiEndpoint}`,
-    account,
-    ...(target.appUserId ? [`As app user: ${target.appUserId}`] : []),
-  ];
-}
-
 // ─── The plan as plain text ──────────────────────────────────────
+//
+// A plan reads as a header (the title), what it acts on as key-value lines,
+// then the change list: "+" adds, "-" deletes, "~" changes, "=" stays, and
+// "!" warns.
 
 const MAX_ROWS = 10;
 const MAX_CELL = 40;
 
 const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? '' : 's'}`;
 
-const indent = (lines: string[]): string[] => lines.map((line) => (line ? `  ${line}` : line));
+const indented = (lines: string[], by = '  '): string[] => lines.map((line) => (line ? `${by}${line}` : line));
 
-/** Lines of cells, each column padded to its widest cell. */
-function columns(lines: string[][]): string[] {
-  const widths = lines.reduce<number[]>(
-    (max, line) => line.map((cell, index) => Math.max(max[index] ?? 0, cell.length)),
-    []
-  );
-  return lines.map((line) => line.map((cell, index) => cell.padEnd(widths[index])).join('  ').trimEnd());
+/** A UUID shows as its first eight hex digits; any other id shows whole. */
+const shortId = (id: string): string => (/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(id) ? id.slice(0, 8) : id);
+
+export const databaseWords = (database: PlanDatabase): string =>
+  database.name ? `${database.name} (${shortId(database.id)})` : database.id;
+
+function accountWords({ userId, email, agent }: PlanAccount): string {
+  const person = email ?? `user ${userId}`;
+  return agent ? `agent ${agent.name}, for ${person}` : person;
+}
+
+/** The target as key-value lines, for a host that shows the plan as text: what, where, and as whom. */
+export function planTargetLines(target: PlanTarget): string[] {
+  switch (target.kind) {
+  case 'workspace':
+    return columns([['directory', target.cwd]]);
+  case 'no-credential':
+    return columns([['endpoint', target.endpoint], ['as', 'no one: the request carries no credential']]);
+  case 'account':
+    return columns([
+      ['backend', target.apiEndpoint],
+      ['as', accountWords(target.account)],
+      ...(target.replaces ? [['replaces', databaseWords(target.replaces)]] : []),
+    ]);
+  case 'database':
+    return columns([
+      ['database', databaseWords(target.database)],
+      ['backend', target.apiEndpoint],
+      ['as', accountWords(target.account)],
+      ...(target.appUserId ? [['app user', target.appUserId]] : []),
+    ]);
+  }
+}
+
+const ruleKey = (rule: PlanRule): string =>
+  JSON.stringify([rule.permissive, [...rule.privileges].sort(), rule.policy_role, rule.words]);
+
+function ruleCells(rule: PlanRule): string[] {
+  const role = rule.policy_role === 'authenticated' ? '' : ` (role ${rule.policy_role})`;
+  return [rule.permissive ? 'rule' : 'limit', rule.privileges.join(' '), `${rule.words}${role}`];
+}
+
+/** Each item of `after` marked "=" when `before` has it too and "+" when not, then each item only `before` has, marked "-". */
+function marked<T>(after: T[], before: T[], key: (item: T) => string): Array<[string, T]> {
+  const had = new Set(before.map(key));
+  const has = new Set(after.map(key));
+  return [
+    ...after.map((item): [string, T] => [had.has(key(item)) ? '=' : '+', item]),
+    ...before.filter((item) => !has.has(key(item))).map((item): [string, T] => ['-', item]),
+  ];
+}
+
+function columnCells(column: PlanColumn, isNew: boolean): string[] {
+  const value = column.default === undefined ? 'default not known' : column.default ?? '';
+  return [column.name, column.type, column.required ? 'required' : '', column.computed && !isNew && value ? `${value} (new rows only)` : value];
+}
+
+/**
+ * The field list of a table a plan creates: the fields the input gives, then the columns the change adds that the
+ * input does not name (the ones its Data nodes add).
+ */
+export function newTableFieldLines(fields: ConfirmPreviewField[], access: PlanTableAccess | undefined): string[] {
+  const named = new Set(fields.map((field) => field.name));
+  const rows = [
+    ...fields.map((field) => [field.name, field.type, field.isRequired ? 'required' : '', field.defaultValue ?? '']),
+    ...(access?.columnsAdded ?? []).filter((column) => !named.has(column.name)).map((column) => columnCells(column, true)),
+  ];
+  return rows.length ? columns(rows) : ['(no fields)'];
+}
+
+const findingColumns = (finding: PlanFinding): string =>
+  finding.columns?.length ? ` Column${finding.columns.length === 1 ? '' : 's'}: ${listed(finding.columns)}.` : '';
+
+/**
+ * The access of one table as change-list lines: its rules and grants (marked against the rules now, when the table
+ * exists), row security, the columns the change adds or keeps, the findings and the notes. For a table the plan
+ * creates, the columns it adds belong in the table's field list (`newTableFieldLines`), so they are left out here.
+ */
+export function planAccessLines(access: PlanTableAccess): string[] {
+  const { before, after } = access;
+  // Each item is [mark, kind, text]: the rules' own columns are aligned first, then the mark and the kind of every item.
+  const rules = before ? marked(after.rules, before.rules, ruleKey) : after.rules.map((rule): [string, PlanRule] => ['', rule]);
+  const ruleTexts = columns(rules.map(([, rule]) => ruleCells(rule).slice(1)));
+  const items: string[][] = rules.length ? rules.map(([mark, rule], index) => [mark, ruleCells(rule)[0], ruleTexts[index]]) : [[before ? '=' : '', 'rule', 'none']];
+  const grants = before ? marked(after.grants, before.grants, (grant) => grant) : after.grants.map((grant): [string, string] => ['', grant]);
+  items.push(...(grants.length ? grants.map(([mark, grant]) => [mark, 'grant', grant]) : [[before ? '=' : '', 'grant', 'none']]));
+  if (before && before.rowSecurity !== after.rowSecurity) {
+    items.push(['~', 'row security', `${before.rowSecurity ? 'on' : 'off'} -> ${after.rowSecurity ? 'on' : 'off'}`]);
+  }
+  if (before) {
+    const added = (access.columnsAdded ?? []).map((column) => ['+', ...columnCells(column, false)]);
+    const kept = (access.columnsReused ?? []).map((column) => ['=', ...columnCells(column, false), 'kept as it is']);
+    const texts = columns([...added, ...kept].map((row) => row.slice(1)));
+    items.push(...[...added, ...kept].map((row, index) => [row[0], 'column', texts[index]]));
+  }
+  const lines = columns(before ? items : items.map((item) => item.slice(1)));
+  if (!after.rowSecurity) lines.push('! Row security is off, so the rules do not apply.');
+  for (const finding of access.findingsAdded) {
+    lines.push(`! finding (${finding.level}): ${finding.summary}${findingColumns(finding)}`, ...indented(finding.details ?? []));
+  }
+  for (const finding of access.findingsRemoved) lines.push(`- finding: ${finding.summary}${findingColumns(finding)}`);
+  if (access.failsIfRows?.length) {
+    const verb = access.failsIfRows.length === 1 ? 'is' : 'are';
+    lines.push(`! Fails if the table has rows: ${listed(access.failsIfRows)} ${verb} required, and those rows get no value. This tool cannot see the rows.`);
+  }
+  for (const note of access.notes ?? []) lines.push(`! ${note}`);
+  return lines;
 }
 
 function cell(value: unknown): string {
@@ -238,7 +252,8 @@ function cell(value: unknown): string {
   return text.length > MAX_CELL ? `${text.slice(0, MAX_CELL - 1)}…` : text;
 }
 
-function rowLines(rows: Record<string, unknown>[]): string[] {
+/** Rows as a table under their keys, the first ten of them. */
+export function rowLines(rows: Record<string, unknown>[]): string[] {
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
   const shown = rows.slice(0, MAX_ROWS);
   const lines = columns([keys, ...shown.map((row) => keys.map((key) => cell(row[key])))]);
@@ -246,44 +261,16 @@ function rowLines(rows: Record<string, unknown>[]): string[] {
   return lines;
 }
 
-const fieldCells = (field: ConfirmPreviewField): string[] => [
-  field.name,
-  field.type,
-  field.isRequired ? 'required' : '',
-  field.defaultValue === null ? '' : `default ${field.defaultValue}`
-];
-
-function tableLines(table: ConfirmPreviewTable): string[] {
-  const lines = [`Table "${table.name}"`];
-  lines.push(...indent(table.fields.length ? columns(table.fields.map(fieldCells)) : ['(no fields)']));
-  if (table.policies.length) lines.push(...indent([`Policies: ${table.policies.join(', ')}`]));
-  if (table.relationCount) lines.push(...indent([`Relations: ${table.relationCount}`]));
-  return lines;
+/** The tables of a template preview, one line each: its name, its field count and its rule types. */
+export function templateTableLines(tables: ConfirmPreviewTable[]): string[] {
+  return columns(tables.map((table) => [
+    table.name || '(no name)',
+    plural(table.fields.length, 'field'),
+    table.policies.length ? `rules: ${table.policies.join(', ')}` : '',
+  ]));
 }
 
-const tablesLines = (tables: ConfirmPreviewTable[]): string[] =>
-  tables.flatMap((table, index) => (index === 0 ? tableLines(table) : ['', ...tableLines(table)]));
-
-function previewLines(preview: ConfirmPreview): string[] {
-  switch (preview.kind) {
-  case 'records':
-    return [`${plural(preview.rows.length, 'row')} for table "${preview.tableName}":`, ...indent(rowLines(preview.rows))];
-  case 'blueprint':
-    return tablesLines(preview.tables);
-  case 'template': {
-    const source = preview.blueprintName ? ` from blueprint "${preview.blueprintName}"` : '';
-    return [`Template "${preview.displayName}"${source}:`, ...indent(tablesLines(preview.tables))];
-  }
-  case 'policies':
-    return [`Policies for table "${preview.tableName}":`, ...indent(preview.policies)];
-  case 'field':
-    return [`Field on table "${preview.tableName}":`, ...indent(columns([fieldCells(preview.field)]))];
-  }
-}
-
-/** The plan of a change as plain text: what it acts on, the title, the message, then the preview when there is one. */
+/** The plan of a change as plain text: the title, what it acts on, then the change list of the message. */
 export function renderPlan(prompt: ConfirmPrompt): string {
-  const lines = [...planTargetLines(prompt.target), '', prompt.title, prompt.message];
-  if (prompt.preview) lines.push('', ...previewLines(prompt.preview));
-  return lines.join('\n');
+  return [prompt.title, ...indented(planTargetLines(prompt.target)), '', ...indented(prompt.message.split('\n'))].join('\n');
 }

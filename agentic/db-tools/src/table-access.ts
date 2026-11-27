@@ -225,6 +225,14 @@ function storedDefault(value: string | null): ColumnDefault {
   }
 }
 
+/** A stored field default as the SQL it stands for (`now()`, `0`), or as stored when this tool cannot read it. */
+export function defaultText(value: string | null): string {
+  const parsed = storedDefault(value);
+  if (parsed === null) return '';
+  if (parsed === 'unknown') return value;
+  return 'generated' in parsed ? `generated (${parsed.generated})` : defaultSql(parsed);
+}
+
 /** A column as the registry reads it: its default decides, for example, whose team a new row names. */
 export const tableField = (field: SchemaField): TableField => ({
   name: field.name,

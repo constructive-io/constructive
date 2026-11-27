@@ -56,8 +56,8 @@ describe('confirm gate pi adapter', () => {
     const result = await gate.onToolCall(event('delete_table', { table_name: 't' }), fakeCtx(ui));
     expect(confirms).toEqual([
       [
-        'Delete table?',
-        'Database: "shop" (ID db-1)\nBackend: http://api.localhost:3000/graphql\nAccount: user-1\n\nPermanently delete the table "t" and its data.',
+        'Delete table t',
+        'database  shop (db-1)\nbackend   http://api.localhost:3000/graphql\nas        user user-1\n\n- t  the table and all its rows\n! This cannot be undone.',
       ],
     ]);
     expect(result).toMatchObject({ block: true });

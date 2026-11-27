@@ -770,7 +770,7 @@ export const setAccessTool: HarnessTool<typeof SetAccessZod, SetAccessDetails> =
   name: 'set_access',
   label: 'Set access',
   description:
-    'Replace every access rule of a table with a list of rules, in one change; the grants stay, and the columns the rules need are added. The plan shows the rules now and after, one sentence each. Gated.',
+    'Replace every access rule of a table with a list of rules, in one change; the grants stay, and the columns the rules need are added. The plan marks each rule as kept, added or removed.',
   promptSnippet: 'set_access: replace the access rules of a table with a list of rules. Gated.',
   parameters: SetAccessZod,
   effect: 'write',

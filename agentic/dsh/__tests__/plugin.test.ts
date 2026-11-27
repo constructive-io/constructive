@@ -110,9 +110,9 @@ describe('createConstructivePlugin', () => {
 
     expect(ctx.asked).toEqual([{ toolName: 'delete_table', callId: 'c1' }]);
     expect(ctx.reasons[0].split('\n').slice(0, 3)).toEqual([
-      'Database: "shop" (ID db-1)',
-      'Backend: http://api.localhost:3000/graphql',
-      'Account: user-1',
+      'database  shop (db-1)',
+      'backend   http://api.localhost:3000/graphql',
+      'as        user user-1',
     ]);
     expect(decision).toEqual({ kind: 'allow' });
   });

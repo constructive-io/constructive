@@ -1,4 +1,5 @@
 import {
+  alignColumns,
   type ConfirmPreviewTable,
   type HarnessTool,
   strictObject,  textParam,
@@ -48,6 +49,8 @@ type TemplateTable = {
 };
 
 type TemplateInfo = {
+  id: string;
+  version: string | null;
   displayName: string;
   description: string | null;
   categories: string[];
@@ -106,16 +109,17 @@ function parseTemplateTables(definition: unknown): TemplateTable[] {
 }
 
 function formatTemplatesText(templates: TemplateInfo[]): string {
-  if (templates.length === 0) return 'No blueprint templates available.';
-  const lines = [`Available blueprint templates (${templates.length}):`];
-  for (const template of templates) {
-    const cats = template.categories.length ? ` [${template.categories.join(', ')}]` : '';
-    lines.push(`  ${template.displayName} — ${template.tables.length} tables${cats}`);
-    for (const table of template.tables) {
-      lines.push(`    - ${table.name} (${table.fields.length} field${table.fields.length === 1 ? '' : 's'})`);
-    }
-  }
-  return lines.join('\n');
+  if (templates.length === 0) return 'No templates yet.';
+  return alignColumns([
+    ['NAME', 'VERSION', 'TABLES', 'TAGS', 'ID'],
+    ...templates.map((template) => [
+      template.displayName || '(no name)',
+      template.version ?? '',
+      String(template.tables.length),
+      template.categories.join(', '),
+      template.id,
+    ]),
+  ]).join('\n');
 }
 
 // The latest project blueprint (or a named one) — the definition source for
@@ -237,6 +241,8 @@ export const listTemplatesTool: HarnessTool<typeof ListTemplatesZod, ListTemplat
       result = await ready.value.modules.blueprintTemplate
         .findMany({
           select: {
+            id: true,
+            version: true,
             displayName: true,
             description: true,
             categories: true,
@@ -253,6 +259,8 @@ export const listTemplatesTool: HarnessTool<typeof ListTemplatesZod, ListTemplat
 
     const templates: TemplateInfo[] = (result.data.blueprintTemplates?.nodes ?? []).map(
       (template) => ({
+        id: template.id,
+        version: template.version ?? null,
         displayName: template.displayName ?? '',
         description: template.description ?? null,
         categories: Array.isArray(template.categories) ? template.categories : [],
