@@ -176,9 +176,19 @@ export async function generate(
       }
 
       const outDir = path.resolve(options.schema?.output || outputRoot || '.');
-      await fs.promises.mkdir(outDir, { recursive: true });
       const filename = options.schema?.filename || 'schema.graphql';
       const filePath = path.join(outDir, filename);
+
+      if (options.dryRun) {
+        return {
+          success: true,
+          message: `Dry run complete. Would export schema to ${filePath}`,
+          output: outDir,
+          filesWritten: [],
+        };
+      }
+
+      await fs.promises.mkdir(outDir, { recursive: true });
       await fs.promises.writeFile(filePath, sdl, 'utf-8');
 
       return {
@@ -683,8 +693,15 @@ export async function generateMulti(
   const results: Array<{ name: string; result: GenerateResult }> = [];
   let hasError = false;
 
+  const effectiveDryRun = dryRun ?? cliOverrides?.dryRun;
+  const isDryRun =
+    effectiveDryRun !== undefined
+      ? effectiveDryRun
+      : names.length > 0 && names.every((name) => Boolean(configs[name]?.dryRun));
+
   const schemaEnabled = !!schema?.enabled;
   const targetInfos: RootRootReadmeTarget[] = [];
+  const writtenTargetNames: string[] = [];
   const useUnifiedCli = !schemaEnabled && !!unifiedCli && names.length > 1;
 
   const cliTargets: MultiTargetCliTarget[] = [];
@@ -697,7 +714,7 @@ export async function generateMulti(
   };
 
   // Remove stale target directories before generating
-  if (cleanStaleTargets && names.length > 0 && !dryRun) {
+  if (cleanStaleTargets && names.length > 0 && !isDryRun) {
     const firstOutput = getConfigOptions(configs[names[0]]).output;
     const outputRoot = path.dirname(firstOutput);
     removeStaleTargetDirs(outputRoot, names, verbose);
@@ -712,11 +729,12 @@ export async function generateMulti(
         ...(cliOverrides ?? {}),
       };
       const targetConfig = applySharedPgpmDb(baseConfig, sharedSources);
+      const targetDryRun = effectiveDryRun ?? targetConfig.dryRun;
       const result = await generate(
         {
           ...targetConfig,
-          verbose,
-          dryRun,
+          verbose: verbose ?? targetConfig.verbose,
+          dryRun: targetDryRun,
           schema: schemaEnabled
             ? { ...schema, filename: schema?.filename ?? `${name}.graphql` }
             : targetConfig.schema,
@@ -727,7 +745,8 @@ export async function generateMulti(
       if (result.skills) recordSkills(result.skills.dir, result.skills.names);
       if (!result.success) {
         hasError = true;
-      } else {
+      } else if (!targetDryRun) {
+        writtenTargetNames.push(name);
         const resolvedConfig = getConfigOptions(targetConfig);
         const gens: string[] = [];
         if (resolvedConfig.reactQuery) gens.push('React Query');
@@ -755,7 +774,7 @@ export async function generateMulti(
       }
     }
 
-    if (useUnifiedCli && cliTargets.length > 0 && !dryRun) {
+    if (useUnifiedCli && cliTargets.length > 0 && !isDryRun) {
       const cliConfig = typeof unifiedCli === 'object' ? unifiedCli : {};
       const toolName = cliConfig.toolName ?? 'app';
       const firstTargetConfig = configs[names[0]];
@@ -836,7 +855,7 @@ export async function generateMulti(
     }
 
     // Generate root-root README and barrel if multi-target
-    if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
+    if (names.length > 1 && targetInfos.length > 0 && !isDryRun) {
       const rootReadme = generateRootRootReadme(targetInfos);
       await writeGeneratedFiles(
         [{ path: rootReadme.fileName, content: rootReadme.content }],
@@ -845,16 +864,13 @@ export async function generateMulti(
         { pruneStaleFiles: false },
       );
 
-      // Write a root barrel (index.ts) that re-exports each target as a
+      // Write a root barrel (index.ts) that re-exports each written target as a
       // namespace so the package has a single entry-point.  Derive the
-      // common output root from the first target's output path.
-      const successfulNames = results
-        .filter((r) => r.result.success)
-        .map((r) => r.name);
-      if (successfulNames.length > 0) {
-        const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
+      // common output root from the first written target's output path.
+      if (writtenTargetNames.length > 0) {
+        const firstOutput = getConfigOptions(configs[writtenTargetNames[0]]).output;
         const outputRoot = path.dirname(firstOutput);
-        const barrelContent = generateMultiTargetBarrel(successfulNames);
+        const barrelContent = generateMultiTargetBarrel(writtenTargetNames);
         await writeGeneratedFiles(
           [{ path: 'index.ts', content: barrelContent }],
           outputRoot,
@@ -865,7 +881,7 @@ export async function generateMulti(
         // Write manifest so removeStaleTargetDirs knows which dirs are generated
         fs.writeFileSync(
           path.join(outputRoot, TARGETS_MANIFEST),
-          JSON.stringify(successfulNames.sort()) + '\n',
+          JSON.stringify([...writtenTargetNames].sort()) + '\n',
         );
       }
     }
@@ -874,7 +890,7 @@ export async function generateMulti(
     // target that did not rewrite its skills (it failed, e.g. a schema without
     // tables, or has skills disabled) keeps them: only a target that is no
     // longer configured is stale.
-    if (cleanStaleTargets && !dryRun) {
+    if (cleanStaleTargets && !isDryRun) {
       for (const [skillsDir, skillNames] of skillNamesByDir) {
         const removedSkills = removeStaleGeneratedSkills(
           skillsDir,
