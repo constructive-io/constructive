@@ -6,6 +6,9 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
+  "imports": {
+    "#server-package": "./package.json"
+  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {
@@ -62,6 +65,7 @@
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
     "express": "^5.2.1",
+    "find-and-require-package-json": "^0.9.1",
     "gql-ast": "workspace:^",
     "grafast": "1.1.2",
     "grafserv": "1.0.1",

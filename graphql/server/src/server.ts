@@ -43,6 +43,7 @@ import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createRequestProtectionMiddleware } from './middleware/request-protection';
 import { createStandingMiddleware } from './middleware/standing';
+import { version } from './middleware/version';
 import { isWebSocketUpgrade, routeWebSocketUpgrade } from './middleware/websocket';
 import { createPlatformRefusalRecorder, installRefusalRecorder } from './refusals/recorder';
 
@@ -137,6 +138,7 @@ class Server {
     }
 
     healthz(app);
+    app.get('/version', version(effectiveOpts.server?.commit));
     if (observabilityEnabled) {
       app.get('/debug/memory', localObservabilityOnly, debugMemory);
       app.get('/debug/db', localObservabilityOnly, createDebugDatabaseMiddleware(effectiveOpts));

@@ -12,6 +12,7 @@ import type {
   I18nFieldMeta,
   I18nMeta,
   MetaBuild,
+  PgAttribute,
   PgCodec,
   RealtimeMeta,
   SearchColumnMeta,
@@ -112,6 +113,28 @@ export function soleFilesTypeName(build: MetaBuild, schema?: GraphQLSchema): str
     .map((plane) => uploadSurfaceNames(build.inflection as any, plane.filesCodec).filesTypeName)
     .filter((typeName) => !schema || !!getFieldContainerType(schema, typeName));
   return filesTypes.length === 1 ? filesTypes[0] : null;
+}
+
+/** Resolve a file column's declared storage plane, falling back only when the
+ * API exposes one plane. `@fileFilesTable` is the SQL identity written by the
+ * DataFileRef generator, so APIs with several planes never have to guess. */
+export function filesTypeNameForField(
+  attr: PgAttribute,
+  build: MetaBuild,
+  schema: GraphQLSchema | undefined,
+  soleFilesType: string | null,
+): string | null {
+  const tag = (attr.extensions?.tags as Record<string, unknown> | undefined)?.fileFilesTable;
+  if (typeof tag !== 'string' || tag.length === 0) return soleFilesType;
+
+  const plane = storagePlanesForBuild(build).find((candidate) => {
+    const pg = candidate.filesCodec.extensions?.pg;
+    return `${pg?.schemaName}.${pg?.name ?? candidate.filesCodec.name}` === tag;
+  });
+  if (!plane) return null;
+
+  const typeName = uploadSurfaceNames(build.inflection as any, plane.filesCodec).filesTypeName;
+  return !schema || !!getFieldContainerType(schema, typeName) ? typeName : null;
 }
 
 /**

@@ -383,6 +383,24 @@ describe('file columns', () => {
       filesType: null
     });
   });
+
+  it('uses a field storage binding when the API has several file stores', () => {
+    const planes = { ...storagePlane('app'), ...storagePlane('org') };
+    const documents = resource(
+      codec('documents', {
+        id: attr(scalar('uuid')),
+        attachment: attr(upload, {
+          extensions: { tags: { fileFilesTable: 'app_public.app_files' } }
+        })
+      }),
+      [pk('id')]
+    );
+    const tables = collectTablesMeta(build({ documents, ...planes }) as any);
+    const attachment = tables.find((t) => t.tableName === 'documents')!.fields
+      .find((f) => f.name === 'attachment')!;
+
+    expect(attachment.file).toMatchObject({ filesType: 'AppFiles' });
+  });
 });
 
 describe('the new fields through the _meta query', () => {
