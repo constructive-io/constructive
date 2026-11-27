@@ -2,6 +2,7 @@ import { svcCache } from '@pgpmjs/server-utils';
 import type { Express } from 'express';
 import { readFileSync } from 'fs';
 import { graphileCache } from 'graphile-cache';
+import { execFileSync } from 'node:child_process';
 import { join } from 'path';
 import supertest from 'supertest';
 
@@ -59,5 +60,17 @@ describe('GET /version', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ name: pkg.name, version: pkg.version, commit: 'abc1234' });
+  });
+
+  it('reads the package metadata when loaded from the ESM build', () => {
+    const result = execFileSync(process.execPath, ['--input-type=module', '--eval', `
+      import { version } from './dist/esm/middleware/version.js';
+      await version('abc1234')(null, {
+        setHeader() {},
+        json(body) { console.log(JSON.stringify(body)); }
+      }, (error) => { throw error; });
+    `], { cwd: join(__dirname, '../../..'), encoding: 'utf8' });
+
+    expect(JSON.parse(result)).toEqual({ name: pkg.name, version: pkg.version, commit: 'abc1234' });
   });
 });
