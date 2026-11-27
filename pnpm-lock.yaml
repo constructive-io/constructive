@@ -196,8 +196,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
     publishDirectory: dist
 
   agentic/db-tools:
@@ -1704,8 +1704,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1(@dataplan/json@1.0.1(grafast@1.1.2(graphql@16.13.0)))(grafast@1.1.2(graphql@16.13.0))(graphile-config@1.1.0)(graphql@16.13.0)(pg-sql2@5.0.1)(pg@8.21.0)
       '@inquirerer/utils':
-        specifier: ^3.3.13
-        version: 3.3.13
+        specifier: ^3.3.16
+        version: 3.3.16
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -1734,8 +1734,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
@@ -2431,8 +2431,8 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8(graphql@16.13.0)(ws@8.21.3)
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       makage:
         specifier: ^0.8.0
         version: 0.8.0
@@ -2636,8 +2636,8 @@ importers:
         specifier: workspace:^
         version: link:../../graphql/types/dist
       '@inquirerer/utils':
-        specifier: ^3.3.13
-        version: 3.3.13
+        specifier: ^3.3.16
+        version: 3.3.16
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../../pgpm/core/dist
@@ -2657,8 +2657,8 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2679,8 +2679,8 @@ importers:
         version: 0.2.2
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.4.6
-        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
+        specifier: ^1.4.9
+        version: 1.4.9(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -2753,8 +2753,8 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2973,8 +2973,8 @@ importers:
   packages/safegres:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.3.13
-        version: 3.3.13
+        specifier: ^3.3.16
+        version: 3.3.16
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
@@ -2991,8 +2991,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       libpg-query:
         specifier: ^18.3.0
         version: 18.3.0
@@ -3160,8 +3160,8 @@ importers:
   pgpm/cli:
     dependencies:
       '@inquirerer/utils':
-        specifier: ^3.3.13
-        version: 3.3.13
+        specifier: ^3.3.16
+        version: 3.3.16
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
@@ -3202,11 +3202,11 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       genomic:
-        specifier: ^5.6.6
-        version: 5.6.6
+        specifier: ^5.6.10
+        version: 5.6.10
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -3230,8 +3230,8 @@ importers:
         version: 0.2.2
     devDependencies:
       '@inquirerer/test':
-        specifier: ^1.4.6
-        version: 1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
+        specifier: ^1.4.9
+        version: 1.4.9(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))
       '@types/cross-spawn':
         specifier: ^6.0.6
         version: 6.0.6
@@ -3300,8 +3300,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.6.6
-        version: 5.6.6
+        specifier: ^5.6.10
+        version: 5.6.10
       git-changed:
         specifier: ^0.4.0
         version: 0.4.0
@@ -3352,8 +3352,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       makage:
         specifier: ^0.8.0
         version: 0.8.0
@@ -3423,8 +3423,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -4023,8 +4023,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.8
+        version: 4.9.8
       nested-obj:
         specifier: ^0.2.3
         version: 0.2.3
@@ -5371,16 +5371,16 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirerer/test@1.4.6':
-    resolution: {integrity: sha512-S/0zETbBIlL9CAkjmpuuaqy3BoihvamajBVBgVxSJCGtjOeOifqy3U+xuIMPyRZJx8FDEumGTEfNq2gPVxPD6w==}
+  '@inquirerer/test@1.4.9':
+    resolution: {integrity: sha512-wzLMT7oFgnze/SFoHZdNZ8ZcYmyiHtheh5RBMlbMAQz4eU+PIPN0lQNGvc1xl2ztE+9XaVY6r5NOma5qDRyY3Q==}
     peerDependencies:
       jest: '>=29.0.0'
     peerDependenciesMeta:
       jest:
         optional: true
 
-  '@inquirerer/utils@3.3.13':
-    resolution: {integrity: sha512-/C6rJZtJOmvTMVFrXHPBag/xFM0u03fC1UREy/dki/BFw5cEv3JYCBTbSxywYJ3T2tPoY/r7fE+th7XR4PYDPg==}
+  '@inquirerer/utils@3.3.16':
+    resolution: {integrity: sha512-DEEkjmVUletu5CbyXEqGSmPqBEDSi6RugAf2OpHq92LAciyEf6LLFJZ+y55ep5NkLggdkJ5q+Y+sL6UULjgxpA==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -7165,6 +7165,9 @@ packages:
   appstash@0.8.0:
     resolution: {integrity: sha512-BGt/TxAwPO6c30df8FnGwy0w3UvH4MBYQza+nDTxbektw6eBFzyCGt7qzBWRiml2YNNW8ebzoKpK2XfXNQkyrw==}
 
+  appstash@0.8.2:
+    resolution: {integrity: sha512-Lnq3NcsDE4fQA533gLSP+qZyv9ZzAu1nsIUzcG59yEM+pKH+gA5rCeWCtL/owp7IphryDb0cR4EsSsKFa5JxSw==}
+
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
 
@@ -7420,8 +7423,8 @@ packages:
   cjs-module-lexer@2.2.0:
     resolution: {integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==}
 
-  clean-ansi@0.2.2:
-    resolution: {integrity: sha512-K0GSu1IuQWIxt2Ot1W9+kj5vv1b2ZEKR7rtDBuVUoRUYx3InRlh37Ekz6t9rlA72sjvRehyfV+pIXwO44OJreA==}
+  clean-ansi@0.2.4:
+    resolution: {integrity: sha512-d2W7f82QDbpePJvUyM5aGeV5NRNQnkbSk2looSzw2woDDj/PGtYHylqpdX9RLDct5x3dyQRn12t+NYJnNQarhA==}
 
   clean-stack@2.2.0:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
@@ -8143,6 +8146,9 @@ packages:
   find-and-require-package-json@0.9.1:
     resolution: {integrity: sha512-jFpCL0XgjipSk109viUtfp+NyR/oW6a4Xus4tV3UYkmCbsjisEeZD1x5QnD1NDDK/hXas1WFs4yO13L4TPXWlQ==}
 
+  find-and-require-package-json@0.9.3:
+    resolution: {integrity: sha512-KPYJL0iWu6ERDRDVZERWMt02WdCZzgSAS9+3hvIhl8ckWRn9AznVWigUjP56nOHTxd426C+9ALv9cHIISY6RlQ==}
+
   find-up@2.1.0:
     resolution: {integrity: sha512-NWzkk0jSJtTt08+FBFMvXoeZnOJD+jTtsRmBYbAIzJdX6l7dLgR7CTubCM5/eDdPUBvLCeVasP1brfVR/9/EZQ==}
     engines: {node: '>=4'}
@@ -8255,8 +8261,8 @@ packages:
     resolution: {integrity: sha512-zV/5HKTfCeKWnxG0Dmrw51hEWFGfcF2xiXqcA3+J90WDuP0SvoiSO5ORvcBsifmx/FoIjgQN3oNOGaQ5PhLFkg==}
     engines: {node: '>=18'}
 
-  genomic@5.6.6:
-    resolution: {integrity: sha512-Rcw2Q8U4c9GfoAPS5lkpY4Dtm2rvRTtS8AK4awCejlWfe6m0P0dtp2gusixsoOuPWL9VAWm616/skbPkKFeBbw==}
+  genomic@5.6.10:
+    resolution: {integrity: sha512-t/yfnHrVxfI69gQGbWzDyoaJ0gwgk/knudy/H9ifkhbFGKgUPHXkQy455IgjbICo+2n1/Li0mRWikbuRX0tV/w==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -8691,8 +8697,11 @@ packages:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
 
-  inquirerer@4.9.4:
-    resolution: {integrity: sha512-ALS4QpTbm9geTdRelvU1Cg4gaFEWBf2rc/5Qqd6cUZcaTqTXLGyfE4/g3Os2wm6f4H+4RNuZyZ94n+7OHr7D7A==}
+  inquirerer@4.9.7:
+    resolution: {integrity: sha512-3PgTWhyKjt42C45JlVKlDhM9NRgHEciZM40fqZUGIK5aAFKu3gR/4JnJN7n5nnOK3Cs/Xu0Y8nOWdEDGxy53rA==}
+
+  inquirerer@4.9.8:
+    resolution: {integrity: sha512-cmQ1phUtT1E34fCcyias96i/9IFv+yLIVUUjTRZH7WKAk4WktrNE/p5nSw5TWvAn/RaGozLcoZGX+Y6012vKdQ==}
 
   interpret@3.1.1:
     resolution: {integrity: sha512-6xwYfHbajpoF0xLW+iwLkhwgvLoZDfjYfoFNu8ftMoXINzwuymNLd9u/KmwtdT2GbR+/Cz66otEGEVVUHX9QLQ==}
@@ -11259,6 +11268,9 @@ packages:
   yanse@0.2.2:
     resolution: {integrity: sha512-T+4OAK9/idBEgH0M6WwFT5k55OOcNLBbheVgJ5qqBchzUA+DN7SfHBDi47zsQeXcBg6Mf5z9FFASTxPwAGbO2A==}
 
+  yanse@0.2.4:
+    resolution: {integrity: sha512-ZXb6OpKfgRqemmFcw6iSOEFubFOhIr3VCq0awSq5/DkxKQuqT8QIRzmrcGjWfu+mJPy+nNHQhH5xiKsRRC0cYw==}
+
   yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
@@ -12959,17 +12971,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.19.11
 
-  '@inquirerer/test@1.4.6(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))':
+  '@inquirerer/test@1.4.9(jest@30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3)))':
     dependencies:
-      clean-ansi: 0.2.2
-      inquirerer: 4.9.4
+      clean-ansi: 0.2.4
+      inquirerer: 4.9.7
     optionalDependencies:
       jest: 30.4.2(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@6.0.3))
 
-  '@inquirerer/utils@3.3.13':
+  '@inquirerer/utils@3.3.16':
     dependencies:
-      appstash: 0.8.0
-      inquirerer: 4.9.4
+      appstash: 0.8.2
+      inquirerer: 4.9.7
       semver: 7.8.5
 
   '@isaacs/cliui@8.0.2':
@@ -14953,6 +14965,8 @@ snapshots:
 
   appstash@0.8.0: {}
 
+  appstash@0.8.2: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -15238,7 +15252,7 @@ snapshots:
 
   cjs-module-lexer@2.2.0: {}
 
-  clean-ansi@0.2.2: {}
+  clean-ansi@0.2.4: {}
 
   clean-stack@2.2.0: {}
 
@@ -15927,6 +15941,8 @@ snapshots:
 
   find-and-require-package-json@0.9.1: {}
 
+  find-and-require-package-json@0.9.3: {}
+
   find-up@2.1.0:
     dependencies:
       locate-path: 2.0.0
@@ -16037,10 +16053,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  genomic@5.6.6:
+  genomic@5.6.10:
     dependencies:
-      appstash: 0.8.0
-      inquirerer: 4.9.4
+      appstash: 0.8.2
+      inquirerer: 4.9.8
 
   gensync@1.0.0-beta.2: {}
 
@@ -16745,12 +16761,19 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  inquirerer@4.9.4:
+  inquirerer@4.9.7:
     dependencies:
       deepmerge: 4.3.1
-      find-and-require-package-json: 0.9.1
+      find-and-require-package-json: 0.9.3
       minimist: 1.2.8
-      yanse: 0.2.2
+      yanse: 0.2.4
+
+  inquirerer@4.9.8:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.9.3
+      minimist: 1.2.8
+      yanse: 0.2.4
 
   interpret@3.1.1: {}
 
@@ -19967,6 +19990,8 @@ snapshots:
       yaml: 2.9.0
 
   yanse@0.2.2: {}
+
+  yanse@0.2.4: {}
 
   yargs-parser@20.2.9: {}
 
