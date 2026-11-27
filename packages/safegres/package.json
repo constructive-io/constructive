@@ -57,13 +57,13 @@
     "safegres"
   ],
   "dependencies": {
-    "@inquirerer/utils": "^3.3.13",
+    "@inquirerer/utils": "^3.3.16",
     "@pgpmjs/logger": "workspace:^",
     "@pgsql/lint": "^18.3.17",
     "@pgsql/traverse": "^18.8.15",
     "@pgsql/types": "^18.0.0",
     "confstash": "^0.1.2",
-    "inquirerer": "^4.9.4",
+    "inquirerer": "^4.9.7",
     "libpg-query": "^18.3.0",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",

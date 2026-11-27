@@ -46,7 +46,7 @@
     "@types/pg": "^8.20.4",
     "@types/semver": "^7.8.0",
     "copyfiles": "^2.4.1",
-    "inquirerer": "^4.9.4",
+    "inquirerer": "^4.9.7",
     "makage": "^0.8.0"
   },
   "dependencies": {
@@ -61,7 +61,7 @@
     "@pgpmjs/types": "workspace:^",
     "cross-spawn": "^7.0.6",
     "csv-to-pg": "workspace:^",
-    "genomic": "^5.6.6",
+    "genomic": "^5.6.9",
     "git-changed": "^0.4.0",
     "glob": "^13.0.6",
     "parse-package-name": "^1.0.0",
