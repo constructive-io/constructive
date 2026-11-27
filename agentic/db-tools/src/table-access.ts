@@ -20,7 +20,7 @@ import {
   type TablePolicy,
   type TablePrivilege,
 } from './access';
-import { AUTHZ_NODES, isObject } from './access/policies';
+import { AUTHZ_NODES, isObject, part } from './access/policies';
 import { fieldTypeToTypeName } from './blueprint/field-type';
 import type { ProjectContext } from './context';
 import { DESCRIBE_SCHEMA, failureFromError, failureFromErrors, type FailureMeaning, type Result, suggest } from './failure';
@@ -140,7 +140,7 @@ const groupBy = <T extends { tableId: string }>(rows: T[]): Map<string, T[]> => 
 };
 
 /** The application tables of the bound database (every one, or those named), with all their access parts. */
-export async function readTables(context: ProjectContext, names?: string[]): Promise<Result<TableRecord[]>> {
+export async function readTables(context: ProjectContext, names?: string[], schemaId?: string): Promise<Result<TableRecord[]>> {
   const { api, databaseId } = context;
   try {
     const tablesResult = await api.table
@@ -148,6 +148,7 @@ export async function readTables(context: ProjectContext, names?: string[]): Pro
         select: { id: true, name: true, category: true, useRls: true },
         where: {
           databaseId: { equalTo: databaseId },
+          ...(schemaId ? { schemaId: { equalTo: schemaId } } : {}),
           or: [{ category: { equalTo: 'APP' } }, { name: { equalTo: 'users' } }],
           ...(names ? { name: { in: names } } : {}),
         },
@@ -206,7 +207,7 @@ export async function readTables(context: ProjectContext, names?: string[]): Pro
 /** One table of the bound database by name, or `not-found` naming the call that lists them. */
 export async function readTable(context: ProjectContext, name: string): Promise<Result<TableRecord>> {
   const stored = renamed(name);
-  const read = await readTables(context, stored ? [name, stored] : [name]);
+  const read = await readTables(context, stored ? [name, stored] : [name], context.schemaId);
   if (read.kind === 'failed') return read;
   const table = read.value.find((candidate) => candidate.name === name);
   if (table) return { kind: 'ok', value: table };
@@ -331,13 +332,14 @@ export function asWritten(policy: TablePolicy): WrittenRule {
 /** One rule as a plan names it, under the keys a caller writes: its own sentence, and for an update rule with its own check of the changed row, that one too. */
 export function planRule(policy: TablePolicy, related?: TableAccessInput['related']): PlanRule {
   const check = policy.with_check ? ` A changed row must pass instead: ${ruleWords(policy.with_check.type, policy.with_check.data ?? {}, related)}` : '';
-  return {
+  const rule: PlanRule = {
     $type: policy.type,
     privileges: policy.privileges,
     permissive: policy.permissive !== false,
     policy_role: policy.role || 'authenticated',
     words: `${ruleWords(policy.type, policy.data, related)}${check}`,
   };
+  return Object.defineProperty(rule, 'comparisonKey', { value: part(policy).key });
 }
 
 /** A table's grants in words, one entry per role: "select, insert, update and delete to authenticated", "update (title) to editor". */

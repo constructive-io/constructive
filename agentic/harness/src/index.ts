@@ -1,4 +1,5 @@
 export * from './adapter';
+export type { Blueprint } from './blueprint';
 export * from './gating/approvals';
 export * from './gating/confirm-gate';
 export * from './gating/constructive-policy';

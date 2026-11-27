@@ -55,7 +55,7 @@ describe('toPiTool', () => {
     expect('promptGuidelines' in piTool).toBe(false);
   });
 
-  it('forwards cwd and the abort signal, and nothing else pi passes', async () => {
+  it('forwards cwd, the call id and the abort signal, and nothing else pi passes', async () => {
     const seen: unknown[] = [];
     const tool = defineHarnessTool({
       ...echoTool,
@@ -74,7 +74,7 @@ describe('toPiTool', () => {
       { cwd: '/tmp/project', model: 'anything-else' } as never,
     );
 
-    expect(seen).toEqual([{ cwd: '/tmp/project', signal: controller.signal }]);
+    expect(seen).toEqual([{ cwd: '/tmp/project', toolCallId: 'call-1', signal: controller.signal }]);
     expect(result).toEqual({ content: [{ type: 'text', text: 'hi' }], details: null });
   });
 });

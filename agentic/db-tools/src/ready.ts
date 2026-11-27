@@ -15,7 +15,7 @@ const accountOf = (context: ProjectContext) => ({
 });
 
 /** The bound database a change goes to, at the backend and as the account the context resolved. */
-export function databaseTarget(context: ProjectContext, appUserId?: string): PlanTarget {
+export function databaseTarget(context: ProjectContext, appUserId?: string): Extract<PlanTarget, { kind: 'database' }> {
   return {
     kind: 'database',
     database: { name: context.databaseName, id: context.databaseId },

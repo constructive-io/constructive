@@ -203,6 +203,7 @@ export interface HarnessToolResult<TDetails = unknown> {
 export interface HarnessToolContext {
   /** Working directory of the run — the project the tool acts on. */
   readonly cwd: string;
+  readonly toolCallId?: string;
   /** Aborted when the run is cancelled, if the harness offers one. */
   readonly signal?: AbortSignal;
 }

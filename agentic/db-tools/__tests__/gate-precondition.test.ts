@@ -128,7 +128,7 @@ describe('the plan names what the call acts on', () => {
   });
 
   it.each<[string, Record<string, unknown>, () => PlanTarget]>([
-    ['delete_table', { table_name: 'posts' }, () => onDatabase()],
+    ['delete_table', { table_name: 'posts' }, () => onDatabase({ table: { id: 't1', schemaId: 'schema-1' } })],
     ['add_records', { table_name: 'posts', records: [{ title: 'a' }] }, () => onDatabase({ appUserId: 'U1' })],
     ['delete_template', { templateName: 'Blog' }, () => onAccount()],
     ['provision_database', { database_name: 'next' }, () => onAccount()],
@@ -141,6 +141,60 @@ describe('the plan names what the call acts on', () => {
 
     expect(ready).toEqual({ kind: 'ready', target: target() });
     expect(decision).toMatchObject({ kind: 'ask', prompt: { target: target() } });
+  });
+
+  it.each([false, true])('deletes only the approved table (table replaced: %s)', async (replaced) => {
+    let tableId = 'original';
+    await backend.close();
+    backend = await startFakeBackend(({ query }) => {
+      if (/mutation/.test(query)) return { data: { deleteTable: { table: { id: tableId } } } };
+      if (/\btables\b/.test(query)) return { data: { tables: { nodes: [{ name: 'posts', id: tableId }] } } };
+      return projectAnswer(query, 'ME') ?? { data: {} };
+    });
+    const tool = constructiveDbTools.find(({ name }) => name === 'delete_table')!;
+    const event = { toolName: tool.name, toolCallId: 'delete-1', input: { table_name: 'posts' } };
+    const blocked = await createConfirmGate(constructiveGateDeps()).onToolCall(event, {
+      ...decliningHost(),
+      confirmTool: async () => {
+        if (replaced) tableId = 'replacement';
+        return true;
+      },
+    }, cwd);
+    const result = await tool.execute(event.input, { cwd, toolCallId: event.toolCallId });
+    expect(blocked).toBeUndefined();
+    expect(result.failure?.message).toBe(replaced ? 'The current table and project do not match the approved delete target.' : undefined);
+    expect(backend.requests.some(({ query }) => /mutation/.test(query))).toBe(!replaced);
+  });
+
+  it('plans saved template access using the schema where each table will be created', async () => {
+    await backend.close();
+    backend = await startFakeBackend((request) => {
+      if (/blueprintTemplates/.test(request.query)) return {
+        data: { blueprintTemplates: { nodes: [{ id: 'tpl-1', definition: { tables: [{
+          table_name: 'posts',
+          schema_name: 'app_private',
+          policies: [{ $type: 'AuthzAllowAll', privileges: ['select'] }],
+          grants: [{ roles: ['authenticated'], privileges: [['select', '*']] }],
+          use_rls: false,
+        }] } }] } },
+      };
+      if (/schemas/.test(request.query)) return { data: { schemas: { nodes: [
+        { id: 'schema-1', name: 'app_public' }, { id: 'schema-2', name: 'app_private' },
+      ] } } };
+      if (/\btables\b/.test(request.query)) {
+        const schema = JSON.stringify(request.variables).includes('schema-2');
+        return { data: { tables: { nodes: schema ? [] : [{ name: 'posts' }] } } };
+      }
+      return projectAnswer(request.query, 'ME') ?? { data: {} };
+    });
+    const decision = await createConstructiveGatePolicy(constructiveGateDeps()).resolvePrompt({
+      toolName: 'apply_template', toolCallId: 'template-1', input: { templateName: 'Blog' },
+    }, cwd);
+    expect(decision).toMatchObject({ kind: 'ask', prompt: { access: [{ table: 'posts', schema: 'app_private' }] } });
+    if (decision.kind !== 'ask') return;
+    expect(decision.prompt.message).toContain('+ posts (schema app_private)');
+    expect(decision.prompt.message).toContain('select to authenticated');
+    expect(decision.prompt.message).toContain('Row security is off');
   });
 });
 

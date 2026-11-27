@@ -2,7 +2,7 @@ import type { AnyHarnessTool, PlanTableAccess, PlanTarget } from '@agentic-kit/h
 import type { BlueprintPolicy } from 'node-type-registry';
 
 import { type TableAccessInput, tablePolicyFromBlueprint } from '../access';
-import { fieldTypeToTypeName } from '../blueprint/field-type';
+import { fieldTypeToTypeName, toFieldDefault } from '../blueprint/field-type';
 import type { ProjectContext } from '../context';
 import type { Result } from '../failure';
 import { provisionDatabaseReady } from '../provision-database/provision';
@@ -113,18 +113,23 @@ const newRelationNotes = (params: { field_name?: string; junction_table_name?: s
 // The access of each table a blueprint creates: its rules and grants as the backend receives them, with the read-only
 // limit the backend adds beside a team rule, its own fields and the columns its nodes add (a new table has no rows),
 // and the names the backend stores differently.
-const blueprintAccess = ({ definition, related }: ProvisionBlueprintReady): PlanTableAccess[] =>
+const blueprintAccess = ({ definition, related }: Pick<ProvisionBlueprintReady, 'definition' | 'related'>): PlanTableAccess[] =>
   definition.tables.flatMap((table) => {
     if (typeof table.table_name !== 'string') return [];
     const policies = (table.policies ?? []) as BlueprintPolicy[];
     const grants = table.grants as TableAccessInput['grants'];
-    const rules = policies.map((policy) => ({ type: policy.$type, data: policy.data ?? {} }));
+    const rules = policies.map(tablePolicyFromBlueprint);
     // The blueprint was refused before this when a rule reads a column the table will not have.
     const change = columnChange(table.table_name, (table.fields ?? []).map(({ name }) => ({ name })), table.nodes ?? [], rules);
     const columns = change.kind === 'ok' ? change.value : { added: [], reused: [], failsIfRows: [], fields: [], notes: [] };
-    const own = (table.fields ?? []).map((field) => ({ name: field.name, required: field.is_required === true, default: field.default ?? null, type: fieldTypeToTypeName(field.type) }));
+    const own = (table.fields ?? []).map((field) => ({
+      name: field.name,
+      required: field.is_required === true,
+      default: typeof field.default === 'object' ? field.default : toFieldDefault(field.default) ?? null,
+      type: fieldTypeToTypeName(field.type),
+    }));
     const access = planTableAccess(table.table_name, undefined, {
-      policies: [...policies.map(tablePolicyFromBlueprint), ...addedByBackend(policies, grants)],
+      policies: [...rules, ...addedByBackend(policies, grants)],
       grants,
       rls_enabled: table.use_rls !== false,
       fields: [...own, ...columns.fields],
@@ -132,7 +137,7 @@ const blueprintAccess = ({ definition, related }: ProvisionBlueprintReady): Plan
     });
     const names = [renameNote('table', table.table_name), ...(table.fields ?? []).map((field) => renameNote('field', field.name))];
     const notes = [...names.filter((note): note is string => note !== undefined), ...readOnlyNotes(policies, grants), ...columns.notes];
-    return [{ ...access, ...columnPlan(columns, false), ...(notes.length ? { notes } : {}) }];
+    return [{ ...access, ...(table.schema_name ? { schema: table.schema_name } : {}), ...columnPlan(columns, false), ...(notes.length ? { notes } : {}) }];
   });
 
 const project = (_params: unknown, cwd: string) => projectReady(cwd);
@@ -152,13 +157,16 @@ export const toolPreconditions: ReadonlyMap<string, Precondition> = new Map<stri
   [listTemplatesTool.name, targeting(project, accountTarget)],
   [provisionBlueprintTool.name, targeting(provisionBlueprintReady, (context) => databaseTarget(context), blueprintAccess)],
   [addRelationTool.name, targeting(addRelationReady, (context) => databaseTarget(context), undefined, newRelationNotes)],
-  [deleteTableTool.name, targeting(deleteTableReady, ({ context }) => databaseTarget(context))],
+  [deleteTableTool.name, targeting(deleteTableReady, ({ context, table }) => ({
+    ...databaseTarget(context),
+    table: { id: table.id, schemaId: context.schemaId },
+  }))],
   [createFieldTool.name, targeting(createFieldReady, ({ context }) => databaseTarget(context), undefined, newFieldNote)],
   [updateFieldTool.name, targeting(updateFieldReady, ({ context }) => databaseTarget(context))],
   [retypeFieldTool.name, targeting(retypeFieldReady, ({ context }) => databaseTarget(context))],
   [deleteFieldTool.name, targeting(deleteFieldReady, ({ context }) => databaseTarget(context))],
   [addPoliciesTool.name, targeting(addPoliciesReady, ({ context }) => databaseTarget(context), addPoliciesPlan)],
-  [applyTemplateTool.name, targeting(applyTemplateReady, ({ context }) => databaseTarget(context))],
+  [applyTemplateTool.name, targeting(applyTemplateReady, ({ context }) => databaseTarget(context), blueprintAccess)],
   [createTemplateTool.name, targeting((_params, cwd) => ownedProjectReady(cwd), accountTarget)],
   [updateTemplateTool.name, targeting(templateReady, ({ context }) => accountTarget(context))],
   [deleteTemplateTool.name, targeting(templateReady, ({ context }) => accountTarget(context))],

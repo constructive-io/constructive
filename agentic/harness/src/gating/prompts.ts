@@ -41,6 +41,7 @@ const policyType = (policy: Record<string, unknown>, key: string): string | null
 const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? '' : 's'}`;
 
 const under = (lines: string[]): string[] => lines.map((line) => (line ? `    ${line}` : line));
+const tableLabel = (table: string, schema?: string) => schema ? `${table} (schema ${schema})` : table;
 
 function blueprintTables(input: Record<string, unknown> | undefined): ConfirmPreviewTable[] {
   const definition = obj(input?.definition);
@@ -60,8 +61,7 @@ function blueprintTables(input: Record<string, unknown> | undefined): ConfirmPre
 }
 
 // The rule and grant lines the gate resolved for one table; without them, the rule types the input names.
-function accessOf(access: PlanTableAccess[] | undefined, table: string, policies: Record<string, unknown>[]): string[] {
-  const found = access?.find((entry) => entry.table === table);
+function accessOf(found: PlanTableAccess | undefined, policies: Record<string, unknown>[]): string[] {
   if (found) return planAccessLines(found);
   return policies.map((policy) => `rule  ${policyType(policy, '$type') ?? '?'}`);
 }
@@ -70,12 +70,12 @@ function blueprintMessage(input: Record<string, unknown> | undefined, access: Pl
   const definition = obj(input?.definition);
   const tables = arr(definition?.tables).flatMap((table) => {
     const name = typeof table.table_name === 'string' ? table.table_name : '?';
-    const schema = typeof table.schema_name === 'string' ? ` (schema ${table.schema_name})` : '';
-    const found = access?.find((entry) => entry.table === name);
+    const schema = str(table, 'schema_name');
+    const found = access?.find((entry) => entry.table === name && entry.schema === schema);
     return [
-      `+ ${name}${schema}`,
+      `+ ${tableLabel(name, schema)}`,
       ...under(newTableFieldLines(arr(table.fields).map(previewField), found)),
-      ...under(accessOf(access, name, arr(table.policies))),
+      ...under(accessOf(found, arr(table.policies))),
     ];
   });
   const links = arr(definition?.relations).map((relation) => {
@@ -86,7 +86,7 @@ function blueprintMessage(input: Record<string, unknown> | undefined, access: Pl
 }
 
 function accessMessage(tableName: string, access: PlanTableAccess[] | undefined, policies: Record<string, unknown>[]): string {
-  const lines = accessOf(access, tableName, policies);
+  const lines = accessOf(access?.find((entry) => entry.table === tableName), policies);
   const unchanged = lines.every((line) => line.startsWith('= '));
   return [`${unchanged ? '=' : '~'} ${tableName}${unchanged ? '  no change' : ''}`, ...under(lines)].join('\n');
 }
@@ -229,7 +229,8 @@ function describeCall(
   }
   case 'apply_template': {
     const name = str(input, 'templateName') ?? '?';
-    return { title: `Apply template ${name}`, message: `+ the tables of template ${name}` };
+    const lines = access?.flatMap((table) => [`+ ${tableLabel(table.table, table.schema)}`, ...under(planAccessLines(table))]);
+    return { title: `Apply template ${name}`, message: lines?.length ? lines.join('\n') : `+ the tables of template ${name}` };
   }
   case 'create_template': {
     const source = str(input, 'blueprintName');

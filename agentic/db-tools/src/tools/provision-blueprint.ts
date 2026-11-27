@@ -1,7 +1,7 @@
 import type { HarnessTool, ToolFailure } from '@agentic-kit/harness';
 import type { BlueprintDefinition, BlueprintPolicy, BlueprintRelation, BlueprintTable } from 'node-type-registry';
 
-import { dataNodesForPolicies, fieldsAddedByNodes, ROW_ID } from '../access';
+import { dataNodesForPolicies, fieldsAddedByNodes, ROW_ID, tablePolicyFromBlueprint } from '../access';
 import { columnsOf, type RelatedColumns } from '../access/words';
 import { expandBlueprintDefaults } from '../blueprint/blueprint-defaults';
 import { type Blueprint, blueprintProblems, BlueprintZod } from '../blueprint/blueprint-schema';
@@ -103,8 +103,8 @@ function blueprintChecks(definition: BlueprintDefinition, context: { roles: read
   for (const table of newTables(checked)) {
     const clash = fieldNodeClash(table);
     if (clash) return { kind: 'failed', failure: clash };
-    const rules = (table.policies ?? []).map((policy) => ({ type: policy.$type, data: policy.data ?? {} }));
-    const needed = dataNodesForPolicies(rules, new Set((table.fields ?? []).map(({ name }) => name)));
+    const rules = (table.policies ?? []).map(tablePolicyFromBlueprint);
+    const needed = dataNodesForPolicies(rules.flatMap((rule) => rule.with_check ? [rule, { type: rule.with_check.type, data: rule.with_check.data ?? {} }] : [rule]), new Set((table.fields ?? []).map(({ name }) => name)));
     if (needed.problems.length) return { kind: 'failed', failure: { code: 'invalid-input', message: `Table "${table.table_name}": ${needed.problems.join(' ')}` } };
     const change = columnChange(table.table_name, (table.fields ?? []).map(({ name }) => ({ name })), table.nodes ?? [], rules);
     if (change.kind === 'failed') return { kind: 'failed', failure: { ...change.failure, message: `Table "${table.table_name}": ${change.failure.message}` } };
@@ -150,7 +150,7 @@ export async function provisionBlueprintReady(params: Blueprint, cwd: string): P
   const made = newTables(definition);
   const taken = await tablesTaken(ready.value, made.map((table) => ({ name: table.table_name, ...(table.schema_name ? { schema: table.schema_name } : {}) })), schemas.value);
   if (taken) return { kind: 'failed', failure: taken };
-  const missing = await relationTablesMissing(ready.value, made.map((table) => table.table_name), (definition.relations ?? []) as Array<BlueprintRelation & { source_table?: string; target_table?: string }>);
+  const missing = await relationTablesMissing(ready.value, made.map((table) => table.table_name), (definition.relations ?? []) as BlueprintRelation[], schemas.value);
   if (missing) return { kind: 'failed', failure: missing };
   return { kind: 'ok', value: { ...ready.value, definition, ...(related ? { related } : {}) } };
 }

@@ -26,12 +26,12 @@ export type ResolvedSchema = {
 };
 
 export async function resolveSchema(context: ProjectContext): Promise<ResolvedSchema> {
-  const { api, databaseId } = context;
+  const { api, databaseId, schemaId } = context;
 
   const tablesResult = await api.table
     .findMany({
       select: { id: true, name: true },
-      where: { databaseId: { equalTo: databaseId } },
+      where: { databaseId: { equalTo: databaseId }, schemaId: { equalTo: schemaId } },
     })
     .execute();
 
@@ -195,21 +195,35 @@ export function renameNote(what: 'table' | 'field', name: string): string | unde
  */
 export async function relationTablesMissing(
   context: ProjectContext,
-  made: string[],
-  relations: ReadonlyArray<{ source_table?: string; target_table?: string }>,
+  made: readonly string[],
+  relations: ReadonlyArray<{ source_table?: string; source_schema?: string; target_table?: string; target_schema?: string }>,
+  schemas: ReadonlyMap<string, string>,
 ): Promise<ToolFailure | null> {
-  const named = [...new Set(relations.flatMap((relation) => [relation.source_table, relation.target_table]).filter((name): name is string => typeof name === 'string'))];
+  const named = relations.flatMap((relation) => [
+    { name: relation.source_table, schema: relation.source_schema },
+    { name: relation.target_table, schema: relation.target_schema },
+  ]).filter((table): table is { name: string; schema: string | undefined } => typeof table.name === 'string');
   if (named.length === 0) return null;
-  let existing: string[];
+  const key = (name: string, schemaId: string | undefined) => JSON.stringify([schemaId, name]);
+  const normalize = (name: string) => storedName(name) ?? name;
+  const created = new Set(made.map(normalize));
+  const known = new Set<string>();
+  const names = new Set<string>();
   try {
-    const result = await context.api.table.findMany({ select: { name: true }, where: { databaseId: { equalTo: context.databaseId } } }).execute();
+    const result = await context.api.table.findMany({ select: { name: true, schemaId: true }, where: { databaseId: { equalTo: context.databaseId } } }).execute();
     if (!result.ok) return failureFromErrors(result.errors, 'Failed to read the tables of the project database');
-    existing = (result.data.tables?.nodes ?? []).map((table) => table.name);
+    for (const table of result.data.tables?.nodes ?? []) {
+      names.add(table.name);
+      known.add(key(table.name, table.schemaId));
+    }
   } catch (err) {
     return failureFromError(err, 'Failed to read the tables of the project database');
   }
-  const known = new Set([...existing, ...made.map((name) => storedName(name) ?? name)]);
-  const missing = named.filter((name) => !known.has(storedName(name) ?? name));
+  const missing = [...new Set(named.filter(({ name, schema }) => {
+    const stored = normalize(name);
+    return !created.has(stored) && !(schema === undefined ? names.has(stored) : known.has(key(stored, schemas.get(schema))));
+  })
+    .map(({ name, schema }) => schema === undefined ? name : `${schema}.${name}`))];
   if (missing.length === 0) return null;
   return {
     code: 'not-found',

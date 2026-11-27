@@ -4,6 +4,7 @@ import {
   type HarnessTool,
   strictObject,  textParam,
   type ToolFailure } from '@agentic-kit/harness';
+import type { BlueprintDefinition } from 'node-type-registry';
 import { z } from 'zod';
 
 import { buildBlueprint } from '../blueprint-construction';
@@ -21,7 +22,7 @@ import {
   ToolFailureError,
 } from '../failure';
 import { ownedProjectReady, projectReady } from '../ready';
-import { storedTableNames, tablesTaken } from '../schema-resolve';
+import { readSchemas, schemasMissing, storedTableNames, tablesTaken } from '../schema-resolve';
 
 export type TemplateDetails = {
   success: boolean;
@@ -371,7 +372,7 @@ type ApplyTemplateParams = z.infer<typeof ApplyTemplateZod>;
 export async function applyTemplateReady(
   params: ApplyTemplateParams,
   cwd: string,
-): Promise<Result<{ context: ProjectContext & { ownerId: string }; templateId: string }>> {
+): Promise<Result<{ context: ProjectContext & { ownerId: string }; templateId: string; definition: BlueprintDefinition }>> {
   const ready = await ownedProjectReady(cwd);
   if (ready.kind === 'failed') return ready;
   let template: { id: string; definition: unknown };
@@ -380,8 +381,15 @@ export async function applyTemplateReady(
   } catch (err) {
     return { kind: 'failed', failure: failureFromError(err, `Failed to read the template "${params.templateName}"`) };
   }
-  const taken = await tablesTaken(ready.value, parseTemplateTables(template.definition).map((table) => ({ name: table.name })));
-  return taken ? { kind: 'failed', failure: taken } : { kind: 'ok', value: { context: ready.value, templateId: template.id } };
+  const raw = template.definition as Partial<BlueprintDefinition> | null | undefined;
+  const definition = { ...raw, tables: Array.isArray(raw?.tables) ? raw.tables : [] };
+  const tables = definition.tables.flatMap((table) =>
+    typeof table.table_name === 'string' ? [{ name: table.table_name, schema: table.schema_name }] : []);
+  const named = tables.flatMap(({ schema }) => schema === undefined ? [] : [schema]);
+  const schemas = named.length ? await readSchemas(ready.value) : { kind: 'ok' as const, value: new Map<string, string>() };
+  if (schemas.kind === 'failed') return schemas;
+  const conflict = schemasMissing(named, schemas.value) ?? await tablesTaken(ready.value, tables, schemas.value);
+  return conflict ? { kind: 'failed', failure: conflict } : { kind: 'ok', value: { context: ready.value, templateId: template.id, definition } };
 }
 
 export const applyTemplateTool: HarnessTool<typeof ApplyTemplateZod, TemplateDetails> = {

@@ -170,6 +170,36 @@ describe('a name the backend stores differently', () => {
 });
 
 describe('no plan for a change that cannot work', () => {
+  it('plans a generated column used only in an update rule’s with_check', async () => {
+    const input = { name: 'todo', description: 'Todo', definition: { tables: [{
+      table_name: 'notes',
+      policies: [{ $type: 'AuthzAllowAll', privileges: ['update'], with_check: {
+        $type: 'AuthzDirectOwner', data: { entity_field: 'editor_id' },
+      } }],
+    }] } };
+    const result = await constructiveGateDeps().precondition('provision_blueprint', input, cwd);
+    expect(result).toMatchObject({ kind: 'ready', access: [{
+      table: 'notes', columnsAdded: expect.arrayContaining([expect.objectContaining({ name: 'editor_id', type: 'uuid' })]),
+    }] });
+  });
+
+  it('does not resolve a schema-qualified relation endpoint to an existing table in a different schema', async () => {
+    const input = { name: 'todo', description: 'Todo', definition: {
+      tables: [{ table_name: 'notes', policies: [{ $type: 'AuthzAllowAll' }] }],
+      relations: [{ $type: 'RelationBelongsTo', source_table: 'notes', target_table: 'users', target_schema: 'app_private', field_name: 'parent_id' }],
+    } };
+    await backend.close();
+    backend = await startFakeBackend((request) => /schemas/.test(request.query)
+      ? { data: { schemas: { nodes: [{ id: 'schema-1', name: 'app_public' }, { id: 'schema-2', name: 'app_private' }] } } }
+      : /tables/.test(request.query)
+        ? { data: { tables: { nodes: [{ id: 't2', name: 'users', schemaId: 'schema-1' }] } } }
+        : projectAnswer(request.query, 'ME') ?? answer(request));
+    const result = await constructiveGateDeps().precondition('provision_blueprint', input, cwd);
+    expect(result).toMatchObject({ kind: 'blocked', failure: {
+      code: 'not-found', message: expect.stringContaining('names the table "app_private.users"'),
+    } });
+  });
+
   // One row for each write and destructive tool that names a table, a field, a template or an entity type:
   // the precondition finds that it does not exist, or that the stored form of a new name is taken.
   const ROWS: Array<[string, Record<string, unknown>, string, string]> = [

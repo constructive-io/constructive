@@ -1,4 +1,4 @@
-import { type HarnessTool, identifierParam, strictObject, textParam, type ToolCallSuggestion, type ToolFailure } from '@agentic-kit/harness';
+import { type HarnessTool, identifierParam, strictObject, takeApprovedTable, textParam, type ToolCallSuggestion, type ToolFailure } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import { toFieldDefault, toFieldType } from '../blueprint/field-type';
@@ -85,9 +85,21 @@ export const deleteTableTool: HarnessTool<typeof DeleteTableZod, MutationDetails
   parameters: DeleteTableZod,
   effect: 'destructive',
   async execute(params: z.infer<typeof DeleteTableZod>, ctx) {
+    const approved = ctx.toolCallId ? takeApprovedTable(ctx.toolCallId, ctx.cwd) : undefined;
     const ready = await deleteTableReady(params, ctx.cwd);
     if (ready.kind === 'failed') return fail(ready.failure);
     const { context, table } = ready.value;
+    if (ctx.toolCallId && (
+      !approved || approved.database.id !== context.databaseId || approved.apiEndpoint !== context.controlApiEndpoint ||
+      approved.account.userId !== context.accountUserId || approved.account.agent?.principalId !== context.accountAgent?.principalId ||
+      approved.table?.schemaId !== context.schemaId || approved.table.id !== table.id
+    )) {
+      return fail({
+        code: 'failed',
+        message: 'The current table and project do not match the approved delete target.',
+        hint: 'Review the current target and approve a new request.',
+      });
+    }
     try {
       const result = await context.api.table
         .delete({ where: { id: table.id }, select: { id: true } })

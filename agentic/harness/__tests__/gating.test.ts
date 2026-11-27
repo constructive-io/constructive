@@ -373,7 +373,7 @@ describe('buildConfirmPrompt', () => {
   });
   const ACCESS: PlanTableAccess[] = [
     created('contacts', [OWNER], [{ id: 'bare-owner', level: 'high', summary: 'A removed member keeps their rows.' }]),
-    created('notes', [ALL]),
+    { ...created('notes', [ALL]), schema: 'app_private' },
   ];
 
   it('says which tables are made, with their fields and each rule they get in words', () => {
@@ -436,6 +436,27 @@ describe('buildConfirmPrompt', () => {
       message: ['+ database  shop', '+ .env      binds this directory to shop'].join('\n'),
       target: NEW_DATABASE,
     });
+  });
+
+  it('shows the correct access for same-named tables in different schemas', () => {
+    const prompt = buildConfirmPrompt('provision_blueprint', { definition: { tables: [
+      { table_name: 'posts' }, { table_name: 'posts', schema_name: 'app_private' },
+    ] } }, { target: TARGET, access: [
+      created('posts', [OWNER]), { ...created('posts', [ALL]), schema: 'app_private' },
+    ] });
+    const [defaultSchema, privateSchema] = prompt.message.split('+ posts (schema app_private)');
+    expect(defaultSchema).toContain(OWNER.words);
+    expect(defaultSchema).not.toContain(ALL.words);
+    expect(privateSchema).toContain(ALL.words);
+    expect(privateSchema).not.toContain(OWNER.words);
+  });
+
+  it('marks a changed rule even when the prose stays the same', () => {
+    const before = created('posts', [{ ...OWNER, comparisonKey: 'before' }]).after;
+    const access = { ...created('posts', [{ ...OWNER, comparisonKey: 'after' }]), before };
+    const prompt = buildConfirmPrompt('set_access', { table_name: 'posts' }, { target: TARGET, access: [access] });
+    expect(prompt.message).toMatch(/\+ +rule/);
+    expect(prompt.message).toMatch(/- +rule/);
   });
 
   it('says a replacement binds a new, empty database, and the old one keeps its data', () => {

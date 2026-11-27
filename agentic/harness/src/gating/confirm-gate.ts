@@ -20,6 +20,15 @@ import type { ConfirmPreview, PlanTarget } from './preview';
  */
 export type GateResult = { block: true; reason: string; failure?: ToolFailure } | undefined;
 
+const approvedTables = new Map<string, Extract<PlanTarget, { kind: 'database' }>>();
+
+export function takeApprovedTable(toolCallId: string, cwd: string) {
+  const key = JSON.stringify([cwd, toolCallId]);
+  const target = approvedTables.get(key);
+  approvedTables.delete(key);
+  return target;
+}
+
 export type GateHost = {
   /** Whether a confirmation UI is available (headless hosts return false). */
   hasUI: boolean;
@@ -87,6 +96,7 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
         };
       }
 
+      const tableTarget = prompt.target.kind === 'database' && prompt.target.table ? structuredClone(prompt.target) : undefined;
       const approved = await host.confirmTool(
         event.toolCallId,
         prompt.title,
@@ -97,6 +107,13 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
       if (!approved) {
         declineGuard.recordDecline(event.toolName, input);
         return { block: true, reason: buildDeclineReason(event.toolName) };
+      }
+      if (tableTarget) {
+        const key = JSON.stringify([cwd, event.toolCallId]);
+        approvedTables.set(key, tableTarget);
+        setTimeout(() => {
+          if (approvedTables.get(key) === tableTarget) approvedTables.delete(key);
+        }, 60_000).unref();
       }
       // An approved mutation changes state, so earlier declines may no longer
       // describe the same effect (e.g. a create_template preview derives from

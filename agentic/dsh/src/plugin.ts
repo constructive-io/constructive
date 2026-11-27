@@ -60,7 +60,7 @@ export function createConstructivePlugin(options: ConstructivePluginOptions = {}
     name: DSH_PLUGIN_NAME,
     inject: ['tools'],
     apply(ctx: DshPluginContext): void {
-      for (const definition of toDshTools(tools, { cwd })) {
+      for (const definition of toDshTools(tools, { cwd, gated: options.gate !== false })) {
         ctx.tools.register(definition);
       }
 

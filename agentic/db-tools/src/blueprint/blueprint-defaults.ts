@@ -42,7 +42,13 @@ function expandField(field: unknown): unknown {
 function expandTable(table: unknown): unknown {
   if (!isRecord(table) || typeof table.table_name !== 'string') return table;
   const policies = listOf(table.policies).map(expandPolicy);
-  const rules = policies.filter(isRecord).map((policy) => ({ type: String(policy.$type), data: isRecord(policy.data) ? policy.data : {} }));
+  const rules = policies.filter(isRecord).flatMap((policy) => {
+    const rule = { type: String(policy.$type), data: isRecord(policy.data) ? policy.data : {} };
+    const check = policy.with_check;
+    return isRecord(check) && typeof check.$type === 'string'
+      ? [rule, { type: check.$type, data: isRecord(check.data) ? check.data : {} }]
+      : [rule];
+  });
   const declared = listOf(table.fields).flatMap((field) => (isRecord(field) && typeof field.name === 'string' ? [field.name] : []));
   const needed = dataNodesForPolicies(rules, new Set(declared)).nodes;
   const given = listOf(table.nodes).filter((node): node is Node => typeof node === 'string' || (isRecord(node) && typeof node.$type === 'string'));

@@ -50,7 +50,7 @@ export type PlanAccount = { userId: string; email?: string; agent?: PlanAgent };
  *   backend (a host's own policy that gates a shell command).
  */
 export type PlanTarget =
-  | { kind: 'database'; database: PlanDatabase; apiEndpoint: string; account: PlanAccount; appUserId?: string }
+  | { kind: 'database'; database: PlanDatabase; apiEndpoint: string; account: PlanAccount; appUserId?: string; table?: { id: string; schemaId: string } }
   | { kind: 'account'; apiEndpoint: string; account: PlanAccount; replaces?: PlanDatabase }
   | { kind: 'no-credential'; endpoint: string }
   | { kind: 'workspace'; cwd: string };
@@ -66,6 +66,7 @@ export type PlanRule = {
   /** False for a restrictive rule: a limit every row must also pass. */
   permissive: boolean;
   policy_role: string;
+  comparisonKey?: string;
   /** One plain sentence for what the rule checks. */
   words: string;
 };
@@ -91,6 +92,7 @@ export type PlanColumn = {
  */
 export type PlanTableAccess = {
   table: string;
+  schema?: string;
   before?: PlanAccessState;
   after: PlanAccessState;
   findingsAdded: PlanFinding[];
@@ -167,12 +169,13 @@ export function planTargetLines(target: PlanTarget): string[] {
       ['backend', target.apiEndpoint],
       ['as', accountWords(target.account)],
       ...(target.appUserId ? [['app user', target.appUserId]] : []),
+      ...(target.table ? [['schema id', target.table.schemaId], ['table id', target.table.id]] : []),
     ]);
   }
 }
 
 const ruleKey = (rule: PlanRule): string =>
-  JSON.stringify([rule.permissive, [...rule.privileges].sort(), rule.policy_role, rule.words]);
+  JSON.stringify([rule.comparisonKey ?? [rule.$type, rule.permissive, rule.policy_role], [...new Set(rule.privileges.map((value) => value.toLowerCase()))].sort()]);
 
 function ruleCells(rule: PlanRule): string[] {
   const role = rule.policy_role === 'authenticated' ? '' : ` (role ${rule.policy_role})`;
