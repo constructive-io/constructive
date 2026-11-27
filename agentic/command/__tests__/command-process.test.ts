@@ -104,39 +104,39 @@ describe('the command layer in a child process', () => {
   });
 
   it.each([
-    ['approve', 'Apply this change?'],
+    ['approve', 'Apply?'],
     ['secret', 'Password']
   ])('cancels "%s" with exit 130 when Ctrl-C is pressed at the prompt', async (command, prompt) => {
     const exit = await runFixture([command], { stdin: 'open', tty: true, onStderr: answer(prompt, '\u0003') });
     expect(exit.code).toBe(130);
     expect(exit.stdout).toBe('');
     const errors = exit.stderr.split('\n').filter((line) => line.startsWith('Error'));
-    expect(errors).toEqual(['Error (cancelled): The command was cancelled at a prompt (Ctrl-C). Nothing was changed by this step.']);
+    expect(errors).toEqual(['Error (cancelled): Cancelled (Ctrl-C). Nothing changed.']);
     expect(exit.stderr).not.toContain('applied');
   });
 
   it.each([
-    ['approve', 'Ctrl-D', 'Apply this change?', '\u0004'],
-    ['approve', 'a closed stdin', 'Apply this change?', ''],
+    ['approve', 'Ctrl-D', 'Apply?', '\u0004'],
+    ['approve', 'a closed stdin', 'Apply?', ''],
     ['secret', 'Ctrl-D', 'Password', '\u0004']
   ])('cancels "%s" with exit 1 when %s ends the input at the prompt', async (command, _end, prompt, keys) => {
     const exit = await runFixture([command], { stdin: 'open', tty: true, onStderr: answer(prompt, keys, { keepOpen: keys !== '' }) });
     expect(exit.code).toBe(1);
     expect(exit.stdout).toBe('');
     const errors = exit.stderr.split('\n').filter((line) => line.startsWith('Error'));
-    expect(errors).toEqual(['Error (cancelled): The input ended before the prompt got an answer. Nothing was changed by this step.']);
+    expect(errors).toEqual(['Error (cancelled): No answer: the input ended. Nothing changed.']);
     expect(exit.stderr).not.toContain('applied');
   });
 
   it('reports a declined approval as cancelled with exit 1, and applies nothing', async () => {
-    const exit = await runFixture(['approve'], { stdin: 'open', tty: true, onStderr: answer('Apply this change?', 'n\n') });
+    const exit = await runFixture(['approve'], { stdin: 'open', tty: true, onStderr: answer('Apply?', 'n\n') });
     expect(exit.code).toBe(1);
-    expect(exit.stderr).toContain('Error (cancelled): The change was not approved, so nothing was changed.');
+    expect(exit.stderr).toContain('Error (cancelled): Not approved. Nothing changed.');
     expect(exit.stderr).not.toContain('applied');
   });
 
   it('applies the change once the person approves it at the prompt', async () => {
-    const exit = await runFixture(['approve'], { stdin: 'open', tty: true, onStderr: answer('Apply this change?', 'y\n') });
+    const exit = await runFixture(['approve'], { stdin: 'open', tty: true, onStderr: answer('Apply?', 'y\n') });
     expect(exit.code).toBe(0);
     expect(exit.stderr).toContain('Change the fixture.');
     expect(exit.stderr).toContain('applied');

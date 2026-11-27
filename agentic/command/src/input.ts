@@ -67,17 +67,18 @@ export function jsonSchemaOf(schema: z.ZodType, io: 'input' | 'output'): JSONSch
 }
 
 export const LAYER_INPUT = z.object({
-  json: z.boolean().optional().describe('Print one JSON envelope on stdout (same as --format json)'),
-  format: z.enum(['text', 'json']).optional().describe('Output format; the default is text on a terminal, else json'),
-  fields: z.string().optional().describe('Keep only these comma-separated paths of data, for example id,owner.name'),
-  input: z.string().optional().describe('The whole input as JSON, @file.json, or - for stdin; flags override its keys'),
-  dry_run: z.boolean().optional().describe('Show the plan of a change and change nothing'),
-  yes: z.boolean().optional().meta({ description: 'Approve the plan of a change without a prompt', 'x-short': 'y' }),
-  no_input: z.boolean().optional().describe('Never prompt; a missing value fails with missing-input'),
-  tty: z.boolean().optional().describe('Pass false to never prompt (same as --no-input)'),
-  schema: z.boolean().optional().describe('Print the input and output JSON Schema of the command'),
-  llms: z.boolean().optional().describe('Print a Markdown command index for agents; with --json, the full manifest'),
-  cwd: z.string().optional().meta({ description: 'Run as if started in this directory', 'x-carry': true }),
+  json: z.boolean().optional().describe('Same as --format json'),
+  format: z.enum(['text', 'json']).optional().describe('Default: text on a terminal, json otherwise'),
+  fields: z.string().optional().describe('Keep only these paths of data, for example id,owner.name'),
+  input: z.string().optional().describe('The whole input: JSON, @file.json, or - for stdin'),
+  dry_run: z.boolean().optional().describe('Show the plan; change nothing'),
+  yes: z.boolean().optional().meta({ description: 'Approve the plan without a prompt', 'x-short': 'y' }),
+  approve: z.string().optional().describe('Apply only the plan with this id, from --dry-run or exit 3'),
+  no_input: z.boolean().optional().describe('Never prompt'),
+  tty: z.boolean().optional().describe('false: never prompt'),
+  schema: z.boolean().optional().describe("Print the command's JSON Schema"),
+  llms: z.boolean().optional().describe('Print the command index for agents (with --json, the manifest)'),
+  cwd: z.string().optional().meta({ description: 'Run as if in this directory', 'x-carry': true }),
   version: z.boolean().optional().describe('Print the version'),
   help: z.boolean().optional().meta({ description: 'Show help', 'x-short': 'h' })
 });
@@ -91,6 +92,7 @@ export interface LayerFlags {
   input?: string;
   dryRun: boolean;
   yes: boolean;
+  approve?: string;
   noInput: boolean;
   tty: boolean;
   schema: boolean;
@@ -387,7 +389,7 @@ function parseJson(text: string, label: string): unknown {
     const position = /position (\d+)/.exec((error as Error).message)?.[1];
     throw invalidInput(
       `${label} is not valid JSON${position ? ` (the error is at character ${position})` : ''}.`,
-      `Pass valid JSON, or a file with ${label} @file.json.`,
+      `Pass JSON, or a file with ${label} @file.json. Text needs JSON quotes: ${label} '"text"'.`,
       label
     );
   }
@@ -453,6 +455,7 @@ export function readLayerFlags(tokens: Token[], cwd: string, lenient = false): L
     input: values.input as string | undefined,
     dryRun: values.dry_run === true,
     yes: values.yes === true,
+    approve: values.approve as string | undefined,
     noInput: values.no_input === true,
     tty: values.tty !== false,
     schema: values.schema === true,

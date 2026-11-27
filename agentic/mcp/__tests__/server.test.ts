@@ -222,7 +222,7 @@ describe('a change on a connection without elicitation', () => {
     expect(envelope(result)).toEqual({ ok: true, data: { created: 'a' }, plan: planOf({ thing_name: 'a' }) });
     expect(text(result)).toMatch(/^Created a\n/);
     expect(text(result)).toContain('Change {"thing_name":"a"}.');
-    expect(text(result)).toContain('Database: "db-1" (ID id-1)');
+    expect(text(result)).toContain('database  db-1 (id-1)');
     expect(runs).toEqual([{ tool: 'create_thing', params: { thing_name: 'a' }, cwd }]);
     expect(asked).toEqual([`create_thing in ${cwd}`]);
   });
@@ -236,7 +236,7 @@ describe.each(['legacy', 'modern'] as const)('a change on a %s connection with f
     expect(envelope(result)).toEqual({ ok: true, data: { created: 'a' }, plan: planOf({ thing_name: 'a' }) });
     expect(messages).toHaveLength(1);
     expect(messages[0]).toContain('Change {"thing_name":"a"}.');
-    expect(messages[0]).toContain('Database: "db-1" (ID id-1)');
+    expect(messages[0]).toContain('database  db-1 (id-1)');
     expect(runs).toEqual([{ tool: 'create_thing', params: { thing_name: 'a' }, cwd }]);
   });
 
@@ -250,7 +250,7 @@ describe.each(['legacy', 'modern'] as const)('a change on a %s connection with f
     expect(result.isError).toBe(true);
     expect(envelope(result).error).toMatchObject({ code: 'cancelled', message: expect.stringMatching(/nothing was changed/) });
     expect(envelope(result).plan).toEqual(planOf({ thing_name: 'a' }));
-    expect(text(result)).toContain('Database: "db-1" (ID id-1)');
+    expect(text(result)).toContain('database  db-1 (id-1)');
     expect(runs).toEqual([]);
   });
 });

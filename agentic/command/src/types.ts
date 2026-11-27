@@ -89,6 +89,8 @@ export interface CommandContext {
   format: 'text' | 'json';
   /** The run was given --yes: a change it plans is approved without a prompt. */
   yes: boolean;
+  /** The run was given --approve <id>: a change it plans is applied only when its plan has that id. */
+  approve?: string;
   /** Values of the CLI's own global flags. */
   globals: Record<string, unknown>;
   /** Use only when `interactive` is true. */
@@ -148,8 +150,9 @@ export interface Planned {
 }
 
 /**
- * A command that changes something. The layer calls `plan`, then decides: --dry-run returns the plan, --yes
- * approves it, a terminal asks, and anything else stops with exit 3. Only then does it call `apply`.
+ * A command that changes something. The layer calls `plan`, then decides: --dry-run returns the plan, --approve <id>
+ * approves it while it is the plan with that id, --yes approves any plan, a terminal asks, and anything else stops with
+ * exit 3. Only then does it call `apply`.
  */
 export interface ChangeCommand<TSchema extends InputSchema = InputSchema, TData = unknown, TPlanned extends Planned = Planned> extends CommandShape<TSchema> {
   effect: 'write' | 'destructive';
@@ -205,17 +208,18 @@ export const ExitCode = { ok: 0, failure: 1, usage: 2, approvalRequired: 3, sign
  * step that follows. The layer builds its errors only with these codes, so a new one needs its sentence to compile.
  */
 export const COMMAND_ERROR_CODES = {
-  'unknown-command': 'The words before the flags name no command, so nothing ran: the hint names the nearest command, and the step lists the commands of the group or of the CLI.',
-  'unknown-topic': 'The words after help name no command, group or help topic, so nothing ran: the hint names the nearest one, and the step lists them all.',
-  'unknown-flag': "A flag the command does not have was given, so nothing ran: the hint names the nearest flag, and the step shows the command's help.",
-  'unexpected-argument': "More arguments were given than the command takes, so nothing ran: the step shows the command's help, and other values go in flags.",
-  'missing-input': "A required value was not given and no prompt could ask for it, so nothing ran: error.details.missing names the flags, and the step shows the command's --schema.",
-  'invalid-input': "A flag, an --input key or a JSON value does not match the command's schema, so nothing ran (for --fields on a read, only the selection of its output failed): the hint names the nearest allowed key or value, and the step shows the command's --schema.",
-  'dry-run-unsupported': 'The command has no plan, so it has no dry run and nothing ran: it changes at once (a sign-in, a context, a narrower right), or it serves a protocol whose client approves each change; the step shows its help.',
-  'approval-required': 'A change stopped before it was made because the run had no --yes and no terminal to ask on, so nothing changed: error.details.plan holds the plan to show the person, and the step reruns the command with --yes once they approve.',
-  cancelled: 'A prompt ended without an answer (Ctrl-C exits 130, the end of input exits 1), or the person declined, so the step it guarded changed nothing: run the command again when the person is ready.',
-  interrupted: "The run got SIGINT, and the layer aborted the command's signal and waited briefly for it to stop, so a change may be partly made: check the state before running the command again.",
-  failed: 'The command threw an error that is not a CliError, so the message is its own: rerun with DEBUG=1 for the stack in error.details.'
+  'unknown-command': 'No command has these words, so nothing ran: the hint names the nearest one.',
+  'unknown-topic': 'No command, group or help topic has this name, so nothing ran: the hint names the nearest one.',
+  'unknown-flag': 'The command has no such flag, so nothing ran: the hint names the nearest one.',
+  'unexpected-argument': 'The command takes fewer arguments, so nothing ran: pass the other values as flags.',
+  'missing-input': 'A required value is missing and no prompt could ask, so nothing ran: error.details.missing names the flags.',
+  'invalid-input': "A flag, an --input key or a value does not fit the command's schema, so nothing ran: see the command's --schema.",
+  'dry-run-unsupported': 'The command changes at once or serves a protocol, so it has no plan and no dry run: run it without --dry-run.',
+  'approval-required': 'There is no approval and no terminal to ask, so nothing changed: show error.details.plan to the person, then run the --approve step.',
+  'plan-changed': 'The plan is no longer the one the --approve id names, so nothing changed: show the new error.details.plan to the person, then run its --approve step.',
+  cancelled: 'A prompt got no answer (Ctrl-C exits 130, the end of input exits 1), or the person declined: nothing changed.',
+  interrupted: 'The run got SIGINT, so a change may be partly made: check the state before you rerun.',
+  failed: 'An unexpected error: the message is its own, and DEBUG=1 adds the stack to error.details.'
 } as const satisfies Record<string, string>;
 
 export type CommandErrorCode = keyof typeof COMMAND_ERROR_CODES;

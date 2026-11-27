@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@agentic-kit/harness": "workspace:^",
-    "inquirerer": "^4.9.4",
+    "inquirerer": "^4.10.1",
     "zod": "^4.4.3"
   },
   "keywords": [

@@ -1,4 +1,4 @@
-import { type ConfirmPrompt, defineHarnessTool, type GatePolicy, identifierParam, type ToolFailure } from '@agentic-kit/harness';
+import { type ConfirmPrompt, defineHarnessTool, type GatePolicy, identifierParam, type PlanTarget, takeApprovedTable, type ToolFailure } from '@agentic-kit/harness';
 import { mkdtempSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -9,6 +9,7 @@ import { type CommandDefinition, createCli, toCliCommands, toolCallStep, toolCom
 
 const cwd = mkdtempSync(join(tmpdir(), 'agentic-command-'));
 const calls: Array<{ tool: string; params: unknown; cwd: string }> = [];
+const approvedTables: unknown[] = [];
 
 const listTool = defineHarnessTool({
   name: 'list_things',
@@ -33,6 +34,7 @@ const deleteTool = defineHarnessTool({
   effect: 'destructive',
   async execute(params, ctx) {
     calls.push({ tool: 'delete_thing', params, cwd: ctx.cwd });
+    approvedTables.push(ctx.toolCallId ? takeApprovedTable(ctx.toolCallId, ctx.cwd) : undefined);
     return { content: [{ type: 'text', text: `Deleted ${params.thing_name}` }], details: { deleted: params.thing_name } };
   }
 });
@@ -67,6 +69,14 @@ const connectTool = defineHarnessTool({
 });
 
 const TARGET = { kind: 'account', apiEndpoint: 'http://api.localhost:3000/graphql', account: { userId: 'user-1' } } as const;
+const TABLE_TARGET: PlanTarget = {
+  kind: 'database',
+  database: { id: 'db-1', name: 'app' },
+  apiEndpoint: 'http://api.localhost:3000/graphql',
+  account: { userId: 'user-1' },
+  table: { id: 'table-1', schemaId: 'schema-1' }
+};
+let target: PlanTarget = TARGET;
 
 // A read that suggests what to do after it.
 const suggestTool = defineHarnessTool({
@@ -107,7 +117,7 @@ const gate: GatePolicy = {
       prompt: {
         title: 'Change thing?',
         message: `Change the thing "${name}".`,
-        target: TARGET,
+        target,
         preview: { kind: 'policies', tableName: name, policies: ['AuthzDirectOwner'] }
       }
     };
@@ -190,8 +200,10 @@ const plan: ConfirmPrompt = {
 
 beforeEach(() => {
   calls.length = 0;
+  approvedTables.length = 0;
   prompted.length = 0;
   ready = true;
+  target = TARGET;
 });
 
 describe('a read', () => {
@@ -211,29 +223,31 @@ describe('a read', () => {
 });
 
 describe('a change', () => {
-  it('stops with approval-required and the plan when it is not interactive and has no --yes', async () => {
+  it('stops with approval-required, the plan and its --approve step when it is not interactive and has no approval', async () => {
     const result = await run(['thing', 'delete', 'posts']);
     expect(result.code).toBe(3);
     const { error, meta } = result.json();
     expect(error.code).toBe('approval-required');
-    expect(error.details).toEqual({ plan });
+    expect(error.details).toEqual({ plan, planId: expect.stringMatching(/^[0-9a-f]{12}$/) });
     expect(error.hint).toMatch(/plan/);
-    expect(meta.next).toEqual([{ command: 'demo thing delete posts --yes', argv: ['demo', 'thing', 'delete', 'posts', '--yes'], why: expect.any(String) }]);
+    const id = error.details.planId;
+    expect(meta.next).toEqual([{ command: `demo thing delete posts --approve ${id}`, argv: ['demo', 'thing', 'delete', 'posts', '--approve', id], why: expect.any(String) }]);
     expect(calls).toEqual([]);
   });
 
   it('prints the plan above the approval-required error in text format', async () => {
     const result = await run(['thing', 'delete', 'posts', '--format', 'text']);
     expect(result.code).toBe(3);
-    expect(result.stderr).toMatch(/Change the thing "posts"[\s\S]*AuthzDirectOwner[\s\S]*Error \(approval-required\)/);
+    expect(result.stderr).toMatch(/Change thing\?\n[\s\S]*Change the thing "posts"\.\n\nError \(approval-required\)/);
     expect(calls).toEqual([]);
   });
 
   it('returns the plan for --dry-run, offers the real run, and changes nothing', async () => {
     const result = await run(['thing', 'delete', 'posts', '--dry-run', '--yes']);
     expect(result.code).toBe(0);
-    expect(result.json().data).toEqual({ applied: false, plan });
-    expect(result.json().meta.next).toEqual([{ command: 'demo thing delete posts --yes', argv: ['demo', 'thing', 'delete', 'posts', '--yes'], why: expect.any(String) }]);
+    const id = result.json().data.planId;
+    expect(result.json().data).toEqual({ applied: false, plan, planId: id });
+    expect(result.json().meta.next).toEqual([{ command: `demo thing delete posts --approve ${id}`, argv: ['demo', 'thing', 'delete', 'posts', '--approve', id], why: expect.any(String) }]);
     expect(calls).toEqual([]);
   });
 
@@ -256,6 +270,16 @@ describe('a change', () => {
     expect(calls).toEqual([{ tool: 'delete_thing', params: { thing_name: 'posts' }, cwd }]);
   });
 
+  it.each([
+    ['--yes', ['--yes'], {}],
+    ['a yes on a terminal', ['--json'], { tty: true, answers: [['Apply?', 'y\n']] as Array<[string, string]> }]
+  ])('applies with the table the plan showed, for the tool to compare with the table it finds (%s)', async (_how, flags, options) => {
+    target = TABLE_TARGET;
+    const result = await run(['thing', 'delete', 'posts', ...flags], options);
+    expect(result.code).toBe(0);
+    expect(approvedTables).toEqual([TABLE_TARGET]);
+  });
+
   it('asks the gate for a write, and returns options.next', async () => {
     const write = await run(['thing', 'create', 'widgets', '--yes']);
     expect(write.json().meta.next).toEqual([{ command: 'demo thing delete widgets', argv: ['demo', 'thing', 'delete', 'widgets'], why: 'Undo widgets' }]);
@@ -265,14 +289,14 @@ describe('a change', () => {
 
 describe('the interactive confirm', () => {
   it('shows the plan and runs when the person approves', async () => {
-    const result = await run(['thing', 'delete', 'posts', '--json'], { tty: true, answers: [['Apply this change?', 'y\n']] });
+    const result = await run(['thing', 'delete', 'posts', '--json'], { tty: true, answers: [['Apply?', 'y\n']] });
     expect(result.code).toBe(0);
     expect(result.stderr).toContain('Change the thing "posts".');
     expect(calls).toHaveLength(1);
   });
 
   it('fails with cancelled when the person declines', async () => {
-    const result = await run(['thing', 'delete', 'posts', '--json'], { tty: true, answers: [['Apply this change?', 'n\n']] });
+    const result = await run(['thing', 'delete', 'posts', '--json'], { tty: true, answers: [['Apply?', 'n\n']] });
     expect(result.code).toBe(1);
     expect(result.json().error.code).toBe('cancelled');
     expect(calls).toEqual([]);

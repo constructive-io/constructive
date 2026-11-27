@@ -6,10 +6,12 @@ import {
   type HarnessTool,
   type HarnessToolContent,
   type HarnessToolResult,
+  recordApprovedTable,
   type ToolCallSuggestion,
   type ToolFailure,
   type ToolFailureCode
 } from '@agentic-kit/harness';
+import { randomUUID } from 'crypto';
 import { z } from 'zod';
 
 import {
@@ -258,8 +260,10 @@ export function toCliCommand<TSchema extends z.ZodType, TDetails, TInput extends
       if (decision.kind === 'blocked') throw failureError(decision.failure, undefined, failureNext(decision.failure, ctx));
       return { plan: decision.prompt, params };
     },
-    async apply(_given, { params }, ctx) {
-      return finish(await tool.execute(params, { cwd: ctx.cwd, signal: ctx.signal }), params, ctx);
+    async apply(_given, { params, plan }, ctx) {
+      const toolCallId = randomUUID();
+      recordApprovedTable(toolCallId, ctx.cwd, plan.target);
+      return finish(await tool.execute(params, { cwd: ctx.cwd, toolCallId, signal: ctx.signal }), params, ctx);
     }
   };
   return change;

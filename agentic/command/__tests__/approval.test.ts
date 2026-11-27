@@ -19,3 +19,9 @@ describe('decideApproval', () => {
     expect(decideApproval({ dryRun, yes, interactive })).toBe(expected);
   });
 });
+
+describe('decideApproval with --approve', () => {
+  it.each([true, false])('applies only the plan with that id, without a prompt (interactive %s)', (interactive) => {
+    expect(decideApproval({ dryRun: false, yes: false, interactive, approve: 'abcdef123456' })).toBe('apply-if-same');
+  });
+});

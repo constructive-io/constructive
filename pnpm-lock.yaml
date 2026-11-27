@@ -193,8 +193,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@aws-sdk/credential-provider-node@3.972.89)(@smithy/signature-v4@5.7.4)(ws@8.21.3)(zod@4.4.3)
       inquirerer:
-        specifier: ^4.9.8
-        version: 4.9.8
+        specifier: ^4.10.1
+        version: 4.10.1
     publishDirectory: dist
 
   agentic/command:
@@ -203,8 +203,8 @@ importers:
         specifier: workspace:^
         version: link:../harness/dist
       inquirerer:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.10.1
+        version: 4.10.1
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -453,8 +453,8 @@ importers:
         specifier: workspace:^
         version: link:../../sdk/constructive-sdk/dist
       appstash:
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: ^0.9.0
+        version: 0.9.0
     publishDirectory: dist
 
   examples/codegen-integration:
@@ -7226,6 +7226,9 @@ packages:
   appstash@0.8.2:
     resolution: {integrity: sha512-Lnq3NcsDE4fQA533gLSP+qZyv9ZzAu1nsIUzcG59yEM+pKH+gA5rCeWCtL/owp7IphryDb0cR4EsSsKFa5JxSw==}
 
+  appstash@0.9.0:
+    resolution: {integrity: sha512-FBv+u8qPDgnY24uZq9qr/lHHTb9AOwYMxHg5gmomg2v/ITRmrLZ9ZbwzpyOpTa72Je4FwNlOXRCvmby745Hjvw==}
+
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
 
@@ -8766,6 +8769,9 @@ packages:
   inquirer@8.2.7:
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
+
+  inquirerer@4.10.1:
+    resolution: {integrity: sha512-kNI77JKGylrpeqtkzB0hgany2OVIXfJ2SycC5cb2QI4xtTgoZtRF4vJTwck4zTLl0gNHu/qRzZ8kg+jPZF2fXg==}
 
   inquirerer@4.9.7:
     resolution: {integrity: sha512-3PgTWhyKjt42C45JlVKlDhM9NRgHEciZM40fqZUGIK5aAFKu3gR/4JnJN7n5nnOK3Cs/Xu0Y8nOWdEDGxy53rA==}
@@ -15067,6 +15073,8 @@ snapshots:
 
   appstash@0.8.2: {}
 
+  appstash@0.9.0: {}
+
   aproba@2.0.0: {}
 
   arg@4.1.3: {}
@@ -16871,6 +16879,14 @@ snapshots:
       wrap-ansi: 6.2.0
     transitivePeerDependencies:
       - '@types/node'
+
+  inquirerer@4.10.1:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.9.3
+      minimist: 1.2.8
+      string-width: 4.2.3
+      yanse: 0.2.4
 
   inquirerer@4.9.7:
     dependencies:

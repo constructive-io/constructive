@@ -1,3 +1,4 @@
+import { alignColumns } from '@agentic-kit/harness';
 import { Inquirerer, parseArgv } from 'inquirerer';
 import { resolve as resolvePath } from 'path';
 import { Readable, Writable } from 'stream';
@@ -154,7 +155,7 @@ function kindOf(command: CommandDefinition, owner: string): Kind {
   if (!has('plan') || !has('apply') || has('run')) {
     throw new Error(
       `${owner} has the effect "${effect}", so it has plan() and apply() and no run(): the layer shows the plan, ` +
-        'and calls apply only once the run approves it (--yes, or a yes on a terminal). ' +
+        'and calls apply only once the run approves it (--approve <id>, --yes, or a yes on a terminal). ' +
         'A write the person makes to their own local session, with nothing to approve, is immediate: true with run().'
     );
   }
@@ -204,14 +205,16 @@ function unmatchedFields(unmatched: string[], command: string, data: unknown): {
   };
 }
 
+/** A value as one cell: true is "yes", false and nothing are blank, and an object is its JSON. */
 const cell = (value: unknown): string =>
-  value === null || value === undefined ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+  value === null || value === undefined || value === false ? '' : value === true ? 'yes' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+/** A data key as words: `apiEndpoint` and `api_endpoint` are "api endpoint". */
+const keyWords = (key: string): string => key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').toLowerCase();
 
 function renderTable(rows: Record<string, unknown>[]): string {
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
-  const cells = [keys, ...rows.map((row) => keys.map((key) => cell(row[key])))];
-  const widths = keys.map((_, index) => Math.max(...cells.map((line) => line[index].length)));
-  return cells.map((line) => line.map((value, index) => value.padEnd(widths[index])).join('  ').trimEnd()).join('\n');
+  return alignColumns([keys.map((key) => keyWords(key).toUpperCase()), ...rows.map((row) => keys.map((key) => cell(row[key])))]).join('\n');
 }
 
 function renderData(data: unknown): string {
@@ -221,10 +224,7 @@ function renderData(data: unknown): string {
     return data.every(isPlainObject) ? renderTable(data) : data.map(cell).join('\n');
   }
   if (isPlainObject(data)) {
-    return Object.entries(data)
-      .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => `${key}: ${cell(value)}`)
-      .join('\n');
+    return alignColumns(Object.entries(data).filter(([, value]) => value !== undefined).map(([key, value]) => [keyWords(key), cell(value)])).join('\n');
   }
   return String(data);
 }
@@ -371,7 +371,7 @@ function rejectUnknownFlags(tokens: Token[], table: FlagTable, scope: Scope): vo
   const typed = unknown.flag.replace(/^-+/, '');
   const suggestions = closest(kebabCase(typed) || typed, table.flags.map((def) => def.flag)).map((flag) => `--${flag}`);
   throw usageError('unknown-flag', `${unknown.flag} is not a flag of "${usage}".`, {
-    hint: suggestions.length ? `Did you mean ${orList(suggestions)}?` : `Run "${usage} --help" to list the flags.`,
+    hint: suggestions.length ? `Did you mean ${orList(suggestions)}?` : undefined,
     next: [helpStep(scope, 'List the flags')],
     details: { flag: unknown.flag, suggestions }
   });
@@ -382,7 +382,6 @@ function rejectPositionals(tokens: Token[], scope: Scope): void {
   const extra = tokens.find((token): token is Extract<Token, { kind: 'positional' }> => token.kind === 'positional');
   if (!extra) return;
   throw usageError('unexpected-argument', `"${usage}" takes no arguments, but got "${extra.value}".`, {
-    hint: `Run "${usage} --help" to list the commands.`,
     next: [helpStep(scope, 'List the commands')]
   });
 }
@@ -391,8 +390,8 @@ function missingInput(scope: Scope, missing: FlagDef[], blocker: string): CliErr
   const { usage } = scope;
   const flags = missing.map((def) => `--${def.flag}`);
   return usageError('missing-input', `"${usage}" needs ${orList(flags, 'and')}.`, {
-    cause: `No value was given, and prompts are off because ${blocker}.`,
-    hint: `Pass ${flags.length === 1 ? 'it as a flag' : 'them as flags'}, or pass the whole input with --input '<json>', --input @file.json or --input - (stdin).`,
+    cause: `Prompts are off: ${blocker}.`,
+    hint: `Pass ${orList(flags, 'and')}, or the whole input with --input.`,
     next: [scope.step([...scope.path, '--schema'], 'See every input property')],
     details: { missing: flags }
   });
@@ -402,17 +401,34 @@ function missingInput(scope: Scope, missing: FlagDef[], blocker: string): CliErr
 function rejectDryRun(layer: LayerFlags, scope: Scope, why: string): void {
   if (!layer.dryRun) return;
   throw usageError('dry-run-unsupported', `"${scope.usage}" has no dry run: ${why}.`, {
-    hint: `Run it without --dry-run. Run "${scope.usage} --help" to see what it changes.`,
+    hint: 'Run it without --dry-run.',
     next: [helpStep(scope, 'See what the command changes')],
     details: { flag: '--dry-run' }
   });
 }
 
+/** --approve <id> applies one plan, so it needs a plan, and it does not go with --yes or --dry-run. */
+function rejectApprove(layer: LayerFlags, scope: Scope, why?: string): void {
+  if (layer.approve === undefined) return;
+  const beside = layer.yes ? '--yes' : layer.dryRun ? '--dry-run' : undefined;
+  if (!why && !beside) return;
+  throw usageError(
+    'invalid-input',
+    why ? `--approve does not apply to "${scope.usage}": ${why}.` : `--approve and ${beside} do not go together: --approve applies one plan, and ${beside === '--yes' ? '--yes applies any plan' : '--dry-run applies none'}.`,
+    {
+      hint: why ? 'Run it without --approve.' : `Give --approve <id> alone, or ${beside} alone.`,
+      next: [helpStep(scope, 'See what the command changes')],
+      details: { flag: '--approve' }
+    }
+  );
+}
+
 /** A command that serves a protocol has no plan of the layer's, so it takes neither --dry-run nor --yes. */
 function rejectApprovalFlags(layer: LayerFlags, scope: Scope): void {
-  rejectDryRun(layer, scope, 'it serves a protocol, and its client approves each change made through it');
+  rejectDryRun(layer, scope, 'it serves a protocol, and its client approves each change');
+  rejectApprove(layer, scope, 'its client approves each change');
   if (layer.yes) {
-    throw usageError('invalid-input', `--yes does not apply to "${scope.usage}": it approves nothing here, because its client approves each change made through it.`, {
+    throw usageError('invalid-input', `--yes does not apply to "${scope.usage}": its client approves each change.`, {
       hint: 'Run it without --yes.',
       next: [helpStep(scope, 'See what the command serves')],
       details: { flag: '--yes' }
@@ -491,7 +507,7 @@ export function createCli(definition: CliConfig): Cli {
 
   const help: ReadCommand<typeof HELP_INPUT, HelpPage> = {
     name: 'help',
-    summary: 'Show the help of the CLI, a command, a group or a help topic',
+    summary: 'Show the help of a command or topic',
     effect: 'read',
     positionals: ['name'],
     input: HELP_INPUT,
@@ -632,7 +648,11 @@ export function createCli(definition: CliConfig): Cli {
       if (layer.llms) return layer.format === 'json' ? output.json(manifest()) : output.print(llmsIndex(config, shownOf));
       if (layer.schema) return output.json(commandSchema(command, shownOf(command)));
       if (kind === 'serve') rejectApprovalFlags(layer, scope);
-      if (kind === 'immediate') rejectDryRun(layer, scope, 'it makes its change as soon as it runs');
+      if (kind === 'immediate') {
+        rejectDryRun(layer, scope, 'it changes at once');
+        rejectApprove(layer, scope, 'it changes at once, with no plan to approve');
+      }
+      if (kind === 'change') rejectApprove(layer, scope);
     }
 
     const cwd = layer.cwd ? resolvePath(io.cwd, layer.cwd) : io.cwd;
@@ -661,6 +681,7 @@ export function createCli(definition: CliConfig): Cli {
       interactive,
       format: output.format,
       yes: layer.yes,
+      ...(layer.approve === undefined ? {} : { approve: layer.approve }),
       globals,
       signal: controller.signal,
       // A getter, so that process.stdin is only opened when the command reads it.
@@ -682,13 +703,13 @@ export function createCli(definition: CliConfig): Cli {
             case 'interrupt':
               return layerError({
                 code: 'cancelled',
-                message: 'The command was cancelled at a prompt (Ctrl-C). Nothing was changed by this step.',
+                message: 'Cancelled (Ctrl-C). Nothing changed.',
                 exitCode: ExitCode.interrupted
               });
             case 'end-of-input':
               return layerError({
                 code: 'cancelled',
-                message: 'The input ended before the prompt got an answer. Nothing was changed by this step.',
+                message: 'No answer: the input ended. Nothing changed.',
                 exitCode: ExitCode.failure
               });
             }

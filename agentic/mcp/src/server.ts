@@ -162,7 +162,7 @@ function previewQuestion(plan: ConfirmPrompt): InputRequiredResult {
     inputRequests: {
       [APPLY]: inputRequired.elicit({
         mode: 'form',
-        message: `${renderPlan(plan)}\n\nApply this change?`,
+        message: renderPlan(plan),
         requestedSchema: {
           type: 'object',
           properties: { [APPLY]: APPLY_FIELD },

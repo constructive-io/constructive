@@ -100,6 +100,8 @@ const tableAdd: CommandDefinition = {
 
 const applied: string[] = [];
 const bumped: string[] = [];
+// What the target "moving" looks like now: a change to it between two runs changes its plan.
+let moving = 'before';
 
 /**
  * A change: its plan names the target, and apply records that it ran. A target named "blocked" cannot be planned, and
@@ -114,7 +116,7 @@ const deploy: ChangeCommand<z.ZodObject<{ target: z.ZodString; from_stdin: z.Zod
   plan: ({ target, from_stdin }, ctx) => {
     seen.push({ input: { target }, ctx });
     if (target === 'blocked') throw new CliError({ code: 'no-env', message: 'There is nothing to deploy here.', hint: 'Bind the directory first.' });
-    return { plan: planOf(target), target, ...(target === 'keyed' && !from_stdin ? { needs: ['--from-stdin'] } : {}) };
+    return { plan: planOf(target === 'moving' ? `moving ${moving}` : target), target, ...(target === 'keyed' && !from_stdin ? { needs: ['--from-stdin'] } : {}) };
   },
   apply: (_input, { target }) => {
     applied.push(target);
@@ -569,7 +571,7 @@ describe('output', () => {
   it('renders data with the default renderer when the command gives no text', async () => {
     const result = await exec(cli, ['table', 'list'], { tty: true });
     expect(result.stdout.trimEnd().split('\n').map((line) => line.split(/ {2,}/))).toEqual([
-      ['name', 'owner', 'rows'],
+      ['NAME', 'OWNER', 'ROWS'],
       ['users', '{"id":1,"name":"ann"}', '3'],
       ['posts', '{"id":2,"name":"bob"}', '5']
     ]);
@@ -657,11 +659,11 @@ describe('secrets', () => {
 });
 
 describe('help, --schema and --llms', () => {
-  it.each([[['--help']], [['-h']], [[]]])('%j prints the root help with the agent block', async (argv) => {
+  it.each([[['--help']], [['-h']], [[]]])('%j prints the root help, which points agents to --llms', async (argv) => {
     const result = await exec(cli, argv);
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('Usage:\n  demo <command> [flags]');
-    expect(result.stdout).toContain('Agents:\n  - Pass --json for machine output.');
+    expect(result.stdout).toContain('Agents: run "demo --llms" for the command index and the notes for agents.');
     expect(result.stdout).toContain('--context <string>');
     expect(result.stdout).toContain('--no-input');
     expect(result.stdout).not.toContain('boom');
@@ -752,7 +754,7 @@ describe('help topics and the help command', () => {
   it('prints a topic: its summary, then its body', async () => {
     const result = await exec(guide, ['help', 'output'], { tty: true });
     expect(result.code).toBe(0);
-    expect(result.stdout).toBe('What a command prints\n\nWithout a terminal, a command prints one JSON envelope.\n\n- `--json` asks for it on a terminal too.\n');
+    expect(result.stdout).toBe('What a command prints\n\nWithout a terminal, a command prints one JSON envelope.\n\n- --json asks for it on a terminal too.\n');
     expect((await exec(guide, ['help', 'output'])).json().data).toEqual({ kind: 'topic', name: 'output', text: result.stdout });
   });
 
@@ -774,7 +776,7 @@ describe('help topics and the help command', () => {
     const root = (await exec(guide, ['--help'])).stdout;
     expect(root).toMatch(/Help topics:\n {2}output +What a command prints\n/);
     expect(root).toContain('Run "demo help <topic>" to read one.');
-    expect(root).toMatch(/\n {2}help +Show the help of the CLI, a command, a group or a help topic \(read\)\n/);
+    expect(root).toMatch(/\n {2}help +Show the help of a command or topic\n/);
     expect((await exec(guide, ['help', '--help'])).stdout).toContain('demo help [name...] [flags]');
     const llms = (await exec(guide, ['--llms'])).stdout;
     expect(llms).toContain('## Help topics\n\n');
@@ -800,7 +802,7 @@ describe('help topics and the help command', () => {
     for (const topic of topics) expect(reference).toContain(topic.body);
     expect(reference).toContain('`demo table add <table-name> [flags]`');
     expect(reference).toMatch(/- `--table-name <string>`: Name of the table \(required, or argument 1\)\n/);
-    expect(reference).toContain('- `-y, --yes`: Approve the plan of a change without a prompt\n');
+    expect(reference).toContain('- `-y, --yes`: Approve the plan without a prompt\n');
     expect(reference).toContain('demo table add users --password <secret>');
     expect(reference).toContain('- Pass --json for machine output.\n');
     expect(reference).not.toContain('default-secret');
@@ -882,7 +884,7 @@ describe('secrets come from the schema', () => {
     expect(failed.stdout).not.toMatch(/NESTED-SECRET-9|TOKEN-ONE-111/);
     const stopped = await exec(cli, ['vault', 'l', '--creds', '{"secret":"NESTED-SECRET-9"}', '--json']);
     expect(stopped.code).toBe(ExitCode.approvalRequired);
-    expect(stopped.json().meta.next[0].argv).toEqual(['demo', 'vault', 'l', '--creds', '<creds>', '--json', '--yes']);
+    expect(stopped.json().meta.next[0].argv).toEqual(['demo', 'vault', 'l', '--creds', '<creds>', '--json', '--approve', stopped.json().error.details.planId]);
     expect(stopped.stdout).not.toContain('NESTED-SECRET-9');
     const ok = await exec(cli, ['vault', 'l', '--creds', '{"secret":"NESTED-SECRET-9","user":"u"}', '--yes', '--json']);
     expect(ok.json().meta.next).toEqual([{
@@ -998,7 +1000,7 @@ describe('layer prompts', () => {
   it.each([
     ['a text prompt', ['table', 'add', '--json'], { tty: true, answers: [['Name of the table', 'users\n']] }, 0],
     ['a list and a confirm', ['setup', '--json'], { tty: true, answers: [['audit', '\u001b[B'], ['> audit', '\r'], ['Continue?', 'y\n']] }, 0],
-    ['the approval of a change', ['deploy', 'web', '--json'], { tty: true, answers: [['Apply this change?', 'y\n']] }, 0],
+    ['the approval of a change', ['deploy', 'web', '--json'], { tty: true, answers: [['Apply?', 'y\n']] }, 0],
     ['ctx.prompter without a terminal', ['ask', '--json'], {}, ExitCode.failure]
   ] as Array<[string, string[], RunOptions, number]>)('never reset the terminal: %s', async (_name, argv, options, code) => {
     const result = await exec(cli, argv, options);
@@ -1257,7 +1259,7 @@ describe('a command that serves a protocol', () => {
     const text = await exec(cli, ['serve'], { tty: true });
     expect(text.code).toBe(0);
     expect(text.stdout).toBe('PROTOCOL\n');
-    expect(text.stderr).toContain('closed: true\nNext:\n  demo status  # Check\n');
+    expect(text.stderr).toContain('closed  yes\nNext:\n  demo status  # Check\n');
   });
 });
 
@@ -1291,7 +1293,7 @@ describe('-y, the short form of --yes', () => {
   });
 
   it('shows in help, in the manifest and in --llms', async () => {
-    expect((await exec(cli, ['--help'])).stdout).toMatch(/-y, --yes +Approve the plan of a change without a prompt/);
+    expect((await exec(cli, ['--help'])).stdout).toMatch(/-y, --yes +Approve the plan without a prompt/);
     expect((await exec(cli, ['--help'])).stdout).toMatch(/-h, --help +Show help/);
     expect((await exec(cli, ['--llms', '--json'])).json().globals.properties.yes['x-short']).toBe('y');
     expect((await exec(cli, ['--llms'])).stdout).toContain('`-y` is `--yes`');
@@ -1396,20 +1398,21 @@ describe('ctx.followUp', () => {
 
 describe('the approval of a change', () => {
   const PLAN = planOf('web');
-  const RERUN = { command: 'demo deploy web --json --yes', argv: ['demo', 'deploy', 'web', '--json', '--yes'], why: 'Apply the change once the person approves the plan' };
+  const rerun = (planId: string) => ({ command: `demo deploy web --json --approve ${planId}`, argv: ['demo', 'deploy', 'web', '--json', '--approve', planId], why: 'Apply after approval' });
 
-  it('stops before the change with exit 3, the plan and the rerun with --yes, when there is no terminal', async () => {
+  it('stops before the change with exit 3, the plan and its --approve step, when there is no terminal', async () => {
     const result = await exec(cli, ['deploy', 'web', '--json']);
     expect(result.code).toBe(ExitCode.approvalRequired);
+    const { planId } = result.json().error.details;
     expect(result.json()).toEqual({
       ok: false,
       error: {
         code: 'approval-required',
-        message: 'This change needs approval, and prompts are off, so nothing was changed.',
-        hint: 'Show the plan to the person. When they approve it, run the same command with --yes.',
-        details: { plan: PLAN }
+        message: 'Nothing changed. The plan needs approval, and there is no terminal to ask.',
+        hint: 'Show the plan to the person, then run the --approve step.',
+        details: { plan: PLAN, planId }
       },
-      meta: { command: 'deploy', next: [RERUN] }
+      meta: { command: 'deploy', next: [rerun(planId)] }
     });
     expect(applied).toEqual([]);
   });
@@ -1417,24 +1420,28 @@ describe('the approval of a change', () => {
   it('prints the plan above the error in text format', async () => {
     const result = await exec(cli, ['deploy', 'web', '--format', 'text']);
     expect(result.code).toBe(ExitCode.approvalRequired);
-    expect(result.stderr).toMatch(/Directory: [\s\S]*Change web\.\n\nError \(approval-required\)/);
+    expect(result.stderr).toMatch(/directory {2}[\s\S]*Change web\.\n\nError \(approval-required\)/);
     expect(applied).toEqual([]);
   });
 
   it.each([[['--dry-run']], [['--dry-run', '--yes']], [['--dry-run', '-y']]])('returns the plan for %j, offers the real run, and changes nothing', async (flags) => {
     const result = await exec(cli, ['deploy', 'web', ...flags, '--json']);
     expect(result.code).toBe(0);
-    expect(result.json().data).toEqual({ applied: false, plan: PLAN });
-    expect(result.json().meta.next).toEqual([RERUN]);
+    const { planId } = result.json().data;
+    expect(result.json().data).toEqual({ applied: false, plan: PLAN, planId });
+    expect(result.json().meta.next).toEqual([rerun(planId)]);
     expect(applied).toEqual([]);
   });
 
   it('adds the flags its plan needs to the exit-3 step and the dry-run step when there is no terminal, and only then', async () => {
-    const step = (command: string) => ({ command, argv: command.split(' '), why: RERUN.why });
-    expect((await exec(cli, ['deploy', 'keyed', '--json'])).json().meta.next).toEqual([step('demo deploy keyed --json --from-stdin --yes')]);
-    expect((await exec(cli, ['deploy', 'keyed', '--dry-run', '--json'])).json().meta.next).toEqual([step('demo deploy keyed --json --from-stdin --yes')]);
-    expect((await exec(cli, ['deploy', 'keyed', '--from-stdin', '--dry-run', '--json'])).json().meta.next).toEqual([step('demo deploy keyed --from-stdin --json --yes')]);
-    expect((await exec(cli, ['deploy', 'keyed', '--dry-run', '--json'], { tty: true })).json().meta.next).toEqual([step('demo deploy keyed --json --yes')]);
+    const step = (command: string) => ({ command, argv: command.split(' '), why: 'Apply after approval' });
+    const stopped = (await exec(cli, ['deploy', 'keyed', '--json'])).json();
+    const id = stopped.error.details.planId;
+    expect(stopped.meta.next).toEqual([step(`demo deploy keyed --json --from-stdin --approve ${id}`)]);
+    expect((await exec(cli, ['deploy', 'keyed', '--dry-run', '--json'])).json().meta.next).toEqual([step(`demo deploy keyed --json --from-stdin --approve ${id}`)]);
+    const given = (await exec(cli, ['deploy', 'keyed', '--from-stdin', '--dry-run', '--json'])).json();
+    expect(given.meta.next).toEqual([step(`demo deploy keyed --from-stdin --json --approve ${given.data.planId}`)]);
+    expect((await exec(cli, ['deploy', 'keyed', '--dry-run', '--json'], { tty: true })).json().meta.next).toEqual([step(`demo deploy keyed --json --approve ${id}`)]);
     expect(applied).toEqual([]);
   });
 
@@ -1446,6 +1453,78 @@ describe('the approval of a change', () => {
     const result = await exec(cli, ['deploy', 'web', ...flags], { tty });
     expect(result.code).toBe(ExitCode.approvalRequired);
     expect(applied).toEqual([]);
+  });
+
+  describe('an approval of one plan, with --approve <id>', () => {
+    const planIdOf = async (argv: string[]): Promise<string> => (await exec(cli, [...argv, '--json'])).json().error.details.planId;
+
+    it('gives each plan an id, in the data of --dry-run and in the error of exit 3, and offers --approve <id> as the next step', async () => {
+      const stopped = (await exec(cli, ['deploy', 'web', '--json'])).json();
+      const { planId } = stopped.error.details;
+      expect(planId).toMatch(/^[0-9a-f]{12}$/);
+      const next = { command: `demo deploy web --json --approve ${planId}`, argv: ['demo', 'deploy', 'web', '--json', '--approve', planId], why: 'Apply after approval' };
+      expect(stopped.meta.next).toEqual([next]);
+      const dry = (await exec(cli, ['deploy', 'web', '--dry-run', '--json'])).json();
+      expect(dry.data).toEqual({ applied: false, plan: PLAN, planId });
+      expect(dry.meta.next).toEqual([next]);
+      expect(applied).toEqual([]);
+    });
+
+    it('applies the change while its plan is the one with that id', async () => {
+      const result = await exec(cli, ['deploy', 'web', '--approve', await planIdOf(['deploy', 'web']), '--json']);
+      expect(result.code).toBe(0);
+      expect(applied).toEqual(['web']);
+    });
+
+    it('refuses the id once the plan has changed, shows the new plan with its id, and changes nothing', async () => {
+      moving = 'before';
+      const approved = await planIdOf(['deploy', 'moving']);
+      moving = 'after';
+      const result = await exec(cli, ['deploy', 'moving', '--approve', approved, '--json']);
+      expect(result.code).toBe(ExitCode.approvalRequired);
+      const { error, meta } = result.json();
+      expect(error).toMatchObject({ code: 'plan-changed', details: { plan: planOf('moving after') } });
+      expect(error.details.planId).not.toBe(approved);
+      expect(meta.next[0].argv).toEqual(['demo', 'deploy', 'moving', '--json', '--approve', error.details.planId]);
+      expect(applied).toEqual([]);
+    });
+
+    it('applies with the step that adds the flags the plan needs, since they only say how a secret arrives', async () => {
+      const stopped = (await exec(cli, ['deploy', 'keyed', '--json'])).json();
+      const result = await exec(cli, stopped.meta.next[0].argv.slice(1));
+      expect(result.code).toBe(0);
+      expect(applied).toEqual(['keyed']);
+    });
+
+    it('leaves a secret input out of the id', async () => {
+      const rotate: ChangeCommand<z.ZodObject<{ key: z.ZodString }>> = {
+        name: 'rotate',
+        summary: 'Rotate the key',
+        effect: 'write',
+        input: z.object({ key: z.string().meta({ 'x-secret': true, description: 'The new key' }) }),
+        plan: () => ({ plan: planOf('the key') }),
+        apply: () => ({ data: {} })
+      };
+      const small = createCli({ name: 'demo', version: '1.0.0', commands: [rotate] });
+      const idFor = async (key: string) => (await exec(small, ['rotate', '--key', key, '--json'])).json().error.details.planId;
+      const first = await idFor('first-secret-value');
+      expect(first).toMatch(/^[0-9a-f]{12}$/);
+      expect(await idFor('second-secret-value')).toBe(first);
+    });
+
+    it.each([[['--yes']], [['--dry-run']]])('is a usage error beside %j', async (flags) => {
+      const result = await exec(cli, ['deploy', 'web', '--approve', 'abcdef123456', ...flags, '--json']);
+      expect(result.code).toBe(ExitCode.usage);
+      expect(result.json().error.code).toBe('invalid-input');
+      expect(applied).toEqual([]);
+    });
+
+    it('is a usage error for a change that has no plan', async () => {
+      const result = await exec(cli, ['bump', '--approve', 'abcdef123456', '--json']);
+      expect(result.code).toBe(ExitCode.usage);
+      expect(result.json().error).toMatchObject({ code: 'invalid-input', details: { flag: '--approve' } });
+      expect(bumped).toEqual([]);
+    });
   });
 
   it('applies the plan with --yes', async () => {
@@ -1463,24 +1542,24 @@ describe('the approval of a change', () => {
   });
 
   it('shows the plan on a terminal and applies it when the person says yes', async () => {
-    const result = await exec(cli, ['deploy', 'web', '--json'], { tty: true, answers: [['Apply this change?', 'y\n']] });
+    const result = await exec(cli, ['deploy', 'web', '--json'], { tty: true, answers: [['Apply?', 'y\n']] });
     expect(result.code).toBe(0);
     expect(result.stderr).toContain('Change web.');
     expect(applied).toEqual(['web']);
   });
 
   it('fails with cancelled, exit 1, when the person declines', async () => {
-    const result = await exec(cli, ['deploy', 'web', '--json'], { tty: true, answers: [['Apply this change?', 'n\n']] });
+    const result = await exec(cli, ['deploy', 'web', '--json'], { tty: true, answers: [['Apply?', 'n\n']] });
     expect(result.code).toBe(ExitCode.failure);
-    expect(result.json().error).toEqual({ code: 'cancelled', message: 'The change was not approved, so nothing was changed.' });
+    expect(result.json().error).toEqual({ code: 'cancelled', message: 'Not approved. Nothing changed.' });
     expect(applied).toEqual([]);
   });
 
   it('labels a change by its effect alone in --schema, the manifest and help', async () => {
     expect((await exec(cli, ['deploy', '--schema'])).json()).toMatchObject({ name: 'deploy', effect: 'destructive' });
     expect((await exec(cli, ['deploy', '--help'])).stdout).toContain('Effect: destructive');
-    expect((await exec(cli, ['--help'])).stdout).toMatch(/deploy +Deploy a target \(destructive\)/);
-    expect((await exec(cli, ['--help'])).stdout).toMatch(/server +Run the server \(write, takes its own flags\)/);
+    expect((await exec(cli, ['--help'])).stdout).toMatch(/deploy +Deploy a target +destructive\n/);
+    expect((await exec(cli, ['--help'])).stdout).toMatch(/server +Run the server +own flags\n/);
   });
 });
 
@@ -1498,13 +1577,13 @@ describe('a change that runs at once', () => {
     const result = await exec(cli, ['bump', '--dry-run', '--json']);
     expect(result.code).toBe(ExitCode.usage);
     expect(result.json().error).toMatchObject({ code: 'dry-run-unsupported', details: { flag: '--dry-run' } });
-    expect(result.json().error.message).toContain('makes its change as soon as it runs');
+    expect(result.json().error.message).toContain('it changes at once');
     expect(bumped).toEqual([]);
   });
 
   it('says it runs at once in help', async () => {
     expect((await exec(cli, ['bump', '--help'])).stdout).toContain('Effect: write, at once');
-    expect((await exec(cli, ['--help'])).stdout).toMatch(/bump +Bump a counter at once \(write, at once\)/);
+    expect((await exec(cli, ['--help'])).stdout).toMatch(/bump +Bump a counter at once +at once\n/);
   });
 });
 

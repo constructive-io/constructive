@@ -1,3 +1,5 @@
+import { alignColumns } from '@agentic-kit/harness';
+
 import { FlagDef, FlagKind, flagKind, FlagTable, isSecret, kebabCase, LAYER_FLAGS, orList } from './input';
 import type { CliConfig, CliManifest, CommandDefinition, CommandExample, CommandManifest, Effect, HelpTopic, JSONSchema, ReferenceSection } from './types';
 
@@ -47,7 +49,8 @@ const shortForms = (): string[] =>
 
 /** What every CLI of this layer tells its agents, after the CLI's own notes. */
 const layerNotes = (name: string): string[] => [
-  'A change (write or destructive) shows its plan with --dry-run, asks on a terminal, and without a terminal stops with exit 3 and the plan until it is run with --yes. ' +
+  'A change (write or destructive) shows its plan and its id with --dry-run, asks on a terminal, and without a terminal stops with exit 3 and the plan. ' +
+    'Show the plan to the person, then run the next step, --approve <id>: it applies the change only while the plan is the same, and otherwise stops with plan-changed and the new plan. ' +
     'A command marked "at once" changes as soon as it runs, and refuses --dry-run; one that takes its own flags, or serves on stdio, has no plan either.',
   `Run "${name} --llms" for a command index, and "${name} <command> --schema" for the JSON Schema of a command.`
 ];
@@ -107,9 +110,18 @@ function effectLabel(command: KindFacts): string {
   return command.effect;
 }
 
-function commandRows(commands: CommandDefinition[]): string[] {
-  return columns(commands.map((command) => [command.name, `${command.summary} (${effectLabel(command)})`]));
+/** The effect column of a command list: blank for a read, so the commands that change something stand out. */
+function effectColumn(command: KindFacts): string {
+  if (command.passthrough) return 'own flags';
+  if (command.stdout === 'reserved') return 'stdio';
+  if (command.immediate) return 'at once';
+  return command.effect === 'read' ? '' : command.effect;
 }
+
+const commandRows = (commands: CommandDefinition[]): string[] =>
+  alignColumns(commands.map((command) => [command.name, command.summary, effectColumn(command)])).map((line) => `  ${line}`);
+
+const EFFECT_LEGEND = '"write" and "destructive" commands show a plan and ask first; "at once" commands change without one.';
 
 function redactExample(example: CommandExample, table: FlagTable): CommandExample {
   let command = example.command;
@@ -142,7 +154,6 @@ function publicSchema(schema: JSONSchema | undefined): JSONSchema | undefined {
 export function rootHelp(config: CliConfig, table: FlagTable): string {
   const lines = [`${config.name} ${config.version}`];
   if (config.description) lines.push(config.description);
-  const notes = [...(config.notes ?? []), ...layerNotes(config.name)];
   lines.push(
     '',
     'Usage:',
@@ -151,13 +162,15 @@ export function rootHelp(config: CliConfig, table: FlagTable): string {
     'Commands:',
     ...commandRows(visible(config)),
     '',
+    EFFECT_LEGEND,
+    '',
     'Global flags:',
     ...columns(table.flags.map((def) => flagRow(def, [])))
   );
   if (config.topics?.length) {
     lines.push('', 'Help topics:', ...columns(config.topics.map((topic) => [topic.name, topic.summary])), '', `Run "${config.name} help <topic>" to read one.`);
   }
-  lines.push('', 'Agents:', ...notes.map((note) => `  - ${note}`));
+  lines.push('', `Agents: run "${config.name} --llms" for the command index and the notes for agents.`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -170,6 +183,7 @@ export function groupHelp(config: CliConfig, group: string): string {
     'Commands:',
     ...commandRows(commands),
     '',
+    EFFECT_LEGEND,
     `Run "${config.name} ${group} <command> --help" for the flags of a command.`
   ];
   return `${lines.join('\n')}\n`;
@@ -178,7 +192,6 @@ export function groupHelp(config: CliConfig, group: string): string {
 export function commandHelp(config: CliConfig, command: CommandDefinition, { table }: Shown): string {
   const positionals = positionalsOf(command);
   const flags = inputFlags(table);
-  const otherFlags = table.flags.filter((def) => def.scope !== 'input').map((def) => `--${def.flag}`);
   const usage = `${config.name} ${command.name}`;
   const lines = [`${usage}: ${command.summary}`, `Effect: ${effectLabel(command)}`];
   if (command.description) lines.push('', command.description);
@@ -188,7 +201,7 @@ export function commandHelp(config: CliConfig, command: CommandDefinition, { tab
     lines.push('', 'Usage:', `  ${usage}${argumentsOf(positionals, flags)}${flags.length ? ' [flags]' : ''}`);
   }
   if (flags.length) lines.push('', 'Flags:', ...columns(flags.map((def) => flagRow(def, positionals))));
-  lines.push('', `Global flags: ${otherFlags.join(', ')}. Run "${config.name} --help" for what they do.`);
+  lines.push('', `Global flags: ${config.name} --help`);
   if (command.examples?.length) {
     lines.push('', 'Examples:');
     for (const example of command.examples.map((item) => redactExample(item, table))) {
@@ -200,7 +213,9 @@ export function commandHelp(config: CliConfig, command: CommandDefinition, { tab
   return `${lines.join('\n')}\n`;
 }
 
-export const topicPage = (topic: HelpTopic): string => `${topic.summary}\n\n${topic.body}\n`;
+/** A topic as a terminal shows it: its Markdown without the fence lines of its code blocks or the backticks of inline code. */
+export const topicPage = (topic: HelpTopic): string =>
+  `${topic.summary}\n\n${topic.body.replace(/^ {0,3}```.*\n?/gm, '').replace(/`([^`\n]+)`/g, '$1')}\n`;
 
 export function commandSchema(command: CommandDefinition, shown: Shown) {
   return {
@@ -222,7 +237,7 @@ export function llmsIndex(config: CliConfig, shownOf: ShownOf): string {
     `Version ${config.version}. Run \`${config.name} <command> --schema\` for the input and output JSON Schema of a command, ` +
       `and \`${config.name} --llms --json\` for the full manifest. When stdout is not a terminal, a command${own} prints one JSON envelope: ` +
       '`{"ok":true,"data":...}` or `{"ok":false,"error":{"code":...,"message":...}}`. ' +
-      'A change stops with exit 3 and its plan in `error.details.plan` until it is run with `--yes`. ' +
+      'A change stops with exit 3, its plan in `error.details.plan` and its id in `error.details.planId`. `--approve <id>` applies that plan only, and `--yes` applies any plan. ' +
       `Short forms: ${orList(shortForms(), 'and')}.`,
     '',
     '## Commands',

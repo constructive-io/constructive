@@ -22,6 +22,16 @@ export type GateResult = { block: true; reason: string; failure?: ToolFailure } 
 
 const approvedTables = new Map<string, Extract<PlanTarget, { kind: 'database' }>>();
 
+/** Keeps the table target a person approved for one call, for 60 seconds, until the tool takes it with takeApprovedTable. */
+export function recordApprovedTable(toolCallId: string, cwd: string, target: PlanTarget): void {
+  if (target.kind !== 'database' || !target.table) return;
+  const key = JSON.stringify([cwd, toolCallId]);
+  approvedTables.set(key, target);
+  setTimeout(() => {
+    if (approvedTables.get(key) === target) approvedTables.delete(key);
+  }, 60_000).unref();
+}
+
 export function takeApprovedTable(toolCallId: string, cwd: string) {
   const key = JSON.stringify([cwd, toolCallId]);
   const target = approvedTables.get(key);
@@ -96,7 +106,7 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
         };
       }
 
-      const tableTarget = prompt.target.kind === 'database' && prompt.target.table ? structuredClone(prompt.target) : undefined;
+      const shown = structuredClone(prompt.target);
       const approved = await host.confirmTool(
         event.toolCallId,
         prompt.title,
@@ -108,13 +118,7 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
         declineGuard.recordDecline(event.toolName, input);
         return { block: true, reason: buildDeclineReason(event.toolName) };
       }
-      if (tableTarget) {
-        const key = JSON.stringify([cwd, event.toolCallId]);
-        approvedTables.set(key, tableTarget);
-        setTimeout(() => {
-          if (approvedTables.get(key) === tableTarget) approvedTables.delete(key);
-        }, 60_000).unref();
-      }
+      recordApprovedTable(event.toolCallId, cwd, shown);
       // An approved mutation changes state, so earlier declines may no longer
       // describe the same effect (e.g. a create_template preview derives from
       // the blueprint, not the input) — let them re-prompt with fresh eyes.
