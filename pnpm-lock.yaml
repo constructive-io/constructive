@@ -196,8 +196,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
     publishDirectory: dist
 
   agentic/db-tools:
@@ -1734,8 +1734,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
@@ -2431,8 +2431,8 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8(graphql@16.13.0)(ws@8.21.3)
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       makage:
         specifier: ^0.8.0
         version: 0.8.0
@@ -2657,8 +2657,8 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2753,8 +2753,8 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2991,8 +2991,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       libpg-query:
         specifier: ^18.3.0
         version: 18.3.0
@@ -3202,11 +3202,11 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       genomic:
-        specifier: ^5.6.9
-        version: 5.6.9
+        specifier: ^5.6.10
+        version: 5.6.10
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -3300,8 +3300,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/csv-to-pg/dist
       genomic:
-        specifier: ^5.6.9
-        version: 5.6.9
+        specifier: ^5.6.10
+        version: 5.6.10
       git-changed:
         specifier: ^0.4.0
         version: 0.4.0
@@ -3352,8 +3352,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       makage:
         specifier: ^0.8.0
         version: 0.8.0
@@ -3423,8 +3423,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       pg:
         specifier: ^8.21.0
         version: 8.21.0
@@ -4023,8 +4023,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inquirerer:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.9.8
+        version: 4.9.8
       nested-obj:
         specifier: ^0.2.3
         version: 0.2.3
@@ -8261,8 +8261,8 @@ packages:
     resolution: {integrity: sha512-zV/5HKTfCeKWnxG0Dmrw51hEWFGfcF2xiXqcA3+J90WDuP0SvoiSO5ORvcBsifmx/FoIjgQN3oNOGaQ5PhLFkg==}
     engines: {node: '>=18'}
 
-  genomic@5.6.9:
-    resolution: {integrity: sha512-gzo9meKLXfzEGTBJ8E+soQDlddyLz6f46BwMT5xEIiG0G20S+BLLoUjolXvJrBOkjySFybgrs4T3p3pNgUGWPA==}
+  genomic@5.6.10:
+    resolution: {integrity: sha512-t/yfnHrVxfI69gQGbWzDyoaJ0gwgk/knudy/H9ifkhbFGKgUPHXkQy455IgjbICo+2n1/Li0mRWikbuRX0tV/w==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -8699,6 +8699,9 @@ packages:
 
   inquirerer@4.9.7:
     resolution: {integrity: sha512-3PgTWhyKjt42C45JlVKlDhM9NRgHEciZM40fqZUGIK5aAFKu3gR/4JnJN7n5nnOK3Cs/Xu0Y8nOWdEDGxy53rA==}
+
+  inquirerer@4.9.8:
+    resolution: {integrity: sha512-cmQ1phUtT1E34fCcyias96i/9IFv+yLIVUUjTRZH7WKAk4WktrNE/p5nSw5TWvAn/RaGozLcoZGX+Y6012vKdQ==}
 
   interpret@3.1.1:
     resolution: {integrity: sha512-6xwYfHbajpoF0xLW+iwLkhwgvLoZDfjYfoFNu8ftMoXINzwuymNLd9u/KmwtdT2GbR+/Cz66otEGEVVUHX9QLQ==}
@@ -16050,10 +16053,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  genomic@5.6.9:
+  genomic@5.6.10:
     dependencies:
       appstash: 0.8.2
-      inquirerer: 4.9.7
+      inquirerer: 4.9.8
 
   gensync@1.0.0-beta.2: {}
 
@@ -16759,6 +16762,13 @@ snapshots:
       - '@types/node'
 
   inquirerer@4.9.7:
+    dependencies:
+      deepmerge: 4.3.1
+      find-and-require-package-json: 0.9.3
+      minimist: 1.2.8
+      yanse: 0.2.4
+
+  inquirerer@4.9.8:
     dependencies:
       deepmerge: 4.3.1
       find-and-require-package-json: 0.9.3

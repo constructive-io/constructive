@@ -69,7 +69,7 @@
     "graphile-schema": "workspace:^",
     "graphql": "16.13.0",
     "inflekt": "^0.8.1",
-    "inquirerer": "^4.9.7",
+    "inquirerer": "^4.9.8",
     "jiti": "^2.7.0",
     "oxfmt": "^0.51.0",
     "pg-cache": "workspace:^",

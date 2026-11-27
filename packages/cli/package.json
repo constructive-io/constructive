@@ -57,7 +57,7 @@
     "@pgpmjs/types": "workspace:^",
     "appstash": "^0.8.0",
     "find-and-require-package-json": "^0.9.1",
-    "inquirerer": "^4.9.7",
+    "inquirerer": "^4.9.8",
     "js-yaml": "^4.1.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",

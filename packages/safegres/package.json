@@ -63,7 +63,7 @@
     "@pgsql/traverse": "^18.8.15",
     "@pgsql/types": "^18.0.0",
     "confstash": "^0.1.2",
-    "inquirerer": "^4.9.7",
+    "inquirerer": "^4.9.8",
     "libpg-query": "^18.3.0",
     "pg": "^8.21.0",
     "pg-env": "workspace:^",
