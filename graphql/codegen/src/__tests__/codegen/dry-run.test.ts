@@ -190,6 +190,42 @@ describe('codegen --dry-run writes nothing in every mode', () => {
       expect(fs.existsSync(path.join(schemaOut, 'beta.graphql'))).toBe(false);
       expect(fs.existsSync(path.join(tempDir, 'README.md'))).toBe(false);
     });
+
+    it('excludes dryRun targets from root barrel, manifest, and unified CLI in mixed runs', async () => {
+      process.chdir(tempDir);
+
+      const outRoot = path.join(tempDir, 'out-mixed');
+
+      const { results, hasError } = await generateMulti({
+        configs: {
+          preview: {
+            schemaFile: EXAMPLE_SCHEMA,
+            orm: true,
+            dryRun: true,
+            output: path.join(outRoot, 'preview'),
+            docs: { readme: false, agents: false, skills: false },
+          },
+          real: {
+            schemaFile: EXAMPLE_SCHEMA,
+            orm: true,
+            output: path.join(outRoot, 'real'),
+            docs: { readme: false, agents: false, skills: false },
+          },
+        },
+      });
+
+      expect(hasError).toBe(false);
+      expect(results).toHaveLength(2);
+      expect(fs.existsSync(path.join(outRoot, 'preview'))).toBe(false);
+      expect(fs.existsSync(path.join(outRoot, 'real', 'orm', 'index.ts'))).toBe(true);
+
+      const barrel = fs.readFileSync(path.join(outRoot, 'index.ts'), 'utf-8');
+      expect(barrel).toContain('./real');
+      expect(barrel).not.toContain('./preview');
+
+      const manifest = JSON.parse(fs.readFileSync(path.join(outRoot, TARGETS_MANIFEST), 'utf-8'));
+      expect(manifest).toEqual(['real']);
+    });
   });
 
   describe('runCodegenHandler() CLI paths', () => {
