@@ -231,6 +231,7 @@ export function hasResolvedCodegenSource(
   return Boolean(
     normalized.endpoint ||
       normalized.schemaFile ||
+      normalized.schemaDir ||
       (normalized.schemas as string[] | undefined)?.length ||
       (normalized.apiNames as string[] | undefined)?.length ||
       dbSchemas?.length ||

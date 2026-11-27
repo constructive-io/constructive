@@ -248,6 +248,14 @@ describe('codegen --dry-run writes nothing in every mode', () => {
       fs.writeFileSync(path.join(inputSchemas, 'alpha.graphql'), sdl, 'utf-8');
       fs.writeFileSync(path.join(inputSchemas, 'beta.graphql'), sdl, 'utf-8');
 
+      // Simulate inquirerer injecting default `dry-run: false` if prompted
+      const prompter = {
+        prompt: jest.fn(async (argv: Record<string, unknown>) => ({
+          ...argv,
+          'dry-run': false,
+        })),
+      };
+
       const outDir = path.join(tempDir, 'out');
       await runCodegenHandler(
         {
@@ -256,9 +264,10 @@ describe('codegen --dry-run writes nothing in every mode', () => {
           output: outDir,
           'dry-run': true,
         },
-        createNoopPrompter(),
+        prompter,
       );
 
+      expect(prompter.prompt).not.toHaveBeenCalled();
       expect(fs.existsSync(outDir)).toBe(false);
       expect(fs.existsSync(path.join(tempDir, 'README.md'))).toBe(false);
     });
