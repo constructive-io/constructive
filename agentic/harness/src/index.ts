@@ -1,9 +1,5 @@
 export * from './adapter';
-export * from './blueprint/blueprint-defaults';
-export * from './blueprint/blueprint-schema';
-export * from './blueprint/field-type';
-export * from './blueprint/internal-policies';
-export * from './blueprint/policy-provisioning';
+export type { Blueprint } from './blueprint';
 export * from './gating/approvals';
 export * from './gating/confirm-gate';
 export * from './gating/constructive-policy';

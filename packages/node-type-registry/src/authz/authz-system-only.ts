@@ -11,7 +11,15 @@ export const AuthzSystemOnly: NodeTypeDefinition = {
     'Use for INSERT policies on append-only event/audit/usage tables.',
   parameter_schema: {
     type: 'object',
-    properties: {}
+    properties: {},
+    additionalProperties: false
   },
-  tags: ['authz', 'system']
+  tags: ['authz', 'system'],
+  summary: 'A limit: only work the system runs itself passes; it never lets a normal request in.',
+  use_when: [
+    'Create on append-only event, audit or usage tables that only the platform writes.'
+  ],
+  avoid_when: [
+    'Any operation people or agents must perform themselves.'
+  ]
 };

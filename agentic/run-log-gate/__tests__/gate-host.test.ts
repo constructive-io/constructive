@@ -1,3 +1,4 @@
+import type { PlanTarget } from '@agentic-kit/harness';
 import type { RunLogStore } from '@agentic-kit/run-log';
 import { MemoryRunLogStore, projectToolState, readAll } from '@agentic-kit/run-log';
 
@@ -6,6 +7,8 @@ import { createRunLogGateHost, SKIPPED_REASON } from '../src/gate-host';
 
 /** Let every pending read/append settle — the submit is several awaits deep. */
 const flush = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
+
+const TARGET: PlanTarget = { kind: 'workspace', cwd: '/project' };
 
 describe('createRunLogGateHost', () => {
   let store: MemoryRunLogStore;
@@ -28,21 +31,21 @@ describe('createRunLogGateHost', () => {
     expect(host().hasUI).toBe(true);
   });
 
-  it('asks in the log, with the title and message a human reads', async () => {
+  it('asks in the log, with the target, the title and the message a human reads', async () => {
     const requested: unknown[] = [];
     const gate = host({ onRequested: (request) => requested.push(request) });
-    const pending = gate.confirmTool('call-1', 'Allow bash?', 'The agent wants to run `ls`.');
+    const pending = gate.confirmTool('call-1', 'Allow bash?', 'The agent wants to run `ls`.', undefined, TARGET);
     await flush();
 
     expect(requested).toEqual([
-      { toolCallId: 'call-1', title: 'Allow bash?', message: 'The agent wants to run `ls`.' }
+      { toolCallId: 'call-1', title: 'Allow bash?', message: 'The agent wants to run `ls`.', target: TARGET }
     ]);
     const records = await readAll(store, 'run-1');
     expect(records.map((record) => record.entry.id)).toEqual(['approval-call-1']);
     expect(projectToolState(records).pendingApprovals).toEqual([
       expect.objectContaining({
         toolCallId: 'call-1',
-        prompt: 'Allow bash?\n\nThe agent wants to run `ls`.'
+        prompt: 'directory  /project\n\nAllow bash?\n\nThe agent wants to run `ls`.'
       })
     ]);
 
@@ -53,7 +56,7 @@ describe('createRunLogGateHost', () => {
   it('settles on the resolution a human wrote and files it as the gate decision', async () => {
     const decided: unknown[] = [];
     const gate = host({ onDecided: (decision) => decided.push(decision) });
-    const pending = gate.confirmTool('call-1', 'Allow bash?', 'rm -rf /');
+    const pending = gate.confirmTool('call-1', 'Allow bash?', 'rm -rf /', undefined, TARGET);
     await flush();
     await resolveApproval(store, 'run-1', {
       toolCallId: 'call-1',
@@ -85,7 +88,7 @@ describe('createRunLogGateHost', () => {
 
   it('denies when nobody answers in time', async () => {
     const gate = host({ timeoutMs: 0 });
-    await expect(gate.confirmTool('call-1', 'Allow bash?', 'ls')).resolves.toBe(false);
+    await expect(gate.confirmTool('call-1', 'Allow bash?', 'ls', undefined, TARGET)).resolves.toBe(false);
     await gate.drain();
 
     const projected = projectToolState(await readAll(store, 'run-1'));

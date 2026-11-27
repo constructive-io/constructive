@@ -4,7 +4,6 @@ import path from 'node:path';
 
 import type { AgentTool } from '@agentic-kit/agent';
 import type { ConfirmGate, GateHost } from '@agentic-kit/harness';
-import { MUTATING_DB_TOOLS } from '@agentic-kit/harness';
 
 import { createPiToolsHost } from '../src/host';
 import {
@@ -76,7 +75,7 @@ describe('gated toolset', () => {
     expect(seen).toEqual([{ toolName: 'add_records', toolCallId: 'c1', input: { table: 'users' } }]);
   });
 
-  it('leaves the coding tools ungated: the harness only gates mutating db tools', async () => {
+  it('leaves the coding tools ungated: a clone knows no db tool effect', async () => {
     const ran: string[] = [];
     const { tools } = createGatedToolset({
       tools: [tool('bash', ran), tool('edit_file', ran)],
@@ -87,7 +86,6 @@ describe('gated toolset', () => {
 
     for (const t of tools) await t.execute('c1', {}, undefined);
     expect(ran).toEqual(['bash', 'edit_file']);
-    expect(MUTATING_DB_TOOLS.has('bash')).toBe(false);
   });
 });
 

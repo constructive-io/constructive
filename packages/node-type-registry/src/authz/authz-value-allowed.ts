@@ -1,4 +1,5 @@
 import type { NodeTypeDefinition } from '../types';
+import { ALLOWED_VALUES } from './parameters';
 
 export const AuthzValueAllowed: NodeTypeDefinition = {
   name: 'AuthzValueAllowed',
@@ -17,7 +18,7 @@ export const AuthzValueAllowed: NodeTypeDefinition = {
         description: 'Column on the protected table to check'
       },
       allowed: {
-        description: 'Allowed values as a constant string array, or a local column name containing the allowed values',
+        description: 'Allowed values as a constant list, or a local column name containing the allowed values',
         anyOf: [
           {
             type: 'string',
@@ -25,12 +26,7 @@ export const AuthzValueAllowed: NodeTypeDefinition = {
             'x-column-scope': 'local',
             description: 'Local column name containing allowed values'
           },
-          {
-            type: 'array',
-            items: { type: ['string', 'boolean', 'number'] },
-            description:
-              'Constant list of allowed values. Element JSON type is preserved: booleans/numbers emit typed constants (e.g. [true] -> TRUE, [5] -> 5), strings emit text literals.'
-          }
+          ALLOWED_VALUES
         ]
       },
       operator: {
@@ -39,7 +35,19 @@ export const AuthzValueAllowed: NodeTypeDefinition = {
         description: 'Operator to use for the value check'
       }
     },
-    required: ['column', 'allowed', 'operator']
+    required: ['column', 'allowed', 'operator'],
+    additionalProperties: false
   },
-  tags: ['authz', 'value']
+  tags: ['authz', 'value'],
+  summary: 'Rows whose column holds an allowed value pass; it does not check who is asking.',
+  use_when: [
+    'The update check that limits what a row may change into, such as the allowed status values.',
+    'Inside AuthzComposite, next to a rule about people.'
+  ],
+  avoid_when: [
+    'As the only policy on an operation.'
+  ],
+  risks: [
+    'It does not check who is asking: as the only policy on an operation, anyone who can use the table passes for matching rows.'
+  ]
 };

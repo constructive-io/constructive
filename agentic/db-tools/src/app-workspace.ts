@@ -16,9 +16,9 @@ const execFileAsync = promisify(execFile);
 // with `Cannot find module 'graphile-connection-filter'`. Hoisting the override
 // to the ROOT pnpm-workspace.yaml (which pnpm 11.8 DOES read) collapses graphql —
 // and therefore grafast — to a single version, and the missing module resolves
-// (PNPM-GRAPHQL-OVERRIDE-001). We also strip the nested packages/app
+// We also strip the nested packages/app
 // pnpm-workspace.yaml the template ships, and keep onlyBuiltDependencies so the
-// native deps build where honored (PNPM-BUILDS-001).
+// native deps build where honored.
 export const NATIVE_BUILD_DEPS = ['esbuild', 'sharp', 'unrs-resolver'];
 export const IGNORED_BUILDS_RE = /ERR_PNPM_IGNORED_BUILDS|Ignored build scripts/;
 const DEFAULT_GRAPHQL_OVERRIDE = '16.14.0';
@@ -122,8 +122,7 @@ export async function ensureWorkspaceConfig(cwd: string): Promise<void> {
 }
 
 // Force @constructive-io/graphql-codegen to `latest` in the app package.json
-// before the single install — older 4.9.x throws on PostGraphile `filter` inputs
-// (TS-001).
+// before the single install — older 4.9.x throws on PostGraphile `filter` inputs.
 export async function pinCodegenLatest(appDir: string): Promise<void> {
   const pkgPath = path.join(appDir, 'package.json');
   const pkg = JSON.parse(await readFile(pkgPath, 'utf8'));
@@ -137,10 +136,8 @@ export async function pinCodegenLatest(appDir: string): Promise<void> {
 
 // The Constructive Next.js app is just the `nextjs/constructive-app` tree from
 // the sandbox-templates repo — it ships no `____VAR____` placeholders, so there
-// is nothing to templatize. `pgpm init` only fetches and copies that tree, but
-// its CLI is unreliable in the non-TTY agent shell, which made the agent thrash
-// for minutes. Materialize `packages/app` deterministically by shallow-cloning
-// the template instead (PGPM-001).
+// is nothing to templatize. Materialize `packages/app` deterministically by
+// shallow-cloning the template.
 export async function ensureAppScaffold(
   cwd: string,
   exec: RunCommand = run,
@@ -150,7 +147,7 @@ export async function ensureAppScaffold(
     return { ok: true, out: 'packages/app already scaffolded' };
   }
 
-  const tmp = path.join(os.tmpdir(), `airpage-app-template-${process.pid}`);
+  const tmp = path.join(os.tmpdir(), `constructive-app-template-${process.pid}`);
   await rm(tmp, { recursive: true, force: true });
   const clone = await exec('git', ['clone', '--depth', '1', TEMPLATE_REPO, tmp], cwd);
   if (!clone.ok) {
@@ -181,7 +178,7 @@ export async function ensureAppScaffold(
 // pnpm writes node_modules/.modules.yaml once an install finishes linking, so a
 // partial install (interrupted, or failed mid-way) lacks it. Codegen also
 // needs its bin, so both must be there to skip the install.
-function composedInstallComplete(appDir: string): boolean {
+export function composedInstallComplete(appDir: string): boolean {
   const modules = path.join(appDir, 'node_modules');
   return (
     existsSync(path.join(modules, '.modules.yaml')) &&

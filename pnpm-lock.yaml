@@ -214,6 +214,9 @@ importers:
       '@constructive-io/sdk':
         specifier: workspace:^
         version: link:../../sdk/constructive-sdk/dist
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       node-type-registry:
         specifier: workspace:^
         version: link:../../packages/node-type-registry/dist
@@ -2841,29 +2844,22 @@ importers:
     publishDirectory: dist
 
   packages/node-type-registry:
-    dependencies:
+    devDependencies:
       '@babel/generator':
         specifier: ^7.29.0
         version: 7.29.1
       '@babel/types':
         specifier: ^7.29.0
         version: 7.29.0
-      '@pgsql/types':
-        specifier: ^18.0.0
-        version: 18.0.0
-      '@pgsql/utils':
-        specifier: ^18.3.15
-        version: 18.3.15
-      pgsql-deparser:
-        specifier: ^18.5.8
-        version: 18.5.8
-      schema-typescript:
-        specifier: ^0.14.4
-        version: 0.14.4
-    devDependencies:
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       makage:
         specifier: ^0.8.0
         version: 0.8.0
+      schema-typescript:
+        specifier: ^0.14.4
+        version: 0.14.4
     publishDirectory: dist
 
   packages/oauth:

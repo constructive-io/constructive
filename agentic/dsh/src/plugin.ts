@@ -5,7 +5,7 @@ import {
   type ToolsHost
 } from '@agentic-kit/db-tools';
 import type { AnyHarnessTool, ConfirmGateOptions, GateHost } from '@agentic-kit/harness';
-import { createConfirmGate } from '@agentic-kit/harness';
+import { createConfirmGate, planTargetLines } from '@agentic-kit/harness';
 
 import { toDshTools } from './dsh-tool';
 import type {
@@ -60,7 +60,7 @@ export function createConstructivePlugin(options: ConstructivePluginOptions = {}
     name: DSH_PLUGIN_NAME,
     inject: ['tools'],
     apply(ctx: DshPluginContext): void {
-      for (const definition of toDshTools(tools, { cwd })) {
+      for (const definition of toDshTools(tools, { cwd, gated: options.gate !== false })) {
         ctx.tools.register(definition);
       }
 
@@ -97,12 +97,12 @@ function approvalHost(
 ): GateHost {
   return {
     hasUI: approval !== undefined,
-    confirmTool: async (_toolCallId, title, message) => {
+    confirmTool: async (_toolCallId, title, message, _preview, target) => {
       if (!approval) return false;
       const outcome = await approval.request({
         toolName: exec.name,
         callId: exec.callId,
-        reason: `${title}\n\n${message}`,
+        reason: [...planTargetLines(target), '', title, '', message].join('\n'),
         ...(exec.agent === undefined ? {} : { agent: exec.agent })
       });
       return outcome === 'allowed-once';

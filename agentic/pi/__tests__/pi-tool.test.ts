@@ -11,6 +11,7 @@ const echoTool = defineHarnessTool({
   description: 'Echo a message back.',
   promptSnippet: 'echo: say it back.',
   parameters: z.object({ message: z.string().describe('What to echo.') }),
+  effect: 'read',
   async execute(params, ctx) {
     return {
       content: [{ type: 'text', text: `${params.message} @ ${ctx.cwd}` }],
@@ -54,7 +55,7 @@ describe('toPiTool', () => {
     expect('promptGuidelines' in piTool).toBe(false);
   });
 
-  it('forwards cwd and the abort signal, and nothing else pi passes', async () => {
+  it('forwards cwd, the call id and the abort signal, and nothing else pi passes', async () => {
     const seen: unknown[] = [];
     const tool = defineHarnessTool({
       ...echoTool,
@@ -73,7 +74,7 @@ describe('toPiTool', () => {
       { cwd: '/tmp/project', model: 'anything-else' } as never,
     );
 
-    expect(seen).toEqual([{ cwd: '/tmp/project', signal: controller.signal }]);
+    expect(seen).toEqual([{ cwd: '/tmp/project', toolCallId: 'call-1', signal: controller.signal }]);
     expect(result).toEqual({ content: [{ type: 'text', text: 'hi' }], details: null });
   });
 });
@@ -89,7 +90,7 @@ describe('dbTools', () => {
     expect(registered.map((tool) => tool.name)).toEqual(
       constructiveDbTools.map((tool) => tool.name),
     );
-    expect(registered).toHaveLength(18);
+    expect(registered).toHaveLength(25);
     for (const tool of registered) {
       expect(typeof tool.execute).toBe('function');
       expect(tool.parameters).toMatchObject({ type: 'object' });

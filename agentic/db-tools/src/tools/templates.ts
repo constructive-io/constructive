@@ -1,9 +1,28 @@
-import { type ConfirmPreviewTable, filterInternalPolicies, type HarnessTool } from '@agentic-kit/harness';
+import {
+  alignColumns,
+  type ConfirmPreviewTable,
+  type HarnessTool,
+  strictObject,  textParam,
+  type ToolFailure } from '@agentic-kit/harness';
+import type { BlueprintDefinition } from 'node-type-registry';
 import { z } from 'zod';
 
 import { buildBlueprint } from '../blueprint-construction';
 import type { ModulesClient, ProjectContext } from '../context';
-import { resolveProjectContext } from '../context';
+import {
+  DESCRIBE_SCHEMA,
+  failedResult,
+  failureFromError,
+  failureFromErrors,
+  failureText,
+  noRowCreated,
+  noRowsChanged,
+  type Result,
+  suggest,
+  ToolFailureError,
+} from '../failure';
+import { ownedProjectReady, projectReady } from '../ready';
+import { readSchemas, schemasMissing, storedTableNames, tablesTaken } from '../schema-resolve';
 
 export type TemplateDetails = {
   success: boolean;
@@ -31,6 +50,8 @@ type TemplateTable = {
 };
 
 type TemplateInfo = {
+  id: string;
+  version: string | null;
   displayName: string;
   description: string | null;
   categories: string[];
@@ -80,9 +101,7 @@ function parseTemplateTables(definition: unknown): TemplateTable[] {
           defaultValue: typeof field.default === 'string' ? field.default : null,
         };
       }),
-      policies: filterInternalPolicies(
-        policies.map((policy) => (policy as { $type?: string }).$type ?? '').filter(Boolean),
-      ),
+      policies: [...new Set(policies.map((policy) => (policy as { $type?: string }).$type ?? '').filter(Boolean))],
       relationCount: relations.filter(
         (relation) => (relation as { source_table?: string }).source_table === table.table_name,
       ).length,
@@ -91,16 +110,17 @@ function parseTemplateTables(definition: unknown): TemplateTable[] {
 }
 
 function formatTemplatesText(templates: TemplateInfo[]): string {
-  if (templates.length === 0) return 'No blueprint templates available.';
-  const lines = [`Available blueprint templates (${templates.length}):`];
-  for (const template of templates) {
-    const cats = template.categories.length ? ` [${template.categories.join(', ')}]` : '';
-    lines.push(`  ${template.displayName} — ${template.tables.length} tables${cats}`);
-    for (const table of template.tables) {
-      lines.push(`    - ${table.name} (${table.fields.length} field${table.fields.length === 1 ? '' : 's'})`);
-    }
-  }
-  return lines.join('\n');
+  if (templates.length === 0) return 'No templates yet.';
+  return alignColumns([
+    ['NAME', 'VERSION', 'TABLES', 'TAGS', 'ID'],
+    ...templates.map((template) => [
+      template.displayName || '(no name)',
+      template.version ?? '',
+      String(template.tables.length),
+      template.categories.join(', '),
+      template.id,
+    ]),
+  ]).join('\n');
 }
 
 // The latest project blueprint (or a named one) — the definition source for
@@ -160,64 +180,88 @@ export async function createTemplatePreviewTables(
   }
 }
 
-async function resolveTemplateId(client: ModulesClient, displayName: string): Promise<string> {
+async function findTemplate(client: ModulesClient, displayName: string): Promise<{ id: string; definition: unknown }> {
   const result = await client.blueprintTemplate
     .findMany({
-      select: { id: true, displayName: true },
+      select: { id: true, displayName: true, definition: true },
       where: { displayName: { equalTo: displayName } },
       first: 1,
     })
     .unwrap();
 
   const template = result.blueprintTemplates?.nodes?.[0];
-  if (!template?.id) throw new Error(`Template "${displayName}" not found`);
-  return template.id;
+  if (!template?.id) {
+    throw new ToolFailureError({
+      code: 'not-found',
+      message: `Template "${displayName}" not found.`,
+      hint: 'Check the template names that exist, then retry.',
+      calls: [suggest('list_templates', {}, 'See the templates that exist')],
+    });
+  }
+  return { id: template.id, definition: template.definition };
 }
 
-function done(success: boolean, message: string) {
-  return { content: [{ type: 'text' as const, text: message }], details: { success, message } };
+/** What update_template and delete_template check before they change anything: the project, and the template. */
+export async function templateReady(params: { templateName: string }, cwd: string): Promise<Result<{ context: ProjectContext; templateId: string }>> {
+  const ready = await projectReady(cwd);
+  if (ready.kind === 'failed') return ready;
+  try {
+    return { kind: 'ok', value: { context: ready.value, templateId: (await findTemplate(ready.value.modules, params.templateName)).id } };
+  } catch (err) {
+    return { kind: 'failed', failure: failureFromError(err, `Failed to read the template "${params.templateName}"`) };
+  }
+}
+
+function done(message: string) {
+  return { content: [{ type: 'text' as const, text: message }], details: { success: true, message } };
+}
+
+function fail(failure: ToolFailure) {
+  return failedResult<TemplateDetails>(failure, { success: false, message: failureText(failure) });
 }
 
 // ── list_templates ────────────────────────────────────────────────────────
 
-const ListTemplatesZod = z.object({});
+const ListTemplatesZod = strictObject('the input', {});
 
 export const listTemplatesTool: HarnessTool<typeof ListTemplatesZod, ListTemplatesDetails> = {
   name: 'list_templates',
   label: 'List templates',
   description:
-    'List the blueprint templates available to provision into the project database (display name, description, categories, table count). Read-only — these are a global catalog, not the project schema.',
+    'List the blueprint templates this account can apply to the project database: its own and the public ones (display name, description, categories, table count). Read-only — these are a template catalog, not the project schema.',
   promptSnippet:
     'list_templates: list the available blueprint templates to apply. Read-only — call before apply_template.',
   parameters: ListTemplatesZod,
+  effect: 'read',
   async execute(_params: z.infer<typeof ListTemplatesZod>, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) {
-      return { content: [{ type: 'text', text: resolved.reason }], details: { templates: [] } };
+    const ready = await projectReady(ctx.cwd);
+    if (ready.kind === 'failed') return failedResult(ready.failure, { templates: [] });
+
+    let result;
+    try {
+      result = await ready.value.modules.blueprintTemplate
+        .findMany({
+          select: {
+            id: true,
+            version: true,
+            displayName: true,
+            description: true,
+            categories: true,
+            definition: true,
+          },
+          orderBy: ['NAME_ASC'],
+        })
+        .execute();
+    } catch (err) {
+      return failedResult(failureFromError(err, 'Failed to read templates'), { templates: [] });
     }
 
-    const result = await resolved.context.modules.blueprintTemplate
-      .findMany({
-        select: {
-          displayName: true,
-          description: true,
-          categories: true,
-          definition: true,
-        },
-        orderBy: ['NAME_ASC'],
-      })
-      .execute();
-
-    if (!result.ok) {
-      const message = result.errors.map((e) => e.message).join('; ');
-      return {
-        content: [{ type: 'text', text: `Failed to read templates: ${message}` }],
-        details: { templates: [] },
-      };
-    }
+    if (!result.ok) return failedResult(failureFromErrors(result.errors, 'Failed to read templates'), { templates: [] });
 
     const templates: TemplateInfo[] = (result.data.blueprintTemplates?.nodes ?? []).map(
       (template) => ({
+        id: template.id,
+        version: template.version ?? null,
         displayName: template.displayName ?? '',
         description: template.description ?? null,
         categories: Array.isArray(template.categories) ? template.categories : [],
@@ -234,17 +278,16 @@ export const listTemplatesTool: HarnessTool<typeof ListTemplatesZod, ListTemplat
 
 // ── create_template ───────────────────────────────────────────────────────
 
-const CreateTemplateZod = z.object({
-  displayName: z.string().describe('Display name for the new blueprint template'),
-  blueprintName: z
-    .string()
+const CreateTemplateZod = strictObject('the input', {
+  displayName: textParam().describe('Display name for the new blueprint template'),
+  blueprintName: textParam()
     .describe(
       'Display name of an existing project blueprint to save as the template. Defaults to the most recently provisioned blueprint.',
     )
     .optional(),
   description: z.string().describe('Description shown in the template catalog').optional(),
   categories: z
-    .array(z.string())
+    .array(textParam())
     .describe('Categories for catalog grouping and discovery')
     .optional(),
 });
@@ -253,25 +296,29 @@ export const createTemplateTool: HarnessTool<typeof CreateTemplateZod, CreateTem
   name: 'create_template',
   label: 'Create template',
   description:
-    'Save an existing project blueprint into the global template catalog as a reusable blueprint template. Defaults to the most recently provisioned blueprint; pass blueprintName to pick a specific one by display name. Gated.',
+    'Save an existing project blueprint as a reusable blueprint template in the account\'s template catalog; it stays private until it is made public. Defaults to the most recently provisioned blueprint; give the display name of a blueprint to pick a specific one. Gated.',
   promptSnippet:
     'create_template: save a project blueprint to the reusable template catalog. Gated.',
   parameters: CreateTemplateZod,
+  effect: 'write',
   async execute(params: z.infer<typeof CreateTemplateZod>, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) return done(false, resolved.reason);
-    const { modules, ownerId } = resolved.context;
-    if (!ownerId) return done(false, 'Not authenticated (missing OWNER_ID in .env).');
+    const ready = await ownedProjectReady(ctx.cwd);
+    if (ready.kind === 'failed') return fail(ready.failure);
+    const { modules, ownerId } = ready.value;
 
     try {
-      const blueprint = await findProjectBlueprint(resolved.context, params.blueprintName);
+      const blueprint = await findProjectBlueprint(ready.value, params.blueprintName);
       if (!blueprint) {
         const which = params.blueprintName ? `"${params.blueprintName}"` : 'any blueprint';
-        return done(false, `No project blueprint found (${which}). Provision a blueprint first.`);
+        return fail({
+          code: 'not-found',
+          message: `No project blueprint found (${which}).`,
+          hint: 'Create tables from a blueprint first, then retry.',
+        });
       }
 
       const base = params.displayName.toLowerCase().replace(/\s+/g, '_');
-      await modules.blueprintTemplate
+      const created = await modules.blueprintTemplate
         .create({
           data: {
             ownerId,
@@ -284,6 +331,9 @@ export const createTemplateTool: HarnessTool<typeof CreateTemplateZod, CreateTem
           select: { id: true, displayName: true },
         })
         .unwrap();
+      if (!created.createBlueprintTemplate?.blueprintTemplate) {
+        return fail(noRowCreated(`Failed to create template "${params.displayName}"`, suggest('list_templates', {}, 'See the templates that exist')));
+      }
 
       const message = `Created template "${params.displayName}"`;
       return {
@@ -297,38 +347,66 @@ export const createTemplateTool: HarnessTool<typeof CreateTemplateZod, CreateTem
         },
       };
     } catch (err) {
-      return done(false, err instanceof Error ? err.message : 'Failed to create template');
+      return fail(failureFromError(err, `Failed to create template "${params.displayName}"`));
     }
   },
 };
 
 // ── apply_template ────────────────────────────────────────────────────────
 
-const ApplyTemplateZod = z.object({
-  templateName: z.string().describe('The display name of the blueprint template to apply'),
-  nameOverride: z
-    .string()
+const ApplyTemplateZod = strictObject('the input', {
+  templateName: textParam().describe('The display name of the blueprint template to apply'),
+  nameOverride: textParam()
     .describe(
       'Optional name override for the created blueprint (snake_case). Defaults to template name.',
     )
     .optional(),
 });
 
+type ApplyTemplateParams = z.infer<typeof ApplyTemplateZod>;
+
+/**
+ * What apply_template checks before it changes anything: an owned project,
+ * the template, and none of its tables in the project yet.
+ */
+export async function applyTemplateReady(
+  params: ApplyTemplateParams,
+  cwd: string,
+): Promise<Result<{ context: ProjectContext & { ownerId: string }; templateId: string; definition: BlueprintDefinition }>> {
+  const ready = await ownedProjectReady(cwd);
+  if (ready.kind === 'failed') return ready;
+  let template: { id: string; definition: unknown };
+  try {
+    template = await findTemplate(ready.value.modules, params.templateName);
+  } catch (err) {
+    return { kind: 'failed', failure: failureFromError(err, `Failed to read the template "${params.templateName}"`) };
+  }
+  const raw = template.definition as Partial<BlueprintDefinition> | null | undefined;
+  const definition = { ...raw, tables: Array.isArray(raw?.tables) ? raw.tables : [] };
+  const tables = definition.tables.flatMap((table) =>
+    typeof table.table_name === 'string' ? [{ name: table.table_name, schema: table.schema_name }] : []);
+  const named = tables.flatMap(({ schema }) => schema === undefined ? [] : [schema]);
+  const schemas = named.length ? await readSchemas(ready.value) : { kind: 'ok' as const, value: new Map<string, string>() };
+  if (schemas.kind === 'failed') return schemas;
+  const conflict = schemasMissing(named, schemas.value) ?? await tablesTaken(ready.value, tables, schemas.value);
+  return conflict ? { kind: 'failed', failure: conflict } : { kind: 'ok', value: { context: ready.value, templateId: template.id, definition } };
+}
+
 export const applyTemplateTool: HarnessTool<typeof ApplyTemplateZod, TemplateDetails> = {
   name: 'apply_template',
   label: 'Apply template',
   description:
-    'Apply an existing blueprint template to the project database, creating its tables. Use the template display name (from list_templates).',
+    'Apply an existing blueprint template to the project database, creating its tables. Use the template display name, as the template list gives it.',
   promptSnippet: 'apply_template: provision a saved blueprint template by display name. Gated.',
   parameters: ApplyTemplateZod,
-  async execute(params: z.infer<typeof ApplyTemplateZod>, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) return done(false, resolved.reason);
-    const { modules, databaseId, schemaId, ownerId } = resolved.context;
-    if (!ownerId) return done(false, 'Not authenticated (missing OWNER_ID in .env).');
+  effect: 'write',
+  async execute(params: ApplyTemplateParams, ctx) {
+    const ready = await applyTemplateReady(params, ctx.cwd);
+    if (ready.kind === 'failed') return fail(ready.failure);
+    const { context, templateId } = ready.value;
+    const { modules, databaseId, schemaId, ownerId } = context;
 
     try {
-      const templateId = await resolveTemplateId(modules, params.templateName);
       const base = params.nameOverride ?? params.templateName.toLowerCase().replace(/\s+/g, '_');
       const nameOverride = `${base}_${Date.now()}`;
 
@@ -340,7 +418,7 @@ export const applyTemplateTool: HarnessTool<typeof ApplyTemplateZod, TemplateDet
         .unwrap();
 
       const blueprintId = copyResult.copyTemplateToBlueprint?.result;
-      if (!blueprintId) throw new Error('Failed to copy template');
+      if (!blueprintId) return fail(noRowCreated(`Failed to apply template "${params.templateName}"`, DESCRIBE_SCHEMA));
 
       const { tables } = await buildBlueprint(
         modules,
@@ -349,25 +427,30 @@ export const applyTemplateTool: HarnessTool<typeof ApplyTemplateZod, TemplateDet
       );
 
       const createdCount = Object.keys(tables).length;
+      // The construction maps the template's table names to ids; the backend may store a name in another form.
+      const stored = await storedTableNames(context, Object.values(tables)).catch(() => new Map<string, string>());
+      const names = Object.entries(tables).map(([given, id]) => {
+        const as = stored.get(id) ?? given;
+        return as === given ? as : `${as} (stored from "${given}")`;
+      });
       return done(
-        true,
-        `Applied template "${params.templateName}" — created ${createdCount} table${createdCount === 1 ? '' : 's'}`,
+        `Applied template "${params.templateName}" — created ${createdCount} table${createdCount === 1 ? '' : 's'}${names.length ? `: ${names.join(', ')}` : ''}`,
       );
     } catch (err) {
-      return done(false, err instanceof Error ? err.message : 'Failed to apply template');
+      return fail(failureFromError(err, `Failed to apply template "${params.templateName}"`));
     }
   },
 };
 
 // ── update_template ───────────────────────────────────────────────────────
 
-const UpdateTemplateZod = z.object({
-  templateName: z.string().describe('The display name of the blueprint template to update'),
-  patch: z.object({
-    displayName: z.string().describe('New display name').optional(),
+const UpdateTemplateZod = strictObject('the input', {
+  templateName: textParam().describe('The display name of the blueprint template to update'),
+  patch: strictObject('a patch', {
+    displayName: textParam().describe('New display name').optional(),
     description: z.string().describe('New description').optional(),
-    categories: z.array(z.string()).describe('New categories').optional(),
-    tags: z.array(z.string()).describe('New tags').optional(),
+    categories: z.array(textParam()).describe('New categories').optional(),
+    tags: z.array(textParam()).describe('New tags').optional(),
     visibility: z.enum(['private', 'public']).describe('New visibility').optional(),
   }),
 });
@@ -378,29 +461,33 @@ export const updateTemplateTool: HarnessTool<typeof UpdateTemplateZod, TemplateD
   description: 'Update a blueprint template’s metadata (display name, description, categories, tags, visibility).',
   promptSnippet: 'update_template: edit a saved template’s metadata by display name. Gated.',
   parameters: UpdateTemplateZod,
+  effect: 'write',
   async execute(params: z.infer<typeof UpdateTemplateZod>, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) return done(false, resolved.reason);
+    const ready = await templateReady(params, ctx.cwd);
+    if (ready.kind === 'failed') return fail(ready.failure);
+    const { context, templateId } = ready.value;
     try {
-      const templateId = await resolveTemplateId(resolved.context.modules, params.templateName);
-      await resolved.context.modules.blueprintTemplate
+      const result = await context.modules.blueprintTemplate
         .update({
           where: { id: templateId },
           data: params.patch,
           select: { id: true, displayName: true },
         })
         .unwrap();
-      return done(true, `Updated template "${params.templateName}"`);
+      if (!result.updateBlueprintTemplate?.blueprintTemplate) {
+        return fail(noRowsChanged(`Failed to update template "${params.templateName}"`, suggest('list_templates', {}, 'See the templates that exist')));
+      }
+      return done(`Updated template "${params.templateName}"`);
     } catch (err) {
-      return done(false, err instanceof Error ? err.message : 'Failed to update template');
+      return fail(failureFromError(err, `Failed to update template "${params.templateName}"`));
     }
   },
 };
 
 // ── delete_template ───────────────────────────────────────────────────────
 
-const DeleteTemplateZod = z.object({
-  templateName: z.string().describe('The display name of the blueprint template to delete'),
+const DeleteTemplateZod = strictObject('the input', {
+  templateName: textParam().describe('The display name of the blueprint template to delete'),
 });
 
 export const deleteTemplateTool: HarnessTool<typeof DeleteTemplateZod, TemplateDetails> = {
@@ -409,17 +496,21 @@ export const deleteTemplateTool: HarnessTool<typeof DeleteTemplateZod, TemplateD
   description: 'Permanently delete a blueprint template by its display name.',
   promptSnippet: 'delete_template: remove a saved template by display name. Destructive — gated.',
   parameters: DeleteTemplateZod,
+  effect: 'destructive',
   async execute(params: z.infer<typeof DeleteTemplateZod>, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) return done(false, resolved.reason);
+    const ready = await templateReady(params, ctx.cwd);
+    if (ready.kind === 'failed') return fail(ready.failure);
+    const { context, templateId } = ready.value;
     try {
-      const templateId = await resolveTemplateId(resolved.context.modules, params.templateName);
-      await resolved.context.modules.blueprintTemplate
+      const result = await context.modules.blueprintTemplate
         .delete({ where: { id: templateId }, select: { id: true } })
         .unwrap();
-      return done(true, `Deleted template "${params.templateName}"`);
+      if (!result.deleteBlueprintTemplate?.blueprintTemplate) {
+        return fail(noRowsChanged(`Failed to delete template "${params.templateName}"`, suggest('list_templates', {}, 'See the templates that exist')));
+      }
+      return done(`Deleted template "${params.templateName}"`);
     } catch (err) {
-      return done(false, err instanceof Error ? err.message : 'Failed to delete template');
+      return fail(failureFromError(err, `Failed to delete template "${params.templateName}"`));
     }
   },
 };

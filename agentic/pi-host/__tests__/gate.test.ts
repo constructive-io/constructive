@@ -1,4 +1,5 @@
 import { createGraphQLConversationClient, Inbox, requestApproval, respondToApproval, textPart, toolPart, Transcript } from '@agentic-kit/agent-conversation';
+import type { PlanTarget } from '@agentic-kit/harness';
 
 import { FakeAgentApi } from '../../agent-conversation/__tests__/fake-client';
 import { createThreadGateHost } from '../src/gate';
@@ -58,6 +59,8 @@ function answer(api: FakeAgentApi, decision: { approved: boolean; reason?: strin
   api.addUserMessage(THREAD_ID, [respondToApproval(pending, decision)]);
 }
 
+const TARGET: PlanTarget = { kind: 'account', apiEndpoint: 'http://api.localhost:3000/graphql', account: { userId: 'user-1' } };
+
 describe('thread gate host', () => {
   it('is a UI: a decision can be obtained, asynchronously', () => {
     const h = harness();
@@ -73,7 +76,7 @@ describe('thread gate host', () => {
     });
     h.onTick = () => answer(h.api, { approved: true, reason: 'go ahead' });
 
-    await expect(host.confirmTool('call-1', 'Apply migration?', 'It adds a table.')).resolves.toBe(
+    await expect(host.confirmTool('call-1', 'Apply migration?', 'It adds a table.', undefined, TARGET)).resolves.toBe(
       true
     );
 
@@ -89,12 +92,29 @@ describe('thread gate host', () => {
     );
   });
 
+  it('writes what the change acts on into the pending call', async () => {
+    const h = harness();
+    const host = createThreadGateHost({ transcript: h.transcript, inbox: h.inbox, newApprovalId: () => 'a1' });
+    h.onTick = () => answer(h.api, { approved: true });
+    const target: PlanTarget = {
+      kind: 'database',
+      database: { name: 'shop', id: 'db-1' },
+      apiEndpoint: 'http://api.localhost:3000/graphql',
+      account: { userId: 'user-1' }
+    };
+
+    await host.confirmTool('call-1', 'Delete table?', 'Permanently delete the table "posts".', undefined, target);
+
+    const written = h.api.messages.find((m) => m.authorRole === 'assistant')!;
+    expect((written.parts![0] as { input: { target: PlanTarget } }).input.target).toEqual(target);
+  });
+
   it('records a decline as output-denied', async () => {
     const h = harness();
     const host = createThreadGateHost({ transcript: h.transcript, inbox: h.inbox });
     h.onTick = () => answer(h.api, { approved: false, reason: 'not that table' });
 
-    await expect(host.confirmTool('call-1', 'Delete table?', 'It drops rows.')).resolves.toBe(
+    await expect(host.confirmTool('call-1', 'Delete table?', 'It drops rows.', undefined, TARGET)).resolves.toBe(
       false
     );
     const written = h.api.messages.find((m) => m.authorRole === 'assistant')!;
@@ -114,7 +134,7 @@ describe('thread gate host', () => {
     });
     h.onTick = () => h.api.addUserMessage(THREAD_ID, [textPart('/cancel')]);
 
-    await expect(host.confirmTool('call-1', 'Apply?', 'x')).resolves.toBe(false);
+    await expect(host.confirmTool('call-1', 'Apply?', 'x', undefined, TARGET)).resolves.toBe(false);
     expect(cancels).toEqual(['/cancel']);
     const written = h.api.messages.find((m) => m.authorRole === 'assistant')!;
     expect(written.parts![0]).toMatchObject({ state: 'output-denied', output: '/cancel' });
@@ -143,7 +163,7 @@ describe('thread gate host', () => {
         inbox,
         approvalTimeoutMs: 120_000
       });
-      await expect(host.confirmTool('call-1', 'Apply?', 'x')).resolves.toBe(false);
+      await expect(host.confirmTool('call-1', 'Apply?', 'x', undefined, TARGET)).resolves.toBe(false);
     } finally {
       jest.restoreAllMocks();
     }
@@ -164,7 +184,7 @@ describe('thread gate host', () => {
       h.api.addUserMessage(THREAD_ID, [respondToApproval(other, { approved: true })]);
     };
 
-    await expect(host.confirmTool('call-1', 'Apply?', 'x')).rejects.toThrow(
+    await expect(host.confirmTool('call-1', 'Apply?', 'x', undefined, TARGET)).rejects.toThrow(
       /approval for tool call other arrived while call-1 was pending/
     );
   });

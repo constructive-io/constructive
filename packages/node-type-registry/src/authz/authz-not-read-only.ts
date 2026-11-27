@@ -1,4 +1,5 @@
 import type { NodeTypeDefinition } from '../types';
+import { MEMBER_LIST, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
 
 export const AuthzNotReadOnly: NodeTypeDefinition = {
   name: 'AuthzNotReadOnly',
@@ -15,18 +16,28 @@ export const AuthzNotReadOnly: NodeTypeDefinition = {
         'x-column-scope': 'local',
         description: 'Column name referencing the entity (e.g., entity_id, org_id)'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped).'
-      }
+      ...TEAM_KIND,
+      ...MEMBER_LIST
     },
     required: [
       'entity_field'
-    ]
+    ],
+    allOf: [TEAM_KIND_GIVEN],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'authz',
     'restrictive'
+  ],
+  summary: 'A limit: members of the row\'s team who are read-only cannot pass; it is meant to sit on top of the policy that grants access.',
+  use_when: [
+    'Rarely by hand: the platform adds it for team tables that a blueprint builds.'
+  ],
+  avoid_when: [
+    'App-wide rows: it checks the team named on the row.'
+  ],
+  risks: [
+    'Used on its own as a grant, it lets every member who is not read-only reach every row of their team.'
   ]
 };

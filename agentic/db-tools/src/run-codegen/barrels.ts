@@ -1,4 +1,4 @@
-// Turbopack barrel normalization (TURBOPACK-BARREL-001).
+// Turbopack barrel normalization.
 //
 // Codegen emits directory barrel re-exports like `export * from './hooks'` where
 // `./hooks` is a directory with an index.ts. Next.js 16's Turbopack cannot

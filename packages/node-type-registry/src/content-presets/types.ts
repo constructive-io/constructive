@@ -2,8 +2,7 @@
  * Content presets are the *contents* of a database, as opposed to module
  * presets, which are the modules a database installs. One entry becomes one
  * `content_presets` row — `(kind, slug)` keyed, merkle-versioned — and
- * provisioning resolves a slug through
- * `metaschema_generators.content_preset_definition(kind, slug)`.
+ * provisioning resolves a slug to its definition by `(kind, slug)`.
  *
  * They live here, beside the module presets, for one reason: the numbers in a
  * trust ladder are product decisions, and a decision belongs somewhere a

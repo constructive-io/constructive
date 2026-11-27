@@ -33,16 +33,37 @@ export const AuthzOrgHierarchy: NodeTypeDefinition = {
       max_depth: {
         type: 'integer',
         description: 'Optional max depth to limit visibility'
+      },
+      sprt_schema: {
+        type: 'string',
+        readOnly: true,
+        description: 'The schema of the reporting chart the policy reads, which the backend resolves.'
+      },
+      sprt_table: {
+        type: 'string',
+        readOnly: true,
+        description: 'The reporting chart the policy reads, which the backend resolves.'
       }
     },
     required: [
       'direction',
       'anchor_field'
-    ]
+    ],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'hierarchy',
     'authz'
+  ],
+  summary: 'People above or below the row\'s person in the organization\'s reporting chart get access.',
+  use_when: [
+    'Managers who must see the work of the people below them.'
+  ],
+  avoid_when: [
+    'Rows every member of the organization may see: use AuthzEntityMembership.'
+  ],
+  risks: [
+    'The database needs the hierarchy module; without it the policy fails to build.'
   ]
 };

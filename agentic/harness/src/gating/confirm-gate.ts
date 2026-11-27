@@ -1,8 +1,9 @@
+import { failureText, type ToolFailure } from '../tools/tool';
 import type { ConstructiveGateDeps } from './constructive-policy';
 import { createConstructiveGatePolicy } from './constructive-policy';
 import { buildDeclineReason, createDeclineGuard } from './decline-guard';
 import type { GatePolicy, GateToolCallEvent } from './policy';
-import type { ConfirmPreview } from './preview';
+import type { ConfirmPreview, PlanTarget } from './preview';
 
 /**
  * Host-neutral confirm gate. It owns the mechanics of asking a human —
@@ -13,8 +14,20 @@ import type { ConfirmPreview } from './preview';
  * hook so a pi adapter is a thin mapping: no Electron, no pi imports.
  */
 
-/** `block: true` stops the tool call; `reason` is surfaced to the agent. */
-export type GateResult = { block: true; reason: string } | undefined;
+/**
+ * `block: true` stops the tool call; `reason` is surfaced to the agent. A call
+ * that cannot run yet also carries the tool's `failure`.
+ */
+export type GateResult = { block: true; reason: string; failure?: ToolFailure } | undefined;
+
+const approvedTables = new Map<string, Extract<PlanTarget, { kind: 'database' }>>();
+
+export function takeApprovedTable(toolCallId: string, cwd: string) {
+  const key = JSON.stringify([cwd, toolCallId]);
+  const target = approvedTables.get(key);
+  approvedTables.delete(key);
+  return target;
+}
 
 export type GateHost = {
   /** Whether a confirmation UI is available (headless hosts return false). */
@@ -24,7 +37,8 @@ export type GateHost = {
     toolCallId: string,
     title: string,
     message: string,
-    preview?: ConfirmPreview
+    preview: ConfirmPreview | undefined,
+    target: PlanTarget
   ): Promise<boolean>;
   /** A retry of an already-declined call was auto-skipped without prompting. */
   notifyToolSkipped(toolCallId: string): void;
@@ -69,6 +83,12 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
         return { block: true, reason: retryBlock };
       }
 
+      const decision = await policy.resolvePrompt(event, cwd);
+      if (decision.kind === 'blocked') {
+        return { block: true, reason: failureText(decision.failure), failure: decision.failure };
+      }
+      const { prompt } = decision;
+
       if (!host.hasUI) {
         return {
           block: true,
@@ -76,18 +96,24 @@ export function createConfirmGate(options: ConfirmGateOptions): ConfirmGate {
         };
       }
 
-      const prompt = await policy.resolvePrompt(event, cwd);
-      if (!prompt) return;
-
+      const tableTarget = prompt.target.kind === 'database' && prompt.target.table ? structuredClone(prompt.target) : undefined;
       const approved = await host.confirmTool(
         event.toolCallId,
         prompt.title,
         prompt.message,
-        prompt.preview
+        prompt.preview,
+        prompt.target
       );
       if (!approved) {
         declineGuard.recordDecline(event.toolName, input);
         return { block: true, reason: buildDeclineReason(event.toolName) };
+      }
+      if (tableTarget) {
+        const key = JSON.stringify([cwd, event.toolCallId]);
+        approvedTables.set(key, tableTarget);
+        setTimeout(() => {
+          if (approvedTables.get(key) === tableTarget) approvedTables.delete(key);
+        }, 60_000).unref();
       }
       // An approved mutation changes state, so earlier declines may no longer
       // describe the same effect (e.g. a create_template preview derives from

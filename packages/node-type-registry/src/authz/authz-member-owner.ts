@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { MASK_COLUMN, MEMBER_CHECKS, MEMBER_LIST, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
+import { ACTIVE_MEMBER_RISK, AGENT_IDENTITY_RISK, PERSONAL_ORG_RISK } from './plain-words';
 
 export const AuthzMemberOwner: NodeTypeDefinition = {
   name: 'AuthzMemberOwner',
@@ -28,14 +30,7 @@ export const AuthzMemberOwner: NodeTypeDefinition = {
         description: 'SPRT column to select for the entity match',
         default: 'entity_id'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
-      },
-      entity_type: {
-        type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup."
-      },
+      ...TEAM_KIND,
       levels: {
         type: 'array',
         items: { type: 'string' },
@@ -45,9 +40,36 @@ export const AuthzMemberOwner: NodeTypeDefinition = {
         type: 'array',
         items: { type: 'string' },
         description: 'Capability names of any kind (capability, level, ...) merged into the same mask'
-      }
+      },
+      is_admin: {
+        type: 'boolean',
+        description: 'If true, require is_admin flag'
+      },
+      is_owner: {
+        type: 'boolean',
+        description: 'If true, require is_owner flag'
+      },
+      mask_column: MASK_COLUMN,
+      ...MEMBER_LIST,
+      ...MEMBER_CHECKS
     },
-    required: ['owner_field', 'entity_field']
+    required: ['owner_field', 'entity_field'],
+    allOf: [TEAM_KIND_GIVEN],
+    additionalProperties: false
   },
-  tags: ['ownership', 'membership', 'authz']
+  tags: ['ownership', 'membership', 'authz'],
+  summary: 'Only the person whose id is in the row\'s owner column, and only while they are a member of the team named in the row.',
+  use_when: [
+    'Team rows that only their author may change: use it for update and delete, next to AuthzEntityMembership for read.',
+    'Private rows inside a team, such as a person\'s own drafts.'
+  ],
+  avoid_when: [
+    'Rows every member should change: use AuthzEntityMembership.'
+  ],
+  risks: [
+    'Admins of the team do not pass; add a separate admin policy if they must manage other people\'s rows.',
+    ACTIVE_MEMBER_RISK,
+    AGENT_IDENTITY_RISK,
+    PERSONAL_ORG_RISK
+  ]
 };

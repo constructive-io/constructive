@@ -1,8 +1,9 @@
-import { classifyBackendErrors, errorsText, type GraphQLError, postGraphQL } from './graphql-http';
-import { getHost, noBackendReason } from './host';
+import { failureText } from './failure';
+import { answerText, classifyBackendErrors, type GraphQLError, postGraphQL, retryAfterOf } from './graphql-http';
+import { getHost, noBackendReason, readAccount, readBackendConfig } from './host';
 
 
-export type UnreachableCause = 'network' | 'server' | 'auth' | 'error';
+export type UnreachableCause = 'network' | 'server' | 'rate-limited' | 'auth' | 'error';
 
 export type DatabaseProbe =
   | { status: 'found'; databaseId: string; name?: string; ownerId?: string; hash?: string }
@@ -99,12 +100,16 @@ export async function probeDatabase(args: {
 }
 
 function unreachable(databaseId: string, errors: GraphQLError[], signInHint?: string): DatabaseProbe {
-  const detail = errorsText(errors);
+  const detail = answerText(errors);
   switch (classifyBackendErrors(errors)) {
   case 'network':
     return { status: 'unreachable', databaseId, cause: 'network', detail };
   case 'server':
     return { status: 'unreachable', databaseId, cause: 'server', detail };
+  case 'rate-limited': {
+    const seconds = retryAfterOf(errors);
+    return { status: 'unreachable', databaseId, cause: 'rate-limited', detail: seconds === undefined ? detail : `${detail}; it asks to wait ${seconds} seconds` };
+  }
   case 'auth':
   case 'forbidden':
     // A rejected ACCOUNT credential is never evidence the binding is dead.
@@ -112,7 +117,7 @@ function unreachable(databaseId: string, errors: GraphQLError[], signInHint?: st
       status: 'unreachable',
       databaseId,
       cause: 'auth',
-      detail: `${detail}: the account credential was rejected. ${signInHint ?? 'Sign in again, then retry.'}`,
+      detail: `the account credential was rejected (${detail}). ${signInHint ?? 'Sign in again, then retry.'}`,
     };
   default:
     return { status: 'unreachable', databaseId, cause: 'error', detail };
@@ -126,7 +131,17 @@ function unreachable(databaseId: string, errors: GraphQLError[], signInHint?: st
  */
 export async function probeBoundDatabase(databaseId: string): Promise<DatabaseProbe> {
   const host = getHost();
-  const account = host.account();
+  // A host that cannot give its backend (a wrong override, an incomplete
+  // context) fails both reads; its own reason must win over "sign in".
+  const backendRead = readBackendConfig(host);
+  if (backendRead.kind === 'failed') {
+    return { status: 'unreachable', databaseId, cause: 'error', detail: failureText(backendRead.failure) };
+  }
+  const accountRead = await readAccount(host);
+  if (accountRead.kind === 'failed') {
+    return { status: 'unreachable', databaseId, cause: 'auth', detail: failureText(accountRead.failure) };
+  }
+  const account = accountRead.value;
   const bearer = account?.apiKey ?? account?.accessToken;
   if (!bearer) {
     return {
@@ -136,7 +151,7 @@ export async function probeBoundDatabase(databaseId: string): Promise<DatabasePr
       detail: `No usable account credential. ${host.signInHint ?? 'Sign in to the app, then retry.'}`,
     };
   }
-  const endpoint = host.backendConfig()?.apiEndpoint;
+  const endpoint = backendRead.value?.apiEndpoint;
   if (!endpoint) {
     return { status: 'unreachable', databaseId, cause: 'error', detail: noBackendReason(host.signInHint) };
   }

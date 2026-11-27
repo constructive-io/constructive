@@ -95,28 +95,29 @@ describe('waiting for a blueprint build', () => {
     expect(documents.filter((doc) => /\berror\b/.test(doc))).toEqual([]);
   });
 
+  const INTERNAL = 'The blueprint build failed with an error the backend does not show. Construction id: con-1.';
+
   it.each([
     [
-      'a coded error',
+      'a public coded error, by its code and context',
       { code: 'BLUEPRINT_MODULE_NOT_INSTALLED', context: { module: 'agent' }, class: 'public' },
-      'The blueprint build failed: BLUEPRINT_MODULE_NOT_INSTALLED {"module":"agent"}',
+      'The blueprint build failed with the code BLUEPRINT_MODULE_NOT_INSTALLED {"module":"agent"}. Construction id: con-1.',
     ],
-    [
-      'a database error',
-      { code: '57014', message: 'canceling statement due to statement timeout' },
-      'The blueprint build failed: 57014: canceling statement due to statement timeout',
-    ],
-  ])('surfaces %s of a failed build', async (_kind, error, message) => {
+    ['an internal coded error, by the construction id only', { code: 'SOME_INTERNAL_CODE', context: { table: 'field' }, class: 'internal' }, INTERNAL],
+    ['a database error, by the construction id only', { code: '57014', message: 'canceling statement due to statement timeout' }, INTERNAL],
+    // What a live backend stored for a build an agent asked for.
+    ['a refused null, by the construction id only', { code: '23502', message: 'null value in column "name" of relation "field" violates not-null constraint' }, INTERNAL],
+  ])('says %s of a failed build', async (_kind, error, message) => {
     const { client } = backend({ statuses: [{ status: 'pending' }, { status: 'failed' }], error });
 
-    await expect(buildBlueprint(client, INPUT, fakeTime())).rejects.toThrow(message);
+    await expect(buildBlueprint(client, INPUT, fakeTime())).rejects.toThrow(new Error(message));
   });
 
-  it('fails clearly when the schema has no error column', async () => {
+  it('fails clearly when the schema has no error column, without the text of the refusal', async () => {
     const { client } = backend({ statuses: [{ status: 'failed' }], error: NO_ERROR_COLUMN });
 
     await expect(buildBlueprint(client, INPUT, fakeTime())).rejects.toThrow(
-      /^The blueprint build failed: the backend gave no reason \(reading it failed: .*Cannot query field "error"/,
+      new Error('The blueprint build failed, and its reason could not be read (the backend answered with an error without a public code). Construction id: con-1.'),
     );
   });
 
@@ -147,8 +148,10 @@ describe('waiting for a blueprint build', () => {
 
 describe('provision_blueprint', () => {
   async function provision(client: ReturnType<typeof backend>['client']) {
+    // The project has no table yet, so the blueprint's tables are free to make.
+    const noTables = { table: { findMany: () => ({ execute: async () => ({ ok: true, data: { tables: { nodes: [] as { name: string }[] } } }) }) } };
     mockResolve.mockResolvedValue({
-      context: { modules: client, databaseId: 'db-1', schemaId: 'schema-1', ownerId: 'user-1' },
+      context: { api: noTables, modules: client, databaseId: 'db-1', schemaId: 'schema-1', ownerId: 'user-1' },
       reason: '',
     } as never);
     const ctx: HarnessToolContext = { cwd: '/tmp/project' };
@@ -159,7 +162,7 @@ describe('provision_blueprint', () => {
       } as never,
       ctx,
     );
-    return result.details;
+    return result;
   }
 
   it('reports a failed build instead of the tables it asked for', async () => {
@@ -168,10 +171,24 @@ describe('provision_blueprint', () => {
       error: { code: 'RELATION_TARGET_NOT_FOUND', context: { target_table: 'authors' }, class: 'public' },
     });
 
-    expect(await provision(client)).toMatchObject({
+    expect((await provision(client)).details).toMatchObject({
       created: 0,
-      error: 'The blueprint build failed: RELATION_TARGET_NOT_FOUND {"target_table":"authors"}',
+      error: 'Failed to provision "library": The blueprint build failed with the code RELATION_TARGET_NOT_FOUND {"target_table":"authors"}. Construction id: con-1.',
     });
+  });
+
+  it('shows none of the text of a build the backend failed, in the failure or the details', async () => {
+    const { client } = backend({
+      statuses: [{ status: 'failed' }],
+      error: { code: '23502', message: 'null value in column "name" of relation "field" violates not-null constraint' },
+    });
+
+    const result = await provision(client);
+
+    expect(result.failure).toMatchObject({ code: 'failed', message: 'Failed to provision "library": The blueprint build failed with an error the backend does not show. Construction id: con-1.' });
+    expect(result.failure.hint).toMatch(/give the construction id to the backend operator/);
+    const shown = JSON.stringify(result);
+    for (const text of ['23502', 'null value', 'relation "field"']) expect(shown).not.toContain(text);
   });
 
   // A queued build carries on without the call, so the host must not call
@@ -182,8 +199,9 @@ describe('provision_blueprint', () => {
   ] as const)('carries the construction id only once a build is queued: %s', async (_case, setup, id) => {
     const { client } = backend(setup);
 
-    const details = await provision(client);
+    const { details } = await provision(client);
     expect(details.error).toBeTruthy();
+    expect(details.error).not.toContain('permission denied for table');
     expect(details.constructionId).toBe(id);
   });
 });

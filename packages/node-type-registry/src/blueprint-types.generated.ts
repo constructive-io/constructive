@@ -74,7 +74,7 @@ export interface CheckOneOfParams {
 }
 /** Declares that typed pointer columns may only reference rows owned by the same scope owner as the referencing row, proven through a link table that carries the owner (owner_scope, owner_key) — typically a catalog projection that must never be referenced structurally. Creates one BEFORE INSERT OR UPDATE trigger enforcing the declared arity over the pointers and requiring every pointer that is set to resolve to a same-owner row, so it covers belongs-to / has-one / has-many (key on the row being written) and has-and-belongs-to-many (both keys on the junction row, arity all). Visibility/publication flags are never an authorization input. */
 export interface CheckOwnedRelationParams {
-  /* Schema holding the link tables the ownership is proven through (e.g. catalog_private) */
+  /* Schema holding the link tables the ownership is proven through */
   link_schema_name: string;
   /* Scope that owns the referencing rows; matched against the link row's owner_scope (e.g. database, platform) */
   owner_scope: string;
@@ -1227,6 +1227,12 @@ export interface AuthzAppMemberOwnerParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** App-level membership check (hardcoded membership_type=1). Verifies the user has app membership (optionally with specific capability) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. For entity-scoped checks (org, channel, etc.), use AuthzEntityMembership instead. */
 export interface AuthzAppMembershipParams {
@@ -1238,18 +1244,24 @@ export interface AuthzAppMembershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Column-level write authorization. Generates BEFORE INSERT/UPDATE triggers that enforce an authorization node whenever a guarded column is written to a protected value or transitions. The write-time counterpart to RLS SELECT/WITH CHECK policies: any table can declare "only an actor satisfying <authz> may set column X". The nested authz value is a normal Authz node compiled by the standard RLS pipeline; row-referencing nodes have their protected-table column references rebound to NEW. The immutable rule delegates to the native DataImmutableFields generator. */
 export interface AuthzColumnSecurityParams {
   /* Guarded columns that share the same rule and authorization (e.g. ["is_shared"]). */
   columns: string[];
-  /* Write pattern that arms the guard: set_true/set_false (column set to that boolean), set_values (column set to one of values), writable_when (column written/changed at all), transition (OLD->NEW pairs in allowed), immutable (delegates to DataImmutableFields). */
-  rule: 'set_true' | 'set_false' | 'set_values' | 'writable_when' | 'transition' | 'immutable';
-  /* Any Authz node (AuthzAppMembership, AuthzComposite, AuthzValueExists, ...) that must be satisfied to perform the guarded write. Required for all rules except immutable. */
+  /* Write pattern that arms the guard: set_true/set_false (column set to that boolean), set_values (column set to one of values), not_values (column set to a non-NULL value outside values), writable_when (column written/changed at all), transition (OLD->NEW pairs in allowed), immutable (delegates to DataImmutableFields). */
+  rule: 'set_true' | 'set_false' | 'set_values' | 'not_values' | 'writable_when' | 'transition' | 'immutable';
+  /* An Authz expression (one node such as {"AuthzAppMembership": {...}}, or AND, OR or NOT over nodes) that must be satisfied to perform the guarded write. Required for all rules except immutable. */
   authz?: {
     [key: string]: unknown;
   };
-  /* For rule=set_values: the protected values that arm the guard. */
+  /* For rule=set_values: the protected values that arm the guard. For rule=not_values: the allowed values; any non-NULL value outside them arms the guard. */
   values?: string[];
   /* For rule=transition: allowed guarded transitions expressed as "from->to" (e.g. ["member->admin"]). */
   allowed?: string[];
@@ -1259,6 +1271,12 @@ export interface AuthzColumnSecurityParams {
   error_code?: string;
   /* Human-readable message raised when the guard denies the write. */
   error_message?: string;
+  /* Conditions on the row being written; the guard arms only when the write matches the rule and the row meets them. */
+  conditions?: {
+    [key: string]: unknown;
+  } | {
+    [key: string]: unknown;
+  }[];
 }
 /** Composite authorization policy that combines multiple authorization nodes using boolean logic (AND/OR). The data field contains a JSONB AST with nested authorization nodes. */
 export interface AuthzCompositeParams {
@@ -1274,18 +1292,15 @@ export interface AuthzCompositeParams {
   NOT?: {
     [key: string]: unknown;
   };
-  /* Raw Postgres BoolExpr AST node (power-user / backwards-compatible) */
-  BoolExpr?: {
-    /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: 'AND_EXPR' | 'OR_EXPR' | 'NOT_EXPR';
-    /* Array of authorization nodes or nested BoolExpr ASTs */args?: {
-      [key: string]: unknown;
-    }[];
-  };
 }
-/** Passes when the row's database column equals the session's pinned database claim (jwt.claims.database_id). Consults no principal, membership or entity, so it admits a connection whose identity is set by infrastructure — such as a cloud function's pg-wire proxy lane, which pins the claim from the connection and cannot widen it — to exactly the database that connection is bound to. A session with no claim fails loudly rather than reading nothing. */
+/** Passes when the row's database column equals the session's pinned database claim (jwt.claims.database_id). Consults no principal, membership or entity, so it admits a connection whose identity the platform sets — such as a cloud function's database connection, whose claim comes from the connection and cannot widen it — to exactly the database that connection is bound to. A session with no claim fails loudly rather than reading nothing. */
 export interface AuthzDatabaseClaimParams {
   /* Column carrying the row's database id */
   entity_field?: string;
+  /* A schema whose database must be the claimed one, in place of a column; the rule then reads no column. */
+  schema_id?: string;
+  /* Only connections the platform attests for the claimed database pass. */
+  lane_attested?: boolean;
 }
 /** Denies all access. Generates FALSE expression. */
 export type AuthzDenyAllParams = {};
@@ -1305,9 +1320,9 @@ export interface AuthzEntityMembershipParams {
   entity_field: string;
   /* SPRT column to select for the entity match */
   sel_field?: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
   levels?: string[];
@@ -1319,6 +1334,18 @@ export interface AuthzEntityMembershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
+  /* A function that checks the membership instead of the member list; it is called with the row's team column. */
+  check_function_name?: string;
+  /* The schema of that function. */
+  check_function_schema?: string;
 }
 /** Path-scoped file sharing via ltree containment. Grants access when a path_shares row matches the current user, bucket, and an ancestor path with the required permission. */
 export interface AuthzFilePathParams {
@@ -1356,21 +1383,41 @@ export interface AuthzMemberOwnerParams {
   entity_field: string;
   /* SPRT column to select for the entity match */
   sel_field?: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
   levels?: string[];
   /* Capability names of any kind (capability, level, ...) merged into the same mask */
   capabilities?: string[];
+  /* If true, require is_admin flag */
+  is_admin?: boolean;
+  /* If true, require is_owner flag */
+  is_owner?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
 export interface AuthzNotReadOnlyParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
   entity_field: string;
-  /* Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped). */
-  membership_type?: number | string;
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
+  entity_type?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
 }
 /** Organizational hierarchy visibility using closure table. Managers can see subordinate data or subordinates can see manager data. */
 export interface AuthzOrgHierarchyParams {
@@ -1387,9 +1434,9 @@ export interface AuthzOrgHierarchyParams {
 export interface AuthzPeerOwnershipParams {
   /* Column name on protected table referencing the owning user (e.g., owner_id) */
   owner_field: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* Achievement level names to require (kind=level catalog rows, merged into the same mask) */
   levels?: string[];
@@ -1399,6 +1446,16 @@ export interface AuthzPeerOwnershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag on current user membership */
   is_owner?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Published state access control. Restricts access to records that are published. */
 export interface AuthzPublishableParams {
@@ -1417,9 +1474,9 @@ export interface AuthzRelatedEntityMembershipParams {
   sel_field?: string;
   /* SPRT column to join on with the related table */
   sprt_join_field?: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -1439,6 +1496,18 @@ export interface AuthzRelatedEntityMembershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+  /* Select sel_field from the related row instead of the team id; the platform's own related policies set it with sel_field "id". */
+  sel_obj?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Array membership check in a related table. */
 export interface AuthzRelatedMemberListParams {
@@ -1465,9 +1534,9 @@ export interface AuthzRelatedMemberOwnerParams {
   sel_field?: string;
   /* SPRT column to join on with the related table */
   sprt_join_field?: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
   membership_type?: number;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. */
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -1487,14 +1556,26 @@ export interface AuthzRelatedMemberOwnerParams {
   is_admin?: boolean;
   /* If true, require is_owner flag */
   is_owner?: boolean;
+  /* Select sel_field from the related row instead of the team id; the platform's own related policies set it with sel_field "id". */
+  sel_obj?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Peer visibility through shared entity membership via a related table. Like AuthzPeerOwnership but the owning user is resolved through a FK JOIN to a related table. Combines SPRT self-join with object table JOIN. */
 export interface AuthzRelatedPeerOwnershipParams {
   /* Column name on protected table referencing the related table (e.g., message_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type?: number | string;
-  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  /* The team kind: 2=org, 3+=dynamic entity types. */
+  membership_type?: number;
+  /* Entity type prefix (e.g. 'org', 'channel', 'department'), resolved to its membership_type; use it instead of membership_type for readability. */
   entity_type?: string;
   /* UUID of the related table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -1516,6 +1597,16 @@ export interface AuthzRelatedPeerOwnershipParams {
   is_admin?: boolean;
   /* If true, require is_owner flag on current user membership */
   is_owner?: boolean;
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. A zero mask requires nothing. */
+  mask_column?: string;
+  /* The schema of the member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_schema?: string;
+  /* The member list the policy reads. With a team kind the backend resolves it and replaces this value. */
+  sprt_table?: string;
+  /* Capability bits a member must hold, as a bit string. Capabilities or levels, when given, replace it. */
+  mask?: string;
+  /* The width the mask is padded to; by default the length of the mask. */
+  bitlen?: number;
 }
 /** Restricts access to system-initiated operations (triggers, background jobs). Checks jwt.claims.role_type = "system". Normal API requests default to "user" and are denied. Use for INSERT policies on append-only event/audit/usage tables. */
 export type AuthzSystemOnlyParams = {};
@@ -1534,8 +1625,8 @@ export interface AuthzTemporalParams {
 export interface AuthzValueAllowedParams {
   /* Column on the protected table to check */
   column: string;
-  /* Allowed values as a constant string array, or a local column name containing the allowed values */
-  allowed: string | (string | boolean | number)[];
+  /* Allowed values as a constant list, or a local column name containing the allowed values */
+  allowed: string | (string | boolean | number | null)[];
   /* Operator to use for the value check */
   operator: 'in' | 'any' | 'overlap' | 'contains' | 'contained';
 }
@@ -1555,7 +1646,7 @@ export interface AuthzValueExistsParams {
     /* Prefix of the module instance, for entity-scoped installations */prefix?: string;
   };
   /* Join conditions between the protected row and the referenced table */
-  join?: {
+  join: {
     /* Column on the protected table */local_column: string;
     /* Column on the referenced table */ref_column: string;
     /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
@@ -1563,7 +1654,26 @@ export interface AuthzValueExistsParams {
   /* Optional higher-level condition JSON applied to the referenced table (row alias d) */
   conditions?: {
     [key: string]: unknown;
-  }[];
+  }[] | {
+    [key: string]: unknown;
+  };
+  /* A further row that must exist in a third table, joined to the referenced row (alias b unless ref_alias says otherwise). */
+  exists?: {
+    /* UUID of the third table (alternative to ref_schema/ref_table) */ref_table_id?: string;
+    /* Schema of the third table (or use ref_table_id) */ref_schema?: string;
+    /* Name of the third table (or use ref_table_id) */ref_table?: string;
+    /* Alias of the third table in the join */ref_alias?: string;
+    /* Join conditions between the referenced row and the third table */join?: {
+      /* Column on the referenced table */local_column: string;
+      /* Column on the third table */ref_column: string;
+      /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
+    }[];
+    /* Optional condition JSON applied to the third table */conditions?: {
+      [key: string]: unknown;
+    }[] | {
+      [key: string]: unknown;
+    };
+  };
 }
 /** EXISTS check in a referenced table joined by a local column, with a value/array match on a referenced column and optional additional conditions. */
 export interface AuthzValueMatchParams {
@@ -1581,7 +1691,7 @@ export interface AuthzValueMatchParams {
     /* Prefix of the module instance, for entity-scoped installations */prefix?: string;
   };
   /* Join conditions between the protected row and the referenced table */
-  join?: {
+  join: {
     /* Column on the protected table */local_column: string;
     /* Column on the referenced table */ref_column: string;
     /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
@@ -1589,13 +1699,32 @@ export interface AuthzValueMatchParams {
   /* Value match on a referenced column */
   match: {
     /* Column on the referenced table to match */ref_column: string;
-    /* Allowed values as a constant string array, or a local column name containing the allowed values */allowed: string | string[];
+    /* Allowed values as a constant list, or a local column name containing the allowed values */allowed: string | (string | boolean | number | null)[];
     /* Operator to use for the match */operator: 'in' | 'any' | 'overlap' | 'contains' | 'contained';
   };
   /* Optional higher-level condition JSON applied to the referenced table (row alias d) */
   conditions?: {
     [key: string]: unknown;
-  }[];
+  }[] | {
+    [key: string]: unknown;
+  };
+  /* A further row that must exist in a third table, joined to the referenced row (alias b unless ref_alias says otherwise). */
+  exists?: {
+    /* UUID of the third table (alternative to ref_schema/ref_table) */ref_table_id?: string;
+    /* Schema of the third table (or use ref_table_id) */ref_schema?: string;
+    /* Name of the third table (or use ref_table_id) */ref_table?: string;
+    /* Alias of the third table in the join */ref_alias?: string;
+    /* Join conditions between the referenced row and the third table */join?: {
+      /* Column on the referenced table */local_column: string;
+      /* Column on the third table */ref_column: string;
+      /* Join operator */operator?: '=' | '!=' | '>' | '<' | '>=' | '<=';
+    }[];
+    /* Optional condition JSON applied to the third table */conditions?: {
+      [key: string]: unknown;
+    }[] | {
+      [key: string]: unknown;
+    };
+  };
 }
 /**
  * ===========================================================================
@@ -1679,7 +1808,7 @@ export interface RelationManyToManyParams {
     policy_name?: string;
   }[];
 }
-/** Declares a spatial predicate between two existing geometry/geography columns. Inserts a metaschema_public.spatial_relation row; the sync_spatial_relation_tags trigger then projects a @spatialRelation smart tag onto the owner column so graphile-postgis' PostgisSpatialRelationsPlugin can expose it as a cross-table filter in GraphQL. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired. */
+/** Declares a spatial predicate between two existing geometry/geography columns. It records the relation, and the backend tags the owner column with a @spatialRelation smart tag, so the GraphQL API can expose it as a cross-table filter. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired. */
 export interface RelationSpatialParams {
   /* Table that owns the relation (the @spatialRelation tag is emitted on the owner column of this table) */
   source_table_id: string;
@@ -1789,14 +1918,14 @@ export interface BlueprintField {
 /** A WITH CHECK override node for an UPDATE policy. Its expression governs the resulting row while the main policy node governs the targeted row. */
 export interface BlueprintPolicyWithCheck {
   /** Authz* policy type name for the WITH CHECK expression. */
-  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Policy-specific data (structure varies by policy type). */
   data?: Record<string, unknown>;
 }
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
+  $type: 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -1895,6 +2024,32 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** A CHECK constraint nested inside a table definition (table_name not required). */
+export type BlueprintTableCheckConstraint = {
+  $type: 'CheckOneOf';
+  /** Name of the CHECK constraint. */name: string;
+  /** The check node's parameters. */data: CheckOneOfParams;
+  /** Optional schema name override. */schema_name?: string;
+} | {
+  $type: 'CheckGreaterThan';
+  /** Name of the CHECK constraint. */name: string;
+  /** The check node's parameters. */data: CheckGreaterThanParams;
+  /** Optional schema name override. */schema_name?: string;
+} | {
+  $type: 'CheckLessThan';
+  /** Name of the CHECK constraint. */name: string;
+  /** The check node's parameters. */data: CheckLessThanParams;
+  /** Optional schema name override. */schema_name?: string;
+} | {
+  $type: 'CheckNotEqual';
+  /** Name of the CHECK constraint. */name: string;
+  /** The check node's parameters. */data: CheckNotEqualParams;
+  /** Optional schema name override. */schema_name?: string;
+};
+/** A CHECK constraint definition within a blueprint (top-level, requires table_name). */
+export type BlueprintCheckConstraint = BlueprintTableCheckConstraint & {
+  /** Table name this CHECK constraint belongs to. */table_name: string;
+};
 /** A reference from a blueprint table entry to a table generated by an installed module. Resolved through the module row's recorded table ids; a reference that matches no module instance or no provisioned table fails construction rather than creating a table. */
 export interface BlueprintModuleTableRef {
   /** Module type owning the table. Currently "agent". */
@@ -2493,6 +2648,8 @@ export interface BlueprintTable {
   full_text_searches?: BlueprintTableFullTextSearch[];
   /** Table-level unique constraints (table_name inherited from parent). */
   unique_constraints?: BlueprintTableUniqueConstraint[];
+  /** Table-level CHECK constraints (table_name inherited from parent). */
+  check_constraints?: BlueprintTableCheckConstraint[];
 }
 /** The complete blueprint definition -- the JSONB shape accepted by construct_blueprint(). */
 export interface BlueprintDefinition {
@@ -2506,6 +2663,8 @@ export interface BlueprintDefinition {
   full_text_searches?: BlueprintFullTextSearch[];
   /** Unique constraints on table columns. */
   unique_constraints?: BlueprintUniqueConstraint[];
+  /** CHECK constraints on table columns. */
+  check_constraints?: BlueprintCheckConstraint[];
   /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
   entity_types?: BlueprintEntityType[];
   /** Top-level storage configuration array. Each entry has an optional scope ("app" or "org"). App-scoped (default) creates storage_module with membership_type = NULL. Org-scoped creates per-org/user storage with owner_id and AFTER INSERT bucket seeding. When infra is installed, a private "functions" bucket is auto-injected into org-scoped entries. For child entity type storage, use entity_types[].storage instead. */

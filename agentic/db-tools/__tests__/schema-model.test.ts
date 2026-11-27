@@ -308,8 +308,9 @@ describe('readSchemaModel', () => {
       { id: 'u-code', columns: ['code'] },
       { id: 'u-pair', columns: ['name', 'list_id'] },
     ]);
+    // The read-only block is reported with the other rules; it does not change the access mode.
     expect(items.access).toBe('private');
-    expect(items.policies.map((p) => p.type)).not.toContain('AuthzNotReadOnly');
+    expect(items.policies.map((p) => p.type)).toContain('AuthzNotReadOnly');
     expect(lists.access).toBe('shared');
   });
 
@@ -321,6 +322,6 @@ describe('readSchemaModel', () => {
     const read = readSchemaModel(contextWith(api));
 
     await expect(read).rejects.toBeInstanceOf(SchemaReadError);
-    await expect(read).rejects.toThrow(/policies: permission denied/);
+    await expect(read).rejects.toThrow('Could not read policies: the backend answered with an error without a public code');
   });
 });

@@ -1,6 +1,7 @@
 import {
   ProvisionPendingError,
   type ProvisionRequestExecutor,
+  ProvisionSignedOutError,
   type ProvisionTicket,
   ProvisionTicketLostError,
   requestDatabaseProvision,
@@ -15,6 +16,16 @@ const httpError = (status: number) =>
 const graphqlError = (message: string) =>
   Object.assign(new Error(`GraphQL Error: ${message}`), { errors: [{ message }] });
 const networkError = () => new TypeError('fetch failed');
+// The latest server answers HTTP 200 and puts the status inside the error.
+const limited = () =>
+  Object.assign(new Error('GraphQL Error: Too many requests are in flight for this API. Please retry in a moment.'), {
+    errors: [
+      {
+        message: 'Too many requests are in flight for this API. Please retry in a moment.',
+        extensions: { code: 'CONCURRENCY_LIMIT_REACHED', class: 'public', http: 429 },
+      },
+    ],
+  });
 
 function ticket(overrides: Partial<ProvisionTicket> = {}): ProvisionTicket {
   return {
@@ -66,6 +77,17 @@ function run(args: {
 }
 
 describe('requestDatabaseProvision', () => {
+  it.each([
+    ['UNAUTHENTICATED', Object.assign(new Error('GraphQL Error: Unauthenticated.'), { errors: [{ message: 'Unauthenticated.', extensions: { code: 'UNAUTHENTICATED' } }] })],
+    ['an HTTP 401', httpError(401)],
+  ])('stops with the ticket when the backend refuses a poll with %s, after the request passed', async (_case, refused) => {
+    const { promise, request, pollCalls } = run({ initial: ticket(), polls: [refused] });
+
+    await expect(promise).rejects.toEqual(expect.objectContaining({ constructor: ProvisionSignedOutError, ticketId: 'ticket-1' }));
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(pollCalls).toEqual(['ticket-1']);
+  });
+
   it('sends databaseName, subdomain (= databaseName), domain, and the request branch', async () => {
     const { promise, request } = run({ initial: done });
     await promise;
@@ -105,23 +127,24 @@ describe('requestDatabaseProvision', () => {
     expect(pollCalls).toHaveLength(3);
   });
 
-  it('surfaces errorMessage when the ticket fails before the first poll', async () => {
+  // The text a job stores on its ticket is the server's own; the ticket id is what the backend operator looks up.
+  it('names the ticket, not the text its job stored, when the ticket fails before the first poll', async () => {
     const { promise, pollCalls } = run({
       initial: ticket({ status: 'failed', errorMessage: 'database "my_app" already exists' }),
     });
-    await expect(promise).rejects.toThrow('database "my_app" already exists');
+    await expect(promise).rejects.toThrow(new Error("the backend's provisioning job failed (ticket ticket-1)"));
     expect(pollCalls).toEqual([]);
   });
 
-  it('surfaces errorMessage when a polled ticket fails', async () => {
+  it('names the ticket when a polled ticket fails', async () => {
     const { promise } = run({
       initial: ticket(),
       polls: [ticket({ status: 'failed', errorMessage: 'provision job crashed' })],
     });
-    await expect(promise).rejects.toThrow('provision job crashed');
+    await expect(promise).rejects.toThrow(new Error("the backend's provisioning job failed (ticket ticket-1)"));
   });
 
-  it('surfaces bootstrapError when the owner bootstrap fails', async () => {
+  it('names the ticket when the owner bootstrap fails', async () => {
     const { promise } = run({
       initial: ticket({ status: 'completed', databaseId: 'db-id' }),
       polls: [
@@ -133,7 +156,7 @@ describe('requestDatabaseProvision', () => {
         }),
       ],
     });
-    await expect(promise).rejects.toThrow('owner copy failed');
+    await expect(promise).rejects.toThrow(new Error("the backend's owner bootstrap job failed (ticket ticket-1)"));
   });
 
   it('rejects a completed ticket without a databaseId', async () => {
@@ -156,6 +179,11 @@ describe('requestDatabaseProvision', () => {
     await expect(promise).resolves.toEqual({ databaseId: 'db-id', ticketId: 'ticket-1' });
   });
 
+  it('tolerates a poll refused with a 429 inside the error', async () => {
+    const { promise } = run({ initial: ticket(), polls: [limited(), done] });
+    await expect(promise).resolves.toEqual({ databaseId: 'db-id', ticketId: 'ticket-1' });
+  });
+
   it('leaves the ticket pending after the fourth consecutive unreachable poll', async () => {
     const { promise, pollCalls } = run({
       initial: ticket(),
@@ -166,13 +194,11 @@ describe('requestDatabaseProvision', () => {
     expect(pollCalls).toHaveLength(4);
   });
 
-  it('fails at once when a poll gets a GraphQL or auth error, without calling it pending', async () => {
-    for (const error of [graphqlError('permission denied for table database_provision_module'), httpError(401)]) {
-      const { promise, pollCalls } = run({ initial: ticket(), polls: [error] });
-      await expect(promise).rejects.toThrow(/could not be read/);
-      await expect(promise).rejects.not.toBeInstanceOf(ProvisionPendingError);
-      expect(pollCalls).toHaveLength(1);
-    }
+  it('fails at once when a poll gets a GraphQL error, without calling it pending', async () => {
+    const { promise, pollCalls } = run({ initial: ticket(), polls: [graphqlError('permission denied for table database_provision_module')] });
+    await expect(promise).rejects.toThrow(/could not be read/);
+    await expect(promise).rejects.not.toBeInstanceOf(ProvisionPendingError);
+    expect(pollCalls).toHaveLength(1);
   });
 
   it('resets the failure budget after a readable poll', async () => {

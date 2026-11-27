@@ -96,6 +96,42 @@ export const PENDING_PROVISION_KEYS = {
   attempts: 'PROVISION_TICKET_ATTEMPTS',
 } as const;
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The backend's own check on a database name, which is 3 to 63 characters long. */
+export const DATABASE_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+
+const isDatabaseName = (value: string): boolean => value.length >= 3 && value.length <= 63 && DATABASE_NAME_PATTERN.test(value);
+
+function isEndpoint(value: string): boolean {
+  try {
+    return ['http:', 'https:'].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The form of each binding value the tools read from a project's .env. The ticket's endpoint and account need none:
+ * they are used only when they equal the host's own, and its attempt count is read as a number.
+ */
+const BINDING_FORMS: Record<string, (value: string) => boolean> = {
+  DATABASE_ID: (value) => UUID.test(value),
+  OWNER_ID: (value) => UUID.test(value),
+  DATABASE_NAME: isDatabaseName,
+  API_ENDPOINT: isEndpoint,
+  MODULES_ENDPOINT: isEndpoint,
+  [PENDING_PROVISION_KEYS.ticketId]: (value) => UUID.test(value),
+  [PENDING_PROVISION_KEYS.databaseName]: isDatabaseName,
+};
+
+/**
+ * The binding keys whose value in `env` is not of its form. The .env of a cloned project is not the person's text, so
+ * such a value is never used, sent or shown: the caller refuses with the keys alone.
+ */
+export const invalidBindingKeys = (env: Record<string, string | undefined>): string[] =>
+  Object.entries(BINDING_FORMS).flatMap(([key, valid]) => (env[key] && !valid(env[key]) ? [key] : []));
+
 /** The binding keys provision_database owns in a project's .env. */
 export const PROVISION_ENV_KEYS = [
   'DATABASE_ID',

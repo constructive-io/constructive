@@ -18,6 +18,7 @@ export interface ToDshToolOptions {
    * per call. Defaults to `process.cwd()`.
    */
   cwd?: () => string;
+  gated?: boolean;
 }
 
 /** The canonical value a bound tool returns: the neutral result, as JSON. */
@@ -26,6 +27,7 @@ const OUTPUT_SCHEMA: DshJsonSchema = {
   properties: {
     content: { type: 'array', items: { type: 'object' } },
     details: {},
+    failure: { type: 'object' },
     terminate: { type: 'boolean' }
   },
   required: ['content']
@@ -65,11 +67,13 @@ export function toDshTool<TParams extends z.ZodType, TDetails>(
       const params = tool.parameters.parse(args) as z.output<TParams>;
       const result: HarnessToolResult<TDetails> = await tool.execute(params, {
         cwd: cwd(),
+        ...(options.gated ? { toolCallId: exec.callId } : {}),
         signal: exec.signal
       });
       return {
         content: result.content,
         details: result.details === undefined ? null : result.details,
+        ...(result.failure === undefined ? {} : { failure: result.failure }),
         ...(result.terminate === undefined ? {} : { terminate: result.terminate })
       };
     }

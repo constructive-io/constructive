@@ -9,8 +9,8 @@
  * reusable building blocks used inside a blueprint; presets are starting
  * points for which modules to install before any blueprint is authored.
  *
- * All module names match the `rls_module`, `user_auth_module`, ... names in
- * `metaschema_generators.provision_database_modules` in constructive-db.
+ * All module names match the `rls_module`, `user_auth_module`, ... names the
+ * backend provisions a database with.
  *
  * Naming uses snake_case for module names to match the server-side SQL
  * convention, and kebab-ish `auth:hardened` for preset names because they're
@@ -18,9 +18,9 @@
  */
 
 /**
- * Options shared by every module entry. All fields map 1:1 to what
- * `metaschema_generators.provision_database_modules` reads from
- * `e->'options'` for the module. NULL/omitted fields use module defaults.
+ * Options shared by every module entry. Each field is an option the backend
+ * reads for the module when it provisions the database, under the same name.
+ * NULL/omitted fields use module defaults.
  */
 export type BaseModuleOptions = {
   /** Scope for scoped modules: 'app' (membership_type = app) or 'org' (per-org). Some modules also accept 'platform'. */
@@ -204,8 +204,8 @@ export interface ModulePreset {
   /**
    * List of modules to install. Each entry is either a plain module name
    * (string) or a Babel-style tuple [name, options] for modules that need
-   * configuration. Module names must match the canonical list accepted by
-   * `metaschema_generators.provision_database_modules` in constructive-db.
+   * configuration. Module names must match the canonical list the backend
+   * provisions a database with.
    * Order doesn't matter — provisioning resolves dependencies.
    *
    * Examples:

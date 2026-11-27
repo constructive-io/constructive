@@ -9,14 +9,19 @@
 //    requested, and a completed one is only reported (binding it is `adopt`);
 //  - the host saves the binding before `.env` is written.
 
-import { readFile, realpath, writeFile } from 'node:fs/promises';
+import { realpathSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+import type { PlanAgent, PlanDatabase, PlanTarget, ToolFailure } from '@agentic-kit/harness';
 
 import { prewarmAppWorkspace, run, type RunCommand } from '../app-workspace';
 import { type DatabaseProbe, probeDatabase } from '../db-probe';
-import { getHost, noBackendReason, type ProjectBinding, reprovisionAdvice, type ToolsHost } from '../host';
+import { failureText, invalidBinding, noBackendFailure, type Result, suggest } from '../failure';
+import { answersSignedOut, thrownText } from '../graphql-http';
+import { getHost, type ProjectBinding, readAccount, readBackendConfig, replaceCall, reprovisionAdvice, type ToolsHost } from '../host';
 import { selectProvisionCredential } from './credential';
-import { archiveBindingKeys, ARCHIVED_BINDING_KEYS, type EnvVars, mergeEnv, provisionEnvVars, readEnv } from './env-file';
+import { archiveBindingKeys, ARCHIVED_BINDING_KEYS, type EnvVars, invalidBindingKeys, mergeEnv, provisionEnvVars, readEnv } from './env-file';
 import { loadProvisionManifest } from './manifest';
 import {
   abandonedTickets,
@@ -33,8 +38,10 @@ import {
   createProvisionExecutor,
   isTicketInFlight,
   isTransientProvisionError,
+  ProvisionJobError,
   ProvisionPendingError,
   type ProvisionRequestExecutor,
+  ProvisionSignedOutError,
   type ProvisionTicket,
   ProvisionTicketLostError,
   requestDatabaseProvision,
@@ -75,6 +82,11 @@ export type ProvisionFailureCode =
   | 'binding-not-saved'
   | 'env-write-failed'
   | 'reprovision-not-allowed'
+  | 'no-backend'
+  | 'invalid-input'
+  | 'missing-credentials'
+  | 'plan-required'
+  | 'limit-reached'
   | 'failed';
 
 export type ProvisionDatabaseDetails = {
@@ -102,15 +114,44 @@ export type ProvisionDatabaseDetails = {
   replaced?: string;
   /** With `name-taken`: a database of this account holds the name. Never bound automatically. */
   heldBy?: { databaseId: string; yours: boolean; createdAt?: string };
+  /**
+   * On a failed call: true when the prewarm, which starts with the request,
+   * prepared packages/app (scaffold and install) before the call ended.
+   */
+  appWorkspacePrepared?: boolean;
 };
 
 type Details = ProvisionDatabaseDetails;
 
-function failure(code: ProvisionFailureCode, message: string, extra: Partial<Details> = {}): Details {
-  return { ...extra, success: false, message, code };
+// A result while it travels inside this module: the details, and on a failed
+// or pending call its failure, which the entry points hand to the tool only,
+// so `details` keeps its shape.
+type Outcome = Details & { failure?: ToolFailure };
+
+type Why = Omit<ToolFailure, 'code'>;
+
+function refuse(code: ProvisionFailureCode, why: Why, extra: Partial<Details> = {}): Outcome {
+  const failure: ToolFailure = { ...why, code };
+  return { ...extra, success: false, message: failureText(failure), code, failure };
 }
 
-const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
+function withoutFailure({ failure: _failure, ...details }: Outcome): Details {
+  return details;
+}
+
+// A probe the backend could not answer: a rejected account credential needs a
+// sign-in, which the probe's detail already asks for; anything else, a retry.
+function unanswered(
+  probe: Extract<DatabaseProbe, { status: 'unreachable' }>,
+  message: string,
+  hint: string,
+  extra: Partial<Details> = {},
+): Outcome {
+  return probe.cause === 'auth'
+    ? refuse('signed-out', { message }, extra)
+    : refuse('backend-unreachable', { message, hint, retryable: true }, extra);
+}
+
 const today = () => new Date().toISOString().slice(0, 10);
 const noop = (): void => undefined;
 
@@ -129,14 +170,88 @@ async function updateEnvFile(envPath: string, edit: (content: string) => string)
   await writeFile(envPath, edit(await readText(envPath)));
 }
 
-/** The DATABASE_ID in a project's `.env`, if any. */
+/** A project's `.env`, with each binding value checked: one that is not of its form is never used, sent or shown. */
+async function readBinding(envPath: string): Promise<Result<EnvVars>> {
+  const env = readEnv(await readText(envPath));
+  const invalid = invalidBindingKeys(env);
+  return invalid.length ? { kind: 'failed', failure: invalidBinding(invalid) } : { kind: 'ok', value: env };
+}
+
+/** The DATABASE_ID in a project's `.env`, if it has one of the form a database id takes. */
 export async function boundDatabaseId(cwd: string): Promise<string | undefined> {
-  return readEnv(await readText(path.join(cwd, '.env'))).DATABASE_ID || undefined;
+  const binding = await boundDatabase(cwd);
+  return binding.kind === 'ok' ? binding.value?.id : undefined;
+}
+
+/** The database the `.env` of `cwd` binds, as a plan names it. */
+async function boundDatabase(cwd: string): Promise<Result<PlanDatabase | undefined>> {
+  const binding = await readBinding(path.join(cwd, '.env'));
+  if (binding.kind === 'failed') return binding;
+  const env = binding.value;
+  return { kind: 'ok', value: env.DATABASE_ID ? { name: env.DATABASE_NAME ?? '', id: env.DATABASE_ID } : undefined };
+}
+
+type ProvisionAccess = { apiEndpoint: string; modulesEndpoint: string; credential: { ownerId: string; bearer: string }; email?: string; agent?: PlanAgent };
+
+/**
+ * The backend and the account a provision runs with, or why it cannot run.
+ * The host's backend config is the only endpoint source: the account bearer
+ * provisions with it, so an ambient env var or a guessed default must never
+ * redirect it. Every project provisions UNDER the account (requestDatabase
+ * owns the database to the JWT user).
+ */
+async function provisionAccess(host: ToolsHost): Promise<Result<ProvisionAccess>> {
+  const backendRead = readBackendConfig(host);
+  if (backendRead.kind === 'failed') return { kind: 'failed', failure: { ...backendRead.failure, code: 'no-backend' } };
+  const apiEndpoint = backendRead.value?.apiEndpoint;
+  const modulesEndpoint = backendRead.value?.modulesEndpoint;
+  if (!apiEndpoint || !modulesEndpoint) {
+    const noBackend = noBackendFailure(host.signInHint);
+    return { kind: 'failed', failure: { ...noBackend, message: `Cannot provision a database: ${noBackend.message}` } };
+  }
+  const accountRead = await readAccount(host);
+  if (accountRead.kind === 'failed') return { kind: 'failed', failure: { ...accountRead.failure, code: 'signed-out' } };
+  const credential = selectProvisionCredential(accountRead.value, host.signInHint);
+  if (credential.mode === 'error') {
+    return { kind: 'failed', failure: { code: 'signed-out', message: `Cannot provision a database: ${credential.reason}` } };
+  }
+  const account = accountRead.value;
+  return {
+    kind: 'ok',
+    value: { apiEndpoint, modulesEndpoint, credential, ...(account?.email ? { email: account.email } : {}), ...(account?.agent ? { agent: account.agent } : {}) },
+  };
+}
+
+/**
+ * What provision_database and replace_database check before they change
+ * anything: a backend and an account to provision under, and a binding whose
+ * values are of their form. They act on no bound database; a replace names
+ * the one the directory leaves.
+ */
+export async function provisionDatabaseReady(replace: boolean, cwd: string): Promise<Result<PlanTarget>> {
+  const access = await provisionAccess(getHost());
+  if (access.kind === 'failed') return access;
+  const bound = await boundDatabase(cwd);
+  if (bound.kind === 'failed') return bound;
+  const replaces = replace ? bound.value : undefined;
+  return {
+    kind: 'ok',
+    value: {
+      kind: 'account',
+      apiEndpoint: access.value.apiEndpoint,
+      account: {
+        userId: access.value.credential.ownerId,
+        ...(access.value.email ? { email: access.value.email } : {}),
+        ...(access.value.agent ? { agent: access.value.agent } : {}),
+      },
+      ...(replaces ? { replaces } : {}),
+    },
+  };
 }
 
 // The per-DB endpoints are subdomain.<domain>; the provisioning domain is the api
-// endpoint's host minus its first label (api.localhost -> localhost,
-// api.launchql.dev -> launchql.dev), so dev and devnet both provision correctly.
+// endpoint's host minus its first label (api.example.com -> example.com), so
+// every backend provisions under its own domain.
 function provisionDomain(apiEndpoint: string): string {
   try {
     const { hostname } = new URL(apiEndpoint);
@@ -161,8 +276,18 @@ const projectLocks = new Map<string, Promise<void>>();
 
 // One provision per project at a time: a second call waits, then sees what
 // the first one left (a binding, a recorded ticket) instead of racing it.
+// The key is resolved synchronously, so a call takes its place in the queue
+// before it yields and calls queue in call order.
+function lockKey(cwd: string): string {
+  try {
+    return realpathSync(cwd);
+  } catch {
+    return path.resolve(cwd);
+  }
+}
+
 async function withProjectLock<T>(cwd: string, fn: () => Promise<T>): Promise<T> {
-  const key = await realpath(cwd).catch(() => path.resolve(cwd));
+  const key = lockKey(cwd);
   const previous = projectLocks.get(key) ?? Promise.resolve();
   let release: () => void = noop;
   const done = new Promise<void>((resolve) => (release = resolve));
@@ -199,52 +324,44 @@ type Run = {
  * entry point: replace mode refuses a live binding here, and `abandonPending`
  * and `adopt` are honoured.
  */
-export function provisionDatabase(
+export async function provisionDatabase(
   input: ProvisionInput,
   ctx: { cwd: string; signal?: AbortSignal },
   exec: RunCommand = run,
 ): Promise<Details> {
-  return withProjectLock(ctx.cwd, () => provision(input, ctx.cwd, exec, false));
+  return withoutFailure(await withProjectLock(ctx.cwd, () => provision(input, ctx.cwd, exec, false)));
 }
 
 /**
- * The provision_database tool's entry point: its `reprovision: true` may
+ * The entry point of provision_database and replace_database: a replace may
  * replace a live binding (a clean rebuild), unless the host turned tool
  * reprovisioning off.
  */
-export function provisionFromTool(
+export async function provisionFromTool(
   input: Pick<ProvisionInput, 'databaseName' | 'mode' | 'replaces'>,
   ctx: { cwd: string; signal?: AbortSignal },
   exec: RunCommand = run,
-): Promise<Details> {
-  return withProjectLock(ctx.cwd, () => provision(input, ctx.cwd, exec, true));
+): Promise<{ details: Details; failure?: ToolFailure }> {
+  const outcome = await withProjectLock(ctx.cwd, () => provision(input, ctx.cwd, exec, true));
+  return { details: withoutFailure(outcome), ...(outcome.failure ? { failure: outcome.failure } : {}) };
 }
 
-async function provision(input: ProvisionInput, cwd: string, exec: RunCommand, viaTool: boolean): Promise<Details> {
+async function provision(input: ProvisionInput, cwd: string, exec: RunCommand, viaTool: boolean): Promise<Outcome> {
   const name = input.databaseName?.trim();
-  if (!name) return failure('failed', 'database_name is required.');
+  if (!name) return refuse('invalid-input', { message: 'The database needs a name.' });
 
-  // The host's backend config is the only endpoint source: the account bearer
-  // provisions with it, so an ambient env var or a guessed default must never
-  // redirect it.
   const host = getHost();
-  const backend = host.backendConfig();
-  const apiEndpoint = backend?.apiEndpoint;
-  const modulesEndpoint = backend?.modulesEndpoint;
-  if (!apiEndpoint || !modulesEndpoint) {
-    return failure('failed', `Cannot provision a database: ${noBackendReason(host.signInHint)}`);
+  const access = await provisionAccess(host);
+  if (access.kind === 'failed') {
+    const { code, ...why } = access.failure;
+    return refuse(code as ProvisionFailureCode, why);
   }
-
-  // Every project provisions UNDER the account (requestDatabase owns the
-  // database to the JWT user). The account bearer authenticates the mutation
-  // and the probes.
-  const credential = selectProvisionCredential(host.account(), host.signInHint);
-  if (credential.mode === 'error') {
-    return failure('signed-out', `Cannot provision a database: ${credential.reason}`);
-  }
+  const { apiEndpoint, modulesEndpoint, credential } = access.value;
 
   const envPath = path.join(cwd, '.env');
-  const env = readEnv(await readText(envPath));
+  const binding = await readBinding(envPath);
+  if (binding.kind === 'failed') return refuse('missing-credentials', binding.failure);
+  const env = binding.value;
   const bound = env.DATABASE_ID || undefined;
   const r: Run = {
     host,
@@ -275,43 +392,55 @@ async function provision(input: ProvisionInput, cwd: string, exec: RunCommand, v
 
   if (input.adopt) {
     const prewarm = startPrewarm(r, exec);
-    return bindDatabase(r, { databaseId: input.adopt, replaced, adopted: true }, prewarm);
+    return afterPrewarm(await bindDatabase(r, { databaseId: input.adopt, replaced, adopted: true }, prewarm), prewarm);
   }
   return requestAndBind(r, input, env, replaced, exec);
 }
 
 // ---- ensure: keep the binding --------------------------------------------
 
-async function keepBinding(r: Run, env: EnvVars, bound: string, adopt?: string): Promise<Details> {
+async function keepBinding(r: Run, env: EnvVars, bound: string, adopt?: string): Promise<Outcome> {
   const probe = await r.probe(bound);
   if (probe.status === 'unreachable') {
-    return failure(
-      'backend-unreachable',
-      `Cannot verify the existing database binding (DATABASE_ID=${bound}): ${probe.detail}. Retry once the backend answers; don't reprovision on an unreachable backend.`,
+    return unanswered(
+      probe,
+      `Cannot verify the existing database binding (DATABASE_ID=${bound}): ${probe.detail}.`,
+      "Retry once the backend answers; don't reprovision on an unreachable backend.",
       { databaseId: bound },
     );
   }
   if (probe.status === 'missing') {
-    return failure(
+    return refuse(
       'db-missing',
-      `Project carries a binding (DATABASE_ID=${bound}) but that database no longer exists on this backend, or this account lost access to it. ${reprovisionAdvice(r.host)}`,
+      {
+        message: `Project carries a binding (DATABASE_ID=${bound}) but that database no longer exists on this backend, or this account lost access to it.`,
+        hint: reprovisionAdvice(r.host),
+        ...replaceCall(r.host),
+      },
       { databaseId: bound },
     );
   }
   if (probe.ownerId && probe.ownerId !== r.ownerId) {
-    return failure(
+    return refuse(
       'account-mismatch',
-      `Project carries a binding (DATABASE_ID=${bound}) but that database was provisioned under a different account than the one signed in. ${reprovisionAdvice(r.host)}`,
+      {
+        message: `Project carries a binding (DATABASE_ID=${bound}) but that database was provisioned under a different account than the one signed in.`,
+        hint: reprovisionAdvice(r.host),
+        ...replaceCall(r.host),
+      },
       { databaseId: bound },
     );
   }
   if (probe.status === 'suspended') {
-    return failure('db-suspended', suspendedText(bound, probe), { databaseId: bound });
+    return refuse('db-suspended', { message: suspendedText(bound, probe) }, { databaseId: bound });
   }
   if (adopt && adopt !== bound) {
-    return failure(
+    return refuse(
       'binding-live',
-      `The project is bound to a live database (DATABASE_ID=${bound}); adopt binds only an unbound project. Use replace mode to swap it.`,
+      {
+        message: `The project is bound to a live database (DATABASE_ID=${bound}); adopt binds only an unbound project.`,
+        hint: 'Use replace mode to swap it.',
+      },
       { databaseId: bound },
     );
   }
@@ -344,10 +473,10 @@ async function keepBinding(r: Run, env: EnvVars, bound: string, adopt?: string):
       await updateEnvFile(r.envPath, (content) => mergeEnv(content, refresh));
       note = ` Refreshed in .env: ${keys}.`;
     } catch (err) {
-      note = ` Could not refresh ${keys} in .env: ${errorText(err)}.`;
+      note = ` Could not refresh ${keys} in .env: ${thrownText(err)}.`;
     }
   }
-  const advice = r.host.toolReprovision === false ? '' : ' Pass reprovision: true only for an explicit clean rebuild.';
+  const advice = r.host.toolReprovision === false ? '' : ' Replacing it with a new database is a separate change, only for an explicit clean rebuild.';
   return {
     success: true,
     message: `Project already provisioned (DATABASE_ID=${bound}) and the database is live under this account. Skipping.${advice}${note}`,
@@ -365,18 +494,20 @@ function suspendedText(databaseId: string, probe: Extract<DatabaseProbe, { statu
 
 // ---- replace: compare and swap -------------------------------------------
 
-async function checkReplace(r: Run, input: ProvisionInput, bound: string | undefined): Promise<Details | null> {
+async function checkReplace(r: Run, input: ProvisionInput, bound: string | undefined): Promise<Outcome | null> {
   if (r.viaTool && r.host.toolReprovision === false) {
-    return failure(
-      'reprovision-not-allowed',
-      `provision_database can't replace this project's database: the app replaces a database only after the user approves it. ${reprovisionAdvice(r.host)}`,
-    );
+    return refuse('reprovision-not-allowed', {
+      message: "This project's database is not replaced here: the app replaces a database only after the user approves it.",
+      hint: reprovisionAdvice(r.host),
+    });
   }
   const expected = input.replaces === undefined ? bound : input.replaces || undefined;
   if ((expected ?? '') !== (bound ?? '')) {
-    return failure(
+    return refuse(
       'binding-changed',
-      `The project's binding changed (DATABASE_ID is ${bound ?? 'unset'}, expected ${expected ?? 'unset'}), so nothing was replaced.`,
+      {
+        message: `The project's binding changed (DATABASE_ID is ${bound ?? 'unset'}, expected ${expected ?? 'unset'}), so nothing was replaced.`,
+      },
       { databaseId: bound },
     );
   }
@@ -384,19 +515,22 @@ async function checkReplace(r: Run, input: ProvisionInput, bound: string | undef
 
   const probe = await r.probe(bound);
   if (probe.status === 'unreachable') {
-    return failure(
-      'backend-unreachable',
-      `Cannot verify the binding being replaced (DATABASE_ID=${bound}): ${probe.detail}. Retry once the backend answers.`,
+    return unanswered(
+      probe,
+      `Cannot verify the binding being replaced (DATABASE_ID=${bound}): ${probe.detail}.`,
+      'Retry once the backend answers.',
       { databaseId: bound },
     );
   }
-  if (probe.status === 'suspended') return failure('db-suspended', suspendedText(bound, probe), { databaseId: bound });
+  if (probe.status === 'suspended') {
+    return refuse('db-suspended', { message: suspendedText(bound, probe) }, { databaseId: bound });
+  }
   // A missing or foreign-owned binding is replaced; a live one of this account
   // only through the tool's explicit rebuild.
   if (probe.status === 'found' && (!probe.ownerId || probe.ownerId === r.ownerId) && !r.viaTool) {
-    return failure(
+    return refuse(
       'binding-live',
-      `The bound database (DATABASE_ID=${bound}) is live under this account, so it wasn't replaced.`,
+      { message: `The bound database (DATABASE_ID=${bound}) is live under this account, so it wasn't replaced.` },
       { databaseId: bound },
     );
   }
@@ -405,7 +539,7 @@ async function checkReplace(r: Run, input: ProvisionInput, bound: string | undef
 
 // ---- request, resume, recover --------------------------------------------
 
-type Lookup = { inFlight: ProvisionTicket[]; refusal?: Details; problem?: string };
+type Lookup = { inFlight: ProvisionTicket[]; refusal?: Outcome; problem?: string };
 
 // The account's in-flight provisions of this name, newest first. A lookup that
 // can't reach the backend refuses (nothing may be requested blind); one that
@@ -415,16 +549,26 @@ async function findInFlight(r: Run, skip: ReadonlySet<string>): Promise<Lookup> 
     const tickets = await r.executor.listOwn({ databaseName: r.name, ownerId: r.ownerId });
     return { inFlight: tickets.filter((t) => t.id && !skip.has(t.id) && isTicketInFlight(t)) };
   } catch (err) {
+    if (answersSignedOut(err)) {
+      return {
+        inFlight: [],
+        refusal: refuse('signed-out', {
+          message: `The backend did not accept the account credential while this call checked for a provision of "${r.name}" already in progress. Nothing was requested.`,
+          hint: r.host.signInHint ?? 'Sign in again, then call again.',
+        }),
+      };
+    }
     if (isTransientProvisionError(err)) {
       return {
         inFlight: [],
-        refusal: failure(
-          'backend-unreachable',
-          `Could not check the backend for a provision of "${r.name}" already in progress (${errorText(err)}). Nothing was requested; retry once the backend answers.`,
-        ),
+        refusal: refuse('backend-unreachable', {
+          message: `Could not check the backend for a provision of "${r.name}" already in progress (${thrownText(err)}). Nothing was requested.`,
+          hint: 'Retry once the backend answers.',
+          retryable: true,
+        }),
       };
     }
-    return { inFlight: [], problem: errorText(err) };
+    return { inFlight: [], problem: thrownText(err) };
   }
 }
 
@@ -436,12 +580,26 @@ const ticketOf = (r: Run, ticket: ProvisionTicket): PendingTicket => ({
   attempts: 0,
 });
 
-function startPrewarm(r: Run, exec: RunCommand): Promise<{ ok: boolean; out: string }> {
-  // The packages/app scaffold + install are database-INDEPENDENT, so they run
-  // alongside the provision. Best-effort: run_codegen re-runs the same
-  // idempotent steps. A call that returns early leaves it running; a retry
-  // joins that same run rather than starting a second install.
-  return prewarmAppWorkspace(r.cwd, exec).catch((err: unknown) => ({ ok: false, out: errorText(err) }));
+type Prewarm = Promise<{ ok: boolean; out: string }>;
+
+// The packages/app scaffold + install don't need the database, so they run
+// while the backend builds it. Best-effort: run_codegen re-runs the same
+// idempotent steps. A pending call leaves it running; a retry joins that same
+// run rather than starting a second install.
+function startPrewarm(r: Run, exec: RunCommand): Prewarm {
+  if (r.host.prewarmApp === false) return Promise.resolve({ ok: false, out: 'The host prepares packages/app itself.' });
+  return prewarmAppWorkspace(r.cwd, exec).catch((err: unknown) => ({ ok: false, out: thrownText(err) }));
+}
+
+// The prewarm runs whether or not a database comes of the call, so a call that
+// fails after it started waits for it and says what it left in packages/app.
+async function afterPrewarm(outcome: Outcome, prewarm: Prewarm): Promise<Outcome> {
+  if (outcome.success || outcome.pending || !outcome.failure || !(await prewarm).ok) return outcome;
+  const failure: ToolFailure = {
+    ...outcome.failure,
+    message: `${outcome.failure.message.replace(/\.?$/, '.')} packages/app is ready for the next attempt.`,
+  };
+  return { ...outcome, failure, message: failureText(failure), appWorkspacePrepared: true };
 }
 
 async function requestAndBind(
@@ -450,7 +608,7 @@ async function requestAndBind(
   env: EnvVars,
   replaced: string | undefined,
   exec: RunCommand,
-): Promise<Details> {
+): Promise<Outcome> {
   const abandoned = abandonedTickets(env);
   const abandon = async (ids: string[]) => {
     for (const id of ids) abandoned.add(id);
@@ -468,9 +626,13 @@ async function requestAndBind(
     } else if (input.abandonPending) {
       await abandon([recorded.ticketId]);
     } else if (recorded.databaseName !== r.name) {
-      return failure(
+      return refuse(
         'pending-other',
-        `A provision of "${recorded.databaseName}" (ticket ${recorded.ticketId}) is still recorded for this project. Call provision_database with database_name "${recorded.databaseName}" to finish it; another name would start a second database.`,
+        {
+          message: `A provision of "${recorded.databaseName}" (ticket ${recorded.ticketId}) is still recorded for this project.`,
+          hint: `Call again with the name "${recorded.databaseName}" to finish it; another name would start a second database.`,
+          calls: [suggest(againTool(r), { database_name: recorded.databaseName }, 'Finish the provision recorded for this project')],
+        },
         { ticketId: recorded.ticketId },
       );
     } else {
@@ -492,8 +654,6 @@ async function requestAndBind(
     }
   }
 
-  const prewarm = startPrewarm(r, exec);
-
   // Resolve the module set: pinned base preset from node-type-registry, then
   // ordered overlays (host default < project-local provision.json). A bad
   // preset/manifest fails the run rather than provisioning a wrong module set.
@@ -506,9 +666,24 @@ async function requestAndBind(
     if (projectOverlay) layers.push(projectOverlay);
     modules = resolveProvisionModules(layers);
   } catch (err) {
-    return failure('failed', `Cannot resolve provision modules: ${errorText(err)}`);
+    return refuse('failed', { message: `Cannot resolve provision modules: ${thrownText(err)}` });
   }
 
+  const prewarm = startPrewarm(r, exec);
+  return afterPrewarm(await sendRequest(r, { current, recovered, abandoned, modules, replaced }, prewarm), prewarm);
+}
+
+type Request = {
+  current: PendingTicket | undefined;
+  recovered: boolean;
+  abandoned: Set<string>;
+  modules: ReturnType<typeof resolveProvisionModules>;
+  replaced: string | undefined;
+};
+
+async function sendRequest(r: Run, request: Request, prewarm: Prewarm): Promise<Outcome> {
+  let { current, recovered } = request;
+  const { abandoned, modules, replaced } = request;
   // requestDatabase claims a warm-pool database when the module set matches a
   // cataloged preset and cold-provisions otherwise; the ticket is polled on the
   // modules endpoint until the database AND its owner bootstrap complete. An
@@ -542,6 +717,7 @@ async function requestAndBind(
       if (err instanceof ProvisionPendingError) {
         return pendingResult(r, ticketFor(err.ticketId), err.message, recovered);
       }
+      if (err instanceof ProvisionSignedOutError) return signedOutWaiting(r, ticketFor(err.ticketId), err.message);
       if (err instanceof ProvisionTicketLostError) {
         // The ticket can't be read back, which doesn't mean the provision
         // stopped. Follow another in-flight one of this name, or stop without
@@ -558,9 +734,13 @@ async function requestAndBind(
         const checked = lookup.problem
           ? `the backend couldn't be asked for another one (${lookup.problem})`
           : 'no other provision of that name is in progress';
-        return failure(
+        return refuse(
           'ticket-lost',
-          `The provision of "${r.name}" (ticket ${err.ticketId}) can no longer be found on this backend, and ${checked}. Nothing was created, and the record is cleared, so calling provision_database again requests a new database.`,
+          {
+            message: `The provision of "${r.name}" (ticket ${err.ticketId}) can no longer be found on this backend, and ${checked}.`,
+            hint: 'Nothing was created, and the record is cleared, so calling again requests a new database.',
+            calls: [again(r, 'Request the database again')],
+          },
           { ticketId: err.ticketId },
         );
       }
@@ -587,7 +767,7 @@ async function requestAndBind(
 // same name resumes it. Past MAX_PENDING_ATTEMPTS the ticket stays recorded
 // and the call fails `provision-stuck`: nothing new is requested while it is
 // in flight, until the host abandons it.
-async function pendingResult(r: Run, ticket: PendingTicket, reason: string, recovered: boolean): Promise<Details> {
+async function pendingResult(r: Run, ticket: PendingTicket, reason: string, recovered: boolean): Promise<Outcome> {
   const { ticketId } = ticket;
   let recordedOk = true;
   try {
@@ -596,39 +776,129 @@ async function pendingResult(r: Run, ticket: PendingTicket, reason: string, reco
     recordedOk = false;
   }
   if (ticket.attempts > MAX_PENDING_ATTEMPTS) {
-    return failure(
+    return refuse(
       'provision-stuck',
-      `Database "${r.name}" is still not ready after ${MAX_PENDING_ATTEMPTS} waits (${reason}). Its request (ticket ${ticketId}) stays recorded, and no other database is requested while it is in progress. Check the backend's provisioning jobs.`,
+      {
+        message: `Database "${r.name}" is still not ready after ${MAX_PENDING_ATTEMPTS} waits (${reason}). Its request (ticket ${ticketId}) stays recorded, and no other database is requested while it is in progress.`,
+        hint: "Check the backend's provisioning jobs.",
+      },
       { ticketId },
     );
   }
-  const again = `call provision_database again with database_name "${r.name}"${
-    r.mode === 'replace' && r.viaTool ? ' and reprovision: true' : ''
-  }`;
+  const waiting = `call again with the same name, "${r.name}", to keep waiting on it`;
   const message = recordedOk
-    ? `Database "${r.name}" is still provisioning (${reason}). The request is recorded in .env; ${again} to keep waiting on it. Don't change the name: that starts a second database.`
-    : `Database "${r.name}" is still provisioning (${reason}). Recording its ticket in .env failed, but the backend still has it: ${again} to keep waiting on it. Don't change the name: that starts a second database.`;
-  return { success: false, message, pending: true, ticketId, ...(recovered ? { recovered: true } : {}) };
+    ? `Database "${r.name}" is still provisioning (${reason}). The request is recorded in .env; ${waiting}. Don't change the name: that starts a second database.`
+    : `Database "${r.name}" is still provisioning (${reason}). Recording its ticket in .env failed, but the backend still has it: ${waiting}. Don't change the name: that starts a second database.`;
+  return {
+    success: false,
+    message,
+    pending: true,
+    ticketId,
+    ...(recovered ? { recovered: true } : {}),
+    // No details code: a pending call has not failed, it has not finished.
+    failure: {
+      code: 'provision-pending',
+      message,
+      retryable: true,
+      calls: [again(r, 'Keep waiting on the recorded request')],
+    },
+  };
 }
 
-const NAME_TAKEN_RE = /already exists|already taken|already in use|duplicate/i;
+// A failed ticket stores the job's error text, not a GraphQL error, so the
+// code a refusal raised and PostgreSQL's own unique-violation text are the
+// only signals it has; the request's own GraphQL answer has a code.
+const TICKET_CODE_RE = /^(?:\[[^\]]*\]\s*)?([A-Z][A-Z0-9_]+)\b/;
+const TICKET_UNIQUE_RE = /duplicate key value violates unique constraint/;
 
-async function requestFailure(r: Run, err: unknown): Promise<Details> {
-  const detail = errorText(err);
-  if (!NAME_TAKEN_RE.test(detail)) return failure('failed', `Database provisioning failed: ${detail}.`);
+/** The public code of a refusal: from the request's GraphQL answer, or from a failed ticket. */
+function refusalCode(err: unknown): string | undefined {
+  if (err instanceof ProvisionJobError) return TICKET_CODE_RE.exec(err.ticketError)?.[1];
+  const errors = (err as { errors?: { extensions?: { code?: unknown; class?: unknown } }[] } | null)?.errors;
+  if (!Array.isArray(errors)) return undefined;
+  const code = errors.find((error) => error?.extensions?.class !== 'internal')?.extensions?.code;
+  return typeof code === 'string' ? code : undefined;
+}
+
+const isNameTaken = (err: unknown): boolean =>
+  refusalCode(err) === 'UNIQUE_VIOLATION' || (err instanceof ProvisionJobError && TICKET_UNIQUE_RE.test(err.ticketError));
+
+const REFUSED = 'Database provisioning was refused';
+
+// The tool of the same call again: a replace from the tool is its own tool.
+const againTool = (r: Run): string => (r.mode === 'replace' && r.viaTool ? 'replace_database' : 'provision_database');
+
+// The same call again, with the same name.
+const again = (r: Run, why: string) => suggest(againTool(r), { database_name: r.name }, why);
+
+const anotherName = (r: Run) => suggest(againTool(r), {}, 'Request the database under a name that is free', ['database_name']);
+
+// The backend refused a read of the provision because the sign-in ended. The provision may still be running, so its
+// ticket stays recorded, and the next call after a sign-in waits on it instead of requesting another database.
+async function signedOutWaiting(r: Run, ticket: PendingTicket, reason: string): Promise<Outcome> {
+  const recorded = await updateEnvFile(r.envPath, (content) => recordPendingTicket(content, ticket)).then(() => true, () => false);
+  return refuse(
+    'signed-out',
+    {
+      message:
+        `The backend did not accept the account credential while it read the provision of "${r.name}" (ticket ${ticket.ticketId}): ${reason}. ` +
+        `The database may still be on its way${recorded ? ', and the request stays recorded in .env' : ''}.`,
+      hint: `${r.host.signInHint ?? 'Sign in again'}, then call again with the same name to keep waiting on it. Don't change the name: that starts a second database.`,
+      calls: [again(r, 'Keep waiting on the recorded request once signed in')],
+    },
+    { ticketId: ticket.ticketId },
+  );
+}
+
+async function requestFailure(r: Run, err: unknown): Promise<Outcome> {
+  const detail = thrownText(err);
+  if (answersSignedOut(err)) {
+    return refuse('signed-out', {
+      message: `${REFUSED}${refusalCode(err) ? ` (${refusalCode(err)})` : ''}: the backend did not accept the account credential.`,
+      hint: r.host.signInHint ?? 'Sign in again, then call again.',
+    });
+  }
+  switch (refusalCode(err)) {
+  case 'BILLING_PLAN_REQUIRED':
+    return refuse('plan-required', {
+      message: `${REFUSED} (BILLING_PLAN_REQUIRED): this account has no active plan, and this backend requires one before it creates a database.`,
+      hint: 'Choose a plan for this account under Billing → Plans in the Constructive dashboard, then call again.',
+      calls: [again(r, 'Request the database again once the account has a plan')],
+    });
+  case 'LIMIT_REACHED':
+    return refuse('limit-reached', {
+      message: `${REFUSED} (LIMIT_REACHED): this account has as many databases as its plan allows.`,
+      hint: 'Delete a database this account no longer needs, or choose a plan that allows more under Billing → Plans in the Constructive dashboard, then call again.',
+      calls: [again(r, 'Request the database again once the account has room for it')],
+    });
+  case 'BILLING_QUOTA_EXCEEDED':
+    return refuse('limit-reached', {
+      message: `${REFUSED} (BILLING_QUOTA_EXCEEDED): this account has used up the allowance of its plan.`,
+      hint: 'Choose a plan with a larger allowance under Billing → Plans in the Constructive dashboard, or wait for the allowance to renew, then call again.',
+      calls: [again(r, 'Request the database again once the allowance allows it')],
+    });
+  default:
+    break;
+  }
+  if (!isNameTaken(err)) return refuse('failed', { message: `Database provisioning failed: ${detail}.` });
   const heldBy = await ownHolder(r);
   if (heldBy) {
     const when = heldBy.createdAt ? `, requested ${heldBy.createdAt}` : '';
-    return failure(
+    return refuse(
       'name-taken',
-      `Database provisioning failed: ${detail}. The name "${r.name}" belongs to a database this account provisioned earlier (ID ${heldBy.databaseId}${when}) that this project isn't bound to, so it was not bound. Re-run with a different database_name.`,
+      {
+        message: `Database provisioning failed: ${detail}. The name "${r.name}" belongs to a database this account provisioned earlier (ID ${heldBy.databaseId}${when}) that this project isn't bound to, so it was not bound.`,
+        hint: 'Call again with another database name.',
+        calls: [anotherName(r)],
+      },
       { heldBy },
     );
   }
-  return failure(
-    'name-taken',
-    `Database provisioning failed: ${detail}. The database name is already taken on the backend; re-run with a different database_name.`,
-  );
+  return refuse('name-taken', {
+    message: `Database provisioning failed: ${detail}. The database name is already taken on the backend.`,
+    hint: 'Call again with another database name.',
+    calls: [anotherName(r)],
+  });
 }
 
 // A completed provision of this name by this account whose database still
@@ -650,7 +920,7 @@ async function ownHolder(r: Run): Promise<Details['heldBy'] | undefined> {
 
 // ---- binding ---------------------------------------------------------------
 
-async function saveBinding(r: Run, binding: ProjectBinding, ticket?: PendingTicket): Promise<Details | null> {
+async function saveBinding(r: Run, binding: ProjectBinding, ticket?: PendingTicket): Promise<Outcome | null> {
   if (!r.host.persistBinding) return null;
   try {
     await r.host.persistBinding(binding);
@@ -658,11 +928,17 @@ async function saveBinding(r: Run, binding: ProjectBinding, ticket?: PendingTick
   } catch (err) {
     // Keep the ticket recorded, so the next call resumes it and binds it.
     if (ticket) await updateEnvFile(r.envPath, (content) => recordPendingTicket(content, ticket)).catch(noop);
-    return failure(
+    return refuse(
       'binding-not-saved',
-      `Database "${binding.databaseName}" (ID ${binding.databaseId}) is ready, but the app couldn't save the binding (${errorText(err)}), so .env was left unchanged.${
-        ticket ? ' Calling provision_database again with the same name binds it.' : ''
-      }`,
+      {
+        message: `Database "${binding.databaseName}" (ID ${binding.databaseId}) is ready, but the app couldn't save the binding (${thrownText(err)}), so .env was left unchanged.`,
+        ...(ticket
+          ? {
+            hint: 'Calling again with the same name binds it.',
+            calls: [again(r, 'Bind the database that is ready')],
+          }
+          : {}),
+      },
       { databaseId: binding.databaseId, ...(ticket ? { ticketId: ticket.ticketId } : {}) },
     );
   }
@@ -677,11 +953,7 @@ type Bind = {
   adopted?: boolean;
 };
 
-async function bindDatabase(
-  r: Run,
-  bind: Bind,
-  prewarm: Promise<{ ok: boolean; out: string }>,
-): Promise<Details> {
+async function bindDatabase(r: Run, bind: Bind, prewarm: Prewarm): Promise<Outcome> {
   const { databaseId, ticket } = bind;
 
   // Bind only a database this account owns. An unreachable backend keeps the
@@ -691,24 +963,26 @@ async function bindDatabase(
     if (ticket) {
       return pendingResult(r, ticket, `provisioned, but its owner couldn't be confirmed: ${owner.detail}`, bind.recovered);
     }
-    return failure('backend-unreachable', `Cannot verify database ${databaseId}: ${owner.detail}. Retry once the backend answers.`);
+    return unanswered(owner, `Cannot verify database ${databaseId}: ${owner.detail}.`, 'Retry once the backend answers.');
   }
   const visible = owner.status !== 'missing';
   if (!visible || owner.ownerId !== r.ownerId) {
     if (ticket) await updateEnvFile(r.envPath, clearPendingTicket).catch(noop);
     const why = visible ? "it isn't owned by" : "it isn't visible to";
     if (bind.adopted) {
-      return failure(visible ? 'account-mismatch' : 'db-missing', `Database ${databaseId} was not bound: ${why} the signed-in account.`);
+      return refuse(visible ? 'account-mismatch' : 'db-missing', {
+        message: `Database ${databaseId} was not bound: ${why} the signed-in account.`,
+      });
     }
-    return failure(
-      'failed',
-      `Database provisioning returned database ${databaseId}, but ${why} the signed-in account, so it was not bound. Call provision_database again to request a new database.`,
-    );
+    return refuse('failed', {
+      message: `Database provisioning returned database ${databaseId}, but ${why} the signed-in account, so it was not bound.`,
+      hint: 'Call again to request a new database.',
+      calls: [again(r, 'Request a new database')],
+    });
   }
   if (bind.adopted && owner.status === 'suspended') {
-    return failure('db-suspended', suspendedText(databaseId, owner));
+    return refuse('db-suspended', { message: suspendedText(databaseId, owner) });
   }
-
   const saved = await saveBinding(
     r,
     {
@@ -742,27 +1016,26 @@ async function bindDatabase(
       ),
     );
   } catch (err) {
-    return failure(
+    return refuse(
       'env-write-failed',
-      `Database provisioned (ID: ${databaseId}) but writing .env failed: ${errorText(err)}`,
+      { message: `Database provisioned (ID: ${databaseId}) but writing .env failed: ${thrownText(err)}` },
       { databaseId },
     );
   }
 
   // Settle the concurrent prewarm so the scaffold + install are in place before
   // run_codegen runs. A failure here is non-fatal: run_codegen redoes the work.
-  const prewarmed = (await prewarm).ok ? ' packages/app prewarmed.' : '';
+  const prewarmed = (await prewarm).ok ? ' packages/app is ready.' : '';
   const notes = [
-    bind.resumed ? ' Finished the provision an earlier call had started.' : '',
-    bind.recovered ? ' Found it on the backend by name: its ticket was no longer recorded.' : '',
+    bind.resumed ? ' Finished an earlier request.' : '',
+    bind.recovered ? ' Found it on the backend by name.' : '',
     prewarmed,
-    bind.replaced
-      ? ' Previous binding archived in .env (old database kept); rebuild the schema with provision_blueprint + run_codegen.'
-      : '',
+    bind.replaced ? ' The old binding is archived in .env, and the old database keeps its data. Build the schema again here.' : '',
   ].join('');
+  const named = `${r.name} (${databaseId.slice(0, 8)})`;
   const message = bind.adopted
-    ? `Bound database "${r.name}" (ID: ${databaseId}), which this account provisioned earlier. Binding written to .env.${notes}`
-    : `Provisioned database "${r.name}" (ID: ${databaseId}). Binding written to .env.${notes}`;
+    ? `Bound this directory to ${named}. Wrote .env.${notes}`
+    : `Created ${named} and bound this directory to it. Wrote .env.${notes}`;
   return {
     success: true,
     message,

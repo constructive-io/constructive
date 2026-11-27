@@ -123,6 +123,28 @@ describe('probeBoundDatabase', () => {
     );
   });
 
+  it('reads a 429 as the backend limiting requests, with the seconds to wait', async () => {
+    configureHost({ account: () => ({ userId: 'u1', accessToken: 't' }), backendConfig: () => ({ apiEndpoint: 'http://api.host.test/graphql' }) });
+    mockPost.mockResolvedValue({ httpStatus: 429, data: null, errors: [{ message: 'Too many requests.', extensions: { code: 'RATE_LIMITED', httpStatus: 429, retryAfterSeconds: 5 } }] });
+
+    await expect(probeBoundDatabase('db-1')).resolves.toMatchObject({ status: 'unreachable', cause: 'rate-limited', detail: expect.stringContaining('5 seconds') });
+  });
+
+  it('waits for an account the host gives later, and is unreachable with cause auth when it rejects', async () => {
+    configureHost({
+      account: () => Promise.resolve({ userId: 'u1', accessToken: 'later-token' }),
+      backendConfig: () => ({ apiEndpoint: 'http://api.host.test/graphql' }),
+    });
+    mockPost.mockResolvedValue(answer([{ id: 'db-1', ownerId: 'u1' }]));
+    await expect(probeBoundDatabase('db-1')).resolves.toMatchObject({ status: 'found' });
+    expect(mockPost).toHaveBeenCalledWith(expect.objectContaining({ headers: { Authorization: 'Bearer later-token' } }));
+
+    mockPost.mockClear();
+    configureHost({ account: () => Promise.reject(new Error('refresh failed')), backendConfig: () => ({ apiEndpoint: 'http://api.host.test/graphql' }) });
+    await expect(probeBoundDatabase('db-1')).resolves.toMatchObject({ status: 'unreachable', cause: 'auth', detail: expect.stringContaining('refresh failed') });
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
   it('is unreachable with cause auth when signed out, without asking the backend', async () => {
     configureHost({ account: () => null, backendConfig: () => null, signInHint: 'Sign in from Settings.' });
 
@@ -130,6 +152,20 @@ describe('probeBoundDatabase', () => {
       status: 'unreachable',
       cause: 'auth',
       detail: expect.stringMatching(/Sign in from Settings\./),
+    });
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it('is unreachable with cause error when the host cannot give its session, and says why', async () => {
+    const unusable = () => {
+      throw new Error('CONSTRUCTIVE_API_ENDPOINT is not set, so the credential names no backend.');
+    };
+    configureHost({ account: unusable, backendConfig: unusable, signInHint: 'Sign in from Settings.' });
+
+    await expect(probeBoundDatabase('db-1')).resolves.toMatchObject({
+      status: 'unreachable',
+      cause: 'error',
+      detail: expect.stringMatching(/CONSTRUCTIVE_API_ENDPOINT is not set/),
     });
     expect(mockPost).not.toHaveBeenCalled();
   });

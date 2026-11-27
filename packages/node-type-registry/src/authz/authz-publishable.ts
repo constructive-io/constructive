@@ -28,11 +28,22 @@ export const AuthzPublishable: NodeTypeDefinition = {
         description: 'Require published_at to be non-null and <= now()',
         default: true
       }
-    }
+    },
+    additionalProperties: false
   },
   tags: [
     'temporal',
     'publishing',
     'authz'
+  ],
+  summary: 'Anyone who can use the table can read rows once they are published; it does not check who is asking.',
+  use_when: [
+    'Read access to posts or pages that everyone may see once they are published. Use it for read only.'
+  ],
+  avoid_when: [
+    'Create, update or delete: anyone who can use the table could change every published row.'
+  ],
+  risks: [
+    'With the usual grant to signed-in people, every signed-in person can read every published row, even people outside the team or the app.'
   ]
 };

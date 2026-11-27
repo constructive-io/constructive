@@ -19,12 +19,12 @@ them.
 obtainable. A Job can obtain one — it writes the pending call into the thread at
 `approval-requested` and waits for the human to echo it back — so the runner
 reports `true`. Reporting `false` would tell the harness no decision is possible
-and every tool in `MUTATING_DB_TOOLS` would be refused before it ran.
+and every call whose tool effect is not `read` would be refused before it ran.
 
 The gate is the harness's. `createGatedToolset` calls `gate.onToolCall(...)` and,
 when the gate blocks, returns the gate's own reason to the model as an ordinary
 tool result — a declined call is information the agent can act on, not a crash.
-pi's fs/edit/bash/git tools are not in `MUTATING_DB_TOOLS` and are never gated:
+pi's fs/edit/bash/git tools are not db tools, so `CLONE_GATE_DEPS` knows no effect for them and they are never gated:
 the whole point of the coding lane is that editing the clone is free.
 
 ## Credentials do not go in the clone

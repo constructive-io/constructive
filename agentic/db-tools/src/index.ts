@@ -1,51 +1,9 @@
 import type { AnyHarnessTool } from '@agentic-kit/harness';
 
 import { configureHost, type ToolsHost } from './host';
-import { addPoliciesTool } from './tools/add-policies';
-import { addRecordsTool } from './tools/add-records';
-import { addRelationTool } from './tools/add-relation';
-import { createApiKeyTool } from './tools/create-api-key';
-import { describeSchemaTool } from './tools/describe-schema';
-import { manageEntityTypesTool } from './tools/manage-entity-types';
-import { createFieldTool, deleteFieldTool, deleteTableTool, updateFieldTool } from './tools/mutations';
-import { provisionBlueprintTool } from './tools/provision-blueprint';
-import { provisionDatabaseTool } from './tools/provision-database';
-import { runCodegenTool } from './tools/run-codegen';
-import {
-  applyTemplateTool,
-  createTemplateTool,
-  deleteTemplateTool,
-  listTemplatesTool,
-  updateTemplateTool,
-} from './tools/templates';
+import { constructiveDbTools } from './tools';
 
-/**
- * The Constructive database tools, in registration order.
- *
- * Plain `HarnessTool`s: a harness gets them by mapping them into its own tool
- * shape, which is the adapter's job, so this package stays free of any harness
- * dependency (see `toPiTool` in `@agentic-kit/pi` for that binding).
- */
-export const constructiveDbTools: readonly AnyHarnessTool[] = [
-  provisionDatabaseTool,
-  describeSchemaTool,
-  listTemplatesTool,
-  provisionBlueprintTool,
-  addRelationTool,
-  deleteTableTool,
-  createFieldTool,
-  updateFieldTool,
-  deleteFieldTool,
-  addPoliciesTool,
-  applyTemplateTool,
-  createTemplateTool,
-  updateTemplateTool,
-  deleteTemplateTool,
-  addRecordsTool,
-  manageEntityTypesTool,
-  createApiKeyTool,
-  runCodegenTool,
-];
+export { constructiveDbTools };
 
 /** Configure the host and get the tools in one call. */
 export function createConstructiveDbTools(host: ToolsHost): readonly AnyHarnessTool[] {
@@ -53,6 +11,59 @@ export function createConstructiveDbTools(host: ToolsHost): readonly AnyHarnessT
   return constructiveDbTools;
 }
 
+export {
+  ACCESS_CHECKS,
+  type AccessCheck,
+  type AccessFinding,
+  accessFindings,
+  type AccessOperation,
+  ADDED_FIELDS,
+  type AddedColumn,
+  type AddedDefault,
+  type AddedField,
+  BUILT_IN_SCOPES,
+  checkRule,
+  type ColumnGap,
+  columnGaps,
+  type ColumnRead,
+  columnsReadByPolicies,
+  type DataNodeNeed,
+  dataNodesForPolicies,
+  defaultFills,
+  DERIVED_KEYS,
+  explainPolicy,
+  fieldsAddedByNodes,
+  type MembershipScope,
+  type NeededDataNode,
+  POLICY_ROLES,
+  POLICY_WORDS,
+  policyDifference,
+  type PolicyWordsTemplate,
+  type ResolvedPolicy,
+  resolveEntityTypes,
+  ROW_ID,
+  type RuleProblem,
+  TABLE_NEEDS,
+  type TableAccessInput,
+  type TableField,
+  type TableKind,
+  type TablePolicy,
+  tablePolicyFromBlueprint,
+  type TablePrivilege,
+} from './access';
+export { expandBlueprintDefaults } from './blueprint/blueprint-defaults';
+export {
+  type AccessPolicy,
+  AccessPolicyZod,
+  AuthzTypeZod,
+  type Blueprint,
+  blueprintProblems,
+  BlueprintZod,
+  type FieldBlueprint,
+  type TableBlueprint,
+} from './blueprint/blueprint-schema';
+export { fieldTypeToTypeName, toFieldDefault, toFieldType } from './blueprint/field-type';
+export { isInternalPolicy } from './blueprint/internal-policies';
 export {
   BlueprintBuildError,
   buildBlueprint,
@@ -83,6 +94,7 @@ export {
   probeDatabase,
   type UnreachableCause,
 } from './db-probe';
+export { failureFromErrors,type FailureMeaning } from './failure';
 export { constructiveGateDeps, type ConstructiveGateResolvers } from './gate';
 export {
   type BackendErrorKind,
@@ -91,6 +103,7 @@ export {
   postGraphQL,
   statusAdapter,
 } from './graphql-http';
+export { type PostGraphQLArgs } from './graphql-http';
 export {
   type ActiveDataToken,
   configureHost,
@@ -153,10 +166,36 @@ export {
   SchemaReadError,
   type TableAccess,
 } from './schema-model';
+export { accessState, asWritten, grantWords, planRule, ruleWords, type WrittenRule } from './table-access';
 export { toolSchema } from './tool-schema';
-export { type AddRecordsDetails } from './tools/add-records';
-export { type CreateApiKeyDetails } from './tools/create-api-key';
-export { type RunCodegenDetails, type RunCodegenTimings } from './tools/run-codegen';
-export { createTemplatePreviewTables } from './tools/templates';
+export { describePolicyTypeTool, explainAccessTool, type ExplainedRule, type ExplainedTable, setAccessTool } from './tools/access';
+export { type AddPoliciesDetails, addPoliciesTool } from './tools/add-policies';
+export { type AddRecordsDetails, addRecordsTool } from './tools/add-records';
+export { type AddRelationDetails, addRelationTool } from './tools/add-relation';
+export { type CreateApiKeyDetails, createApiKeyTool } from './tools/create-api-key';
+export { type DescribeSchemaDetails, describeSchemaTool } from './tools/describe-schema';
+export { createEntityTypeTool, deleteEntityTypeTool, type EntityTypesDetails, type EntityTypeSummary, listEntityTypesTool } from './tools/entity-types';
+export {
+  createFieldTool,
+  deleteFieldTool,
+  deleteTableTool,
+  type MutationDetails,
+  retypeFieldTool,
+  updateFieldTool,
+} from './tools/mutations';
+export { type ProvisionBlueprintDetails, provisionBlueprintTool } from './tools/provision-blueprint';
+export { provisionDatabaseTool, replaceDatabaseTool } from './tools/provision-database';
+export { type RunCodegenDetails, type RunCodegenTimings, runCodegenTool } from './tools/run-codegen';
+export {
+  applyTemplateTool,
+  type CreateTemplateDetails,
+  createTemplatePreviewTables,
+  createTemplateTool,
+  deleteTemplateTool,
+  type ListTemplatesDetails,
+  listTemplatesTool,
+  type TemplateDetails,
+  updateTemplateTool,
+} from './tools/templates';
 
 export default constructiveDbTools;

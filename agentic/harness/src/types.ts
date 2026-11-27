@@ -41,7 +41,7 @@ export interface HarnessCredentials {
 
 /** Backend endpoint configuration pinned by the host / project binding. */
 export interface HarnessEndpoints {
-  /** Platform GraphQL endpoint, e.g. `http://api.localhost:3000/graphql`. */
+  /** Platform GraphQL endpoint, e.g. `https://api.example.com/graphql`. */
   apiEndpoint: string;
   /** Modules control-plane endpoint used by provisioning. */
   modulesEndpoint: string;

@@ -1,160 +1,74 @@
-import { fieldTypeToTypeName, type HarnessTool, isInternalPolicy } from '@agentic-kit/harness';
+import { alignColumns, type HarnessTool, type HarnessToolResult, strictObject } from '@agentic-kit/harness';
 import { z } from 'zod';
 
-import { resolveProjectContext } from '../context';
+import type { ProjectContext } from '../context';
+import { failedResult, failureFromError } from '../failure';
+import { projectReady } from '../ready';
+import { accessInputOf, asWritten, defaultText, readTables, type SchemaField, type WrittenRule } from '../table-access';
 
-const ParamZod = z.object({});
+const ParamZod = strictObject('the input', {});
 type Params = z.infer<typeof ParamZod>;
-
-type SchemaField = {
-  name: string;
-  type: string;
-  isRequired: boolean;
-  defaultValue: string | null;
-};
 
 type SchemaTable = {
   name: string;
   fields: SchemaField[];
+  /** Every policy type of the table, each once. */
   policies: string[];
+  /** Each rule that applies, in the shape a caller writes one. */
+  policyRules: WrittenRule[];
 };
+
+const ruleCells = (rule: WrittenRule): string[] => [
+  rule.permissive ? 'rule' : 'limit',
+  rule.$type,
+  rule.privileges.join(' '),
+  rule.policy_role === 'authenticated' ? '' : `role ${rule.policy_role}`
+];
 
 export type DescribeSchemaDetails = {
   tables: SchemaTable[];
 };
 
-function toDefaultValueString(value: unknown): string | null {
-  if (value == null) return null;
-  if (typeof value === 'string') return value;
-  return JSON.stringify(value);
-}
-
 function formatText(details: DescribeSchemaDetails): string {
-  const lines: string[] = [];
-  if (details.tables.length === 0) {
-    lines.push('No application tables yet.');
-  } else {
-    lines.push(`Tables (${details.tables.length}):`);
-    for (const table of details.tables) {
-      lines.push(`  ${table.name}`);
-      for (const field of table.fields) {
-        const req = field.isRequired ? ' required' : '';
-        const def = field.defaultValue != null ? ` default=${field.defaultValue}` : '';
-        lines.push(`    - ${field.name}: ${field.type}${req}${def}`);
-      }
-      if (table.policies.length > 0) {
-        lines.push(`    policies: ${table.policies.join(', ')}`);
-      }
-    }
-  }
-  return lines.join('\n');
+  if (details.tables.length === 0) return 'No tables yet.';
+  const indent = (lines: string[]) => lines.map((line) => `  ${line}`);
+  return details.tables
+    .map((table) => [
+      table.name,
+      ...indent(alignColumns(table.fields.map((field) => [field.name, field.type, field.isRequired ? 'required' : '', defaultText(field.defaultValue)]))),
+      ...indent(alignColumns(table.policyRules.map(ruleCells)))
+    ].join('\n'))
+    .join('\n\n');
 }
 
 export const describeSchemaTool: HarnessTool<typeof ParamZod, DescribeSchemaDetails> = {
   name: 'describe_schema',
   label: 'Describe schema',
   description:
-    'Inspect the current Constructive database schema for this project: application tables with their fields (name, type, required, default). Read-only.',
+    'Inspect the current Constructive database schema for this project: application tables with their fields (name, type, required, default) and every access rule that applies to each table, in the shape a rule is written, without the parts the backend sets. Read-only.',
   promptSnippet:
     'describe_schema: list the project database tables and their fields. Read-only — call before modifying schema.',
   parameters: ParamZod,
+  effect: 'read',
   async execute(_params: Params, ctx) {
-    const resolved = await resolveProjectContext(ctx.cwd);
-    if (!resolved.context) {
-      return {
-        content: [{ type: 'text', text: resolved.reason }],
-        details: { tables: [] },
-      };
+    const ready = await projectReady(ctx.cwd);
+    if (ready.kind === 'failed') return failedResult(ready.failure, { tables: [] });
+
+    try {
+      return await describeTables(ready.value);
+    } catch (err) {
+      return failedResult(failureFromError(err, 'Failed to read schema'), { tables: [] });
     }
-
-    const { api, databaseId } = resolved.context;
-
-    const tablesResult = await api.table
-      .findMany({
-        select: { id: true, name: true, category: true },
-        where: {
-          databaseId: { equalTo: databaseId },
-          or: [{ category: { equalTo: 'APP' } }, { name: { equalTo: 'users' } }],
-        },
-        orderBy: ['NAME_ASC'],
-      })
-      .execute();
-
-    if (!tablesResult.ok) {
-      const message = tablesResult.errors.map((e) => e.message).join('; ');
-      return {
-        content: [{ type: 'text', text: `Failed to read schema: ${message}` }],
-        details: { tables: [] },
-      };
-    }
-
-    const tableNodes = tablesResult.data.tables?.nodes ?? [];
-    const tableIds = tableNodes.map((t) => t.id);
-
-    const fieldsByTable = new Map<string, SchemaField[]>();
-    const policiesByTable = new Map<string, string[]>();
-    if (tableIds.length > 0) {
-      const [fieldsResult, policiesResult] = await Promise.all([
-        api.field
-          .findMany({
-            select: {
-              name: true,
-              type: true,
-              isRequired: true,
-              defaultValue: true,
-              tableId: true,
-            },
-            where: { tableId: { in: tableIds } },
-          })
-          .execute(),
-        api.policy
-          .findMany({
-            select: { tableId: true, policyType: true },
-            where: { tableId: { in: tableIds } },
-          })
-          .execute(),
-      ]);
-
-      if (!fieldsResult.ok) {
-        const message = fieldsResult.errors.map((e) => e.message).join('; ');
-        return {
-          content: [{ type: 'text', text: `Failed to read fields: ${message}` }],
-          details: { tables: [] },
-        };
-      }
-
-      for (const field of fieldsResult.data.fields?.nodes ?? []) {
-        const list = fieldsByTable.get(field.tableId) ?? [];
-        list.push({
-          name: field.name,
-          type: fieldTypeToTypeName(field.type),
-          isRequired: Boolean(field.isRequired),
-          defaultValue: toDefaultValueString(field.defaultValue),
-        });
-        fieldsByTable.set(field.tableId, list);
-      }
-
-      // One policy spans CRUD as several rows; collapse to distinct types per table.
-      if (policiesResult.ok) {
-        for (const policy of policiesResult.data.policies?.nodes ?? []) {
-          if (isInternalPolicy(policy.policyType)) continue;
-          const list = policiesByTable.get(policy.tableId) ?? [];
-          if (!list.includes(policy.policyType)) list.push(policy.policyType);
-          policiesByTable.set(policy.tableId, list);
-        }
-      }
-    }
-
-    const tables: SchemaTable[] = tableNodes.map((table) => ({
-      name: table.name,
-      fields: fieldsByTable.get(table.id) ?? [],
-      policies: policiesByTable.get(table.id) ?? [],
-    }));
-
-    const details: DescribeSchemaDetails = { tables };
-    return {
-      content: [{ type: 'text', text: formatText(details) }],
-      details,
-    };
   },
 };
+
+async function describeTables(context: ProjectContext): Promise<HarnessToolResult<DescribeSchemaDetails>> {
+  const read = await readTables(context);
+  if (read.kind === 'failed') return failedResult(read.failure, { tables: [] });
+  const tables: SchemaTable[] = read.value.map((table) => {
+    const policyRules = accessInputOf(table).policies.map(asWritten);
+    return { name: table.name, fields: table.fields, policies: [...new Set(policyRules.map((rule) => rule.$type))], policyRules };
+  });
+  const details: DescribeSchemaDetails = { tables };
+  return { content: [{ type: 'text', text: formatText(details) }], details };
+}

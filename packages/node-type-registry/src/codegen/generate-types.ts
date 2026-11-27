@@ -18,13 +18,15 @@
  */
 
 import * as t from '@babel/types';
+import { createHash } from 'crypto';
 import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { JSONSchema as SchemaTS_JSONSchema } from 'schema-typescript';
 import { generateTypeScriptTypes } from 'schema-typescript';
 
-import { allNodeTypes } from '../index';
-import type { NodeTypeDefinition } from '../types';
+import { AUTHZ_EXPRESSION, EXPRESSION_KEYS } from '../authz/parameters';
+import { allNodeTypes, policyNodeTypes } from '../index';
+import type { JSONSchema, NodeTypeDefinition } from '../types';
 
  
 const babelGenerator = require('@babel/generator');
@@ -145,6 +147,14 @@ function partialOf(inner: t.TSType): t.TSTypeReference {
 // ---------------------------------------------------------------------------
 
 function ensureArrayItems(schema: Record<string, unknown>): Record<string, unknown> {
+  // An Authz expression is typed by its own keys only: schema-typescript cannot
+  // express "exactly one key, named after a node".
+  if (schema.format === 'authz-expression') {
+    return schema.properties
+      ? ensureArrayItems({ type: 'object', title: schema.title, description: schema.description, properties: schema.properties })
+      : { type: 'object', description: schema.description };
+  }
+
   const out: Record<string, unknown> = { ...schema };
 
   // Strip $defs — they exist for JSON Schema validators but schema-typescript
@@ -163,10 +173,12 @@ function ensureArrayItems(schema: Record<string, unknown>): Record<string, unkno
     out.items = { type: 'string' };
   }
 
-  // Recurse into properties
+  // Recurse into properties. A key the backend writes is not part of the
+  // authoring types: a caller does not send it.
   if (out.properties && typeof out.properties === 'object') {
     const props: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(out.properties as Record<string, unknown>)) {
+      if ((v as { readOnly?: boolean })?.readOnly) continue;
       props[k] = v && typeof v === 'object' ? ensureArrayItems(v as Record<string, unknown>) : v;
     }
     out.properties = props;
@@ -767,6 +779,37 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
       )
     ]),
     'A unique constraint nested inside a table definition (table_name not required).'
+  );
+}
+
+// The check node types a check_constraints[] entry may name; the backend refuses any other.
+const CHECK_CONSTRAINT_TYPES = ['CheckOneOf', 'CheckGreaterThan', 'CheckLessThan', 'CheckNotEqual'];
+
+function buildBlueprintTableCheckConstraint(): t.ExportNamedDeclaration {
+  const members = CHECK_CONSTRAINT_TYPES.map((name) =>
+    t.tsTypeLiteral([
+      requiredProp('$type', strLit(name)),
+      addJSDoc(requiredProp('name', t.tsStringKeyword()), 'Name of the CHECK constraint.'),
+      addJSDoc(requiredProp('data', t.tsTypeReference(t.identifier(`${name}Params`))), 'The check node\'s parameters.'),
+      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name override.')
+    ])
+  );
+  return addJSDoc(
+    exportTypeAlias('BlueprintTableCheckConstraint', t.tsUnionType(members)),
+    'A CHECK constraint nested inside a table definition (table_name not required).'
+  );
+}
+
+function buildBlueprintCheckConstraint(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportTypeAlias(
+      'BlueprintCheckConstraint',
+      t.tsIntersectionType([
+        t.tsTypeReference(t.identifier('BlueprintTableCheckConstraint')),
+        t.tsTypeLiteral([addJSDoc(requiredProp('table_name', t.tsStringKeyword()), 'Table name this CHECK constraint belongs to.')])
+      ])
+    ),
+    'A CHECK constraint definition within a blueprint (top-level, requires table_name).'
   );
 }
 
@@ -1560,6 +1603,13 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableUniqueConstraint')))
         ),
         'Table-level unique constraints (table_name inherited from parent).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'check_constraints',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableCheckConstraint')))
+        ),
+        'Table-level CHECK constraints (table_name inherited from parent).'
       )
     ]),
     'A table definition within a blueprint.'
@@ -1607,6 +1657,15 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
           )
         ),
         'Unique constraints on table columns.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'check_constraints',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintCheckConstraint'))
+          )
+        ),
+        'CHECK constraints on table columns.'
       ),
       addJSDoc(
         optionalProp(
@@ -1668,6 +1727,361 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
 }
 
 // ---------------------------------------------------------------------------
+// JSON Schema for a blueprint definition. The structural types above are the
+// one description: their AST is turned into JSON Schema, and each node's data
+// is its parameter_schema in the form a caller writes it.
+// ---------------------------------------------------------------------------
+
+type Json = { [key: string]: unknown };
+
+const refTo = (name: string): Json => ({ $ref: `#/$defs/${name}` });
+
+function jsDocOf(node: t.Node): string | undefined {
+  const block = node.leadingComments?.find((comment) => comment.type === 'CommentBlock');
+  return block ? block.value.replace(/^\*\s*/, '').trim() : undefined;
+}
+
+const withDoc = (schema: Json, node: t.Node): Json => (jsDocOf(node) ? { ...schema, description: jsDocOf(node) } : schema);
+
+const FIELD_TYPE_SCHEMA: Json = {
+  type: 'object',
+  description: 'A structured PostgreSQL type, e.g. { name: "text" } or { name: "numeric", args: [10, 2] }.',
+  properties: {
+    name: { type: 'string', description: 'Type name.' },
+    schema: { type: 'string', description: 'Schema qualifier.' },
+    args: { type: 'array', items: { type: ['string', 'number', 'boolean'] }, description: 'Type arguments.' },
+    array_dimensions: { type: 'integer', description: 'Number of array dimensions: 1 is text[].' },
+    range: { type: 'array', items: { type: 'string' }, maxItems: 2, description: 'Interval field range, e.g. ["day", "second"].' }
+  },
+  required: ['name']
+};
+
+const FIELD_DEFAULT_SCHEMA: Json = {
+  type: 'object',
+  description: 'A structured default expression, e.g. { value: false }, { function: "now" } or { value: {}, cast: { name: "jsonb" } }.',
+  properties: {
+    value: { description: 'Literal value.' },
+    function: { type: 'string', description: 'Function name.' },
+    schema: { type: 'string', description: 'Schema qualifier of the function.' },
+    args: { type: 'array', items: { anyOf: [{ type: ['string', 'number', 'boolean', 'null'] }, refTo('FieldDefault')] }, description: 'Function arguments.' },
+    cast: refTo('FieldType'),
+    operator: { type: 'string', description: 'Binary operator, e.g. "+".' },
+    left: refTo('FieldDefault'),
+    right: refTo('FieldDefault'),
+    sql_keyword: { type: 'string', description: 'SQL keyword, e.g. "CURRENT_TIMESTAMP".' }
+  }
+};
+
+const CODEGEN_REFS: Record<string, string> = { FieldType: 'FieldType', FieldDefault: 'FieldDefault', TriggerCondition: 'TriggerCondition' };
+
+// One node's data as a caller writes it: keys the backend writes are left out, an Authz expression points at
+// AuthzExpression, a hand-typed property points at its def, and the node's own $defs move to the root.
+function nodeDataSchema(schema: JSONSchema, hoisted: Map<string, Json>): Json {
+  const walk = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(walk);
+    if (!value || typeof value !== 'object') return value;
+    const node = value as JSONSchema;
+    if (node.format === 'authz-expression') return node.description ? { ...refTo('AuthzExpression'), description: node.description } : refTo('AuthzExpression');
+    const codegen = node['x-codegen-type'] as string | undefined;
+    if (codegen) {
+      const parts = codegen.split('|').map((part) => part.trim()).map((part) =>
+        part.endsWith('[]') ? { type: 'array', items: refTo(CODEGEN_REFS[part.slice(0, -2)]) } : refTo(CODEGEN_REFS[part])
+      );
+      return { ...(parts.length === 1 ? parts[0] : { anyOf: parts }), ...(node.description ? { description: node.description } : {}) };
+    }
+    const out: Json = {};
+    for (const [key, inner] of Object.entries(node)) {
+      if (key === '$defs') {
+        for (const [name, def] of Object.entries(inner as Record<string, JSONSchema>)) {
+          const converted = walk(def) as Json;
+          if (hoisted.has(name) && JSON.stringify(hoisted.get(name)) !== JSON.stringify(converted)) {
+            throw new Error(`blueprint JSON Schema: two node schemas define $defs.${name} differently; give one of them another name.`);
+          }
+          hoisted.set(name, converted);
+        }
+      } else if (key === 'properties') {
+        out.properties = Object.fromEntries(
+          Object.entries(inner as Record<string, JSONSchema>).filter(([, property]) => !property.readOnly).map(([name, property]) => [name, walk(property)])
+        );
+      } else {
+        out[key] = walk(inner);
+      }
+    }
+    return out;
+  };
+  return walk(schema) as Json;
+}
+
+function tsTypeSchema(type: t.TSType): Json {
+  if (t.isTSStringKeyword(type)) return { type: 'string' };
+  if (t.isTSNumberKeyword(type)) return { type: 'number' };
+  if (t.isTSBooleanKeyword(type)) return { type: 'boolean' };
+  if (t.isTSUnknownKeyword(type) || t.isTSAnyKeyword(type)) return {};
+  if (t.isTSNeverKeyword(type)) return { not: {} };
+  if (t.isTSLiteralType(type) && t.isStringLiteral(type.literal)) return { const: type.literal.value };
+  if (t.isTSArrayType(type)) return { type: 'array', items: tsTypeSchema(type.elementType) };
+  if (t.isTSTypeLiteral(type)) return membersSchema(type.members);
+  if (t.isTSIntersectionType(type)) return { allOf: type.types.map(tsTypeSchema) };
+  if (t.isTSUnionType(type)) {
+    const literals = type.types.filter((member): member is t.TSLiteralType => t.isTSLiteralType(member) && t.isStringLiteral(member.literal));
+    if (literals.length === type.types.length) return { enum: literals.map((member) => (member.literal as t.StringLiteral).value) };
+    const tagged = type.types.map(typeTag);
+    if (tagged.every(Boolean)) {
+      return byType({ type: 'object', properties: {} }, type.types.map((member, i) => ({ name: tagged[i], then: membersSchema((member as t.TSTypeLiteral).members) })));
+    }
+    return { anyOf: type.types.map(tsTypeSchema) };
+  }
+  if (t.isTSTypeReference(type) && t.isIdentifier(type.typeName)) {
+    if (type.typeName.name === 'Record') return { type: 'object', additionalProperties: tsTypeSchema(type.typeParameters.params[1]) };
+    return refTo(type.typeName.name);
+  }
+  throw new Error(`blueprint JSON Schema: no rule turns the TS type ${type.type} into JSON Schema; add one to tsTypeSchema.`);
+}
+
+// The `$type` literal of an object type, which makes a union of them a union keyed by `$type`.
+function typeTag(type: t.TSType): string | undefined {
+  if (!t.isTSTypeLiteral(type)) return undefined;
+  const tag = type.members.find((member) => t.isTSPropertySignature(member) && t.isIdentifier(member.key) && member.key.name === '$type') as t.TSPropertySignature | undefined;
+  const literal = tag?.typeAnnotation?.typeAnnotation;
+  return t.isTSLiteralType(literal) && t.isStringLiteral(literal.literal) ? literal.literal.value : undefined;
+}
+
+function membersSchema(members: t.TSTypeElement[]): Json {
+  const properties: Json = {};
+  const required: string[] = [];
+  for (const member of members) {
+    if (!t.isTSPropertySignature(member) || !(t.isIdentifier(member.key) || t.isStringLiteral(member.key))) {
+      throw new Error('blueprint JSON Schema: a structural type has a member that is not a named property; only properties turn into JSON Schema.');
+    }
+    const name = t.isIdentifier(member.key) ? member.key.name : member.key.value;
+    properties[name] = withDoc(tsTypeSchema(member.typeAnnotation.typeAnnotation), member);
+    if (!member.optional) required.push(name);
+  }
+  return { type: 'object', properties, ...(required.length ? { required } : {}) };
+}
+
+// Entries keyed by `$type`: the type names one of `branches`, and its branch applies.
+function byType(base: Json, branches: Array<{ name: string; then: Json }>): Json {
+  const properties = (base.properties ?? {}) as Json;
+  return {
+    ...base,
+    required: [...new Set(['$type', ...((base.required as string[]) ?? [])])],
+    properties: { ...properties, $type: { enum: branches.map((branch) => branch.name) } },
+    allOf: branches.map((branch) => ({ if: { properties: { $type: { const: branch.name } }, required: ['$type'] }, then: branch.then }))
+  };
+}
+
+function nodeEntrySchema(dataNodes: NodeTypeDefinition[]): Json {
+  return byType(
+    { type: 'object', properties: { data: { type: 'object' } }, additionalProperties: false },
+    dataNodes.map((nt) => ({
+      name: nt.name,
+      then: { properties: { data: refTo(`${nt.name}Params`) }, ...((nt.parameter_schema.required ?? []).length ? { required: ['data'] } : {}) }
+    }))
+  );
+}
+
+// The privileges a policy takes, in any letter case, as the backend reads them.
+const PRIVILEGE_PATTERN = '^([Ss][Ee][Ll][Ee][Cc][Tt]|[Ii][Nn][Ss][Ee][Rr][Tt]|[Uu][Pp][Dd][Aa][Tt][Ee]|[Dd][Ee][Ll][Ee][Tt][Ee])$';
+
+function policySchemas(authzNodes: NodeTypeDefinition[]): Record<string, Json> {
+  const data = authzNodes.map((nt) => ({ name: nt.name, then: { properties: { data: refTo(`${nt.name}Params`) } } }));
+  return {
+    BlueprintPolicyWithCheck: byType({ type: 'object', properties: { data: { type: 'object' } }, additionalProperties: false }, data),
+    BlueprintPolicy: {
+      ...byType(
+        {
+          type: 'object',
+          properties: {
+            privileges: { type: 'array', minItems: 1, items: { type: 'string', pattern: PRIVILEGE_PATTERN } },
+            permissive: { type: 'boolean' },
+            policy_role: { type: 'string' },
+            policy_name: { type: 'string' },
+            data: { type: 'object' },
+            with_check: refTo('BlueprintPolicyWithCheck')
+          },
+          additionalProperties: false
+        },
+        data
+      ),
+      description: 'An RLS policy entry for a blueprint table. A with_check override applies to UPDATE only.',
+      if: { required: ['with_check'] },
+      then: { required: ['privileges'], properties: { privileges: { items: { type: 'string', pattern: '^[Uu][Pp][Dd][Aa][Tt][Ee]$' } } } }
+    }
+  };
+}
+
+function relationSchema(relationNodes: NodeTypeDefinition[]): Json {
+  const ends: Json = {
+    source_table: { type: 'string' },
+    target_table: { type: 'string' },
+    source_schema: { type: 'string' },
+    target_schema: { type: 'string' },
+    source_module: refTo('BlueprintModuleTableRef'),
+    target_module: refTo('BlueprintModuleTableRef')
+  };
+  return byType(
+    { type: 'object', description: 'A relation entry in a blueprint definition.', properties: ends },
+    relationNodes.map((nt) => {
+      const params = nodeDataSchema(nt.parameter_schema, new Map());
+      const spatial = nt.name === 'RelationSpatial';
+      return {
+        name: nt.name,
+        then: {
+          properties: { ...(params.properties as Json), ...(spatial ? { source_field: { type: 'string' }, target_field: { type: 'string' } } : {}) },
+          ...(spatial ? { required: ['source_field', 'target_field'] } : {})
+        }
+      };
+    })
+  );
+}
+
+// The structural statements stand for themselves; the node unions, the policies and the relations come from the
+// node types, so their data is checked against each node's parameter_schema.
+function buildBlueprintJsonSchema(statements: t.Statement[], nodeTypes: NodeTypeDefinition[]): Json {
+  // Converted when the definition reaches them, so a type it does not use needs no rule here.
+  const declared = new Map<string, Json | (() => Json)>();
+  for (const statement of statements) {
+    if (!t.isExportNamedDeclaration(statement)) continue;
+    const declaration = statement.declaration;
+    if (t.isTSInterfaceDeclaration(declaration)) declared.set(declaration.id.name, () => withDoc(membersSchema(declaration.body.body), statement));
+    if (t.isTSTypeAliasDeclaration(declaration)) declared.set(declaration.id.name, () => withDoc(tsTypeSchema(declaration.typeAnnotation), statement));
+  }
+  const dataNodes = nodeTypes.filter((nt) => nt.category !== 'relation' && nt.category !== 'view');
+  const hoisted = new Map<string, Json>();
+  for (const nt of nodeTypes) declared.set(`${nt.name}Params`, { ...nodeDataSchema(nt.parameter_schema, hoisted), description: nt.description });
+  for (const [name, def] of hoisted) declared.set(name, def);
+  declared.set('AuthzExpression', {
+    type: 'object',
+    description: AUTHZ_EXPRESSION.description,
+    minProperties: 1,
+    maxProperties: 1,
+    properties: Object.fromEntries(
+      EXPRESSION_KEYS.map((key) => [
+        key,
+        key === 'NOT' ? refTo('AuthzExpression') : ['AND', 'OR'].includes(key) ? { type: 'array', minItems: 1, items: refTo('AuthzExpression') } : refTo(`${key}Params`)
+      ])
+    ),
+    additionalProperties: false
+  });
+  declared.set('BlueprintNodeShorthand', { enum: dataNodes.map((nt) => nt.name), description: 'String shorthand -- just the node type name.' });
+  declared.set('BlueprintNodeObject', { ...nodeEntrySchema(dataNodes), description: 'Object form -- { $type, data } with typed parameters.' });
+  for (const [name, schema] of Object.entries(policySchemas(policyNodeTypes))) declared.set(name, schema);
+  declared.set('BlueprintRelation', relationSchema(nodeTypes.filter((nt) => nt.category === 'relation')));
+  declared.set('FieldType', FIELD_TYPE_SCHEMA);
+  declared.set('FieldDefault', FIELD_DEFAULT_SCHEMA);
+
+  // Only what the definition reaches, in a stable order.
+  const defs: Record<string, Json> = {};
+  const visit = (value: unknown): void => {
+    if (Array.isArray(value)) return value.forEach(visit);
+    if (!value || typeof value !== 'object') return;
+    for (const [key, inner] of Object.entries(value)) {
+      if (key === '$ref' && typeof inner === 'string' && inner.startsWith('#/$defs/')) {
+        const name = inner.slice('#/$defs/'.length);
+        if (defs[name]) continue;
+        const entry = declared.get(name);
+        if (!entry) throw new Error(`blueprint JSON Schema: "${name}" is referenced but not defined; define it in buildBlueprintJsonSchema.`);
+        const def = typeof entry === 'function' ? entry() : entry;
+        defs[name] = def;
+        visit(def);
+      } else if (key !== 'enum' && key !== 'const' && key !== 'default') {
+        visit(inner);
+      }
+    }
+  };
+  visit(refTo('BlueprintDefinition'));
+  return {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    title: 'BlueprintDefinition',
+    description: defs.BlueprintDefinition.description,
+    allOf: [refTo('BlueprintDefinition')],
+    $defs: Object.fromEntries(Object.keys(defs).sort().map((name) => [name, defs[name]]))
+  };
+}
+
+// Where a value is itself a schema, so a repeated one can stand behind a $ref.
+const SCHEMA_MAPS = ['properties', 'patternProperties'];
+const SCHEMA_LISTS = ['anyOf', 'oneOf', 'allOf'];
+const SCHEMA_VALUES = ['items', 'additionalProperties', 'propertyNames', 'contains', 'not', 'if', 'then', 'else'];
+
+const canonical = (value: unknown): string => JSON.stringify(value, (_key, inner) =>
+  inner && typeof inner === 'object' && !Array.isArray(inner) ? Object.fromEntries(Object.keys(inner).sort().map((key) => [key, inner[key]])) : inner
+);
+
+// Each schema the definition holds, at the place it sits, outermost first.
+function eachSubschema(schema: Json, visit: (value: Json, replace: (next: Json) => void) => boolean): void {
+  const at = (value: unknown, replace: (next: Json) => void) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+    if (visit(value as Json, replace)) eachSubschema(value as Json, visit);
+  };
+  for (const key of SCHEMA_MAPS) {
+    const map = schema[key] as Record<string, unknown> | undefined;
+    if (map && typeof map === 'object') for (const name of Object.keys(map)) at(map[name], (next) => (map[name] = next));
+  }
+  for (const key of SCHEMA_LISTS) {
+    const list = schema[key] as unknown[] | undefined;
+    if (Array.isArray(list)) list.forEach((item, i) => at(item, (next) => (list[i] = next)));
+  }
+  for (const key of SCHEMA_VALUES) {
+    const value = schema[key];
+    if (Array.isArray(value)) value.forEach((item, i) => at(item, (next) => (value[i] = next)));
+    else at(value, (next) => (schema[key] = next));
+  }
+}
+
+// A subschema that appears more than once, and is bigger than a $ref to it, moves to $defs; repeated until none is left.
+// One that holds a default keeps its place.
+function shareRepeatedSubtrees(schema: Json): Json {
+  const out = JSON.parse(JSON.stringify(schema)) as Json;
+  const defs = out.$defs as Record<string, Json>;
+  const MIN_SIZE = 48;
+  for (;;) {
+    const roots = Object.values(defs);
+    const counts = new Map<string, number>();
+    for (const root of roots) {
+      eachSubschema(root, (value) => {
+        if (value.$ref) return false;
+        // A validator fills a default only from a property's own schema, not through a $ref to it.
+        if (value.default !== undefined) return true;
+        const key = canonical(value);
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+        return true;
+      });
+    }
+    const shared = new Set([...counts].filter(([key, count]) => count > 1 && key.length >= MIN_SIZE).map(([key]) => key));
+    if (shared.size === 0) break;
+    for (const root of roots) {
+      eachSubschema(root, (value, replace) => {
+        const key = canonical(value);
+        if (!shared.has(key)) return true;
+        const name = `shared-${createHash('sha1').update(key).digest('hex').slice(0, 10)}`;
+        defs[name] ??= value;
+        replace(refTo(name));
+        return false;
+      });
+    }
+  }
+  out.$defs = Object.fromEntries(Object.keys(defs).sort().map((name) => [name, defs[name]]));
+  return out;
+}
+
+function renderBlueprintSchema(schema: Json): string {
+  return [
+    '// GENERATED FILE \u2014 DO NOT EDIT',
+    '//',
+    '// Regenerate with:',
+    '//   cd packages/node-type-registry && pnpm generate:types',
+    '',
+    "import type { JSONSchema } from './types';",
+    '',
+    '/** JSON Schema (draft-07) of a blueprint definition: the shapes construct_blueprint() reads, with each node\'s data checked against its parameter_schema in the form a caller writes it. */',
+    `export const blueprintDefinitionJsonSchema: JSONSchema = ${JSON.stringify(shareRepeatedSubtrees(schema))};`,
+    ''
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------------
 // Section comment helper
 // ---------------------------------------------------------------------------
 
@@ -1686,7 +2100,7 @@ function sectionComment(title: string): t.Statement {
 // Main generator
 // ---------------------------------------------------------------------------
 
-function buildProgram(meta?: MetaTableInfo[]): string {
+function buildProgram(meta?: MetaTableInfo[]): { types: string; schema: string } {
   const statements: t.Statement[] = [];
 
   // Group node types by category
@@ -1703,7 +2117,6 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   const relationNodes = allNodeTypes.filter(
     (nt) => nt.category === 'relation'
   );
-  const authzNodes = allNodeTypes.filter((nt) => nt.category === 'authz');
 
   // -- Shared recursive types (emitted before parameter interfaces) --
   statements.push(sectionComment('Shared recursive types'));
@@ -1729,8 +2142,8 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     : 'Static fallback (no _meta provided)';
   statements.push(sectionComment(`Structural types — ${metaSource}`));
   statements.push(buildBlueprintField());
-  statements.push(buildBlueprintPolicyWithCheck(authzNodes));
-  statements.push(buildBlueprintPolicy(authzNodes, meta));
+  statements.push(buildBlueprintPolicyWithCheck(policyNodeTypes));
+  statements.push(buildBlueprintPolicy(policyNodeTypes, meta));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
   statements.push(buildBlueprintTableFullTextSearch());
@@ -1738,6 +2151,8 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
+  statements.push(buildBlueprintTableCheckConstraint());
+  statements.push(buildBlueprintCheckConstraint());
   statements.push(buildBlueprintModuleTableRef());
   statements.push(buildBlueprintModuleInstallRef());
   statements.push(buildBlueprintBucketSeed());
@@ -1788,7 +2203,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   ].join('\n');
 
   const output = generate(file, { comments: true, jsescOption: { quotes: 'single' } });
-  return header + output.code + '\n';
+  return { types: header + output.code + '\n', schema: renderBlueprintSchema(buildBlueprintJsonSchema(statements, allNodeTypes)) };
 }
 
 // ---------------------------------------------------------------------------
@@ -1819,12 +2234,12 @@ function main() {
     console.log('No --meta flag; using static fallback types');
   }
 
-  const content = buildProgram(meta);
-  const filename = 'blueprint-types.generated.ts';
-  const filepath = join(outdir, filename);
+  const { types, schema } = buildProgram(meta);
+  const filepath = join(outdir, 'blueprint-types.generated.ts');
 
   if (!existsSync(outdir)) mkdirSync(outdir, { recursive: true });
-  writeFileSync(filepath, content);
+  writeFileSync(filepath, types);
+  writeFileSync(join(outdir, 'blueprint-schema.generated.ts'), schema);
 
   console.log(`Generated ${filepath} (${allNodeTypes.length} node types)`);
 }

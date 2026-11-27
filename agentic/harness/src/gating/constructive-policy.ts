@@ -1,6 +1,17 @@
+import type { ToolEffect, ToolFailure } from '../tools/tool';
 import type { GatePolicy, GateToolCallEvent } from './policy';
-import type { ConfirmPreview } from './preview';
-import { buildConfirmPrompt, MUTATING_DB_TOOLS } from './prompts';
+import type { ConfirmPreview, PlanTableAccess, PlanTarget } from './preview';
+import { templateTableLines } from './preview';
+import { buildConfirmPrompt } from './prompts';
+
+/**
+ * What the precondition step resolved: why the call cannot run, or what it acts
+ * on, for a call that creates or changes the access of a table, that access,
+ * and what the plan must say that the input does not.
+ */
+export type GateReadiness =
+  | { kind: 'blocked'; failure: ToolFailure }
+  | { kind: 'ready'; target: PlanTarget; access?: PlanTableAccess[]; notes?: string[] };
 
 /**
  * Host capabilities the Constructive database policy needs. These are
@@ -9,13 +20,21 @@ import { buildConfirmPrompt, MUTATING_DB_TOOLS } from './prompts';
  */
 export type ConstructiveGateDeps = {
   /**
-   * Whether the project is provisioned/runnable at `cwd`. Unrunnable calls
-   * skip the confirm so the tool can return its clean "provision first"
-   * message instead of making the user approve something that fails.
+   * The effect of a tool, or undefined for a tool this policy does not know,
+   * which it leaves ungated. Synchronous and free of I/O, like `isGated`.
    */
-  isProjectRunnable(cwd: string): Promise<boolean>;
-  /** Whether a data-plane token is available (gates `add_records`). */
-  hasDataToken(cwd: string): Promise<boolean>;
+  effectOf(toolName: string): ToolEffect | undefined;
+  /**
+   * Why the call cannot run now, or what it acts on when it can. It must be
+   * the check the tool itself makes before it changes anything (the same
+   * project context, plane and sign-in), so the gate and the tool cannot
+   * disagree; the target it resolved goes into the plan.
+   */
+  precondition(
+    toolName: string,
+    input: Record<string, unknown> | undefined,
+    cwd: string
+  ): Promise<GateReadiness>;
   /**
    * Resolve the preview for `create_template` (its tables live in the
    * blueprint it copies, not in the tool input). Return undefined when a
@@ -26,59 +45,37 @@ export type ConstructiveGateDeps = {
     blueprintName: string | undefined,
     displayName: string
   ): Promise<ConfirmPreview | undefined>;
-  /**
-   * Tool names that require a human decision. Defaults to
-   * `MUTATING_DB_TOOLS`; a host that wants a different set entirely is better
-   * served by its own `GatePolicy`.
-   */
-  gatedTools?: ReadonlySet<string>;
 };
 
 /**
  * The gate policy for Constructive's database tools, as the Desktop and CLI
- * hosts want it: gate every mutating db tool, and skip the confirm when the
- * call is going to bounce off a missing project or a missing sign-in anyway.
+ * hosts want it: gate every call whose effect is not `read`, block a call
+ * whose precondition fails with that failure, and ask for every other one.
  */
 export function createConstructiveGatePolicy(deps: ConstructiveGateDeps): GatePolicy {
-  const gatedTools = deps.gatedTools ?? MUTATING_DB_TOOLS;
-
   return {
     isGated: (event: GateToolCallEvent) => {
-      if (!gatedTools.has(event.toolName)) return false;
-      // manage_entity_types multiplexes read + write actions behind one tool
-      // name; its read action is not a mutation, so it skips the gate.
-      if (event.toolName === 'manage_entity_types' && event.input?.action === 'list') return false;
-      return true;
+      const effect = deps.effectOf(event.toolName);
+      return effect !== undefined && effect !== 'read';
     },
 
     resolvePrompt: async (event, cwd) => {
       const input = event.input;
-      const prompt = buildConfirmPrompt(event.toolName, input);
+      const ready = await deps.precondition(event.toolName, input, cwd);
+      if (ready.kind === 'blocked') return { kind: 'blocked', failure: ready.failure };
 
-      // provision_database is the tool that CREATES the project context, so it
-      // can't gate on an existing one — confirm it directly.
-      if (event.toolName === 'provision_database') return prompt;
-
-      if (!(await deps.isProjectRunnable(cwd))) return null;
-      // Tools that need an app sign-in skip the confirm when no data token
-      // exists — the tool returns its sign-in prompt instead of making the
-      // user approve something that fails.
-      if (
-        (event.toolName === 'add_records' || event.toolName === 'create_api_key') &&
-        !(await deps.hasDataToken(cwd))
-      ) {
-        return null;
-      }
-
+      const prompt = buildConfirmPrompt(event.toolName, input, { target: ready.target, access: ready.access, notes: ready.notes });
       if (event.toolName === 'create_template') {
         const blueprintName =
           typeof input?.blueprintName === 'string' ? input.blueprintName : undefined;
         const displayName = typeof input?.displayName === 'string' ? input.displayName : '';
         const preview = await deps.resolveTemplatePreview(cwd, blueprintName, displayName);
-        if (preview) return { ...prompt, preview };
+        if (preview) {
+          const tables = preview.kind === 'template' ? templateTableLines(preview.tables).map((line) => `    ${line}`) : [];
+          return { kind: 'ask', prompt: { ...prompt, message: [prompt.message, ...tables].join('\n'), preview } };
+        }
       }
-
-      return prompt;
+      return { kind: 'ask', prompt };
     },
   };
 }

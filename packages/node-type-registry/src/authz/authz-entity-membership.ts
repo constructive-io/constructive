@@ -1,4 +1,6 @@
 import type { NodeTypeDefinition } from '../types';
+import { MEMBER_CHECKS, MEMBER_LIST, TEAM_KIND, TEAM_KIND_GIVEN } from './parameters';
+import { ACTIVE_MEMBER_RISK, PERSONAL_ORG_RISK } from './plain-words';
 
 export const AuthzEntityMembership: NodeTypeDefinition = {
   name: 'AuthzEntityMembership',
@@ -20,14 +22,7 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
         description: 'SPRT column to select for the entity match',
         default: 'entity_id'
       },
-      membership_type: {
-        type: ['integer', 'string'],
-        description: 'Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)'
-      },
-      entity_type: {
-        type: 'string',
-        description: "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
-      },
+      ...TEAM_KIND,
       levels: {
         type: 'array',
         items: {
@@ -58,14 +53,46 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
       is_owner: {
         type: 'boolean',
         description: 'If true, require is_owner flag'
+      },
+      ...MEMBER_LIST,
+      ...MEMBER_CHECKS,
+      mask_table: {
+        type: 'string',
+        readOnly: true,
+        description: 'The protected table, which the backend records for mask_column.'
+      },
+      check_function_name: {
+        type: 'string',
+        description: 'A function that checks the membership instead of the member list; it is called with the row\'s team column.'
+      },
+      check_function_schema: {
+        type: 'string',
+        description: 'The schema of that function.'
       }
     },
     required: [
       'entity_field'
-    ]
+    ],
+    allOf: [TEAM_KIND_GIVEN],
+    additionalProperties: false
   },
   tags: [
     'membership',
     'authz'
+  ],
+  summary: 'Members of the team named in the row get access; a team is an organization or another kind of group.',
+  use_when: [
+    'Rows that belong to an organization or a team, where every member may take part.',
+    'Rows a person keeps for themselves: every user has a personal organization whose id is their own id.'
+  ],
+  avoid_when: [
+    'Rows only their author may change: use AuthzMemberOwner for update and delete.'
+  ],
+  risks: [
+    ACTIVE_MEMBER_RISK,
+    'On create and update, the row can only name a team the person belongs to.',
+    'Read-only members pass this policy. The platform adds a block on them only when it builds the table with this policy, grants to change rows and the team kind given as a number (2 or more); with entity_type, or for a policy added on its own, add AuthzNotReadOnly as a limit.',
+    'The team kind must be a number or entity_type: a number written as text is refused when the policy is built.',
+    PERSONAL_ORG_RISK
   ]
 };

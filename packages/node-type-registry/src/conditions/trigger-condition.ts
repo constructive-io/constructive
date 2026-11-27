@@ -7,8 +7,7 @@ import type { JSONSchema } from '../types';
  * Consumed by: JobTrigger, EventTracker, ProcessExtraction,
  * ProcessImageVersions, ProcessFileEmbedding, ProcessImageEmbedding.
  *
- * On the SQL side, these conditions are compiled to AST via
- * metaschema_generators.build_condition_expr().
+ * The backend compiles these conditions into the trigger's WHEN clause.
  */
 export const triggerConditionSchema: JSONSchema = {
   type: 'object',
