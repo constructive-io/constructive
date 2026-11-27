@@ -122,6 +122,7 @@ const deployOptions = getDeploymentEnvOptions();
 | `SERVER_HOST` | Server host |
 | `SERVER_TRUST_PROXY` | Trust proxy headers |
 | `SERVER_ORIGIN` | Server origin URL |
+| `SERVER_COMMIT` | Source commit of the running build, answered by `GET /version` (the image sets it from the build argument) |
 | `SERVER_STRICT_AUTH` | Strict authentication mode |
 
 ### Storage

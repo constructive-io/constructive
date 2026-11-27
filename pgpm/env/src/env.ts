@@ -45,6 +45,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     SERVER_TRUST_PROXY,
     SERVER_ORIGIN,
     SERVER_STRICT_AUTH,
+    SERVER_COMMIT,
 
     PGHOST,
     PGPORT,
@@ -127,6 +128,7 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(SERVER_TRUST_PROXY && { trustProxy: parseEnvBoolean(SERVER_TRUST_PROXY) }),
       ...(SERVER_ORIGIN && { origin: SERVER_ORIGIN }),
       ...(SERVER_STRICT_AUTH && { strictAuth: parseEnvBoolean(SERVER_STRICT_AUTH) }),
+      ...(SERVER_COMMIT && { commit: SERVER_COMMIT }),
     },
     pg: {
       ...(PGHOST && { host: PGHOST }),
