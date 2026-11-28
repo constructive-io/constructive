@@ -19,6 +19,8 @@ import {
   normalizeOutdir,
   preparePackage,
   SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
+import type { SupabaseUsersTable } from './supabase-users-sync';
+import { addSupabaseUsersSync } from './supabase-users-sync';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
@@ -222,9 +224,24 @@ const exportMigrationsToDisk = async ({
 
   // Build description for the database extension package
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
+  const declaredExtensions: string[] = db.rows[0].export_requires ?? [];
+  let supabaseUsers: SupabaseUsersTable | undefined;
+  if (declaredExtensions.includes('pgpm-supabase')) {
+    const { rows } = await pgPool.query<SupabaseUsersTable>(
+      `SELECT s.schema_name, t.name AS table_name
+      FROM metaschema_modules_public.users_module u
+      JOIN metaschema_public.table t ON t.id = u.table_id
+      JOIN metaschema_public.schema s ON s.id = t.schema_id
+      WHERE u.database_id = $1`,
+      [databaseId]
+    );
+    if (rows.length !== 1) {
+      throw new Error('Cannot export Supabase user sync: expected exactly one Constructive users table.');
+    }
+    [supabaseUsers] = rows;
+  }
 
-  if (appRows.length > 0) {
-    const declaredExtensions: string[] = db.rows[0].export_requires ?? [];
+  if (appRows.length > 0 || supabaseUsers) {
     const extensions = databaseExportExtensions(declaredExtensions);
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, extensions, prompter, argv);
@@ -242,6 +259,7 @@ const exportMigrationsToDisk = async ({
       // recursive deploys order them correctly.
       const { packages, warnings } = await partitionExportRows(dbRows, partition);
       warnings.forEach(warning => console.warn(`partition: ${warning}`));
+      if (supabaseUsers) await addSupabaseUsersSync(packages.flatMap(pkg => pkg.rows), supabaseUsers);
 
       for (const pkg of packages) {
         const pkgDir = await preparePackage({
@@ -264,6 +282,7 @@ const exportMigrationsToDisk = async ({
         writePgpmFiles(pkg.rows, pkgOpts);
       }
     } else {
+      if (supabaseUsers) await addSupabaseUsersSync(dbRows, supabaseUsers);
       // Create/prepare the module directory
       const dbModuleDir = await preparePackage({
         project,
