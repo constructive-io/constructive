@@ -232,7 +232,7 @@ jobs:
   # =========================================================================
   pg-tests:
     needs: build
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -340,7 +340,7 @@ jobs:
   # =========================================================================
   integration-tests:
     needs: build
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -445,7 +445,7 @@ jobs:
   # =========================================================================
   ai-tests:
     needs: build
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: luxor-ubuntu-medium-4c-8g
     timeout-minutes: 15
     strategy:
       fail-fast: false
