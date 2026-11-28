@@ -1113,7 +1113,7 @@ relocatable = false
       const syncDeploy = 'supabase/register_users';
       const syncMigration = (kind: string) => readFileSync(join(outdir, extensionName, kind, `${syncDeploy}.sql`), 'utf-8');
       const planPath = join(outdir, extensionName, 'pgpm.plan');
-      const syncCall = `SELECT supabase_integration.sync_users('"pets_supabase_public"."app_identities"'::regclass);`;
+      const syncFunction = 'supabase_integration.sync_users(';
       const usersTableId = 'a1b2c3d4-e5f6-4708-b250-000000000099';
       try {
         const { rows } = await pg.query(
@@ -1160,10 +1160,37 @@ relocatable = false
         expect(plan).toContain(`${exportedPrimaryKey} [${usersDeploy.replace('pets_public', 'pets_supabase_public')}]`);
         expect(plan).toContain(`${syncDeploy} [${exportedPrimaryKey}]`);
         expect(plan.indexOf(exportedPrimaryKey)).toBeLessThan(plan.indexOf(syncDeploy));
-        expect(syncMigration('deploy')).toContain(syncCall);
-        expect(syncMigration('revert')).toContain('DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;');
+        expect(syncMigration('deploy')).toContain(syncFunction);
+        expect(syncMigration('deploy')).toContain('"pets_supabase_public"."app_identities"');
         expect(readFileSync(join(outdir, extensionName, 'deploy', `${exportedPrimaryKey}.sql`), 'utf-8'))
-          .not.toContain(syncCall);
+          .not.toContain(syncFunction);
+        await pg.beforeEach();
+        try {
+          await pg.query(`
+            CREATE SCHEMA auth;
+            CREATE TABLE auth.users (id uuid PRIMARY KEY);
+            CREATE SCHEMA supabase_integration;
+            CREATE FUNCTION supabase_integration.tg_sync_users() RETURNS trigger
+              LANGUAGE plpgsql AS 'BEGIN RETURN NEW; END;';
+            CREATE TRIGGER supabase_sync_users AFTER INSERT ON auth.users
+              FOR EACH ROW EXECUTE FUNCTION supabase_integration.tg_sync_users('public.other_users');
+          `);
+          await pg.expectError(() => pg.query(syncMigration('verify')), /not installed for the exported users table/);
+          await pg.expectError(() => pg.query(syncMigration('deploy')), /already registered for another users table/);
+          await pg.query(syncMigration('revert'));
+          expect((await pg.query("SELECT tgname FROM pg_trigger WHERE tgrelid = 'auth.users'::regclass")).rows)
+            .toEqual([{ tgname: 'supabase_sync_users' }]);
+
+          await pg.query(`
+            CREATE OR REPLACE TRIGGER supabase_sync_users AFTER INSERT ON auth.users
+              FOR EACH ROW EXECUTE FUNCTION supabase_integration.tg_sync_users('pets_supabase_public.app_identities');
+          `);
+          await pg.query(syncMigration('verify'));
+          await pg.query(syncMigration('revert'));
+          await pg.expectError(() => pg.query(syncMigration('verify')), /not installed for the exported users table/);
+        } finally {
+          await pg.afterEach();
+        }
         const metaDatabaseSql = join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql');
         expect(readFileSync(metaDatabaseSql, 'utf-8')).not.toContain('export_requires');
 
@@ -1176,7 +1203,7 @@ relocatable = false
         const partitionSql = getDirectoryStructure(partitionDir)
           .filter(file => file.endsWith('.sql'))
           .map(file => readFileSync(join(partitionDir, file), 'utf-8'));
-        expect(partitionSql.filter(sql => sql.includes(syncCall))).toHaveLength(1);
+        expect(partitionSql.filter(sql => sql.includes(syncFunction))).toHaveLength(1);
 
         rmSync(metaDatabaseSql);
         await runExport({ excludeCategories: ['ddl'] });

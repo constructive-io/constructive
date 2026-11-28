@@ -11,6 +11,9 @@ interface ConstraintNode {
   Constraint?: { contype: string };
 }
 
+const sqlBlock = (body: string): string =>
+  `DO ${escapeLiteral(`BEGIN\n${body}\nEND;`)};`;
+
 const findUsersPrimaryKey = (
   rows: PgpmRow[],
   { schema_name, table_name }: SupabaseUsersTable
@@ -52,25 +55,37 @@ export const addSupabaseUsersSync = async (
     if (rows.some(row => row.deploy === deploy)) {
       throw new Error(`Cannot export Supabase user sync: migration ${deploy} already exists.`);
     }
+
+    const trigger = `SELECT FROM pg_catalog.pg_trigger
+      WHERE tgrelid = pg_catalog.to_regclass('auth.users') AND tgname = 'supabase_sync_users'`;
+    // The installer stores format('%I.%I', ...) followed by a NUL in pg_trigger.tgargs.
+    const matchesTarget = `tgfoid = pg_catalog.to_regprocedure('supabase_integration.tg_sync_users()')
+      AND tgargs = pg_catalog.convert_to(
+        pg_catalog.format('%I.%I', ${escapeLiteral(schema_name)}, ${escapeLiteral(table_name)}),
+        pg_catalog.current_setting('server_encoding')::pg_catalog.name
+      ) || pg_catalog.decode('00', 'hex')`;
+    const hasMatchingTrigger = `EXISTS (${trigger} AND ${matchesTarget})`;
+    const lockSource = 'LOCK TABLE auth.users IN SHARE ROW EXCLUSIVE MODE;';
+
     // Existing deployments skip recorded changes, so leave the key migration intact.
     rows.push({
       name: 'Supabase user sync',
       deploy,
       deps: [key.deploy],
-      content: `SELECT supabase_integration.sync_users(${escapeLiteral(table)}::regclass);`,
-      revert: 'DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;',
-      verify: `DO $verify$
-BEGIN
-  IF NOT EXISTS (
-    SELECT FROM pg_catalog.pg_trigger
-    WHERE tgrelid = 'auth.users'::regclass
-      AND tgname = 'supabase_sync_users'
-      AND tgfoid = 'supabase_integration.tg_sync_users()'::regprocedure
-  ) THEN
-    RAISE EXCEPTION 'Supabase user sync trigger is not installed';
+      content: sqlBlock(`  ${lockSource}
+  IF EXISTS (${trigger} AND (${matchesTarget}) IS NOT TRUE) THEN
+    RAISE EXCEPTION 'Supabase user sync is already registered for another users table';
   END IF;
-END;
-$verify$;`
+  PERFORM supabase_integration.sync_users(${escapeLiteral(table)}::regclass);`),
+      revert: sqlBlock(`  IF pg_catalog.to_regclass('auth.users') IS NOT NULL THEN
+    ${lockSource}
+    IF ${hasMatchingTrigger} THEN
+      DROP TRIGGER supabase_sync_users ON auth.users;
+    END IF;
+  END IF;`),
+      verify: sqlBlock(`  IF NOT ${hasMatchingTrigger} THEN
+    RAISE EXCEPTION 'Supabase user sync trigger is not installed for the exported users table';
+  END IF;`)
     });
     return;
   }
