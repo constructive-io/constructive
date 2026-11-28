@@ -88,7 +88,7 @@ Every `Authz*` node carries plain words, so a person or an agent can tell who a 
 
 Each Authz node's `parameter_schema` is closed (`additionalProperties: false`), so a key the backend would store and ignore is refused instead of making a policy wider than meant. Keys the backend writes when it stores a policy (the member list it resolves, a capability mask, a compiled condition) are listed with `readOnly: true`: a stored policy may hold them, and a rule a caller writes leaves them out. A value that holds an Authz expression (`AuthzComposite`'s data, its `AND`/`OR`/`NOT` parts, `AuthzColumnSecurity.authz`) is marked `format: 'authz-expression'`: one key, which is `AND` or `OR` with a list, `NOT` with one expression, or the name of an Authz node with that node's data. A raw expression cannot be written.
 
-`pnpm generate:reference --outdir <folder>` writes the nodes as a Markdown reference page, `authz-node-reference.md`, with no date or version in it, so a copy that differs from a fresh render is stale. The page is made at dev time and is not part of the runtime exports.
+`pnpm generate:reference --outdir <skills folder>` writes two Markdown reference pages into the skills folder of the skills repository: the Authz nodes (`constructive-security/references/authz-node-reference.md`), and every other node with where a blueprint names it (`constructive-blueprints/references/node-reference.md`). They have no date or version in them, so a copy that differs from a fresh render is stale, and `--check` lists the stale pages and exits 1. The pages are made at dev time and are not part of the runtime exports.
 
 ## Blueprint JSON Schema
 
