@@ -186,7 +186,7 @@ describe('no plan for a change that cannot work', () => {
   it('does not resolve a schema-qualified relation endpoint to an existing table in a different schema', async () => {
     const input = { name: 'todo', description: 'Todo', definition: {
       tables: [{ table_name: 'notes', policies: [{ $type: 'AuthzAllowAll' }] }],
-      relations: [{ $type: 'RelationBelongsTo', source_table: 'notes', target_table: 'users', target_schema: 'app_private', field_name: 'parent_id' }],
+      relations: [{ $type: 'RelationBelongsTo', source_table: 'notes', target_table: 'users', target_schema: 'app_private', field_name: 'parent_id', delete_action: 'c' }],
     } };
     await backend.close();
     backend = await startFakeBackend((request) => /schemas/.test(request.query)
@@ -220,7 +220,7 @@ describe('no plan for a change that cannot work', () => {
         description: 'Notes',
         definition: {
           tables: [{ table_name: 'notes', policies: [{ $type: 'AuthzAppMembership' }] }],
-          relations: [{ $type: 'RelationBelongsTo', source_table: 'notes', target_table: 'no_such_table', field_name: 'thing_id' }],
+          relations: [{ $type: 'RelationBelongsTo', source_table: 'notes', target_table: 'no_such_table', field_name: 'thing_id', delete_action: 'c' }],
         },
       },
       'not-found',
