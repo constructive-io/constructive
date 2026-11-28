@@ -332,6 +332,8 @@ export interface PreparePackageOptions {
   name: string;
   description: string;
   extensions: string[];
+  /** Requirements owned by the source database rather than by the package. */
+  declaredExtensions?: readonly string[];
   prompter?: Inquirerer;
   /** Repository name for module scaffolding. Defaults to module name if not provided. */
   repoName?: string;
@@ -451,24 +453,48 @@ export const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOption
 };
 
 /**
- * Ensures the module's control file `requires` line contains every requested
- * extension, preserving any extras already listed.
+ * Syncs source-declared requirements and preserves requirements added by hand.
  */
-const syncControlRequires = (pgpmDir: string, name: string, extensions: string[]): void => {
+const syncControlRequires = (
+  pgpmDir: string,
+  name: string,
+  extensions: string[],
+  declaredExtensions?: readonly string[]
+): void => {
   const controlPath = path.join(pgpmDir, `${name}.control`);
   if (!existsSync(controlPath)) return;
 
   const content = readFileSync(controlPath, 'utf-8');
-  const match = content.match(/^requires\s*=\s*'([^']*)'\s*$/m);
-  const existing = match ? match[1].split(',').map((s) => s.trim()).filter(Boolean) : [];
-  const merged = [...existing, ...extensions.filter((ext) => !existing.includes(ext))];
-  if (merged.length === existing.length) return;
+  const match = content.match(/^requires[ \t]*=[ \t]*'([^']*)'[ \t]*\r?$/m);
+  const parseList = (value = '') => value.split(',').map((s) => s.trim()).filter(Boolean);
+  const existing = parseList(match?.[1]);
+  const marker = /^# pgpm-export-requires: ([^\r\n]+)\r?\n?/m;
+  const previous = content.match(marker);
+  const managed = declaredExtensions === undefined ? [] : parseList(previous?.[1]);
+  const retained = existing.filter(ext => !managed.includes(ext) || declaredExtensions?.includes(ext));
+  const merged = [
+    ...new Set([...retained, ...extensions, ...(declaredExtensions ?? [])])
+  ];
 
-  const requiresLine = `requires = '${merged.join(',')}'`;
-  const updated = match
-    ? content.replace(match[0], requiresLine)
-    : `${content.trimEnd()}\n${requiresLine}\n`;
-  writeFileSync(controlPath, updated);
+  let updated = content;
+  if (merged.join(',') !== existing.join(',')) {
+    const requiresLine = `requires = '${merged.join(',')}'`;
+    updated = match
+      ? updated.replace(match[0], requiresLine)
+      : `${updated.trimEnd()}\n${requiresLine}\n`;
+  }
+  if (declaredExtensions !== undefined) {
+    const next = [...new Set(declaredExtensions)]
+      .filter(ext => !extensions.includes(ext) && (managed.includes(ext) || !existing.includes(ext)));
+    const line = next.length ? `# pgpm-export-requires: ${next.join(',')}\n` : '';
+    if (previous) {
+      updated = updated.replace(marker, line);
+    } else if (line) {
+      updated = `${updated.trimEnd()}\n${line}`;
+    }
+  }
+
+  if (updated !== content) writeFileSync(controlPath, updated);
 };
 
 /**
@@ -484,6 +510,7 @@ export const preparePackage = async ({
   name,
   description,
   extensions,
+  declaredExtensions,
   prompter,
   repoName,
   username
@@ -541,10 +568,8 @@ export const preparePackage = async ({
       rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
       rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
 
-      // Re-exports over an existing package skip initModule, so sync the
-      // control file's requires with the requested extensions.
-      syncControlRequires(pgpmDir, name, extensions);
     }
+    syncControlRequires(pgpmDir, name, extensions, declaredExtensions);
   } finally {
     process.chdir(curDir);
   }

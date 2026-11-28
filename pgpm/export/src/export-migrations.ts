@@ -8,6 +8,7 @@ import { exportMeta } from './export-meta';
 import {
   buildMetaRevertScript,
   databaseExportExtensions,
+  DB_REQUIRED_EXTENSIONS,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
@@ -223,7 +224,8 @@ const exportMigrationsToDisk = async ({
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
   if (appRows.length > 0) {
-    const extensions = databaseExportExtensions(db.rows[0].export_requires);
+    const declaredExtensions: string[] = db.rows[0].export_requires ?? [];
+    const extensions = databaseExportExtensions(declaredExtensions);
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, extensions, prompter, argv);
 
@@ -248,7 +250,8 @@ const exportMigrationsToDisk = async ({
           outdir: normalizedOutdir,
           name: pkg.name,
           description: `${pkg.name} (partitioned from ${name})`,
-          extensions: [...extensions, ...pkg.requires],
+          extensions: [...DB_REQUIRED_EXTENSIONS, ...pkg.requires],
+          declaredExtensions,
           prompter,
           repoName,
           username
@@ -268,7 +271,8 @@ const exportMigrationsToDisk = async ({
         outdir: normalizedOutdir,
         name,
         description: dbExtensionDesc,
-        extensions,
+        extensions: [...DB_REQUIRED_EXTENSIONS],
+        declaredExtensions,
         prompter,
         repoName,
         username

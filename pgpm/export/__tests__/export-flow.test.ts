@@ -14,7 +14,7 @@
  */
 
 import { PgpmMigrate,PgpmPackage } from '@pgpmjs/core';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync,writeFileSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, relative } from 'path';
 import type { PgConfig } from 'pg-env';
@@ -1086,22 +1086,26 @@ relocatable = false
       expect(planContent).toContain('schemas/pets_full_public/tables/pets/policies/pets_policy');
     }, 180000);
 
-    it('adds declared requirements only to the database package', async () => {
+    it('syncs declared database requirements without removing unrelated dependencies', async () => {
       const extensionName = 'pets-supabase';
       const metaExtensionName = 'pets-supabase-svc';
       const outdir = join(exportWorkspaceDir, 'packages');
       scaffoldModule(extensionName, 'Exported database with an extension requirement');
       scaffoldModule(metaExtensionName, 'Exported service metadata');
-      await pg.query(
-        `UPDATE metaschema_public.database SET export_requires = ARRAY['pgpm-supabase'] WHERE id = $1`,
-        [DATABASE_ID]
+      const controlPath = (name: string) => join(outdir, name, `${name}.control`);
+      appendFileSync(controlPath(extensionName), "requires = 'manual-dependency'\n");
+      const requirements = (name: string) => readFileSync(controlPath(name), 'utf-8')
+        .match(/^requires = '([^']+)'/m)?.[1].split(',');
+      const setRequirements = (requires: string[]) => pg.query(
+        `UPDATE metaschema_public.database SET export_requires = $2 WHERE id = $1`,
+        [DATABASE_ID, requires]
       );
       try {
         const { rows } = await pg.query(
           'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
           [DATABASE_ID]
         );
-        await exportMigrations({
+        const runExport = () => exportMigrations({
           project: new PgpmPackage(exportWorkspaceDir),
           options: { pg: dbConfig },
           dbInfo: { dbname: dbConfig.database, databaseName: 'pets', database_ids: [DATABASE_ID] },
@@ -1112,14 +1116,19 @@ relocatable = false
           metaExtensionName
         });
 
-        const control = (name: string) => readFileSync(join(outdir, name, `${name}.control`), 'utf-8');
-        expect(control(extensionName)).toMatch(/^requires = '.*\bpgpm-supabase\b/m);
-        const serviceRequires = control(metaExtensionName).match(/^requires = '([^']+)'/m)?.[1].split(',');
-        expect(serviceRequires).not.toContain('pgpm-supabase');
+        await setRequirements(['pgpm-supabase']);
+        await runExport();
+        expect(requirements(extensionName)).toEqual(expect.arrayContaining(['pgpm-supabase', 'manual-dependency']));
+        expect(requirements(metaExtensionName)).not.toContain('pgpm-supabase');
         expect(readFileSync(join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql'), 'utf-8'))
           .not.toContain('export_requires');
+
+        await setRequirements([]);
+        await runExport();
+        expect(requirements(extensionName)).not.toContain('pgpm-supabase');
+        expect(requirements(extensionName)).toContain('manual-dependency');
       } finally {
-        await pg.query(`UPDATE metaschema_public.database SET export_requires = '{}' WHERE id = $1`, [DATABASE_ID]);
+        await setRequirements([]);
       }
     });
 
