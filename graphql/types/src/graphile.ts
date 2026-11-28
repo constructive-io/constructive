@@ -54,6 +54,37 @@ export interface GrafastCacheLimits {
 }
 
 /**
+ * Process-wide bounds on cold PostGraphile handler builds.
+ *
+ * A build introspects the database and constructs a schema. When many APIs go
+ * cold at once (a restart, a flush, more active APIs than the handler cache
+ * holds), unbounded builds run in parallel and compete with requests for the
+ * same small connection pool until connection attempts time out. Builds beyond
+ * `concurrency` wait in arrival order; a build that finds the queue full, or
+ * waits longer than `queueWaitMs`, is refused with a retryable 503.
+ */
+export interface GraphileBuildLimits {
+  /** Handler builds that may run at once in this process. */
+  concurrency?: number;
+  /** Builds that may wait for a slot. `0` refuses at once while every slot is busy. */
+  queueMax?: number;
+  /** How long a build may wait for a slot, in milliseconds. `0` never waits. */
+  queueWaitMs?: number;
+}
+
+/**
+ * Default build bounds. Two concurrent builds leave most of the default
+ * five-connection pool to requests, the queue absorbs a cold start of a few
+ * dozen APIs, and a build that cannot start within 30 seconds is refused with
+ * a retryable 503 instead of waiting out the client's timeout.
+ */
+export const graphileBuildLimitDefaults: Readonly<Required<GraphileBuildLimits>> = Object.freeze({
+  concurrency: 2,
+  queueMax: 64,
+  queueWaitMs: 30_000
+});
+
+/**
  * PostGraphile/Graphile v5 configuration
  */
 export interface GraphileOptions {
@@ -65,6 +96,11 @@ export interface GraphileOptions {
   preset?: Partial<GraphileConfig.Preset>;
   /** Explicit per-schema Grafast cache bounds used for tenant-density control. */
   grafastCache?: GrafastCacheLimits;
+  /**
+   * Bounds on concurrent cold handler builds; see {@link GraphileBuildLimits}.
+   * Unset keys use {@link graphileBuildLimitDefaults}.
+   */
+  buildLimits?: GraphileBuildLimits;
   /**
    * Allow clients to request Grafast plan/SQL output with the
    * `x-graphql-explain` header. Off unless set.

@@ -91,6 +91,18 @@ PostgreSQL extensions or change the API's exposed schemas.
 Each cache limit must be a safe integer of at least `2`. When omitted, Grafast's
 upstream default for that cache remains in effect.
 
+### Schema Build Limits
+- `GRAPHILE_BUILD_CONCURRENCY` - Handler builds that may run at once in the process (default `2`, at least `1`)
+- `GRAPHILE_BUILD_QUEUE_MAX` - Builds that may wait for a slot (default `64`; `0` refuses at once while every slot is busy)
+- `GRAPHILE_BUILD_QUEUE_WAIT_MS` - How long a build may wait for a slot (default `30000`; `0` never waits)
+
+A request whose API has no cached handler waits for a build slot. When the
+queue is full or the wait expires, the request is refused with HTTP 503, a
+`Retry-After` header (the queue wait in seconds, at most 60) and the
+`SCHEMA_BUILD_UNAVAILABLE` error code, so clients and load balancers can retry. A build that cannot reach the database is
+answered the same way. Invalid values fail option resolution with the variable
+name.
+
 ### Grafast Explain
 - `GRAPHILE_EXPLAIN` - Allow clients to request Grafast plan/SQL output via the `x-graphql-explain` header (off unless set)
 

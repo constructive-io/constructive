@@ -4,7 +4,7 @@ import v8 from 'node:v8';
 import { SVC_CACHE_TTL_MS,svcCache } from '@pgpmjs/server-utils';
 import { getCacheStats } from 'graphile-cache';
 
-import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
+import { getBuildSlotStats, getInFlightCount, getInFlightKeys } from '../middleware/graphile';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
 import { getRefusalRecorderStats } from '../refusals/recorder';
 
@@ -55,6 +55,8 @@ export interface DebugMemorySnapshot {
     count: number;
     keys: string[];
   };
+  /** Handler builds holding a build slot, and builds waiting for one. */
+  buildSlots: ReturnType<typeof getBuildSlotStats>;
   graphileBuilds: ReturnType<typeof getGraphileBuildStats>;
   /** In-memory refusal counter + flusher state; null when no recorder is installed. */
   refusals: ReturnType<typeof getRefusalRecorderStats>;
@@ -121,6 +123,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       count: getInFlightCount(),
       keys: getInFlightKeys(),
     },
+    buildSlots: getBuildSlotStats(),
     graphileBuilds: getGraphileBuildStats(),
     refusals: getRefusalRecorderStats(),
     uptimeMinutes: process.uptime() / 60,
