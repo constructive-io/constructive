@@ -16,6 +16,10 @@
     "cnc": "index.js",
     "constructive": "index.js"
   },
+  "man": [
+    "./man/constructive.1",
+    "./man/cnc.1"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/constructive-io/constructive"
@@ -26,44 +30,53 @@
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "build": "makage build && node scripts/man.mjs",
+    "build:dev": "makage build --dev && node scripts/man.mjs",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
-    "@inquirerer/test": "^1.4.9",
-    "@types/js-yaml": "^4.0.9",
+    "@modelcontextprotocol/client": "2.4.0",
     "@types/node": "^22.19.11",
     "@types/pg": "^8.20.4",
     "@types/shelljs": "^0.10.0",
     "glob": "^13.0.6",
     "makage": "^0.8.0",
     "pg": "^8.21.0",
-    "ts-node": "^10.9.2"
+    "remark-man": "^9.0.0",
+    "remark-parse": "^11.0.0",
+    "ts-node": "^10.9.2",
+    "unified": "^11.0.5"
   },
   "dependencies": {
+    "@agentic-kit/command": "workspace:^",
+    "@agentic-kit/db-tools": "workspace:^",
+    "@agentic-kit/harness": "workspace:^",
+    "@agentic-kit/mcp": "workspace:^",
+    "@agentic-kit/session": "workspace:^",
+    "@constructive-io/fetch": "^1.2.0",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-explorer": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@inquirerer/utils": "^3.3.16",
+    "@inquirerer/utils": "^3.4.1",
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "appstash": "^0.8.0",
     "find-and-require-package-json": "^0.9.1",
-    "inquirerer": "^4.9.8",
-    "js-yaml": "^4.1.0",
+    "graphql": "16.13.0",
+    "inquirerer": "^4.10.1",
+    "node-type-registry": "workspace:^",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgpm": "workspace:^",
     "shelljs": "^0.10.0",
-    "yanse": "^0.2.2"
+    "smol-toml": "1.9.1",
+    "zod": "^4.4.3"
   },
   "keywords": [
     "cli",

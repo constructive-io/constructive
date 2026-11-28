@@ -1,31 +1,36 @@
 #!/usr/bin/env node
-import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
+import { checkForUpdates } from '@inquirerer/utils';
+import { getPackageJson } from 'inquirerer';
 
-import { commands } from './commands';
+import { createConstructiveCli } from './cli';
 
-if (process.argv.includes('--version') || process.argv.includes('-v')) {
-  const pkg = getPackageJson(__dirname);
-  console.log(pkg.version);
-  process.exit(0);
+export { commands, createConstructiveCli } from './cli';
+
+/**
+ * The update notice, or null. The check caches its answer under the home
+ * directory and cannot be told another place, so it does not run at all when
+ * CONSTRUCTIVE_STASH_DIR isolates the run from the home directory.
+ */
+export async function updateNotice(env: NodeJS.ProcessEnv): Promise<string | null> {
+  if (env.CONSTRUCTIVE_STASH_DIR !== undefined) return null;
+  try {
+    const pkg = getPackageJson(__dirname);
+    const result = await checkForUpdates({ pkgName: pkg.name, pkgVersion: pkg.version, toolName: 'constructive' });
+    return result.hasUpdate && result.message ? `${result.message}\nRun npm i -g ${pkg.name}@latest to upgrade.\n` : null;
+  } catch {
+    return null;
+  }
 }
 
-export const options: Partial<CLIOptions> = {
-  minimistOpts: {
-    alias: {
-      v: 'version',
-      h: 'help'
-    }
-  }
-};
-
-const app = new CLI(commands, options);
-
-app.run().then(()=> {
-  // all done!
-}).catch(error => {
-  // Should not reach here with the new CLI error handling pattern
-  // But keep as fallback for unexpected errors
-  console.error('Unexpected error:', error);
-  process.exit(1);
-});
-
+if (require.main === module) {
+  // Agents and scripts never see the notice: it needs a person at a terminal.
+  const interactive = process.stdin.isTTY && process.stdout.isTTY && !process.env.CI;
+  const notice = interactive ? updateNotice(process.env) : Promise.resolve(null);
+  createConstructiveCli()
+    .run(process.argv.slice(2))
+    .then(async (code) => {
+      const message = await notice;
+      if (message) process.stderr.write(message);
+      process.exitCode = code;
+    });
+}

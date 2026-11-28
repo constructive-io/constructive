@@ -1,33 +1,37 @@
 # Constructive CLI Package - Agent Guide
 
-The `@constructive-io/cli` package provides the user-facing CLI for the Constructive ecosystem.
+`@constructive-io/cli` is the `constructive` binary (also `cnc`): the platform without a UI, for people and agents. It is built on the command layer of `@agentic-kit/command` (`createCli`), so help, `--schema`, `--llms`, the JSON envelope, exit codes, the no-terminal rule and the approval of every change come from the command registry, not from hand-written text. Each command's input is a zod object.
 
-- **Binaries:** `constructive` (full) and `cnc` (shorthand)
-- **What it covers:** Constructive GraphQL workflows only (server, explorer, codegen)
+## Layout
 
-**Note:** Database operations (init, add, deploy, revert, etc.) are handled by the separate `pgpm` CLI. Users should install both tools for the complete workflow.
+- `src/index.ts` is the executable. It runs the CLI and prints the update notice only when the session is interactive.
+- `src/cli.ts` is the registry: every command, the `--context` global flag, the agent notes of the root help, and the help topics.
+- `src/topics.ts`: the help topics (`environment`, `exit-codes`, `output`, `approval`, `agents`, `rules`, `files`) as data. Each fact that code already holds comes from it: the exit codes and the failure codes with their sentences, the commands that change at once, the rule shape, the hosts of `setup agent`, the binding keys of `.env`. `constructive help <topic>` prints one, and the reference has each as a section.
+- `scripts/man.mjs` (build only): renders `renderReference` of the built CLI with `remark-parse` and `remark-man` to `dist/man/constructive.1`, and `dist/man/cnc.1`, which sources it; the `man` field of `package.json` makes `npm i -g` install both.
+- `src/session.ts` holds what every command shares: the session (`--context` or the active context, from `@agentic-kit/session`), `bindTools` (points the `@agentic-kit/db-tools` host at it, with `prewarmApp: false`, so no command clones or installs an app), the active backend and account, `controlPlane` (endpoint and bearer for a platform api request), `backendError` (a GraphQL failure as a `CliError` with the tool codes), the project binding of a directory (`boundDatabaseId` and `boundAgent`: `DATABASE_ID`, and `CONSTRUCTIVE_AGENT` for the agent `setup agent` set it up for, each checked, and a value that fails its check is `invalid` and never shown), `agentStep` (the one place where, under `--as`, a step the backend refused as signed out gets one new token: a read or a plan runs once more, an apply does not; the commands, `whoami`, `status` and the MCP tools and gate all go through it), `readPassword` (the person's password from a prompt or `--password-stdin`, never a flag) and `signInFailed`.
+- `src/errors.ts`: `CLI_ERROR_CODES`, the codes only the CLI answers with their exit and sentence, and `CliCode` (those, the command layer's and the tools'). Every `CliError` the CLI makes is `new CliError<CliCode>(…)`, so a new code needs its sentence.
+- `src/project-files.ts`: `checkWrites`, the check every write of `setup agent` passes first (no link that leaves the directory or points nowhere), and `writeFileReplacing` (the `.env` binding).
+- `src/commands/account.ts`: `login`, `logout`, `whoami`, `status` (`status` asks `GET /version` through `versionRequest`, which `test-utils/jest-setup.ts` refuses for every test).
+- `src/commands/context.ts`: `context list|add|use|remove`; `context remove` refuses while agents are filed under the context (`context-in-use`), with `agent remove` for each as the steps.
+- `src/commands/db.ts`: `db list`, `db use` (binds through `provisionDatabase` with `adopt`), `db status`.
+- `src/commands/tools.ts`: the commands bound to the typed db tools through `@agentic-kit/command` (`toCliCommands`), and `tableBlueprint`, which turns `table add <name> --field name:type[:required] --node <node> --rule <rule>` into a blueprint; with no `--rule` it stops with exit 2 and the owner-only example.
+- `src/commands/access.ts`: the access commands (`types`, `explain`, `set`, `add`), the `--rule` flag and its parser, the owner-only example rule, the text of `access types` and the steps that fix each finding of `access explain`.
+- `src/commands/api/`: `api query`, `api mutate`, `api search`, `api describe`, on the planes of the session backend.
+- `src/commands/mcp.ts`: `mcp`, the same tools served over MCP on stdio (`@agentic-kit/mcp`): read only without `--as` unless `--write`, and under `--as` by the agent's grant; never a tool whose result carries a secret (`create_api_key`).
+- `src/commands/agents.ts`: `agent add|renew|list|grant|revoke|remove` (an agent of the person, from `@agentic-kit/session`; `add` and `renew` need the person's password for a fresh sign-in). `--as <name>` is a global flag with `'x-carry': true`; `openSession` resolves it with `agentSession`, and a step that must act as the person (renew the key, sign in) is built with `{ drop: ['--as'] }`.
+- `src/commands/setup.ts`: `setup agent`, which adds, keeps or renews the agent, writes `CONSTRUCTIVE_AGENT` to the project's `.env`, and gives each host its MCP entry: it creates a host file only where there is none and never edits one (for Claude Code it runs `claude mcp add --scope project` when `claude` is on the PATH and reads `.mcp.json` again, else the result gives the entry). It installs no skill; its next step is `npx skills add constructive-io/constructive-skills`.
+- `src/commands/passthrough.ts`: `server`, `explorer`, `codegen`. Their handlers (`server.ts`, `explorer.ts`, `codegen.ts`) keep their own flags and load only when the command runs. The layer leaves `--help` and `--schema` of a passthrough command to it, so the wrapper answers both (the handler's `usage`, and a schema with `input: null`) before anything starts.
 
-## Entry Points
+## Rules
 
-- **Router:** `packages/cli/src/commands.ts`
-  - Builds a command map with GraphQL commands implemented in this package.
-- **Executable:** `packages/cli/src/index.ts` (compiled to `dist/index.js`)
-
-## Commands
-
-The CLI provides GraphQL-focused commands:
-
-- `packages/cli/src/commands/server.ts` – start the Constructive GraphQL server
-- `packages/cli/src/commands/explorer.ts` – start the Constructive GraphQL explorer
-- `packages/cli/src/commands/codegen.ts` – run GraphQL codegen (`@constructive-io/graphql-codegen`), including `--schema-enabled` for SDL export
-
-## Debugging Tips
-
-- **Command routing:** `packages/cli/src/commands.ts`
-- **Codegen handler:** `packages/cli/src/commands/codegen.ts` delegates to `runCodegenHandler()` from `@constructive-io/graphql-codegen`
-- **Schema building:** `graphile-schema` package provides `buildSchemaSDL` (from database) and `fetchEndpointSchemaSDL` (from endpoint)
+- Each command has exactly one effect, its tool's: every tool has one static effect, so `db create` / `db recreate`, `field update` / `field retype` and the three `entity-type` commands are each bound to their own tool.
+- A tool command gets its input schema, its effect and its plan from the tool, and shows the tool's text as it is: tool text names no tool and no parameter, and the steps that follow come from its `calls`. A test checks that no tool name appears in help or the manifest.
+- `add_records` (`data add`) and `create_api_key` (`key create`) are not registered: they need an app-realm sign-in and a secret-delivery hook that only Desktop has.
+- A command acts as the person unless it says `--as <name>`; the project binding names the agent, and never makes a run act as it.
+- A command that changes anything is a `ChangeCommand`: `plan(input, ctx)` returns `{ plan, ...state }`, and `apply(input, planned, ctx)` makes exactly that change. The layer shows the plan, and calls `apply` only after `--approve <id>` (while the plan has that id), `--yes`, or a yes on a terminal; a run with no terminal stops with exit 3.
+- The only changes with no plan: `login`, `logout`, `agent revoke` and the `context` changes are `ImmediateCommand`s (`immediate: true` with `run`), which change the person's own sign-in or stored contexts, or narrow an agent; `mcp` serves on stdio; `codegen` is a passthrough command. The registry test in `__tests__/cli.test.ts` pins that list, so a new change without a plan fails it.
+- Never take a password or a token as a flag value, and never print one. Nothing secret is written to the project.
 
 ## Tests
 
-- `packages/cli/__tests__/*` covers the GraphQL commands (codegen, cli)
-- Database/PGPM tests are located in `pgpm/cli/__tests__/`
+`__tests__/agents.test.ts` imports the session package's fake auth plane from `agentic/session/__tests__/fake-principals.ts`, which keeps principals, keys and password sign-ins the way the backend does; a move or rename of that file breaks these tests. `__tests__/public-surfaces.test.ts` builds every public surface (the manifest, every `--help` and `--schema`, the MCP tools and instructions, and the text of every file `npm pack` puts in the published packages: JSON, Markdown and the license in full, the string literals and template strings of each script through the TypeScript parser) and fails on the deny list of internal details; it reads the `dist` of each package, so build them first. A deny-list match that is public on purpose goes in `ALLOWED`, with the surface it is on and the reason. `__tests__/help.test.ts` covers `help`, the topics, the reference and the man build (it runs `scripts/man.mjs` on `dist`, so build first); the topics keep their lists flat, because the converter closes a nested list wrongly. `__tests__/*.test.ts` run the CLI in-process with `createConstructiveCli().run(argv, { stdin, stdout, stderr, env, cwd })`, a temporary `CONSTRUCTIVE_STASH_DIR` and no network. `codegen.test.ts` covers the codegen handler.

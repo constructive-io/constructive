@@ -1,10 +1,10 @@
 import { runCodegenHandler } from '@constructive-io/graphql-codegen';
 import type { CLIOptions, Inquirerer } from 'inquirerer';
 
-const usage = `
+export const usage = `
 Constructive GraphQL Codegen:
 
-  cnc codegen [OPTIONS]
+  constructive codegen [OPTIONS]
 
 Source Options (choose one):
   --config <path>            Path to graphql-codegen config file
@@ -40,10 +40,6 @@ export default async (
   prompter: Inquirerer,
   _options: CLIOptions
 ) => {
-  if (argv.help || argv.h) {
-    console.log(usage);
-    process.exit(0);
-  }
 
   await runCodegenHandler(argv as Record<string, unknown>, prompter);
 };
