@@ -51,18 +51,32 @@ export function isConstructiveError(error: unknown): error is ConstructiveError 
   return error instanceof ConstructiveError;
 }
 
-/** Codes worth automatically retrying (transient transport/rate failures). */
+/** Codes worth automatically retrying (transient transport/rate/capacity failures). */
 const RETRYABLE_CODES = new Set([
   'NETWORK_ERROR',
   'TIMEOUT_ERROR',
   'RATE_LIMITED',
   'TOO_MANY_REQUESTS',
+  // Admission control refused the request because its API had too many
+  // requests in flight (HTTP 429 with Retry-After).
+  'CONCURRENCY_LIMIT_REACHED',
 ]);
 
-/** Whether an error is safe to retry (network/timeout/rate-limit). */
+/** Whether an error is safe to retry (network/timeout/rate-limit/capacity). */
 export function isRetryable(error: unknown): boolean {
   const { code } = parse(error) as ParsedError;
   return Boolean(code && RETRYABLE_CODES.has(code));
+}
+
+/**
+ * How long the server asked the client to wait before retrying, in
+ * milliseconds: the `Retry-After` of the HTTP response the error came from.
+ * Undefined when that response had none.
+ */
+export function retryAfterMs(error: unknown): number | undefined {
+  if (!(error instanceof ConstructiveError)) return undefined;
+  const seconds = error.context?.retryAfterSeconds;
+  return typeof seconds === 'number' ? seconds * 1000 : undefined;
 }
 
 /**

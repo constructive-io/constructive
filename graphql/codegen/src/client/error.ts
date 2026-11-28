@@ -16,5 +16,6 @@ export {
   parse,
   type ParsedError,
   parseGraphQLError,
+  retryAfterMs,
   toError,
 } from '@constructive-io/graphql-query';

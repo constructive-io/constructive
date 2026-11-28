@@ -127,7 +127,34 @@ export async function execute<TDocument extends ExecutableDocument>(
   }
 }
 
+/**
+ * Seconds from a `Retry-After` header, which holds either a number of seconds
+ * or an HTTP date. Undefined when the header is absent or unreadable.
+ */
+function parseRetryAfter(value: string | null, now: number = Date.now()): number | undefined {
+  if (value === null) return undefined;
+  const trimmed = value.trim();
+  if (/^\d+$/.test(trimmed)) return Number(trimmed);
+  const at = Date.parse(trimmed);
+  return Number.isNaN(at) ? undefined : Math.max(Math.ceil((at - now) / 1000), 0);
+}
+
 async function handleHttpError(response: Response): Promise<ConstructiveError> {
+  const error = await errorForResponse(response);
+  // A refusal the server expects to clear says when to try again; keep that
+  // with the error so callers can wait it out (see `retryAfterMs`).
+  const retryAfterSeconds = parseRetryAfter(response.headers.get('Retry-After'));
+  if (retryAfterSeconds === undefined) return error;
+  return new ConstructiveError({
+    code: error.code,
+    message: error.message,
+    errorClass: error.errorClass,
+    http: error.http,
+    context: { ...error.context, retryAfterSeconds },
+  });
+}
+
+async function errorForResponse(response: Response): Promise<ConstructiveError> {
   const { status, statusText } = response;
 
   if (status === 401) {
