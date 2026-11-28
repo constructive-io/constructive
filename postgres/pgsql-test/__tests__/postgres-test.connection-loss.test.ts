@@ -20,6 +20,16 @@ beforeAll(async () => {
   ({ pg, db, manager, teardown } = await getConnections());
 });
 
+beforeEach(async () => {
+  await pg.beforeEach();
+  await db.beforeEach();
+});
+
+afterEach(async () => {
+  await db.afterEach();
+  await pg.afterEach();
+});
+
 afterAll(async () => {
   await teardown();
 });
@@ -38,6 +48,22 @@ const terminate = async (pid: number): Promise<void> => {
   await pg.query('SELECT pg_terminate_backend($1)', [pid]);
 };
 
+type Pool = ReturnType<PgTestConnector['getPool']>;
+
+/**
+ * Checks a connection out of the pool, notes its server process, and returns
+ * it to the pool, where it sits idle until the test ends it.
+ */
+const idleConnection = async (pool: Pool): Promise<{ pid: number; gone: Promise<void> }> => {
+  const client = await pool.connect();
+  try {
+    const { rows } = await client.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
+    return { pid: rows[0].pid, gone: ended(client) };
+  } finally {
+    client.release();
+  }
+};
+
 describe('connections the server ends', () => {
   it('fails later queries on a test client without ending the process', async () => {
     const victim = manager.getClient(db.config);
@@ -54,28 +80,29 @@ describe('connections the server ends', () => {
 
   it('replaces an idle pooled connection', async () => {
     const pool = manager.getPool(db.config);
-    const client = await pool.connect();
-    const { rows } = await client.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
-    const gone = ended(client);
-    client.release();
+    const { pid, gone } = await idleConnection(pool);
 
-    await terminate(rows[0].pid);
+    await terminate(pid);
     await gone;
 
-    const { rows: fresh } = await pool.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
-    expect(fresh[0].pid).not.toBe(rows[0].pid);
+    const { rows } = await pool.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
+    expect(rows[0].pid).not.toBe(pid);
   });
 
   it('fails the queries of a checked-out pooled connection', async () => {
     const pool = manager.getPool(db.config);
     const client = await pool.connect();
-    const { rows } = await client.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
-    const gone = ended(client);
+    try {
+      const { rows } = await client.query<{ pid: number }>('SELECT pg_backend_pid() AS pid');
+      const gone = ended(client);
 
-    await terminate(rows[0].pid);
-    await gone;
+      await terminate(rows[0].pid);
+      await gone;
 
-    await expect(client.query('SELECT 1')).rejects.toThrow();
-    client.release(true);
+      await expect(client.query('SELECT 1')).rejects.toThrow();
+    } finally {
+      // Destroy rather than reuse it, whatever the checks found.
+      client.release(true);
+    }
   });
 });
