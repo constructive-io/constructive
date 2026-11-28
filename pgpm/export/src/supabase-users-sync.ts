@@ -11,7 +11,11 @@ interface ConstraintNode {
   Constraint?: { contype: string };
 }
 
-export const addSupabaseUsersSync = async (rows: PgpmRow[], { schema_name, table_name }: SupabaseUsersTable): Promise<void> => {
+export const addSupabaseUsersSync = async (
+  rows: PgpmRow[],
+  { schema_name, table_name }: SupabaseUsersTable,
+  categoryFiltered: boolean
+): Promise<void> => {
   await loadModule();
   const matchesTable = (relation?: { schemaname?: string; relname?: string }) =>
     relation?.schemaname === schema_name && relation.relname === table_name;
@@ -34,7 +38,12 @@ export const addSupabaseUsersSync = async (rows: PgpmRow[], { schema_name, table
   }));
 
   const table = `${escapeIdentifier(schema_name)}.${escapeIdentifier(table_name)}`;
-  if (!row) throw new Error(`Cannot export Supabase user sync: no primary key migration for ${table}.`);
+  if (!row) {
+    const reason = `no primary key migration for ${table}`;
+    if (!categoryFiltered) throw new Error(`Cannot export Supabase user sync: ${reason}.`);
+    console.warn(`Skipping Supabase user sync in category-filtered export: ${reason}.`);
+    return;
+  }
   row.content += `\nSELECT supabase_integration.sync_users(${escapeLiteral(table)}::regclass);`;
   row.revert = `DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;\n${row.revert ?? ''}`;
 };

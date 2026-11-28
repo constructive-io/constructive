@@ -1130,16 +1130,16 @@ relocatable = false
           [DATABASE_ID, usersTableId]
         );
         await pg.query(
-          `INSERT INTO db_migrate.sql_actions (database_id, deploy, deps, content, revert)
+          `INSERT INTO db_migrate.sql_actions (database_id, deploy, deps, content, revert, category)
            VALUES ($1, $2, ARRAY['schemas/pets_public/schema'],
                    'CREATE TABLE pets_public.app_identities (id uuid);',
-                   'DROP TABLE pets_public.app_identities;'),
+                   'DROP TABLE pets_public.app_identities;', 'ddl'),
                   ($1, $3, ARRAY[$2],
                    'ALTER TABLE pets_public.app_identities ADD CONSTRAINT app_identities_pkey PRIMARY KEY (id);',
-                   'ALTER TABLE pets_public.app_identities DROP CONSTRAINT app_identities_pkey;')`,
+                   'ALTER TABLE pets_public.app_identities DROP CONSTRAINT app_identities_pkey;', 'ddl')`,
           [DATABASE_ID, usersDeploy, primaryKeyDeploy]
         );
-        const runExport = (partition?: PartitionConfig) => exportMigrations({
+        const runExport = (extra: { partition?: PartitionConfig; excludeCategories?: string[] } = {}) => exportMigrations({
           project: new PgpmPackage(exportWorkspaceDir),
           options: { pg: dbConfig },
           dbInfo: { dbname: dbConfig.database, databaseName: 'pets', database_ids: [DATABASE_ID] },
@@ -1148,7 +1148,7 @@ relocatable = false
           schema_names: rows.map(row => row.schema_name),
           extensionName,
           metaExtensionName,
-          partition
+          ...extra
         });
 
         await setRequirements(['pgpm-supabase']);
@@ -1161,19 +1161,24 @@ relocatable = false
         expect(deploy).toContain(syncCall);
         expect(deploy.indexOf('PRIMARY KEY (id);')).toBeLessThan(deploy.indexOf(syncCall));
         expect(migration('revert')).toMatch(/DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;\s+ALTER TABLE/);
-        expect(readFileSync(join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql'), 'utf-8'))
-          .not.toContain('export_requires');
+        const metaDatabaseSql = join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql');
+        expect(readFileSync(metaDatabaseSql, 'utf-8')).not.toContain('export_requires');
 
         const partitionName = 'supabase-identities';
         scaffoldModule(partitionName, 'Partition that owns the users table');
-        await runExport({ defaultPackage: extensionName, rules: [
+        await runExport({ partition: { defaultPackage: extensionName, rules: [
           { package: partitionName, select: [{ schema: 'pets_public' }] }
-        ] });
+        ] } });
         const partitionDir = join(outdir, partitionName, 'deploy');
         const partitionSql = getDirectoryStructure(partitionDir)
           .filter(file => file.endsWith('.sql'))
           .map(file => readFileSync(join(partitionDir, file), 'utf-8'));
         expect(partitionSql.filter(sql => sql.includes(syncCall))).toHaveLength(1);
+
+        rmSync(metaDatabaseSql);
+        await runExport({ excludeCategories: ['ddl'] });
+        expect(readFileSync(planPath, 'utf-8')).not.toContain(exportedPrimaryKey);
+        expect(existsSync(metaDatabaseSql)).toBe(true);
 
         await setRequirements([]);
         await runExport();
