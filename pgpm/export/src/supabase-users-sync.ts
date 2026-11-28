@@ -42,33 +42,37 @@ const findUsersPrimaryKey = (
 export const addSupabaseUsersSync = async (
   packages: PgpmRow[][],
   users: SupabaseUsersTable,
+  rename: (value: string) => string,
   getExcludedRows?: () => Promise<PgpmRow[]>
-): Promise<void> => {
+): Promise<PgpmRow | undefined> => {
   await loadModule();
-  const { schema_name, table_name } = users;
-  const table = `${escapeIdentifier(schema_name)}.${escapeIdentifier(table_name)}`;
+  const sourceTable = `${escapeIdentifier(users.schema_name)}.${escapeIdentifier(users.table_name)}`;
   const deploy = 'supabase/register_users';
 
   for (const rows of packages) {
     const key = findUsersPrimaryKey(rows, users);
     if (!key) continue;
-    if (rows.some(row => row.deploy === deploy)) {
+    const exportedDeploy = rename(deploy);
+    if (rows.some(row => rename(row.deploy) === exportedDeploy)) {
       throw new Error(`Cannot export Supabase user sync: migration ${deploy} already exists.`);
     }
 
+    const schema = rename(users.schema_name);
+    const name = rename(users.table_name);
+    const table = `${escapeIdentifier(schema)}.${escapeIdentifier(name)}`;
     const trigger = `SELECT FROM pg_catalog.pg_trigger
       WHERE tgrelid = pg_catalog.to_regclass('auth.users') AND tgname = 'supabase_sync_users'`;
     // The installer stores format('%I.%I', ...) followed by a NUL in pg_trigger.tgargs.
     const matchesTarget = `tgfoid = pg_catalog.to_regprocedure('supabase_integration.tg_sync_users()')
       AND tgargs = pg_catalog.convert_to(
-        pg_catalog.format('%I.%I', ${escapeLiteral(schema_name)}, ${escapeLiteral(table_name)}),
+        pg_catalog.format('%I.%I', ${escapeLiteral(schema)}, ${escapeLiteral(name)}),
         pg_catalog.current_setting('server_encoding')::pg_catalog.name
       ) || pg_catalog.decode('00', 'hex')`;
     const hasMatchingTrigger = `EXISTS (${trigger} AND ${matchesTarget})`;
     const lockSource = 'LOCK TABLE auth.users IN SHARE ROW EXCLUSIVE MODE;';
 
     // Existing deployments skip recorded changes, so leave the key migration intact.
-    rows.push({
+    const sync: PgpmRow = {
       name: 'Supabase user sync',
       deploy,
       deps: [key.deploy],
@@ -86,13 +90,14 @@ export const addSupabaseUsersSync = async (
       verify: sqlBlock(`  IF NOT ${hasMatchingTrigger} THEN
     RAISE EXCEPTION 'Supabase user sync trigger is not installed for the exported users table';
   END IF;`)
-    });
-    return;
+    };
+    rows.push(sync);
+    return sync;
   }
 
   if (getExcludedRows && findUsersPrimaryKey(await getExcludedRows(), users)) {
-    console.warn(`Skipping Supabase user sync: category filter excluded the primary key migration for ${table}.`);
+    console.warn(`Skipping Supabase user sync: category filter excluded the primary key migration for ${sourceTable}.`);
     return;
   }
-  throw new Error(`Cannot export Supabase user sync: no primary key migration for ${table}.`);
+  throw new Error(`Cannot export Supabase user sync: no primary key migration for ${sourceTable}.`);
 };

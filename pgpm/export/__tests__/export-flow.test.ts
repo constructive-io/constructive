@@ -1114,8 +1114,13 @@ relocatable = false
       const syncMigration = (kind: string) => readFileSync(join(outdir, extensionName, kind, `${syncDeploy}.sql`), 'utf-8');
       const planPath = join(outdir, extensionName, 'pgpm.plan');
       const syncFunction = 'supabase_integration.sync_users(';
+      const appAuthSchemaId = 'aaaa0003-0000-0000-0000-000000000099';
       const usersTableId = 'a1b2c3d4-e5f6-4708-b250-000000000099';
       try {
+        await pg.query(
+          "INSERT INTO metaschema_public.schema (id, database_id, name, schema_name) VALUES ($2, $1, 'login', 'auth')",
+          [DATABASE_ID, appAuthSchemaId]
+        );
         const { rows } = await pg.query(
           'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
           [DATABASE_ID]
@@ -1225,6 +1230,7 @@ relocatable = false
         await pg.query('DELETE FROM db_migrate.sql_actions WHERE database_id = $1 AND deploy = ANY($2)', [DATABASE_ID, [usersDeploy, primaryKeyDeploy]]);
         await pg.query('DELETE FROM metaschema_modules_public.users_module WHERE table_id = $1', [usersTableId]);
         await pg.query('DELETE FROM metaschema_public.table WHERE id = $1', [usersTableId]);
+        await pg.query('DELETE FROM metaschema_public.schema WHERE id = $1', [appAuthSchemaId]);
       }
     });
 

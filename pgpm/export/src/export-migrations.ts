@@ -122,6 +122,22 @@ interface ExportOptions {
   partition?: PartitionConfig;
 }
 
+const writeDatabasePackage = (rows: PgpmRow[], opts: SqlWriteOptions, sync?: PgpmRow): void => {
+  writePgpmPlan(rows, opts);
+  if (!sync) {
+    writePgpmFiles(rows, opts);
+    return;
+  }
+
+  // The sync targets a renamed app table but must retain the host's auth.users.
+  writePgpmFiles(rows.filter(row => row !== sync), opts);
+  writePgpmFiles([{
+    ...sync,
+    deploy: opts.replacer(sync.deploy),
+    deps: sync.deps?.map(dep => opts.replacer(dep))
+  }], { ...opts, replacer: value => value ?? '' });
+};
+
 const exportMigrationsToDisk = async ({
   project,
   options,
@@ -266,7 +282,9 @@ const exportMigrationsToDisk = async ({
       // recursive deploys order them correctly.
       const { packages, warnings } = await partitionExportRows(dbRows, partition);
       warnings.forEach(warning => console.warn(`partition: ${warning}`));
-      if (supabaseUsers) await addSupabaseUsersSync(packages.map(pkg => pkg.rows), supabaseUsers, getExcludedRows);
+      const sync = supabaseUsers
+        ? await addSupabaseUsersSync(packages.map(pkg => pkg.rows), supabaseUsers, replacer, getExcludedRows)
+        : undefined;
 
       for (const pkg of packages) {
         const pkgDir = await preparePackage({
@@ -285,11 +303,12 @@ const exportMigrationsToDisk = async ({
           await installMissingModules(pkgDir, dbMissingResult.missingModules);
         }
         const pkgOpts: SqlWriteOptions = { ...opts, name: pkg.name };
-        writePgpmPlan(pkg.rows, pkgOpts);
-        writePgpmFiles(pkg.rows, pkgOpts);
+        writeDatabasePackage(pkg.rows, pkgOpts, sync && pkg.rows.includes(sync) ? sync : undefined);
       }
     } else {
-      if (supabaseUsers) await addSupabaseUsersSync([dbRows], supabaseUsers, getExcludedRows);
+      const sync = supabaseUsers
+        ? await addSupabaseUsersSync([dbRows], supabaseUsers, replacer, getExcludedRows)
+        : undefined;
       // Create/prepare the module directory
       const dbModuleDir = await preparePackage({
         project,
@@ -309,8 +328,7 @@ const exportMigrationsToDisk = async ({
         await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
       }
 
-      writePgpmPlan(dbRows, opts);
-      writePgpmFiles(dbRows, opts);
+      writeDatabasePackage(dbRows, opts, sync);
     }
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
