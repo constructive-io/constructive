@@ -1116,6 +1116,8 @@ relocatable = false
         expect(control(extensionName)).toMatch(/^requires = '.*\bpgpm-supabase\b/m);
         const serviceRequires = control(metaExtensionName).match(/^requires = '([^']+)'/m)?.[1].split(',');
         expect(serviceRequires).not.toContain('pgpm-supabase');
+        expect(readFileSync(join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql'), 'utf-8'))
+          .not.toContain('export_requires');
       } finally {
         await pg.query(`UPDATE metaschema_public.database SET export_requires = '{}' WHERE id = $1`, [DATABASE_ID]);
       }

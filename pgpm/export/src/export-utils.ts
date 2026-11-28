@@ -221,6 +221,10 @@ export interface MetaExportTableEntry {
  * values must come from DDL defaults at deploy time.
  */
 export const META_TABLE_OVERRIDES: Record<string, Omit<TableConfig, 'schema' | 'table'>> = {
+  database: {
+    // The source catalog declares requirements; the exported control owns them.
+    columnDefaults: { export_requires: "'{}'::text[]" }
+  },
   sites: {
     typeOverrides: {
       og_image: 'image',
