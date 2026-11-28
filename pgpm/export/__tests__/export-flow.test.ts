@@ -71,6 +71,7 @@ const SCHEMA_SHIMS_SQL = `
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     owner_id uuid,
     name text,
+    export_requires text[] NOT NULL DEFAULT '{}',
     hash uuid
   );
 
@@ -778,6 +779,8 @@ relocatable = false
     it('should have created the database export module directory', () => {
       const dbModuleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
       expect(existsSync(dbModuleDir)).toBe(true);
+      expect(readFileSync(join(dbModuleDir, `${EXTENSION_NAME}.control`), 'utf-8'))
+        .not.toContain('pgpm-supabase');
     });
 
     it('should have created pgpm.plan for database export', () => {
@@ -1082,6 +1085,41 @@ relocatable = false
       );
       expect(planContent).toContain('schemas/pets_full_public/tables/pets/policies/pets_policy');
     }, 180000);
+
+    it('adds declared requirements only to the database package', async () => {
+      const extensionName = 'pets-supabase';
+      const metaExtensionName = 'pets-supabase-svc';
+      const outdir = join(exportWorkspaceDir, 'packages');
+      scaffoldModule(extensionName, 'Exported database with an extension requirement');
+      scaffoldModule(metaExtensionName, 'Exported service metadata');
+      await pg.query(
+        `UPDATE metaschema_public.database SET export_requires = ARRAY['pgpm-supabase'] WHERE id = $1`,
+        [DATABASE_ID]
+      );
+      try {
+        const { rows } = await pg.query(
+          'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
+          [DATABASE_ID]
+        );
+        await exportMigrations({
+          project: new PgpmPackage(exportWorkspaceDir),
+          options: { pg: dbConfig },
+          dbInfo: { dbname: dbConfig.database, databaseName: 'pets', database_ids: [DATABASE_ID] },
+          author: 'test <test@test.local>',
+          outdir,
+          schema_names: rows.map(row => row.schema_name),
+          extensionName,
+          metaExtensionName
+        });
+
+        const control = (name: string) => readFileSync(join(outdir, name, `${name}.control`), 'utf-8');
+        expect(control(extensionName)).toMatch(/^requires = '.*\bpgpm-supabase\b/m);
+        const serviceRequires = control(metaExtensionName).match(/^requires = '([^']+)'/m)?.[1].split(',');
+        expect(serviceRequires).not.toContain('pgpm-supabase');
+      } finally {
+        await pg.query(`UPDATE metaschema_public.database SET export_requires = '{}' WHERE id = $1`, [DATABASE_ID]);
+      }
+    });
 
     it('hoists meta_registration registry fixtures into the service package', async () => {
       const PART_EXTENSION_NAME = 'pets-part';

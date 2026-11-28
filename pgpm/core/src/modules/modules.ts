@@ -18,6 +18,7 @@ export const PGPM_MODULE_MAP: Record<string, string> = {
   'pgpm-inflection': '@pgpm/inflection',
   'pgpm-jwt-claims': '@pgpm/jwt-claims',
   'pgpm-stamps': '@pgpm/stamps',
+  'pgpm-supabase': '@pgpm/supabase',
   'pgpm-totp': '@pgpm/totp',
   'pgpm-types': '@pgpm/types',
   'pgpm-utils': '@pgpm/utils',

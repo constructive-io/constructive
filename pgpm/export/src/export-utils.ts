@@ -46,6 +46,16 @@ export const DB_REQUIRED_EXTENSIONS = [
   'pgpm-partman'
 ] as const;
 
+/** Build control-file requirements from the defaults and a database's declared extras. */
+export const databaseExportExtensions = (requires: readonly string[] = []): string[] => {
+  for (const name of requires) {
+    if (typeof name !== 'string' || !/^[\w-]+$/.test(name)) {
+      throw new Error(`Invalid extension name in database export requirements: ${JSON.stringify(name)}`);
+    }
+  }
+  return [...new Set([...DB_REQUIRED_EXTENSIONS, ...requires])];
+};
+
 /**
  * Map PostgreSQL data types to FieldType values.
  * Uses udt_name from information_schema which gives the base type name.

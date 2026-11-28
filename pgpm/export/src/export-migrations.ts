@@ -7,7 +7,7 @@ import { getPgPool } from 'pg-cache';
 import { exportMeta } from './export-meta';
 import {
   buildMetaRevertScript,
-  DB_REQUIRED_EXTENSIONS,
+  databaseExportExtensions,
   detectMissingModules,
   installMissingModules,
   makeReplacer,
@@ -223,8 +223,9 @@ const exportMigrationsToDisk = async ({
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
 
   if (appRows.length > 0) {
+    const extensions = databaseExportExtensions(db.rows[0].export_requires);
     // Detect missing modules at workspace level and prompt user
-    const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
+    const dbMissingResult = await detectMissingModules(project, extensions, prompter, argv);
 
     let dbRows = appRows;
     if (granularity) {
@@ -247,7 +248,7 @@ const exportMigrationsToDisk = async ({
           outdir: normalizedOutdir,
           name: pkg.name,
           description: `${pkg.name} (partitioned from ${name})`,
-          extensions: [...DB_REQUIRED_EXTENSIONS, ...pkg.requires],
+          extensions: [...extensions, ...pkg.requires],
           prompter,
           repoName,
           username
@@ -267,7 +268,7 @@ const exportMigrationsToDisk = async ({
         outdir: normalizedOutdir,
         name,
         description: dbExtensionDesc,
-        extensions: [...DB_REQUIRED_EXTENSIONS],
+        extensions,
         prompter,
         repoName,
         username
