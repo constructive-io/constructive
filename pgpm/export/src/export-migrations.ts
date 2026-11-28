@@ -243,6 +243,12 @@ const exportMigrationsToDisk = async ({
   }
 
   if (appRows.length > 0) {
+    const getExcludedRows = excludeCategories?.length
+      ? () => pgPool.query<PgpmRow>(
+        'SELECT deploy, content FROM db_migrate.sql_actions WHERE database_id = $1 AND category = ANY($2::text[])',
+        [databaseId, excludeCategories]
+      ).then(({ rows }) => rows)
+      : undefined;
     const extensions = databaseExportExtensions(declaredExtensions);
     // Detect missing modules at workspace level and prompt user
     const dbMissingResult = await detectMissingModules(project, extensions, prompter, argv);
@@ -260,7 +266,7 @@ const exportMigrationsToDisk = async ({
       // recursive deploys order them correctly.
       const { packages, warnings } = await partitionExportRows(dbRows, partition);
       warnings.forEach(warning => console.warn(`partition: ${warning}`));
-      if (supabaseUsers) await addSupabaseUsersSync(packages.flatMap(pkg => pkg.rows), supabaseUsers, categoryFiltered);
+      if (supabaseUsers) await addSupabaseUsersSync(packages.map(pkg => pkg.rows), supabaseUsers, getExcludedRows);
 
       for (const pkg of packages) {
         const pkgDir = await preparePackage({
@@ -283,7 +289,7 @@ const exportMigrationsToDisk = async ({
         writePgpmFiles(pkg.rows, pkgOpts);
       }
     } else {
-      if (supabaseUsers) await addSupabaseUsersSync(dbRows, supabaseUsers, categoryFiltered);
+      if (supabaseUsers) await addSupabaseUsersSync([dbRows], supabaseUsers, getExcludedRows);
       // Create/prepare the module directory
       const dbModuleDir = await preparePackage({
         project,

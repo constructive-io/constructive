@@ -11,20 +11,18 @@ interface ConstraintNode {
   Constraint?: { contype: string };
 }
 
-export const addSupabaseUsersSync = async (
+const findUsersPrimaryKey = (
   rows: PgpmRow[],
-  { schema_name, table_name }: SupabaseUsersTable,
-  categoryFiltered: boolean
-): Promise<void> => {
-  await loadModule();
+  { schema_name, table_name }: SupabaseUsersTable
+): PgpmRow | undefined => {
   const matchesTable = (relation?: { schemaname?: string; relname?: string }) =>
     relation?.schemaname === schema_name && relation.relname === table_name;
   const isPrimaryKey = (node?: ConstraintNode) =>
     node?.Constraint?.contype === 'CONSTR_PRIMARY';
 
   // Constructive exports create an empty table and add its primary key
-  // separately. Anchor the sync to the key, even when SQL is partitioned.
-  const row = rows.find(row => parseSqlProgram(row.content).statements.some(({ stmt }) => {
+  // separately. The sync trigger uses that key for ON CONFLICT.
+  return rows.find(row => parseSqlProgram(row.content).statements.some(({ stmt }) => {
     const { CreateStmt, AlterTableStmt } = stmt;
     if (matchesTable(CreateStmt?.relation)) {
       return CreateStmt.tableElts?.some((element: ConstraintNode & { ColumnDef?: { constraints?: ConstraintNode[] } }) =>
@@ -36,14 +34,50 @@ export const addSupabaseUsersSync = async (
         isPrimaryKey(AlterTableCmd?.def)
       );
   }));
+};
 
+export const addSupabaseUsersSync = async (
+  packages: PgpmRow[][],
+  users: SupabaseUsersTable,
+  getExcludedRows?: () => Promise<PgpmRow[]>
+): Promise<void> => {
+  await loadModule();
+  const { schema_name, table_name } = users;
   const table = `${escapeIdentifier(schema_name)}.${escapeIdentifier(table_name)}`;
-  if (!row) {
-    const reason = `no primary key migration for ${table}`;
-    if (!categoryFiltered) throw new Error(`Cannot export Supabase user sync: ${reason}.`);
-    console.warn(`Skipping Supabase user sync in category-filtered export: ${reason}.`);
+  const deploy = 'supabase/register_users';
+
+  for (const rows of packages) {
+    const key = findUsersPrimaryKey(rows, users);
+    if (!key) continue;
+    if (rows.some(row => row.deploy === deploy)) {
+      throw new Error(`Cannot export Supabase user sync: migration ${deploy} already exists.`);
+    }
+    // Existing deployments skip recorded changes, so leave the key migration intact.
+    rows.push({
+      name: 'Supabase user sync',
+      deploy,
+      deps: [key.deploy],
+      content: `SELECT supabase_integration.sync_users(${escapeLiteral(table)}::regclass);`,
+      revert: 'DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;',
+      verify: `DO $verify$
+BEGIN
+  IF NOT EXISTS (
+    SELECT FROM pg_catalog.pg_trigger
+    WHERE tgrelid = 'auth.users'::regclass
+      AND tgname = 'supabase_sync_users'
+      AND tgfoid = 'supabase_integration.tg_sync_users()'::regprocedure
+  ) THEN
+    RAISE EXCEPTION 'Supabase user sync trigger is not installed';
+  END IF;
+END;
+$verify$;`
+    });
     return;
   }
-  row.content += `\nSELECT supabase_integration.sync_users(${escapeLiteral(table)}::regclass);`;
-  row.revert = `DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;\n${row.revert ?? ''}`;
+
+  if (getExcludedRows && findUsersPrimaryKey(await getExcludedRows(), users)) {
+    console.warn(`Skipping Supabase user sync: category filter excluded the primary key migration for ${table}.`);
+    return;
+  }
+  throw new Error(`Cannot export Supabase user sync: no primary key migration for ${table}.`);
 };

@@ -1110,7 +1110,8 @@ relocatable = false
       const usersDeploy = 'schemas/pets_public/tables/app_identities/table';
       const primaryKeyDeploy = 'schemas/pets_public/tables/app_identities/constraints/app_identities_pkey/constraint';
       const exportedPrimaryKey = primaryKeyDeploy.replace('pets_public', 'pets_supabase_public');
-      const migration = (kind: string) => readFileSync(join(outdir, extensionName, kind, `${exportedPrimaryKey}.sql`), 'utf-8');
+      const syncDeploy = 'supabase/register_users';
+      const syncMigration = (kind: string) => readFileSync(join(outdir, extensionName, kind, `${syncDeploy}.sql`), 'utf-8');
       const planPath = join(outdir, extensionName, 'pgpm.plan');
       const syncCall = `SELECT supabase_integration.sync_users('"pets_supabase_public"."app_identities"'::regclass);`;
       const usersTableId = 'a1b2c3d4-e5f6-4708-b250-000000000099';
@@ -1155,12 +1156,14 @@ relocatable = false
         await runExport();
         expect(requirements(extensionName)).toEqual(expect.arrayContaining(['pgpm-supabase', 'manual-dependency']));
         expect(requirements(metaExtensionName)).not.toContain('pgpm-supabase');
-        expect(readFileSync(planPath, 'utf-8'))
-          .toContain(`${exportedPrimaryKey} [${usersDeploy.replace('pets_public', 'pets_supabase_public')}]`);
-        const deploy = migration('deploy');
-        expect(deploy).toContain(syncCall);
-        expect(deploy.indexOf('PRIMARY KEY (id);')).toBeLessThan(deploy.indexOf(syncCall));
-        expect(migration('revert')).toMatch(/DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;\s+ALTER TABLE/);
+        const plan = readFileSync(planPath, 'utf-8');
+        expect(plan).toContain(`${exportedPrimaryKey} [${usersDeploy.replace('pets_public', 'pets_supabase_public')}]`);
+        expect(plan).toContain(`${syncDeploy} [${exportedPrimaryKey}]`);
+        expect(plan.indexOf(exportedPrimaryKey)).toBeLessThan(plan.indexOf(syncDeploy));
+        expect(syncMigration('deploy')).toContain(syncCall);
+        expect(syncMigration('revert')).toContain('DROP TRIGGER IF EXISTS supabase_sync_users ON auth.users;');
+        expect(readFileSync(join(outdir, extensionName, 'deploy', `${exportedPrimaryKey}.sql`), 'utf-8'))
+          .not.toContain(syncCall);
         const metaDatabaseSql = join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql');
         expect(readFileSync(metaDatabaseSql, 'utf-8')).not.toContain('export_requires');
 
@@ -1177,15 +1180,19 @@ relocatable = false
 
         rmSync(metaDatabaseSql);
         await runExport({ excludeCategories: ['ddl'] });
-        expect(readFileSync(planPath, 'utf-8')).not.toContain(exportedPrimaryKey);
+        expect(readFileSync(planPath, 'utf-8')).not.toContain(syncDeploy);
         expect(existsSync(metaDatabaseSql)).toBe(true);
 
         await setRequirements([]);
         await runExport();
         expect(requirements(extensionName)).not.toContain('pgpm-supabase');
         expect(requirements(extensionName)).toContain('manual-dependency');
-        expect(migration('deploy')).not.toContain('sync_users');
-        expect(migration('revert')).not.toContain('supabase_sync_users');
+        expect(readFileSync(planPath, 'utf-8')).not.toContain(syncDeploy);
+
+        await setRequirements(['pgpm-supabase']);
+        await pg.query('DELETE FROM db_migrate.sql_actions WHERE database_id = $1 AND deploy = $2', [DATABASE_ID, primaryKeyDeploy]);
+        await expect(runExport({ excludeCategories: ['meta_registration'] }))
+          .rejects.toThrow('Cannot export Supabase user sync: no primary key migration');
       } finally {
         await setRequirements([]);
         await pg.query('DELETE FROM db_migrate.sql_actions WHERE database_id = $1 AND deploy = ANY($2)', [DATABASE_ID, [usersDeploy, primaryKeyDeploy]]);
