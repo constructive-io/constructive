@@ -17,6 +17,7 @@ export {
   parse,
   type ParsedError,
   parseGraphQLError,
+  retryAfterMs,
   toError,
 } from './error';
 export {
