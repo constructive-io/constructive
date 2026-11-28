@@ -2,20 +2,20 @@ import {
   API_KEY_NAME,
   buildCreateApiKeyInput,
   classifyApiKeyError,
+  keyEndsSoon,
   MintedApiKey,
-  needsRemint,
   parseMintedKey,
-  REMINT_THRESHOLD_MS,
-  remintApiKey
+  remintApiKey,
+  SIGN_IN_AGAIN_WITHIN_MS
 } from '../src/api-key';
 
 describe('buildCreateApiKeyInput', () => {
   it('names the key agentic-cli with full access and no MFA', () => {
-    expect(buildCreateApiKeyInput({ years: 5 })).toEqual({
+    expect(buildCreateApiKeyInput({ days: 30 })).toEqual({
       keyName: API_KEY_NAME,
       accessLevel: 'full_access',
       mfaLevel: 'none',
-      expiresIn: { years: 5 }
+      expiresIn: { days: 30 }
     });
     expect(API_KEY_NAME).toBe('agentic-cli');
   });
@@ -43,27 +43,27 @@ describe('classifyApiKeyError', () => {
     expect(classifyApiKeyError(err)).toBe('step-up-required');
   });
 
-  it('falls back to message text and then unknown', () => {
-    expect(classifyApiKeyError(new Error('boom: API_KEY_LIMIT_REACHED'))).toBe('limit-reached');
-    expect(classifyApiKeyError(new Error('NOT_AUTHENTICATED'))).toBe('not-authenticated');
+  it('never reads a code out of message text', () => {
+    expect(classifyApiKeyError(new Error('boom: API_KEY_LIMIT_REACHED'))).toBe('unknown');
+    expect(classifyApiKeyError(new Error('NOT_AUTHENTICATED'))).toBe('unknown');
     expect(classifyApiKeyError(new Error('nope'))).toBe('unknown');
     expect(classifyApiKeyError(undefined)).toBe('unknown');
   });
 });
 
-describe('needsRemint', () => {
+describe('keyEndsSoon', () => {
   const now = Date.parse('2026-08-03T00:00:00Z');
 
   it('is false without an expiry or with an unparsable one', () => {
-    expect(needsRemint({ apiKeyExpiresAt: undefined, now })).toBe(false);
-    expect(needsRemint({ apiKeyExpiresAt: 'garbage', now })).toBe(false);
+    expect(keyEndsSoon({ expiresAt: undefined, now })).toBe(false);
+    expect(keyEndsSoon({ expiresAt: 'garbage', now })).toBe(false);
   });
 
-  it('is true at or inside the 7-day threshold, false outside', () => {
+  it('is true at or inside the 7-day window, false outside', () => {
     const at = (deltaMs: number) => new Date(now + deltaMs).toISOString();
-    expect(needsRemint({ apiKeyExpiresAt: at(REMINT_THRESHOLD_MS), now })).toBe(true);
-    expect(needsRemint({ apiKeyExpiresAt: at(REMINT_THRESHOLD_MS + 1000), now })).toBe(false);
-    expect(needsRemint({ apiKeyExpiresAt: at(-1000), now })).toBe(true);
+    expect(keyEndsSoon({ expiresAt: at(SIGN_IN_AGAIN_WITHIN_MS), now })).toBe(true);
+    expect(keyEndsSoon({ expiresAt: at(SIGN_IN_AGAIN_WITHIN_MS + 1000), now })).toBe(false);
+    expect(keyEndsSoon({ expiresAt: at(-1000), now })).toBe(true);
   });
 });
 
@@ -82,7 +82,7 @@ describe('remintApiKey', () => {
         return minted;
       }
     });
-    expect(result).toEqual(minted);
+    expect(result).toEqual({ kind: 'minted', minted, previousKey: { kind: 'revoked', keyId: 'old-id' } });
     expect(calls).toEqual(['mint', 'revoke:old-id']);
   });
 
@@ -101,26 +101,24 @@ describe('remintApiKey', () => {
         return minted;
       }
     });
-    expect(result).toEqual(minted);
+    expect(result).toEqual({ kind: 'minted', minted, previousKey: { kind: 'revoked', keyId: 'old-id' } });
     expect(calls).toEqual(['mint', 'revoke:old-id', 'mint']);
   });
 
-  it('rethrows non-limit errors without revoking', async () => {
+  it('keeps the old key on a non-limit error without revoking', async () => {
     const revoke = jest.fn();
-    await expect(
-      remintApiKey({
-        currentKeyId: 'old-id',
-        revoke,
-        mint: async () => {
-          throw { errors: [{ extensions: { code: 'STEP_UP_REQUIRED' } }] };
-        }
-      })
-    ).rejects.toBeDefined();
+    const result = await remintApiKey({
+      currentKeyId: 'old-id',
+      revoke,
+      mint: async () => {
+        throw { errors: [{ extensions: { code: 'STEP_UP_REQUIRED' } }] };
+      }
+    });
+    expect(result).toMatchObject({ kind: 'failed', previousKey: { kind: 'kept', keyId: 'old-id' } });
     expect(revoke).not.toHaveBeenCalled();
   });
 
-  it('tolerates a failing revoke', async () => {
-    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  it('reports a failing revoke instead of printing it', async () => {
     const result = await remintApiKey({
       currentKeyId: 'old-id',
       revoke: async () => {
@@ -128,8 +126,6 @@ describe('remintApiKey', () => {
       },
       mint: async () => minted
     });
-    expect(result).toEqual(minted);
-    expect(warn).toHaveBeenCalled();
-    warn.mockRestore();
+    expect(result).toEqual({ kind: 'minted', minted, previousKey: { kind: 'failed', keyId: 'old-id', reason: 'offline' } });
   });
 });

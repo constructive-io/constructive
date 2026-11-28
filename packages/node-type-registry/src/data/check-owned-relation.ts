@@ -49,6 +49,11 @@ export const CheckOwnedRelation: NodeTypeDefinition = {
               type: 'boolean',
               description: "Admit the same database's global-scope rows (app/platform, ownerless by construction) for this column, for pointers whose legal target set is a scope hierarchy within one database",
               default: false
+            },
+            allow_frame_chain: {
+              type: 'boolean',
+              description: "Admit rows owned by any frame on the referencing row's own scope-frame chain (its own scopes, then the platform database's chain) for this column, for pointers naming a definition published UP the hierarchy — the shared platform function image a tenant route targets. Ancestry only: a peer or another keyed owner is on no chain. Requires owner_key_field_name",
+              default: false
             }
           },
           required: ['field_name', 'link_table_name']

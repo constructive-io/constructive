@@ -44,6 +44,61 @@ describe('the blueprint definition JSON Schema', () => {
     expect(errors(table({ policies: [{ ...TEAM, $type: 'AuthzNoSuchNode' }] }))).toContain('/tables/0/policies/0/$type must be equal to one of the allowed values');
   });
 
+  test('only policies with required caller inputs need data', () => {
+    expect(errors(table({ policies: [{ $type: 'AuthzEntityMembership' }] }))).toContain("/tables/0/policies/0 must have required property 'data'");
+    expect(errors(table({ policies: [{ $type: 'AuthzAllowAll' }] }))).toEqual([]);
+    expect(errors(table({ policies: [{ $type: 'AuthzAllowAll', privileges: ['update'], with_check: { $type: 'AuthzEntityMembership' } }] }))).toContain(
+      "/tables/0/policies/0/with_check must have required property 'data'"
+    );
+  });
+
+  test('each relation end names a table or a module table, not both', () => {
+    const module = { type: 'agent', scope: 'org', table: 'message' };
+    const relates = (ends: Record<string, unknown>) => ({
+      ...table(),
+      relations: [{ $type: 'RelationBelongsTo', delete_action: 'r', ...ends }]
+    });
+    expect(errors(relates({}))).not.toEqual([]);
+    expect(errors(relates({ source_table: 'projects' }))).not.toEqual([]);
+    expect(errors(relates({ source_table: 'projects', target_module: module }))).toEqual([]);
+    expect(errors(relates({ source_table: 'projects', target_module: module, delete_action: undefined }))).toContain(
+      "/relations/0 must have required property 'delete_action'"
+    );
+    expect(errors(relates({ source_table: 'projects', target_schema: 'app_public', target_module: module }))).not.toEqual([]);
+    expect(errors(relates({ source_table: 'projects', target_table: 'messages', target_module: module }))).not.toEqual([]);
+  });
+
+  test('each table has one target and nodes that require data cannot use shorthand', () => {
+    const module = { type: 'agent', scope: 'org', table: 'message' };
+    expect(errors({ tables: [{}] })).not.toEqual([]);
+    expect(errors({ tables: [{ module }] })).toEqual([]);
+    expect(errors(table({ module }))).not.toEqual([]);
+    const install = { type: 'agent', scope: 'org' };
+    const provisions = { message: { policies: [TEAM] } };
+    expect(errors({ tables: [{ module: install, provisions }] })).toEqual([]);
+    expect(errors({ tables: [{ module: install }] })).not.toEqual([]);
+    expect(errors({ tables: [{ module, provisions }] })).not.toEqual([]);
+    expect(errors({ tables: [{ module: install, provisions, policies: [TEAM] }] })).not.toEqual([]);
+    expect(errors(table({ nodes: ['DataId'] }))).toEqual([]);
+    expect(errors(table({ nodes: ['AuthzColumnSecurity'] }))).not.toEqual([]);
+  });
+
+  test.each(['AuthzValueExists', 'AuthzValueMatch'])('%s requires a nonempty join', ($type) => {
+    expect(errors(table({ policies: [{ $type, data: { ref_schema: 'app_public', ref_table: 'teams', join: [] } }] }))).toContain(
+      '/tables/0/policies/0/data/join must NOT have fewer than 1 items'
+    );
+  });
+
+  test('junction policies use the same validation as table policies', () => {
+    const junction = (policy: Record<string, unknown>) => ({
+      ...table(),
+      relations: [{ $type: 'RelationManyToMany', source_table: 'projects', target_table: 'labels', policies: [policy] }]
+    });
+    expect(errors(junction(TEAM))).toEqual([]);
+    expect(errors(junction({ $type: 'AuthzNoSuchNode' }))).not.toEqual([]);
+    expect(errors(junction({ $type: 'AuthzEntityMembership' }))).toContain("/relations/0/policies/0 must have required property 'data'");
+  });
+
   test('a with_check override is for update only', () => {
     const check = { $type: 'AuthzValueAllowed', data: { column: 'role', allowed: ['member'], operator: 'in' } };
     expect(errors(table({ policies: [{ ...TEAM, privileges: ['update'], with_check: check }] }))).toEqual([]);

@@ -101,7 +101,7 @@ export const AuthzRelatedMemberOwner: NodeTypeDefinition = {
     'Rows that name their team directly: use AuthzMemberOwner.'
   ],
   risks: [
-    'The registry does not list sel_obj. The backend\'s own policies set sel_obj to true and sel_field to id; without them the row\'s column is compared with the team id itself, not with the related row.',
+    'To compare the row\'s column with the related row\'s id rather than the team id, set sel_obj to true and sel_field to id.',
     ACTIVE_MEMBER_RISK,
     AGENT_IDENTITY_RISK,
     OTHER_TABLE_RISK

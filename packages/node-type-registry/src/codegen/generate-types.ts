@@ -428,6 +428,67 @@ function findTable(
   return tables.find((tbl) => tbl.schemaName === schemaName && tbl.name === tableName);
 }
 
+/**
+ * The processing lanes a file field can state, as the backend lists them: the
+ * option key, and the node types whose parameters the lane's value takes (one
+ * per field type the key applies to). `list` is set when the node has a
+ * parameter of the lane's own name, which a bare list stands for.
+ */
+const FILE_FIELD_LANES: { key: string; nodes: string[]; list?: boolean; doc: string }[] = [
+  {
+    key: 'versions',
+    nodes: ['ProcessImageVersions'],
+    list: true,
+    doc: 'Image fields. Resized versions of the image, written into the image document as `versions`. On by default with the default set of sizes; a list states the versions instead, an object any ProcessImageVersions parameter, false turns it off.'
+  },
+  {
+    key: 'embedding',
+    nodes: ['ProcessImageEmbedding', 'ProcessFileEmbedding'],
+    doc: 'Image and upload fields. A vector embedding of the file. Off by default; true takes the node defaults, an object any ProcessImageEmbedding (image) or ProcessFileEmbedding (upload) parameter. The vector column is `<field>_embedding` unless `field_name` names it.'
+  },
+  {
+    key: 'extraction',
+    nodes: ['ProcessExtraction'],
+    doc: 'Upload fields. Text and metadata extracted from the file. Off by default; true takes the node defaults, an object any ProcessExtraction parameter. The columns are `<field>_text` and `<field>_metadata` unless `text_field` / `metadata_field` name them.'
+  }
+];
+
+function buildBlueprintFieldProcessing(): t.ExportNamedDeclaration {
+  const paramsOf = (node: string) => t.tsTypeReference(t.identifier(`${node}Params`));
+  const withoutField = (node: string) =>
+    t.tsTypeReference(
+      t.identifier('Omit'),
+      t.tsTypeParameterInstantiation([paramsOf(node), strLit('file_field')])
+    );
+  return addJSDoc(
+    exportInterface(
+      'BlueprintFieldProcessing',
+      FILE_FIELD_LANES.map((lane) =>
+        addJSDoc(
+          optionalProp(
+            lane.key,
+            t.tsUnionType([
+              t.tsBooleanKeyword(),
+              ...(lane.list
+                ? lane.nodes.map((node) =>
+                  t.tsTypeReference(
+                    t.identifier('NonNullable'),
+                    t.tsTypeParameterInstantiation([
+                      t.tsIndexedAccessType(paramsOf(node), strLit(lane.key))
+                    ])
+                  ))
+                : []),
+              ...lane.nodes.map(withoutField)
+            ])
+          ),
+          lane.doc
+        )
+      )
+    ),
+    'What runs on the files of an upload or image field. Each key is a lane and provisions the same node an entry in nodes[] would, with file_field filled in; naming the field in such a node instead leaves that lane to the node.'
+  );
+}
+
 function buildBlueprintField(): t.ExportNamedDeclaration {
   // Blueprint field input is not the stored metaschema field row.
   return addJSDoc(
@@ -440,7 +501,17 @@ function buildBlueprintField(): t.ExportNamedDeclaration {
       optionalProp('max', t.tsNumberKeyword()),
       optionalProp('regexp', t.tsStringKeyword()),
       optionalProp('index', strUnion(['btree', 'gin', 'gist', 'brin', 'hash'])),
-      addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.')
+      addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.'),
+      addJSDoc(
+        optionalProp(
+          'processing',
+          t.tsUnionType([
+            t.tsLiteralType(t.booleanLiteral(false)),
+            t.tsTypeReference(t.identifier('BlueprintFieldProcessing'))
+          ])
+        ),
+        'Upload and image fields only. The processing lanes that run on the field\'s files. Omitted, an image field newly added by the blueprint renders the default versions and nothing else runs; false runs nothing.'
+      )
     ]),
     'A custom field (column) to add to a blueprint table.'
   );
@@ -624,7 +695,7 @@ function buildNodeTypes(
     addJSDoc(
       exportTypeAlias(
         'BlueprintNodeShorthand',
-        strUnion(dataNodes.map((nt) => nt.name))
+        strUnion(dataNodes.filter((nt) => !needsNodeData(nt)).map((nt) => nt.name))
       ),
       'String shorthand -- just the node type name.'
     )
@@ -887,8 +958,20 @@ function buildBlueprintBucketSeed(): t.ExportNamedDeclaration {
         'Human-readable description of this bucket.'
       ),
       addJSDoc(
+        optionalProp('type', strUnion(['public', 'private', 'temp'])),
+        'Bucket access type. Defaults to public when is_public is true and private otherwise.'
+      ),
+      addJSDoc(
         optionalProp('is_public', t.tsBooleanKeyword()),
-        'Whether the bucket is publicly readable. Defaults to false.'
+        'Whether the bucket is publicly readable. Must agree with type when both are supplied.'
+      ),
+      addJSDoc(
+        optionalProp('destination', t.tsStringKeyword()),
+        'Destination bucket key for a temporary bucket.'
+      ),
+      addJSDoc(
+        optionalProp('staging_ttl', t.tsStringKeyword()),
+        'Maximum staging time for a temporary bucket as a PostgreSQL interval.'
       ),
       addJSDoc(
         optionalProp(
@@ -907,7 +990,7 @@ function buildBlueprintBucketSeed(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsStringKeyword())
         ),
         'CORS allowed origins for this bucket.'
-      )
+      ),
     ]),
     'A bucket seed entry for storage.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped).'
   );
@@ -934,10 +1017,6 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('key', t.tsStringKeyword()),
         'Module key discriminator. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_buckets. Max 16 chars, lowercase snake_case.'
-      ),
-      addJSDoc(
-        optionalProp('storage_key', t.tsStringKeyword()),
-        '@deprecated Use `key` instead. Kept for backward compatibility.'
       ),
       addJSDoc(
         optionalProp(
@@ -969,7 +1048,7 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('confirm_upload_delay', t.tsStringKeyword()),
-        'Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Defaults to "30 seconds".'
+        'Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Every files table runs the confirm loop: the AFTER INSERT trigger enqueues a storage:confirm_upload job that verifies the object exists in S3 before moving status from requested to uploaded, and expires a requested row whose bytes never arrived within upload_url_expiry_seconds. Defaults to "30 seconds".'
       ),
       addJSDoc(
         optionalProp('staging', t.tsBooleanKeyword()),
@@ -1244,6 +1323,10 @@ function buildBlueprintAgentConfig(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('has_agents', t.tsBooleanKeyword()),
         'Whether to provision the agent registry (agent table + agent_persona table). Implies has_resources = true. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_repository_resources', t.tsBooleanKeyword()),
+        'Whether to attach resources to the repositories they apply to, through an agent_resource_repository junction (resource_id, repository_id, priority). Requires resources and a repository module at this same scope — with no repository catalog to point at, the junction is not created. Defaults to false.'
       ),
       addJSDoc(
         optionalProp('has_runs', t.tsBooleanKeyword()),
@@ -1818,7 +1901,9 @@ function tsTypeSchema(type: t.TSType): Json {
   if (t.isTSBooleanKeyword(type)) return { type: 'boolean' };
   if (t.isTSUnknownKeyword(type) || t.isTSAnyKeyword(type)) return {};
   if (t.isTSNeverKeyword(type)) return { not: {} };
-  if (t.isTSLiteralType(type) && t.isStringLiteral(type.literal)) return { const: type.literal.value };
+  if (t.isTSLiteralType(type) && (t.isStringLiteral(type.literal) || t.isBooleanLiteral(type.literal) || t.isNumericLiteral(type.literal))) {
+    return { const: type.literal.value };
+  }
   if (t.isTSArrayType(type)) return { type: 'array', items: tsTypeSchema(type.elementType) };
   if (t.isTSTypeLiteral(type)) return membersSchema(type.members);
   if (t.isTSIntersectionType(type)) return { allOf: type.types.map(tsTypeSchema) };
@@ -1831,11 +1916,36 @@ function tsTypeSchema(type: t.TSType): Json {
     }
     return { anyOf: type.types.map(tsTypeSchema) };
   }
+  if (t.isTSIndexedAccessType(type) && t.isTSLiteralType(type.indexType) && t.isStringLiteral(type.indexType.literal)) {
+    return (nodeParams(type.objectType).properties as Json)[type.indexType.literal.value] as Json;
+  }
   if (t.isTSTypeReference(type) && t.isIdentifier(type.typeName)) {
-    if (type.typeName.name === 'Record') return { type: 'object', additionalProperties: tsTypeSchema(type.typeParameters.params[1]) };
+    const params = type.typeParameters?.params ?? [];
+    if (type.typeName.name === 'Record') return { type: 'object', additionalProperties: tsTypeSchema(params[1]) };
+    // The parameter schemas allow no null, so NonNullable leaves them as they are.
+    if (type.typeName.name === 'NonNullable') return tsTypeSchema(params[0]);
+    if (type.typeName.name === 'Omit') {
+      const omitted = (tsTypeSchema(params[1]).enum as string[]) ?? [tsTypeSchema(params[1]).const as string];
+      const schema = nodeParams(params[0]);
+      return {
+        ...schema,
+        properties: Object.fromEntries(Object.entries(schema.properties as Json).filter(([key]) => !omitted.includes(key))),
+        ...(schema.required ? { required: (schema.required as string[]).filter((key) => !omitted.includes(key)) } : {})
+      };
+    }
     return refTo(type.typeName.name);
   }
   throw new Error(`blueprint JSON Schema: no rule turns the TS type ${type.type} into JSON Schema; add one to tsTypeSchema.`);
+}
+
+// A node's parameters as a caller writes them, for Omit<...Params> and ...Params['key'] in the structural types.
+function nodeParams(type: t.TSType): Json {
+  const name = t.isTSTypeReference(type) && t.isIdentifier(type.typeName) ? type.typeName.name : undefined;
+  const node = allNodeTypes.find((nt) => `${nt.name}Params` === name);
+  if (!node) {
+    throw new Error(`blueprint JSON Schema: ${name ?? type.type} is not a node's parameters; Omit and indexed access are turned into JSON Schema for node parameters only.`);
+  }
+  return nodeDataSchema(node.parameter_schema, new Map());
 }
 
 // The `$type` literal of an object type, which makes a union of them a union keyed by `$type`.
@@ -1867,17 +1977,31 @@ function byType(base: Json, branches: Array<{ name: string; then: Json }>): Json
     ...base,
     required: [...new Set(['$type', ...((base.required as string[]) ?? [])])],
     properties: { ...properties, $type: { enum: branches.map((branch) => branch.name) } },
-    allOf: branches.map((branch) => ({ if: { properties: { $type: { const: branch.name } }, required: ['$type'] }, then: branch.then }))
+    allOf: [
+      ...((base.allOf ?? []) as Json[]),
+      ...branches.map((branch) => ({ if: { properties: { $type: { const: branch.name } }, required: ['$type'] }, then: branch.then }))
+    ]
   };
+}
+
+function needsNodeData(node: NodeTypeDefinition): boolean {
+  return (node.parameter_schema.required ?? []).some((key) => {
+    const property = node.parameter_schema.properties?.[key];
+    return !property?.readOnly && property?.default === undefined;
+  });
+}
+
+function nodeDataBranches(nodes: NodeTypeDefinition[]): Array<{ name: string; then: Json }> {
+  return nodes.map((nt) => ({
+    name: nt.name,
+    then: { properties: { data: refTo(`${nt.name}Params`) }, ...(needsNodeData(nt) ? { required: ['data'] } : {}) }
+  }));
 }
 
 function nodeEntrySchema(dataNodes: NodeTypeDefinition[]): Json {
   return byType(
     { type: 'object', properties: { data: { type: 'object' } }, additionalProperties: false },
-    dataNodes.map((nt) => ({
-      name: nt.name,
-      then: { properties: { data: refTo(`${nt.name}Params`) }, ...((nt.parameter_schema.required ?? []).length ? { required: ['data'] } : {}) }
-    }))
+    nodeDataBranches(dataNodes)
   );
 }
 
@@ -1885,7 +2009,7 @@ function nodeEntrySchema(dataNodes: NodeTypeDefinition[]): Json {
 const PRIVILEGE_PATTERN = '^([Ss][Ee][Ll][Ee][Cc][Tt]|[Ii][Nn][Ss][Ee][Rr][Tt]|[Uu][Pp][Dd][Aa][Tt][Ee]|[Dd][Ee][Ll][Ee][Tt][Ee])$';
 
 function policySchemas(authzNodes: NodeTypeDefinition[]): Record<string, Json> {
-  const data = authzNodes.map((nt) => ({ name: nt.name, then: { properties: { data: refTo(`${nt.name}Params`) } } }));
+  const data = nodeDataBranches(authzNodes);
   return {
     BlueprintPolicyWithCheck: byType({ type: 'object', properties: { data: { type: 'object' } }, additionalProperties: false }, data),
     BlueprintPolicy: {
@@ -1911,6 +2035,31 @@ function policySchemas(authzNodes: NodeTypeDefinition[]): Record<string, Json> {
   };
 }
 
+function namedOrModuleTarget(name: string, schema: string, module: string): Json {
+  return {
+    oneOf: [
+      { required: [name], not: { required: [module] } },
+      { required: [module], not: { anyOf: [{ required: [name] }, { required: [schema] }] } }
+    ]
+  };
+}
+
+function tableTargetSchema(): Json {
+  return {
+    ...namedOrModuleTarget('table_name', 'schema_name', 'module'),
+    if: { required: ['provisions'] },
+    then: {
+      required: ['module'],
+      not: { anyOf: ['policies', 'grants', 'nodes', 'fields'].map((key) => ({ required: [key] })) },
+      properties: {
+        module: { not: { required: ['table'] } },
+        provisions: { minProperties: 1 }
+      }
+    },
+    else: { properties: { module: refTo('BlueprintModuleTableRef') } }
+  };
+}
+
 function relationSchema(relationNodes: NodeTypeDefinition[]): Json {
   const ends: Json = {
     source_table: { type: 'string' },
@@ -1921,15 +2070,27 @@ function relationSchema(relationNodes: NodeTypeDefinition[]): Json {
     target_module: refTo('BlueprintModuleTableRef')
   };
   return byType(
-    { type: 'object', description: 'A relation entry in a blueprint definition.', properties: ends },
+    {
+      type: 'object',
+      description: 'A relation entry in a blueprint definition.',
+      properties: ends,
+      allOf: ['source', 'target'].map((end) => namedOrModuleTarget(`${end}_table`, `${end}_schema`, `${end}_module`))
+    },
     relationNodes.map((nt) => {
       const params = nodeDataSchema(nt.parameter_schema, new Map());
       const spatial = nt.name === 'RelationSpatial';
+      const resolved = ['source_table_id', 'target_table_id', 'source_field_id', 'target_field_id'];
+      const required = ((params.required ?? []) as string[]).filter((key) => !resolved.includes(key));
+      if (spatial) required.push('source_field', 'target_field');
       return {
         name: nt.name,
         then: {
-          properties: { ...(params.properties as Json), ...(spatial ? { source_field: { type: 'string' }, target_field: { type: 'string' } } : {}) },
-          ...(spatial ? { required: ['source_field', 'target_field'] } : {})
+          properties: {
+            ...(params.properties as Json),
+            ...(spatial ? { source_field: { type: 'string' }, target_field: { type: 'string' } } : {}),
+            ...(nt.name === 'RelationManyToMany' ? { policies: { type: 'array', items: refTo('BlueprintPolicy') } } : {})
+          },
+          ...(required.length ? { required } : {})
         }
       };
     })
@@ -1944,7 +2105,14 @@ function buildBlueprintJsonSchema(statements: t.Statement[], nodeTypes: NodeType
   for (const statement of statements) {
     if (!t.isExportNamedDeclaration(statement)) continue;
     const declaration = statement.declaration;
-    if (t.isTSInterfaceDeclaration(declaration)) declared.set(declaration.id.name, () => withDoc(membersSchema(declaration.body.body), statement));
+    if (t.isTSInterfaceDeclaration(declaration)) {
+      declared.set(declaration.id.name, () => {
+        const schema = withDoc(membersSchema(declaration.body.body), statement);
+        return declaration.id.name === 'BlueprintTable'
+          ? { ...schema, ...tableTargetSchema() }
+          : schema;
+      });
+    }
     if (t.isTSTypeAliasDeclaration(declaration)) declared.set(declaration.id.name, () => withDoc(tsTypeSchema(declaration.typeAnnotation), statement));
   }
   const dataNodes = nodeTypes.filter((nt) => nt.category !== 'relation' && nt.category !== 'view');
@@ -1964,7 +2132,7 @@ function buildBlueprintJsonSchema(statements: t.Statement[], nodeTypes: NodeType
     ),
     additionalProperties: false
   });
-  declared.set('BlueprintNodeShorthand', { enum: dataNodes.map((nt) => nt.name), description: 'String shorthand -- just the node type name.' });
+  declared.set('BlueprintNodeShorthand', { enum: dataNodes.filter((nt) => !needsNodeData(nt)).map((nt) => nt.name), description: 'String shorthand -- just the node type name.' });
   declared.set('BlueprintNodeObject', { ...nodeEntrySchema(dataNodes), description: 'Object form -- { $type, data } with typed parameters.' });
   for (const [name, schema] of Object.entries(policySchemas(policyNodeTypes))) declared.set(name, schema);
   declared.set('BlueprintRelation', relationSchema(nodeTypes.filter((nt) => nt.category === 'relation')));
@@ -2073,6 +2241,7 @@ function renderBlueprintSchema(schema: Json): string {
     '// Regenerate with:',
     '//   cd packages/node-type-registry && pnpm generate:types',
     '',
+    '/* eslint-disable */',
     "import type { JSONSchema } from './types';",
     '',
     '/** JSON Schema (draft-07) of a blueprint definition: the shapes construct_blueprint() reads, with each node\'s data checked against its parameter_schema in the form a caller writes it. */',
@@ -2141,6 +2310,7 @@ function buildProgram(meta?: MetaTableInfo[]): { types: string; schema: string }
     ? 'Derived from _meta'
     : 'Static fallback (no _meta provided)';
   statements.push(sectionComment(`Structural types — ${metaSource}`));
+  statements.push(buildBlueprintFieldProcessing());
   statements.push(buildBlueprintField());
   statements.push(buildBlueprintPolicyWithCheck(policyNodeTypes));
   statements.push(buildBlueprintPolicy(policyNodeTypes, meta));

@@ -2,23 +2,35 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-jest.mock('../src/auth', () => ({
+jest.mock('@agentic-kit/session', () => ({
+  ...jest.requireActual('@agentic-kit/session'),
   signIn: jest.fn(),
   signOut: jest.fn(),
-  refreshApiKeyIfNeeded: jest.fn()
+  verifySession: jest.fn()
 }));
 
-import { AccountSession, saveSession } from '../src/account-store';
-import { signIn, signOut } from '../src/auth';
-import { backendFromApiEndpoint, loadBackendConfig, saveBackendConfig } from '../src/backend-store';
+import {
+  AccountSession,
+  addBackend,
+  backendFromEndpoints,
+  saveSession,
+  selectBackend,
+  signIn,
+  signOut,
+  verifySession
+} from '@agentic-kit/session';
+
 import { login, logout, whoami } from '../src/commands';
 import { AgentCliConfig, loadConfig } from '../src/config';
 
-const LOCAL = backendFromApiEndpoint('http://api.localhost:3000/graphql');
-const REMOTE = backendFromApiEndpoint('https://api.example.com/graphql');
+const LOCAL = backendFromEndpoints({ api: 'http://api.localhost:3000/graphql' });
+const REMOTE = backendFromEndpoints({ api: 'https://api.example.com/graphql' });
+
+const useBackend = (config: AgentCliConfig) => selectBackend(config.store, addBackend(config.store, LOCAL).name);
 
 const signInMock = signIn as jest.Mock;
 const signOutMock = signOut as jest.Mock;
+const verifyMock = verifySession as jest.Mock;
 
 let home: string;
 let config: AgentCliConfig;
@@ -44,6 +56,8 @@ beforeEach(() => {
   });
   signInMock.mockReset();
   signOutMock.mockReset();
+  verifyMock.mockReset();
+  verifyMock.mockResolvedValue({ kind: 'accepted' });
   process.exitCode = undefined;
 });
 
@@ -56,47 +70,25 @@ afterEach(() => {
 const output = () => logs.join('\n');
 
 describe('login', () => {
-  it('signs in against the named API endpoint and persists all five planes', async () => {
-    signInMock.mockResolvedValue(session);
+  it('signs in against the backend derived from the named API endpoint', async () => {
+    signInMock.mockResolvedValue({ session, context: 'example.com', apiKey: { kind: 'minted' }, previousKey: { kind: 'absent' } });
 
-    await login(config, { apiUrl: LOCAL.apiEndpoint, email: 'dev@example.com', password: 'pw' });
+    await login(config, { apiUrl: REMOTE.apiEndpoint, email: 'dev@example.com', password: 'pw' });
 
     expect(signInMock).toHaveBeenCalledWith({
       store: config.store,
-      context: 'localhost-3000',
-      authEndpoint: LOCAL.authEndpoint,
+      backend: REMOTE,
       email: 'dev@example.com',
       password: 'pw'
     });
-    expect(loadBackendConfig(config.store)).toEqual(LOCAL);
     expect(output()).toContain('signed in as dev@example.com');
     expect(output()).toContain('cnc_li...abcd');
-  });
-
-  it('derives auth and modules endpoints from a custom API URL', async () => {
-    signInMock.mockResolvedValue(session);
-
-    await login(config, {
-      apiUrl: 'https://api.example.com/graphql',
-      email: 'dev@example.com',
-      password: 'pw'
-    });
-
-    expect(signInMock).toHaveBeenCalledWith(
-      expect.objectContaining({ authEndpoint: 'https://auth.example.com/graphql' })
-    );
-    expect(loadBackendConfig(config.store)).toEqual({
-      apiEndpoint: 'https://api.example.com/graphql',
-      authEndpoint: 'https://auth.example.com/graphql',
-      modulesEndpoint: 'https://modules.example.com/graphql',
-      agentEndpoint: 'https://agent.example.com/graphql',
-      computeEndpoint: 'https://compute.example.com/graphql'
-    });
+    expect(output()).toContain('session stored in context example.com');
   });
 
   it('ships no backend: with no API endpoint named it refuses before any network call', async () => {
     await expect(login(config, { email: 'dev@example.com', password: 'pw' })).rejects.toThrow(
-      'Invalid API endpoint URL: (empty)'
+      'is not an absolute URL'
     );
     expect(signInMock).not.toHaveBeenCalled();
   });
@@ -104,62 +96,67 @@ describe('login', () => {
   it('rejects an invalid custom URL before any network call', async () => {
     await expect(
       login(config, { apiUrl: 'not a url', email: 'dev@example.com', password: 'pw' })
-    ).rejects.toThrow('Invalid API endpoint URL');
+    ).rejects.toThrow('is not an absolute URL');
     expect(signInMock).not.toHaveBeenCalled();
   });
 
-  it('warns when the session lacks an API key after sign-in', async () => {
-    signInMock.mockResolvedValue({ ...session, apiKey: undefined, keyId: undefined });
+  it('warns when no API key was minted, and when the replaced key could not be revoked', async () => {
+    signInMock.mockResolvedValue({
+      session,
+      context: 'localhost-3000',
+      apiKey: { kind: 'not-minted', reason: 'API keys are disabled' },
+      previousKey: { kind: 'failed', keyId: 'key-0', reason: 'offline' }
+    });
 
     await login(config, { apiUrl: LOCAL.apiEndpoint, email: 'dev@example.com', password: 'pw' });
 
-    expect(output()).toContain('API key mint failed');
-  });
-
-  it('does not persist the backend config when sign-in fails', async () => {
-    signInMock.mockRejectedValue(new Error('Invalid credentials'));
-
-    await expect(
-      login(config, { apiUrl: REMOTE.apiEndpoint, email: 'dev@example.com', password: 'bad' })
-    ).rejects.toThrow('Invalid credentials');
-    expect(loadBackendConfig(config.store)).toBeNull();
+    expect(output()).toContain('no new API key was minted (API keys are disabled); the previous key stays in use');
+    expect(output()).toContain('key-0 of the replaced session could not be revoked (offline)');
   });
 });
 
 describe('logout', () => {
-  it('signs out against the stored backend', async () => {
-    saveBackendConfig(config.store, REMOTE);
-    signOutMock.mockResolvedValue(true);
+  it('signs out of the active backend', async () => {
+    signOutMock.mockResolvedValue({ kind: 'cleared', context: 'localhost-3000', key: { kind: 'revoked', keyId: 'key-1' } });
 
     await logout(config);
 
-    expect(signOutMock).toHaveBeenCalledWith({
-      store: config.store,
-      authEndpoint: REMOTE.authEndpoint
-    });
+    expect(signOutMock).toHaveBeenCalledWith({ store: config.store, session: expect.objectContaining({ kind: 'no-backend' }) });
     expect(output()).toContain('signed out');
   });
 
+  it('signs out of the session the environment gives, and says nothing stored was removed', async () => {
+    const saved = { ...process.env };
+    Object.assign(process.env, { CONSTRUCTIVE_USER_ID: 'env-user', CONSTRUCTIVE_ACCESS_TOKEN: 'env-token', CONSTRUCTIVE_API_ENDPOINT: REMOTE.apiEndpoint });
+    try {
+      signOutMock.mockResolvedValue({ kind: 'from-environment' });
+      await logout(config);
+      expect(signOutMock).toHaveBeenCalledWith({ store: config.store, session: expect.objectContaining({ kind: 'signed-in', source: 'env' }) });
+      expect(output()).toContain('the session comes from the environment');
+    } finally {
+      process.env = saved;
+    }
+  });
+
   it('reports when there is no session', async () => {
-    saveBackendConfig(config.store, LOCAL);
-    signOutMock.mockResolvedValue(false);
+    signOutMock.mockResolvedValue({ kind: 'not-signed-in', context: null });
     await logout(config);
     expect(output()).toContain('not signed in');
   });
 
-  it('never signs out against a guessed backend when none was chosen', async () => {
+  it('says the session was cleared but the key stays valid when the revoke failed', async () => {
+    signOutMock.mockResolvedValue({ kind: 'cleared', context: 'localhost-3000', key: { kind: 'failed', keyId: 'key-1', reason: 'offline' } });
     await logout(config);
-    expect(signOutMock).not.toHaveBeenCalled();
-    expect(output()).toContain('not signed in');
+    expect(output()).toContain('session cleared, but the API key key-1 could not be revoked (offline)');
   });
 });
 
 describe('whoami', () => {
-  it('prints the session details with a masked API key', () => {
-    saveBackendConfig(config.store, LOCAL);
-    saveSession(config.store, session);
+  it('prints the session details with a masked API key', async () => {
+    useBackend(config);
+    saveSession(config.store, { ...session, issuedFor: LOCAL });
 
-    whoami(config);
+    await whoami(config);
 
     expect(process.exitCode).toBeUndefined();
     expect(output()).toContain('signed in as dev@example.com');
@@ -170,8 +167,46 @@ describe('whoami', () => {
     expect(output()).not.toContain('access-token');
   });
 
-  it('exits 1 with a sign-in hint when signed out', () => {
-    whoami(config);
+  it('says the backend rejected the credential, and exits 1', async () => {
+    useBackend(config);
+    saveSession(config.store, { ...session, issuedFor: LOCAL });
+    verifyMock.mockResolvedValue({ kind: 'rejected', reason: 'The server rejected the credential (UNAUTHENTICATED).', code: 'UNAUTHENTICATED' });
+
+    await whoami(config);
+
+    expect(process.exitCode).toBe(1);
+    expect(output()).toContain('credential: rejected');
+    expect(output()).toContain('Run `agent login` to sign in again');
+  });
+
+  it('names a stored session that another backend issued, and does not use it', async () => {
+    useBackend(config);
+    saveSession(config.store, { ...session, issuedFor: { ...LOCAL, authEndpoint: 'http://auth.elsewhere.localhost/graphql' } });
+
+    await whoami(config);
+
+    expect(process.exitCode).toBe(1);
+    expect(output()).toContain('but the session was issued for http://auth.elsewhere.localhost/graphql');
+    expect(verifyMock).not.toHaveBeenCalled();
+  });
+
+  it('names the missing plane of a context another app wrote instead of reporting a backend', async () => {
+    const four = LOCAL;
+    config.store.createContext('localnet', {
+      endpoint: four.apiEndpoint,
+      targets: { api: { endpoint: four.apiEndpoint }, auth: { endpoint: four.authEndpoint }, modules: { endpoint: four.modulesEndpoint }, agent: { endpoint: four.agentEndpoint } }
+    });
+    config.store.setCurrentContext('localnet');
+    saveSession(config.store, session);
+
+    await whoami(config);
+
+    expect(process.exitCode).toBe(1);
+    expect(output()).toContain('"localnet" lacks the compute endpoint');
+  });
+
+  it('exits 1 with a sign-in hint when signed out', async () => {
+    await whoami(config);
     expect(process.exitCode).toBe(1);
     expect(output()).toContain('run `agent login`');
   });

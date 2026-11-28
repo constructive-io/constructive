@@ -1,7 +1,7 @@
 {
   "name": "node-type-registry",
   "version": "1.23.0",
-  "description": "Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Relation*, and View* node types.",
+  "description": "Node type definitions for the Constructive blueprint system: every Authz*, Data*, Relation* and View* node type, with the module presets and content presets.",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
   "module": "esm/index.js",
@@ -29,7 +29,11 @@
     "test:watch": "jest --watch",
     "generate:types": "ts-node src/codegen/generate-types.ts",
     "generate:json": "ts-node src/codegen/generate-json.ts --outdir dist",
-    "generate:reference": "ts-node src/codegen/generate-reference.ts"
+    "generate:reference": "ts-node src/codegen/generate-reference.ts",
+    "sync:registry": "node scripts/sync-registry.mjs"
+  },
+  "dependencies": {
+    "blocks-schema": "^0.5.4"
   },
   "devDependencies": {
     "@babel/generator": "^7.29.0",

@@ -6,9 +6,13 @@ import type { NodeTypeDefinition } from '../types';
  *
  * At the SQL layer, data_image_embedding delegates entirely to
  * data_file_embedding, merging image-specific defaults before forwarding.
- * The parameter schema here is intentionally identical to ProcessFileEmbedding;
- * only the defaults differ (dimensions: 512, task: embedding:process_image_embedding,
- * mime_patterns: ['image/%']).
+ * The parameter schema is ProcessFileEmbedding's minus extraction/chunks — it
+ * is direct mode only until an OCR worker exists — and the defaults differ
+ * (dimensions: 512, mime_patterns: ['image/%']). The
+ * task is the same file-shaped record worker, embedding:process_file_embedding:
+ * the trigger payload is the file row's columns (file_id, key, mime_type,
+ * bucket_id), which embedding:process_image_embedding — the flow function that
+ * embeds an {image_url, alt_text} it is handed — does not accept.
  *
  * Kept as a separate node type for backward compatibility — existing
  * blueprints that reference ProcessImageEmbedding continue to work unchanged.
@@ -21,8 +25,8 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
   description:
     'Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding ' +
     'with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=[\'image/%\'], ' +
-    'task_identifier=\'embedding:process_image_embedding\', direct mode (no extraction). ' +
-    'Accepts all ProcessFileEmbedding parameters — any overrides are forwarded through.',
+    'task_identifier=\'embedding:process_file_embedding\', direct mode only: there is no ' +
+    'image extraction (OCR) worker, so extraction is refused. Every other parameter is forwarded through.',
   parameter_schema: {
     type: 'object',
     $defs: conditionDefs,
@@ -86,8 +90,12 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
       task_identifier: {
         type: 'string',
         format: 'function-ref',
-        description: 'Job task identifier for the image embedding worker',
-        default: 'embedding:process_image_embedding'
+        description:
+          'Job task identifier for the image embedding worker. The payload is the file ' +
+          'row (file_id, key, mime_type, bucket_id), so the task must be a record worker ' +
+          'that reads the object itself — not embedding:process_image_embedding, which ' +
+          'embeds an image_url it is handed.',
+        default: 'embedding:process_file_embedding'
       },
       events: {
         type: 'array',
@@ -103,7 +111,8 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
           'When set, the trigger reads the object key, MIME type and bucket id ' +
           'out of that document (NEW.<file_field> ->> \'key\', ...) instead of ' +
           'requiring key/mime_type/bucket_id columns beside it, and the MIME ' +
-          'patterns match against <file_field> ->> \'mime\'.'
+          'patterns match against <file_field> ->> \'mime\'. ' +
+          'An array column (image[]/upload[]) is refused (PROCESS_IMAGE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED): one vector column cannot hold a vector per element.'
       },
       payload_custom: {
         type: 'object',
@@ -143,53 +152,6 @@ export const ProcessImageEmbedding: NodeTypeDefinition = {
           obj_field: { type: 'string', format: 'column-ref', description: 'Column on the related table that holds the entity_id' }
         },
         required: ['obj_table', 'obj_field']
-      },
-
-      // ── Extraction config (optional — enables extract mode) ────────
-      extraction: {
-        type: 'object',
-        description:
-          'Text extraction configuration. Forwarded to ProcessFileEmbedding. ' +
-          'When present, enables extract mode (e.g., OCR for images).',
-        properties: {
-          text_field: {
-            type: 'string',
-            format: 'column-ref',
-            description: 'Field to store extracted text',
-            default: 'extracted_text'
-          },
-          metadata_field: {
-            type: 'string',
-            format: 'column-ref',
-            description: 'JSONB field for extraction metadata',
-            default: 'extracted_metadata'
-          }
-        }
-      },
-
-      // ── Chunking config (optional — forwarded to ProcessFileEmbedding) ─
-      chunks: {
-        type: 'object',
-        description:
-          'Chunking configuration. Forwarded to ProcessFileEmbedding. ' +
-          'Only meaningful when extraction is also provided.',
-        properties: {
-          content_field_name: {
-            type: 'string',
-            format: 'column-ref',
-            default: 'content'
-          },
-          chunk_size: { type: 'integer', default: 1000 },
-          chunk_overlap: { type: 'integer', default: 200 },
-          chunk_strategy: {
-            type: 'string',
-            enum: ['fixed', 'sentence', 'paragraph', 'semantic'],
-            default: 'paragraph'
-          },
-          metadata_fields: { type: 'object' },
-          enqueue_chunking_job: { type: 'boolean', default: true },
-          chunking_task_name: { type: 'string', format: 'function-ref', default: 'embedding:chunk_record' }
-        }
       }
     }
   },

@@ -42,6 +42,6 @@ export const AuthzDatabaseClaim: NodeTypeDefinition = {
     'Rows people reach through the API: use a membership policy.'
   ],
   risks: [
-    'Every session the platform binds to that database passes, including an API key used through the database connection proxy.'
+    'By default, every session the platform binds to that database passes, including an API key used through the database connection proxy. You can require the platform to attest the connection instead.'
   ]
 };

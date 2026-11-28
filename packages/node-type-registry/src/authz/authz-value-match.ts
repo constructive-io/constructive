@@ -38,6 +38,7 @@ export const AuthzValueMatch: NodeTypeDefinition = {
       },
       join: {
         type: 'array',
+        minItems: 1,
         description: 'Join conditions between the protected row and the referenced table',
         items: {
           type: 'object',

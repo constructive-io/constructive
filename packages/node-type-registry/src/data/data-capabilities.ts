@@ -16,8 +16,19 @@ export const DataCapabilities: NodeTypeDefinition = {
         default: 'required_capabilities'
       },
       capabilities: {
-        type: 'string',
-        description: 'Selects the capabilities module whose bit numbering the mask is measured in, by scope (e.g. "app", "org") or by table prefix. Required only when the database has more than one; several with no selector raises naming the candidates.'
+        type: 'object',
+        description: 'Selector for the capabilities module whose bit numbering the mask is measured in, e.g. {"scope": "org"}. Every key given must match exactly one module; none or several raises naming the candidates. Required only when the database has more than one.',
+        properties: {
+          scope: {
+            type: 'string',
+            description: 'Scope the module is installed at ("app", "org", or an entity type prefix).'
+          },
+          prefix: {
+            type: 'string',
+            description: 'Table prefix of the module instance; rarely needed since prefix follows scope.'
+          }
+        },
+        additionalProperties: false
       },
       default: {
         type: 'array',

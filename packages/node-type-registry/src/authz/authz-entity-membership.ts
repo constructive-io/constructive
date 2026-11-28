@@ -44,7 +44,7 @@ export const AuthzEntityMembership: NodeTypeDefinition = {
         format: 'column-ref',
         'x-column-scope': 'local',
         description:
-          'Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capability/capabilities — both are ANDed.',
+          'Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capabilities — both checks must pass.',
       },
       is_admin: {
         type: 'boolean',

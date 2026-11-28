@@ -5,7 +5,7 @@ export const DataInheritFromParent: NodeTypeDefinition = {
   slug: 'data_inherit_from_parent',
   category: 'data',
   display_name: 'Inherit From Parent',
-  description: 'BEFORE INSERT trigger that copies specified fields from a parent table via a foreign key. The parent row is looked up through RLS (SECURITY INVOKER), so the insert fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files.',
+  description: 'BEFORE INSERT OR UPDATE trigger that copies specified fields from a parent table via a foreign key; on UPDATE the fields are re-copied only when the parent FK changes. The parent row is looked up through RLS (SECURITY INVOKER), so the insert or update fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files.',
   parameter_schema: {
     type: 'object',
     properties: {

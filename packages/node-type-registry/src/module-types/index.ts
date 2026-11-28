@@ -82,6 +82,12 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
     description: 'Provisions database usage logging.'
   },
   {
+    name: 'refusal_log_module',
+    display_name: 'Refusal Log',
+    description: 'Provisions the platform-only admission-control refusal ledger and its daily rollup.',
+    internal: true
+  },
+  {
     name: 'devices_module',
     display_name: 'Devices',
     description: 'Provisions remembered user devices.'
@@ -266,7 +272,12 @@ export const allModuleTypes: ModuleTypeDefinition[] = [
   {
     name: 'principal_auth_module',
     display_name: 'Principal Auth',
-    description: 'Provisions principal authentication state.'
+    description: 'Provisions credentials for principals: API keys, child sessions and token exchange.'
+  },
+  {
+    name: 'principals_module',
+    display_name: 'Principals',
+    description: 'Provisions principals as authorization data: scoped sub-identities, their capability masks and entity scope.'
   },
   {
     name: 'profiles_module',

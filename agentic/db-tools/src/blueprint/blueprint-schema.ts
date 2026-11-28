@@ -60,8 +60,11 @@ export function ruleShapeProblems(rule: unknown, { withCheck = false }: { withCh
   if (envelope.privileges === undefined) problems.push({ path: 'privileges', code: 'privileges', message: '"privileges" is missing: give the privileges the rule covers, from select, insert, update and delete.' });
   if (!withCheck && envelope.with_check !== undefined) problems.push({ path: 'with_check', code: 'not-supported', message: `"with_check" ${RULE_KEY_HINTS.with_check}` });
   const validate = blueprintValidator('BlueprintPolicy');
+  // The rule's own data is left out here, and checkRule reports what it lacks.
+  const dataLeftOut = (error: { instancePath: string; keyword: string; params: Record<string, unknown> }) =>
+    error.instancePath === '' && error.keyword === 'required' && error.params.missingProperty === 'data';
   if (!validate(jsonCopy(withCheck ? envelope : unchecked))) {
-    for (const error of validate.errors.filter(reported)) {
+    for (const error of validate.errors.filter((error) => reported(error) && !dataLeftOut(error))) {
       const path = error.instancePath.split('/').slice(1).join('.');
       if (error.keyword === 'additionalProperties') {
         const key = String(error.params.additionalProperty);
