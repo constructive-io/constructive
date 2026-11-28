@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.38.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.37.8...@constructive-io/graphql-env@3.38.0) (2026-11-28)
+
+### Bug Fixes
+
+- **graphql-server:** bound concurrent cold schema builds and answer refusals with 503 ([#2092](https://github.com/constructive-io/constructive/issues/2092)) ([fa2cf31](https://github.com/constructive-io/constructive/commit/fa2cf310f7fced03d39d3249863c0c6eb423cd84))
+
 ## [3.37.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-env@3.37.7...@constructive-io/graphql-env@3.37.8) (2026-11-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-env

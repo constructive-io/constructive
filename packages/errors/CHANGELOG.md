@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.26.3...@constructive-io/errors@0.27.0) (2026-11-28)
+
+### Bug Fixes
+
+- **graphql-server:** bound concurrent cold schema builds and answer refusals with 503 ([#2092](https://github.com/constructive-io/constructive/issues/2092)) ([fa2cf31](https://github.com/constructive-io/constructive/commit/fa2cf310f7fced03d39d3249863c0c6eb423cd84))
+
 ## [0.26.3](https://github.com/constructive-io/constructive/compare/@constructive-io/errors@0.26.2...@constructive-io/errors@0.26.3) (2026-11-26)
 
 ### Bug Fixes

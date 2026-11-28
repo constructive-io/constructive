@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.11.0](https://github.com/constructive-io/constructive/compare/agentic-kit@2.10.4...agentic-kit@2.11.0) (2026-11-28)
+
+**Note:** Version bump only for package agentic-kit
+
 ## [2.10.4](https://github.com/constructive-io/constructive/compare/agentic-kit@2.10.3...agentic-kit@2.10.4) (2026-11-26)
 
 **Note:** Version bump only for package agentic-kit

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.44.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.9...graphql-server-test@3.44.0) (2026-11-28)
+
+### Bug Fixes
+
+- **deps:** bump inquirerer to 4.9.7 ([#2098](https://github.com/constructive-io/constructive/issues/2098)) ([ab0cd00](https://github.com/constructive-io/constructive/commit/ab0cd009d7fbae17da660ae0251474d1f449c2aa))
+- **graphql-server:** bound concurrent cold schema builds and answer refusals with 503 ([#2092](https://github.com/constructive-io/constructive/issues/2092)) ([fa2cf31](https://github.com/constructive-io/constructive/commit/fa2cf310f7fced03d39d3249863c0c6eb423cd84))
+
 ## [3.43.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@3.43.8...graphql-server-test@3.43.9) (2026-11-26)
 
 ### Bug Fixes

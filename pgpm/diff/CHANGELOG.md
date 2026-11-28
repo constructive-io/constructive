@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.10.19...@pgpmjs/diff@0.11.0) (2026-11-28)
+
+**Note:** Version bump only for package @pgpmjs/diff
+
 ## [0.10.19](https://github.com/constructive-io/constructive/compare/@pgpmjs/diff@0.10.18...@pgpmjs/diff@0.10.19) (2026-11-26)
 
 **Note:** Version bump only for package @pgpmjs/diff

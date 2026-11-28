@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.31.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.30.6...@pgpmjs/server-utils@3.31.0) (2026-11-28)
+
+**Note:** Version bump only for package @pgpmjs/server-utils
+
 ## [3.30.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/server-utils@3.30.5...@pgpmjs/server-utils@3.30.6) (2026-11-26)
 
 **Note:** Version bump only for package @pgpmjs/server-utils

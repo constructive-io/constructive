@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.24.0](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.56...@constructive-io/cli@8.24.0) (2026-11-28)
+
+### Bug Fixes
+
+- **deps:** bump inquirerer to 4.9.7 ([#2098](https://github.com/constructive-io/constructive/issues/2098)) ([ab0cd00](https://github.com/constructive-io/constructive/commit/ab0cd009d7fbae17da660ae0251474d1f449c2aa))
+
 ## [8.23.56](https://github.com/constructive-io/constructive/compare/@constructive-io/cli@8.23.55...@constructive-io/cli@8.23.56) (2026-11-26)
 
 **Note:** Version bump only for package @constructive-io/cli

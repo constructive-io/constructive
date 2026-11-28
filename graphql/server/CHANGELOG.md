@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.37.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.17...@constructive-io/graphql-server@5.37.0) (2026-11-28)
+
+### Bug Fixes
+
+- **graphql-server:** bound concurrent cold schema builds and answer refusals with 503 ([#2092](https://github.com/constructive-io/constructive/issues/2092)) ([fa2cf31](https://github.com/constructive-io/constructive/commit/fa2cf310f7fced03d39d3249863c0c6eb423cd84))
+- **graphql-server:** release the concurrency slot of a request whose client already hung up ([#2099](https://github.com/constructive-io/constructive/issues/2099)) ([e2104c4](https://github.com/constructive-io/constructive/commit/e2104c41f753a4326e896e0545fdf4e72b0be61b))
+
+### Features
+
+- **server:** GET /version answers the server package and its commit ([#2097](https://github.com/constructive-io/constructive/issues/2097)) ([7a536f1](https://github.com/constructive-io/constructive/commit/7a536f12f33cac2972f3d4aeb7a5b611e87a740b))
+
 ## [5.36.17](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@5.36.16...@constructive-io/graphql-server@5.36.17) (2026-11-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

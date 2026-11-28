@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.55...@agentic-kit/pi-host@0.8.0) (2026-11-28)
+
+- feat(agentic)!: the tools layer: plain words and closed schemas in the registry, one rule shape and one effect per tool ([ef140ab](https://github.com/constructive-io/constructive/commit/ef140ab545a0693079de7804e6601a745d004f61))
+
+### BREAKING CHANGES
+
+- every Authz parameter_schema refuses a key it does not
+  list, and the membership nodes require a team kind or a member list. In
+  the generated types, AuthzCompositeParams has no BoolExpr (write AND, OR
+  or NOT), membership_type is a number (name a team kind with entity_type),
+  and AuthzValueExistsParams and AuthzValueMatchParams require join.
+
+the blueprint exports leave @agentic-kit/harness.
+Blueprint, BlueprintZod, FieldBlueprint, TableBlueprint,
+expandBlueprintDefaults, fieldTypeToTypeName, toFieldType, toFieldDefault
+and isInternalPolicy come from @agentic-kit/db-tools; BlueprintDefinition,
+FieldType and FieldDefault come from node-type-registry; the policy
+provisioning helpers (POLICY_PROVISIONING_CONFIG, buildNodeData and the
+rest) and MUTATING_DB_TOOLS are removed.
+GateHost.confirmTool(toolCallId, title, message, preview, target) takes
+the preview and the target as required arguments. ConstructiveGateDeps is
+{ effectOf, precondition }: precondition returns GateReadiness (blocked
+with a failure, or ready with a target), in place of isProjectRunnable,
+hasDataToken and gatedTools. GatePolicy.resolvePrompt returns a
+GateDecision. GateResult may carry a failure. ConfirmPrompt has a
+required target. A PlanRule has $type and policy_role. pi's
+ConfirmGateDeps is Partial<ConstructiveGateResolvers>. run-log-gate's
+gatePrompt is gatePrompt(title, message, target), and RunLogGateRequest
+has a required target.
+Stored rules are read in the write shape: describe_schema's policyRules
+and every rule explain_access returns hold $type and policy_role and leave
+out the readOnly keys (stored parse trees and resolved member lists
+included).
+Tools: manage_entity_types is replaced by list_entity_types,
+create_entity_type and delete_entity_type; provision_database loses
+reprovision (use replace_database); update_field loses new_type (use
+retype_field); an add_policies rule is a BlueprintPolicy ($type,
+privileges, permissive, policy_role, policy_name, data) in place of
+policy_type, operations, role_name, is_permissive, data and node_data.
+
 ## [0.7.55](https://github.com/constructive-io/constructive/compare/@agentic-kit/pi-host@0.7.54...@agentic-kit/pi-host@0.7.55) (2026-11-26)
 
 **Note:** Version bump only for package @agentic-kit/pi-host

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.59.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.58.6...@pgpmjs/types@2.59.0) (2026-11-28)
+
+### Features
+
+- **server:** GET /version answers the server package and its commit ([#2097](https://github.com/constructive-io/constructive/issues/2097)) ([7a536f1](https://github.com/constructive-io/constructive/commit/7a536f12f33cac2972f3d4aeb7a5b611e87a740b))
+
 ## [2.58.6](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.58.5...@pgpmjs/types@2.58.6) (2026-11-26)
 
 **Note:** Version bump only for package @pgpmjs/types

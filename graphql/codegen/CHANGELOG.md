@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.53...@constructive-io/graphql-codegen@5.26.0) (2026-11-28)
+
+### Bug Fixes
+
+- **codegen:** honor --dry-run in schema export and multi-target modes ([#2100](https://github.com/constructive-io/constructive/issues/2100)) ([cb1161c](https://github.com/constructive-io/constructive/commit/cb1161c83890ed764e623e135248fbffa2eb57e4))
+- **deps:** bump inquirerer to 4.9.7 ([#2098](https://github.com/constructive-io/constructive/issues/2098)) ([ab0cd00](https://github.com/constructive-io/constructive/commit/ab0cd009d7fbae17da660ae0251474d1f449c2aa))
+
 ## [5.25.53](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@5.25.52...@constructive-io/graphql-codegen@5.25.53) (2026-11-26)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/constructive-io/constructive/compare/graphile-meta@1.14.1...graphile-meta@1.15.0) (2026-11-28)
+
+### Bug Fixes
+
+- **meta:** resolve file column storage binding ([#2082](https://github.com/constructive-io/constructive/issues/2082)) ([32d1552](https://github.com/constructive-io/constructive/commit/32d1552643af1e1d5ca403dfd3c3ef699aa40c5f))
+
 ## [1.14.1](https://github.com/constructive-io/constructive/compare/graphile-meta@1.14.0...graphile-meta@1.14.1) (2026-11-23)
 
 **Note:** Version bump only for package graphile-meta
