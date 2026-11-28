@@ -59,6 +59,12 @@ export const LimitTrackUsage: NodeTypeDefinition = {
         description: 'Which DML events to attach triggers for',
         default: ['INSERT', 'DELETE'],
       },
+      enforce: {
+        type: 'boolean',
+        description:
+          'With INSERT tracked, also attach a BEFORE INSERT gate on check_billing_quota that refuses a row past the allowance (BILLING_QUOTA_EXCEEDED), like the invocation quota gate. Off (default), rows past the allowance are inserted and their charge is refused. A slug with no meter row is never refused.',
+        default: false,
+      },
     },
     required: ['meter_slug'],
   },

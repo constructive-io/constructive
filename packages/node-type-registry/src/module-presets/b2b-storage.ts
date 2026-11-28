@@ -21,7 +21,9 @@ export const PresetB2bStorage: ModulePreset = {
     'Everything in `auth:hardened`, plus orgs, invites, capabilities, profiles and hierarchy at ' +
     'both app and org membership scopes, an `events_module` at both scopes carrying the ' +
     '`humanity` trust ladder (so a member can earn `level.reachable` and a policy can gate on ' +
-    'it), and `storage_module` for file uploads, exposed on the `storage` API. The storage ' +
+    'it), `plans_module` + `billing_module` + `rate_limit_meters_module` (the chain the sync ' +
+    'invocation verb requires to rate-limit calls), and `storage_module` for file uploads, ' +
+    'exposed on the `storage` API. The storage ' +
     'module creates `app_buckets` and `app_files` tables with full RLS: AuthzPublishable for public reads, ' +
     'AuthzAppMembership for member access, AuthzDirectOwner for uploader-only modify/delete. ' +
     'Entity-type provisioning with a non-empty `storage` array adds per-scope storage tables ' +
@@ -74,6 +76,13 @@ export const PresetB2bStorage: ModulePreset = {
     ['profiles_module', { scope: 'app' }],
     ['profiles_module', { scope: 'org' }],
     ['hierarchy_module', { scope: 'org' }],
+    // Billing & plans: invocation_sync_verb fails closed without a provisioned
+    // rate_limit_meters_module whose check function is non-empty, and that
+    // function only exists once billing_module (which needs plans_module) is
+    // installed — so a B2B tenant could not generate a sync verb at all.
+    'plans_module',
+    'billing_module',
+    'rate_limit_meters_module',
     ['invites_module', { scope: 'app' }],
     ['invites_module', { scope: 'org' }],
     // Binds the database to the typed catalog plane. Buckets are routable

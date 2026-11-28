@@ -35,6 +35,14 @@ export type BaseModuleOptions = {
   private_schema_name?: string;
   /** RLS policy overrides for the module's tables. */
   policies?: unknown[];
+  /**
+   * Which of the scope's storage planes this module binds to, for the modules
+   * that carry a typed bucket reference (site_surface, route, function). A scope
+   * has exactly one plane of every other kind, but may carry several storage
+   * planes, each with its own semantic `key` — so the binding is named rather
+   * than guessed. Defaults to 'default'.
+   */
+  storage_key?: string;
 };
 
 /**
@@ -77,12 +85,19 @@ export type AgentModuleOptions = BaseModuleOptions & {
   has_plans?: boolean;
   has_resources?: boolean;
   has_agents?: boolean;
+  has_repository_resources?: boolean;
   has_runs?: boolean;
   resources?: unknown[];
 };
 
 /** Storage module feature flags. */
 export type StorageModuleOptions = BaseModuleOptions & {
+  /**
+   * Semantic identity of this plane within its scope, and what a consuming
+   * module names in `storage_key`. Unique per (database, scope); `prefix` only
+   * names the generated tables. Defaults to 'default'.
+   */
+  key?: string;
   has_versioning?: boolean;
   has_content_hash?: boolean;
   has_custom_keys?: boolean;
@@ -113,6 +128,17 @@ export type TrustLadderRung = {
   limit?: string;
   /** Credits deposited into `limit`; defaults to 0. */
   limit_amount?: number;
+  /** Counting window of `event`, an interval literal ('30 days'); omitted counts for life. */
+  period_interval?: string;
+  /** How long a grant of `level` lasts before it lapses; omitted never lapses. */
+  expires_interval?: string;
+  /** Event names whose recording for an actor revokes `level` and resets their progress toward it. */
+  revoked_by?: string[];
+  /**
+   * Permission names (this scope's own catalog) withheld from principals until
+   * they hold `level`. An unknown name fails the seed rather than un-gating.
+   */
+  unlocks?: string[];
 };
 
 /** One baseline limit: a row in the tenant's default-limits table. */
@@ -141,11 +167,12 @@ export type LimitsModuleOptions = BaseModuleOptions & {
  * the content catalog — `'humanity'` for evidence that an account belongs to
  * someone (one reachable channel plus onboarding), `'metered'` where capacity
  * is rationed (reachable → accountable → established → trusted → vouched) —
- * and an array is the caller's own ladder inline. App scope only — an entity ladder belongs to an
- * organization that does not exist at provision time.
+ * and an array of rungs is the caller's own ladder inline. An array of slugs
+ * seeds several presets into one ladder (`['humanity', 'agent']`). At entity
+ * scope the same content is seeded per entity, on the entity's own insert.
  */
 export type EventsModuleOptions = BaseModuleOptions & {
-  trust_ladder?: string | TrustLadderRung[];
+  trust_ladder?: string | string[] | TrustLadderRung[];
 };
 
 /** Catalog module options (table-name overrides). */

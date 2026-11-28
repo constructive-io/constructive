@@ -4,10 +4,12 @@ import type { NodeTypeDefinition } from '../types';
 /**
  * File extraction processing node.
  *
- * Composes a JobTrigger that fires when a file transitions to status = 'uploaded'.
- * The trigger enqueues a
- * text-extraction job that converts the file contents (PDF, DOCX, HTML, etc.)
- * into plain text or markdown, storing the result in configurable output fields.
+ * Composes a JobTrigger that enqueues a text-extraction job converting the file
+ * contents (PDF, DOCX, HTML, etc.) into plain text or markdown, storing the
+ * result in configurable output fields. On a storage module's files table the
+ * trigger fires when the file transitions to status = 'uploaded'; on a business
+ * table with an upload/image column it fires on the configured events (INSERT
+ * by default, plus an UPDATE that changes the file when no events are given).
  *
  * The extraction worker is external (Knative function) — this node only creates
  * the trigger infrastructure and output fields. The worker calls back into the
@@ -20,7 +22,8 @@ export const ProcessExtraction: NodeTypeDefinition = {
   display_name: 'File Extraction',
   description:
     'Creates extraction output fields and a job trigger for file text extraction. ' +
-    'Fires when a file is uploaded (status = \'uploaded\') or on INSERT. ' +
+    'On a storage files table it fires when the file reaches status = \'uploaded\'; ' +
+    'on a business table with a file column it fires on INSERT and on an UPDATE that changes the file; events, when given, replace that default. ' +
     'The external worker extracts text/metadata from the file (PDF, DOCX, HTML, etc.) ' +
     'and writes the result back to the configured output fields. ' +
     'Typically used upstream of ProcessFileEmbedding or ProcessChunks.',
@@ -68,6 +71,38 @@ export const ProcessExtraction: NodeTypeDefinition = {
         default: ['application/pdf', 'text/%']
       },
 
+      routes: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            mime_patterns: {
+              type: 'array',
+              items: { type: 'string' },
+              minItems: 1,
+              description: 'MIME type LIKE patterns this route takes, e.g. [\'application/vnd.openxmlformats-officedocument.%\'].'
+            },
+            task_identifier: {
+              type: 'string',
+              format: 'function-ref',
+              description: 'Job task identifier of the function that extracts these MIME types'
+            },
+            extraction_model: { type: 'string', description: 'Extraction model for this route; the node\'s when omitted' },
+            extraction_provider: { type: 'string', description: 'Extraction provider for this route; the node\'s when omitted' },
+            queue_name: { type: 'string', description: 'Job queue name for this route; the node\'s when omitted' },
+            max_attempts: { type: 'integer', description: 'Maximum retry attempts for this route; the node\'s when omitted' },
+            priority: { type: 'integer', description: 'Job priority for this route; the node\'s when omitted' }
+          },
+          required: ['mime_patterns', 'task_identifier']
+        },
+        description:
+          'MIME types sent to another extraction function. A file runs the first route whose mime_patterns match it; ' +
+          'the node\'s own mime_patterns and task_identifier take only the files no route matched, so one file never runs two functions. ' +
+          'Every route writes the node\'s text_field and metadata_field, and shares its file_field, events, trigger_conditions and billing scope. ' +
+          'A task is named once across the node and its routes (PROCESS_EXTRACTION_DUPLICATE_ROUTE_TASK). ' +
+          'Example: [{"mime_patterns": ["application/vnd.openxmlformats-officedocument.%"], "task_identifier": "office:extract_text"}].'
+      },
+
       // ── Job routing ───────────────────────────────────────────────
       task_identifier: {
         type: 'string',
@@ -78,7 +113,10 @@ export const ProcessExtraction: NodeTypeDefinition = {
       events: {
         type: 'array',
         items: { type: 'string', enum: ['INSERT', 'UPDATE'] },
-        description: 'Trigger events that fire the job',
+        description:
+          'Trigger events that fire the job on a business table. Ignored on a storage ' +
+          'files table, where the trigger is always the status transition to uploaded ' +
+          '(INSERT is rejected there: the row is still requested).',
         default: ['INSERT']
       },
       file_field: {
@@ -89,7 +127,8 @@ export const ProcessExtraction: NodeTypeDefinition = {
           'When set, the trigger reads the object key, MIME type and bucket id ' +
           'out of that document (NEW.<file_field> ->> \'key\', ...) instead of ' +
           'requiring key/mime_type/bucket_id columns beside it, and the MIME ' +
-          'patterns match against <file_field> ->> \'mime\'.'
+          'patterns match against <file_field> ->> \'mime\'. ' +
+          'The column may be an array (image[]/upload[]): the lane then runs once per element whose key is new to the array, and text_field (created as jsonb) and metadata_field hold one entry per element, as jsonb objects keyed by the element\'s object key.'
       },
       payload_custom: {
         type: 'object',

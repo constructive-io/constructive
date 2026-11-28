@@ -38,6 +38,15 @@ export const ProcessChunks: NodeTypeDefinition = {
         description: 'Name of the text content column in the chunks table',
         default: 'content'
       },
+      source_fields: {
+        type: 'array',
+        items: { type: 'string', format: 'column-ref' },
+        description:
+          'Parent columns the chunks are cut from. When set, the enqueue ' +
+          'triggers fire only once one of them is populated (INSERT) or ' +
+          'changed (UPDATE), and the worker chunks exactly those columns. ' +
+          'Omit to chunk every readable content column on every write.'
+      },
 
       // ── Chunking strategy ──────────────────────────────────────────
       chunk_size: {

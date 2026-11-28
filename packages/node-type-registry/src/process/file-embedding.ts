@@ -10,7 +10,10 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
     'Generic, MIME-scoped embedding node for file tables. Supports two modes: ' +
     'direct (whole-file to single vector, e.g. CLIP for images) when extraction ' +
     'is omitted, or extract (file to text to chunks to per-chunk vectors) when ' +
-    'extraction config is provided. Composes SearchVector + JobTrigger + ' +
+    'extraction config is provided; extract mode composes ProcessExtraction for the text ' +
+    '(its task, MIME rule, queue and, on a storage files table, its result writer). On a storage files table it fires when the file reaches status = \'uploaded\'; ' +
+    'on a business table with a file column it fires on INSERT and on an UPDATE that changes the file; events, when given, replace that default. ' +
+    'Composes SearchVector + JobTrigger + ' +
     'ProcessChunks (enabled by default in extract mode) internally. Multiple ' +
     'instances can coexist on the same table with different MIME scopes, field ' +
     'names, and embedding strategies.',
@@ -70,8 +73,9 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
         items: { type: 'string' },
         description:
           'MIME type LIKE patterns to match. Multiple patterns are OR\'d together. ' +
-          'Examples: [\'image/%\'], [\'application/pdf\', \'text/%\'], [\'audio/%\'].',
-        default: ['image/%']
+          'Examples: [\'image/%\'], [\'application/pdf\', \'text/%\'], [\'audio/%\']. ' +
+          'Defaults to [\'image/%\'] in direct mode and to [\'application/pdf\', \'text/%\'] ' +
+          'in extract mode.'
       },
 
       // ── Job routing ────────────────────────────────────────────────
@@ -80,13 +84,16 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
         format: 'function-ref',
         description:
           'Job task identifier for the worker. In direct mode this is the ' +
-          'embedding worker; in extract mode this is the extraction worker.',
-        default: 'embedding:process_file_embedding'
+          'embedding worker (default embedding:process_file_embedding); in extract mode ' +
+          'this is the extraction worker (default document:extract_file_text).'
       },
       events: {
         type: 'array',
         items: { type: 'string', enum: ['INSERT', 'UPDATE'] },
-        description: 'Trigger events that fire the job',
+        description:
+          'Trigger events that fire the job on a business table. Ignored on a storage ' +
+          'files table, where the trigger is always the status transition to uploaded ' +
+          '(INSERT is rejected there: the row is still requested).',
         default: ['INSERT']
       },
       file_field: {
@@ -97,7 +104,8 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
           'When set, the trigger reads the object key, MIME type and bucket id ' +
           'out of that document (NEW.<file_field> ->> \'key\', ...) instead of ' +
           'requiring key/mime_type/bucket_id columns beside it, and the MIME ' +
-          'patterns match against <file_field> ->> \'mime\'.'
+          'patterns match against <file_field> ->> \'mime\'. ' +
+          'An array column (image[]/upload[]) is refused (PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED): one vector column cannot hold a vector per element.'
       },
       payload_custom: {
         type: 'object',
@@ -175,10 +183,11 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
       extraction: {
         type: 'object',
         description:
-          'Text extraction configuration. When present, the generator creates ' +
-          'extraction output fields on the table and configures SearchVector with ' +
-          'source_fields + stale tracking. When absent, the node operates in direct ' +
-          'mode (single vector per file, no text extraction).',
+          'Text extraction configuration. When present, the node composes ProcessExtraction ' +
+          '(output fields, MIME-conditional trigger on queue extraction with 5 attempts, and ' +
+          'on a storage files table the <files>_write_extraction writer) and configures ' +
+          'SearchVector with the text field as source_fields + stale tracking. When absent, ' +
+          'the node operates in direct mode (single vector per file, no text extraction).',
         properties: {
           text_field: {
             type: 'string',
@@ -191,6 +200,20 @@ export const ProcessFileEmbedding: NodeTypeDefinition = {
             format: 'column-ref',
             description: 'JSONB field for extraction metadata (page count, language, etc.)',
             default: 'extracted_metadata'
+          },
+          routes: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                mime_patterns: { type: 'array', items: { type: 'string' }, minItems: 1 },
+                task_identifier: { type: 'string', format: 'function-ref' }
+              },
+              required: ['mime_patterns', 'task_identifier']
+            },
+            description:
+              'MIME types sent to another extraction function, as ProcessExtraction.routes: ' +
+              'the first matching route takes a file, and the node\'s own mime_patterns and task take the rest.'
           }
         }
       },

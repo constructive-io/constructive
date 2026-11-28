@@ -12,7 +12,7 @@
    <a href="https://www.npmjs.com/package/node-type-registry"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Fnode-type-registry%2Fpackage.json"/></a>
 </p>
 
-Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Relation*, View*, and Table* node types.
+Node type definitions for the Constructive blueprint system: every Authz*, Data*, Relation*, View* and Table* node type, with the module presets and content presets.
 
 ## Usage
 
@@ -23,7 +23,7 @@ import { allNodeTypes, AuthzDirectOwner, DataId } from 'node-type-registry';
 console.log(AuthzDirectOwner.parameter_schema);
 
 // Get all node types as a flat array
-console.log(allNodeTypes.length); // 52
+console.log(allNodeTypes.length);
 ```
 
 ## Blueprint Types (generated)
@@ -50,10 +50,10 @@ const definition: BlueprintDefinition = {
         { $type: 'DataDirectOwner', data: { include_id: false } },
       ],
       fields: [
-        { name: 'title', type: 'text', is_not_null: true },
-        { name: 'description', type: 'text' },
+        { name: 'title', type: { name: 'text' }, is_not_null: true },
+        { name: 'description', type: { name: 'text' } },
       ],
-      policies: [{ $type: 'AuthzDirectOwner' }],
+      policies: [{ $type: 'AuthzDirectOwner', data: { entity_field: 'owner_id' } }],
     },
   ],
   relations: [
@@ -73,15 +73,14 @@ const definition: BlueprintDefinition = {
 };
 ```
 
-### Regenerating types
+### Where the source lives
 
-When node type definitions are added or modified, regenerate with:
+`src/` is a copy of the registry that the backend deploys, generated files included. Change a node type or a preset there, then copy it here from a checkout of the backend's repository:
 
 ```bash
-cd graphql/node-type-registry && pnpm generate:types
+pnpm sync:registry <checkout>          # copies src/
+pnpm sync:registry --check <checkout>  # lists the files that differ, and exits 1 if one does
 ```
-
-This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
 
 ## Authz nodes: plain words and closed parameters
 

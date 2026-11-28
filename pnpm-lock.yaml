@@ -2844,6 +2844,10 @@ importers:
     publishDirectory: dist
 
   packages/node-type-registry:
+    dependencies:
+      blocks-schema:
+        specifier: ^0.5.4
+        version: 0.5.5
     devDependencies:
       '@babel/generator':
         specifier: ^7.29.0
@@ -7280,6 +7284,10 @@ packages:
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
 
+  blocks-schema@0.5.5:
+    resolution: {integrity: sha512-dvnFlKk4/ELpNgtmyh6C4XkkqaGbGHjZNo3HjzyPqXBiokikKO0zBQtBZiPsM1lqqfJ4sWE2VKMquImICbUdFg==}
+    engines: {node: '>=24.0.0'}
+
   body-parser@2.2.1:
     resolution: {integrity: sha512-nfDwkulwiZYQIGwxdy0RUmowMhKcFVcYXUU7m4QlKYim1rUtg83xm2yjZ40QjDuc291AJjjeSc9b++AWHSgSHw==}
     engines: {node: '>=18'}
@@ -9082,6 +9090,10 @@ packages:
   json-parse-even-better-errors@3.0.2:
     resolution: {integrity: sha512-fi0NG4bPjCHunUJffmLd0gxssIgkNmArMvis4iNah6Owg1MCJjWhEcDLmsK6iGkJq3tHwbDkTlce70/tmXN4cQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  json-renderer@0.4.4:
+    resolution: {integrity: sha512-gk43N1+J0w95wERIQbkI9EE3tfRWEa4305xQYXD5AIAWTTuHc/JszSldnUJf1W9R0+Z75iweP/QcGpcjpDsSHA==}
+    engines: {node: '>=24.0.0'}
 
   json-schema-to-ts@3.1.1:
     resolution: {integrity: sha512-+DWg8jCJG2TEnpy7kOm/7/AxaYoaRbjVB4LFZLySZlWn8exGs3A4OLJR966cVvU26N7X9TWxl+Jsw7dzAqKT6g==}
@@ -15095,6 +15107,11 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
+  blocks-schema@0.5.5:
+    dependencies:
+      json-renderer: 0.4.4
+      zod: 4.4.3
+
   body-parser@2.2.1:
     dependencies:
       bytes: 3.1.2
@@ -17370,6 +17387,10 @@ snapshots:
   json-parse-even-better-errors@2.3.1: {}
 
   json-parse-even-better-errors@3.0.2: {}
+
+  json-renderer@0.4.4:
+    dependencies:
+      zod: 4.4.3
 
   json-schema-to-ts@3.1.1:
     dependencies:

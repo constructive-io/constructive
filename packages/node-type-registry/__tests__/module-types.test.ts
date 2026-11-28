@@ -1,5 +1,6 @@
 import {
   allModulePresets,
+  findMissingModuleDependencies,
   type ModuleEntry,
   type ModulePreset,
   publicModulePresets,
@@ -10,26 +11,6 @@ import {
   isInternalModule,
   publicModuleTypes
 } from '../src/module-types';
-
-function moduleEntries(
-  preset: (typeof allModulePresets)[number]
-): Array<[string, Record<string, unknown>]> {
-  return preset.modules.map((entry) => {
-    if (typeof entry === 'string') return [entry, {}];
-    return entry;
-  });
-}
-
-function hasModule(
-  entries: Array<[string, Record<string, unknown>]>,
-  name: string,
-  scope?: string
-): boolean {
-  return entries.some(
-    ([entryName, options]) =>
-      entryName === name && (scope === undefined || options.scope === scope)
-  );
-}
 
 describe('module type registry', () => {
   test('matches the complete module registry', () => {
@@ -48,6 +29,7 @@ describe('module type registry', () => {
       'database_settings_module',
       'db_preset_module',
       'db_usage_module',
+      'refusal_log_module',
       'devices_module',
       'domain_module',
       'email_sender_module',
@@ -83,6 +65,7 @@ describe('module type registry', () => {
       'phone_numbers_module',
       'plans_module',
       'principal_auth_module',
+      'principals_module',
       'profiles_module',
       'rate_limit_meters_module',
       'rate_limits_module',
@@ -122,6 +105,7 @@ describe('module type registry', () => {
       'content_preset_module',
       'database_settings_module',
       'db_preset_module',
+      'refusal_log_module',
       'domain_module',
       'infra_config_module',
       'infra_module',
@@ -166,7 +150,9 @@ describe('module type registry', () => {
       'minimal',
       'auth:hardened',
       'b2b:storage',
-      'full'
+      'full',
+      'b2b:saas',
+      'auth:byo'
     ]);
   });
 
@@ -235,36 +221,9 @@ describe('module type registry', () => {
     expect(full?.modules).toContainEqual(['function_module', { scope: 'app' }]);
   });
 
-  test('all presets satisfy the provisioning dependency checks', () => {
+  test('every preset installs the modules its modules depend on', () => {
     for (const preset of allModulePresets) {
-      const entries = moduleEntries(preset);
-      expect(hasModule(entries, 'users_module')).toBe(true);
-      expect(hasModule(entries, 'sessions_module')).toBe(true);
-      expect(hasModule(entries, 'rls_module')).toBe(true);
-
-      if (hasModule(entries, 'session_secrets_module')) {
-        expect(hasModule(entries, 'sessions_module')).toBe(true);
-      }
-      if (hasModule(entries, 'user_auth_module')) {
-        expect(hasModule(entries, 'sessions_module')).toBe(true);
-      }
-      if (hasModule(entries, 'identity_providers_module')) {
-        expect(hasModule(entries, 'connected_accounts_module')).toBe(true);
-        expect(hasModule(entries, 'internal_secrets_module', 'app')).toBe(true);
-      }
-      if (hasModule(entries, 'webauthn_auth_module')) {
-        expect(hasModule(entries, 'user_auth_module')).toBe(true);
-        expect(hasModule(entries, 'session_secrets_module')).toBe(true);
-        expect(hasModule(entries, 'webauthn_credentials_module')).toBe(true);
-      }
-      if (hasModule(entries, 'hierarchy_module', 'org')) {
-        expect(hasModule(entries, 'memberships_module', 'org')).toBe(true);
-      }
-      for (const scope of ['app', 'org']) {
-        if (hasModule(entries, 'invites_module', scope)) {
-          expect(hasModule(entries, 'memberships_module', scope)).toBe(true);
-        }
-      }
+      expect({ preset: preset.name, missing: findMissingModuleDependencies(preset.modules) }).toEqual({ preset: preset.name, missing: [] });
     }
   });
 });

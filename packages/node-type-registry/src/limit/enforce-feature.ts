@@ -1,3 +1,4 @@
+import { conditionDefs, conditionProperties } from '../conditions';
 import type { NodeTypeDefinition } from '../types';
 
 export const LimitEnforceFeature: NodeTypeDefinition = {
@@ -6,9 +7,10 @@ export const LimitEnforceFeature: NodeTypeDefinition = {
   category: 'limit_enforce',
   display_name: 'Enforce Feature Flag',
   description:
-    'Gates a table behind a feature flag backed by the cap tables. Attaches a BEFORE INSERT trigger that checks whether the named feature cap value is > 0. Features are modeled as caps with max=0 (disabled) or max=1 (enabled) in limit_caps / limit_caps_defaults tables. Resolution: COALESCE(per-entity cap, scope default, 0).',
+    'Gates a table behind a feature flag backed by the cap tables. Attaches a BEFORE trigger that checks whether the named feature cap value is > 0. Features are modeled as caps with max=0 (disabled) or max=1 (enabled) in limit_caps / limit_caps_defaults tables. Resolution: COALESCE(per-entity cap, scope default, 0). Gate INSERT and UPDATE when a row can reach the gated state after creation, and narrow the gate with conditions when only some of the table\'s rows are the gated feature.',
   parameter_schema: {
     type: 'object',
+    $defs: conditionDefs,
     properties: {
       feature_name: {
         type: 'string',
@@ -50,6 +52,21 @@ export const LimitEnforceFeature: NodeTypeDefinition = {
           },
         },
         required: ['obj_table', 'obj_field'],
+      },
+      events: {
+        type: 'array',
+        items: {
+          type: 'string',
+          enum: ['INSERT', 'UPDATE'],
+        },
+        description:
+          'Which DML events the cap gates. UPDATE is required when a row can reach the gated state after creation (e.g. a discriminator flipped from an ungated value to a gated one). DELETE is not supported: a cap answers whether a row may exist.',
+        default: ['INSERT'],
+      },
+      conditions: {
+        ...conditionProperties.conditions,
+        description:
+          'Compound conditions for the trigger WHEN clause, so the cap gates a subset of rows rather than the whole table (e.g. only the rows a customer authors on a table the platform also writes). Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema.',
       },
     },
     required: ['feature_name'],

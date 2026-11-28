@@ -106,6 +106,11 @@ export const JobTrigger: NodeTypeDefinition = {
         type: 'string',
         description: 'Job queue name for routing to specific workers'
       },
+      queue_key_field: {
+        type: 'string',
+        format: 'column-ref',
+        description: 'Column whose value keys the job queue, so the queue name becomes "<queue_name or task_identifier>:<row value>". A named queue is held for the whole job, so a shared literal queue serializes every job that uses it; keying on the work\'s subject keeps same-subject jobs ordered while unrelated subjects run in parallel.'
+      },
       priority: {
         type: 'integer',
         description: 'Job priority (lower = higher priority)',

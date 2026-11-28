@@ -87,6 +87,7 @@ export interface CheckOwnedRelationParams {
     /* Optional link column additionally restricted regardless of ownership (e.g. a bucket type) */target_type_field_name?: string;
     /* Value target_type_field_name must equal */target_type_value?: string;
     /* Admit the same database's global-scope rows (app/platform, ownerless by construction) for this column, for pointers whose legal target set is a scope hierarchy within one database */allow_owner_tier?: boolean;
+    /* Admit rows owned by any frame on the referencing row's own scope-frame chain (its own scopes, then the platform database's chain) for this column, for pointers naming a definition published UP the hierarchy — the shared platform function image a tenant route targets. Ancestry only: a peer or another keyed owner is on no chain. Requires owner_key_field_name */allow_frame_chain?: boolean;
   }[];
   /* How many pointers a row must set: exactly_one for a polymorphic target (route → api OR site OR bucket), all for a junction/join row of a has-and-belongs-to-many relation (and for a mandatory belongs-to), any for optional pointers that are only checked when set */
   arity?: 'exactly_one' | 'all' | 'any';
@@ -131,8 +132,11 @@ export interface DataBulkParams {
 export interface DataCapabilitiesParams {
   /* Name of the bit(n) mask column to create on this table. */
   field?: string;
-  /* Selects the capabilities module whose bit numbering the mask is measured in, by scope (e.g. "app", "org") or by table prefix. Required only when the database has more than one; several with no selector raises naming the candidates. */
-  capabilities?: string;
+  /* Selector for the capabilities module whose bit numbering the mask is measured in, e.g. {"scope": "org"}. Every key given must match exactly one module; none or several raises naming the candidates. Required only when the database has more than one. */
+  capabilities?: {
+    /* Scope the module is installed at ("app", "org", or an entity type prefix). */scope?: string;
+    /* Table prefix of the module instance; rarely needed since prefix follows scope. */prefix?: string;
+  };
   /* Capability names every row requires unless told otherwise, resolved to a literal mask and baked into the column default. Omitted means a zero mask: requires nothing. */
   default?: string[];
   /* Who writes the mask: "direct" the writer, bounded by the subset guard; "derived" the mapping row named by from_column, stamped by generated triggers and hidden from mutations. */
@@ -318,7 +322,7 @@ export interface DataInflectionParams {
   /* Inflection operations to apply in order */
   ops: ('plural' | 'singular' | 'camel' | 'pascal' | 'dashed' | 'slugify' | 'underscore' | 'lower' | 'upper')[];
 }
-/** BEFORE INSERT trigger that copies specified fields from a parent table via a foreign key. The parent row is looked up through RLS (SECURITY INVOKER), so the insert fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files. */
+/** BEFORE INSERT OR UPDATE trigger that copies specified fields from a parent table via a foreign key; on UPDATE the fields are re-copied only when the parent FK changes. The parent row is looked up through RLS (SECURITY INVOKER), so the insert or update fails if the caller cannot see the parent. Used by the storage module to inherit owner_id and is_public from buckets to files. */
 export interface DataInheritFromParentParams {
   /* Name of the FK field on this table that references the parent (e.g. bucket_id) */
   parent_fk_field: string;
@@ -620,7 +624,7 @@ export interface LimitEnforceCounterParams {
   /* Which DML events to attach triggers for */
   events?: ('INSERT' | 'DELETE' | 'UPDATE')[];
 }
-/** Gates a table behind a feature flag backed by the cap tables. Attaches a BEFORE INSERT trigger that checks whether the named feature cap value is > 0. Features are modeled as caps with max=0 (disabled) or max=1 (enabled) in limit_caps / limit_caps_defaults tables. Resolution: COALESCE(per-entity cap, scope default, 0). */
+/** Gates a table behind a feature flag backed by the cap tables. Attaches a BEFORE trigger that checks whether the named feature cap value is > 0. Features are modeled as caps with max=0 (disabled) or max=1 (enabled) in limit_caps / limit_caps_defaults tables. Resolution: COALESCE(per-entity cap, scope default, 0). Gate INSERT and UPDATE when a row can reach the gated state after creation, and narrow the gate with conditions when only some of the table's rows are the gated feature. */
 export interface LimitEnforceFeatureParams {
   /* Cap name representing this feature (must match a limit_caps_defaults entry with max=0 or max=1) */
   feature_name: string;
@@ -634,6 +638,10 @@ export interface LimitEnforceFeatureParams {
     /* Schema of the related table (user-facing name, e.g., "public"). Optional — if omitted, resolved by table name within the same database_id (raises error if ambiguous). */obj_schema?: string;
     /* Column on the related table that holds the entity_id (e.g., "entity_id"). Required. */obj_field: string;
   };
+  /* Which DML events the cap gates. UPDATE is required when a row can reach the gated state after creation (e.g. a discriminator flipped from an ungated value to a gated one). DELETE is not supported: a cap answers whether a row may exist. */
+  events?: ('INSERT' | 'UPDATE')[];
+  /* Compound conditions for the trigger WHEN clause, so the cap gates a subset of rows rather than the whole table (e.g. only the rows a customer authors on a table the platform also writes). Accepts a single leaf condition, an array of conditions (implicitly AND), or a nested combinator tree ({AND: [...], OR: [...], NOT: {...}}). Each leaf is {field, op, value?, row?, ref?}. Column types are resolved automatically from the table schema. */
+  conditions?: TriggerCondition | TriggerCondition[];
 }
 /** Attaches a BEFORE trigger that calls check_rate_limit() to enforce sliding-window rate limits before allowing mutations. The function checks all three scopes (entity, actor-in-entity, actor) in a single call; which scopes are actually enforced is controlled by what rows exist in rate_window_limits (plan-based config). Requires a provisioned meter_rate_limits_module and billing_module for the target database. */
 export interface LimitEnforceRateParams {
@@ -674,6 +682,8 @@ export interface LimitTrackUsageParams {
   quantity?: number;
   /* Which DML events to attach triggers for */
   events?: ('INSERT' | 'DELETE' | 'UPDATE')[];
+  /* With INSERT tracked, also attach a BEFORE INSERT gate on check_billing_quota that refuses a row past the allowance (BILLING_QUOTA_EXCEEDED), like the invocation quota gate. Off (default), rows past the allowance are inserted and their charge is refused. A slug with no meter row is never refused. */
+  enforce?: boolean;
 }
 /**
  * ===========================================================================
@@ -947,6 +957,8 @@ export interface JobTriggerParams {
   job_key?: string;
   /* Job queue name for routing to specific workers */
   queue_name?: string;
+  /* Column whose value keys the job queue, so the queue name becomes "<queue_name or task_identifier>:<row value>". A named queue is held for the whole job, so a shared literal queue serializes every job that uses it; keying on the work's subject keeps same-subject jobs ordered while unrelated subjects run in parallel. */
+  queue_key_field?: string;
   /* Job priority (lower = higher priority) */
   priority?: number;
   /* Delay before job runs as PostgreSQL interval (e.g., 30 seconds, 5 minutes) */
@@ -964,6 +976,8 @@ export interface JobTriggerParams {
 export interface ProcessChunksParams {
   /* Name of the text content column in the chunks table */
   content_field_name?: string;
+  /* Parent columns the chunks are cut from. When set, the enqueue triggers fire only once one of them is populated (INSERT) or changed (UPDATE), and the worker chunks exactly those columns. Omit to chunk every readable content column on every write. */
+  source_fields?: string[];
   /* Maximum number of characters per chunk */
   chunk_size?: number;
   /* Number of overlapping characters between consecutive chunks */
@@ -997,7 +1011,32 @@ export interface ProcessChunksParams {
   /* Task identifier for the chunking job queue */
   chunking_task_name?: string;
 }
-/** Creates extraction output fields and a job trigger for file text extraction. Fires when a file is uploaded (status = 'uploaded') or on INSERT. The external worker extracts text/metadata from the file (PDF, DOCX, HTML, etc.) and writes the result back to the configured output fields. Typically used upstream of ProcessFileEmbedding or ProcessChunks. */
+/** Enqueues a tenant-registered task when a file on a storage files table reaches status = 'uploaded' and generates the result writer the task calls back over the function lane. The task must already be registered for the database (register_function with scope database); the node is refused otherwise. */
+export interface ProcessCustomParams {
+  /* Task identifier of the tenant-registered function (namespace:name). Must resolve through the function registry for this database at provisioning time. */
+  task_identifier: string;
+  /* Optional jsonb field on the files table that receives the result the task hands to the generated writer. When omitted the writer only records the uploaded → processed transition. */
+  result_field?: string;
+  /* Optional MIME type LIKE patterns to match. Multiple patterns are OR'd together. When omitted every uploaded file is processed. */
+  mime_patterns?: string[];
+  /* Additional compound conditions beyond auto-generated filtering. Merged with the auto-generated conditions via AND. */
+  trigger_conditions?: TriggerCondition | TriggerCondition[];
+  /* Column on the files table that holds (or references) the entity_id for billing scope. Forwarded to the composed JobTrigger. */
+  entity_field?: string;
+  /* FK lookup configuration for resolving entity_id through a related table. Forwarded to the composed JobTrigger. */
+  entity_lookup?: {
+    /* Name of the related table to look up entity_id from */obj_table: string;
+    /* Schema of the related table (user-facing name, optional) */obj_schema?: string;
+    /* Column on the related table that holds the entity_id */obj_field: string;
+  };
+  /* Job queue name for the task */
+  queue_name?: string;
+  /* Maximum number of retry attempts */
+  max_attempts?: number;
+  /* Job priority (lower = higher priority) */
+  priority?: number;
+}
+/** Creates extraction output fields and a job trigger for file text extraction. On a storage files table it fires when the file reaches status = 'uploaded'; on a business table with a file column it fires on INSERT and on an UPDATE that changes the file; events, when given, replace that default. The external worker extracts text/metadata from the file (PDF, DOCX, HTML, etc.) and writes the result back to the configured output fields. Typically used upstream of ProcessFileEmbedding or ProcessChunks. */
 export interface ProcessExtractionParams {
   /* Field to store extracted text/markdown */
   text_field?: string;
@@ -1009,11 +1048,21 @@ export interface ProcessExtractionParams {
   extraction_provider?: string;
   /* MIME type LIKE patterns to match. Multiple patterns are OR'd together. Examples: ['application/pdf', 'text/%'], ['application/vnd.openxmlformats%']. */
   mime_patterns?: string[];
+  /* MIME types sent to another extraction function. A file runs the first route whose mime_patterns match it; the node's own mime_patterns and task_identifier take only the files no route matched, so one file never runs two functions. Every route writes the node's text_field and metadata_field, and shares its file_field, events, trigger_conditions and billing scope. A task is named once across the node and its routes (PROCESS_EXTRACTION_DUPLICATE_ROUTE_TASK). Example: [{"mime_patterns": ["application/vnd.openxmlformats-officedocument.%"], "task_identifier": "office:extract_text"}]. */
+  routes?: {
+    /* MIME type LIKE patterns this route takes, e.g. ['application/vnd.openxmlformats-officedocument.%']. */mime_patterns: string[];
+    /* Job task identifier of the function that extracts these MIME types */task_identifier: string;
+    /* Extraction model for this route; the node's when omitted */extraction_model?: string;
+    /* Extraction provider for this route; the node's when omitted */extraction_provider?: string;
+    /* Job queue name for this route; the node's when omitted */queue_name?: string;
+    /* Maximum retry attempts for this route; the node's when omitted */max_attempts?: number;
+    /* Job priority for this route; the node's when omitted */priority?: number;
+  }[];
   /* Job task identifier for the extraction worker */
   task_identifier?: string;
-  /* Trigger events that fire the job */
+  /* Trigger events that fire the job on a business table. Ignored on a storage files table, where the trigger is always the status transition to uploaded (INSERT is rejected there: the row is still requested). */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. The column may be an array (image[]/upload[]): the lane then runs once per element whose key is new to the array, and text_field (created as jsonb) and metadata_field hold one entry per element, as jsonb objects keyed by the element's object key. */
   file_field?: string;
   /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
@@ -1036,7 +1085,7 @@ export interface ProcessExtractionParams {
   /* Job priority (lower = higher priority) */
   priority?: number;
 }
-/** Generic, MIME-scoped embedding node for file tables. Supports two modes: direct (whole-file to single vector, e.g. CLIP for images) when extraction is omitted, or extract (file to text to chunks to per-chunk vectors) when extraction config is provided. Composes SearchVector + JobTrigger + ProcessChunks (enabled by default in extract mode) internally. Multiple instances can coexist on the same table with different MIME scopes, field names, and embedding strategies. */
+/** Generic, MIME-scoped embedding node for file tables. Supports two modes: direct (whole-file to single vector, e.g. CLIP for images) when extraction is omitted, or extract (file to text to chunks to per-chunk vectors) when extraction config is provided; extract mode composes ProcessExtraction for the text (its task, MIME rule, queue and, on a storage files table, its result writer). On a storage files table it fires when the file reaches status = 'uploaded'; on a business table with a file column it fires on INSERT and on an UPDATE that changes the file; events, when given, replace that default. Composes SearchVector + JobTrigger + ProcessChunks (enabled by default in extract mode) internally. Multiple instances can coexist on the same table with different MIME scopes, field names, and embedding strategies. */
 export interface ProcessFileEmbeddingParams {
   /* Name of the vector embedding column */
   field_name?: string;
@@ -1054,13 +1103,13 @@ export interface ProcessFileEmbeddingParams {
   embedding_model?: string;
   /* Embedding provider name (e.g. "ollama", "openai"). When null, the worker falls back to runtime config. */
   embedding_provider?: string;
-  /* MIME type LIKE patterns to match. Multiple patterns are OR'd together. Examples: ['image/%'], ['application/pdf', 'text/%'], ['audio/%']. */
+  /* MIME type LIKE patterns to match. Multiple patterns are OR'd together. Examples: ['image/%'], ['application/pdf', 'text/%'], ['audio/%']. Defaults to ['image/%'] in direct mode and to ['application/pdf', 'text/%'] in extract mode. */
   mime_patterns?: string[];
-  /* Job task identifier for the worker. In direct mode this is the embedding worker; in extract mode this is the extraction worker. */
+  /* Job task identifier for the worker. In direct mode this is the embedding worker (default embedding:process_file_embedding); in extract mode this is the extraction worker (default document:extract_file_text). */
   task_identifier?: string;
-  /* Trigger events that fire the job */
+  /* Trigger events that fire the job on a business table. Ignored on a storage files table, where the trigger is always the status transition to uploaded (INSERT is rejected there: the row is still requested). */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. An array column (image[]/upload[]) is refused (PROCESS_FILE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED): one vector column cannot hold a vector per element. */
   file_field?: string;
   /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
@@ -1090,10 +1139,14 @@ export interface ProcessFileEmbeddingParams {
     /* Schema of the related table (user-facing name, optional) */obj_schema?: string;
     /* Column on the related table that holds the entity_id */obj_field: string;
   };
-  /* Text extraction configuration. When present, the generator creates extraction output fields on the table and configures SearchVector with source_fields + stale tracking. When absent, the node operates in direct mode (single vector per file, no text extraction). */
+  /* Text extraction configuration. When present, the node composes ProcessExtraction (output fields, MIME-conditional trigger on queue extraction with 5 attempts, and on a storage files table the <files>_write_extraction writer) and configures SearchVector with the text field as source_fields + stale tracking. When absent, the node operates in direct mode (single vector per file, no text extraction). */
   extraction?: {
     /* Field to store extracted text/markdown */text_field?: string;
     /* JSONB field for extraction metadata (page count, language, etc.) */metadata_field?: string;
+    /* MIME types sent to another extraction function, as ProcessExtraction.routes: the first matching route takes a file, and the node's own mime_patterns and task take the rest. */routes?: {
+      mime_patterns: string[];
+      task_identifier: string;
+    }[];
   };
   /* Whether to create a chunks table via ProcessChunks. Defaults to true when extraction is provided, false in direct mode. Set explicitly to override. */
   include_chunks?: boolean;
@@ -1109,7 +1162,7 @@ export interface ProcessFileEmbeddingParams {
     /* Task identifier for the chunking job queue */chunking_task_name?: string;
   };
 }
-/** Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=['image/%'], task_identifier='embedding:process_image_embedding', direct mode (no extraction). Accepts all ProcessFileEmbedding parameters — any overrides are forwarded through. */
+/** Image-specific preset of ProcessFileEmbedding. Delegates to ProcessFileEmbedding with image-oriented defaults: dimensions=512 (CLIP), mime_patterns=['image/%'], task_identifier='embedding:process_file_embedding', direct mode only: there is no image extraction (OCR) worker, so extraction is refused. Every other parameter is forwarded through. */
 export interface ProcessImageEmbeddingParams {
   /* Name of the vector embedding column */
   field_name?: string;
@@ -1129,11 +1182,11 @@ export interface ProcessImageEmbeddingParams {
   embedding_provider?: string;
   /* MIME type LIKE patterns to match. Multiple patterns are OR'd together. */
   mime_patterns?: string[];
-  /* Job task identifier for the image embedding worker */
+  /* Job task identifier for the image embedding worker. The payload is the file row (file_id, key, mime_type, bucket_id), so the task must be a record worker that reads the object itself — not embedding:process_image_embedding, which embeds an image_url it is handed. */
   task_identifier?: string;
   /* Trigger events that fire the job */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. An array column (image[]/upload[]) is refused (PROCESS_IMAGE_EMBEDDING_ARRAY_FILE_FIELD_UNSUPPORTED): one vector column cannot hold a vector per element. */
   file_field?: string;
   /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
@@ -1149,28 +1202,11 @@ export interface ProcessImageEmbeddingParams {
     /* Schema of the related table (user-facing name, optional) */obj_schema?: string;
     /* Column on the related table that holds the entity_id */obj_field: string;
   };
-  /* Text extraction configuration. Forwarded to ProcessFileEmbedding. When present, enables extract mode (e.g., OCR for images). */
-  extraction?: {
-    /* Field to store extracted text */text_field?: string;
-    /* JSONB field for extraction metadata */metadata_field?: string;
-  };
-  /* Chunking configuration. Forwarded to ProcessFileEmbedding. Only meaningful when extraction is also provided. */
-  chunks?: {
-    content_field_name?: string;
-    chunk_size?: number;
-    chunk_overlap?: number;
-    chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
-    metadata_fields?: {
-      [key: string]: unknown;
-    };
-    enqueue_chunking_job?: boolean;
-    chunking_task_name?: string;
-  };
 }
-/** Creates a job trigger for image variant generation. Fires when an image file is uploaded (status = 'uploaded') or on INSERT. The external worker generates resized, cropped, or reformatted versions (thumbnails, previews, WebP conversions, etc.) and stores them as new file records linked to the source image. */
+/** Creates a job trigger for image variant generation. On a storage files table it fires when the file reaches status = 'uploaded'; on a business table with a file column it fires on INSERT and on an UPDATE that changes the file; events, when given, replace that default. The image worker generates resized, cropped, or reformatted versions (thumbnails, previews, WebP conversions, etc.), stores them beside the source object in the file's own bucket, and records each variant's name, key, format, dimensions and size: inside the file column's own document (its versions member) on a business table, in the manifest column on a storage files table. With no versions given the worker uses the default ladder (thumbnail, small, medium, large, xlarge), resolved when the job runs, and skips any version larger than the source. */
 export interface ProcessImageVersionsParams {
-  /* Array of version definitions. Each version specifies dimensions, format, and quality for a generated image variant. Required — the blueprint must explicitly define what variants to generate. */
-  versions: {
+  /* Array of version definitions. Each version specifies dimensions, format, and quality for a generated image variant. Optional: when omitted the worker resolves the default ladder at job time (thumbnail 160x160 cover, then small 320, medium 640, large 1280 and xlarge 1920 wide, WebP quality 80), so a later change to the default reaches tables already provisioned. A version larger than the source is skipped rather than upscaled. */
+  versions?: {
     /* Version identifier (e.g., "thumb", "preview", "hero") */name: string;
     /* Target width in pixels */width?: number;
     /* Target height in pixels */height?: number;
@@ -1178,13 +1214,15 @@ export interface ProcessImageVersionsParams {
     /* Output image format */format?: 'jpeg' | 'png' | 'webp' | 'avif';
     /* Output quality (1-100) */quality?: number;
   }[];
-  /* MIME type LIKE patterns to match. Defaults to all image types. */
+  /* Files tables only: name of the jsonb column the variants manifest is written to. Created by the generator when absent; forwarded to the worker in the job payload. Rejected with file_field, where the manifest is written inside the file document. */
+  versions_field?: string;
+  /* MIME type LIKE patterns to match. Defaults to all image types except image/svg+xml, which is not rasterized unless a pattern given here asks for it. */
   mime_patterns?: string[];
   /* Job task identifier for the image processing worker */
   task_identifier?: string;
-  /* Trigger events that fire the job */
+  /* Trigger events that fire the job on a business table. Ignored on a storage files table, where the trigger is always the status transition to uploaded (INSERT is rejected there: the row is still requested). */
   events?: ('INSERT' | 'UPDATE')[];
-  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. */
+  /* Name of an upload/image domain column holding the file reference. When set, the trigger reads the object key, MIME type and bucket id out of that document (NEW.<file_field> ->> 'key', ...) instead of requiring key/mime_type/bucket_id columns beside it, and the MIME patterns match against <file_field> ->> 'mime'. The column may be an array (image[]/upload[]): the lane then runs once per element whose key is new to the array, and each element carries its own manifest in its versions member. */
   file_field?: string;
   /* Custom payload key-to-source mapping for the job trigger. A source is either a column name or a read into a jsonb column ({"field": "upload", "path": ["key"]}). Defaults to the four file columns, or to the file_field document when file_field is set. */
   payload_custom?: {
@@ -1328,7 +1366,7 @@ export interface AuthzEntityMembershipParams {
   levels?: string[];
   /* Capability names of any kind (capability, level, ...) merged into the same mask */
   capabilities?: string[];
-  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capability/capabilities — both are ANDed. */
+  /* Per-row required permissions (DataCapabilities): a bit(n) column on this table whose bits the actor must hold, checked as sprt.capabilities & row.mask = row.mask. Narrows access row by row without joining a grant table; a zero mask requires nothing. Composes with capabilities — both checks must pass. */
   mask_column?: string;
   /* If true, require is_admin flag */
   is_admin?: boolean;
@@ -1744,6 +1782,8 @@ export interface RelationBelongsToParams {
   delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
+  /* Columns both tables carry that the referenced row must share with the referencing row (e.g. ["entity_id"], or ["project_id"] for a stage of the same project). Adds a hidden composite FK (field_name, ...scope_fields) -> target (id, ...scope_fields) plus the target unique key it needs, so a row cannot point at another scope's row even when it knows the id. */
+  scope_fields?: string[];
 }
 /** Creates a foreign key field on the target table referencing the source table. Inverse of RelationBelongsTo — same FK, different perspective. "projects has many tasks" creates tasks.project_id. Auto-derives the FK field name from the source table name using inflection. delete_action is required and must be explicitly provided by the caller. */
 export interface RelationHasManyParams {
@@ -1898,6 +1938,15 @@ export interface ViewTableProjectionParams {
  * ===========================================================================
  */
 ;
+/** What runs on the files of an upload or image field. Each key is a lane and provisions the same node an entry in nodes[] would, with file_field filled in; naming the field in such a node instead leaves that lane to the node. */
+export interface BlueprintFieldProcessing {
+  /** Image fields. Resized versions of the image, written into the image document as `versions`. On by default with the default set of sizes; a list states the versions instead, an object any ProcessImageVersions parameter, false turns it off. */
+  versions?: boolean | NonNullable<ProcessImageVersionsParams['versions']> | Omit<ProcessImageVersionsParams, 'file_field'>;
+  /** Image and upload fields. A vector embedding of the file. Off by default; true takes the node defaults, an object any ProcessImageEmbedding (image) or ProcessFileEmbedding (upload) parameter. The vector column is `<field>_embedding` unless `field_name` names it. */
+  embedding?: boolean | Omit<ProcessImageEmbeddingParams, 'file_field'> | Omit<ProcessFileEmbeddingParams, 'file_field'>;
+  /** Upload fields. Text and metadata extracted from the file. Off by default; true takes the node defaults, an object any ProcessExtraction parameter. The columns are `<field>_text` and `<field>_metadata` unless `text_field` / `metadata_field` name them. */
+  extraction?: boolean | Omit<ProcessExtractionParams, 'file_field'>;
+}
 /** A custom field (column) to add to a blueprint table. */
 export interface BlueprintField {
   /** The column name. */
@@ -1914,6 +1963,8 @@ export interface BlueprintField {
   index?: 'btree' | 'gin' | 'gist' | 'brin' | 'hash';
   /** Comment/description for this field. */
   description?: string;
+  /** Upload and image fields only. The processing lanes that run on the field's files. Omitted, an image field newly added by the blueprint renders the default versions and nothing else runs; false runs nothing. */
+  processing?: false | BlueprintFieldProcessing;
 }
 /** A WITH CHECK override node for an UPDATE policy. Its expression governs the resulting row while the main policy node governs the targeted row. */
 export interface BlueprintPolicyWithCheck {
@@ -2076,8 +2127,14 @@ export interface BlueprintBucketSeed {
   name: string;
   /** Human-readable description of this bucket. */
   description?: string;
-  /** Whether the bucket is publicly readable. Defaults to false. */
+  /** Bucket access type. Defaults to public when is_public is true and private otherwise. */
+  type?: 'public' | 'private' | 'temp';
+  /** Whether the bucket is publicly readable. Must agree with type when both are supplied. */
   is_public?: boolean;
+  /** Destination bucket key for a temporary bucket. */
+  destination?: string;
+  /** Maximum staging time for a temporary bucket as a PostgreSQL interval. */
+  staging_ttl?: string;
   /** MIME type allowlist (e.g., ["image/png", "image/jpeg"]). NULL means all types allowed. */
   allowed_mime_types?: string[];
   /** Maximum file size in bytes for this bucket. NULL means no limit. */
@@ -2091,8 +2148,6 @@ export interface BlueprintStorageConfig {
   scope?: 'app' | 'org';
   /** Module key discriminator. Defaults to "default" (omitted from table names). Non-default keys appear as an infix: {prefix}_{key}_buckets. Max 16 chars, lowercase snake_case. */
   key?: string;
-  /** @deprecated Use `key` instead. Kept for backward compatibility. */
-  storage_key?: string;
   /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. */
   buckets?: BlueprintBucketSeed[];
   /** Override for presigned upload URL expiry time in seconds. */
@@ -2103,7 +2158,7 @@ export interface BlueprintStorageConfig {
   default_max_file_size?: number;
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
-  /** Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Defaults to "30 seconds". */
+  /** Delay before the first upload confirmation attempt (PostgreSQL interval string, e.g. "30 seconds"). Every files table runs the confirm loop: the AFTER INSERT trigger enqueues a storage:confirm_upload job that verifies the object exists in S3 before moving status from requested to uploaded, and expires a requested row whose bytes never arrived within upload_url_expiry_seconds. Defaults to "30 seconds". */
   confirm_upload_delay?: string;
   /** Provision a temporary staging bucket (type temp, tagged default-temp) that stages for the private default bucket, so uploads land there and are promoted into their destination on confirmation. Setting staging_ttl implies this. Defaults to false. */
   staging?: boolean;
@@ -2193,6 +2248,8 @@ export interface BlueprintAgentConfig {
   has_resources?: boolean;
   /** Whether to provision the agent registry (agent table + agent_persona table). Implies has_resources = true. Defaults to false. */
   has_agents?: boolean;
+  /** Whether to attach resources to the repositories they apply to, through an agent_resource_repository junction (resource_id, repository_id, priority). Requires resources and a repository module at this same scope — with no repository catalog to point at, the junction is not created. Defaults to false. */
+  has_repository_resources?: boolean;
   /** Whether to provision the agent execution surface: agent_run (one supervised run of a thread — placement, cursor, artifacts), agent_event (that run's append-only transcript, agent session entries stored verbatim, append-only by grant with UNIQUE (run_id, seq)) and agent_run_workspace (the repositories a run works in — zero rows for a chat with no clone, one per repository otherwise, UNIQUE (run_id, repo)). Defaults to false. */
   has_runs?: boolean;
   /** Resource configuration array. First element configures the agent_resource table: vector dimensions (default 768), chunk_size (default 1000), chunk_strategy (default "paragraph"), chunk_overlap (default 200), embedding_model, embedding_provider, search_indexes (default ["bm25"]). */
@@ -2291,7 +2348,7 @@ export interface BlueprintEntityType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzColumnSecurity' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzEntityMembership' | 'AuthzFilePath' | 'AuthzHumanOnly' | 'AuthzMemberList' | 'AuthzMemberOwner' | 'AuthzNotReadOnly' | 'AuthzOrgHierarchy' | 'AuthzPeerOwnership' | 'AuthzPublishable' | 'AuthzRelatedEntityMembership' | 'AuthzRelatedMemberList' | 'AuthzRelatedMemberOwner' | 'AuthzRelatedPeerOwnership' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'AuthzValueAllowed' | 'AuthzValueExists' | 'AuthzValueMatch' | 'CheckGreaterThan' | 'CheckLessThan' | 'CheckNotEqual' | 'CheckOneOf' | 'CheckOwnedRelation' | 'DataArchivable' | 'DataBulk' | 'DataCapabilities' | 'DataCompositeField' | 'DataDenormalized' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataGenerated' | 'DataHistory' | 'DataI18n' | 'DataId' | 'DataIdentity' | 'DataImmutableFields' | 'DataInflection' | 'DataInheritFromParent' | 'DataJsonb' | 'DataLock' | 'DataMemberOwner' | 'DataOwnedFields' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchBm25' | 'SearchFullText' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'SearchTrgm' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'EventReferral' | 'EventTracker' | 'GuardStepUp' | 'JobTrigger' | 'LimitEnforceAggregate' | 'LimitEnforceCounter' | 'LimitEnforceFeature' | 'LimitEnforceRate' | 'LimitTrackUsage' | 'LimitWarningAggregate' | 'LimitWarningCounter' | 'LimitWarningRate' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
+export type BlueprintNodeShorthand = 'AuthzAllowAll' | 'AuthzAppMemberOwner' | 'AuthzAppMembership' | 'AuthzComposite' | 'AuthzDatabaseClaim' | 'AuthzDenyAll' | 'AuthzHumanOnly' | 'AuthzMemberOwner' | 'AuthzPublishable' | 'AuthzSystemOnly' | 'AuthzTemporal' | 'CheckGreaterThan' | 'CheckLessThan' | 'DataArchivable' | 'DataBulk' | 'DataCapabilities' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataForceCurrentUser' | 'DataHistory' | 'DataId' | 'DataJsonb' | 'DataLock' | 'DataMemberOwner' | 'DataOwnershipInEntity' | 'DataPeoplestamps' | 'DataPrincipalstamps' | 'DataPublishable' | 'DataRealtime' | 'DataSlug' | 'DataSoftDelete' | 'DataStatusField' | 'DataTags' | 'DataTimestamps' | 'SearchSpatial' | 'SearchUnified' | 'SearchVector' | 'TableOrganizationSettings' | 'TableUserProfiles' | 'TableUserSettings' | 'GuardStepUp' | 'ProcessChunks' | 'ProcessExtraction' | 'ProcessFileEmbedding' | 'ProcessImageEmbedding' | 'ProcessImageVersions';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: 'AuthzAllowAll';
@@ -2548,6 +2605,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: 'ProcessChunks';
   data: ProcessChunksParams;
+} | {
+  $type: 'ProcessCustom';
+  data: ProcessCustomParams;
 } | {
   $type: 'ProcessExtraction';
   data: ProcessExtractionParams;
