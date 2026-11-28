@@ -1,3 +1,4 @@
+import { Logger } from '@pgpmjs/logger';
 import { AuthOptions, PgTestClientContext,PgTestConnectionOptions } from '@pgpmjs/types';
 import { Client, QueryResult } from 'pg';
 import { PgConfig } from 'pg-env';
@@ -5,6 +6,8 @@ import { PgConfig } from 'pg-env';
 import { generateContextStatements } from './context-utils';
 import { defaultPgClientFactory, getActivePgClientFactory } from './driver';
 import { getRoleName } from './roles';
+
+const log = new Logger('pgsql-client');
 
 export type PgClientOpts = {
   deferConnect?: boolean;
@@ -25,10 +28,32 @@ export class PgClient {
     this.config = config;
     const factory = getActivePgClientFactory() ?? defaultPgClientFactory;
     this.client = factory(this.config) as Client;
+    this.listenForConnectionLoss();
     if (!opts.deferConnect) {
       this.connectPromise = this.client.connect();
       if (opts.trackConnect) opts.trackConnect(this.connectPromise);
     }
+  }
+
+  /**
+   * node-postgres emits 'error' on a client whose connection the server ends
+   * or drops: `pg_terminate_backend`, a restart, a crash. With no listener
+   * that event is fatal, and the whole test process exits instead of the one
+   * test failing. Listening keeps the process alive without hiding anything:
+   * every later query on this client still rejects.
+   *
+   * A client from a registered factory may not emit events at all.
+   */
+  private listenForConnectionLoss(): void {
+    if (typeof (this.client as { on?: unknown }).on !== 'function') return;
+    this.client.on('error', (err: Error & { code?: string }) => {
+      const detail = `[${err.code ?? 'unknown'}] ${err.message}`;
+      if (this._ended) {
+        log.debug(`Connection to ${this.config.database} ended while closing: ${detail}`);
+      } else {
+        log.warn(`Connection to ${this.config.database} lost, later queries on this client will fail: ${detail}`);
+      }
+    });
   }
 
   protected async ensureConnected(): Promise<void> {

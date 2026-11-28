@@ -80,6 +80,19 @@ export class PgTestConnector {
     const key = this.poolKey(config);
     if (!this.pgPools.has(key)) {
       const pool = new Pool(config);
+      // node-postgres reports a connection the server ends or drops on the pool
+      // while the connection is idle, and on its client while it is checked out.
+      // With no listener either event ends the test process. Queries on the
+      // broken connection still reject, and the pool discards it on release.
+      pool.on('error', (err: Error & { code?: string }) => {
+        log.warn(`Idle connection in pg pool [${key}] lost [${err.code ?? 'unknown'}]: ${err.message}`);
+      });
+      pool.on('connect', (client) => {
+        // An idle client's error also reaches the pool listener above.
+        client.on('error', (err: Error & { code?: string }) => {
+          log.debug(`pg pool [${key}] client connection error [${err.code ?? 'unknown'}]: ${err.message}`);
+        });
+      });
       this.pgPools.set(key, pool);
       log.info(`📘 Created new pg pool: ${key}`);
     }
