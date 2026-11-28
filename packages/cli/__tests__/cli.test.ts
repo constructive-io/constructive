@@ -435,16 +435,16 @@ describe('status, whoami and contexts', () => {
         'a version and a commit',
         (res) => res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ name: '@constructive-io/graphql-server', version: '5.36.13', commit: '0123abc' })),
         { status: 'known', name: '@constructive-io/graphql-server', version: '5.36.13', commit: '0123abc' },
-        /^Server: @constructive-io\/graphql-server 5\.36\.13, commit 0123abc$/m
+        /^server +@constructive-io\/graphql-server 5\.36\.13 \(commit 0123abc\)$/m
       ],
       [
         'no commit',
         (res) => res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ name: '@constructive-io/graphql-server', version: '5.36.13', commit: null })),
         { status: 'known', commit: null },
-        /^Server: @constructive-io\/graphql-server 5\.36\.13, no commit recorded$/m
+        /^server +@constructive-io\/graphql-server 5\.36\.13$/m
       ],
-      ['a 404 from a server older than the route', (res) => res.writeHead(404).end('Not Found'), { status: 'unknown', reason: 'no-version-route' }, /^Server: version unknown: the server has no \/version/m],
-      ['a page that is not the version', (res) => res.writeHead(200, { 'Content-Type': 'text/html' }).end('<html></html>'), { status: 'unknown', reason: 'bad-answer' }, /^Server: version unknown: /m]
+      ['a 404 from a server older than the route', (res) => res.writeHead(404).end('Not Found'), { status: 'unknown', reason: 'no-version-route' }, /^server +version unknown \(no \/version route\)$/m],
+      ['a page that is not the version', (res) => res.writeHead(200, { 'Content-Type': 'text/html' }).end('<html></html>'), { status: 'unknown', reason: 'bad-answer' }, /^server +version unknown \(/m]
     ])('shows the version GET /version answers, and never fails on it: %s', async (_what, answer, server, line) => {
       const requests: string[] = [];
       const backend = http.createServer((req, res) => {
@@ -481,7 +481,7 @@ describe('status, whoami and contexts', () => {
         const status = await run(['status', '--format', 'text']);
         expect(status.code).toBe(0);
         expect(Date.now() - started).toBeLessThan(2000);
-        expect(status.out).toMatch(/^Server: version unknown: no answer from .*\/version within 0\.1 s\.$/m);
+        expect(status.out).toMatch(/^server +version unknown \(no answer within 0\.1 s\)$/m);
       } finally {
         backend.closeAllConnections();
         await new Promise((resolve) => backend.close(resolve));
@@ -655,7 +655,7 @@ describe('login', () => {
       expect(code).toBe(0);
       expect(json.data.projectAgent).toEqual({ name: 'helper' });
       expect(json.meta.next.map((step: { argv: string[] }) => step.argv.slice(1))).toEqual([['whoami', '--as', 'helper']]);
-      expect((await run(['whoami', '--format', 'text'])).out).toContain('but this run acts as the person, with the person\'s rights');
+      expect((await run(['whoami', '--format', 'text'])).out).toContain('but this run acts as you. Add --as');
     } finally {
       await auth.close();
     }
@@ -751,12 +751,12 @@ describe('tool commands', () => {
     storeSignedIn(store);
   });
 
-  it('stops a change with approval-required and the plan when there is no terminal and no --yes', async () => {
+  it('stops a change with approval-required, the plan and its --approve step when there is no terminal and no approval', async () => {
     const { code, json } = await run(['db', 'create', 'shop']);
     expect(code).toBe(3);
     expect(json.error.code).toBe('approval-required');
     expect(json.error.details.plan).toMatchObject({ title: expect.any(String), message: expect.stringContaining('shop') });
-    expect(json.meta.next).toEqual([expect.objectContaining({ command: 'constructive db create shop --yes' })]);
+    expect(json.meta.next).toEqual([expect.objectContaining({ command: `constructive db create shop --approve ${json.error.details.planId}` })]);
   });
 
   it('shows the plan and changes nothing with --dry-run', async () => {
@@ -768,7 +768,7 @@ describe('tool commands', () => {
   it('stops db recreate for approval like any other change', async () => {
     const { code, json } = await run(['db', 'recreate', 'shop']);
     expect(code).toBe(3);
-    expect(json.meta.next).toEqual([expect.objectContaining({ command: 'constructive db recreate shop --yes' })]);
+    expect(json.meta.next).toEqual([expect.objectContaining({ command: `constructive db recreate shop --approve ${json.error.details.planId}` })]);
   });
 
   it('names commands, not tools, in the help of a tool command', async () => {

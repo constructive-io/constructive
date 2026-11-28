@@ -111,18 +111,15 @@ export type TableAddInput = { name: string; field?: string[]; node?: string[]; r
 
 /** The refusal of a table with no rule, with a ready example the person can copy. */
 function noRule(input: TableAddInput, ctx: CommandContext): CliError {
-  const rule = JSON.stringify(OWNER_ONLY_RULE);
   return new CliError<CliCode>({
     code: 'missing-input',
-    message: `"${CLI_NAME} table add" needs at least one --rule: with row security on and no rule, no one can read or change the rows, so it makes no such table.`,
-    hint:
-      `For a table whose rows only their owner reads and changes, add --node ${OWNER_NODE} --rule '${rule}'. ` +
-      `"${CLI_NAME} access types" lists the rule types in plain words.`,
+    message: 'table add needs a --rule. Without one, no one can read or change the rows.',
+    hint: `The first step below adds an owner-only rule. "${CLI_NAME} access types" lists the others.`,
     exitCode: ExitCode.usage,
     details: { missing: ['--rule'], flag: '--rule', example: { node: OWNER_NODE, rule: OWNER_ONLY_RULE } },
     next: [
-      ctx.next(ownerOnly(input.name, input.field), 'Add it with one rule: only the person whose id is in its owner_id column reads and changes a row'),
-      ctx.next(['access', 'types'], 'List the rule types in plain words')
+      ctx.next(ownerOnly(input.name, input.field), 'Only the person in owner_id reads and changes a row'),
+      ctx.next(['access', 'types'], 'List the rule types')
     ]
   });
 }
@@ -153,8 +150,8 @@ export function tableAddText(details: ProvisionBlueprintDetails): string {
         ...table.fields.filter((field) => field.requestedName).map((field) => `the field "${field.requestedName}" as "${field.name}"`)
       ];
       return [
-        `Added the table "${table.name}" with ${fields.length ? `the fields ${fields.join(', ')}` : 'no fields of its own'}.`,
-        ...(renamed.length ? [`The backend stored ${renamed.join(', and ')}; use the stored names in other commands.`] : [])
+        `Added table ${table.name}${fields.length ? ` (${fields.join(', ')})` : ''}.`,
+        ...(renamed.length ? [`The backend stored ${renamed.join(', and ')}. Use the stored names in other commands.`] : [])
       ];
     })
     .join('\n');
@@ -170,7 +167,7 @@ export const gate = createConstructiveGatePolicy(constructiveGateDeps());
 export const toolEntries: ToolCommandEntry[] = [
   toolCommand(provisionDatabaseTool, {
     name: 'db create',
-    summary: 'Create a database and bind this directory to it',
+    summary: 'Create a database and bind to it',
     description:
       'Provisions a database under the signed-in account and writes its binding (DATABASE_ID, DATABASE_NAME and the endpoints) to the .env of this directory. ' +
       'A directory already bound to a live database of this account keeps it. When a call returns while the database is still provisioning, run it again with the same name to keep waiting; ' +
@@ -184,7 +181,7 @@ export const toolEntries: ToolCommandEntry[] = [
   }),
   toolCommand(replaceDatabaseTool, {
     name: 'db recreate',
-    summary: 'Bind this directory to a new, empty database in place of its current one',
+    summary: 'Bind to a new, empty database',
     description:
       'Provisions a new database and binds this directory to it, for a database that is gone, that belongs to another account, or for a clean rebuild. ' +
       'The old database is kept on the backend and its binding is archived in .env, but its tables and records do not carry over.',
@@ -194,23 +191,23 @@ export const toolEntries: ToolCommandEntry[] = [
   }),
   toolCommand(runCodegenTool, {
     name: 'db codegen',
-    summary: 'Generate the typed SDK of the app in packages/app'
+    summary: "Generate the app's typed SDK"
   }),
   toolCommand(describeSchemaTool, {
     name: 'schema show',
-    summary: 'Show the tables and fields of the bound database, and the rule types of each table'
+    summary: 'Show the tables, fields and rules'
   }),
   toolCommand(provisionBlueprintTool, {
     name: 'table add',
-    summary: 'Add a table with fields and the rules that say who reads and changes its rows',
+    summary: 'Add a table with its rules',
     description:
-      'Adds one table to the bound database. Each --field is name:type or name:type:required. Each --node is a Data node, as its type (DataDirectOwner) or as JSON with its data. ' +
-      'Each --rule is a rule as JSON, and at least one is needed: with no --rule it stops with exit 2 and gives an owner-only example to copy. ' +
-      'Every table also gets id, created_at and updated_at, and the columns its rules need. To add several related tables at once, use blueprint apply.',
+      'Adds one table to the bound database. Each --field is name:type or name:type:required. Each --node is a Data node: its type (DataDirectOwner), or JSON with its data. ' +
+      `At least one --rule is needed (see "${CLI_NAME} help rules"). Every table also gets id, created_at and updated_at, and the columns its rules need. ` +
+      'For several related tables at once, use blueprint apply.',
     input: z.object({
-      name: z.string().describe('Table name in snake_case, plural, for example tasks'),
-      field: z.array(z.string()).optional().describe('A field as name:type or name:type:required'),
-      node: z.array(z.string()).optional().describe('A Data node, as its type (DataDirectOwner) or as JSON: {"$type": "DataDirectOwner", "data": {...}}'),
+      name: z.string().describe('Table name, snake_case and plural, for example tasks'),
+      field: z.array(z.string()).optional().describe('name:type or name:type:required'),
+      node: z.array(z.string()).optional().describe('A Data node: its type (DataDirectOwner), or JSON'),
       rule: RULE_FLAG
     }),
     positionals: ['name'],
@@ -236,21 +233,21 @@ export const toolEntries: ToolCommandEntry[] = [
   }),
   toolCommand(createFieldTool, {
     name: 'field add',
-    summary: 'Add a field to a table',
+    summary: 'Add a field',
     positionals: ['table_name', 'field_name'],
     examples: [{ command: `${CLI_NAME} field add tasks notes --type text --yes` }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
   }),
   toolCommand(updateFieldTool, {
     name: 'field update',
-    summary: 'Rename a field, or change whether it is required or unique, or its default',
+    summary: 'Rename a field, or change its options',
     positionals: ['table_name', 'field_name'],
     examples: [{ command: `${CLI_NAME} field update tasks notes --new-name details --yes` }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
   }),
   toolCommand(retypeFieldTool, {
     name: 'field retype',
-    summary: 'Change the type of a field; the cast can lose data',
+    summary: 'Change the type of a field',
     positionals: ['table_name', 'field_name'],
     examples: [{ command: `${CLI_NAME} field retype tasks estimate --type integer --dry-run` }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
@@ -264,57 +261,57 @@ export const toolEntries: ToolCommandEntry[] = [
   }),
   toolCommand(addRelationTool, {
     name: 'relation add',
-    summary: 'Link two existing tables',
+    summary: 'Link two tables',
     positionals: ['source_table', 'target_table'],
     examples: [{ command: `${CLI_NAME} relation add tasks projects --field-name project_id --yes`, description: 'tasks.project_id references projects' }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
   }),
   toolCommand(provisionBlueprintTool, {
     name: 'blueprint apply',
-    summary: 'Create tables, fields, rules and relations from a blueprint',
+    summary: 'Create tables from a blueprint',
     examples: [{ command: `${CLI_NAME} blueprint apply --input @blueprint.json --dry-run`, description: 'Show the tables the blueprint makes' }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
   }),
   ...accessEntries,
   toolCommand(listEntityTypesTool, {
     name: 'entity-type list',
-    summary: 'List the entity types of the bound database'
+    summary: 'List the entity types'
   }),
   toolCommand(createEntityTypeTool, {
     name: 'entity-type create',
-    summary: 'Create an entity type (an org, a team, a project) with its table and memberships',
+    summary: 'Create an entity type (org, team, project)',
     positionals: ['name'],
     examples: [{ command: `${CLI_NAME} entity-type create team --has-invites --yes` }],
     next: (_details, _params, ctx) => [ENTITY_TYPE_LIST(ctx)]
   }),
   toolCommand(deleteEntityTypeTool, {
     name: 'entity-type delete',
-    summary: 'Delete the registration of an entity type; its table stays',
+    summary: 'Unregister an entity type; its table stays',
     positionals: ['entity_type_id'],
     examples: [{ command: `${CLI_NAME} entity-type delete <id> --dry-run`, description: 'The id comes from entity-type list' }],
     next: (_details, _params, ctx) => [ENTITY_TYPE_LIST(ctx)]
   }),
   toolCommand(listTemplatesTool, {
     name: 'template list',
-    summary: 'List the blueprint templates'
+    summary: 'List the templates'
   }),
   toolCommand(createTemplateTool, {
     name: 'template create',
-    summary: 'Save a blueprint of this database as a template',
+    summary: 'Save this database as a template',
     positionals: ['displayName'],
     examples: [{ command: `${CLI_NAME} template create 'Task tracker' --yes` }],
     next: (_details, _params, ctx) => [TEMPLATE_LIST(ctx)]
   }),
   toolCommand(applyTemplateTool, {
     name: 'template apply',
-    summary: 'Create the tables of a template in the bound database',
+    summary: 'Create the tables of a template here',
     positionals: ['templateName'],
     examples: [{ command: `${CLI_NAME} template apply 'Task tracker' --dry-run` }],
     next: (_details, _params, ctx) => [SCHEMA_SHOW(ctx)]
   }),
   toolCommand(updateTemplateTool, {
     name: 'template update',
-    summary: 'Change the name, description, categories, tags or visibility of a template',
+    summary: 'Change the details of a template',
     positionals: ['templateName'],
     examples: [{ command: `${CLI_NAME} template update 'Task tracker' --patch '{"visibility":"public"}' --yes` }],
     next: (_details, _params, ctx) => [TEMPLATE_LIST(ctx)]

@@ -10,6 +10,7 @@ import {
   setAccessTool,
   type TableKind
 } from '@agentic-kit/db-tools';
+import { alignColumns as columns } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import type { CliCode } from '../errors';
@@ -17,19 +18,13 @@ import { CLI_NAME } from '../session';
 
 type PolicyTypeDetails = Awaited<ReturnType<typeof describePolicyTypeTool.execute>>['details'];
 
-/** Lines of cells, each column padded to its widest cell. */
-function columns(rows: string[][]): string[] {
-  const widths = rows.reduce<number[]>((max, row) => row.map((cell, index) => Math.max(max[index] ?? 0, cell.length)), []);
-  return rows.map((row) => row.map((cell, index) => cell.padEnd(widths[index])).join('  ').trimEnd());
-}
-
 /** The rule shape every access command takes, in the words of its help. */
 export const RULE_SHAPE =
   '{"$type": "<rule type>", "privileges": ["select", "insert", "update", "delete"], "permissive": false (optional), "policy_role": "<role>" (optional), ' +
   '"policy_name": "<name>" (optional, for a second rule of one type, role and privilege), "data": {...} (the parameters of its type)}';
 
 /** `--rule`: one rule as JSON, repeated for each rule. */
-export const RULE_FLAG = z.array(z.string()).optional().describe(`A rule as JSON: ${RULE_SHAPE}. Repeat it for each rule; access types lists the rule types`);
+export const RULE_FLAG = z.array(z.string()).optional().describe(`A rule as JSON; see "${CLI_NAME} help rules"`);
 
 /** The rules of `--rule`, each parsed as JSON; the tool checks each against its type. */
 export function parseRules(specs: readonly string[]): AccessPolicy[] {
@@ -155,7 +150,7 @@ function neededColumns(type: NonNullable<PolicyTypeDetails['type']>, properties:
 export function typesText(details: PolicyTypeDetails): string {
   if (!details.type) {
     const rows = (details.types ?? []).map((type) => [type.name, kindWords(ONTO_EXISTING, type.tableKind), type.summary ?? '']);
-    return columns([['type', 'onto an existing table', 'who it lets in'], ...rows]).join('\n');
+    return columns([['TYPE', 'ONTO AN EXISTING TABLE', 'WHO IT LETS IN'], ...rows]).join('\n');
   }
   const { type } = details;
   const schema = (type.parameterSchema ?? {}) as NodeSchema;
@@ -184,12 +179,12 @@ export function typesText(details: PolicyTypeDetails): string {
 }
 
 /** The line of help that sends a person writing rules to the rule types. */
-export const RULE_TYPES_NOTE = `${CLI_NAME} access types lists the rule types --rule can use, in plain words; ${CLI_NAME} access types <type> shows the parameters of one.`;
+export const RULE_TYPES_NOTE = `The rule types: ${CLI_NAME} access types, and ${CLI_NAME} access types <type> for one.`;
 
 export const accessEntries = [
   toolCommand(describePolicyTypeTool, {
     name: 'access types',
-    summary: 'List the rule types a rule can use, in plain words, or show one with its parameters and the columns it needs',
+    summary: 'List the rule types, or show one',
     positionals: ['type'],
     text: typesText,
     examples: [
@@ -199,7 +194,7 @@ export const accessEntries = [
   }),
   toolCommand(explainAccessTool, {
     name: 'access explain',
-    summary: 'Say in plain words what each rule of a table checks, its grants and row security, and what may be wrong',
+    summary: 'Explain the rules of a table',
     positionals: ['table_name'],
     examples: [
       { command: `${CLI_NAME} access explain tasks` },
@@ -210,7 +205,7 @@ export const accessEntries = [
   }),
   toolCommand(setAccessTool, {
     name: 'access set',
-    summary: 'Replace every rule of a table with the rules given',
+    summary: 'Replace the rules of a table',
     input: z.object({ table_name: setAccessTool.parameters.shape.table_name, rule: RULE_FLAG }),
     positionals: ['table_name'],
     mapInput: ({ table_name, rule }: { table_name: string; rule?: string[] }) => ({ table_name, policies: parseRules(rule ?? []) }),
@@ -223,7 +218,7 @@ export const accessEntries = [
   }),
   toolCommand(addPoliciesTool, {
     name: 'access add',
-    summary: 'Add rules to a table; the rules it has stay',
+    summary: 'Add rules to a table',
     input: z.object({ table_name: addPoliciesTool.parameters.shape.table_name, rule: RULE_FLAG }),
     positionals: ['table_name'],
     mapInput: ({ table_name, rule }: { table_name: string; rule?: string[] }) => ({ table_name, policies: parseRules(rule ?? []) }),

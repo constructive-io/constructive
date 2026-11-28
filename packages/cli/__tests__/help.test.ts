@@ -44,7 +44,11 @@ describe('constructive help', () => {
     const { code, out } = await run(['help', name]);
     expect(code).toBe(0);
     const topic = topics().find((item) => item.name === name);
-    expect(JSON.parse(out).data).toEqual({ kind: 'topic', name, text: `${topic.summary}\n\n${topic.body}\n` });
+    const { data } = JSON.parse(out);
+    expect(data).toMatchObject({ kind: 'topic', name });
+    // A terminal shows the Markdown without the fences of its blocks or the backticks of inline code.
+    expect(data.text.startsWith(`${topic.summary}\n\n`)).toBe(true);
+    expect(data.text).not.toMatch(/`/);
   });
 
   it.each([[['db', 'create']], [['access', 'types']], [['agent']]])('prints for %j the page that --help prints', async (words) => {
@@ -77,7 +81,7 @@ describe('constructive help', () => {
   });
 
   it.each([...OVERRIDE_ENV_VARS, STASH_DIR_ENV])('names %s in the environment topic', (variable) => {
-    expect(topics().find((topic) => topic.name === 'environment').body).toContain(`\`${variable}\``);
+    expect(topics().find((topic) => topic.name === 'environment').body).toContain(variable);
   });
 });
 

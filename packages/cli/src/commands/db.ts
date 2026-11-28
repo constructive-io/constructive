@@ -1,5 +1,6 @@
 import { type ChangeCommand, CliError, ExitCode, type InputSchema, type Planned, type ReadCommand } from '@agentic-kit/command';
 import { postGraphQL, provisionDatabase, type ProvisionDatabaseDetails } from '@agentic-kit/db-tools';
+import { alignColumns } from '@agentic-kit/harness';
 import { z } from 'zod';
 
 import type { CliCode } from '../errors';
@@ -10,10 +11,12 @@ import {
   CLI_NAME,
   type ControlPlane,
   controlPlane,
+  databaseLabel,
   databaseNext,
   type DatabaseState,
   databaseState,
   databaseText,
+  dayOf,
   openSession,
   planAccount,
   type Session
@@ -57,16 +60,28 @@ async function listDatabases(plane: ControlPlane, session: Session, cwd: string)
   }));
 }
 
+/** The databases as a table: `*` marks the bound one, and OWNER shows only when the list holds a database of another owner. */
+function databasesText(rows: DatabaseRow[]): string {
+  if (!rows.length) return 'No databases yet.';
+  const owners = rows.some((row) => !row.yours);
+  const table = alignColumns([
+    ['', 'NAME', 'ID', 'CREATED', ...(owners ? ['OWNER'] : [])],
+    ...rows.map((row) => [row.bound ? '*' : '', row.name ?? '', row.id, row.createdAt ? dayOf(row.createdAt) : '', ...(owners ? [row.yours ? 'you' : row.ownerId ?? ''] : [])])
+  ]);
+  return [...table, ...(rows.some((row) => row.bound) ? ['* bound to this directory'] : [])].join('\n');
+}
+
 const dbList: ReadCommand<InputSchema, DatabaseRow[]> = {
   name: 'db list',
-  summary: 'List the databases this account can see',
-  description: 'The newest 100 databases the platform shows the signed-in account. yours says which ones it owns, and bound says which one this directory uses.',
+  summary: 'List your databases',
+  description: 'The newest 100 databases the signed-in account can see. In text, * marks the one this directory is bound to.',
   effect: 'read',
   async run(_input, ctx) {
     const session = await openSession(ctx);
     const rows = await listDatabases(controlPlane(session), session, ctx.cwd);
     return {
       data: rows,
+      text: databasesText(rows),
       next: rows.some((row) => row.yours)
         ? [ctx.next(['db', 'use', { placeholder: 'name-or-id' }], 'Bind this directory to one of yours')]
         : [ctx.next(['db', 'create', { placeholder: 'name' }], 'Create a database for this directory')]
@@ -96,7 +111,7 @@ const DbUseInput = z.object({ database: z.string().describe('Name or ID of the d
 
 const dbUse: ChangeCommand<typeof DbUseInput, unknown, Planned & { database: DatabaseRow }> = {
   name: 'db use',
-  summary: 'Bind this directory to a database you already have',
+  summary: 'Bind this directory to a database',
   description:
     'Writes the binding (DATABASE_ID, DATABASE_NAME and the endpoints) to the .env of this directory. Only a database the signed-in account owns can be bound, and only in a directory that is not bound to a live database yet.',
   effect: 'write',
@@ -128,8 +143,8 @@ const dbUse: ChangeCommand<typeof DbUseInput, unknown, Planned & { database: Dat
     const [target] = matches;
     return {
       plan: {
-        title: 'Bind database?',
-        message: `Bind ${ctx.cwd} to this database, and write the binding to its .env.`,
+        title: `Bind this directory to ${target.name ?? target.id}`,
+        message: [`directory: ${ctx.cwd}`, `~ .env  -> ${databaseLabel(target.name, target.id)}`].join('\n'),
         target: {
           kind: 'database',
           database: { name: target.name, id: target.id },
@@ -150,7 +165,7 @@ const dbUse: ChangeCommand<typeof DbUseInput, unknown, Planned & { database: Dat
 
 const dbStatus: ReadCommand<InputSchema, DatabaseState> = {
   name: 'db status',
-  summary: 'Show whether the database of this directory is live',
+  summary: 'Show whether the bound database is live',
   description:
     'Reads DATABASE_ID from the .env of this directory and asks the backend about it: found, suspended, missing (deleted, or access lost) or unreachable. ' +
     'A DATABASE_ID that is not a database id is invalid, and it is neither sent nor shown.',
@@ -159,7 +174,7 @@ const dbStatus: ReadCommand<InputSchema, DatabaseState> = {
     const session = await openSession(ctx);
     bindTools(session);
     const state = await databaseState(ctx.cwd);
-    return { data: state, text: databaseText(state), next: databaseNext(state, session) };
+    return { data: state, text: alignColumns([['database', databaseText(state)]]).join('\n'), next: databaseNext(state, session) };
   }
 };
 

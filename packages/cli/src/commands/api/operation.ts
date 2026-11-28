@@ -212,7 +212,7 @@ const shown = (data: unknown, target: Target, warnings: string[] = []) => ({
 
 const apiQuery: ReadCommand<typeof DOCUMENT_INPUT, unknown> = {
   name: 'api query',
-  summary: 'Run a GraphQL query on a plane of the backend',
+  summary: 'Run a GraphQL query',
   description:
     'Sends a GraphQL query to a plane of the session backend (api by default) with the session credential, and prints its data. ' +
     'A query only reads, so it runs at once; a mutation or a subscription runs with api mutate.',
@@ -236,7 +236,7 @@ type MutationPlanned = Planned & Awaited<ReturnType<typeof request>>;
 
 const apiMutate: ChangeCommand<typeof DOCUMENT_INPUT, unknown, MutationPlanned> = {
   name: 'api mutate',
-  summary: 'Run a GraphQL mutation on a plane of the backend, after approval',
+  summary: 'Run a GraphQL mutation',
   description:
     'Sends a GraphQL document with a mutation or a subscription to a plane of the session backend, with the session credential. ' +
     'It is a change: without --yes it stops with the plan (the endpoint, the account, each root field with its arguments, and the variables) until a person approves it.',

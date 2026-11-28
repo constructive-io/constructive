@@ -219,7 +219,7 @@ const SearchInput = z.object({
 
 const apiSearch: ReadCommand<typeof SearchInput, { matches: Match[]; total: number }> = {
   name: 'api search',
-  summary: 'Find types and fields in the GraphQL schema of a plane',
+  summary: 'Search the GraphQL schema',
   description: 'Reads the schema of a plane by introspection, and lists the types and fields whose names hold the term, with the first line of each description.',
   effect: 'read',
   input: SearchInput,
@@ -248,7 +248,7 @@ const DescribeInput = z.object({
 
 const apiDescribe: ReadCommand<typeof DescribeInput, Description> = {
   name: 'api describe',
-  summary: 'Show a type with its fields, or a field with its arguments and return type',
+  summary: 'Describe a type or a field',
   description: 'Reads the schema of a plane by introspection. NAME is a type (Database), a field (Database.name), or a root field (databases).',
   effect: 'read',
   input: DescribeInput,

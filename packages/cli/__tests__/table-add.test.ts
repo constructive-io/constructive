@@ -64,7 +64,7 @@ describe('the result of table add', () => {
 
   it('says in one sentence each that the backend stored another name, and names the stored table in its next steps', () => {
     const text = tableAddText(details);
-    expect(text).toContain('The backend stored the table "a_b_c" as "abc", and the field "x_y" as "xy"; use the stored names in other commands.');
+    expect(text).toContain('The backend stored the table "a_b_c" as "abc", and the field "x_y" as "xy". Use the stored names in other commands.');
     expect(tableAddNext(details, ctx).map((step) => step.argv.slice(1))).toEqual([['schema', 'show'], ['access', 'explain', 'abc']]);
   });
 
@@ -102,7 +102,7 @@ describe('table add on the command line', () => {
     const { code, json } = await run(['table', 'add', 'tasks', '--field', 'title:text']);
     expect(code).toBe(2);
     expect(json.error).toMatchObject({ code: 'missing-input', details: { missing: ['--rule'], example: { node: OWNER_NODE, rule: OWNER_ONLY_RULE } } });
-    expect(json.error.hint).toContain(`--node ${OWNER_NODE} --rule '${RULE}'`);
+    expect(json.error.hint).toBe('The first step below adds an owner-only rule. "constructive access types" lists the others.');
     expect(json.meta.next.map((step: NextStep) => step.argv.slice(1))).toEqual([
       ['table', 'add', 'tasks', '--field', 'title:text', '--node', OWNER_NODE, '--rule', RULE],
       ['access', 'types']

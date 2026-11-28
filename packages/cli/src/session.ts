@@ -272,7 +272,7 @@ export function repairStep(store: ConfigStore, name: string, next: NextBuilder):
 
 /** What happened to the API key of a removed session, in words. */
 export const KEY_TEXT: Record<KeyRevocation['kind'], string> = {
-  revoked: 'the API key was revoked',
+  revoked: 'the API key is revoked',
   absent: 'it had no API key',
   failed: 'the API key could not be revoked'
 };
@@ -491,9 +491,11 @@ export const newTokenWords = (agent: string): string =>
   `The backend refused the access token of the agent "${agent}", so a new one was minted; the change was not made again by itself.`;
 
 function renewedChangeError(ctx: CommandContext, error: CliError): CliError {
-  const why = ctx.yes
-    ? 'Run it again with the new token: it keeps --yes, as given, so it makes the change without stopping at its plan'
-    : 'Run it again with the new token: it makes its plan again and stops there without --yes';
+  const why = ctx.approve !== undefined
+    ? 'Run it again with the new token: it keeps --approve, so it makes the change only while its plan is the same'
+    : ctx.yes
+      ? 'Run it again with the new token: it keeps --yes, as given, so it makes the change without stopping at its plan'
+      : 'Run it again with the new token: it makes its plan again and stops there until it is approved';
   return new CliError<CliCode>({
     code: 'signed-out',
     message: `${error.message} ${newTokenWords(String(ctx.globals.as))}`,
@@ -523,13 +525,34 @@ export async function retryRejectedAgent<T>(ctx: CommandContext, again: boolean,
   const step = await agentStep(ctx, { again, run: () => settle(run), refused: signedOut });
   switch (step.kind) {
   case 'done':
-    if ('error' in step.outcome) throw step.outcome.error;
+    if ('error' in step.outcome) throw again ? step.outcome.error : await agentRefusal(ctx, step.outcome.error);
     return step.outcome.value;
   case 'not-run-again':
     throw renewedChangeError(ctx, step.refused.error);
   case 'unusable':
     throw signedOutError(step.session);
   }
+}
+
+/**
+ * A change the backend refused under --as, from an agent that may not change the schema: the error says that is the
+ * cause, and gives the person the grant. Any other error stays as it is.
+ */
+async function agentRefusal(ctx: CommandContext, error: unknown): Promise<unknown> {
+  if (ctx.globals.as === undefined || !isCliError(error) || error.code !== 'permission-denied') return error;
+  const { state } = await openSession(ctx);
+  if (state.kind !== 'signed-in' || state.source !== 'agent' || state.agent.schemaChanges) return error;
+  const { name } = state.agent;
+  return new CliError<CliCode>({
+    code: 'permission-denied',
+    message: error.message,
+    cause: `The agent ${name} may not change the schema.`,
+    hint: `The person can allow it: ${CLI_NAME} agent grant ${name} --schema-changes`,
+    retryable: error.retryable,
+    exitCode: error.exitCode,
+    details: error.details,
+    next: [ctx.next(['agent', 'grant', name, '--schema-changes'], 'Let the agent change the schema, as the person', AS_PERSON), ...(error.next ?? [])]
+  });
 }
 
 export function signedOutError(session: Session): CliError {
@@ -543,7 +566,6 @@ export function signedOutError(session: Session): CliError {
   return new CliError<CliCode>({
     code: 'signed-out',
     message: problem ?? `No one is signed in${where}.`,
-    hint: SIGN_IN_HINT,
     next: signInSteps(session),
     exitCode: ExitCode.signInRequired
   });
@@ -770,20 +792,30 @@ export function databaseNext(state: DatabaseState, session: Session): NextStep[]
   }
 }
 
+/** An ISO timestamp as its UTC date, for text: `2026-12-27`. JSON keeps the full value. */
+export const dayOf = (iso: string): string => (Number.isNaN(Date.parse(iso)) ? iso : new Date(iso).toISOString().slice(0, 10));
+
+/** An ISO timestamp as its UTC time of day, for text: `02:03 UTC`. */
+export const clockOf = (iso: string): string => (Number.isNaN(Date.parse(iso)) ? iso : `${new Date(iso).toISOString().slice(11, 16)} UTC`);
+
+/** A database as text: its name and the first eight hex digits of its id; the full id stays in JSON and in lists. */
+export const databaseLabel = (name: string | null | undefined, id: string): string => (name ? `${name} (${id.slice(0, 8)})` : id);
+
+/** The bound database as the value of a `database` line. */
 export function databaseText(state: DatabaseState): string {
   switch (state.status) {
   case 'unbound':
-    return 'This directory is not bound to a database.';
+    return 'not bound to this directory';
   case 'invalid':
-    return "The DATABASE_ID in this directory's .env is not a database id, so the directory is bound to no database, and the value is not shown. Fix the line or remove it, then bind the directory again.";
+    return 'DATABASE_ID in .env is not a database id, so it is not shown. Fix or remove the line, then bind again.';
   case 'found':
-    return `Bound to the database "${state.name ?? '?'}" (ID ${state.databaseId}), which is live.`;
+    return `${databaseLabel(state.name, state.databaseId)}, live`;
   case 'suspended':
-    return `Bound to the database "${state.name ?? '?'}" (ID ${state.databaseId}), which is suspended since ${state.suspendedAt}${state.suspendedReason ? ` (${state.suspendedReason})` : ''}. Its data is kept.`;
+    return `${databaseLabel(state.name, state.databaseId)}, suspended since ${dayOf(state.suspendedAt)}${state.suspendedReason ? ` (${state.suspendedReason})` : ''}. Its data is kept.`;
   case 'missing':
-    return `Bound to the database ${state.databaseId}, but it no longer exists on this backend, or this account lost access to it.`;
+    return `${state.databaseId}, gone: it no longer exists on this backend, or this account lost access to it`;
   case 'unreachable':
-    return `Bound to the database ${state.databaseId}, but its state is unknown: ${state.detail}`;
+    return `${state.databaseId}, state unknown: ${state.detail}`;
   default: {
     const unknown: never = state;
     throw new Error(`Unknown database state ${JSON.stringify(unknown)}.`);

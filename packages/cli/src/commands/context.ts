@@ -1,4 +1,5 @@
 import { CliError, type CommandContext, ExitCode, type ImmediateCommand, type InputSchema, type NextStep, type ReadCommand } from '@agentic-kit/command';
+import { alignColumns } from '@agentic-kit/harness';
 import {
   addBackend,
   type BackendContext,
@@ -37,6 +38,20 @@ export interface ContextRow {
   missing?: Plane[];
   repair?: NextStep;
   invalidName?: string;
+}
+
+/** The contexts as a table: `*` marks the active one, and an incomplete one names the planes it lacks. */
+function contextsText(rows: ContextRow[]): string {
+  if (!rows.length) return 'No contexts yet.';
+  return alignColumns([
+    ['', 'NAME', 'API ENDPOINT', ''],
+    ...rows.map((row) => [
+      row.current ? '*' : '',
+      row.name,
+      row.apiEndpoint ?? '',
+      row.invalidName ? 'invalid name' : row.complete ? '' : `missing: ${(row.missing ?? []).join(', ')}`
+    ])
+  ]).join('\n');
 }
 
 function toRow(store: ConfigStore, context: BackendContext, next: NextBuilder): ContextRow {
@@ -106,7 +121,7 @@ const contextList: ReadCommand<InputSchema, ContextRow[]> = {
       }
       return row.complete ? [] : [`The context "${row.name}" lacks the ${planeList(row.missing)}. Run: ${row.repair.command}`];
     });
-    return { data: rows, warnings: warnings.length ? warnings : undefined };
+    return { data: rows, text: contextsText(rows), warnings: warnings.length ? warnings : undefined };
   }
 };
 
@@ -139,7 +154,7 @@ function contextInUse(error: ContextInUseError, ctx: CommandContext): CliError {
 
 const contextAdd: ImmediateCommand<typeof ContextAddInput, ContextRow> = {
   name: 'context add',
-  summary: 'Add a backend context from its endpoints',
+  summary: 'Add a backend context',
   description:
     'Stores the backend under the name of its domain (api.example.com is "example.com"), or under --name. ' +
     'The auth, modules, agent and compute endpoints are derived from an api endpoint whose host starts with "api."; for any other host, give each with its flag. ' +
@@ -189,13 +204,13 @@ const contextAdd: ImmediateCommand<typeof ContextAddInput, ContextRow> = {
     }
     const row = contextRow(store, added.name, builder(ctx));
     const next = row.current ? nextFor(store, row, ctx) : [ctx.next(['context', 'use', row.name], 'Make it the active context')];
-    return { data: row, text: `Added the context "${row.name}" for ${row.apiEndpoint}.`, next };
+    return { data: row, text: `Added context ${row.name} (${row.apiEndpoint}).`, next };
   }
 };
 
 const contextUse: ImmediateCommand<typeof NAME_INPUT, ContextRow> = {
   name: 'context use',
-  summary: 'Make a backend context the active one',
+  summary: 'Switch the active context',
   effect: 'write',
   immediate: true,
   input: NAME_INPUT,
@@ -210,7 +225,7 @@ const contextUse: ImmediateCommand<typeof NAME_INPUT, ContextRow> = {
     const row = contextRow(store, name, builder(ctx));
     return {
       data: row,
-      text: row.complete ? `"${name}" is the active context.` : `"${name}" is the active context, but it lacks the ${planeList(row.missing)}.`,
+      text: row.complete ? `${name} is now the active context.` : `${name} is now the active context, but it lacks the ${planeList(row.missing)}.`,
       next: nextFor(store, row, ctx)
     };
   }
@@ -244,7 +259,7 @@ function agentsInContext(context: string, agents: string[], ctx: CommandContext)
 
 const contextRemove: ImmediateCommand<typeof NAME_INPUT, ContextRemoveData> = {
   name: 'context remove',
-  summary: 'Remove a backend context, after signing out of its stored session',
+  summary: 'Sign out of a context and remove it',
   description:
     'Signs out of the session stored under the context first, as logout does (its API key is revoked at the backend that issued it), then deletes the context and the session. ' +
     'While agents of the person are filed under the context, it removes nothing (context-in-use), and the steps remove each agent first.',

@@ -1,4 +1,5 @@
 import { type ChangeCommand, CliError, type CommandContext, ExitCode, type ImmediateCommand, type InputSchema, type NextStep, type Planned, type ReadCommand } from '@agentic-kit/command';
+import { alignColumns } from '@agentic-kit/harness';
 import {
   AgentError,
   type AgentInfo,
@@ -20,6 +21,7 @@ import {
   activeAccount,
   CLI_NAME,
   controlPlane,
+  dayOf,
   openPersonSession,
   PASSWORD_STDIN,
   passwordNeeds,
@@ -32,26 +34,30 @@ import {
   signInFailed
 } from '../session';
 
+/** What an agent may do, as the value of a `may` line. */
+export const mayWords = (schemaChanges: boolean): string =>
+  schemaChanges ? 'read and change the schema' : 'read the schema and the access; no schema changes';
+
+/** What an agent may do, in two or three words, for a one-line result. */
+const mayLabel = (schemaChanges: boolean): string => (schemaChanges ? 'may change the schema' : 'read only');
+
 /**
- * What an agent may do, as the grant reads: schema changes cover every change of the schema, deletes and access rules
+ * What a grant of schema changes lets the agent do. It covers every change of the schema, deletes and access rules
  * among them, so the person never approves less than the agent gets.
  */
-export const mayWords = (schemaChanges: boolean): string =>
-  schemaChanges
-    ? 'may read and change the schema: add, change and delete tables, fields and relations (a delete also deletes the data in it), and replace the rules of who may read and write each table'
-    : 'may read the schema and the access, and may not change the schema';
+export const SCHEMA_CHANGES_SCOPE = 'It can add, change and delete tables, fields, relations and rules. A delete loses data.';
 
 /** The flag that grants schema changes, in the words of the grant. */
-export const SCHEMA_CHANGES_FLAG = 'Let it change the schema: tables, fields and relations, deletes among them, and the rules of who may read and write each table';
-
-/** How the CLI uses an agent's key. */
-const KEY_USE = 'The CLI uses the key to get a short-lived token, keeps that token, and uses it again until it ends.';
+export const SCHEMA_CHANGES_FLAG = 'Let it change the schema: tables, fields, relations and rules, deletes among them';
 
 /** What holding an agent's key allows: the backend accepts the key itself on requests, as the agent. */
-const KEY_HOLDER = `Whoever holds the key can act as the agent until the key ends, the person renews it, or "${CLI_NAME} agent remove" deletes the agent.`;
+const KEY_HOLDER = 'Whoever holds the key acts as the agent until the key ends or the agent is removed.';
 
-/** The agent's key, as the backend treats it. */
-const AGENT_KEY_WORDS = `The agent has its own key, which lasts 30 days. ${KEY_USE} ${KEY_HOLDER}`;
+/** What a plan that makes a key for an agent needs from the person. */
+export const PASSWORD_WORDS = 'your password once (prompt, or --password-stdin)';
+
+/** Lines of `[key, value]` pairs, aligned, under a change line of a plan. */
+export const planPairs = (rows: string[][]): string[] => alignColumns(rows).map((line) => `    ${line}`);
 
 export type Owner = { userId: string; email?: string };
 
@@ -95,18 +101,11 @@ export function owner(session: Session): Owner {
   return account ? { userId: account.userId, ...(account.email ? { email: account.email } : {}) } : { userId: controlPlane(session).userId };
 }
 
-function infoText(info: AgentInfo, who: Owner): string {
-  if ('unreadable' in info) return `The agent "${info.name}" cannot be used: ${info.problem}`;
-  const scope = info.organization ? ` within the organization ${info.organization}` : '';
-  return `The agent "${info.name}" of ${ownerWords(who)}${scope} ${mayWords(info.schemaChanges)}. Its key lasts until ${info.keyExpiresAt}. ${KEY_USE} ${KEY_HOLDER}`;
-}
+const scopeWords = (organization: string | null | undefined): string => (organization ? `, organization ${organization}` : '');
 
 /** The person's password for a new key of an agent, which a fresh sign-in makes. */
 export const agentPassword = (ctx: CommandContext, stdin: boolean | undefined, command: string, who: Owner): Promise<string> =>
   readPassword(ctx, { stdin, command, prompt: `Password of ${ownerWords(who)}`, cause: "A key for the agent needs a fresh sign-in with the person's password." });
-
-/** The sentence of a plan that makes a key for an agent. */
-export const PASSWORD_LINE = 'It needs your password for a fresh sign-in, from a prompt on a terminal or from stdin with --password-stdin; the sign-in is ended when the key is made.';
 
 const agentName = z.string().describe('The name of the agent, as agent list shows it');
 
@@ -119,11 +118,11 @@ const AddInput = z.object({
 
 const agentAdd: ChangeCommand<typeof AddInput, unknown, Planned & { session: Session; who: Owner }> = {
   name: 'agent add',
-  summary: 'Add an agent of the signed-in person: its own credential, which may not change the schema unless allowed',
+  summary: 'Add an agent with its own key',
   description:
-    'Creates a principal of the person on the backend, held to --organization when one is given, without the person\'s admin flag, and stores its key beside the person\'s session. ' +
-    `${AGENT_KEY_WORDS} By default the agent may read the schema and the access, and may not change the schema. ` +
-    'A fresh sign-in makes the key, so it needs the person\'s password. Use the agent with --as <name>.',
+    'Creates a principal of yours on the backend (held to --organization when one is given, never an admin), with its own 30-day key stored beside your session. ' +
+    `By default it may read the schema and the access, and may not change the schema. ${KEY_HOLDER} ` +
+    'The key needs a fresh sign-in, so it asks for your password. Use the agent with --as <name>.',
   effect: 'write',
   input: AddInput,
   positionals: ['name'],
@@ -145,13 +144,19 @@ const agentAdd: ChangeCommand<typeof AddInput, unknown, Planned & { session: Ses
     }
     const who = owner(session);
     const schemaChanges = input.allow_schema_changes === true;
-    const scope = input.organization ? `, held to the organization ${input.organization}` : '';
+    const scope = input.organization ? ` (organization ${input.organization})` : '';
     return {
       plan: {
-        title: 'Add the agent?',
-        message:
-          `Add the agent "${input.name}" for ${ownerWords(who)}${scope}: a principal of the person on the backend, with its own key for 30 days stored beside the person's session, ` +
-          `which acts for them until it is removed or its key ends. ${KEY_HOLDER} It ${mayWords(schemaChanges)}. ${PASSWORD_LINE}`,
+        title: `Add agent ${input.name}`,
+        message: [
+          `+ agent ${input.name}${scope}`,
+          ...planPairs([
+            ['may', mayWords(schemaChanges)],
+            ['key', '30 days, in your store; whoever holds it acts as the agent'],
+            ['needs', PASSWORD_WORDS]
+          ]),
+          ...(schemaChanges ? [`! ${SCHEMA_CHANGES_SCOPE}`] : [])
+        ].join('\n'),
         target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) }
       },
       ...passwordNeeds(input.password_stdin),
@@ -176,7 +181,9 @@ const agentAdd: ChangeCommand<typeof AddInput, unknown, Planned & { session: Ses
     }
     return {
       data: { ...info, owner: who },
-      text: `Added the agent. ${infoText(info, who)}`,
+      text: 'unreadable' in info
+        ? `Added agent ${input.name}, but its entry cannot be read: ${info.problem}`
+        : `Added agent ${info.name} (${mayLabel(info.schemaChanges)}${scopeWords(info.organization)}). Key ends ${dayOf(info.keyExpiresAt)}.`,
       next: [
         ctx.next(['whoami', '--as', input.name], 'Check the agent: who it is, and what it may do'),
         ctx.next(['mcp', '--as', input.name], 'Serve the tools to an agent host as this agent')
@@ -187,14 +194,19 @@ const agentAdd: ChangeCommand<typeof AddInput, unknown, Planned & { session: Ses
 
 const agentList: ReadCommand<InputSchema, AgentInfo[]> = {
   name: 'agent list',
-  summary: 'List the agents of the person under the context, with what each may do and when its key ends',
+  summary: 'List your agents',
   effect: 'read',
   run(_input, ctx) {
     personOnly(ctx, 'agent list');
     const session = openPersonSession(ctx);
     const agents = listAgents({ store: session.store, ...(session.context ? { context: session.context } : {}) });
+    const rows = agents.map((info) =>
+      'unreadable' in info
+        ? [info.name, 'unusable', '', '']
+        : [info.name, info.state, info.schemaChanges ? 'yes' : 'no', dayOf(info.keyExpiresAt)]);
+    const problems = agents.flatMap((info) => ('unreadable' in info ? [`! ${info.name}: ${info.problem}`] : []));
     const text = agents.length
-      ? agents.map((info) => ('unreadable' in info ? `${info.name}  cannot be used: ${info.problem}` : `${info.name}  ${info.state}  ${mayWords(info.schemaChanges)}; key ends ${info.keyExpiresAt}`)).join('\n')
+      ? [...alignColumns([['NAME', 'STATE', 'SCHEMA CHANGES', 'KEY ENDS'], ...rows]), ...problems].join('\n')
       : 'No agents under this context.';
     return { data: agents, text, next: agents.length ? [] : [ctx.next(['agent', 'add', { placeholder: 'name' }], 'Add one')] };
   }
@@ -229,9 +241,10 @@ async function changeScope(session: Session, name: string, verb: 'grant' | 'revo
   } catch (error) {
     agentError(error, ctx);
   }
+  const changed = verb === 'grant' ? 'may now change the schema' : 'may no longer change the schema';
   return {
     data: info,
-    text: infoText(info, owner(session)),
+    text: 'unreadable' in info ? `${name}: ${info.problem}` : `${name} ${changed}.`,
     next: verb === 'grant' ? [ctx.next(['setup', 'agent', name], 'In the project of the agent: see which host entries can now serve the change tools')] : []
   };
 }
@@ -241,7 +254,7 @@ const GrantInput = scopeInput('grant');
 // A grant widens what the agent may do on the backend, so the person approves its plan.
 const agentGrant: ChangeCommand<typeof GrantInput, unknown, Planned & { session: Session }> = {
   name: 'agent grant',
-  summary: 'Let an agent change the schema, after its plan is approved',
+  summary: 'Let an agent change the schema',
   effect: 'write',
   input: GrantInput,
   positionals: ['name'],
@@ -252,13 +265,14 @@ const agentGrant: ChangeCommand<typeof GrantInput, unknown, Planned & { session:
     const session = openPersonSession(ctx);
     knownAgent(session, input.name, ctx);
     const plane = controlPlane(session);
-    const who = owner(session);
     return {
       plan: {
-        title: 'Let the agent change the schema?',
-        message:
-          `Let the agent "${input.name}" of ${ownerWords(who)} change the schema: after this it ${mayWords(true)}. ` +
-          `The backend applies it to every host that runs the agent with --as. An MCP entry with --read-only still serves only the tools that read, until that flag is taken out of it.`,
+        title: `Let agent ${input.name} change the schema`,
+        message: [
+          `~ ${input.name}  read only -> may change the schema`,
+          `! ${SCHEMA_CHANGES_SCOPE}`,
+          'Every host that runs it with --as gets this. An MCP entry with --read-only still only reads.'
+        ].join('\n'),
         target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) }
       },
       session
@@ -290,10 +304,10 @@ const RenewInput = z.object({ name: agentName, ...PASSWORD_STDIN });
 // A new key for the same principal: it widens nothing, but it revokes the old key and makes a secret, so the person approves it.
 const agentRenew: ChangeCommand<typeof RenewInput, unknown, Planned & { session: Session; who: Owner }> = {
   name: 'agent renew',
-  summary: 'Give an agent a new key that lasts 30 days, for the same principal, so it keeps what it may do',
+  summary: 'Give an agent a new 30-day key',
   description:
-    'Makes a new key for the agent\'s principal with a fresh sign-in of the person, stores it, and revokes the old key, which ends every access token minted with it. ' +
-    'Run it before or after the key ends; the agent keeps its name, its principal and its grants. It needs the person\'s password.',
+    'Makes a new key for the same principal with a fresh sign-in, and revokes the old key and every access token minted with it. ' +
+    'The agent keeps its name and its grants. Run it before or after the key ends. It asks for your password.',
   effect: 'write',
   input: RenewInput,
   positionals: ['name'],
@@ -312,13 +326,17 @@ const agentRenew: ChangeCommand<typeof RenewInput, unknown, Planned & { session:
       });
     }
     const who = owner(session);
-    const ends = known.state === 'set-up-again' ? `Its key ended ${known.keyExpiresAt}.` : `Its key ends ${known.keyExpiresAt}.`;
     return {
       plan: {
-        title: 'Renew the key of the agent?',
-        message:
-          `Give the agent "${input.name}" of ${ownerWords(who)} a new key that lasts 30 days, for the same principal, so it still ${mayWords(known.schemaChanges)}. ${ends} ` +
-          `The old key is revoked, which ends every access token minted with it. ${PASSWORD_LINE}`,
+        title: `Renew the key of agent ${input.name}`,
+        message: [
+          `~ ${input.name}  new 30-day key; the old key and its tokens end now`,
+          ...planPairs([
+            ['key', `the current one ${known.state === 'set-up-again' ? 'ended' : 'ends'} ${dayOf(known.keyExpiresAt)}`],
+            ['may', `${mayWords(known.schemaChanges)} (unchanged)`],
+            ['needs', PASSWORD_WORDS]
+          ])
+        ].join('\n'),
         target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) }
       },
       ...passwordNeeds(input.password_stdin),
@@ -337,7 +355,9 @@ const agentRenew: ChangeCommand<typeof RenewInput, unknown, Planned & { session:
     const warning = revocationWarning(renewal.previousKey, `the agent "${input.name}"`);
     return {
       data: { ...renewal, owner: who },
-      text: `Renewed the key of the agent. ${infoText(renewal.agent, who)}`,
+      text: 'unreadable' in renewal.agent
+        ? `Renewed the key of agent ${input.name}, but its entry cannot be read: ${renewal.agent.problem}`
+        : `Renewed the key of agent ${input.name}. It ends ${dayOf(renewal.agent.keyExpiresAt)}.`,
       ...(warning ? { warnings: [warning] } : {}),
       next: [ctx.next(['whoami', '--as', input.name], 'Check the agent with its new key')]
     };
@@ -345,16 +365,16 @@ const agentRenew: ChangeCommand<typeof RenewInput, unknown, Planned & { session:
 };
 
 const REMOVAL_TEXT: { [kind in AgentRemoval['kind']]: (name: string) => string } = {
-  removed: (name) => `Removed the agent "${name}": its principal is deleted, so its key and every access token of it have ended, and its entry is gone.`,
-  'already-gone': (name) => `The backend no longer had the agent "${name}", so only its entry was removed.`,
-  'entry-removed': (name) => `The entry of the agent "${name}" could not be read, so only the entry was removed; its principal may still exist on the backend.`
+  removed: (name) => `Removed agent ${name}. Its key and tokens have ended.`,
+  'already-gone': (name) => `The backend no longer had agent ${name}, so only its entry was removed.`,
+  'entry-removed': (name) => `The entry of agent ${name} could not be read, so only the entry was removed. Its principal may still exist on the backend.`
 };
 
 const RemoveInput = z.object({ name: agentName });
 
 const agentRemove: ChangeCommand<typeof RemoveInput, unknown, Planned & { session: Session }> = {
   name: 'agent remove',
-  summary: 'Remove an agent: its principal on the backend, which ends every credential of it, and its stored entry',
+  summary: 'Remove an agent and end its key',
   effect: 'destructive',
   input: RemoveInput,
   positionals: ['name'],
@@ -364,11 +384,10 @@ const agentRemove: ChangeCommand<typeof RemoveInput, unknown, Planned & { sessio
     const session = openPersonSession(ctx);
     const plane = controlPlane(session);
     knownAgent(session, input.name, ctx);
-    const who = owner(session);
     return {
       plan: {
-        title: 'Remove the agent?',
-        message: `Delete the agent "${input.name}" of ${ownerWords(who)}: its principal on the backend is deleted, which ends its key and every access token of it at once, and its stored entry is removed. A host that runs it with --as stops working.`,
+        title: `Remove agent ${input.name}`,
+        message: [`- agent ${input.name}  its key and tokens end now`, '! A host that runs it with --as stops working.'].join('\n'),
         target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) }
       },
       session

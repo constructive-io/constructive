@@ -44,7 +44,7 @@ describe('access types', () => {
     expect(json.data.types.map((type: { name: string }) => type.name)).toEqual(AuthzTypeZod.options);
 
     const lines = (await run(['access', 'types', '--format', 'text'])).out.split('\n');
-    expect(lines[0]).toMatch(/^type +onto an existing table +who it lets in$/);
+    expect(lines[0]).toMatch(/^TYPE +ONTO AN EXISTING TABLE +WHO IT LETS IN$/);
     expect(lines).toContainEqual(expect.stringMatching(/^AuthzAllowAll +yes +\S/));
     expect(lines).toContainEqual(expect.stringMatching(/^AuthzEntityMembership +yes, a Data node adds its columns +\S/));
     expect(lines).toContainEqual(expect.stringMatching(/^AuthzDatabaseClaim +no, add the columns it reads first +\S/));
@@ -65,7 +65,7 @@ describe('access types', () => {
   it.each([['access', 'add'], ['access', 'set'], ['table', 'add']])('says in the help of %s %s that access types lists the rule types', async (...argv) => {
     const { code, out } = await run([...argv, '--help']);
     expect(code).toBe(0);
-    expect(out).toContain('constructive access types lists the rule types');
+    expect(out).toContain('The rule types: constructive access types, and constructive access types <type> for one.');
   });
 });
 

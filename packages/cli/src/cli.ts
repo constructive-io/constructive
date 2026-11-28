@@ -49,8 +49,8 @@ const commandsWith = (tools: CommandDefinition[]): CommandDefinition[] => [
 export const commands = commandsWith(toolCommands);
 
 const GLOBALS = z.object({
-  context: z.string().optional().meta({ description: 'The backend context to use (default: the active one; see context list)', 'x-carry': true }),
-  as: z.string().optional().meta({ description: 'Run the command as this agent of the person (see agent list), with its own key; without it, a command acts as the person', 'x-carry': true })
+  context: z.string().optional().meta({ description: 'Backend context (default: the active one)', 'x-carry': true }),
+  as: z.string().optional().meta({ description: 'Act as this agent (see agent list)', 'x-carry': true })
 });
 
 export function createConstructiveCli(tools: CommandDefinition[] = toolCommands): Cli {
@@ -60,12 +60,12 @@ export function createConstructiveCli(tools: CommandDefinition[] = toolCommands)
   return createCli({
     name: CLI_NAME,
     version: getPackageJson(__dirname).version,
-    description: 'Use the Constructive platform from a terminal or an agent: sign in, create a database, and change its schema.',
+    description: 'Use Constructive from a terminal or an agent.',
     globals: GLOBALS,
     notes: [
       `Sign in first with "${CLI_NAME} login"; "${CLI_NAME} status" names whatever is still missing.`,
       `"${CLI_NAME} schema show" reads the tables of the database bound to the working directory.`,
-      'Every change has a plan: on exit 3 the plan, with what it acts on, where and as whom, is in error.details.plan. Show it to the person, and rerun with --yes once they approve.',
+      'Every change has a plan: on exit 3 the plan, with what it acts on, where and as whom, is in error.details.plan. Show it to the person, and once they approve, run the --approve <id> step in meta.next: it applies that plan and no other.',
       `These have no plan, so they change at once and refuse --dry-run: ${noPlan.join(', ')}. ` +
         "They change only the person's sign-in or stored contexts, or narrow what an agent may do; codegen takes its own flags and writes generated files; mcp starts a server, whose host asks the person before each change made through it.",
       `Without a terminal, every command prints one JSON envelope, but ${passthrough.join(', ')}, which take their own flags and print their own output; ` +

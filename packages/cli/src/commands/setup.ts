@@ -1,6 +1,6 @@
 import { type ChangeCommand, CliError, type CommandContext, ExitCode, type NextStep, type Planned } from '@agentic-kit/command';
 import { mergeEnv, readEnv } from '@agentic-kit/db-tools';
-import { listed } from '@agentic-kit/harness';
+import { alignColumns, listed } from '@agentic-kit/harness';
 import { type AgentDetails, type AgentInfo, checkAgentName, createAgent, grantSchemaChanges, listAgents, renewAgentKey } from '@agentic-kit/session';
 import { execFile } from 'child_process';
 import * as fs from 'fs';
@@ -11,14 +11,13 @@ import { z } from 'zod';
 
 import type { CliCode } from '../errors';
 import { checkWrites, writeFileReplacing, writtenFile } from '../project-files';
-import { AGENT_BINDING_KEY, boundAgent, type BoundValue, CLI_NAME, controlPlane, openPersonSession, PASSWORD_STDIN, passwordNeeds, personOnly, planAccount, type Session } from '../session';
-import { agentError, agentPassword, mayWords, type Owner, owner, ownerWords, PASSWORD_LINE, SCHEMA_CHANGES_FLAG } from './agents';
+import { AGENT_BINDING_KEY, boundAgent, type BoundValue, CLI_NAME, controlPlane, dayOf, openPersonSession, PASSWORD_STDIN, passwordNeeds, personOnly, planAccount, type Session } from '../session';
+import { agentError, agentPassword, type Owner, owner, PASSWORD_WORDS, SCHEMA_CHANGES_FLAG, SCHEMA_CHANGES_SCOPE } from './agents';
 
 const SERVER = 'constructive';
 
 /** What the person decides on: the agent's own credential is not a sandbox for a program that runs as them. */
-export const SHELL_LIMIT =
-  "The agent's credential limits what it does through Constructive's tools; it does not stop a program that runs as you, such as the agent's own shell commands, from using your sign-in.";
+export const SHELL_LIMIT = "The agent's limits cover Constructive's tools, not its own shell commands, which can use your sign-in.";
 
 /** How a project gets the Constructive skill: the skills CLI installs and updates it, not this one. */
 export const SKILLS: NextStep = {
@@ -77,14 +76,14 @@ const entryOf = (name: string, readOnly: boolean): Entry => ({ command: CLI_NAME
 /** Whether a host's entry keeps --read-only: always for an agent that may not change the schema, and for a host not known to ask before each write. */
 const readOnlyFor = (host: Host, schemaChanges: boolean): boolean => !schemaChanges || !HOST_SETUP[host].asksBeforeWrites;
 
-/** What a host's entry serves, in words, and why it keeps --read-only. */
-function servesWords(host: Host, schemaChanges: boolean): string {
+/** Why a host's entry keeps --read-only for an agent that may change the schema; undefined when it does not. */
+function readOnlyWarning(host: Host, schemaChanges: boolean): string | undefined {
   const { label, asksBeforeWrites } = HOST_SETUP[host];
-  if (!schemaChanges) return 'it serves only the tools that read (--read-only), since the agent may not change the schema';
-  if (asksBeforeWrites) return `it serves the tools that read and write, and ${label} asks the person before each write`;
-  return `it serves only the tools that read (--read-only), since ${CLI_NAME} cannot tell that ${label} asks the person before each write; ${WRITES_BY_HAND}`;
+  if (!schemaChanges || asksBeforeWrites) return undefined;
+  return `! ${label} keeps --read-only: ${CLI_NAME} cannot tell that it asks you before each write. ${WRITES_BY_HAND[0].toUpperCase()}${WRITES_BY_HAND.slice(1)}.`;
 }
-const entryWords = (entry: Entry): string => `command: ${entry.command}, args: [${entry.args.map((word) => JSON.stringify(word)).join(', ')}]`;
+
+const entryWords = (entry: Entry): string => [entry.command, ...entry.args].join(' ');
 
 /** A host file that holds only our server, which is also the block a person adds to a file that exists. */
 const configText = (format: 'json' | 'toml', entry: Entry): string =>
@@ -110,7 +109,7 @@ const READ_ONLY_CHANGE: { [change in 'add' | 'remove']: { plan: string; apply: s
   remove: { plan: 'take "--read-only" out of its args by hand', apply: 'Take "--read-only" out of its args by hand, then reload the host, so that it serves the tools that write' }
 };
 
-const differsInReadOnly = (file: string): string => `the "${SERVER}" server in ${file} differs from this entry only in --read-only`;
+const DIFFERS_IN_READ_ONLY = `its "${SERVER}" server differs from this entry only in --read-only`;
 
 function readText(file: string): string | undefined {
   try {
@@ -168,20 +167,19 @@ function planMcp(cwd: string, host: Host, name: string, readOnly: boolean, claud
   return { kind: 'print', file, block: configText(format, entry), why };
 }
 
-function mcpLine(host: Host, action: McpAction, entry: Entry, found: string[], schemaChanges: boolean): string {
-  const label = `${HOST_SETUP[host].label}${found.length ? ` (found ${found.join(', ')})` : ''}`;
-  const serves = servesWords(host, schemaChanges);
+/** A host's row of the plan, [mark, file, what], and the warning when its entry keeps --read-only for an agent that may write. */
+function mcpRow(action: McpAction, entry: Entry): string[] {
   switch (action.kind) {
   case 'create':
-    return `  ${label}: create ${action.file} with the "${SERVER}" server: ${entryWords(entry)}; ${serves}.`;
+    return ['+', action.file, entryWords(entry)];
   case 'keep':
-    return `  ${label}: keep ${action.file}, which has that "${SERVER}" server; ${serves}.`;
+    return ['=', action.file, entryWords(entry)];
   case 'host-command':
-    return `  ${label}: ${action.file} exists, so run "${action.argv.join(' ')}", which adds the server to it; ${serves}.`;
+    return ['+', action.file, `${entryWords(entry)}, added by "${action.argv.join(' ')}"`];
   case 'read-only-flag':
-    return `  ${label}: ${differsInReadOnly(action.file)}, and ${CLI_NAME} never edits a host's file, so the result says to ${READ_ONLY_CHANGE[action.change].plan}: ${entryWords(entry)}; ${serves}.`;
+    return ['!', action.file, `${DIFFERS_IN_READ_ONLY}. ${CLI_NAME} never edits a host's file, so the result says to ${READ_ONLY_CHANGE[action.change].plan}.`];
   case 'print':
-    return `  ${label}: ${action.why}, so the result gives the entry to add by hand: ${entryWords(entry)}; ${serves}.`;
+    return ['!', action.file, `${action.why}, so the result gives the entry to add by hand: ${entryWords(entry)}`];
   }
 }
 
@@ -216,17 +214,22 @@ interface SetupPlanned extends Planned {
   mcps: Array<{ host: Host; entry: Entry; action: McpAction }>;
 }
 
-function agentLine(name: string, agent: AgentPlan, schemaChanges: boolean, asked: boolean, who: Owner, bound: boolean): string {
-  if (agent.kind === 'add') {
-    return `  Agent: agent add ${name}${schemaChanges ? ' --allow-schema-changes' : ''}, an agent of ${ownerWords(who)}: it ${mayWords(schemaChanges)}. ${PASSWORD_LINE}`;
-  }
-  const found = bound ? ` (named in .env)` : '';
-  const parts = [
-    agent.renew ? `"${name}"${found} exists, but its key ended ${agent.info.keyExpiresAt} → renew its key (agent renew). ${PASSWORD_LINE}` : `keep "${name}"${found}, which exists.`,
-    agent.grant ? `It may not change the schema → will be allowed to (agent grant): after this it ${mayWords(true)}.` : `It ${mayWords(schemaChanges)}.`,
-    ...(schemaChanges && !asked ? [`It keeps schema changes; "${CLI_NAME} agent revoke ${name} --schema-changes" narrows it.`] : [])
-  ];
-  return `  Agent: ${parts.join(' ')}`;
+/** The agent's rows of the plan, [mark, item, what], then the lines that warn or explain. */
+function agentRows(name: string, agent: AgentPlan, schemaChanges: boolean, asked: boolean): { rows: string[][]; notes: string[] } {
+  const label = schemaChanges ? 'may change the schema' : 'read only';
+  if (agent.kind === 'add') return { rows: [['+', 'agent', `${name}  ${label}; needs ${PASSWORD_WORDS}`]], notes: schemaChanges ? [`! ${SCHEMA_CHANGES_SCOPE}`] : [] };
+  return {
+    rows: [
+      agent.renew
+        ? ['~', 'agent', `${name}  key ended ${dayOf(agent.info.keyExpiresAt)} -> new 30-day key; needs ${PASSWORD_WORDS}`]
+        : ['=', 'agent', `${name}  exists; ${agent.grant ? 'read only' : label}`],
+      ...(agent.grant ? [['~', 'agent', `${name}  read only -> may change the schema`]] : [])
+    ],
+    notes: [
+      ...(agent.grant ? [`! ${SCHEMA_CHANGES_SCOPE}`] : []),
+      ...(schemaChanges && !asked ? [`It keeps schema changes; "${CLI_NAME} agent revoke ${name} --schema-changes" narrows it.`] : [])
+    ]
+  };
 }
 
 /** Writes a new file, never one that exists (an exclusive create also refuses a link): false when the file is there by now. */
@@ -258,16 +261,15 @@ async function hostAdded(action: Extract<McpAction, { kind: 'host-command' }>, h
   return planMcp(ctx.cwd, host, name, readOnly, true).kind === 'keep' ? undefined : `${command} ran, but ${action.file} does not have the "${SERVER}" server afterwards, so the entry was not added.`;
 }
 
-/** What the plan does to the binding: write it, keep it, or replace the entry, which it shows only when that is an agent name. */
-function bindingLine(bound: BoundValue, name: string): string {
-  const rest = `${AGENT_BINDING_KEY}=${name} in .env, beside the database binding; commands still act as the person unless they say --as ${name}.`;
+/** What the plan does to the binding, as a row [mark, file, what]: write it, keep it, or replace the entry, which it shows only when that is an agent name. */
+function bindingRow(bound: BoundValue, name: string): string[] {
   switch (bound.status) {
   case 'absent':
-    return `  Binding: write ${rest}`;
+    return ['+', '.env', `${AGENT_BINDING_KEY}=${name}`];
   case 'invalid':
-    return `  Binding: replace the ${AGENT_BINDING_KEY} entry that is not a valid agent name with ${rest}`;
+    return ['~', '.env', `${AGENT_BINDING_KEY} (not a valid agent name) -> ${name}`];
   case 'valid':
-    return bound.value === name ? `  Binding: keep ${AGENT_BINDING_KEY}=${name} in .env.` : `  Binding: replace ${AGENT_BINDING_KEY}=${bound.value} with ${rest}`;
+    return bound.value === name ? ['=', '.env', `${AGENT_BINDING_KEY}=${name}`] : ['~', '.env', `${AGENT_BINDING_KEY}=${bound.value} -> ${name}`];
   }
 }
 
@@ -297,16 +299,14 @@ function agentNameOf(given: string | undefined, bound: BoundValue, ctx: CommandC
 export function setupCommands(): ChangeCommand<typeof SetupInput, unknown, SetupPlanned>[] {
   const setupAgent: ChangeCommand<typeof SetupInput, unknown, SetupPlanned> = {
     name: 'setup agent',
-    summary: 'Set this project up for an agent host: an agent of the person, its name in the project binding, and the MCP entry that runs the tools as that agent',
+    summary: 'Set up this project for an agent host',
     description:
-      'Adds the agent (it may not change the schema unless --allow-schema-changes, which also grants an agent that exists), or renews the key of one whose key ended; ' +
-      `records its name in the .env of the project (${AGENT_BINDING_KEY}), where status, whoami and a rerun find it; and gives each host it finds the MCP server ` +
-      `"${CLI_NAME} mcp --as <name>" (${HOSTS.map((host) => `${HOST_SETUP[host].label}: ${HOST_SETUP[host].mcpFile}`).join('; ')}). ` +
-      `The entry keeps --read-only unless the agent may change the schema and the host asks the person before each write, which only ${listed(HOSTS.filter((host) => HOST_SETUP[host].asksBeforeWrites).map((host) => HOST_SETUP[host].label))} is known to do; ` +
-      `for another host, ${WRITES_BY_HAND}. ` +
-      "It creates a host's file only where there is none, and never edits one that exists: for Claude Code it runs claude mcp add when claude is on the PATH, " +
-      'and otherwise the result gives the entry to add by hand. It installs no skill; the skills CLI does. No secret is written to the project. ' +
-      `Commands still act as the person unless they say --as <name>. ${SHELL_LIMIT}`,
+      'Adds the agent, or renews its key when the key ended; --allow-schema-changes also grants an agent that exists. ' +
+      `It writes the agent's name to .env (${AGENT_BINDING_KEY}) and gives each host it finds the MCP server "${CLI_NAME} mcp --as <name>" ` +
+      `(${HOSTS.map((host) => `${HOST_SETUP[host].label}: ${HOST_SETUP[host].mcpFile}`).join('; ')}). ` +
+      `The entry keeps --read-only unless the agent may change the schema and the host asks you before each write, which only ${listed(HOSTS.filter((host) => HOST_SETUP[host].asksBeforeWrites).map((host) => HOST_SETUP[host].label))} is known to do. ` +
+      "It creates a host's file only where there is none, and never edits one. It writes no secret to the project and installs no skill. " +
+      SHELL_LIMIT,
     effect: 'write',
     input: SetupInput,
     positionals: ['name'],
@@ -351,17 +351,18 @@ export function setupCommands(): ChangeCommand<typeof SetupInput, unknown, Setup
         const readOnly = readOnlyFor(host, schemaChanges);
         return { host, entry: entryOf(name, readOnly), action: planMcp(ctx.cwd, host, name, readOnly, claudeOnPath) };
       });
+      const forAgent = agentRows(name, agent, schemaChanges, asked);
       const lines = [
-        `Set this directory up for an agent host (${ctx.cwd}):`,
-        agentLine(name, agent, schemaChanges, asked, who, bound.status === 'valid' && bound.value === name),
-        bindingLine(bound, name),
-        ...mcps.map(({ host, entry, action }) => mcpLine(host, action, entry, HOST_SETUP[host].found.filter((file) => fs.existsSync(path.join(ctx.cwd, file))), schemaChanges)),
-        `  Skills: it installs no skill; "${SKILLS.command}" adds the Constructive skill to the host.`,
-        '  No secret is written: the entry and the binding name the agent, and the CLI reads its key from the store.',
-        `  ${SHELL_LIMIT}`
+        `directory: ${ctx.cwd}`,
+        ...alignColumns([...forAgent.rows, bindingRow(bound, name), ...mcps.map(({ entry, action }) => mcpRow(action, entry))]),
+        ...forAgent.notes,
+        ...mcps.map(({ host }) => readOnlyWarning(host, schemaChanges)).filter((warning): warning is string => warning !== undefined),
+        `No secret goes into the project. Commands still act as you unless they say --as ${name}.`,
+        `! ${SHELL_LIMIT}`
       ];
+      const labels = listed(hosts.map((host) => HOST_SETUP[host].label));
       return {
-        plan: { title: 'Set up the agent?', message: lines.join('\n'), target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) } },
+        plan: { title: `Set up this directory for ${labels}`, message: lines.join('\n'), target: { kind: 'account', apiEndpoint: plane.endpoint, account: planAccount(session) } },
         ...(makesKey(agent) ? passwordNeeds(input.password_stdin) : {}),
         session,
         who,
@@ -408,40 +409,42 @@ export function setupCommands(): ChangeCommand<typeof SetupInput, unknown, Setup
       const hostLines: string[] = [];
       const results: Array<{ host: Host; file: string; entry: Entry; action: McpAction['kind']; change?: 'add' | 'remove'; block?: string }> = [];
       for (const { host, entry, action } of mcps) {
-        const { label, pickUp } = HOST_SETUP[host];
-        const serves = servesWords(host, schemaChanges);
+        const { pickUp } = HOST_SETUP[host];
+        const warning = readOnlyWarning(host, schemaChanges);
+        const done = (line: string) => hostLines.push(line, ...(warning ? [warning] : []));
         if (action.kind === 'create' && createFile(path.join(ctx.cwd, action.file), action.content)) {
-          hostLines.push(`${label}: created ${action.file}; ${serves}. ${pickUp}`);
+          done(`+ ${action.file}  created. ${pickUp}`);
           results.push({ host, file: action.file, entry, action: action.kind });
         } else if (action.kind === 'keep') {
-          hostLines.push(`${label}: ${action.file} already has the entry; ${serves}. ${pickUp}`);
+          done(`= ${action.file}  has the entry already. ${pickUp}`);
           results.push({ host, file: action.file, entry, action: action.kind });
         } else if (action.kind === 'read-only-flag') {
           const block = configText(HOST_SETUP[host].format, entry);
-          hostLines.push(`${label}: ${differsInReadOnly(action.file)}. ${READ_ONLY_CHANGE[action.change].apply}; ${serves}:\n${block.trimEnd()}`);
+          done(`! ${action.file}: ${DIFFERS_IN_READ_ONLY}. ${READ_ONLY_CHANGE[action.change].apply}:\n${block.trimEnd()}`);
           results.push({ host, file: action.file, entry, action: action.kind, change: action.change, block });
         } else {
           const problem = action.kind === 'host-command' ? await hostAdded(action, host, name, readOnlyFor(host, schemaChanges), ctx) : undefined;
           if (action.kind === 'host-command' && problem === undefined) {
-            hostLines.push(`${label}: "${action.argv.join(' ')}" added the server to ${action.file}; ${serves}. ${pickUp}`);
+            done(`+ ${action.file}  added by "${action.argv.join(' ')}". ${pickUp}`);
             results.push({ host, file: action.file, entry, action: action.kind });
             continue;
           }
           const block = configText(HOST_SETUP[host].format, entry);
           if (action.kind === 'create') warnings.push(`${action.file} was created by another program while setup ran, so nothing was written to it.`);
           if (problem) warnings.push(problem);
-          hostLines.push(`${label}: add this "${SERVER}" server to ${action.file} by hand, then reload the host; ${serves}:\n${block.trimEnd()}`);
+          done(`! ${action.file}: add this "${SERVER}" server by hand, then reload the host:\n${block.trimEnd()}`);
           results.push({ host, file: action.file, entry, action: 'print', block });
         }
       }
       return {
         data: { agent: info, owner: who, binding: { file: '.env', key: AGENT_BINDING_KEY, name }, hosts: results },
         text: [
-          `The agent "${name}" of ${ownerWords(who)} ${mayWords(schemaChanges)}.`,
-          `The project binding names it (${AGENT_BINDING_KEY}=${name} in .env): status and whoami read it, and a command acts as the agent only with --as ${name}.`,
+          `Set up agent ${name} (${schemaChanges ? 'may change the schema' : 'read only'}) for this directory.`,
+          ...(schemaChanges ? [`! ${SCHEMA_CHANGES_SCOPE}`] : []),
+          `= .env  ${AGENT_BINDING_KEY}=${name}`,
           ...hostLines,
-          `Skills: setup installs no skill; run "${SKILLS.command}" to add the Constructive skill to the host.`,
-          SHELL_LIMIT
+          `Commands still act as you unless they say --as ${name}. Next, add the skill: ${SKILLS.command}`,
+          `! ${SHELL_LIMIT}`
         ].join('\n'),
         ...(warnings.length ? { warnings } : {}),
         next: [ctx.next(['whoami', '--as', name], 'Check the agent: who it is, and what it may do'), SKILLS]

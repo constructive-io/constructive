@@ -1,4 +1,5 @@
 import { CliError, type CommandContext, ExitCode, type ImmediateCommand, type InputSchema, type NextStep, type NextWord, type ReadCommand } from '@agentic-kit/command';
+import { alignColumns } from '@agentic-kit/harness';
 import {
   type AgentIdentity,
   type BackendConfig,
@@ -30,11 +31,13 @@ import {
   agentStep,
   boundAgent,
   CLI_NAME,
+  clockOf,
   configureTools,
   databaseNext,
   type DatabaseState,
   databaseState,
   databaseText,
+  dayOf,
   KEY_TEXT,
   NO_PROMPT_CAUSE,
   openCliStore,
@@ -53,6 +56,9 @@ import {
   signInSteps
 } from '../session';
 import { mayWords } from './agents';
+
+/** Key-value lines, the keys padded to the widest: the layout of whoami and status. */
+const pairs = (rows: string[][]): string => alignColumns(rows).join('\n');
 
 const LoginInput = z.object({
   email: z.string().describe('Email of the account'),
@@ -101,10 +107,8 @@ async function projectAgentOf(session: Session, cwd: string): Promise<ProjectAge
 
 const projectAgentLine = (agent: ProjectAgent): string =>
   'invalid' in agent
-    ? `The project's ${AGENT_BINDING_KEY} entry in .env is not a valid agent name, so it names no agent, and it is not shown; this run acts as the person. ` +
-      `Run "${CLI_NAME} setup agent <name>" to name the agent of this project again, or remove the line.`
-    : `This project is set up for the agent "${agent.name}" (${AGENT_BINDING_KEY} in .env), but this run acts as the person, with the person's rights. ` +
-      `Run ${CLI_NAME} commands with --as ${agent.name} to act as that agent.`;
+    ? `${AGENT_BINDING_KEY} in .env is not a valid agent name, so it is not shown; this run acts as you.`
+    : `${agent.name} is set up here (${AGENT_BINDING_KEY} in .env), but this run acts as you. Add --as ${agent.name} to act as it.`;
 
 const projectAgentStep = (ctx: CommandContext, command: string, agent: ProjectAgent): NextStep =>
   'invalid' in agent
@@ -114,22 +118,24 @@ const projectAgentStep = (ctx: CommandContext, command: string, agent: ProjectAg
 const agentOf = (session: Session): AgentView | undefined =>
   session.state.kind === 'signed-in' && session.state.source === 'agent' ? session.state.agent : undefined;
 
-/** Who the agent is, whose, what it may do, and when its key ends. */
-function agentLine(agent: AgentView, owner: { userId: string; email?: string }): string {
-  return `Acting as the agent "${agent.name}" of ${owner.email ?? `user ${owner.userId}`}: it ${mayWords(agent.schemaChanges)}. ` +
-    `Its access token ends ${agent.accessExpiresAt}, and its key, which mints the next one, ends ${agent.keyExpiresAt}; then the person renews it with "${CLI_NAME} agent renew ${agent.name}".`;
-}
+/** Who the agent is, whose, what it may do, and when its token and key end, as key-value rows. */
+const agentRows = (agent: AgentView, owner: { userId: string; email?: string }, check: string): string[][] => [
+  ['agent', `${agent.name}, for ${owner.email ?? `user ${owner.userId}`}`],
+  ['may', mayWords(agent.schemaChanges)],
+  ['token', `ends ${clockOf(agent.accessExpiresAt)}`],
+  ['key', `ends ${dayOf(agent.keyExpiresAt)}${check}`]
+];
 
 /** The warning that a key ends within a week: the person signs in again, or renews the agent's key. */
 function keyEndWarning(session: Session, account: ActiveAccount): string | undefined {
   const agent = agentOf(session);
   if (agent) {
     return keyEndsSoon({ expiresAt: agent.keyExpiresAt })
-      ? `The key of the agent "${agent.name}" ends ${agent.keyExpiresAt}: the person renews it with "${CLI_NAME} agent renew ${agent.name}".`
+      ? `The key of agent ${agent.name} ends ${dayOf(agent.keyExpiresAt)}. Renew it as yourself: ${CLI_NAME} agent renew ${agent.name}`
       : undefined;
   }
   return account.credential.source === 'session' && keyEndsSoon({ expiresAt: account.credential.expiresAt })
-    ? `Your key ends ${account.credential.expiresAt}: sign in again with "${CLI_NAME} login" before then.`
+    ? `Your key ends ${dayOf(account.credential.expiresAt)}. Sign in again before then: ${CLI_NAME} login`
     : undefined;
 }
 
@@ -217,31 +223,34 @@ async function loginTarget(input: LoginInput, ctx: CommandContext): Promise<Logi
 
 const targetLine = (target: LoginTarget): string => `Signing in to ${target.backend.apiEndpoint} (from ${target.from}).`;
 
-const CHECK_TEXT: Record<CredentialCheck['kind'], string> = {
-  accepted: 'The backend accepted it.',
-  rejected: 'The backend rejected it.',
-  unchecked: 'The backend could not check it.'
-};
-
-function whoamiText(data: WhoamiData): string {
-  const text = personOrAgentText(data);
-  return data.projectAgent ? `${text}\n${projectAgentLine(data.projectAgent)}` : text;
+/** What the backend said of the credential, after a comma; nothing when it accepted it, since that is the usual case. */
+function checkWords(check: CredentialCheck): string {
+  if (check.kind === 'accepted') return ', accepted';
+  return `, ${check.kind === 'rejected' ? 'rejected' : 'not checked'} (${check.reason})`;
 }
 
-function personOrAgentText(data: WhoamiData): string {
-  if (data.agent) {
-    const where = data.apiEndpoint ? ` On ${data.apiEndpoint}${data.context ? ` (context "${data.context}")` : ''}.` : '';
-    const reason = data.check.kind === 'accepted' ? '' : ` (${data.check.reason})`;
-    return `${agentLine(data.agent, data.account)}${where} ${CHECK_TEXT[data.check.kind]}${reason}`;
-  }
-  const who = data.account.email ?? `user ${data.account.userId}`;
-  const where = data.apiEndpoint ? ` on ${data.apiEndpoint}` : '';
-  const context = data.context ? ` (context "${data.context}")` : '';
-  const key = data.credential.kind === 'api-key' ? 'an API key' : 'an access token';
-  const expiry = data.credential.expiresAt ? ` that expires ${data.credential.expiresAt}` : '';
-  const source = data.credential.source === 'environment' ? ' from the environment' : '';
-  const reason = data.check.kind === 'accepted' ? '' : ` (${data.check.reason})`;
-  return `Signed in as ${who}${where}${context}, with ${key}${expiry}${source}. ${CHECK_TEXT[data.check.kind]}${reason}`;
+const backendWords = (apiEndpoint: string | null, context: string | null): string =>
+  apiEndpoint ? `${apiEndpoint}${context ? ` (context ${context})` : ''}` : 'none';
+
+function credentialWords(credential: WhoamiData['credential']): string {
+  const kind = credential.kind === 'api-key' ? 'API key' : 'access token';
+  const source = credential.source === 'environment' ? ' from the environment' : '';
+  return `${kind}${source}${credential.expiresAt ? `, ends ${dayOf(credential.expiresAt)}` : ''}`;
+}
+
+function whoamiText(data: WhoamiData): string {
+  const backend: string[] = ['backend', backendWords(data.apiEndpoint, data.context)];
+  const rows = data.agent
+    ? [...agentRows(data.agent, data.account, checkWords(data.check)), backend]
+    : [['account', data.account.email ?? `user ${data.account.userId}`], backend, ['key', `${credentialWords(data.credential)}${checkWords(data.check)}`]];
+  return pairs(data.projectAgent ? [...rows, ['agent', projectAgentLine(data.projectAgent)]] : rows);
+}
+
+/** The one line a sign-in prints: who, where, and when the key ends. */
+function loginText(data: WhoamiData): string {
+  const where = data.context ? ` (context ${data.context})` : data.apiEndpoint ? ` on ${data.apiEndpoint}` : '';
+  const ends = data.credential.expiresAt ? ` Key ends ${dayOf(data.credential.expiresAt)}.` : '';
+  return `Signed in as ${data.account.email ?? `user ${data.account.userId}`}${where}.${ends}`;
 }
 
 /** The context the resolved session belongs to: null for a backend the environment names. */
@@ -291,8 +300,8 @@ const login: ImmediateCommand<typeof LoginInput, WhoamiData> = {
   name: 'login',
   summary: 'Sign in with email and password',
   description:
-    'Signs in to a Constructive backend, makes an API key that lasts 30 days for every command, stores it in the shared Constructive stash, ends the password sign-in, and makes the backend the active context. ' +
-    'The password comes from a prompt on a terminal, or from stdin with --password-stdin; it is never a flag value. Sign in again before the key ends.',
+    'Signs in, makes an API key that lasts 30 days, stores it in your store, and makes the backend the active context. ' +
+    'The password comes from a prompt on a terminal, or from stdin with --password-stdin, never from a flag.',
   effect: 'write',
   immediate: true,
   input: LoginInput,
@@ -327,7 +336,7 @@ const login: ImmediateCommand<typeof LoginInput, WhoamiData> = {
     ].filter((warning): warning is string => !!warning);
     return {
       data,
-      text: whoamiText(data),
+      text: loginText(data),
       warnings: warnings.length ? warnings : undefined,
       next: [
         ctx.next(['db', 'create', placeholder('database_name')], 'Create a database for this directory'),
@@ -353,7 +362,7 @@ function agentsLeft(session: Session, context: string | null, ctx: CommandContex
   return {
     agents: agents.map((info) => ('unreadable' in info ? { name: info.name } : { name: info.name, keyExpiresAt: info.keyExpiresAt })),
     text: agents.map((info) =>
-      `The agent "${info.name}" stays live with its own key${'unreadable' in info ? '' : ` until ${info.keyExpiresAt}`}, unless it is removed: "${CLI_NAME} agent remove ${info.name}" ends it, after you sign in again.`),
+      `! Agent ${info.name} keeps its own key${'unreadable' in info ? '' : ` until ${dayOf(info.keyExpiresAt)}`}. To end it, sign in again and run: ${CLI_NAME} agent remove ${info.name}`),
     next: [
       ctx.next(['login', '--email', placeholder('email'), ...passwordWords(ctx.interactive)], 'Sign in again: removing an agent needs the person signed in'),
       ...agents.map((info) => ctx.next(['agent', 'remove', info.name], 'Then remove the agent, which ends its credential'))
@@ -363,10 +372,10 @@ function agentsLeft(session: Session, context: string | null, ctx: CommandContex
 
 const logout: ImmediateCommand<InputSchema, LogoutData> = {
   name: 'logout',
-  summary: 'Sign out: revoke the API key and remove the stored session',
+  summary: 'Sign out and revoke the key',
   description:
-    'Signs out of the session the command resolves (--context, else the active one): it revokes the API key at the backend that issued it, and removes the stored session in every case, ' +
-    'also when the key cannot be revoked; the result says what happened to the key. A session from the environment has nothing stored to remove.',
+    'Signs out of the session of --context, else of the active one: it revokes the API key, and removes the stored session even when the key cannot be revoked. ' +
+    'A session from the environment has nothing stored to remove.',
   effect: 'write',
   immediate: true,
   async run(_input, ctx) {
@@ -393,7 +402,7 @@ const logout: ImmediateCommand<InputSchema, LogoutData> = {
       const left = agentsLeft(session, result.context, ctx);
       return {
         data: { context: result.context, signedOut: true, key: result.key, ...(left.agents ? { agents: left.agents } : {}) },
-        text: [`Signed out of "${result.context}": the session was removed, and ${KEY_TEXT[result.key.kind]}.`, ...left.text].join('\n'),
+        text: [`Signed out of ${result.context}: the session is removed, and ${KEY_TEXT[result.key.kind]}.`, ...left.text].join('\n'),
         warnings: warning ? [warning] : undefined,
         next: left.next.length ? left.next : [ctx.next(['login', '--email', placeholder('email'), ...passwordWords(ctx.interactive)], 'Sign in again')]
       };
@@ -408,8 +417,8 @@ const logout: ImmediateCommand<InputSchema, LogoutData> = {
 
 const whoami: ReadCommand<InputSchema, WhoamiData> = {
   name: 'whoami',
-  summary: 'Show the signed-in account, and whether the backend accepts its credential',
-  description: 'Asks the backend once. Fails with signed-out or credential-rejected (exit 4) when no usable credential is stored. Never prints a token.',
+  summary: 'Show who is signed in',
+  description: 'Asks the backend once whether it accepts the credential. Fails with signed-out or credential-rejected (exit 4) when there is no usable credential. Never prints a token.',
   effect: 'read',
   async run(_input, ctx) {
     const { session, check } = await checkedCredential(ctx, await openSession(ctx));
@@ -451,14 +460,13 @@ async function serverVersion(apiEndpoint: string, signal: AbortSignal | undefine
   return { status: 'unknown', reason: 'bad-answer', url, detail: response.ok ? 'the body is not { name, version, commit }' : `HTTP ${response.status}` };
 }
 
-function serverLine(server: ServerVersion): string {
-  if (server.status === 'known') return `Server: ${server.name} ${server.version}, ${server.commit ? `commit ${server.commit}` : 'no commit recorded'}`;
-  const why = {
-    'no-version-route': `the server has no /version (${server.url}), so it is older than that route`,
-    unreachable: `no answer from ${server.url} within ${versionRequest.timeoutMs / 1000} s`,
-    'bad-answer': `${server.url} answered, but ${server.detail}`
+function serverWords(server: ServerVersion): string {
+  if (server.status === 'known') return `${server.name} ${server.version}${server.commit ? ` (commit ${server.commit})` : ''}`;
+  return {
+    'no-version-route': 'version unknown (no /version route)',
+    unreachable: `version unknown (no answer within ${versionRequest.timeoutMs / 1000} s)`,
+    'bad-answer': `version unknown (${server.detail})`
   }[server.reason];
-  return `Server: version unknown: ${why}.`;
 }
 
 export interface StatusData {
@@ -488,31 +496,35 @@ function statusNext(session: Session, data: StatusData): NextStep[] {
   return databaseNext(data.database, session);
 }
 
-function accountLine(data: StatusData): string {
-  if (data.problem) return `Account: ${data.problem}`;
-  if (data.agent && data.account) return `Account: ${agentLine(data.agent, data.account)}`;
-  if (!data.account) return 'Account: signed out.';
-  const source = data.credential.source === 'environment' ? ' from the environment' : '';
-  const check = data.check ? ` ${CHECK_TEXT[data.check.kind]}${data.check.kind === 'accepted' ? '' : ` (${data.check.reason})`}` : '';
-  return `Account: ${data.account.email ?? data.account.userId} (${data.credential.kind}${source}).${check}`;
+function accountRows(data: StatusData): string[][] {
+  const check = data.check ? checkWords(data.check) : '';
+  if (data.problem) return [['account', data.problem]];
+  if (data.agent && data.account) return agentRows(data.agent, data.account, check);
+  if (!data.account) return [['account', 'signed out']];
+  const source = data.credential.source === 'environment' ? ' (from the environment)' : '';
+  return [['account', `${data.account.email ?? data.account.userId}${source}${check}`]];
+}
+
+function backendRow(data: StatusData): string[] {
+  if (data.backend) {
+    return ['backend', `${backendWords(data.backend.apiEndpoint, data.context)}${data.backend.source === 'environment' ? ' (from CONSTRUCTIVE_API_ENDPOINT)' : ''}`];
+  }
+  return ['backend', data.missingPlanes ? `context ${data.context} lacks the ${planeList(data.missingPlanes)}` : 'none chosen'];
 }
 
 function statusText(data: StatusData): string {
-  const lines = [
-    data.backend
-      ? `Backend: ${data.backend.apiEndpoint}${data.context ? ` (context "${data.context}")` : ''}${data.backend.source === 'environment' ? ', from CONSTRUCTIVE_API_ENDPOINT' : ''}`
-      : data.missingPlanes ? `Backend: the context "${data.context}" lacks the ${planeList(data.missingPlanes)}.` : 'Backend: none chosen.',
-    ...(data.server ? [serverLine(data.server)] : []),
-    accountLine(data),
-    ...(data.projectAgent ? [`Agent: ${projectAgentLine(data.projectAgent)}`] : []),
-    `Database: ${databaseText(data.database)}`
-  ];
-  return lines.join('\n');
+  return pairs([
+    backendRow(data),
+    ...(data.server ? [['server', serverWords(data.server)]] : []),
+    ...accountRows(data),
+    ...(data.projectAgent ? [['agent', projectAgentLine(data.projectAgent)]] : []),
+    ['database', databaseText(data.database)]
+  ]);
 }
 
 const status: ReadCommand<InputSchema, StatusData> = {
   name: 'status',
-  summary: 'Show the backend, the account and the database of this directory',
+  summary: 'Show the backend, account and database',
   description:
     'Asks the backend once whether it accepts the credential, once about the bound database, and its server which version it runs (GET /version). ' +
     'Never fails for a missing piece: the data says what is missing, and next names the command for it. Never prints a token.',

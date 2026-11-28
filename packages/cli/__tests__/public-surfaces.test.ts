@@ -67,6 +67,12 @@ const ALLOWED: ReadonlyArray<{ what: string; surface: RegExp; text: RegExp; why:
     why: 'the file the agent CLI writes its db tools extension to; the name is of the tools, not of a repository'
   },
   {
+    what: 'the merkle store options of the graph module',
+    surface: /^packages\/node-type-registry\/(?:esm\/)?module-presets\/dependencies\.js$/,
+    text: /private_schema_name: 'compute_private'/,
+    why: 'a module option the provisioning input takes: the schema the graph module asks its merkle store to use'
+  },
+  {
     what: 'the refused-ticket pattern',
     surface: /\/provision-database\/provision\.js$/,
     text: /duplicate key value violates unique constraint/,

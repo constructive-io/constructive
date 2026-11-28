@@ -28,7 +28,7 @@
 - A tool command gets its input schema, its effect and its plan from the tool, and shows the tool's text as it is: tool text names no tool and no parameter, and the steps that follow come from its `calls`. A test checks that no tool name appears in help or the manifest.
 - `add_records` (`data add`) and `create_api_key` (`key create`) are not registered: they need an app-realm sign-in and a secret-delivery hook that only Desktop has.
 - A command acts as the person unless it says `--as <name>`; the project binding names the agent, and never makes a run act as it.
-- A command that changes anything is a `ChangeCommand`: `plan(input, ctx)` returns `{ plan, ...state }`, and `apply(input, planned, ctx)` makes exactly that change. The layer shows the plan, and calls `apply` only after `--yes` or a yes on a terminal; a run with no terminal stops with exit 3.
+- A command that changes anything is a `ChangeCommand`: `plan(input, ctx)` returns `{ plan, ...state }`, and `apply(input, planned, ctx)` makes exactly that change. The layer shows the plan, and calls `apply` only after `--approve <id>` (while the plan has that id), `--yes`, or a yes on a terminal; a run with no terminal stops with exit 3.
 - The only changes with no plan: `login`, `logout`, `agent revoke` and the `context` changes are `ImmediateCommand`s (`immediate: true` with `run`), which change the person's own sign-in or stored contexts, or narrow an agent; `mcp` serves on stdio; `codegen` is a passthrough command. The registry test in `__tests__/cli.test.ts` pins that list, so a new change without a plan fails it.
 - Never take a password or a token as a flag value, and never print one. Nothing secret is written to the project.
 

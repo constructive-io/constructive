@@ -32,8 +32,8 @@ function passthrough(name: string, summary: string, effect: Effect, load: () => 
 // A lazy require, not import(): the CJS build keeps import() as an ESM import, which cannot load these files.
 /* eslint-disable @typescript-eslint/no-require-imports */
 export const passthroughCommands = [
-  passthrough('server', 'Start a Constructive GraphQL server on a local Postgres', 'read', () => require('./server') as typeof import('./server')),
-  passthrough('explorer', 'Start the GraphiQL explorer on a local Postgres', 'read', () => require('./explorer') as typeof import('./explorer')),
-  passthrough('codegen', 'Generate TypeScript types and an SDK from a GraphQL schema', 'write', () => require('./codegen') as typeof import('./codegen'))
+  passthrough('server', 'Start a local GraphQL server', 'read', () => require('./server') as typeof import('./server')),
+  passthrough('explorer', 'Start the local GraphiQL explorer', 'read', () => require('./explorer') as typeof import('./explorer')),
+  passthrough('codegen', 'Generate types and an SDK', 'write', () => require('./codegen') as typeof import('./codegen'))
 ];
 /* eslint-enable @typescript-eslint/no-require-imports */

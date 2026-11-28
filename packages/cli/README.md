@@ -31,13 +31,13 @@ constructive access explain tasks
 constructive schema show
 ```
 
-A script or an agent runs the same path without a terminal. The password comes from stdin, and a database change needs `--yes` (or `-y`): without it the command stops with exit 3 and puts the plan in `error.details.plan`, so the agent can show it to the person first.
+A script or an agent runs the same path without a terminal. The password comes from stdin. A database change stops with exit 3, the plan in `error.details.plan` and its id in `error.details.planId`, so the agent can show the plan to the person first. Once they approve, the agent runs the next step, `--approve <id>`, which applies that plan and no other. A script that shows no plan to anyone gives `--yes` (or `-y`).
 
 ```bash
 printf %s "$PASSWORD" | constructive login --api-endpoint https://api.example.com/graphql --email you@example.com --password-stdin
-constructive db create my-app            # exit 3, the plan, and meta.next: "constructive db create my-app --yes"
-constructive db create my-app --yes      # provisioning can take a few minutes
-constructive table add tasks --field title:text:required --node DataDirectOwner --rule "$OWNER_ONLY_RULE" --yes
+constructive db create my-app                       # exit 3, the plan, and meta.next: "constructive db create my-app --approve <id>"
+constructive db create my-app --approve 4f1c2a9e0b7d  # applies that plan; provisioning can take a few minutes
+constructive table add tasks --field title:text:required --node DataDirectOwner --rule "$OWNER_ONLY_RULE" --yes  # a script: any plan
 constructive status                      # what is signed in, where, the server's version, and which database this directory uses
 ```
 
@@ -45,7 +45,7 @@ constructive status                      # what is signed in, where, the server'
 
 ## Commands
 
-Each command has one effect: `read` changes nothing, `write` changes something, and `destructive` can lose data. A change to a database (every `db`, `table`, `field`, `relation`, `blueprint`, `access`, `entity-type` and `template` change, `db use` and `api mutate`) shows its plan and needs `--yes`, or a yes on a terminal, and `--dry-run` shows the plan alone; so do `agent add`, `agent renew`, `agent grant`, `agent remove` and `setup agent`. `login`, `logout`, `agent revoke` and the `context` commands change at once: they change only the person's own sign-in or stored contexts, or narrow what an agent may do, so they have no plan and refuse `--dry-run`. `codegen` takes its own flags, and `mcp` starts at once too; the host asks the person before each change made through it. The command layer runs the approval of every other change, so none can skip it. `context remove` signs out of the context's stored session first, as `logout` does.
+Each command has one effect: `read` changes nothing, `write` changes something, and `destructive` can lose data. A change to a database (every `db`, `table`, `field`, `relation`, `blueprint`, `access`, `entity-type` and `template` change, `db use` and `api mutate`) shows its plan and needs `--approve <id>`, `--yes`, or a yes on a terminal, and `--dry-run` shows the plan alone; so do `agent add`, `agent renew`, `agent grant`, `agent remove` and `setup agent`. `login`, `logout`, `agent revoke` and the `context` commands change at once: they change only the person's own sign-in or stored contexts, or narrow what an agent may do, so they have no plan and refuse `--dry-run`. `codegen` takes its own flags, and `mcp` starts at once too; the host asks the person before each change made through it. The command layer runs the approval of every other change, so none can skip it. `context remove` signs out of the context's stored session first, as `logout` does.
 
 | Group | Read | Write | Destructive |
 | --- | --- | --- | --- |
@@ -70,7 +70,7 @@ The facts that belong to no one command are help topics, which the CLI prints an
 | Topic | What it covers |
 | --- | --- |
 | `constructive help output` | the text and the JSON envelope, `--fields`, `meta.next`, and prompts |
-| `constructive help approval` | plans, `--dry-run`, `--yes`, exit 3, and the commands that change at once |
+| `constructive help approval` | plans and their ids, `--dry-run`, `--approve`, `--yes`, exit 3, and the commands that change at once |
 | `constructive help exit-codes` | the exit codes, and what the code of each failure means |
 | `constructive help agents` | an agent's own key, `--as`, `setup agent` and the MCP server |
 | `constructive help rules` | the one shape of an access rule, and `access types` |

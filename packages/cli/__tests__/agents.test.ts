@@ -76,7 +76,7 @@ describe('agent add, renew, list, grant, revoke and remove', () => {
     const stopped = await run(['agent', 'add', 'helper']);
     expect(stopped.code).toBe(3);
     expect(stopped.json.error.details.plan).toMatchObject({
-      message: expect.stringMatching(/"helper" for owner@example\.com.*may read the schema and the access, and may not change the schema.*needs your password/),
+      message: expect.stringMatching(/^\+ agent helper\n.*may +read the schema and the access; no schema changes\n.*needs +your password once/s),
       target: { kind: 'account', account: { userId: 'person-1', email: 'owner@example.com' } }
     });
     expect(auth.ops()).toEqual([]);
@@ -140,7 +140,7 @@ describe('agent add, renew, list, grant, revoke and remove', () => {
     auth.calls.length = 0;
     const stopped = await run(['agent', 'renew', 'helper']);
     expect(stopped.code).toBe(3);
-    expect(stopped.json.error.details.plan.message).toMatch(/new key that lasts 30 days, for the same principal.*old key is revoked/);
+    expect(stopped.json.error.details.plan.message).toMatch(/^~ helper {2}new 30-day key; the old key and its tokens end now\n/);
     expect(auth.ops()).toEqual([]);
 
     const renewed = await withPassword(['agent', 'renew', 'helper']);
@@ -178,7 +178,7 @@ describe('agent add, renew, list, grant, revoke and remove', () => {
       (await withPassword(['setup', 'agent', 'builder', '--allow-schema-changes', '--format', 'text'])).out
     ];
     for (const words of approved) {
-      expect(words).toMatch(/delete tables, fields and relations \(a delete also deletes the data in it\), and replace the rules of who may read and write each table/);
+      expect(words).toContain('It can add, change and delete tables, fields, relations and rules. A delete loses data.');
       expect(words).not.toMatch(/build tables|touch the data/);
     }
   });
@@ -230,13 +230,17 @@ describe('agent add, renew, list, grant, revoke and remove', () => {
   });
 
   it('gives steps that run as given without a terminal: --password-stdin wherever the change makes a key', async () => {
+    const planId = (json: { data?: { planId?: string }; error?: { details?: { planId?: string } } }) => json.data?.planId ?? json.error?.details?.planId;
     const stopped = await run(['agent', 'add', 'helper']);
-    expect(steps(stopped.json)).toEqual([['agent', 'add', 'helper', '--password-stdin', '--yes']]);
-    expect(steps((await run(['agent', 'add', 'helper', '--dry-run'])).json)).toEqual([['agent', 'add', 'helper', '--password-stdin', '--yes']]);
+    expect(steps(stopped.json)).toEqual([['agent', 'add', 'helper', '--password-stdin', '--approve', planId(stopped.json)]]);
+    const dry = await run(['agent', 'add', 'helper', '--dry-run']);
+    expect(steps(dry.json)).toEqual([['agent', 'add', 'helper', '--password-stdin', '--approve', planId(dry.json)]]);
     expect((await run(stopped.json.meta.next[0].argv.slice(1), { stdin: auth.password })).code).toBe(0);
 
-    expect(steps((await run(['agent', 'renew', 'helper', '--dry-run'])).json)).toEqual([['agent', 'renew', 'helper', '--password-stdin', '--yes']]);
-    expect(steps((await run(['agent', 'renew', 'helper', '--password-stdin', '--dry-run'])).json)).toEqual([['agent', 'renew', 'helper', '--password-stdin', '--yes']]);
+    const renew = await run(['agent', 'renew', 'helper', '--dry-run']);
+    expect(steps(renew.json)).toEqual([['agent', 'renew', 'helper', '--password-stdin', '--approve', planId(renew.json)]]);
+    const piped = await run(['agent', 'renew', 'helper', '--password-stdin', '--dry-run']);
+    expect(steps(piped.json)).toEqual([['agent', 'renew', 'helper', '--password-stdin', '--approve', planId(piped.json)]]);
     const missing = await run(['agent', 'renew', 'helper', '--yes']);
     expect(missing.json.error.code).toBe('missing-input');
     expect(steps(missing.json)).toEqual([['agent', 'renew', 'helper', '--yes', '--password-stdin']]);
@@ -263,8 +267,8 @@ describe('agent add, renew, list, grant, revoke and remove', () => {
     expect(steps(json)).toEqual([['login', '--email', '<email>', '--password-stdin'], ['agent', 'remove', 'helper']]);
     expect(fs.existsSync(agentFile('helper'))).toBe(true);
     const text = await run(['logout', '--format', 'text']);
-    expect(text.out).toContain('The agent "helper" stays live with its own key until');
-    expect(text.out).toContain('"constructive agent remove helper" ends it');
+    expect(text.out).toContain('! Agent helper keeps its own key until');
+    expect(text.out).toContain('sign in again and run: constructive agent remove helper');
   });
 
   it.each([[['agent', 'add', 'helper']], [['agent', 'renew', 'helper']], [['agent', 'list']], [['login', '--email', 'owner@example.com']], [['logout']], [['context', 'list']]])(
@@ -293,8 +297,9 @@ describe('--as', () => {
     });
     expect(whoami.out).not.toMatch(SECRET);
     const text = await run(['whoami', '--as', 'helper', '--format', 'text']);
-    expect(text.out).toContain('Acting as the agent "helper" of owner@example.com');
-    expect(text.out).toContain('"constructive agent renew helper"');
+    expect(text.out).toMatch(/^agent +helper, for owner@example\.com$/m);
+    expect(text.out).toMatch(/^may +read the schema and the access; no schema changes$/m);
+    expect(text.out).toMatch(/^key +ends \d{4}-\d{2}-\d{2}, accepted$/m);
 
     const status = await run(['status', '--as', 'helper']);
     expect(status.json.data).toMatchObject({ agent: { name: 'helper' }, signedIn: true });
@@ -496,6 +501,14 @@ describe('--as', () => {
     expect(json.data.plan.target).toMatchObject({ kind: 'database', database: { name: 'demo', id: DEMO.id }, account: { userId: 'person-1', email: 'owner@example.com', agent: { name: 'helper', principalId } } });
   });
 
+  it('says that the agent may not change the schema when the backend refuses its change, and gives the person the grant', async () => {
+    auth.fail.other = { code: 'FORBIDDEN', message: 'Forbidden' };
+    const { code, json } = await run(['api', 'mutate', 'mutation { a }', '--as', 'helper', '--yes']);
+    expect(code).toBe(1);
+    expect(json.error).toMatchObject({ code: 'permission-denied', cause: 'The agent helper may not change the schema.' });
+    expect(json.meta.next[0].argv).toEqual(['constructive', 'agent', 'grant', 'helper', '--schema-changes']);
+  });
+
   it('names the agent in the account of a plan made under --as, as the tools do', async () => {
     const { principalId } = record('helper');
     const { code, json } = await run(['api', 'mutate', 'mutation { a }', '--as', 'helper', '--dry-run']);
@@ -523,7 +536,7 @@ describe('--as', () => {
   });
 });
 
-const SHELL_LIMIT = 'it does not stop a program that runs as you';
+const SHELL_LIMIT = 'not its own shell commands, which can use your sign-in';
 
 describe('setup agent', () => {
   const entry = (name: string, readOnly = true) => ({ command: 'constructive', args: ['mcp', '--as', name, ...(readOnly ? ['--read-only'] : [])] });
@@ -537,10 +550,11 @@ describe('setup agent', () => {
     const { code, json } = await run(['setup', 'agent', 'helper', '--dry-run']);
     expect(code).toBe(0);
     const plan = json.data.plan.message;
-    for (const words of ['agent add helper', 'create .mcp.json', 'create .cursor/mcp.json', '"mcp", "--as", "helper", "--read-only"', 'CONSTRUCTIVE_AGENT=helper in .env', 'npx skills add constructive-io/constructive-skills', SHELL_LIMIT]) {
-      expect(plan).toContain(words);
+    for (const pattern of [/^\+ +agent +helper {2}read only; needs your password once/m, /^\+ +\.mcp\.json +constructive mcp --as helper --read-only$/m, /^\+ +\.cursor\/mcp\.json +constructive mcp --as helper --read-only$/m, /^\+ +\.env +CONSTRUCTIVE_AGENT=helper$/m]) {
+      expect(plan).toMatch(pattern);
     }
-    expect(plan).toContain('Skills: it installs no skill');
+    expect(plan).toContain(SHELL_LIMIT);
+    expect(plan).not.toContain('skills add');
     expect(plan).not.toContain('none are installed');
     expect(plan).not.toContain('.codex');
     expect(plan).not.toMatch(SECRET);
@@ -595,7 +609,7 @@ describe('setup agent', () => {
     fs.writeFileSync(path.join(project, '.mcp.json'), '{"mcpServers": {}}\n');
     try {
       const dry = await run(['setup', 'agent', 'helper', '--dry-run'], { extraEnv: { PATH: bin } });
-      expect(dry.json.data.plan.message).toContain('run "claude mcp add --scope project constructive -- constructive mcp --as helper --read-only"');
+      expect(dry.json.data.plan.message).toContain('added by "claude mcp add --scope project constructive -- constructive mcp --as helper --read-only"');
       const done = await run(['setup', 'agent', 'helper', '--password-stdin', '--yes'], { stdin: auth.password, extraEnv: { PATH: bin } });
       expect(done.code).toBe(0);
       expect(fs.readFileSync(log, 'utf8').split('\n').filter(Boolean)).toEqual([
@@ -634,7 +648,7 @@ describe('setup agent', () => {
     expect(steps(status.json)).toContainEqual(['setup', 'agent', '<name>']);
     expect(status.out).not.toContain(shown);
     const text = await run(['status', '--format', 'text']);
-    expect(text.out).toContain('CONSTRUCTIVE_AGENT entry in .env is not a valid agent name');
+    expect(text.out).toContain('CONSTRUCTIVE_AGENT in .env is not a valid agent name');
     expect(text.out).not.toContain(shown);
     const stopped = await run(['setup', 'agent', '--dry-run']);
     expect(stopped.code).toBe(2);
@@ -642,7 +656,7 @@ describe('setup agent', () => {
     expect(stopped.out).not.toMatch(new RegExp(`${shown.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}|DEBUG`));
     const named = await run(['setup', 'agent', 'helper', '--dry-run']);
     expect(named.code).toBe(0);
-    expect(named.json.data.plan.message).toContain('replace the CONSTRUCTIVE_AGENT entry that is not a valid agent name with CONSTRUCTIVE_AGENT=helper');
+    expect(named.json.data.plan.message).toMatch(/^~ +\.env +CONSTRUCTIVE_AGENT \(not a valid agent name\) -> helper$/m);
     expect(named.json.data.plan.message).not.toContain(shown);
   });
 
@@ -668,8 +682,8 @@ describe('setup agent', () => {
     const sent = auth.ops().length;
     const dry = await run(['setup', 'agent', '--allow-schema-changes', '--dry-run']);
     const plan = dry.json.data.plan.message;
-    expect(plan).toContain('keep "helper" (named in .env)');
-    expect(plan).toContain('may not change the schema → will be allowed to (agent grant)');
+    expect(plan).toMatch(/^= +agent +helper {2}exists; read only$/m);
+    expect(plan).toMatch(/^~ +agent +helper {2}read only -> may change the schema$/m);
     expect(plan).toContain('take "--read-only" out of its entry\'s args by hand');
     const done = await run(['setup', 'agent', '--allow-schema-changes', '--yes']);
     expect(done.code).toBe(0);
@@ -684,9 +698,10 @@ describe('setup agent', () => {
   it('gives the step after --dry-run and exit 3 with --password-stdin only when the run makes a key, and the step runs as given', async () => {
     fs.mkdirSync(path.join(project, '.claude'));
     const dry = await run(['setup', 'agent', 'helper', '--host', 'claude', '--dry-run']);
-    expect(steps(dry.json)).toEqual([['setup', 'agent', 'helper', '--host', 'claude', '--password-stdin', '--yes']]);
+    expect(steps(dry.json)).toEqual([['setup', 'agent', 'helper', '--host', 'claude', '--password-stdin', '--approve', dry.json.data.planId]]);
     expect((await run(dry.json.meta.next[0].argv.slice(1), { stdin: auth.password })).code).toBe(0);
-    expect(steps((await run(['setup', 'agent'])).json)).toEqual([['setup', 'agent', '--yes']]);
+    const stopped = await run(['setup', 'agent']);
+    expect(steps(stopped.json)).toEqual([['setup', 'agent', '--approve', stopped.json.error.details.planId]]);
   });
 
   it('says on a rerun that the server in .mcp.json differs only in --read-only, and gives the change to make by hand, after a grant and after a revoke', async () => {
@@ -695,7 +710,7 @@ describe('setup agent', () => {
     const before = read('.mcp.json');
     expect((await run(['agent', 'grant', 'helper', '--schema-changes', '--yes'])).code).toBe(0);
     const plan = (await run(['setup', 'agent', '--dry-run'])).json.data.plan.message;
-    expect(plan).toContain('the "constructive" server in .mcp.json differs from this entry only in --read-only');
+    expect(plan).toContain('its "constructive" server differs from this entry only in --read-only');
     expect(plan).toContain('take "--read-only" out of its args by hand');
     expect(plan).not.toContain('another');
     const done = await run(['setup', 'agent', '--yes']);
@@ -716,7 +731,7 @@ describe('setup agent', () => {
     expect((await withPassword(['setup', 'agent', 'helper'])).code).toBe(0);
     endKey('helper');
     const dry = await run(['setup', 'agent', '--dry-run']);
-    expect(dry.json.data.plan.message).toContain('its key ended');
+    expect(dry.json.data.plan.message).toMatch(/^~ +agent +helper {2}key ended \d{4}-\d{2}-\d{2} -> new 30-day key/m);
     const sent = auth.ops().length;
     expect((await withPassword(['setup', 'agent'])).code).toBe(0);
     expect(auth.ops().slice(sent)).toEqual(['signIn', 'createApiKey', 'revokeApiKey', 'signOut']);
@@ -731,7 +746,7 @@ describe('setup agent', () => {
     expect(json.data.projectAgent).toEqual({ name: 'helper' });
     expect(steps(json)).toContainEqual(['status', '--as', 'helper']);
     const text = await run(['status', '--format', 'text']);
-    expect(text.out).toContain('This project is set up for the agent "helper" (CONSTRUCTIVE_AGENT in .env), but this run acts as the person, with the person\'s rights');
+    expect(text.out).toMatch(/^agent +helper is set up here \(CONSTRUCTIVE_AGENT in \.env\), but this run acts as you\. Add --as helper to act as it\.$/m);
     expect((await run(['status', '--as', 'helper'])).json.data.projectAgent).toBeUndefined();
   });
 
@@ -755,7 +770,7 @@ describe('setup agent', () => {
     const stdin = Object.assign(new PassThrough(), { isTTY: true });
     const stdout = Object.assign(new Writable({ write(chunk, _encoding, done) { out += chunk; done(); } }), { isTTY: true });
     const running = createConstructiveCli().run(['setup', 'agent', 'helper', '--host', 'claude'], { stdin, stdout, stderr: stdout, env: { ...env, CI: '' }, cwd: project });
-    for (let wait = 0; !out.includes('Set up the agent?') && wait < 200; wait += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+    for (let wait = 0; !out.includes('Set up this directory for') && wait < 200; wait += 1) await new Promise((resolve) => setTimeout(resolve, 10));
     fs.writeFileSync(path.join(project, '.mcp.json'), '{"mcpServers": {}}\n');
     stdin.write('y\n');
     expect(await running).toBe(1);

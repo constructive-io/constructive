@@ -86,7 +86,7 @@ function serverInstructions(readOnly: boolean, session: Session): string | undef
     session.agent === null
       ? []
       : [
-        `You act as ${agentWords(session)}, which ${mayWords(session.state.kind === 'signed-in' && session.state.source === 'agent' && session.state.agent.schemaChanges)}.`,
+        `You act as ${agentWords(session)}. It may ${mayWords(session.state.kind === 'signed-in' && session.state.source === 'agent' && session.state.agent.schemaChanges)}.`,
         `Run every \`${CLI_NAME}\` command in a shell with \`--as ${session.agent}\`: a command without it acts as the person, with the person's rights, not as this agent.`
       ];
   const words = [...who, ...(readOnly ? [changeWays(session)] : [])];
@@ -147,7 +147,7 @@ const AGENT_ENTRY = `{ "command": "${CLI_NAME}", "args": ["mcp", "--as", "<name>
 
 export const mcpCommand: ServeCommand<typeof McpInput> = {
   name: 'mcp',
-  summary: 'Serve the database tools to an agent host over MCP, on stdin and stdout',
+  summary: 'Serve the database tools over MCP',
   description:
     'Serves the tools behind the database commands (the same ones, under their tool names) to an agent host over the Model Context Protocol, on stdio, ' +
     'until the host closes stdin. With --as <name> it acts as that agent of the person: it serves the tools that write only when the agent may change the schema and --read-only is not given. ' +
