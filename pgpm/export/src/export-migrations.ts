@@ -7,6 +7,7 @@ import { getPgPool } from 'pg-cache';
 import { exportMeta } from './export-meta';
 import {
   buildMetaRevertScript,
+  databaseExportExtensions,
   DB_REQUIRED_EXTENSIONS,
   detectMissingModules,
   installMissingModules,
@@ -18,6 +19,8 @@ import {
   normalizeOutdir,
   preparePackage,
   SERVICE_REQUIRED_EXTENSIONS} from './export-utils';
+import type { SupabaseUsersTable } from './supabase-users-sync';
+import { addSupabaseUsersSync } from './supabase-users-sync';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
@@ -119,6 +122,22 @@ interface ExportOptions {
   partition?: PartitionConfig;
 }
 
+const writeDatabasePackage = (rows: PgpmRow[], opts: SqlWriteOptions, sync?: PgpmRow): void => {
+  writePgpmPlan(rows, opts);
+  if (!sync) {
+    writePgpmFiles(rows, opts);
+    return;
+  }
+
+  // The sync targets a renamed app table but must retain the host's auth.users.
+  writePgpmFiles(rows.filter(row => row !== sync), opts);
+  writePgpmFiles([{
+    ...sync,
+    deploy: opts.replacer(sync.deploy),
+    deps: sync.deps?.map(dep => opts.replacer(dep))
+  }], { ...opts, replacer: value => value ?? '' });
+};
+
 const exportMigrationsToDisk = async ({
   project,
   options,
@@ -189,7 +208,8 @@ const exportMigrationsToDisk = async ({
   // Category exclusion is applied here explicitly rather than via the
   // export.exclude_categories session GUC, which only affects the session
   // it was set on and therefore cannot be relied upon across connections.
-  const results = excludeCategories && excludeCategories.length > 0
+  const categoryFiltered = !!excludeCategories?.length;
+  const results = categoryFiltered
     ? await pgPool.query(
       `select * from db_migrate.sql_actions
          where database_id = $1
@@ -221,10 +241,33 @@ const exportMigrationsToDisk = async ({
 
   // Build description for the database extension package
   const dbExtensionDesc = extensionDesc || `${name} database schema for ${databaseName}`;
+  const declaredExtensions: string[] = db.rows[0].export_requires ?? [];
+  let supabaseUsers: SupabaseUsersTable | undefined;
+  if (appRows.length > 0 && declaredExtensions.includes('pgpm-supabase')) {
+    const { rows } = await pgPool.query<SupabaseUsersTable>(
+      `SELECT s.schema_name, t.name AS table_name
+      FROM metaschema_modules_public.users_module u
+      JOIN metaschema_public.table t ON t.id = u.table_id
+      JOIN metaschema_public.schema s ON s.id = t.schema_id
+      WHERE u.database_id = $1`,
+      [databaseId]
+    );
+    if (rows.length !== 1) {
+      throw new Error('Cannot export Supabase user sync: expected exactly one Constructive users table.');
+    }
+    [supabaseUsers] = rows;
+  }
 
   if (appRows.length > 0) {
+    const getExcludedRows = excludeCategories?.length
+      ? () => pgPool.query<PgpmRow>(
+        'SELECT deploy, content FROM db_migrate.sql_actions WHERE database_id = $1 AND category = ANY($2::text[])',
+        [databaseId, excludeCategories]
+      ).then(({ rows }) => rows)
+      : undefined;
+    const extensions = databaseExportExtensions(declaredExtensions);
     // Detect missing modules at workspace level and prompt user
-    const dbMissingResult = await detectMissingModules(project, [...DB_REQUIRED_EXTENSIONS], prompter, argv);
+    const dbMissingResult = await detectMissingModules(project, extensions, prompter, argv);
 
     let dbRows = appRows;
     if (granularity) {
@@ -239,6 +282,9 @@ const exportMigrationsToDisk = async ({
       // recursive deploys order them correctly.
       const { packages, warnings } = await partitionExportRows(dbRows, partition);
       warnings.forEach(warning => console.warn(`partition: ${warning}`));
+      const sync = supabaseUsers
+        ? await addSupabaseUsersSync(packages.map(pkg => pkg.rows), supabaseUsers, replacer, getExcludedRows)
+        : undefined;
 
       for (const pkg of packages) {
         const pkgDir = await preparePackage({
@@ -248,6 +294,7 @@ const exportMigrationsToDisk = async ({
           name: pkg.name,
           description: `${pkg.name} (partitioned from ${name})`,
           extensions: [...DB_REQUIRED_EXTENSIONS, ...pkg.requires],
+          declaredExtensions,
           prompter,
           repoName,
           username
@@ -256,10 +303,12 @@ const exportMigrationsToDisk = async ({
           await installMissingModules(pkgDir, dbMissingResult.missingModules);
         }
         const pkgOpts: SqlWriteOptions = { ...opts, name: pkg.name };
-        writePgpmPlan(pkg.rows, pkgOpts);
-        writePgpmFiles(pkg.rows, pkgOpts);
+        writeDatabasePackage(pkg.rows, pkgOpts, sync && pkg.rows.includes(sync) ? sync : undefined);
       }
     } else {
+      const sync = supabaseUsers
+        ? await addSupabaseUsersSync([dbRows], supabaseUsers, replacer, getExcludedRows)
+        : undefined;
       // Create/prepare the module directory
       const dbModuleDir = await preparePackage({
         project,
@@ -268,6 +317,7 @@ const exportMigrationsToDisk = async ({
         name,
         description: dbExtensionDesc,
         extensions: [...DB_REQUIRED_EXTENSIONS],
+        declaredExtensions,
         prompter,
         repoName,
         username
@@ -278,8 +328,7 @@ const exportMigrationsToDisk = async ({
         await installMissingModules(dbModuleDir, dbMissingResult.missingModules);
       }
 
-      writePgpmPlan(dbRows, opts);
-      writePgpmFiles(dbRows, opts);
+      writeDatabasePackage(dbRows, opts, sync);
     }
   } else {
     console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');

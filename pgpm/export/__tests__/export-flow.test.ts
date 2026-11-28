@@ -14,7 +14,8 @@
  */
 
 import { PgpmMigrate,PgpmPackage } from '@pgpmjs/core';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync,writeFileSync } from 'fs';
+import type { PartitionConfig } from '@pgpmjs/transform';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync,writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, relative } from 'path';
 import type { PgConfig } from 'pg-env';
@@ -71,6 +72,7 @@ const SCHEMA_SHIMS_SQL = `
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     owner_id uuid,
     name text,
+    export_requires text[] NOT NULL DEFAULT '{}',
     hash uuid
   );
 
@@ -97,6 +99,12 @@ const SCHEMA_SHIMS_SQL = `
     name text,
     type text,
     description text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.users_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    table_id uuid
   );
 
   -- routing_public tables
@@ -778,6 +786,8 @@ relocatable = false
     it('should have created the database export module directory', () => {
       const dbModuleDir = join(exportWorkspaceDir, 'packages', EXTENSION_NAME);
       expect(existsSync(dbModuleDir)).toBe(true);
+      expect(readFileSync(join(dbModuleDir, `${EXTENSION_NAME}.control`), 'utf-8'))
+        .not.toContain('pgpm-supabase');
     });
 
     it('should have created pgpm.plan for database export', () => {
@@ -1082,6 +1092,147 @@ relocatable = false
       );
       expect(planContent).toContain('schemas/pets_full_public/tables/pets/policies/pets_policy');
     }, 180000);
+
+    it('exports Supabase user sync only for the opted-in database', async () => {
+      const extensionName = 'pets-supabase';
+      const metaExtensionName = 'pets-supabase-svc';
+      const outdir = join(exportWorkspaceDir, 'packages');
+      scaffoldModule(extensionName, 'Exported database with an extension requirement');
+      scaffoldModule(metaExtensionName, 'Exported service metadata');
+      const controlPath = (name: string) => join(outdir, name, `${name}.control`);
+      appendFileSync(controlPath(extensionName), "requires = 'manual-dependency'\n");
+      const requirements = (name: string) => readFileSync(controlPath(name), 'utf-8')
+        .match(/^requires = '([^']+)'/m)?.[1].split(',');
+      const setRequirements = (requires: string[]) => pg.query(
+        `UPDATE metaschema_public.database SET export_requires = $2 WHERE id = $1`,
+        [DATABASE_ID, requires]
+      );
+      const usersDeploy = 'schemas/pets_public/tables/app_identities/table';
+      const primaryKeyDeploy = 'schemas/pets_public/tables/app_identities/constraints/app_identities_pkey/constraint';
+      const exportedPrimaryKey = primaryKeyDeploy.replace('pets_public', 'pets_supabase_public');
+      const syncDeploy = 'supabase/register_users';
+      const syncMigration = (kind: string) => readFileSync(join(outdir, extensionName, kind, `${syncDeploy}.sql`), 'utf-8');
+      const planPath = join(outdir, extensionName, 'pgpm.plan');
+      const syncFunction = 'supabase_integration.sync_users(';
+      const appAuthSchemaId = 'aaaa0003-0000-0000-0000-000000000099';
+      const usersTableId = 'a1b2c3d4-e5f6-4708-b250-000000000099';
+      try {
+        await pg.query(
+          "INSERT INTO metaschema_public.schema (id, database_id, name, schema_name) VALUES ($2, $1, 'login', 'auth')",
+          [DATABASE_ID, appAuthSchemaId]
+        );
+        const { rows } = await pg.query(
+          'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
+          [DATABASE_ID]
+        );
+        await pg.query(
+          `INSERT INTO metaschema_public.table (id, database_id, schema_id, name)
+           SELECT $2, $1, id, 'app_identities' FROM metaschema_public.schema
+           WHERE database_id = $1 AND schema_name = 'pets_public'`,
+          [DATABASE_ID, usersTableId]
+        );
+        await pg.query(
+          `INSERT INTO metaschema_modules_public.users_module (database_id, table_id) VALUES ($1, $2)`,
+          [DATABASE_ID, usersTableId]
+        );
+        await pg.query(
+          `INSERT INTO db_migrate.sql_actions (database_id, deploy, deps, content, revert, category)
+           VALUES ($1, $2, ARRAY['schemas/pets_public/schema'],
+                   'CREATE TABLE pets_public.app_identities (id uuid);',
+                   'DROP TABLE pets_public.app_identities;', 'ddl'),
+                  ($1, $3, ARRAY[$2],
+                   'ALTER TABLE pets_public.app_identities ADD CONSTRAINT app_identities_pkey PRIMARY KEY (id);',
+                   'ALTER TABLE pets_public.app_identities DROP CONSTRAINT app_identities_pkey;', 'ddl')`,
+          [DATABASE_ID, usersDeploy, primaryKeyDeploy]
+        );
+        const runExport = (extra: { partition?: PartitionConfig; excludeCategories?: string[] } = {}) => exportMigrations({
+          project: new PgpmPackage(exportWorkspaceDir),
+          options: { pg: dbConfig },
+          dbInfo: { dbname: dbConfig.database, databaseName: 'pets', database_ids: [DATABASE_ID] },
+          author: 'test <test@test.local>',
+          outdir,
+          schema_names: rows.map(row => row.schema_name),
+          extensionName,
+          metaExtensionName,
+          ...extra
+        });
+
+        await setRequirements(['pgpm-supabase']);
+        await runExport();
+        expect(requirements(extensionName)).toEqual(expect.arrayContaining(['pgpm-supabase', 'manual-dependency']));
+        expect(requirements(metaExtensionName)).not.toContain('pgpm-supabase');
+        const plan = readFileSync(planPath, 'utf-8');
+        expect(plan).toContain(`${exportedPrimaryKey} [${usersDeploy.replace('pets_public', 'pets_supabase_public')}]`);
+        expect(plan).toContain(`${syncDeploy} [${exportedPrimaryKey}]`);
+        expect(plan.indexOf(exportedPrimaryKey)).toBeLessThan(plan.indexOf(syncDeploy));
+        expect(syncMigration('deploy')).toContain(syncFunction);
+        expect(syncMigration('deploy')).toContain('"pets_supabase_public"."app_identities"');
+        expect(readFileSync(join(outdir, extensionName, 'deploy', `${exportedPrimaryKey}.sql`), 'utf-8'))
+          .not.toContain(syncFunction);
+        await pg.beforeEach();
+        try {
+          await pg.query(`
+            CREATE SCHEMA auth;
+            CREATE TABLE auth.users (id uuid PRIMARY KEY);
+            CREATE SCHEMA supabase_integration;
+            CREATE FUNCTION supabase_integration.tg_sync_users() RETURNS trigger
+              LANGUAGE plpgsql AS 'BEGIN RETURN NEW; END;';
+            CREATE TRIGGER supabase_sync_users AFTER INSERT ON auth.users
+              FOR EACH ROW EXECUTE FUNCTION supabase_integration.tg_sync_users('public.other_users');
+          `);
+          await pg.expectError(() => pg.query(syncMigration('verify')), /not installed for the exported users table/);
+          await pg.expectError(() => pg.query(syncMigration('deploy')), /already registered for another users table/);
+          await pg.query(syncMigration('revert'));
+          expect((await pg.query("SELECT tgname FROM pg_trigger WHERE tgrelid = 'auth.users'::regclass")).rows)
+            .toEqual([{ tgname: 'supabase_sync_users' }]);
+
+          await pg.query(`
+            CREATE OR REPLACE TRIGGER supabase_sync_users AFTER INSERT ON auth.users
+              FOR EACH ROW EXECUTE FUNCTION supabase_integration.tg_sync_users('pets_supabase_public.app_identities');
+          `);
+          await pg.query(syncMigration('verify'));
+          await pg.query(syncMigration('revert'));
+          await pg.expectError(() => pg.query(syncMigration('verify')), /not installed for the exported users table/);
+        } finally {
+          await pg.afterEach();
+        }
+        const metaDatabaseSql = join(outdir, metaExtensionName, 'deploy', 'migrate', 'database.sql');
+        expect(readFileSync(metaDatabaseSql, 'utf-8')).not.toContain('export_requires');
+
+        const partitionName = 'supabase-identities';
+        scaffoldModule(partitionName, 'Partition that owns the users table');
+        await runExport({ partition: { defaultPackage: extensionName, rules: [
+          { package: partitionName, select: [{ schema: 'pets_public' }] }
+        ] } });
+        const partitionDir = join(outdir, partitionName, 'deploy');
+        const partitionSql = getDirectoryStructure(partitionDir)
+          .filter(file => file.endsWith('.sql'))
+          .map(file => readFileSync(join(partitionDir, file), 'utf-8'));
+        expect(partitionSql.filter(sql => sql.includes(syncFunction))).toHaveLength(1);
+
+        rmSync(metaDatabaseSql);
+        await runExport({ excludeCategories: ['ddl'] });
+        expect(readFileSync(planPath, 'utf-8')).not.toContain(syncDeploy);
+        expect(existsSync(metaDatabaseSql)).toBe(true);
+
+        await setRequirements([]);
+        await runExport();
+        expect(requirements(extensionName)).not.toContain('pgpm-supabase');
+        expect(requirements(extensionName)).toContain('manual-dependency');
+        expect(readFileSync(planPath, 'utf-8')).not.toContain(syncDeploy);
+
+        await setRequirements(['pgpm-supabase']);
+        await pg.query('DELETE FROM db_migrate.sql_actions WHERE database_id = $1 AND deploy = $2', [DATABASE_ID, primaryKeyDeploy]);
+        await expect(runExport({ excludeCategories: ['meta_registration'] }))
+          .rejects.toThrow('Cannot export Supabase user sync: no primary key migration');
+      } finally {
+        await setRequirements([]);
+        await pg.query('DELETE FROM db_migrate.sql_actions WHERE database_id = $1 AND deploy = ANY($2)', [DATABASE_ID, [usersDeploy, primaryKeyDeploy]]);
+        await pg.query('DELETE FROM metaschema_modules_public.users_module WHERE table_id = $1', [usersTableId]);
+        await pg.query('DELETE FROM metaschema_public.table WHERE id = $1', [usersTableId]);
+        await pg.query('DELETE FROM metaschema_public.schema WHERE id = $1', [appAuthSchemaId]);
+      }
+    });
 
     it('hoists meta_registration registry fixtures into the service package', async () => {
       const PART_EXTENSION_NAME = 'pets-part';

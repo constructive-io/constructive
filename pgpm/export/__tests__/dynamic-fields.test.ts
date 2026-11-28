@@ -332,12 +332,11 @@ describe('typeOverrides should take precedence over introspected types', () => {
     const sites = META_TABLE_CONFIG.sites;
     expect(sites.columnDefaults).toBeDefined();
     expect(sites.columnDefaults!.dbname).toBe('current_database()');
+
+    expect(META_TABLE_CONFIG.database.columnDefaults?.export_requires).toBe("'{}'::text[]");
   });
 
   it('tables without columnDefaults should have no columnDefaults key', () => {
-    const database = META_TABLE_CONFIG.database;
-    expect(database.columnDefaults).toBeUndefined();
-
     const domains = META_TABLE_CONFIG.domains;
     expect(domains.columnDefaults).toBeUndefined();
   });
